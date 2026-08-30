@@ -117,9 +117,7 @@ const CAPABILITIES: CapabilityDef[] = [
 export function AluxTravelerPanel() {
   const { locale: activeLocale } = useTranslation();
   const rawLocale = (activeLocale ?? "es").toLowerCase().slice(0, 2);
-  const locale = (["es", "en", "fr", "de", "it", "pt"] as const).includes(
-    rawLocale as never,
-  )
+  const locale = (["es", "en", "fr", "de", "it", "pt"] as const).includes(rawLocale as never)
     ? (rawLocale as "es" | "en" | "fr" | "de" | "it" | "pt")
     : "es";
   // `narrate_plan` es capacidad de fondo (dock CV3.2); el panel expone el resto.
@@ -128,7 +126,12 @@ export function AluxTravelerPanel() {
     Partial<Record<PanelCapabilityId, AluxTravelerSuggestion>>
   >({});
   const [errors, setErrors] = useState<
-    Partial<Record<PanelCapabilityId, { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }>>
+    Partial<
+      Record<
+        PanelCapabilityId,
+        { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }
+      >
+    >
   >({});
 
   const fns = {
@@ -162,12 +165,13 @@ export function AluxTravelerPanel() {
     },
     onError: (e, id) => {
       const message = e instanceof Error ? e.message : String(e);
-      const kind: "rate_limited" | "credits_exhausted" | "error" =
-        /\b429\b|rate.?limit/i.test(message)
-          ? "rate_limited"
-          : /\b402\b|credit/i.test(message)
-            ? "credits_exhausted"
-            : "error";
+      const kind: "rate_limited" | "credits_exhausted" | "error" = /\b429\b|rate.?limit/i.test(
+        message,
+      )
+        ? "rate_limited"
+        : /\b402\b|credit/i.test(message)
+          ? "credits_exhausted"
+          : "error";
       setErrors((prev) => ({ ...prev, [id]: { kind, message } }));
       const title =
         kind === "credits_exhausted"
@@ -194,8 +198,8 @@ export function AluxTravelerPanel() {
         <div className="min-w-0">
           <h2 className="text-lg font-semibold">Alux · Copiloto de tu viaje</h2>
           <p className="text-xs text-muted-foreground">
-            Analiza tu Travel Workspace y sugiere. Nunca modifica ni envía nada
-            sin que tú lo confirmes.
+            Analiza tu Travel Workspace y sugiere. Nunca modifica ni envía nada sin que tú lo
+            confirmes.
           </p>
         </div>
       </header>
@@ -203,9 +207,9 @@ export function AluxTravelerPanel() {
       <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-foreground">
         <p className="font-medium">Ayúdame a asesorarte mejor</p>
         <p className="mt-1 text-muted-foreground">
-          Mientras más completo esté tu perfil (estilo, intereses, presupuesto, fechas) y más lo completes como perfil público,
-          más preciso puedo ser al recomendarte hoteles, restaurantes, experiencias y rutas del Oriente Maya.
-          {" "}
+          Mientras más completo esté tu perfil (estilo, intereses, presupuesto, fechas) y más lo
+          completes como perfil público, más preciso puedo ser al recomendarte hoteles,
+          restaurantes, experiencias y rutas del Oriente Maya.{" "}
           <a href="/cuenta/perfil" className="font-medium text-primary hover:underline">
             Completar perfil
           </a>
@@ -238,9 +242,7 @@ export function AluxTravelerPanel() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium">{c.label}</span>
-                <span className="block text-[11px] text-muted-foreground">
-                  {c.description}
-                </span>
+                <span className="block text-[11px] text-muted-foreground">{c.description}</span>
                 {hasResult ? (
                   <span className="mt-0.5 inline-block text-[10px] font-semibold uppercase tracking-wide text-primary">
                     · Sugerencia lista
@@ -280,9 +282,7 @@ export function AluxTravelerPanel() {
                   </div>
                 </header>
                 {err.kind === "error" && (
-                  <p className="mb-3 text-[11px] text-muted-foreground">
-                    {err.message}
-                  </p>
+                  <p className="mb-3 text-[11px] text-muted-foreground">{err.message}</p>
                 )}
                 <button
                   type="button"
@@ -298,13 +298,7 @@ export function AluxTravelerPanel() {
           }
           const res = results[c.id];
           if (!res) return null;
-          return (
-            <AluxSuggestionCard
-              key={c.id}
-              capabilityLabel={c.label}
-              suggestion={res}
-            />
-          );
+          return <AluxSuggestionCard key={c.id} capabilityLabel={c.label} suggestion={res} />;
         })}
         {mut.isPending ? (
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -315,8 +309,7 @@ export function AluxTravelerPanel() {
       </div>
 
       <p className="mt-4 text-[11px] italic text-muted-foreground">
-        Alux no reserva, no contacta empresas y no envía al Concierge. Todas las
-        acciones son tuyas.
+        Alux no reserva, no contacta empresas y no envía al Concierge. Todas las acciones son tuyas.
       </p>
     </section>
   );

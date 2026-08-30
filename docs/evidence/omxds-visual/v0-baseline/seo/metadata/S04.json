@@ -16,10 +16,5 @@
   "html_lang": "es",
   "h1": "Cenotes en Valladolid",
   "hreflang_count": 0,
-  "jsonld_types": [
-    "WebSite",
-    "Organization",
-    "BreadcrumbList",
-    "CollectionPage"
-  ]
+  "jsonld_types": ["WebSite", "Organization", "BreadcrumbList", "CollectionPage"]
 }

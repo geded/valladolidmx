@@ -47,10 +47,5 @@ export function InstitutionalBadgesBlock({ config }: InstitutionalBadgesBlockPro
 }
 
 export function InstitutionalBadgesPreview() {
-  return (
-    <InstitutionalBadges
-      dto={buildExperienceBadgesPreviewDTO()}
-      subjectSlug="valladolid"
-    />
-  );
+  return <InstitutionalBadges dto={buildExperienceBadgesPreviewDTO()} subjectSlug="valladolid" />;
 }

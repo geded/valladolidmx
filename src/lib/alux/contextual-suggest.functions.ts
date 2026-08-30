@@ -30,6 +30,8 @@
  *    alineado con el contrato Explainable-by-Default (Política 06).
  */
 import { createServerFn } from "@tanstack/react-start";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { z } from "zod";
 import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
@@ -142,7 +144,8 @@ const SuggestInput = z.object({
   locale: z.enum(["es", "en", "fr", "de", "it", "pt"]).optional(),
 });
 
-export type AluxSuggestKind = "business" | "product" | "event";
+/** G8-R1-D1 · el catálogo canónico incorpora lugares además de empresas. */
+export type AluxSuggestKind = "business" | "product" | "event" | "place";
 
 export interface AluxSuggestionCta {
   readonly label: string;
@@ -167,7 +170,21 @@ export interface AluxContextualSuggestion {
   /** A7 · Horarios reales. */
   readonly openState?: OpenNowState;
   readonly openLabel?: string;
+  /** G8-R1-D2 · identidad canónica tipada de la entidad sugerida. */
+  readonly entityId?: string;
+  readonly canonicalUrl?: string;
+  readonly family?: string | null;
+  /** G8-R1-D3 · acciones distintas: Guardar vs Agregar a Mi Viaje. */
+  readonly favoriteKind?: "business" | "product" | null;
+  readonly planKind?: "destination" | "business" | "product" | "event" | null;
+  /**
+   * G8-R1-E-R3 · Coordenadas ACREDITADAS del candidato (sede real o
+   * heredadas del operador con `source="product_operator"`). Nunca se
+   * inventan ni se derivan de centroides no almacenados.
+   */
+  readonly coords?: { lat: number; lng: number; source: string } | null;
 }
+
 
 export interface AluxActiveDestinationPromotion {
   readonly slug: string;
@@ -201,7 +218,15 @@ export interface AluxContextualSuggestResult {
    * sin romper las sugerencias (que siguen sirviéndose desde catálogo).
    */
   readonly aiStatus?: "ok" | "skipped" | "rate_limited" | "credits_exhausted" | "error";
+  /**
+   * G8-R1-D1 · Diagnóstico por familia del catálogo canónico consultado
+   * (auditoría; nunca se envía al modelo ni se muestra al viajero).
+   */
+  readonly catalogFamilies?: Readonly<
+    Record<string, { loaded: number; eligible: number; note: string }>
+  >;
 }
+
 
 const EMPTY: AluxContextualSuggestResult = {
   suggestions: [],
@@ -235,11 +260,9 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     }
 
     const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     // 1. Destino.
     const { data: dest, error: dErr } = await sb
@@ -251,6 +274,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     const destination = dest;
 
     // 2. Empresas publicadas del destino con su categoría primaria.
+    // G8-R1-F1I-R1 · DEF-F1I-001 — autoridad única de elegibilidad pública:
+    // sólo entran a Alux las empresas con revisión de fuente aprobada.
     const { data: biz, error: bErr } = await sb
       .from("businesses")
       .select(
@@ -259,6 +284,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       .eq("destination_id", dest.id)
       .eq("status", "published")
       .is("deleted_at", null)
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(60);
     if (bErr) return { ...EMPTY, reason: "No se pudieron cargar empresas del destino." };
@@ -271,17 +297,34 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       category_slug: string;
       category_name: string;
     };
-    const businesses: BizRow[] = (biz ?? []).map((row) => {
-      const cat = (row.business_categories as { slug?: unknown; name?: unknown } | null) ?? null;
-      return {
-        id: String(row.id),
-        slug: String(row.slug),
-        display_name: String(row.display_name),
-        tagline: (row.tagline as string | null) ?? null,
-        category_slug: typeof cat?.slug === "string" ? cat.slug : "",
-        category_name: typeof cat?.name === "string" ? cat.name : "",
-      };
-    });
+    const businesses: BizRow[] = (biz ?? [])
+      .map((row) => {
+        const cat = (row.business_categories as { slug?: unknown; name?: unknown } | null) ?? null;
+        return {
+          id: String(row.id),
+          slug: String(row.slug),
+          display_name: String(row.display_name),
+          tagline: (row.tagline as string | null) ?? null,
+          category_slug: typeof cat?.slug === "string" ? cat.slug : "",
+          category_name: typeof cat?.name === "string" ? cat.name : "",
+        };
+      })
+      // G8-R1-F1I-R1 · DEF-F1I-002 — Alux nunca construye rutas a mano: si el
+      // resolutor canónico no puede emitir URL, la ficha no se sugiere.
+      .filter((row) => canonicalBusinessUrl(row) !== null);
+
+    /** URL canónica de una empresa vía autoridad de navegación (nunca manual). */
+    function canonicalBusinessUrl(row: {
+      slug: string;
+      category_slug: string;
+    }): string | null {
+      return buildCanonicalEntityUrl({
+        entityType: "business",
+        slug: row.slug,
+        destinationSlug: destination.slug,
+        categorySlug: row.category_slug,
+      });
+    }
 
     // 2b. Promociones activas de negocios del destino (A6).
     const bizIdsInDest = businesses.map((b) => b.id);
@@ -311,8 +354,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         if (p.ends_at && p.ends_at < nowIso) continue;
         const biz = p.business_id ? bizById.get(p.business_id) : null;
         if (!biz) continue;
-        if (!promoByBizId.has(biz.id))
-          promoByBizId.set(biz.id, { slug: p.slug, title: p.title });
+        if (!promoByBizId.has(biz.id)) promoByBizId.set(biz.id, { slug: p.slug, title: p.title });
         items.push({
           slug: p.slug,
           title: p.title,
@@ -339,10 +381,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
 
     // 2c. Horarios reales (A7) — precomputa "abierto ahora" por negocio en TZ del destino.
     // Oriente Maya opera en America/Merida (UTC−6 sin DST).
-    const openByBizId = new Map<
-      string,
-      { state: OpenNowState; label: string }
-    >();
+    const openByBizId = new Map<string, { state: OpenNowState; label: string }>();
     if (bizIdsInDest.length) {
       const { data: hoursRows } = await sb
         .from("business_hours")
@@ -350,7 +389,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         .in("business_id", bizIdsInDest);
       const byBiz = new Map<
         string,
-        Array<{ day_of_week: number; opens_at: string | null; closes_at: string | null; is_closed: boolean | null }>
+        Array<{
+          day_of_week: number;
+          opens_at: string | null;
+          closes_at: string | null;
+          is_closed: boolean | null;
+        }>
       >();
       for (const r of (hoursRows ?? []) as Array<{
         business_id: string;
@@ -401,12 +445,29 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       push(otherCats);
     } else {
       // Sólo destino: mezclar categorías principales primero.
-      const buckets = { hoteles: [] as BizRow[], restaurantes: [] as BizRow[], experiencias: [] as BizRow[], otras: [] as BizRow[] };
+      const buckets = {
+        hoteles: [] as BizRow[],
+        restaurantes: [] as BizRow[],
+        experiencias: [] as BizRow[],
+        otras: [] as BizRow[],
+      };
       for (const b of businesses) buckets[bucketOf(b.category_slug)].push(b);
       // Round-robin liviano.
-      const rounds = Math.max(buckets.hoteles.length, buckets.restaurantes.length, buckets.experiencias.length, buckets.otras.length);
+      const rounds = Math.max(
+        buckets.hoteles.length,
+        buckets.restaurantes.length,
+        buckets.experiencias.length,
+        buckets.otras.length,
+      );
       for (let i = 0; i < rounds; i++) {
-        push([buckets.restaurantes[i], buckets.experiencias[i], buckets.hoteles[i], buckets.otras[i]].filter(Boolean) as BizRow[]);
+        push(
+          [
+            buckets.restaurantes[i],
+            buckets.experiencias[i],
+            buckets.hoteles[i],
+            buckets.otras[i],
+          ].filter(Boolean) as BizRow[],
+        );
       }
     }
 
@@ -447,9 +508,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     }
 
     function buildSuggestion(row: BizRow, rationale: string): AluxContextualSuggestion {
-      const href = `/oriente-maya/${destination.slug}/${row.category_slug || "empresas"}/${row.slug}`;
+      // DEF-F1I-002 · URL emitida por el resolutor canónico; las filas sin
+      // URL resoluble ya quedaron fuera del conjunto de candidatas.
+      const href = canonicalBusinessUrl(row) ?? "";
       const clean = rationale.trim().replace(/\s+/g, " ");
-      const safeRationale = clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
+      const safeRationale =
+        clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
       const hasActiveCoupon = activeCouponSlugSet.has(row.slug.toLowerCase());
       const promo = promoByBizId.get(row.id) ?? null;
       const open = openByBizId.get(row.id);
@@ -490,7 +554,14 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         activePromotionSlug: promo?.slug,
         openState: open?.state,
         openLabel: open?.label,
+        // G8-R1-D2/D3 · identidad canónica tipada + acciones distintas.
+        entityId: row.id,
+        canonicalUrl: href,
+        family: null,
+        favoriteKind: "business",
+        planKind: "business",
       };
+
     }
 
     // 4a. Enriquecimiento con Alux (Lovable AI Gateway).
@@ -505,9 +576,15 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
 
         const contextLine = [
           `Destino: ${destinationLabel}`,
-          currentCategorySlug ? `Categoría activa: ${data.category?.label ?? currentCategorySlug}` : null,
-          currentBusinessSlug ? `Empresa activa: ${data.business?.label ?? currentBusinessSlug}` : null,
-          currentProductSlug ? `Producto activo: ${data.product?.label ?? currentProductSlug}` : null,
+          currentCategorySlug
+            ? `Categoría activa: ${data.category?.label ?? currentCategorySlug}`
+            : null,
+          currentBusinessSlug
+            ? `Empresa activa: ${data.business?.label ?? currentBusinessSlug}`
+            : null,
+          currentProductSlug
+            ? `Producto activo: ${data.product?.label ?? currentProductSlug}`
+            : null,
         ]
           .filter(Boolean)
           .join(" · ");
@@ -520,8 +597,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
               hints.travel_style ? `estilo ${hints.travel_style}` : null,
               hints.budget_band ? `presupuesto ${hints.budget_band}` : null,
               hints.dietary?.length ? `dieta ${hints.dietary.join(", ")}` : null,
-              hints.accessibility?.length ? `accesibilidad ${hints.accessibility.join(", ")}` : null,
-              hints.interests?.length ? `intereses ${hints.interests.slice(0, 5).join(", ")}` : null,
+              hints.accessibility?.length
+                ? `accesibilidad ${hints.accessibility.join(", ")}`
+                : null,
+              hints.interests?.length
+                ? `intereses ${hints.interests.slice(0, 5).join(", ")}`
+                : null,
             ]
               .filter(Boolean)
               .join(" · ")
@@ -546,18 +627,24 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           return `Concierge humano activo · ${parts.join(" · ")}. Respeta ese trabajo: NO sugieras esos mismos negocios ni ofrezcas alternativas que los contradigan. Complementa alrededor (traslados, gastronomía cercana, actividades del día, opciones para acompañantes, plan B por clima).`;
         })();
 
-        const intentHintLine = data.travelIntent && data.travelIntent !== "explorando"
-          ? (() => {
-              const map: Record<string, string> = {
-                comparando_hoteles: "El viajero está comparando hoteles ahora — prioriza diferenciadores concretos (zona, ambiente, servicios) y evita generalidades.",
-                buscando_comida: "El viajero está buscando dónde comer — prioriza cocina, ambiente y si aplica horario de cocina.",
-                planeando_noche: "El viajero está planeando su noche — prioriza opciones abiertas después de las 18h y ambiente nocturno.",
-                cazando_cupones: "El viajero está atento a promociones — cuando un candidato tenga [Promo activa] o [Cupón del viajero], mencionalo con naturalidad.",
-                perdido: "El viajero lleva rato explorando sin decidir — sé más directo y ofrece un plan concreto, no una lista neutral.",
-              };
-              return `Intención detectada: ${map[data.travelIntent] ?? ""}`;
-            })()
-          : null;
+        const intentHintLine =
+          data.travelIntent && data.travelIntent !== "explorando"
+            ? (() => {
+                const map: Record<string, string> = {
+                  comparando_hoteles:
+                    "El viajero está comparando hoteles ahora — prioriza diferenciadores concretos (zona, ambiente, servicios) y evita generalidades.",
+                  buscando_comida:
+                    "El viajero está buscando dónde comer — prioriza cocina, ambiente y si aplica horario de cocina.",
+                  planeando_noche:
+                    "El viajero está planeando su noche — prioriza opciones abiertas después de las 18h y ambiente nocturno.",
+                  cazando_cupones:
+                    "El viajero está atento a promociones — cuando un candidato tenga [Promo activa] o [Cupón del viajero], mencionalo con naturalidad.",
+                  perdido:
+                    "El viajero lleva rato explorando sin decidir — sé más directo y ofrece un plan concreto, no una lista neutral.",
+                };
+                return `Intención detectada: ${map[data.travelIntent] ?? ""}`;
+              })()
+            : null;
 
         // A15 · Plan del viajero — memoria de lo que ya decidió.
         const planLine = (() => {
@@ -675,7 +762,10 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         else if (/\b402\b|credit/i.test(message)) aiStatus = "credits_exhausted";
         else aiStatus = "error";
         if (!NoObjectGeneratedError.isInstance(error)) {
-          console.warn("[alux.contextual-suggest] AI enrichment failed, using deterministic fallback:", error);
+          console.warn(
+            "[alux.contextual-suggest] AI enrichment failed, using deterministic fallback:",
+            error,
+          );
         }
         aiRationales = null;
       }
@@ -686,6 +776,66 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       return buildSuggestion(row, aiRationale ?? deterministicRationale(row));
     });
     const rationaleSource: "ai" | "deterministic" = aiRationales ? "ai" : "deterministic";
+
+    // ── G8-R1-D1 · Catálogo canónico completo (lugares, productos, eventos).
+    // Se anexa DESPUÉS del ranking de empresas y con rationale determinístico
+    // y explicable: Alux nunca redacta sobre entidades que no leyó.
+    const businessIndex = new Map(
+      businesses.map(
+        (b) => [b.id, { slug: b.slug, categorySlug: b.category_slug, name: b.display_name }] as const,
+      ),
+    );
+    let catalogFamilies: AluxContextualSuggestResult["catalogFamilies"];
+    try {
+      const { loadAluxCanonicalCandidates } = await import("./canonical-catalog.server");
+      const catalog = await loadAluxCanonicalCandidates(sb, {
+        destinationId: destination.id,
+        destinationSlug: destination.slug,
+        publishedBusinessIds: bizIdsInDest,
+        businessIndex,
+        limitPerFamily: 8,
+      });
+      catalogFamilies = catalog.familyReport;
+
+      const already = new Set(suggestions.map((s) => `${s.source.table}:${s.source.id}`));
+      // Cupo acotado por familia para no desplazar a las empresas del destino.
+      const perKind: Record<string, number> = { place: 2, product: 2, event: 2 };
+      for (const c of catalog.candidates) {
+        const key = `${c.source.table}:${c.source.id}`;
+        if (already.has(key)) continue;
+        if ((perKind[c.entityKind] ?? 0) <= 0) continue;
+        if (c.slug === currentProductSlug) continue;
+        perKind[c.entityKind] -= 1;
+        already.add(key);
+        suggestions.push({
+          kind: c.entityKind === "destination" ? "business" : c.entityKind,
+          slug: c.slug,
+          label: c.label,
+          href: c.canonicalUrl,
+          rationale:
+            c.entityKind === "place"
+              ? `Lugar publicado en ${destinationLabel}${c.categoryName ? ` · ${c.categoryName}` : ""}.`
+              : c.entityKind === "event"
+                ? `Evento vigente en ${destinationLabel}.`
+                : `Experiencia publicada en ${destinationLabel}.`,
+          categorySlug: c.categorySlug ?? undefined,
+          categoryName: c.categoryName ?? undefined,
+          source: c.source,
+          ctas: [{ kind: "view", label: "Ver ficha", href: c.canonicalUrl }],
+          entityId: c.entityId,
+          canonicalUrl: c.canonicalUrl,
+          family: c.family,
+          favoriteKind: c.favoriteKind,
+          planKind: c.planKind,
+          coords: c.coords
+            ? { lat: c.coords.lat, lng: c.coords.lng, source: c.coords.source }
+            : null,
+        });
+      }
+    } catch (error) {
+      console.warn("[alux.contextual-suggest] catálogo canónico no disponible:", error);
+    }
+
 
     return {
       suggestions,
@@ -706,5 +856,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           : `Aún no hay más publicaciones en ${destinationLabel} para sugerir.`,
       rationaleSource,
       aiStatus,
+      catalogFamilies,
     };
+
   });

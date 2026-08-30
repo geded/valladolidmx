@@ -12,20 +12,13 @@
  * vía has_business_access (Plan 14.30 §5.3).
  */
 import { useEffect, useMemo, useState } from "react";
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
-import {
-  listMyBusinesses,
-  type PortalBusinessSummary,
-} from "@/lib/portal/portal-reads.functions";
+import { listMyBusinesses, type PortalBusinessSummary } from "@/lib/portal/portal-reads.functions";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -38,16 +31,18 @@ function PortalLayout() {
   const fetchBusinesses = useServerFn(listMyBusinesses);
   const queryClient = useQueryClient();
 
-  const { data: businesses = [], isLoading, error } = useQuery({
+  const {
+    data: businesses = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["portal", "my-businesses", user?.id],
     queryFn: () => fetchBusinesses(),
     enabled: Boolean(user?.id),
     staleTime: 60_000,
   });
 
-  const [activeBusinessId, setActiveBusinessIdState] = useState<string | null>(
-    null,
-  );
+  const [activeBusinessId, setActiveBusinessIdState] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -58,9 +53,7 @@ function PortalLayout() {
   // Reconciliar: si la empresa activa no está en la lista, elegir la primera.
   useEffect(() => {
     if (!businesses.length) return;
-    const stillAccessible = businesses.some(
-      (b) => b.business_id === activeBusinessId,
-    );
+    const stillAccessible = businesses.some((b) => b.business_id === activeBusinessId);
     if (!stillAccessible) {
       const next = businesses[0].business_id;
       setActiveBusinessIdState(next);
@@ -75,14 +68,11 @@ function PortalLayout() {
     setActiveBusinessIdState(id);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, id);
-      window.dispatchEvent(
-        new CustomEvent("portal:active-business-changed", { detail: id }),
-      );
+      window.dispatchEvent(new CustomEvent("portal:active-business-changed", { detail: id }));
     }
     if (previous && previous !== id) {
       queryClient.removeQueries({
-        predicate: (q) =>
-          Array.isArray(q.queryKey) && q.queryKey.includes(previous),
+        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey.includes(previous),
       });
     }
   };
@@ -145,8 +135,8 @@ function PortalBusinessSwitcher({
   onChange: (id: string) => void;
 }) {
   const { roles } = useAuth();
-  const canCreateBusiness = roles.some((r) =>
-    r === "admin" || r === "super_admin" || r === "editor",
+  const canCreateBusiness = roles.some(
+    (r) => r === "admin" || r === "super_admin" || r === "editor",
   );
   return (
     <div className="mb-6 flex flex-col gap-2 rounded-lg border border-border bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -173,10 +163,8 @@ function PortalBusinessSwitcher({
       <div className="flex flex-col gap-2 sm:items-end">
         {activeBusiness && (
           <p className="text-[11px] text-muted-foreground sm:text-right">
-            Tu rol:{" "}
-            <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
-            {" · "}Estado:{" "}
-            <span className="font-semibold">{activeBusiness.status}</span>
+            Tu rol: <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
+            {" · "}Estado: <span className="font-semibold">{activeBusiness.status}</span>
           </p>
         )}
         {canCreateBusiness ? (

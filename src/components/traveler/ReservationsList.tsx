@@ -14,18 +14,8 @@ import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Building2,
-  MapPin,
-  ShoppingBag,
-  Ticket,
-  ReceiptText,
-  ArrowRight,
-} from "lucide-react";
-import {
-  getConciergeOrder,
-  type ConciergeOrderItemView,
-} from "@/lib/concierge/orders.functions";
+import { Building2, MapPin, ShoppingBag, Ticket, ReceiptText, ArrowRight } from "lucide-react";
+import { getConciergeOrder, type ConciergeOrderItemView } from "@/lib/concierge/orders.functions";
 
 interface Props {
   orderId: string;
@@ -69,10 +59,7 @@ export function ReservationsList({ orderId, folio }: Props) {
     staleTime: 60_000,
   });
 
-  const items: ConciergeOrderItemView[] = useMemo(
-    () => q.data?.items ?? [],
-    [q.data],
-  );
+  const items: ConciergeOrderItemView[] = useMemo(() => q.data?.items ?? [], [q.data]);
 
   if (q.isLoading) {
     return (
@@ -85,12 +72,9 @@ export function ReservationsList({ orderId, folio }: Props) {
   if (q.error) {
     return (
       <section className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
-        <h3 className="font-serif text-base text-foreground">
-          No pudimos cargar tus reservas
-        </h3>
+        <h3 className="font-serif text-base text-foreground">No pudimos cargar tus reservas</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Vuelve a intentarlo en unos segundos o contáctanos si el problema
-          persiste.
+          Vuelve a intentarlo en unos segundos o contáctanos si el problema persiste.
         </p>
       </section>
     );
@@ -104,8 +88,8 @@ export function ReservationsList({ orderId, folio }: Props) {
           Tu folio {folio} está confirmado
         </h3>
         <p className="mx-auto mt-1 max-w-lg text-sm text-muted-foreground">
-          Aún no hay líneas detalladas en esta orden. Tu Concierge te
-          notificará cuando cada reserva quede confirmada con el proveedor.
+          Aún no hay líneas detalladas en esta orden. Tu Concierge te notificará cuando cada reserva
+          quede confirmada con el proveedor.
         </p>
       </section>
     );
@@ -117,9 +101,7 @@ export function ReservationsList({ orderId, folio }: Props) {
     <section className="space-y-4">
       <header className="flex items-baseline justify-between gap-4">
         <div>
-          <h2 className="font-serif text-lg text-foreground">
-            Tus reservas confirmadas
-          </h2>
+          <h2 className="font-serif text-lg text-foreground">Tus reservas confirmadas</h2>
           <p className="text-[13px] text-muted-foreground">
             Folio {folio} · {items.length} reservación
             {items.length === 1 ? "" : "es"}

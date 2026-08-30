@@ -12,7 +12,9 @@ export interface SendTransactionalEmailInput {
 }
 
 export async function sendTransactionalEmail(input: SendTransactionalEmailInput) {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw new Error("no_session");
   const res = await fetch("/lovable/email/transactional/send", {
     method: "POST",

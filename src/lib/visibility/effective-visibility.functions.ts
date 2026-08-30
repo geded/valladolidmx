@@ -57,10 +57,9 @@ export const getBusinessActivePlan = createServerFn({ method: "GET" })
   .inputValidator((input: { businessId: string }) => input)
   .handler(async ({ data, context }): Promise<EffectiveVisibilityPlan | null> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rows, error } = await (context.supabase as any).rpc(
-      "get_business_active_plan",
-      { _business_id: data.businessId },
-    );
+    const { data: rows, error } = await (context.supabase as any).rpc("get_business_active_plan", {
+      _business_id: data.businessId,
+    });
     if (error) throw error;
     const row = Array.isArray(rows) ? rows[0] : rows;
     return normalize(row ?? null);

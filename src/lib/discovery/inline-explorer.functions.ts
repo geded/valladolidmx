@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface InlineExplorerItem {
   id: string;
@@ -122,6 +123,8 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .eq("destination_id", (dest as { id: string }).id);
     if (catId) q = q.eq("primary_category_id", catId);
     const { data: rows, count } = await q
@@ -130,7 +133,17 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
       .range(from, to);
 
     const items: InlineExplorerItem[] = (rows ?? []).map((r) => {
-      const locs = ((r as { business_locations?: Array<{ latitude: number | null; longitude: number | null; address_line1: string | null; is_primary: boolean | null }> }).business_locations) ?? [];
+      const locs =
+        (
+          r as {
+            business_locations?: Array<{
+              latitude: number | null;
+              longitude: number | null;
+              address_line1: string | null;
+              is_primary: boolean | null;
+            }>;
+          }
+        ).business_locations ?? [];
       const primary = locs.find((l) => l?.is_primary) ?? locs[0] ?? null;
       const catSlug =
         (r as { primary_category?: { slug?: string | null } | null }).primary_category?.slug ??

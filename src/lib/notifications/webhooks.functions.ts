@@ -51,11 +51,18 @@ export const createWebhookEndpoint = createServerFn({ method: "POST" })
         business_id: data.businessId ?? null,
         label: data.label ?? null,
         url: data.url,
-        secret_current: secret,
       })
       .select("id, url, label, is_active, created_at")
       .single();
     if (error) throw error;
+
+    // El secreto vive en el almacén privado; nunca es legible desde el cliente.
+    const { error: secretError } = await context.supabase.rpc("unc_webhook_secret_set", {
+      _endpoint_id: row.id,
+      _secret: secret,
+    });
+    if (secretError) throw secretError;
+
     // secret devuelto sólo en este momento; nunca más se expone al cliente.
     return { endpoint: row, secret };
   });
@@ -67,20 +74,21 @@ export const rotateWebhookSecret = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: current, error: readError } = await context.supabase
+    const { error: readError } = await context.supabase
       .from("notification_webhook_endpoints")
-      .select("id, secret_current")
+      .select("id")
       .eq("id", data.endpointId)
       .eq("owner_user_id", context.userId)
       .single();
     if (readError) throw readError;
 
     const newSecret = generateSecret();
-    const { error: writeError } = await context.supabase
-      .from("notification_webhook_endpoints")
-      .update({ secret_previous: current.secret_current, secret_current: newSecret })
-      .eq("id", data.endpointId)
-      .eq("owner_user_id", context.userId);
+    // La rotación mueve el secreto vigente a `secret_previous` dentro del
+    // almacén privado; el cliente sólo recibe el valor recién generado.
+    const { error: writeError } = await context.supabase.rpc("unc_webhook_secret_set", {
+      _endpoint_id: data.endpointId,
+      _secret: newSecret,
+    });
     if (writeError) throw writeError;
     return { secret: newSecret };
   });

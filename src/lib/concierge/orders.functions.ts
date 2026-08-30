@@ -255,11 +255,7 @@ function daysUntil(iso: string | null): number | null {
   if (!iso) return null;
   const target = new Date(`${iso}T00:00:00Z`).getTime();
   const today = new Date();
-  const todayUtc = Date.UTC(
-    today.getUTCFullYear(),
-    today.getUTCMonth(),
-    today.getUTCDate(),
-  );
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
   return Math.round((target - todayUtc) / 86_400_000);
 }
 

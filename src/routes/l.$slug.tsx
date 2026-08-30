@@ -52,8 +52,7 @@ export const Route = createFileRoute("/l/$slug")({
       noindex?: boolean;
     };
     const title = seo.title?.trim() || page.title || SITE.name;
-    const description =
-      seo.description?.trim() || page.description || SITE.default_description;
+    const description = seo.description?.trim() || page.description || SITE.default_description;
     const path = seo.canonical?.trim() || `/l/${params.slug}`;
     const ogImage = seo.og_image?.trim() || undefined;
     return buildPublicHead({

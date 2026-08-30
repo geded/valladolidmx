@@ -52,10 +52,17 @@ function formatDate(iso: string | null): string | null {
   }
 }
 
-function StarLine({ rating, scale = 5, size = "sm" }: { rating: number; scale?: number; size?: "sm" | "md" | "lg" }) {
+function StarLine({
+  rating,
+  scale = 5,
+  size = "sm",
+}: {
+  rating: number;
+  scale?: number;
+  size?: "sm" | "md" | "lg";
+}) {
   const stars = clampRating(rating, scale);
-  const cls =
-    size === "lg" ? "text-2xl" : size === "md" ? "text-lg" : "text-sm";
+  const cls = size === "lg" ? "text-2xl" : size === "md" ? "text-lg" : "text-sm";
   return (
     <span aria-label={`${stars} de 5 estrellas`} className={cn("text-primary", cls)}>
       {"★".repeat(stars)}
@@ -72,11 +79,7 @@ function PlatformBadge({ platform }: { platform: ExperienceReviewsPlatform }) {
   );
 }
 
-function Distribution({
-  aggregate,
-}: {
-  aggregate: ExperienceReviewsAggregate;
-}) {
+function Distribution({ aggregate }: { aggregate: ExperienceReviewsAggregate }) {
   const total = Object.values(aggregate.distribution).reduce((a, b) => a + b, 0);
   if (total === 0) return null;
   return (
@@ -88,10 +91,7 @@ function Distribution({
           <li key={k} className="flex items-center gap-2 text-[11px]">
             <span className="w-6 text-right text-muted-foreground">{k}★</span>
             <span className="relative h-1.5 flex-1 overflow-hidden rounded-pill bg-muted">
-              <span
-                className="absolute inset-y-0 left-0 bg-primary"
-                style={{ width: `${pct}%` }}
-              />
+              <span className="absolute inset-y-0 left-0 bg-primary" style={{ width: `${pct}%` }} />
             </span>
             <span className="w-8 text-right tabular-nums text-muted-foreground">{n}</span>
           </li>
@@ -122,10 +122,11 @@ function AggregateCard({
         <StarLine rating={aggregate.average ?? 0} size="md" />
       </div>
       <p className="text-sm text-muted-foreground">
-        <span className="font-medium text-foreground">
-          {ratingLabel(aggregate.average)}
+        <span className="font-medium text-foreground">{ratingLabel(aggregate.average)}</span>
+        <span>
+          {" "}
+          · {aggregate.count} reseña{aggregate.count === 1 ? "" : "s"}
         </span>
-        <span> · {aggregate.count} reseña{aggregate.count === 1 ? "" : "s"}</span>
       </p>
       {showDistribution ? <Distribution aggregate={aggregate} /> : null}
       {showByPlatform && aggregate.byPlatform.length > 0 ? (
@@ -135,13 +136,8 @@ function AggregateCard({
           </p>
           <ul role="list" className="flex flex-col gap-1">
             {aggregate.byPlatform.map((p) => (
-              <li
-                key={p.platform}
-                className="flex items-center justify-between text-xs"
-              >
-                <span className="text-foreground/80">
-                  {PLATFORM_LABEL[p.platform]}
-                </span>
+              <li key={p.platform} className="flex items-center justify-between text-xs">
+                <span className="text-foreground/80">{PLATFORM_LABEL[p.platform]}</span>
                 <span className="tabular-nums text-muted-foreground">
                   {p.average.toFixed(1)} · {p.count}
                 </span>
@@ -175,9 +171,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StarLine rating={item.rating} scale={item.ratingScale} />
-            {capabilities.showPlatformBadge ? (
-              <PlatformBadge platform={item.platform} />
-            ) : null}
+            {capabilities.showPlatformBadge ? <PlatformBadge platform={item.platform} /> : null}
             {item.featured ? (
               <span className="rounded-pill bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                 Destacada
@@ -199,7 +193,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
             {[
               item.author.location,
               capabilities.showTravelerType ? item.travelerType : null,
-              capabilities.showLanguage ? item.language?.toUpperCase() ?? null : null,
+              capabilities.showLanguage ? (item.language?.toUpperCase() ?? null) : null,
               date,
             ]
               .filter(Boolean)
@@ -207,10 +201,13 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
           </p>
         </div>
       </header>
-      {item.title ? (
-        <p className="text-base font-semibold leading-tight">{item.title}</p>
-      ) : null}
-      <p className={cn("whitespace-pre-line text-sm text-foreground/85", compact ? "line-clamp-4" : "")}>
+      {item.title ? <p className="text-base font-semibold leading-tight">{item.title}</p> : null}
+      <p
+        className={cn(
+          "whitespace-pre-line text-sm text-foreground/85",
+          compact ? "line-clamp-4" : "",
+        )}
+      >
         {item.body}
       </p>
       {capabilities.showTags && item.tags.length > 0 ? (
@@ -258,9 +255,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
           ) : null}
         </div>
         {renderItemActions ? (
-          <div className="flex flex-wrap items-center gap-2">
-            {renderItemActions(item)}
-          </div>
+          <div className="flex flex-wrap items-center gap-2">{renderItemActions(item)}</div>
         ) : null}
       </footer>
     </article>
@@ -289,7 +284,7 @@ function groupItems(
     key,
     label:
       groupBy === "platform"
-        ? PLATFORM_LABEL[key as ExperienceReviewsPlatform] ?? key
+        ? (PLATFORM_LABEL[key as ExperienceReviewsPlatform] ?? key)
         : groupBy === "rating"
           ? `${key}★`
           : key,
@@ -350,17 +345,11 @@ export function ExperienceReviews({
       {heading || subheading || renderHeaderActions ? (
         <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-col gap-1">
-            {heading ? (
-              <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-            ) : null}
-            {subheading ? (
-              <p className="text-sm text-muted-foreground">{subheading}</p>
-            ) : null}
+            {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
+            {subheading ? <p className="text-sm text-muted-foreground">{subheading}</p> : null}
           </div>
           {renderHeaderActions ? (
-            <div className="flex flex-wrap items-center gap-2">
-              {renderHeaderActions()}
-            </div>
+            <div className="flex flex-wrap items-center gap-2">{renderHeaderActions()}</div>
           ) : null}
         </header>
       ) : null}
@@ -403,11 +392,7 @@ export function ExperienceReviews({
     >
       {list.map((it) => (
         <li key={it.id}>
-          <ReviewCard
-            item={it}
-            capabilities={capabilities}
-            renderItemActions={renderItemActions}
-          />
+          <ReviewCard item={it} capabilities={capabilities} renderItemActions={renderItemActions} />
         </li>
       ))}
     </ul>
@@ -417,11 +402,7 @@ export function ExperienceReviews({
     <ul role="list" className="flex flex-col gap-4">
       {list.map((it) => (
         <li key={it.id}>
-          <ReviewCard
-            item={it}
-            capabilities={capabilities}
-            renderItemActions={renderItemActions}
-          />
+          <ReviewCard item={it} capabilities={capabilities} renderItemActions={renderItemActions} />
         </li>
       ))}
     </ul>
@@ -434,11 +415,7 @@ export function ExperienceReviews({
     >
       {list.map((it) => (
         <li key={it.id} className="min-w-[280px] max-w-[340px] shrink-0 snap-start">
-          <ReviewCard
-            item={it}
-            capabilities={capabilities}
-            renderItemActions={renderItemActions}
-          />
+          <ReviewCard item={it} capabilities={capabilities} renderItemActions={renderItemActions} />
         </li>
       ))}
     </ul>
@@ -452,9 +429,7 @@ export function ExperienceReviews({
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-semibold">
               {it.author.displayName}
-              <span className="ml-1 text-muted-foreground">
-                · {PLATFORM_LABEL[it.platform]}
-              </span>
+              <span className="ml-1 text-muted-foreground">· {PLATFORM_LABEL[it.platform]}</span>
             </p>
             <p className="line-clamp-1 text-xs text-muted-foreground">{it.body}</p>
           </div>

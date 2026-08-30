@@ -6,11 +6,7 @@ export interface PullToRefreshOptions {
   ref: { current: HTMLElement | null };
 }
 
-export function usePullToRefresh({
-  onRefresh,
-  threshold = 72,
-  ref,
-}: PullToRefreshOptions) {
+export function usePullToRefresh({ onRefresh, threshold = 72, ref }: PullToRefreshOptions) {
   const [pull, setPull] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 

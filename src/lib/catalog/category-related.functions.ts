@@ -19,6 +19,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { MarketplaceBusinessCard } from "./marketplace-reads.functions";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface CategoryRelatedDTO {
   otherCategoriesInDestination: MarketplaceBusinessCard[];
@@ -35,27 +36,18 @@ function publicClient() {
 }
 
 export const getCategoryRelated = createServerFn({ method: "GET" })
-  .inputValidator(
-    (data: { destinationSlug: string; categorySlug: string }) => {
-      if (
-        !data ||
-        typeof data.destinationSlug !== "string" ||
-        data.destinationSlug.length === 0
-      ) {
-        throw new Error("invalid_destination_slug");
-      }
-      if (
-        typeof data.categorySlug !== "string" ||
-        data.categorySlug.length === 0
-      ) {
-        throw new Error("invalid_category_slug");
-      }
-      return {
-        destinationSlug: data.destinationSlug,
-        categorySlug: data.categorySlug,
-      };
-    },
-  )
+  .inputValidator((data: { destinationSlug: string; categorySlug: string }) => {
+    if (!data || typeof data.destinationSlug !== "string" || data.destinationSlug.length === 0) {
+      throw new Error("invalid_destination_slug");
+    }
+    if (typeof data.categorySlug !== "string" || data.categorySlug.length === 0) {
+      throw new Error("invalid_category_slug");
+    }
+    return {
+      destinationSlug: data.destinationSlug,
+      categorySlug: data.categorySlug,
+    };
+  })
   .handler(async ({ data }): Promise<CategoryRelatedDTO> => {
     const supabase = publicClient();
     const { data: rows, error } = await supabase
@@ -65,6 +57,8 @@ export const getCategoryRelated = createServerFn({ method: "GET" })
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(200);
     if (error) throw new Error(`category_related_failed: ${error.message}`);
@@ -85,17 +79,13 @@ export const getCategoryRelated = createServerFn({ method: "GET" })
 
     const otherCategoriesInDestination = all
       .filter(
-        (b) =>
-          b.destination_slug === data.destinationSlug &&
-          b.category_slug !== data.categorySlug,
+        (b) => b.destination_slug === data.destinationSlug && b.category_slug !== data.categorySlug,
       )
       .slice(0, 6);
 
     const sameCategoryOtherDestinations = all
       .filter(
-        (b) =>
-          b.category_slug === data.categorySlug &&
-          b.destination_slug !== data.destinationSlug,
+        (b) => b.category_slug === data.categorySlug && b.destination_slug !== data.destinationSlug,
       )
       .slice(0, 6);
 

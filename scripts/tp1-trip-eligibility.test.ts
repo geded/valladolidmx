@@ -86,11 +86,7 @@ describe("TP1.1 · trip-eligibility", () => {
   });
 
   it("isTripEligible sugar mirrors evaluateTripEligibility", () => {
-    expect(
-      isTripEligible({ kind: "product", targetId: uuid, title: "T" }),
-    ).toBe(true);
-    expect(
-      isTripEligible({ kind: "product", targetId: bad, title: "T" }),
-    ).toBe(false);
+    expect(isTripEligible({ kind: "product", targetId: uuid, title: "T" })).toBe(true);
+    expect(isTripEligible({ kind: "product", targetId: bad, title: "T" })).toBe(false);
   });
 });

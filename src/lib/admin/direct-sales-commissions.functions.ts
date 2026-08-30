@@ -18,12 +18,14 @@ async function assertAdmin(context: {
   supabase: { rpc: (fn: never, args: never) => unknown };
   userId: string;
 }): Promise<void> {
-  const rpc = (context.supabase as unknown as {
-    rpc: (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
-  }).rpc;
+  const rpc = (
+    context.supabase as unknown as {
+      rpc: (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
+    }
+  ).rpc;
   const [a, b] = await Promise.all([
     rpc("has_role", { _user_id: context.userId, _role: "super_admin" }),
     rpc("has_role", { _user_id: context.userId, _role: "admin" }),
@@ -79,14 +81,7 @@ const FilterInput = z
     from: z.string().datetime().optional(),
     to: z.string().datetime().optional(),
     status: z
-      .enum([
-        "all",
-        "paid",
-        "fulfilled",
-        "refunded",
-        "cancelled",
-        "awaiting_payment",
-      ])
+      .enum(["all", "paid", "fulfilled", "refunded", "cancelled", "awaiting_payment"])
       .default("all"),
     businessId: z.string().uuid().optional(),
     search: z.string().trim().max(120).optional(),
@@ -150,8 +145,7 @@ export const listDirectSaleOrders = createServerFn({ method: "POST" })
         traveler_name: (r.traveler_name as string | null) ?? null,
         business_id: businessId,
         business_name: biz
-          ? ((biz.display_name as string | null) ??
-            (biz.legal_name as string | null))
+          ? ((biz.display_name as string | null) ?? (biz.legal_name as string | null))
           : null,
         product_title: (first.title as string | null) ?? null,
         quantity: (first.quantity as number) ?? 1,

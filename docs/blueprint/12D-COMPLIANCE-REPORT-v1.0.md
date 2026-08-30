@@ -32,11 +32,11 @@ Acciones documentales ejecutadas:
 
 ## 4. Excepciones canónicas aprobadas
 
-| ID | Excepción | Justificación |
-| --- | --- | --- |
-| D-05 | `bg-black/80` en overlays Dialog/Sheet/Drawer/AlertDialog | Scrim accesible estándar del primitive shadcn/Radix. Modificarlo rompería el contrato del componente base. |
+| ID   | Excepción                                                              | Justificación                                                                                                  |
+| ---- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| D-05 | `bg-black/80` en overlays Dialog/Sheet/Drawer/AlertDialog              | Scrim accesible estándar del primitive shadcn/Radix. Modificarlo rompería el contrato del componente base.     |
 | D-06 | `text-white` y `bg-white/N` en `Hero` y `SiteHeader` modo transparente | Único caso permitido por el Canon Visual: texto sobre fotografía/video. Contraste reforzado con `drop-shadow`. |
-| D-07 | Colores literales en SVG de Google (`auth.tsx`) | Obligatorio por Google Brand Guidelines para el botón "Sign in with Google". |
+| D-07 | Colores literales en SVG de Google (`auth.tsx`)                        | Obligatorio por Google Brand Guidelines para el botón "Sign in with Google".                                   |
 
 ## 5. Certificación de cumplimiento
 

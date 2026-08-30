@@ -4,7 +4,18 @@
   "title": "Valladolid.mx Product Change Authorization",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "title", "status", "branch", "blueprint", "founder_authority", "permissions", "public_routes", "required_feature_flags", "required_tests"],
+  "required": [
+    "id",
+    "title",
+    "status",
+    "branch",
+    "blueprint",
+    "founder_authority",
+    "permissions",
+    "public_routes",
+    "required_feature_flags",
+    "required_tests"
+  ],
   "properties": {
     "$schema": { "type": "string" },
     "id": { "type": "string", "pattern": "^PCA-[A-Z0-9][A-Z0-9._-]+$" },
@@ -27,8 +38,27 @@
         }
       }
     },
+    "acknowledged_revisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["operation", "path", "sha256", "authority"],
+        "properties": {
+          "operation": { "enum": ["create", "modify", "delete", "rename"] },
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "authority": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
     "public_routes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
-    "required_feature_flags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "required_feature_flags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
     "required_tests": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
   }
 }

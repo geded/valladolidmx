@@ -18,7 +18,33 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
-import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer, Headset, CheckCircle2, Circle, Bell, MessageCircle, LayoutDashboard, Route as RouteIcon, ReceiptText, Sparkles as SparklesIcon, FileText, Heart } from "lucide-react";
+import {
+  Trash2,
+  Save,
+  Users,
+  Calendar,
+  MapPin,
+  Building2,
+  ShoppingBag,
+  Ticket,
+  StickyNote,
+  Plus,
+  Share2,
+  Copy,
+  ExternalLink,
+  Printer,
+  Headset,
+  CheckCircle2,
+  Circle,
+  Bell,
+  MessageCircle,
+  LayoutDashboard,
+  Route as RouteIcon,
+  ReceiptText,
+  Sparkles as SparklesIcon,
+  FileText,
+  Heart,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
@@ -60,9 +86,7 @@ import {
 import { HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
-  validateSearch: (
-    raw: Record<string, unknown>,
-  ): { vista?: MiViajeVista; focus?: string } => {
+  validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista; focus?: string } => {
     const v = raw.vista;
     const f = raw.focus;
     const out: { vista?: MiViajeVista; focus?: string } = {};
@@ -177,9 +201,7 @@ function MiViajePage() {
   });
   const pendingProposalsCount = useMemo(() => {
     const cf = caseFile as { proposals?: Array<{ status?: string }> } | undefined;
-    return (cf?.proposals ?? []).filter(
-      (p) => p.status === "sent" || p.status === "viewed",
-    ).length;
+    return (cf?.proposals ?? []).filter((p) => p.status === "sent" || p.status === "viewed").length;
   }, [caseFile]);
   // CV5.10 v2 · id de la primera propuesta pendiente para deep-link.
   const firstPendingProposalId = useMemo(() => {
@@ -187,9 +209,8 @@ function MiViajePage() {
       | { proposals?: Array<{ proposal_id: string; status?: string }> }
       | undefined;
     return (
-      (cf?.proposals ?? []).find(
-        (p) => p.status === "sent" || p.status === "viewed",
-      )?.proposal_id ?? null
+      (cf?.proposals ?? []).find((p) => p.status === "sent" || p.status === "viewed")
+        ?.proposal_id ?? null
     );
   }, [caseFile]);
   // CV5.10 · Último evento del expediente que no venga del propio viajero.
@@ -198,9 +219,7 @@ function MiViajePage() {
       | { timeline?: Array<{ event_type?: string; summary?: string; created_at?: string }> }
       | undefined;
     const events = cf?.timeline ?? [];
-    const filtered = events.filter(
-      (e) => e.event_type && e.event_type !== "traveler_note",
-    );
+    const filtered = events.filter((e) => e.event_type && e.event_type !== "traveler_note");
     return filtered[0] ?? null;
   }, [caseFile]);
   const reservedIds = useMemo(() => {
@@ -217,18 +236,16 @@ function MiViajePage() {
     return s;
   }, [concierge]);
 
-  const invalidatePlan = () =>
-    {
-      qc.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
-      // A15 · notifica al Concierge para refrescar snapshot inmediato.
-      void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
-        notifyPlanChanged("mi-viaje"),
-      );
-    };
+  const invalidatePlan = () => {
+    qc.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
+    // A15 · notifica al Concierge para refrescar snapshot inmediato.
+    void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
+      notifyPlanChanged("mi-viaje"),
+    );
+  };
 
   const search = useSearch({ from: Route.id });
-  const activeConfirmed =
-    confirmed && confirmed.status !== "refunded" ? confirmed : null;
+  const activeConfirmed = confirmed && confirmed.status !== "refunded" ? confirmed : null;
   const phase = deriveTripPhase(activeQ.data?.plan ?? null, activeConfirmed);
   const vista: MiViajeVista = search.vista ?? PHASE_VISTA_ORDER[phase][0];
 
@@ -256,8 +273,8 @@ function MiViajePage() {
         <h1 className="text-2xl font-semibold sm:text-3xl">Mi Viaje</h1>
         <div className="flex items-start justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            Tu compañero digital del Oriente Maya de Yucatán — antes, durante y
-            después de tu visita. Todas las vistas comparten el mismo viaje.
+            Tu compañero digital del Oriente Maya de Yucatán — antes, durante y después de tu
+            visita. Todas las vistas comparten el mismo viaje.
           </p>
           <button
             type="button"
@@ -271,11 +288,7 @@ function MiViajePage() {
         </div>
       </header>
 
-      <MiViajeVistaTabs
-        current={vista}
-        phase={phase}
-        concierge_badge={pendingProposalsCount}
-      />
+      <MiViajeVistaTabs current={vista} phase={phase} concierge_badge={pendingProposalsCount} />
 
       <WorkspaceOnboardingTour userId={user?.id ?? null} />
 
@@ -290,9 +303,7 @@ function MiViajePage() {
       {activeQ.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando tu plan…</p>
       ) : !activeQ.data ? (
-        <p className="text-sm text-destructive">
-          No pudimos cargar tu plan. Recarga la página.
-        </p>
+        <p className="text-sm text-destructive">No pudimos cargar tu plan. Recarga la página.</p>
       ) : (
         <MiViajeVistaBody
           vista={vista}
@@ -336,48 +347,48 @@ function MiViajeVistaTabs({
         className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card/40 p-1"
         aria-label="Vistas de Mi Viaje"
       >
-      {order.map((key) => {
-        const meta = VISTA_META[key];
-        const Icon = meta.icon;
-        const active = key === current;
-        return (
-          <button
-            key={key}
-            type="button"
-            onClick={() =>
-              navigate({
-                search: (prev: { vista?: MiViajeVista }) => ({
-                  ...prev,
-                  vista: key === "resumen" ? undefined : key,
-                }),
-                replace: true,
-                resetScroll: false,
-              })
-            }
-            aria-pressed={active}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-              active
-                ? "bg-primary text-primary-foreground shadow-soft"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground"
-            }`}
-          >
-            <Icon className="size-3.5" aria-hidden />
-            {meta.label}
-            {key === "concierge" && concierge_badge && concierge_badge > 0 ? (
-              <span
-                className={`ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-semibold leading-4 ${
-                  active
-                    ? "bg-primary-foreground text-primary"
-                    : "bg-primary text-primary-foreground"
-                }`}
-                aria-label={`${concierge_badge} propuesta(s) pendiente(s)`}
-              >
-                {concierge_badge}
-              </span>
-            ) : null}
-          </button>
-        );
-      })}
+        {order.map((key) => {
+          const meta = VISTA_META[key];
+          const Icon = meta.icon;
+          const active = key === current;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() =>
+                navigate({
+                  search: (prev: { vista?: MiViajeVista }) => ({
+                    ...prev,
+                    vista: key === "resumen" ? undefined : key,
+                  }),
+                  replace: true,
+                  resetScroll: false,
+                })
+              }
+              aria-pressed={active}
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                active
+                  ? "bg-primary text-primary-foreground shadow-soft"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              }`}
+            >
+              <Icon className="size-3.5" aria-hidden />
+              {meta.label}
+              {key === "concierge" && concierge_badge && concierge_badge > 0 ? (
+                <span
+                  className={`ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-semibold leading-4 ${
+                    active
+                      ? "bg-primary-foreground text-primary"
+                      : "bg-primary text-primary-foreground"
+                  }`}
+                  aria-label={`${concierge_badge} propuesta(s) pendiente(s)`}
+                >
+                  {concierge_badge}
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
       </nav>
       <span
         aria-hidden
@@ -406,8 +417,8 @@ function PendingProposalsSpotlight({ count }: { count: number }) {
               : `Tienes ${count} propuestas listas para confirmar tu viaje`}
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Revisa lo que armaron para ti y confirma cuando estés listo. Nada se
-            cobra sin tu aprobación.
+            Revisa lo que armaron para ti y confirma cuando estés listo. Nada se cobra sin tu
+            aprobación.
           </p>
         </div>
         <button
@@ -452,20 +463,15 @@ function TravelNotificationsBell({
   const navigate = useNavigate({ from: Route.fullPath });
   const daysToTrip = confirmed?.days_to_trip ?? null;
   const tripMilestone =
-    daysToTrip !== null && daysToTrip >= 0 && daysToTrip <= 14
-      ? daysToTrip
-      : null;
+    daysToTrip !== null && daysToTrip >= 0 && daysToTrip <= 14 ? daysToTrip : null;
   const hasEvent =
     !!latestConciergeEvent &&
     !!latestConciergeEvent.created_at &&
     // sólo si es de los últimos 7 días
-    Date.now() - new Date(latestConciergeEvent.created_at).getTime() <
-      7 * 86_400_000;
+    Date.now() - new Date(latestConciergeEvent.created_at).getTime() < 7 * 86_400_000;
 
   const count =
-    (pendingProposals > 0 ? 1 : 0) +
-    (tripMilestone !== null ? 1 : 0) +
-    (hasEvent ? 1 : 0);
+    (pendingProposals > 0 ? 1 : 0) + (tripMilestone !== null ? 1 : 0) + (hasEvent ? 1 : 0);
 
   const goTo = (vista: MiViajeVista, focus?: string) =>
     navigate({
@@ -509,9 +515,7 @@ function TravelNotificationsBell({
                 onClick={() =>
                   goTo(
                     "concierge",
-                    firstPendingProposalId
-                      ? `proposal:${firstPendingProposalId}`
-                      : "proposals",
+                    firstPendingProposalId ? `proposal:${firstPendingProposalId}` : "proposals",
                   )
                 }
                 className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
@@ -526,8 +530,7 @@ function TravelNotificationsBell({
                       : `${pendingProposals} propuestas listas para confirmar`}
                   </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">
-                    Tu concierge armó una propuesta. Nada se cobra sin tu
-                    aprobación.
+                    Tu concierge armó una propuesta. Nada se cobra sin tu aprobación.
                   </span>
                 </span>
               </button>
@@ -553,7 +556,9 @@ function TravelNotificationsBell({
                         : `Faltan ${tripMilestone} días para tu viaje`}
                   </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {confirmed?.folio ? `Reservación ${confirmed.folio}` : "Revisa tu itinerario del día."}
+                    {confirmed?.folio
+                      ? `Reservación ${confirmed.folio}`
+                      : "Revisa tu itinerario del día."}
                   </span>
                 </span>
               </button>
@@ -666,7 +671,10 @@ function MiViajeVistaBody({
             secondary={{
               label: "Optimizar con Alux",
               to: "/alux",
-              search: { prompt: "Ayúdame a construir un itinerario por el Oriente Maya con paradas eficientes." },
+              search: {
+                prompt:
+                  "Ayúdame a construir un itinerario por el Oriente Maya con paradas eficientes.",
+              },
             }}
           />
         </div>
@@ -675,11 +683,7 @@ function MiViajeVistaBody({
     return (
       <div className="space-y-6">
         {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
-        <ItinerarioViews
-          data={plan}
-          onChanged={onChanged}
-          reservedIds={reservedIds}
-        />
+        <ItinerarioViews data={plan} onChanged={onChanged} reservedIds={reservedIds} />
       </div>
     );
   }
@@ -689,10 +693,7 @@ function MiViajeVistaBody({
         {confirmed ? (
           <>
             <ConfirmedTravelBanner data={confirmed} />
-            <ReservationsList
-              orderId={confirmed.order_id}
-              folio={confirmed.folio}
-            />
+            <ReservationsList orderId={confirmed.order_id} folio={confirmed.folio} />
           </>
         ) : (
           <VistaEmpty
@@ -716,16 +717,18 @@ function MiViajeVistaBody({
             title="Un Concierge local, listo para armar tu viaje contigo"
             body="Cuando envíes tu plan al Concierge, aquí verás propuestas, mensajes y confirmaciones. Sin sentir que estás comprando: confirmando lo que armaron juntos."
             icon={Headset}
-            cta={{ label: "Enviar mi plan al Concierge", to: "/cuenta/mi-viaje", search: { vista: "resumen" } }}
+            cta={{
+              label: "Enviar mi plan al Concierge",
+              to: "/cuenta/mi-viaje",
+              search: { vista: "resumen" },
+            }}
           />
         </div>
       );
     }
     return (
       <div className="space-y-6">
-        {plan.plan.case_id ? (
-          <EmbeddedCaseFile caseId={plan.plan.case_id} focus={focus} />
-        ) : null}
+        {plan.plan.case_id ? <EmbeddedCaseFile caseId={plan.plan.case_id} focus={focus} /> : null}
         <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
       </div>
     );
@@ -763,10 +766,7 @@ function MiViajeVistaBody({
   // recuerdos
   return (
     <div className="space-y-6">
-      <MemoriesSection
-        planId={plan.plan.id}
-        orderId={confirmed?.order_id ?? null}
-      />
+      <MemoriesSection planId={plan.plan.id} orderId={confirmed?.order_id ?? null} />
     </div>
   );
 }
@@ -850,32 +850,38 @@ function AluxWorkspaceHeader({
   const start = p.start_date ?? null;
   const party = p.party_size ?? null;
   const contextBits: string[] = [];
-  if (start) contextBits.push(`Llegada ${new Date(start + "T00:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`);
+  if (start)
+    contextBits.push(
+      `Llegada ${new Date(start + "T00:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`,
+    );
   if (party) contextBits.push(`${party} ${party === 1 ? "viajero" : "viajeros"}`);
   contextBits.push(`${itemCount} ${itemCount === 1 ? "parada" : "paradas"} en el plan`);
 
-  const phasePrompt: Record<TravelCompanionPhase, { title: string; prompt: string; cta: string }> = {
-    planning: {
-      title: "Estás planeando tu viaje",
-      prompt: `Ayúdame a mejorar mi plan actual con ${itemCount} paradas${start ? ` llegando el ${start}` : ""}. Sugiere qué falta y qué reordenar.`,
-      cta: "Mejorar mi plan con Alux",
-    },
-    confirmed: {
-      title: "Tu viaje está confirmado",
-      prompt: `Mi viaje está confirmado${confirmed?.folio ? ` (${confirmed.folio})` : ""}. Prepárame: qué llevar, clima, ropa y consejos culturales del Oriente Maya.`,
-      cta: "Prepararme para el viaje",
-    },
-    onsite: {
-      title: "Estás viviendo el Oriente Maya",
-      prompt: "Estoy en Valladolid ahora mismo. ¿Qué me recomiendas hacer hoy cerca de mí y qué debo saber para vivirlo mejor?",
-      cta: "¿Qué hago ahora?",
-    },
-    post: {
-      title: "El viaje continúa",
-      prompt: "Ya terminé mi viaje al Oriente Maya. Ayúdame a dejar reseñas y a planear mi próxima visita.",
-      cta: "Continuar mi historia",
-    },
-  };
+  const phasePrompt: Record<TravelCompanionPhase, { title: string; prompt: string; cta: string }> =
+    {
+      planning: {
+        title: "Estás planeando tu viaje",
+        prompt: `Ayúdame a mejorar mi plan actual con ${itemCount} paradas${start ? ` llegando el ${start}` : ""}. Sugiere qué falta y qué reordenar.`,
+        cta: "Mejorar mi plan con Alux",
+      },
+      confirmed: {
+        title: "Tu viaje está confirmado",
+        prompt: `Mi viaje está confirmado${confirmed?.folio ? ` (${confirmed.folio})` : ""}. Prepárame: qué llevar, clima, ropa y consejos culturales del Oriente Maya.`,
+        cta: "Prepararme para el viaje",
+      },
+      onsite: {
+        title: "Estás viviendo el Oriente Maya",
+        prompt:
+          "Estoy en Valladolid ahora mismo. ¿Qué me recomiendas hacer hoy cerca de mí y qué debo saber para vivirlo mejor?",
+        cta: "¿Qué hago ahora?",
+      },
+      post: {
+        title: "El viaje continúa",
+        prompt:
+          "Ya terminé mi viaje al Oriente Maya. Ayúdame a dejar reseñas y a planear mi próxima visita.",
+        cta: "Continuar mi historia",
+      },
+    };
   const meta = phasePrompt[phase];
 
   return (
@@ -889,9 +895,7 @@ function AluxWorkspaceHeader({
             Alux · Copiloto de viaje
           </p>
           <h2 className="mt-1 font-serif text-xl text-foreground">{meta.title}</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {contextBits.join(" · ")}
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{contextBits.join(" · ")}</p>
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -905,7 +909,9 @@ function AluxWorkspaceHeader({
         </Link>
         <Link
           to="/alux"
-          search={{ prompt: `Explícame mi plan actual con ${itemCount} paradas y dime qué mejorarías.` }}
+          search={{
+            prompt: `Explícame mi plan actual con ${itemCount} paradas y dime qué mejorarías.`,
+          }}
           className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-background px-3 py-2 text-xs font-medium text-foreground transition hover:bg-accent"
         >
           <RouteIcon className="size-3.5" aria-hidden />
@@ -913,8 +919,8 @@ function AluxWorkspaceHeader({
         </Link>
       </div>
       <p className="mt-3 text-[11px] text-muted-foreground">
-        Alux conoce tu plan, tus reservas y tu momento del viaje. Cada sugerencia
-        se puede añadir con un solo toque; nada se agrega sin tu confirmación.
+        Alux conoce tu plan, tus reservas y tu momento del viaje. Cada sugerencia se puede añadir
+        con un solo toque; nada se agrega sin tu confirmación.
       </p>
     </section>
   );
@@ -986,11 +992,7 @@ function ItinerarioViews({
       </div>
 
       {view === "lista" ? (
-        <PlanItemsSection
-          data={data}
-          onChanged={onChanged}
-          reservedIds={reservedIds}
-        />
+        <PlanItemsSection data={data} onChanged={onChanged} reservedIds={reservedIds} />
       ) : view === "timeline" ? (
         <ItinerarioTimeline data={data} onChanged={onChanged} />
       ) : (
@@ -1049,11 +1051,7 @@ function ItinerarioTimeline({
       }),
   });
 
-  function moveWithinDay(
-    dayItems: TravelPlanItem[],
-    itemId: string,
-    delta: -1 | 1,
-  ) {
+  function moveWithinDay(dayItems: TravelPlanItem[], itemId: string, delta: -1 | 1) {
     const idx = dayItems.findIndex((i) => i.id === itemId);
     if (idx < 0) return;
     const target = idx + delta;
@@ -1109,7 +1107,8 @@ function ItinerarioTimeline({
   if (data.items.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        Aún no hay actividades. Cuando agregues elementos con día asignado, verás aquí tu recorrido cronológico.
+        Aún no hay actividades. Cuando agregues elementos con día asignado, verás aquí tu recorrido
+        cronológico.
       </div>
     );
   }
@@ -1121,31 +1120,23 @@ function ItinerarioTimeline({
           <div className="mb-3 flex items-center justify-between gap-3">
             <h3 className="font-serif text-sm text-foreground">
               {key === "sin" ? "Sin día asignado" : `Día ${(key as number) + 1}`}
-              <span className="ml-2 text-xs text-muted-foreground">
-                ({items.length})
-              </span>
+              <span className="ml-2 text-xs text-muted-foreground">({items.length})</span>
             </h3>
             <div className="ml-auto flex items-center gap-2">
               {typeof key === "number" ? (
-                <DayWeatherChip
-                  startDate={startDate}
-                  totalDays={totalDays}
-                  dayIndex={key}
-                />
+                <DayWeatherChip startDate={startDate} totalDays={totalDays} dayIndex={key} />
               ) : null}
               {items.length >= 2 ? (
-              <button
-                type="button"
-                onClick={() =>
-                  optimize.mutate(key === "sin" ? null : (key as number))
-                }
-                disabled={optimize.isPending}
-                className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15 disabled:opacity-60"
-                title="Alux calcula la ruta más corta entre las paradas de este día"
-              >
-                <Wand2 className="size-3" aria-hidden />
-                Optimizar con Alux
-              </button>
+                <button
+                  type="button"
+                  onClick={() => optimize.mutate(key === "sin" ? null : (key as number))}
+                  disabled={optimize.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15 disabled:opacity-60"
+                  title="Alux calcula la ruta más corta entre las paradas de este día"
+                >
+                  <Wand2 className="size-3" aria-hidden />
+                  Optimizar con Alux
+                </button>
               ) : null}
             </div>
           </div>
@@ -1171,14 +1162,10 @@ function ItinerarioTimeline({
                         {snap.title || (it.item_kind === "note" ? "Nota" : "Elemento")}
                       </p>
                       {snap.subtitle ? (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {snap.subtitle}
-                        </p>
+                        <p className="truncate text-xs text-muted-foreground">{snap.subtitle}</p>
                       ) : null}
                       {it.notes ? (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {it.notes}
-                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">{it.notes}</p>
                       ) : null}
                     </div>
                     {items.length > 1 ? (
@@ -1250,7 +1237,8 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
   if (itemsPayload.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        El mapa muestra destinos y empresas de tu viaje. Cuando agregues alguno, aparecerá aquí con sus coordenadas reales.
+        El mapa muestra destinos y empresas de tu viaje. Cuando agregues alguno, aparecerá aquí con
+        sus coordenadas reales.
       </div>
     );
   }
@@ -1264,7 +1252,8 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
   if (markers.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        Aún no encontramos coordenadas para los elementos guardados. Pide a tu Concierge que enriquezca la ubicación.
+        Aún no encontramos coordenadas para los elementos guardados. Pide a tu Concierge que
+        enriquezca la ubicación.
       </div>
     );
   }
@@ -1279,7 +1268,8 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
         className="h-[380px] w-full"
       />
       <p className="border-t px-3 py-2 text-xs text-muted-foreground">
-        {markers.length} ubicación{markers.length === 1 ? "" : "es"} en tu viaje. Los pines muestran destinos y empresas guardadas.
+        {markers.length} ubicación{markers.length === 1 ? "" : "es"} en tu viaje. Los pines muestran
+        destinos y empresas guardadas.
       </p>
     </div>
   );
@@ -1359,12 +1349,14 @@ function ConfirmedTravelBanner({
         <Sparkles className="h-4 w-4 text-primary" aria-hidden />
         {countdown}
         {data.party_size ? (
-          <span className="text-muted-foreground">· {data.party_size} viajero{data.party_size === 1 ? "" : "s"}</span>
+          <span className="text-muted-foreground">
+            · {data.party_size} viajero{data.party_size === 1 ? "" : "s"}
+          </span>
         ) : null}
       </p>
       <p className="mt-3 text-xs text-muted-foreground">
-        Los ítems reservados con tu concierge quedan bloqueados en tu plan.
-        Guarda tu folio para referencia rápida con tu concierge.
+        Los ítems reservados con tu concierge quedan bloqueados en tu plan. Guarda tu folio para
+        referencia rápida con tu concierge.
       </p>
     </section>
   );
@@ -1384,12 +1376,8 @@ function ConfirmedTripTimeline({
     destination_name: string | null;
   };
 }) {
-  const start = data.plan_start_date
-    ? new Date(`${data.plan_start_date}T00:00:00Z`)
-    : null;
-  const end = data.plan_end_date
-    ? new Date(`${data.plan_end_date}T00:00:00Z`)
-    : null;
+  const start = data.plan_start_date ? new Date(`${data.plan_start_date}T00:00:00Z`) : null;
+  const end = data.plan_end_date ? new Date(`${data.plan_end_date}T00:00:00Z`) : null;
 
   const days: Date[] = [];
   if (start && end) {
@@ -1452,16 +1440,12 @@ function ConfirmedTripTimeline({
             <li
               key={m.key}
               className={`flex gap-3 rounded-xl border p-3 ${
-                m.active
-                  ? "border-primary/40 bg-primary/5"
-                  : "border-border/60 bg-background/60"
+                m.active ? "border-primary/40 bg-primary/5" : "border-border/60 bg-background/60"
               }`}
             >
               <span
                 className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-[10px] font-semibold ${
-                  m.active
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
+                  m.active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}
               >
                 {m.active ? "●" : "○"}
@@ -1484,11 +1468,7 @@ function ConfirmedTripTimeline({
             {days.map((d, idx) => {
               const isArrival = idx === 0;
               const isReturn = end && d.getTime() === end.getTime() && days.length > 1;
-              const label = isArrival
-                ? "Tu llegada"
-                : isReturn
-                  ? "Tu regreso"
-                  : `Día ${idx + 1}`;
+              const label = isArrival ? "Tu llegada" : isReturn ? "Tu regreso" : `Día ${idx + 1}`;
               return (
                 <li
                   key={d.toISOString()}
@@ -1506,14 +1486,12 @@ function ConfirmedTripTimeline({
             })}
           </ol>
           <p className="mt-3 text-[11px] text-muted-foreground">
-            Tu concierge y Alux te propondrán actividades por día conforme se
-            acerque tu viaje.
+            Tu concierge y Alux te propondrán actividades por día conforme se acerque tu viaje.
           </p>
         </div>
       ) : (
         <p className="mt-5 text-xs text-muted-foreground">
-          Cuando confirmes fechas con tu concierge, aquí verás tu itinerario
-          día por día.
+          Cuando confirmes fechas con tu concierge, aquí verás tu itinerario día por día.
         </p>
       )}
     </section>
@@ -1524,13 +1502,7 @@ function ConfirmedTripTimeline({
 /* Editor de metadatos                                                 */
 /* ------------------------------------------------------------------ */
 
-function PlanMetaEditor({
-  data,
-  onSaved,
-}: {
-  data: TravelPlanWithItems;
-  onSaved: () => void;
-}) {
+function PlanMetaEditor({ data, onSaved }: { data: TravelPlanWithItems; onSaved: () => void }) {
   const saveMeta = useServerFn(updatePlanMeta);
   const [title, setTitle] = useState(data.plan.title);
   const [start, setStart] = useState(data.plan.start_date ?? "");
@@ -1622,7 +1594,9 @@ function PlanMetaEditor({
         </label>
       </div>
       <label className="mt-4 block text-sm">
-        <span className="text-xs uppercase tracking-wide text-muted-foreground">Notas generales</span>
+        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+          Notas generales
+        </span>
         <textarea
           value={notes}
           rows={3}
@@ -1710,16 +1684,14 @@ function ShareExportSection({
         <Share2 className="size-4 text-primary" /> Compartir y exportar
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Genera un link público read-only para compartir tu expediente con
-        familia, amigos o tu concierge. Puedes revocarlo en cualquier momento.
+        Genera un link público read-only para compartir tu expediente con familia, amigos o tu
+        concierge. Puedes revocarlo en cualquier momento.
       </p>
 
       {plan.share_token && shareUrl ? (
         <div className="mt-4 space-y-3">
           <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-primary">
-              Link activo
-            </p>
+            <p className="text-xs font-medium uppercase tracking-wide text-primary">Link activo</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <input
                 readOnly
@@ -1789,8 +1761,8 @@ function ShareExportSection({
             {enableMut.isPending ? "Generando…" : "Generar link de compartir"}
           </button>
           <p className="mt-2 text-xs text-muted-foreground">
-            Cualquier persona con el link podrá ver tu expediente (sin tu correo
-            ni notas privadas). Podrás revocarlo cuando quieras.
+            Cualquier persona con el link podrá ver tu expediente (sin tu correo ni notas privadas).
+            Podrás revocarlo cuando quieras.
           </p>
         </div>
       )}
@@ -1845,16 +1817,14 @@ function PlanItemsSection({
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">
-          Tu expediente ({data.items.length})
-        </h2>
+        <h2 className="text-lg font-medium">Tu expediente ({data.items.length})</h2>
       </div>
 
       {data.items.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="text-sm text-muted-foreground">
-            Aún no has agregado nada. Explora el ecosistema y usa el botón
-            "➕ Agregar a Mi Viaje" en las tarjetas.
+            Aún no has agregado nada. Explora el ecosistema y usa el botón "➕ Agregar a Mi Viaje"
+            en las tarjetas.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Link
@@ -1888,9 +1858,7 @@ function PlanItemsSection({
                     key={it.id}
                     item={it}
                     onChanged={onChanged}
-                    reservedByConcierge={Boolean(
-                      it.target_id && reservedIds.has(it.target_id),
-                    )}
+                    reservedByConcierge={Boolean(it.target_id && reservedIds.has(it.target_id))}
                   />
                 ))}
               </ul>
@@ -1952,8 +1920,7 @@ function PlanItemRow({
   });
 
   const saveMut = useMutation({
-    mutationFn: () =>
-      update({ data: { itemId: item.id, notes: notes.trim() || null } }),
+    mutationFn: () => update({ data: { itemId: item.id, notes: notes.trim() || null } }),
     onSuccess: () => {
       setEditing(false);
       onChanged();
@@ -2027,9 +1994,7 @@ function PlanItemRow({
             </div>
           </div>
         ) : item.notes ? (
-          <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">
-            {item.notes}
-          </p>
+          <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{item.notes}</p>
         ) : null}
       </div>
       <div className="flex shrink-0 flex-col gap-1">
@@ -2202,14 +2167,11 @@ function ConciergeSection({
   const { plan, items } = data;
   const [summary, setSummary] = useState("");
 
-  const hasContent =
-    items.length > 0 || Boolean((plan.notes ?? "").trim().length >= 8);
-  const alreadyShared =
-    plan.status === "shared_with_concierge" && Boolean(plan.case_id);
+  const hasContent = items.length > 0 || Boolean((plan.notes ?? "").trim().length >= 8);
+  const alreadyShared = plan.status === "shared_with_concierge" && Boolean(plan.case_id);
 
   const send = useMutation({
-    mutationFn: (s: string) =>
-      promote({ data: { planId: plan.id, summary: s } }),
+    mutationFn: (s: string) => promote({ data: { planId: plan.id, summary: s } }),
     onSuccess: (res) => {
       setSummary("");
       qc.invalidateQueries({ queryKey: ["cc", "my-cases"] });
@@ -2235,22 +2197,22 @@ function ConciergeSection({
     `Viaje "${plan.title}" · ${items.length} elemento${items.length === 1 ? "" : "s"}${
       plan.party_size ? ` · ${plan.party_size} personas` : ""
     }${plan.start_date ? ` · desde ${plan.start_date}` : ""}`;
-  const canSend =
-    !alreadyShared && hasContent && derivedSummary.length >= 8 && !send.isPending;
+  const canSend = !alreadyShared && hasContent && derivedSummary.length >= 8 && !send.isPending;
 
   return (
     <section className="rounded-lg border bg-card p-5">
       <h2 className="text-lg font-medium">Enviar al Concierge</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tu expediente completo (destinos, empresas, productos, eventos, notas,
-        fechas y personas) viaja como snapshot al concierge humano.
+        Tu expediente completo (destinos, empresas, productos, eventos, notas, fechas y personas)
+        viaja como snapshot al concierge humano.
       </p>
 
       {alreadyShared ? (
         <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
           <p className="font-medium">Ya enviaste este viaje al Concierge.</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            El caso está en proceso. Puedes seguir agregando elementos y volver a enviar cuando quieras revisar contigo tu concierge.
+            El caso está en proceso. Puedes seguir agregando elementos y volver a enviar cuando
+            quieras revisar contigo tu concierge.
           </p>
           {plan.case_id ? (
             <Link
@@ -2264,8 +2226,8 @@ function ConciergeSection({
         </div>
       ) : !hasContent ? (
         <div className="mt-4 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-          Agrega al menos un destino, empresa, producto o evento — o escribe
-          notas generales del viaje — para poder enviarlo.
+          Agrega al menos un destino, empresa, producto o evento — o escribe notas generales del
+          viaje — para poder enviarlo.
         </div>
       ) : (
         <form
@@ -2378,9 +2340,21 @@ const PHASE_META: Record<
     tone: "muted",
     aluxPrompt: "Ayúdame a preparar mi viaje al Oriente Maya con calma.",
     checklist: [
-      { key: "identity", label: "Documentos y datos de acompañantes", hint: "Nombres completos y contactos de emergencia." },
-      { key: "expectations", label: "Cuéntale a tu concierge tus expectativas", hint: "Ritmo, intereses, restricciones alimentarias." },
-      { key: "wishlist", label: "Guarda inspiración en Mi Viaje", hint: "Cenotes, restaurantes o experiencias que te llamen." },
+      {
+        key: "identity",
+        label: "Documentos y datos de acompañantes",
+        hint: "Nombres completos y contactos de emergencia.",
+      },
+      {
+        key: "expectations",
+        label: "Cuéntale a tu concierge tus expectativas",
+        hint: "Ritmo, intereses, restricciones alimentarias.",
+      },
+      {
+        key: "wishlist",
+        label: "Guarda inspiración en Mi Viaje",
+        hint: "Cenotes, restaurantes o experiencias que te llamen.",
+      },
     ],
   },
   t14: {
@@ -2389,8 +2363,16 @@ const PHASE_META: Record<
     tone: "info",
     aluxPrompt: "Dame recomendaciones de clima, ropa y cultura para mi viaje.",
     checklist: [
-      { key: "weather", label: "Revisa el clima y qué empacar", hint: "Alux te da el pronóstico de tu destino." },
-      { key: "culture", label: "Contexto cultural del Oriente Maya", hint: "Pequeños hábitos que enriquecen la experiencia." },
+      {
+        key: "weather",
+        label: "Revisa el clima y qué empacar",
+        hint: "Alux te da el pronóstico de tu destino.",
+      },
+      {
+        key: "culture",
+        label: "Contexto cultural del Oriente Maya",
+        hint: "Pequeños hábitos que enriquecen la experiencia.",
+      },
       { key: "docs", label: "Copia digital de identificaciones y reservas" },
     ],
   },
@@ -2496,7 +2478,11 @@ function TripPhaseCard({
     }
   };
 
-  const milestones: { key: "t14" | "t3" | "welcome" | "post"; label: string; iso: string | null }[] = [
+  const milestones: {
+    key: "t14" | "t3" | "welcome" | "post";
+    label: string;
+    iso: string | null;
+  }[] = [
     { key: "t14", label: "Preparando tu llegada", iso: data.email_t14_sent_at },
     { key: "t3", label: "Últimos detalles del viaje", iso: data.email_t3_sent_at },
     { key: "welcome", label: "Bienvenida al Oriente Maya", iso: data.email_welcome_sent_at },
@@ -2614,9 +2600,7 @@ function TripPhaseCard({
                       {c.label}
                     </span>
                     {c.hint ? (
-                      <span className="mt-0.5 block text-xs text-muted-foreground">
-                        {c.hint}
-                      </span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">{c.hint}</span>
                     ) : null}
                   </span>
                 </button>

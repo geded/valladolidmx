@@ -79,9 +79,7 @@ export const signDestinationImageUpload = createServerFn({ method: "POST" })
       .slice(2, 8)}-${clean}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = context.supabase.storage as any;
-    const { data: signed, error } = await storage
-      .from(BUCKET)
-      .createSignedUploadUrl(path);
+    const { data: signed, error } = await storage.from(BUCKET).createSignedUploadUrl(path);
     if (error) throw error;
     return {
       path: signed.path as string,
@@ -106,10 +104,8 @@ interface RegisterMediaInput {
 export const registerDestinationMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: RegisterMediaInput) => {
-    if (!d?.destinationId || !d?.storagePath || !d?.role)
-      throw new Error("invalid_input");
-    if (d.role !== "hero" && d.role !== "gallery")
-      throw new Error("invalid_role");
+    if (!d?.destinationId || !d?.storagePath || !d?.role) throw new Error("invalid_input");
+    if (d.role !== "hero" && d.role !== "gallery") throw new Error("invalid_role");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -253,8 +249,7 @@ interface ReorderInput {
 export const reorderDestinationGallery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ReorderInput) => {
-    if (!d?.destinationId || !Array.isArray(d.orderedIds))
-      throw new Error("invalid_input");
+    if (!d?.destinationId || !Array.isArray(d.orderedIds)) throw new Error("invalid_input");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -293,7 +288,9 @@ export const removeDestinationMedia = createServerFn({ method: "POST" })
     // Localizar el vínculo para saber si es hero y el destino
     const { data: link, error: readErr } = await db
       .from("destination_media")
-      .select("id, role, destination_id, media_asset_id, media_assets:media_assets ( storage_path )")
+      .select(
+        "id, role, destination_id, media_asset_id, media_assets:media_assets ( storage_path )",
+      )
       .eq("id", data.destinationMediaId)
       .maybeSingle();
     if (readErr) throw readErr;

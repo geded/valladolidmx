@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { MarketplaceBusinessCard } from "./marketplace-reads.functions";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface BusinessRelatedDTO {
   sameCategory: MarketplaceBusinessCard[];
@@ -33,25 +34,19 @@ function publicClient() {
 const BUSINESS_SURFACE = "business-profile";
 
 export const getBusinessRelated = createServerFn({ method: "GET" })
-  .inputValidator(
-    (data: {
-      businessId: string;
-      destinationSlug: string;
-      categorySlug: string;
-    }) => {
-      if (!data || typeof data.businessId !== "string" || data.businessId.length === 0) {
-        throw new Error("invalid_business_id");
-      }
-      if (typeof data.destinationSlug !== "string" || data.destinationSlug.length === 0) {
-        throw new Error("invalid_destination_slug");
-      }
-      return {
-        businessId: data.businessId,
-        destinationSlug: data.destinationSlug,
-        categorySlug: typeof data.categorySlug === "string" ? data.categorySlug : "",
-      };
-    },
-  )
+  .inputValidator((data: { businessId: string; destinationSlug: string; categorySlug: string }) => {
+    if (!data || typeof data.businessId !== "string" || data.businessId.length === 0) {
+      throw new Error("invalid_business_id");
+    }
+    if (typeof data.destinationSlug !== "string" || data.destinationSlug.length === 0) {
+      throw new Error("invalid_destination_slug");
+    }
+    return {
+      businessId: data.businessId,
+      destinationSlug: data.destinationSlug,
+      categorySlug: typeof data.categorySlug === "string" ? data.categorySlug : "",
+    };
+  })
   .handler(async ({ data }): Promise<BusinessRelatedDTO> => {
     const supabase = publicClient();
     // E6 · Related overrides (pin/hide) para esta ficha de empresa.
@@ -76,6 +71,8 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(120);
     if (error) throw new Error(`business_related_failed: ${error.message}`);
@@ -94,10 +91,9 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
       };
     });
 
-    const inDestination = all.filter(
-      (b) =>
-        b.destination_slug === data.destinationSlug && b.id !== data.businessId,
-    ).filter((b) => !hiddenIds.has(b.id));
+    const inDestination = all
+      .filter((b) => b.destination_slug === data.destinationSlug && b.id !== data.businessId)
+      .filter((b) => !hiddenIds.has(b.id));
 
     // Aplica pins: los items fijados se anteponen manteniendo su orden.
     const byId = new Map(all.map((b) => [b.id, b]));
@@ -108,10 +104,12 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
     }
     const pinnedSet = new Set(pinnedCards.map((c) => c.id));
 
-    const sameCategoryNatural = inDestination
-      .filter((b) => b.category_slug === data.categorySlug && !pinnedSet.has(b.id));
-    const sameDestinationOtherNatural = inDestination
-      .filter((b) => b.category_slug !== data.categorySlug && !pinnedSet.has(b.id));
+    const sameCategoryNatural = inDestination.filter(
+      (b) => b.category_slug === data.categorySlug && !pinnedSet.has(b.id),
+    );
+    const sameDestinationOtherNatural = inDestination.filter(
+      (b) => b.category_slug !== data.categorySlug && !pinnedSet.has(b.id),
+    );
 
     const sameCategory = [
       ...pinnedCards.filter((c) => c.category_slug === data.categorySlug),

@@ -15,29 +15,24 @@ export const EXPERIENCE_HERO_CONTRACT_VERSION = "1.1.0";
 
 export const experienceHeroVariantSchema = z.enum([
   "immersive", // Full-bleed media, gradiente, textos sobre overlay.
-  "compact",   // Media a la izquierda, texto a la derecha (desktop).
+  "compact", // Media a la izquierda, texto a la derecha (desktop).
   "editorial", // Sin media dominante, tipografía protagonista.
   "cinematic", // v1.1.0 · Full-viewport, carrusel de slides, eyebrow script.
-  "gallery",   // v1.2.0 · Airbnb-style: carrusel horizontal + contador
-               //          + back/share/favorite overlay + info debajo.
+  "gallery", // v1.2.0 · Airbnb-style: carrusel horizontal + contador
+  //          + back/share/favorite overlay + info debajo.
 ]);
 export type ExperienceHeroVariant = z.infer<typeof experienceHeroVariantSchema>;
 
 export const experienceHeroSourceSchema = z.enum([
-  "manual",     // Todos los datos vienen de `config`.
-  "business",   // Hidrata desde BusinessSurfaceContext (si existe).
-  "product",    // Reservado (Ola I3).
-  "destination",// Reservado (Ola I4).
-  "event",      // Reservado (Ola I3).
+  "manual", // Todos los datos vienen de `config`.
+  "business", // Hidrata desde BusinessSurfaceContext (si existe).
+  "product", // Reservado (Ola I3).
+  "destination", // Reservado (Ola I4).
+  "event", // Reservado (Ola I3).
 ]);
 export type ExperienceHeroSource = z.infer<typeof experienceHeroSourceSchema>;
 
-export const experienceHeroBadgeToneSchema = z.enum([
-  "neutral",
-  "primary",
-  "success",
-  "warning",
-]);
+export const experienceHeroBadgeToneSchema = z.enum(["neutral", "primary", "success", "warning"]);
 
 export const experienceHeroBadgeSchema = z.object({
   label: z.string().min(1),
@@ -79,6 +74,12 @@ export const experienceHeroSlideSchema = z.object({
   url: z.string().min(1),
   alt: z.string().default(""),
   focalPoint: z.string().optional(),
+  /** G8-F1D — Caption acreditado del medio (jamás inventado). */
+  caption: z.string().optional(),
+  /** G8-F1D — Crédito público acreditado (jamás inventado). */
+  credit: z.string().optional(),
+  /** G8-F1D — Naturaleza declarada para etiquetar el crédito. */
+  nature: z.enum(["documentary", "conceptual"]).optional(),
 });
 export type ExperienceHeroSlide = z.infer<typeof experienceHeroSlideSchema>;
 

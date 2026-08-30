@@ -20,10 +20,7 @@ import { getBlock } from "./block-registry";
 import { isContainerBlock } from "./layout-engine";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { bootstrapBlockLibrary } from "./block-library";
-import {
-  resolveVariables,
-  type VariableContext,
-} from "./dynamic-variables";
+import { resolveVariables, type VariableContext } from "./dynamic-variables";
 import { appearanceToStyle, hasAppearance, readAppearance } from "./appearance";
 import { buildScopedTypographyCss, type FieldTypography } from "./typography";
 import { applyI18nToNode } from "./i18n-overlay";
@@ -32,6 +29,23 @@ import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
 import { RutasSection } from "@/components/home/RutasSection";
+import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
+import { HomePremiumSurface } from "@/components/home-premium/HomePremiumSurface";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { resolveDestinationPremiumG4 } from "@/components/destination-premium/destination-premium-config";
+import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremiumSurface";
+import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
+import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { resolvePlacePremiumQ2d } from "@/components/place-premium/place-premium-config";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
+import {
+  mergeHomeRealContent,
+  resolveHomeSectionVisibility,
+} from "@/components/home-premium/home-premium-real";
+
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
@@ -124,6 +138,13 @@ import {
   InstitutionalBadgesBlock,
   InstitutionalBadgesPreview,
 } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
+import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import { SmartTerritoryMap } from "@/components/experience-builder/smart-blocks/SmartTerritoryMap";
+
+import type {
+  ExperienceMapDTO,
+  ExperienceMapPoint,
+} from "@/lib/experience-builder/blocks/experience-map/types";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -217,7 +238,10 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
     !studio && locale !== defaultLocale ? applyI18nToNode(node, locale) : node;
   // 2) Resolución de variables dinámicas.
   const resolved: CompositionNode = variableContext
-    ? { ...localized, config: resolveVariables(localized.config, variableContext) as CompositionNode["config"] }
+    ? {
+        ...localized,
+        config: resolveVariables(localized.config, variableContext) as CompositionNode["config"],
+      }
     : localized;
   const content = (
     <Comp
@@ -247,10 +271,9 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
   // Aplica overrides visuales (tipografía, tamaño, colores) definidos en el
   // Inspector → `config.__appearance`. Sin overrides no se envuelve nada.
   const appearance = readAppearance(resolved.config);
-  const typoOverrides =
-    (resolved.config as Record<string, unknown>).__typography as
-      | Record<string, FieldTypography>
-      | undefined;
+  const typoOverrides = (resolved.config as Record<string, unknown>).__typography as
+    | Record<string, FieldTypography>
+    | undefined;
   const scopeId = resolved.id;
   const scopedCss = typoOverrides
     ? buildScopedTypographyCss(scopeId, resolved.type, typoOverrides)
@@ -310,8 +333,7 @@ type BlockPreview = (props: BlockPreviewProps) => ReactNode;
 
 function ContainerPreview({ node, renderChildren }: BlockPreviewProps): ReactNode {
   const padding = (node.config.padding as string) ?? "normal";
-  const padClass =
-    padding === "tight" ? "p-3" : padding === "spacious" ? "p-10" : "p-6";
+  const padClass = padding === "tight" ? "p-3" : padding === "spacious" ? "p-10" : "p-6";
   return (
     <div className={`rounded-lg border border-dashed border-border ${padClass}`}>
       {renderChildren ? renderChildren() : null}
@@ -324,19 +346,13 @@ function SectionPreview({ node, renderChildren }: BlockPreviewProps): ReactNode 
   const subheading = (node.config.subheading as string) ?? "";
   const tone = (node.config.tone as string) ?? "default";
   const toneClass =
-    tone === "muted"
-      ? "bg-muted/40"
-      : tone === "accent"
-        ? "bg-primary/5"
-        : "bg-background";
+    tone === "muted" ? "bg-muted/40" : tone === "accent" ? "bg-primary/5" : "bg-background";
   return (
     <section className={`rounded-lg ${toneClass} p-6`}>
       {heading ? (
         <header className="mb-4">
           <h2 className="text-2xl font-semibold">{heading}</h2>
-          {subheading ? (
-            <p className="mt-1 text-sm text-muted-foreground">{subheading}</p>
-          ) : null}
+          {subheading ? <p className="mt-1 text-sm text-muted-foreground">{subheading}</p> : null}
         </header>
       ) : null}
       {renderChildren ? renderChildren() : null}
@@ -359,23 +375,16 @@ function HeroPreview({ node }: BlockPreviewProps): ReactNode {
   const subtitle = (node.config.subtitle as string) ?? "";
   return (
     <div className="rounded-xl bg-primary/10 px-8 py-16 text-center">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        Hero
-      </p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Hero</p>
       <h1 className="mt-3 text-3xl font-semibold">{title}</h1>
       {subtitle ? (
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-          {subtitle}
-        </p>
+        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">{subtitle}</p>
       ) : null}
     </div>
   );
 }
 
-function NamedSectionPreview({
-  node,
-  displayName,
-}: BlockPreviewProps): ReactNode {
+function NamedSectionPreview({ node, displayName }: BlockPreviewProps): ReactNode {
   const heading = (node.config.heading as string) ?? displayName;
   return (
     <div className="rounded-lg border border-border bg-card/50 p-6">
@@ -402,27 +411,96 @@ function CardPreview({ node, displayName }: BlockPreviewProps): ReactNode {
   );
 }
 
-function GenericBlockPreview({
-  displayName,
-  renderChildren,
-}: BlockPreviewProps): ReactNode {
+function GenericBlockPreview({ displayName, renderChildren }: BlockPreviewProps): ReactNode {
   return (
     <div className="rounded-md border border-border/60 bg-card/30 p-4 text-sm">
-      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-        {displayName}
-      </p>
+      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{displayName}</p>
       {renderChildren ? <div className="mt-3">{renderChildren()}</div> : null}
     </div>
   );
 }
 
-function StudioErrorBlock({
-  title,
-  detail,
-}: {
-  title: string;
-  detail: string;
-}): ReactNode {
+/**
+ * G8-D · `vmx.home.premium-g4` — render único (Studio, preview y producción).
+ * Autoridad visual: `HomePremiumSurface`. No renderiza chrome global.
+ */
+function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolveHomePremiumG4(node.config as Record<string, unknown>);
+  const resolveReal = useServerFn(resolveHomePremiumRealContent);
+  const { data } = useQuery({
+    queryKey: ["home-premium-real-content"],
+    queryFn: () => resolveReal(),
+    staleTime: 60_000,
+  });
+
+  const content = mergeHomeRealContent(resolved.content, data);
+  const sections = resolveHomeSectionVisibility(content, resolved.sections);
+
+  return (
+    <HomePremiumSurface
+      content={content}
+      heroVariant={resolved.heroVariant}
+      layout={resolved.layout}
+      sections={sections}
+      order={resolved.order}
+    />
+  );
+}
+
+/**
+ * G8-E · `vmx.destination.premium-g4` — render único (Studio, preview y
+ * producción). Autoridad visual: `DestinationPremiumSurface`.
+ */
+function DestinationPremiumG4Render({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolveDestinationPremiumG4(node.config as Record<string, unknown>);
+  return (
+    <DestinationPremiumSurface
+      content={resolved.content}
+      heroVariant={resolved.heroVariant}
+      galleryLayout={resolved.galleryLayout}
+      sections={resolved.sections}
+    />
+  );
+}
+
+/**
+ * G8-E · `vmx.listing.premium-g5` — render único de los 6 listados
+ * turísticos. Autoridad visual: `TourismListingSurface`.
+ */
+function ListingPremiumG5Render({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolveListingPremiumG5(node.config as Record<string, unknown>);
+  return (
+    <ListingPremiumSurface
+      hero={resolved.hero}
+      items={resolved.items}
+      columns={resolved.columns}
+      destinationSlug={resolved.destinationSlug}
+      destinationLabel={resolved.destinationLabel}
+      emptyMessage={resolved.emptyMessage}
+      showAddToTrip={resolved.showAddToTrip}
+      showFavorite={resolved.showFavorite}
+    />
+  );
+}
+
+/**
+ * G8-Q2D-A · `vmx.place.premium-q2d` — render único (Studio y preview).
+ * Autoridad visual: `PlacePremiumSurface` (aprobación Founder G8-Q2D-0).
+ * Regla fail-closed de medios resuelta en `resolvePlacePremiumQ2d`.
+ */
+function PlacePremiumQ2dRender({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolvePlacePremiumQ2d(node.config as Record<string, unknown>);
+  return (
+    <PlacePremiumSurface
+      content={resolved.content}
+      presentation={resolved.presentation}
+      variant={resolved.variant}
+      builderNotice={resolved.builderNotice}
+    />
+  );
+}
+
+function StudioErrorBlock({ title, detail }: { title: string; detail: string }): ReactNode {
   return (
     <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
       <p className="font-semibold text-destructive">{title}</p>
@@ -440,6 +518,12 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.section.destinos": NamedSectionPreview,
   "vmx.section.categorias": NamedSectionPreview,
   "vmx.section.rutas": NamedSectionPreview,
+  "vmx.alux.planner": NamedSectionPreview,
+  // G8-D · la preview de Studio usa el MISMO componente que producción.
+  "vmx.home.premium-g4": HomePremiumG4Render,
+  "vmx.destination.premium-g4": DestinationPremiumG4Render,
+  "vmx.listing.premium-g5": ListingPremiumG5Render,
+  "vmx.place.premium-q2d": PlacePremiumQ2dRender,
   "vmx.section.consejo-alux": NamedSectionPreview,
   "vmx.section.arma-tu-viaje": NamedSectionPreview,
   "vmx.section.en-vivo": NamedSectionPreview,
@@ -500,25 +584,17 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 
 // H-02 · Iniciativa 2 — Discovery Navigator (Studio preview neutral).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.discovery.navigator"] = () => (
-  <DiscoveryNavigatorPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.discovery.navigator"] = () => <DiscoveryNavigatorPreview />;
 
 // H-03 · Ola I1.a — Experience Hero (Studio preview neutral).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.hero"] = () => (
-  <ExperienceHeroPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.hero"] = () => <ExperienceHeroPreview />;
 
 // H-03 · Ola I1.b — Experience Subnav + CTA Bar (Studio preview neutral).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.subnav"] = () => (
-  <ExperienceSubnavPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.subnav"] = () => <ExperienceSubnavPreview />;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.cta-bar"] = () => (
-  <ExperienceCtaBarPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.cta-bar"] = () => <ExperienceCtaBarPreview />;
 
 // H-03 · Ola I1.c — Gallery / Info-Grid / Section / Features (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -540,10 +616,14 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 (STUDIO_PREVIEW_MAP as any)["vmx.experience.reviews"] = () => <ExperienceReviewsPreview />;
 // H-03 · Ola I3.b — Experience Related Collection (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.related-collection"] = () => <ExperienceRelatedCollectionPreview />;
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.related-collection"] = () => (
+  <ExperienceRelatedCollectionPreview />
+);
 // H-03 · Ola I3.c — Institutional Badges (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.institutional-badges"] = () => <InstitutionalBadgesPreview />;
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.institutional-badges"] = () => (
+  <InstitutionalBadgesPreview />
+);
 
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
@@ -555,9 +635,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
  * todavía no migrados caen al preview neutral.
  * ------------------------------------------------------------------ */
 
-const wrap = (Component: (props?: { config?: Record<string, unknown> }) => ReactNode): BlockPreview => ({ node }) => (
-  <Component config={node.config as Record<string, unknown>} />
-);
+const wrap =
+  (Component: (props?: { config?: Record<string, unknown> }) => ReactNode): BlockPreview =>
+  ({ node }) => <Component config={node.config as Record<string, unknown>} />;
 
 const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.hero": ({ node }) => {
@@ -613,6 +693,12 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
           search_max_width: node.config.search_max_width as string | undefined,
           text_alignment: node.config.text_alignment as string | undefined,
           search_alignment: node.config.search_alignment as string | undefined,
+          // G8-R1-F1J-HOME-PREMIUM · La variante editorial y sus controles de
+          // composición deben viajar del DTO del CMS al bloque oficial.
+          variant: node.config.variant as string | undefined,
+          media_side: node.config.media_side as string | undefined,
+          mobile_order: node.config.mobile_order as string | undefined,
+          text_safe_zone: node.config.text_safe_zone as string | undefined,
           __typography:
             (node.config.__typography as Record<string, FieldTypography> | undefined) ?? undefined,
         }}
@@ -622,6 +708,14 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.section.destinos": wrap(DestinosSection),
   "vmx.section.categorias": wrap(CategoriasSection),
   "vmx.section.rutas": wrap(RutasSection),
+  // G7 · Planificador Alux visual (render-only, sin IA ni persistencia).
+  "vmx.alux.planner": wrap(AluxPlannerBlock),
+  // G8-D · Home Premium G4: cuerpo premium únicamente. El chrome global
+  // (ribbon/header/footer) lo aporta el shell público o el canvas.
+  "vmx.home.premium-g4": HomePremiumG4Render,
+  "vmx.destination.premium-g4": DestinationPremiumG4Render,
+  "vmx.listing.premium-g5": ListingPremiumG5Render,
+  "vmx.place.premium-q2d": PlacePremiumQ2dRender,
   "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
   "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
   "vmx.section.en-vivo": wrap(EnVivoSection),
@@ -816,12 +910,80 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.institutional-badges"] = ({ node }) => 
 );
 
 /* ------------------------------------------------------------------ *
+ * G8-R1-C+L · GAP-02 — `vmx.experience.map`
+ * El bloque estaba registrado en la biblioteca pero no tenía caso en el
+ * renderer. Se conecta con el MISMO componente en Studio y producción.
+ * Fail-closed: sin puntos con coordenadas reales el bloque se omite.
+ * ------------------------------------------------------------------ */
+const MAP_KINDS = ["business", "product", "destination", "event", "promotion"] as const;
+
+function readMapDto(config: Record<string, unknown>): ExperienceMapDTO | null {
+  const raw = Array.isArray(config.points) ? (config.points as Record<string, unknown>[]) : [];
+  const points: ExperienceMapPoint[] = [];
+  raw.forEach((p, i) => {
+    const lat = Number(p.lat);
+    const lng = Number(p.lng);
+    const title = typeof p.title === "string" ? p.title : "";
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !title) return;
+    const kind = MAP_KINDS.includes(p.kind as (typeof MAP_KINDS)[number])
+      ? (p.kind as ExperienceMapPoint["kind"])
+      : "business";
+    points.push({
+      id: typeof p.id === "string" && p.id ? p.id : `pt-${i}`,
+      kind,
+      lat,
+      lng,
+      title,
+      subtitle: typeof p.subtitle === "string" ? p.subtitle : null,
+      href: typeof p.href === "string" ? p.href : null,
+      priceLabel: typeof p.priceLabel === "string" ? p.priceLabel : null,
+    });
+  });
+  if (points.length === 0) return null;
+  const variant = (["single", "multi", "list-sync", "cluster"] as const).includes(
+    config.variant as never,
+  )
+    ? (config.variant as ExperienceMapDTO["variant"])
+    : points.length > 1
+      ? "multi"
+      : "single";
+  return {
+    variant,
+    heading: typeof config.heading === "string" ? config.heading : null,
+    points,
+  } as ExperienceMapDTO;
+}
+
+const ExperienceMapRender: BlockPreview = ({ node }) => {
+  const dto = readMapDto(node.config);
+  // G8-R1-F1J-HOME-PREMIUM-R2 · Sin puntos estáticos el bloque no se omite:
+  // resuelve el corpus real publicado con la autoridad de elegibilidad única.
+  if (!dto) return <SmartTerritoryMap config={node.config} />;
+  return <ExperienceMapBlock dto={dto} />;
+};
+
+PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.map"] = ExperienceMapRender;
+
+// G8-R1-C+L · GAP-03 — paridad Studio/producción del Planificador Alux.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.alux.planner"] = ({ node }: { node: CompositionNode }) => (
+  <AluxPlannerBlock config={node.config} />
+);
+
+/* ------------------------------------------------------------------ *
  * Bloque formulario configurable
  * ------------------------------------------------------------------ */
 // (Los renderers de `vmx.product.*` se inyectan también en PRODUCTION_COMPONENT_MAP
 //  arriba, reutilizando los mismos componentes de Studio.)
 
-interface FormFieldCfg { key: string; label: string; type: string; required?: boolean }
+interface FormFieldCfg {
+  key: string;
+  label: string;
+  type: string;
+  required?: boolean;
+}
 
 function CustomFormBlock({ config }: { config: Record<string, unknown> }) {
   const heading = (config.heading as string) ?? "Contáctanos";
@@ -890,7 +1052,9 @@ function CustomFormBlock({ config }: { config: Record<string, unknown> }) {
         >
           {submitLabel}
         </button>
-        <p data-form-success className="hidden text-sm text-emerald-600">{successMessage}</p>
+        <p data-form-success className="hidden text-sm text-emerald-600">
+          {successMessage}
+        </p>
       </form>
     </section>
   );

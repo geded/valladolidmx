@@ -80,9 +80,7 @@ export const getAluxConciergeContext = createServerFn({ method: "POST" })
         reserved_destination_ids: asStringArray(d.reserved_destination_ids),
         active_proposals_count: Number(d.active_proposals_count ?? 0) || 0,
         latest_proposal_summary:
-          typeof d.latest_proposal_summary === "string"
-            ? d.latest_proposal_summary
-            : null,
+          typeof d.latest_proposal_summary === "string" ? d.latest_proposal_summary : null,
         shared_notes,
       };
     } catch {

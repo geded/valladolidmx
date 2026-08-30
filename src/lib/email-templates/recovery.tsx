@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 import {
   Body,
@@ -9,17 +9,14 @@ import {
   Html,
   Preview,
   Text,
-} from '@react-email/components'
+} from "@react-email/components";
 
 interface RecoveryEmailProps {
-  siteName: string
-  confirmationUrl: string
+  siteName: string;
+  confirmationUrl: string;
 }
 
-export const RecoveryEmail = ({
-  siteName,
-  confirmationUrl,
-}: RecoveryEmailProps) => (
+export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
   <Html lang="es" dir="ltr">
     <Head />
     <Preview>Restablece tu contraseña en {siteName}</Preview>
@@ -28,45 +25,60 @@ export const RecoveryEmail = ({
         <Heading style={brandMark}>Valladolid.mx</Heading>
         <Heading style={h1}>Restablece tu contraseña</Heading>
         <Text style={text}>
-          Recibimos una solicitud para restablecer tu contraseña en {siteName}.
-          Da clic en el botón para elegir una nueva contraseña.
+          Recibimos una solicitud para restablecer tu contraseña en {siteName}. Da clic en el botón
+          para elegir una nueva contraseña.
         </Text>
         <Button style={button} href={confirmationUrl}>
           Elegir nueva contraseña
         </Button>
         <Text style={footer}>
-          Si no solicitaste este cambio, puedes ignorar este mensaje. Tu
-          contraseña seguirá siendo la misma.
+          Si no solicitaste este cambio, puedes ignorar este mensaje. Tu contraseña seguirá siendo
+          la misma.
         </Text>
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default RecoveryEmail
+export default RecoveryEmail;
 
 const main = {
-  backgroundColor: '#ffffff',
+  backgroundColor: "#ffffff",
   fontFamily: '"Inter","Helvetica Neue",Arial,sans-serif',
-  color: '#2a1e17',
-}
+  color: "#2a1e17",
+};
 const container = {
-  padding: '32px 28px',
-  maxWidth: '520px',
-  margin: '0 auto',
-  backgroundColor: '#fdf9f2',
-  borderRadius: '18px',
-  border: '1px solid #ecdcc0',
-}
+  padding: "32px 28px",
+  maxWidth: "520px",
+  margin: "0 auto",
+  backgroundColor: "#fdf9f2",
+  borderRadius: "18px",
+  border: "1px solid #ecdcc0",
+};
 const brandMark = {
-  fontSize: '13px',
-  fontWeight: 'bold' as const,
-  letterSpacing: '2px',
-  color: '#a4530b',
-  textTransform: 'uppercase' as const,
-  margin: '0 0 12px',
-}
-const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#2a1e17', margin: '0 0 20px', lineHeight: '1.25' }
-const text = { fontSize: '15px', color: '#4a3a2e', lineHeight: '1.6', margin: '0 0 20px' }
-const button = { backgroundColor: '#c86a12', color: '#ffffff', fontSize: '15px', fontWeight: 'bold' as const, borderRadius: '999px', padding: '14px 28px', textDecoration: 'none', display: 'inline-block' }
-const footer = { fontSize: '12px', color: '#8a7a6a', margin: '32px 0 0' }
+  fontSize: "13px",
+  fontWeight: "bold" as const,
+  letterSpacing: "2px",
+  color: "#a4530b",
+  textTransform: "uppercase" as const,
+  margin: "0 0 12px",
+};
+const h1 = {
+  fontSize: "24px",
+  fontWeight: "bold" as const,
+  color: "#2a1e17",
+  margin: "0 0 20px",
+  lineHeight: "1.25",
+};
+const text = { fontSize: "15px", color: "#4a3a2e", lineHeight: "1.6", margin: "0 0 20px" };
+const button = {
+  backgroundColor: "#c86a12",
+  color: "#ffffff",
+  fontSize: "15px",
+  fontWeight: "bold" as const,
+  borderRadius: "999px",
+  padding: "14px 28px",
+  textDecoration: "none",
+  display: "inline-block",
+};
+const footer = { fontSize: "12px", color: "#8a7a6a", margin: "32px 0 0" };

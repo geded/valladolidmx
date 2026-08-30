@@ -103,8 +103,8 @@ export function ExperienceSubnav({ dto, className }: ExperienceSubnavProps) {
     >
       <ul
         className={cn(
-          "-mx-4 flex items-center gap-1 overflow-x-auto px-4 py-2 [scrollbar-width:none]",
-          "sm:mx-0 sm:overflow-visible sm:px-0",
+          "flex max-w-full items-center gap-1 overflow-x-auto py-2 [scrollbar-width:none]",
+          "lg:flex-wrap lg:overflow-visible",
         )}
         style={{ scrollSnapType: "x proximity" }}
       >

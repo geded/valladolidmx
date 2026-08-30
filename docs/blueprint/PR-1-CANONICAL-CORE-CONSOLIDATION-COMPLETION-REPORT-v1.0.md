@@ -10,17 +10,17 @@
 
 Fuente del dominio fragmentada en **7 ubicaciones independientes**:
 
-| # | Ubicación | Valor |
-|---|-----------|-------|
-| 1 | `src/config/site.ts` · `SITE.url` | `https://quehacerenvalladolid.com` |
-| 2 | `src/config/site.ts` · `SITE.og_image` | URL absoluta hardcoded (duplicada) |
-| 3 | `src/lib/discovery/seo.ts` · `DISCOVERY_ORIGIN` | `https://quehacerenvalladolid.com` (2ª fuente) |
-| 4 | `src/lib/discovery/seo.ts` · `SITE_DEFAULT_OG_IMAGE` | URL absoluta hardcoded (duplicada) |
-| 5 | `src/lib/discovery/seo.ts` · `absoluteUrl()` local | usa `DISCOVERY_ORIGIN` local |
-| 6 | `src/lib/visibility/visibility-notifications.server.ts` · `PUBLIC_ORIGIN` | `https://valladolid.mx` (**divergente**) |
-| 7 | 12 email templates · default props (`portalUrl`, `couponUrl`, `planUrl`, `reviewUrl`) | `https://valladolid.mx/...` (**divergentes**) |
-| 8 | `src/components/experience-builder/SeoPreview.tsx` · `siteHost` default | `valladolidmx.lovable.app` |
-| 9 | `src/routes/blog.tsx` · JSON-LD `url` | URL literal hardcoded |
+| #   | Ubicación                                                                             | Valor                                          |
+| --- | ------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| 1   | `src/config/site.ts` · `SITE.url`                                                     | `https://quehacerenvalladolid.com`             |
+| 2   | `src/config/site.ts` · `SITE.og_image`                                                | URL absoluta hardcoded (duplicada)             |
+| 3   | `src/lib/discovery/seo.ts` · `DISCOVERY_ORIGIN`                                       | `https://quehacerenvalladolid.com` (2ª fuente) |
+| 4   | `src/lib/discovery/seo.ts` · `SITE_DEFAULT_OG_IMAGE`                                  | URL absoluta hardcoded (duplicada)             |
+| 5   | `src/lib/discovery/seo.ts` · `absoluteUrl()` local                                    | usa `DISCOVERY_ORIGIN` local                   |
+| 6   | `src/lib/visibility/visibility-notifications.server.ts` · `PUBLIC_ORIGIN`             | `https://valladolid.mx` (**divergente**)       |
+| 7   | 12 email templates · default props (`portalUrl`, `couponUrl`, `planUrl`, `reviewUrl`) | `https://valladolid.mx/...` (**divergentes**)  |
+| 8   | `src/components/experience-builder/SeoPreview.tsx` · `siteHost` default               | `valladolidmx.lovable.app`                     |
+| 9   | `src/routes/blog.tsx` · JSON-LD `url`                                                 | URL literal hardcoded                          |
 
 Migrar el dominio implicaba editar ≥16 archivos.
 
@@ -52,25 +52,25 @@ Todo helper público consume `SITE.url`, `SITE.domain`, `SITE.og_image` o `absol
 
 ## 3 · Archivos modificados
 
-| Archivo | Cambio |
-|---------|--------|
-| `src/config/site.ts` | Nueva SoT + helper `absoluteUrl()`; `og_image` derivado |
-| `src/lib/discovery/seo.ts` | `DISCOVERY_ORIGIN` y `SITE_DEFAULT_OG_IMAGE` convertidos en aliases; `absoluteUrl()` local reexpide al helper central |
-| `src/lib/visibility/visibility-notifications.server.ts` | `PUBLIC_ORIGIN = SITE.url` |
-| `src/routes/blog.tsx` | JSON-LD `url` usa `absoluteUrl("/blog")` |
-| `src/components/experience-builder/SeoPreview.tsx` | Defaults `siteName = SITE.name`, `siteHost = SITE.domain` |
-| `src/lib/email-templates/visibility-request-received.tsx` | `portalUrl` → `` `${SITE.url}/portal/visibilidad` `` |
-| `src/lib/email-templates/visibility-rejected.tsx` | idem |
-| `src/lib/email-templates/visibility-expiring.tsx` | idem |
-| `src/lib/email-templates/visibility-expired.tsx` | idem |
-| `src/lib/email-templates/visibility-activated.tsx` | idem |
-| `src/lib/email-templates/coupon-issued.tsx` | `couponUrl` → SITE.url |
-| `src/lib/email-templates/coupon-redeemed.tsx` | `reviewUrl` → SITE.url |
-| `src/lib/email-templates/coupon-review-reminder.tsx` | `reviewUrl` → SITE.url |
-| `src/lib/email-templates/trip-welcome.tsx` | `planUrl` → SITE.url |
-| `src/lib/email-templates/trip-t3.tsx` | idem |
-| `src/lib/email-templates/trip-t14.tsx` | idem |
-| `src/lib/email-templates/trip-post.tsx` | `reviewUrl` → SITE.url |
+| Archivo                                                   | Cambio                                                                                                                |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `src/config/site.ts`                                      | Nueva SoT + helper `absoluteUrl()`; `og_image` derivado                                                               |
+| `src/lib/discovery/seo.ts`                                | `DISCOVERY_ORIGIN` y `SITE_DEFAULT_OG_IMAGE` convertidos en aliases; `absoluteUrl()` local reexpide al helper central |
+| `src/lib/visibility/visibility-notifications.server.ts`   | `PUBLIC_ORIGIN = SITE.url`                                                                                            |
+| `src/routes/blog.tsx`                                     | JSON-LD `url` usa `absoluteUrl("/blog")`                                                                              |
+| `src/components/experience-builder/SeoPreview.tsx`        | Defaults `siteName = SITE.name`, `siteHost = SITE.domain`                                                             |
+| `src/lib/email-templates/visibility-request-received.tsx` | `portalUrl` → `` `${SITE.url}/portal/visibilidad` ``                                                                  |
+| `src/lib/email-templates/visibility-rejected.tsx`         | idem                                                                                                                  |
+| `src/lib/email-templates/visibility-expiring.tsx`         | idem                                                                                                                  |
+| `src/lib/email-templates/visibility-expired.tsx`          | idem                                                                                                                  |
+| `src/lib/email-templates/visibility-activated.tsx`        | idem                                                                                                                  |
+| `src/lib/email-templates/coupon-issued.tsx`               | `couponUrl` → SITE.url                                                                                                |
+| `src/lib/email-templates/coupon-redeemed.tsx`             | `reviewUrl` → SITE.url                                                                                                |
+| `src/lib/email-templates/coupon-review-reminder.tsx`      | `reviewUrl` → SITE.url                                                                                                |
+| `src/lib/email-templates/trip-welcome.tsx`                | `planUrl` → SITE.url                                                                                                  |
+| `src/lib/email-templates/trip-t3.tsx`                     | idem                                                                                                                  |
+| `src/lib/email-templates/trip-t14.tsx`                    | idem                                                                                                                  |
+| `src/lib/email-templates/trip-post.tsx`                   | `reviewUrl` → SITE.url                                                                                                |
 
 **Total: 17 archivos.**
 
@@ -89,11 +89,11 @@ Todo helper público consume `SITE.url`, `SITE.domain`, `SITE.og_image` o `absol
 
 ## 5 · Constantes convertidas en alias documentado
 
-| Alias legado | Fuente única |
-|--------------|--------------|
-| `DISCOVERY_ORIGIN` (`src/lib/discovery/seo.ts`) | `SITE.url` |
-| `SITE_DEFAULT_OG_IMAGE` (`src/lib/discovery/seo.ts`) | `SITE.og_image` |
-| `PUBLIC_ORIGIN` (`visibility-notifications.server.ts`) | `SITE.url` |
+| Alias legado                                           | Fuente única    |
+| ------------------------------------------------------ | --------------- |
+| `DISCOVERY_ORIGIN` (`src/lib/discovery/seo.ts`)        | `SITE.url`      |
+| `SITE_DEFAULT_OG_IMAGE` (`src/lib/discovery/seo.ts`)   | `SITE.og_image` |
+| `PUBLIC_ORIGIN` (`visibility-notifications.server.ts`) | `SITE.url`      |
 
 Ambos aliases marcados `@deprecated` / con comentario PR-1; consumidores nuevos deben importar directamente de `@/config/site`.
 
@@ -127,11 +127,11 @@ Verificado que **no se modificaron**:
 
 ## 8 · Riesgos
 
-| Riesgo | Severidad | Mitigación |
-|--------|-----------|------------|
+| Riesgo                                                                                                                                            | Severidad                         | Mitigación                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Emails que antes emitían `https://valladolid.mx/...` ahora emiten `https://quehacerenvalladolid.com/...` (dominio canónico activo, no divergente) | Bajo — corrige divergencia previa | Sólo afecta valores por defecto; llamadas que pasan `portalUrl`/`couponUrl` explícitamente no cambian |
-| `SeoPreview` muestra `quehacerenvalladolid.com` en lugar del literal Lovable | Cosmético | Consistente con dominio real |
-| Aliases legados (`DISCOVERY_ORIGIN`, `PUBLIC_ORIGIN`, `SITE_DEFAULT_OG_IMAGE`) preservados | Ninguno | Marcados `@deprecated` para eliminación futura |
+| `SeoPreview` muestra `quehacerenvalladolid.com` en lugar del literal Lovable                                                                      | Cosmético                         | Consistente con dominio real                                                                          |
+| Aliases legados (`DISCOVERY_ORIGIN`, `PUBLIC_ORIGIN`, `SITE_DEFAULT_OG_IMAGE`) preservados                                                        | Ninguno                           | Marcados `@deprecated` para eliminación futura                                                        |
 
 Verificación externa (`rg -rn "https://valladolid\.mx" src/lib/email-templates/`): **0 matches**.
 
@@ -161,7 +161,7 @@ Con la arquitectura consolidada por PR-1, la migración del dominio maestro
 requerirá **editar exclusivamente dos líneas en `src/config/site.ts`**:
 
 ```ts
-const PUBLIC_DOMAIN = "valladolid.mx";     // ← cambio
+const PUBLIC_DOMAIN = "valladolid.mx"; // ← cambio
 const PUBLIC_URL = `https://${PUBLIC_DOMAIN}` as const;
 ```
 
@@ -180,5 +180,5 @@ Automáticamente propagan:
 
 ---
 
-*PR-1 · Canonical Core Consolidation — Completion Report v1.0 emitido.
-Ninguna URL pública fue modificada. Ningún comportamiento visible cambió.*
+_PR-1 · Canonical Core Consolidation — Completion Report v1.0 emitido.
+Ninguna URL pública fue modificada. Ningún comportamiento visible cambió._

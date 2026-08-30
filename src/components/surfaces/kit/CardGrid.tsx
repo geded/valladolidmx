@@ -35,9 +35,7 @@ function Card({ vm }: { vm: CardVM }) {
       ) : null}
       <div className="mt-1">{title}</div>
       {vm.tagline ? (
-        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-          {vm.tagline}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{vm.tagline}</p>
       ) : null}
       {vm.badges && vm.badges.length > 0 ? (
         <div className="mt-2">
@@ -53,9 +51,7 @@ function Card({ vm }: { vm: CardVM }) {
 export function KitCardGrid({ vm }: { vm: CardGridVM }) {
   if (!vm.items || vm.items.length === 0) {
     if (!vm.emptyLabel) return null;
-    return (
-      <p className="mt-4 text-sm text-muted-foreground">{vm.emptyLabel}</p>
-    );
+    return <p className="mt-4 text-sm text-muted-foreground">{vm.emptyLabel}</p>;
   }
   const cols = COLS[vm.columns ?? 3];
   return (

@@ -3,11 +3,13 @@ name: Founder Travel Memory Loop Principle
 description: El viaje no termina al regresar a casa. Toda evolución post-viaje (recuerdos, reseñas, álbumes, estadísticas, recompensas, referidos, re-engagement) reutiliza el mismo Travel Plan e historial. Prohibido crear perfiles, historiales o modelos paralelos.
 type: constraint
 ---
+
 Founder Travel Memory Loop Principle (vinculante).
 
 Ciclo continuo: Inspiración → Planeación → Reserva → Viaje → Recuerdos → Reseñas → Recomendaciones → Referidos → Próximo viaje.
 
 Reglas:
+
 - "Mi Viaje" conserva la memoria completa del visitante y facilita la preparación de su siguiente visita al Oriente Maya de Yucatán.
 - Toda capacidad futura de recuerdos, reseñas, álbumes, estadísticas, recompensas, referidos y re-engagement REUTILIZA el mismo Travel Plan e historial existente.
 - Prohibido crear perfiles, historiales, modelos, tablas o memorias paralelas al Travel Plan.

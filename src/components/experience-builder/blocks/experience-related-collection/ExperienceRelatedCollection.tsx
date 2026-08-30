@@ -48,18 +48,11 @@ function formatDate(iso: string | null): string | null {
 /* ------------------------------------------------------------------ *
  * Mapping ExperienceRelatedItem → TourismCardVM
  * ------------------------------------------------------------------ */
-function relatedItemToVM(
-  item: ExperienceRelatedItem,
-  showKindBadge: boolean,
-): TourismCardVM {
-  const dateLabel =
-    item.dateLabel ??
-    (item.dateStart ? formatDate(item.dateStart) : null);
+function relatedItemToVM(item: ExperienceRelatedItem, showKindBadge: boolean): TourismCardVM {
+  const dateLabel = item.dateLabel ?? (item.dateStart ? formatDate(item.dateStart) : null);
   const meta = item.meta.filter((m) => m.label);
   const territorialContext =
-    item.territorialContext ??
-    meta.find((m) => m.iconKey === "map-pin")?.label ??
-    null;
+    item.territorialContext ?? meta.find((m) => m.iconKey === "map-pin")?.label ?? null;
   // Fallback description → tagline en Tourism Card.
   const tagline = item.description ?? item.subtitle ?? null;
   return {
@@ -156,12 +149,8 @@ export function ExperienceRelatedCollection({
     >
       {heading || subheading ? (
         <header className="mb-5 flex flex-col gap-1">
-          {heading ? (
-            <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-          ) : null}
-          {subheading ? (
-            <p className="text-sm text-muted-foreground">{subheading}</p>
-          ) : null}
+          {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
+          {subheading ? <p className="text-sm text-muted-foreground">{subheading}</p> : null}
         </header>
       ) : null}
 
@@ -183,14 +172,10 @@ export function ExperienceRelatedCollection({
                   <header className="mb-3 flex items-end justify-between gap-3">
                     <div>
                       {g.heading ? (
-                        <h3 className="text-xl font-semibold tracking-tight">
-                          {g.heading}
-                        </h3>
+                        <h3 className="text-xl font-semibold tracking-tight">{g.heading}</h3>
                       ) : null}
                       {g.subheading ? (
-                        <p className="text-sm text-muted-foreground">
-                          {g.subheading}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{g.subheading}</p>
                       ) : null}
                     </div>
                     {g.seeAllHref ? (
@@ -316,11 +301,7 @@ function ItemsLayout({
     >
       {items.map((it) => (
         <li key={`${it.kind}-${it.id}`}>
-          <TourismCard
-            vm={toVM(it)}
-            capabilities={tourismCaps}
-            renderActions={renderItemActions}
-          />
+          <TourismCard vm={toVM(it)} capabilities={tourismCaps} renderActions={renderItemActions} />
         </li>
       ))}
     </ul>

@@ -29,7 +29,7 @@ Antes de proponer un componente/registry/engine nuevo, verificar en el Blueprint
 
 ## 5. Product First Validation
 
-Cada historia US-R* debe demostrar:
+Cada historia US-R\* debe demostrar:
 
 1. capacidad incorporada o mejorada;
 2. flujo de usuario completo;
@@ -39,7 +39,7 @@ Cada historia US-R* debe demostrar:
 
 **DoD obligatorio:** Typecheck + Build + Smoke + Auditoría no-regresión + Comparativa visual antes/después + Demo funcional + Completion Report + Impacto de producto.
 
-*Compilar no es suficiente.*
+_Compilar no es suficiente._
 
 ## 6. Demo Pack Policy
 
@@ -52,7 +52,7 @@ Ninguna entrega se considera terminada sin **Demo Pack**:
 - pasos de reproducción;
 - marca de datos temporales.
 
-Prohibido borrar datos demo hasta que el Founder diga literal: *"Demo validada. Puedes eliminar los datos temporales."*
+Prohibido borrar datos demo hasta que el Founder diga literal: _"Demo validada. Puedes eliminar los datos temporales."_
 
 Forma parte del DoD de cada Sub-ola.
 

@@ -46,10 +46,9 @@ export const listUserZoneScopes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ListSchema.parse(input))
   .handler(async ({ data, context }): Promise<UserZoneScope[]> => {
-    const { data: rows, error } = await context.supabase.rpc(
-      "user_zone_scopes_for",
-      { _user_id: data.userId },
-    );
+    const { data: rows, error } = await context.supabase.rpc("user_zone_scopes_for", {
+      _user_id: data.userId,
+    });
     if (error) throw new Error(error.message);
     return (rows ?? []) as UserZoneScope[];
   });
@@ -58,16 +57,13 @@ export const assignUserZoneScope = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => AssignSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: id, error } = await context.supabase.rpc(
-      "assign_zone_scope",
-      {
-        _user_id: data.userId,
-        _scope_type: data.scopeType,
-        _scope_id: data.scopeId,
-        _role: data.role,
-        _notes: data.notes ?? undefined,
-      },
-    );
+    const { data: id, error } = await context.supabase.rpc("assign_zone_scope", {
+      _user_id: data.userId,
+      _scope_type: data.scopeType,
+      _scope_id: data.scopeId,
+      _role: data.role,
+      _notes: data.notes ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { id: id as string };
   });
@@ -76,10 +72,9 @@ export const revokeUserZoneScope = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => RevokeSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: ok, error } = await context.supabase.rpc(
-      "revoke_zone_scope",
-      { _scope_id: data.scopeId },
-    );
+    const { data: ok, error } = await context.supabase.rpc("revoke_zone_scope", {
+      _scope_id: data.scopeId,
+    });
     if (error) throw new Error(error.message);
     return { revoked: Boolean(ok) };
   });

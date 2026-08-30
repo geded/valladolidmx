@@ -25,9 +25,7 @@ export function EntityInspector() {
           <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             {focused.type}
           </div>
-          <div className="truncate font-display text-sm">
-            {focused.label ?? focused.id}
-          </div>
+          <div className="truncate font-display text-sm">{focused.label ?? focused.id}</div>
         </div>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto text-sm">

@@ -3,6 +3,7 @@ name: Founder Proactive Copilot Principle
 description: Alux Espacial (CV6.6) actúa como copiloto proactivo del viajero en fase onsite. Toda propuesta responde qué hacer ahora, por qué conviene, qué beneficio otorga y qué ocurre si no se realiza. Fuente única: ResolvedDestinationContext + Decision Center + LiveDayContext + Travel Plan Contract. Prohibido tocar Weather/Hours/Traffic/Google Maps/Open-Meteo/CMS/APIs externas.
 type: constraint
 ---
+
 CV6.6 establece a Alux Espacial como copiloto proactivo (no informador). Reglas vinculantes:
 
 1. Fuente única de consumo: `ResolvedDestinationContext`, `DecisionCenter`, `LiveDayContext`, `TravelPlanContract`. Prohibido acceso directo a Contributors (Weather, Hours, Traffic), Google Maps, Open-Meteo, CMS o APIs externas.

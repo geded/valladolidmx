@@ -47,15 +47,10 @@ export const Route = createFileRoute("/api/dev/media-pipeline-derive")({
         } | null;
 
         if (!body?.assetId || !body?.engine) {
-          return Response.json(
-            { error: "assetId and engine are required" },
-            { status: 400 },
-          );
+          return Response.json({ error: "assetId and engine are required" }, { status: 400 });
         }
 
-        const { supabaseAdmin } = await import(
-          "@/integrations/supabase/client.server"
-        );
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         // Verificación defensiva: flag apagado ⇒ no operar.
         const { data: flagRow } = await supabaseAdmin
@@ -64,9 +59,7 @@ export const Route = createFileRoute("/api/dev/media-pipeline-derive")({
           .eq("key", "media_pipeline_enabled")
           .maybeSingle();
         const enabled =
-          typeof flagRow?.value === "boolean"
-            ? flagRow.value
-            : flagRow?.value === "true";
+          typeof flagRow?.value === "boolean" ? flagRow.value : flagRow?.value === "true";
         if (!enabled) {
           return Response.json(
             {

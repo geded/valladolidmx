@@ -13,10 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { resolveSmartBlock } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock } from "@/lib/experience-builder/block-registry";
-import type {
-  SmartBlockFilter,
-  SmartBlockQuery,
-} from "@/lib/experience-builder/block-contract";
+import type { SmartBlockFilter, SmartBlockQuery } from "@/lib/experience-builder/block-contract";
 import type { CompositionNode } from "@/lib/experience-builder/composition-tree";
 import {
   SmartDestinationsGrid,
@@ -41,7 +38,7 @@ export function SmartBlockRuntime({ node }: { node: CompositionNode }) {
   const limit =
     typeof cfg.limit === "number" && cfg.limit > 0 && cfg.limit <= 24
       ? Math.floor(cfg.limit)
-      : baseQuery?.limit ?? 6;
+      : (baseQuery?.limit ?? 6);
   const onlyFeatured = cfg.only_featured === true;
 
   const query: SmartBlockQuery | null = baseQuery
@@ -91,14 +88,17 @@ export function SmartBlockRuntime({ node }: { node: CompositionNode }) {
   }
 }
 
+/**
+ * G8-R1-F1J-HOME-PREMIUM-R2 — `is_featured` no existe en el esquema real.
+ * "Destacado" se resuelve como RANKING dentro del resolver (metadata
+ * `featured`), nunca como filtro duro: una sección destacada jamás queda
+ * vacía por falta de marcado editorial.
+ */
 function mergeFeaturedFilter(
   filters: SmartBlockFilter[] | undefined,
-  type: string,
-  onlyFeatured: boolean,
+  _type: string,
+  _onlyFeatured: boolean,
 ): SmartBlockFilter[] | undefined {
-  if (!onlyFeatured) return filters;
-  // events publican estado; is_featured aplica a destinos, empresas y productos.
-  if (type === "vmx.smart.events-list") return filters;
-  const extra: SmartBlockFilter = { column: "is_featured", op: "eq", value: true };
-  return [...(filters ?? []), extra];
+  return filters;
 }
+

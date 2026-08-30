@@ -113,10 +113,19 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
     const supabase = context.supabase as unknown as {
       from: (t: string) => {
         select: (cols: string) => {
-          eq: (col: string, val: unknown) => {
+          eq: (
+            col: string,
+            val: unknown,
+          ) => {
             maybeSingle?: () => Promise<{ data: unknown; error: unknown }>;
-            eq?: (col: string, val: unknown) => {
-              gte: (col: string, val: unknown) => {
+            eq?: (
+              col: string,
+              val: unknown,
+            ) => {
+              gte: (
+                col: string,
+                val: unknown,
+              ) => {
                 order: (
                   col: string,
                   opts?: unknown,
@@ -136,8 +145,7 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
       .select(
         "home_country, preferred_language, travel_style, budget_band, dietary, accessibility, languages, interests, is_public",
       )
-      .eq("user_id", context.userId)
-      .maybeSingle!();
+      .eq("user_id", context.userId).maybeSingle!();
 
     const p = (profileRes.data ?? {}) as {
       home_country?: string | null;
@@ -165,22 +173,33 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
 
     // 2) Cupones activos (emitidos, vigentes, no canjeados) + slug del negocio.
     const nowIso = new Date().toISOString();
-    const couponsRes = await (supabase as unknown as {
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (c: string, v: unknown) => {
-            eq: (c: string, v: unknown) => {
-              gte: (c: string, v: unknown) => {
-                order: (
+    const couponsRes = await (
+      supabase as unknown as {
+        from: (t: string) => {
+          select: (c: string) => {
+            eq: (
+              c: string,
+              v: unknown,
+            ) => {
+              eq: (
+                c: string,
+                v: unknown,
+              ) => {
+                gte: (
                   c: string,
-                  o?: unknown,
-                ) => { limit: (n: number) => Promise<{ data: unknown; error: unknown }> };
+                  v: unknown,
+                ) => {
+                  order: (
+                    c: string,
+                    o?: unknown,
+                  ) => { limit: (n: number) => Promise<{ data: unknown; error: unknown }> };
+                };
               };
             };
           };
         };
-      };
-    })
+      }
+    )
       .from("traveler_coupons")
       .select(
         "id, title, code, business_id, promotion_slug, discount_percent, valid_until, businesses:businesses!traveler_coupons_business_id_fkey ( slug )",
@@ -220,9 +239,15 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
         rpc: (name: string) => Promise<{ data: unknown; error: unknown }>;
         from: (t: string) => {
           select: (c: string) => {
-            eq: (c: string, v: unknown) => {
+            eq: (
+              c: string,
+              v: unknown,
+            ) => {
               maybeSingle?: () => Promise<{ data: unknown; error: unknown }>;
-              order?: (c: string, o?: unknown) => {
+              order?: (
+                c: string,
+                o?: unknown,
+              ) => {
                 limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
               };
             };
@@ -235,24 +260,19 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
         const planRes = await anySb
           .from("travel_plans")
           .select("id, title, start_date, end_date, party_size")
-          .eq("id", planId)
-          .maybeSingle!();
-        const p = planRes.data as
-          | {
-              id: string;
-              title: string;
-              start_date: string | null;
-              end_date: string | null;
-              party_size: number | null;
-            }
-          | null;
+          .eq("id", planId).maybeSingle!();
+        const p = planRes.data as {
+          id: string;
+          title: string;
+          start_date: string | null;
+          end_date: string | null;
+          party_size: number | null;
+        } | null;
         if (p) {
           const itemsRes = await anySb
             .from("travel_plan_items")
             .select("item_kind, snapshot")
-            .eq("plan_id", p.id)
-            .order!("position", { ascending: true })
-            .limit(30);
+            .eq("plan_id", p.id).order!("position", { ascending: true }).limit(30);
           const rawItems = (itemsRes.data ?? []) as Array<{
             item_kind: string;
             snapshot: { title?: string | null; slug?: string | null } | null;
@@ -287,17 +307,25 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
       }
 
       // Canjeados: negocios donde el viajero YA usó cupón.
-      const redeemedRes = await (context.supabase as unknown as {
-        from: (t: string) => {
-          select: (c: string) => {
-            eq: (c: string, v: unknown) => {
-              eq: (c: string, v: unknown) => {
-                limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
+      const redeemedRes = await (
+        context.supabase as unknown as {
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (
+                c: string,
+                v: unknown,
+              ) => {
+                eq: (
+                  c: string,
+                  v: unknown,
+                ) => {
+                  limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
+                };
               };
             };
           };
-        };
-      })
+        }
+      )
         .from("traveler_coupons")
         .select("businesses:businesses!traveler_coupons_business_id_fkey ( slug )")
         .eq("user_id", context.userId)
@@ -328,12 +356,14 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
       shared_notes: [],
     };
     try {
-      const rpc = (context.supabase as unknown as {
-        rpc: (
-          name: string,
-          args: Record<string, unknown>,
-        ) => Promise<{ data: unknown; error: unknown }>;
-      }).rpc;
+      const rpc = (
+        context.supabase as unknown as {
+          rpc: (
+            name: string,
+            args: Record<string, unknown>,
+          ) => Promise<{ data: unknown; error: unknown }>;
+        }
+      ).rpc;
       const { data: cRaw } = await rpc("alux_get_concierge_context_for_user", {
         _user_id: context.userId,
       });

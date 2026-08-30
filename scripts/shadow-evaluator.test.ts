@@ -65,7 +65,10 @@ describe("A. shadowAuthorization", () => {
     if (!r.ok) expect(r.reason).toBe("production_host");
   });
   test("rejects production custom domain", () => {
-    const r = shadowAuthorization({ headerToken: SECRET, host: "www.quehacerenvalladolid.com" }, ASSET);
+    const r = shadowAuthorization(
+      { headerToken: SECRET, host: "www.quehacerenvalladolid.com" },
+      ASSET,
+    );
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.reason).toBe("production_host");
   });
@@ -86,10 +89,42 @@ describe("A. shadowAuthorization", () => {
 
 describe("B. pickPreferredVariant", () => {
   const rows = [
-    { format: "avif", width: 400, height: 600, bucket: "b", path: "p1", variant_key: "vk1", usage_context: null },
-    { format: "avif", width: 1200, height: 1800, bucket: "b", path: "p2", variant_key: "vk2", usage_context: null },
-    { format: "webp", width: 800, height: 1200, bucket: "b", path: "p3", variant_key: "vk3", usage_context: null },
-    { format: "jpeg", width: 800, height: 1200, bucket: "b", path: "p4", variant_key: "vk4", usage_context: null },
+    {
+      format: "avif",
+      width: 400,
+      height: 600,
+      bucket: "b",
+      path: "p1",
+      variant_key: "vk1",
+      usage_context: null,
+    },
+    {
+      format: "avif",
+      width: 1200,
+      height: 1800,
+      bucket: "b",
+      path: "p2",
+      variant_key: "vk2",
+      usage_context: null,
+    },
+    {
+      format: "webp",
+      width: 800,
+      height: 1200,
+      bucket: "b",
+      path: "p3",
+      variant_key: "vk3",
+      usage_context: null,
+    },
+    {
+      format: "jpeg",
+      width: 800,
+      height: 1200,
+      bucket: "b",
+      path: "p4",
+      variant_key: "vk4",
+      usage_context: null,
+    },
   ] as never;
   test("prefers AVIF over WebP/JPEG", () => {
     const r = __TEST_ONLY__.pickPreferredVariant(rows, 800, "generic");
@@ -137,7 +172,15 @@ describe("C. evaluateMediaSourceShadow — fallback reasons", () => {
       {
         _silent: true,
         _variantFetcher: async () => [
-          { format: "avif", width: 800, height: 1200, bucket: "b", path: "p", variant_key: null, usage_context: null } as never,
+          {
+            format: "avif",
+            width: 800,
+            height: 1200,
+            bucket: "b",
+            path: "p",
+            variant_key: null,
+            usage_context: null,
+          } as never,
         ],
       },
       goodCtx,
@@ -151,7 +194,15 @@ describe("C. evaluateMediaSourceShadow — fallback reasons", () => {
       {
         _silent: true,
         _variantFetcher: async () => [
-          { format: "avif", width: 800, height: 1200, bucket: "b", path: "p", variant_key: "vk", usage_context: null } as never,
+          {
+            format: "avif",
+            width: 800,
+            height: 1200,
+            bucket: "b",
+            path: "p",
+            variant_key: "vk",
+            usage_context: null,
+          } as never,
         ],
         _signer: async () => ({ ok: false, latencyMs: 2000, reason: "storage_unreachable" }),
       },
@@ -168,7 +219,15 @@ describe("C. evaluateMediaSourceShadow — fallback reasons", () => {
       {
         _silent: true,
         _variantFetcher: async () => [
-          { format: "webp", width: 800, height: 1200, bucket: "b", path: "p", variant_key: "vk", usage_context: null } as never,
+          {
+            format: "webp",
+            width: 800,
+            height: 1200,
+            bucket: "b",
+            path: "p",
+            variant_key: "vk",
+            usage_context: null,
+          } as never,
         ],
         _signer: async () => ({ ok: false, latencyMs: 12, reason: "signed_url_error" }),
       },
@@ -183,8 +242,24 @@ describe("C. evaluateMediaSourceShadow — fallback reasons", () => {
       {
         _silent: true,
         _variantFetcher: async () => [
-          { format: "avif", width: 800, height: 1200, bucket: "b", path: "p", variant_key: "vk-avif-800", usage_context: null } as never,
-          { format: "jpeg", width: 800, height: 1200, bucket: "b", path: "p2", variant_key: "vk-jpeg-800", usage_context: null } as never,
+          {
+            format: "avif",
+            width: 800,
+            height: 1200,
+            bucket: "b",
+            path: "p",
+            variant_key: "vk-avif-800",
+            usage_context: null,
+          } as never,
+          {
+            format: "jpeg",
+            width: 800,
+            height: 1200,
+            bucket: "b",
+            path: "p2",
+            variant_key: "vk-jpeg-800",
+            usage_context: null,
+          } as never,
         ],
         _signer: async () => ({ ok: true, latencyMs: 42 }),
       },
@@ -202,7 +277,9 @@ describe("D. Sanitización del evento", () => {
   test("emitShadowDecisionEvent never includes URLs, tokens, IP o cookies", () => {
     const logs: string[] = [];
     const orig = console.log;
-    console.log = (s: unknown) => { logs.push(String(s)); };
+    console.log = (s: unknown) => {
+      logs.push(String(s));
+    };
     try {
       __TEST_ONLY__.emitShadowDecisionEvent(
         {
@@ -233,13 +310,30 @@ describe("D. Sanitización del evento", () => {
     const parsed = JSON.parse(payload);
     expect(Object.keys(parsed).sort()).toEqual(
       [
-        "asset_id","decision","env","fallback_reason","format_preferred",
-        "kind","latency_ms","signed_url_latency_ms","signed_url_ok","ts",
-        "variant_key","width_chosen",
-        "preload_latency_ms","preload_query_count","preload_error",
-        "sign_source","sign_cache_lookup_ms","sign_network_ms",
-        "phase_auth_ms","phase_preflight_ms","phase_select_ms",
-        "phase_sign_ms","phase_parity_ms","phase_total_ms",
+        "asset_id",
+        "decision",
+        "env",
+        "fallback_reason",
+        "format_preferred",
+        "kind",
+        "latency_ms",
+        "signed_url_latency_ms",
+        "signed_url_ok",
+        "ts",
+        "variant_key",
+        "width_chosen",
+        "preload_latency_ms",
+        "preload_query_count",
+        "preload_error",
+        "sign_source",
+        "sign_cache_lookup_ms",
+        "sign_network_ms",
+        "phase_auth_ms",
+        "phase_preflight_ms",
+        "phase_select_ms",
+        "phase_sign_ms",
+        "phase_parity_ms",
+        "phase_total_ms",
       ].sort(),
     );
   });
@@ -284,7 +378,15 @@ describe("F. Respuesta del evaluador NO expone URLs firmadas", () => {
       {
         _silent: true,
         _variantFetcher: async () => [
-          { format: "avif", width: 800, height: 1200, bucket: "b", path: "p", variant_key: "vk", usage_context: null } as never,
+          {
+            format: "avif",
+            width: 800,
+            height: 1200,
+            bucket: "b",
+            path: "p",
+            variant_key: "vk",
+            usage_context: null,
+          } as never,
         ],
         _signer: async () => ({ ok: true, latencyMs: 5 }),
       },
@@ -296,8 +398,8 @@ describe("F. Respuesta del evaluador NO expone URLs firmadas", () => {
     expect(serialized).not.toContain("https:");
     expect(serialized).not.toContain("supabase.co");
     expect(serialized).not.toContain("token=");
-    expect(serialized).not.toContain("\"signedUrl\"");
-    expect(serialized).not.toContain("\"bucket\"");
-    expect(serialized).not.toContain("\"path\"");
+    expect(serialized).not.toContain('"signedUrl"');
+    expect(serialized).not.toContain('"bucket"');
+    expect(serialized).not.toContain('"path"');
   });
 });

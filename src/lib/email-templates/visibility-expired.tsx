@@ -1,20 +1,20 @@
-import * as React from 'react'
-import { SITE } from '@/config/site'
-import { Text } from '@react-email/components'
-import type { TemplateEntry } from './registry'
-import { VisibilityShell, bodyText } from './_visibility-shared'
+import * as React from "react";
+import { SITE } from "@/config/site";
+import { Text } from "@react-email/components";
+import type { TemplateEntry } from "./registry";
+import { VisibilityShell, bodyText } from "./_visibility-shared";
 
 interface Props {
-  recipientName?: string
-  businessName?: string
-  planName?: string
-  portalUrl?: string
+  recipientName?: string;
+  businessName?: string;
+  planName?: string;
+  portalUrl?: string;
 }
 
 const Email = ({
   recipientName,
-  businessName = 'tu negocio',
-  planName = 'tu plan de visibilidad',
+  businessName = "tu negocio",
+  planName = "tu plan de visibilidad",
   portalUrl = `${SITE.url}/portal/visibilidad`,
 }: Props) => (
   <VisibilityShell
@@ -26,24 +26,22 @@ const Email = ({
     accentColor="#a33b25"
   >
     <Text style={bodyText}>
-      {recipientName ? `Hola ${recipientName}, ` : 'Hola, '}
-      <strong>{planName}</strong> de <strong>{businessName}</strong> venció.
-      Tu negocio sigue publicado, pero ya no aparece con boost en el ranking
-      ni en las recomendaciones destacadas de Alux.
+      {recipientName ? `Hola ${recipientName}, ` : "Hola, "}
+      <strong>{planName}</strong> de <strong>{businessName}</strong> venció. Tu negocio sigue
+      publicado, pero ya no aparece con boost en el ranking ni en las recomendaciones destacadas de
+      Alux.
     </Text>
-    <Text style={bodyText}>
-      Reactiva tu plan cuando quieras y recupera tu posición en minutos.
-    </Text>
+    <Text style={bodyText}>Reactiva tu plan cuando quieras y recupera tu posición en minutos.</Text>
   </VisibilityShell>
-)
+);
 
 export const template = {
   component: Email,
-  subject: 'Tu plan de visibilidad venció',
-  displayName: 'Visibilidad · Vencido',
+  subject: "Tu plan de visibilidad venció",
+  displayName: "Visibilidad · Vencido",
   previewData: {
-    recipientName: 'Juan',
-    businessName: 'Hotel Casa Colonial',
-    planName: 'Destacado',
+    recipientName: "Juan",
+    businessName: "Hotel Casa Colonial",
+    planName: "Destacado",
   },
-} satisfies TemplateEntry
+} satisfies TemplateEntry;

@@ -13,21 +13,31 @@
     { "operation": "modify", "path": "src/components/ui/badge.tsx" },
     { "operation": "modify", "path": "src/components/ui/skeleton.tsx" },
     { "operation": "modify", "path": "src/components/alux/AluxContextChip.tsx" },
-    { "operation": "modify", "path": "src/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadges.tsx" },
-    { "operation": "modify", "path": "src/lib/experience-builder/blocks/experience-institutional-badges/contract.ts" },
-    { "operation": "modify", "path": "src/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry.ts" },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadges.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/experience-institutional-badges/contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry.ts"
+    },
     { "operation": "modify", "path": "package.json" },
     { "operation": "create", "path": "src/lib/theme/theme.ts" },
     { "operation": "create", "path": "src/components/ui/ThemeToggle.tsx" },
     { "operation": "create", "path": "src/lib/time/merida.ts" },
     { "operation": "create", "path": "src/components/ui/SkipLink.tsx" },
     { "operation": "create", "path": "src/lib/omxds/visual-foundations-flag.server.ts" },
-    { "operation": "create", "path": "supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql" }
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql"
+    }
   ],
   "public_routes": [],
-  "required_feature_flags": [
-    "omxds_visual_foundations_v1_enabled=false"
-  ],
+  "required_feature_flags": ["omxds_visual_foundations_v1_enabled=false"],
   "required_tests": [
     "bun --version",
     "bun install --frozen-lockfile",

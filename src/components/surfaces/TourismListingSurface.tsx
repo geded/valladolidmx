@@ -23,7 +23,7 @@
  */
 import { useMemo, useState } from "react";
 import { MapPin } from "lucide-react";
-import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
+import { PremiumHero } from "@/components/premium";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
@@ -36,12 +36,10 @@ import {
   type TourismCardVM,
   type TourismEntityKind,
 } from "@/components/experience-builder/tourism-card/TourismCard";
-import type {
-  ExperienceHeroDTO,
-  ExperienceHeroBadge,
-} from "@/lib/experience-builder/blocks/experience-hero/contract";
+import type { ExperienceHeroBadge } from "@/lib/experience-builder/blocks/experience-hero/contract";
 import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/experience-institutional-badges/contract";
 import { cn } from "@/lib/utils";
+import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 
 /* ------------------------------------------------------------------ *
  * Hero — spec ligera; la superficie construye el DTO oficial.
@@ -54,32 +52,6 @@ export interface TourismListingHeroSpec {
   mediaAlt?: string | null;
   badges?: ExperienceHeroBadge[];
   metaLabel?: string | null;
-}
-
-function heroSpecToDTO(spec: TourismListingHeroSpec): ExperienceHeroDTO {
-  const hasMedia = !!spec.mediaUrl;
-  // Alt fallback descriptivo: "<Título> en Valladolid, Oriente Maya"
-  // Evita alts de una sola palabra tipo "Hoteles" cuando el editor
-  // no captura un mediaAlt específico.
-  const fallbackAlt = `${spec.title} en Valladolid, Oriente Maya`;
-  return {
-    variant: hasMedia ? "cinematic" : "editorial",
-    eyebrow: spec.eyebrow ?? null,
-    eyebrowStyle: hasMedia ? "script" : "eyebrow",
-    title: spec.title,
-    description: spec.subtitle ?? null,
-    media: hasMedia
-      ? { url: spec.mediaUrl as string, alt: spec.mediaAlt ?? fallbackAlt, overlay: 0.45 }
-      : null,
-    mediaSlides: hasMedia
-      ? [{ url: spec.mediaUrl as string, alt: spec.mediaAlt ?? fallbackAlt }]
-      : [],
-    overlapHeader: hasMedia,
-    badges: spec.badges ?? [],
-    meta: spec.metaLabel ? [{ iconKey: "map-pin", label: spec.metaLabel }] : [],
-    ctaPrimary: null,
-    ctaSecondary: null,
-  };
 }
 
 /* ------------------------------------------------------------------ *
@@ -131,6 +103,8 @@ export interface TourismListingSurfaceProps {
    * pasar `false` sin romper consumidores existentes.
    */
   showAddToTrip?: boolean;
+  /** G5 · presentación compartida; se deriva del medio cuando no se especifica. */
+  presentation?: PremiumPresentation;
   className?: string;
 }
 
@@ -151,6 +125,7 @@ export function TourismListingSurface({
   mapSlot,
   favoriteKindFor,
   showAddToTrip = true,
+  presentation,
   className,
 }: TourismListingSurfaceProps) {
   const [active, setActive] = useState<Record<string, string | null>>({});
@@ -188,9 +163,7 @@ export function TourismListingSurface({
       const dLng = toRad(vm.coordinates.lng - loc.lng);
       const s =
         Math.sin(dLat / 2) ** 2 +
-        Math.cos(toRad(loc.lat)) *
-          Math.cos(toRad(vm.coordinates.lat)) *
-          Math.sin(dLng / 2) ** 2;
+        Math.cos(toRad(loc.lat)) * Math.cos(toRad(vm.coordinates.lat)) * Math.sin(dLng / 2) ** 2;
       const km = 2 * R * Math.asin(Math.sqrt(s));
       return { vm, km };
     });
@@ -212,7 +185,7 @@ export function TourismListingSurface({
     );
   }, [filtered, nearMeOn, geo.location, destinationLabel]);
 
-  const heroDto = useMemo(() => heroSpecToDTO(hero), [hero]);
+  const premiumPresentation = presentation ?? (hero.mediaUrl ? "cinematic" : "editorial");
 
   const badgeItems = useMemo<InstitutionalBadgeItem[]>(() => {
     if (institutionalBadgeItems && institutionalBadgeItems.length > 0)
@@ -224,9 +197,7 @@ export function TourismListingSurface({
   }, [institutionalBadgeItems, destinationSlug]);
 
   const showBadges = badgeItems.length > 0;
-  const territorialChip = destinationLabel
-    ? `Explorando en ${destinationLabel}`
-    : null;
+  const territorialChip = destinationLabel ? `Explorando en ${destinationLabel}` : null;
 
   const colClass =
     columns === 1
@@ -237,7 +208,21 @@ export function TourismListingSurface({
 
   return (
     <div className={cn("space-y-6", className)}>
-      <ExperienceHero dto={heroDto} headingLevel="h1" />
+      <PremiumHero
+        vm={{
+          presentation: premiumPresentation,
+          eyebrow: hero.eyebrow ?? undefined,
+          title: hero.title,
+          description: hero.subtitle ?? undefined,
+          media: hero.mediaUrl
+            ? {
+                url: hero.mediaUrl,
+                alt: hero.mediaAlt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
+              }
+            : null,
+          badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
+        }}
+      />
 
       {showBadges ? (
         <InstitutionalBadgesBlock
@@ -325,8 +310,7 @@ export function TourismListingSurface({
                 vm={vm}
                 capabilities={capabilities}
                 renderActions={(v) => {
-                  const kind =
-                    favoriteKindFor?.(v) ?? favoriteKindFromEntity(v.entityKind);
+                  const kind = favoriteKindFor?.(v) ?? favoriteKindFromEntity(v.entityKind);
                   const travelKind = travelKindFromEntity(v.entityKind);
                   const canAddToTrip =
                     showAddToTrip &&
@@ -340,9 +324,7 @@ export function TourismListingSurface({
                   if (!kind && !canAddToTrip) return null;
                   return (
                     <div className="flex flex-wrap items-center gap-2">
-                      {kind ? (
-                        <FavoriteButton entityKind={kind} entityId={v.id} />
-                      ) : null}
+                      {kind ? <FavoriteButton entityKind={kind} entityId={v.id} /> : null}
                       {canAddToTrip ? (
                         <AddToTravelPlanButton
                           kind={travelKind as TravelItemKind}
@@ -389,9 +371,7 @@ function favoriteKindFromEntity(
  * en TourismCard (destination, region, promotion, landing, route,
  * category, mixed y desconocidos → null).
  */
-function travelKindFromEntity(
-  kind: TourismEntityKind | null,
-): TravelItemKind | null {
+function travelKindFromEntity(kind: TourismEntityKind | null): TravelItemKind | null {
   switch (kind) {
     case "product":
       return "product";
@@ -437,9 +417,7 @@ function FacetChipGroup({
             )}
           >
             {opt.label}
-            {opt.count != null ? (
-              <span className="ml-1 opacity-70">({opt.count})</span>
-            ) : null}
+            {opt.count != null ? <span className="ml-1 opacity-70">({opt.count})</span> : null}
           </button>
         );
       })}

@@ -1,7 +1,12 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "1fe83c8bfb8874468560c9c3c7d89ded0073a252";
 const authorizedCommit = "3c8e138ae768380f6656fad40b84515615002d7d";
@@ -155,9 +160,8 @@ if (currentBranch && ["base_worktree", "single_commit", "github_authoring_pr_mer
 
 const basePackage = JSON.parse(git(["show", `${base}:package.json`]));
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(git(["diff", "--name-only", base, "--", "bun.lock"]), "");
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I4-A");
+assertGovernedLockBaseline(base, "I4-A");
 assert.equal(
   currentPackage.scripts["test:i4:a"],
   "bun test scripts/omxds/i4/editorial-builder-authoring.test.ts",
@@ -205,8 +209,25 @@ assert.deepEqual(policyConsumers, [
   "src/components/experience-builder/VisualStudio.tsx",
   "src/lib/experience-builder/block-library.ts",
   "src/lib/experience-builder/block-registry.ts",
+  "src/lib/experience-builder/premium-template-registry.ts",
   "src/lib/experience-builder/studio.functions.ts",
 ]);
+const premiumTemplateRegistryPath = "src/lib/experience-builder/premium-template-registry.ts";
+const premiumTemplateRegistrySha256 =
+  "5f05a70a0ebb8e8ea8880e3b2531eb430251c87f565d7ea35ce38f910daadbb1";
+assert.equal(
+  createHash("sha256").update(readFileSync(premiumTemplateRegistryPath)).digest("hex"),
+  premiumTemplateRegistrySha256,
+  "I4-A premium template registry changed after exact acknowledgment",
+);
+assert.ok(
+  (authorization.permissions ?? []).some(
+    (permission) =>
+      permission.operation === "create" && permission.path === premiumTemplateRegistryPath,
+  ),
+  "PCA-2026-013 does not authorize the exact premium template registry path",
+);
+assert.match(authorization.founder_authority, new RegExp(premiumTemplateRegistrySha256));
 
 const policy = readFileSync("src/lib/experience-builder/editorial-builder-policy.ts", "utf8");
 for (const runtimeType of [
@@ -234,5 +255,5 @@ for (const forbidden of [
   assert.ok(!changed.has(forbidden), `forbidden I4-A path changed: ${forbidden}`);
 
 console.log(
-  `I4-A evidence: PASS (${mode}; exact 16-path scope; four consumers; PCA approved; aliases, legacy HTML, external URLs, unregistered media, duplicate and template bypass fail closed).`,
+  `I4-A evidence: PASS (${mode}; exact 16-path scope; five consumers; PCA approved; aliases, legacy HTML, external URLs, unregistered media, duplicate and template bypass fail closed).`,
 );

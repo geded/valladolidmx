@@ -40,7 +40,10 @@ const SubmitInput = z.object({
 
 type SbLike = {
   from: (t: string) => any;
-  rpc?: (n: string, a?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+  rpc?: (
+    n: string,
+    a?: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: { message: string } | null }>;
 };
 
 function hashText(text: string): string {
@@ -55,9 +58,7 @@ export const submitAluxFeedback = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => SubmitInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as unknown as SbLike;
-    const excerpt = data.suggestionText
-      ? data.suggestionText.slice(0, 280)
-      : null;
+    const excerpt = data.suggestionText ? data.suggestionText.slice(0, 280) : null;
     const hash = data.suggestionText ? hashText(data.suggestionText) : null;
 
     const { data: row, error } = await sb
@@ -88,8 +89,7 @@ export const submitAluxFeedback = createServerFn({ method: "POST" })
 export const listMyRecentAluxFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ limit: z.number().int().min(1).max(20).optional().default(10) })
-      .parse(d ?? {}),
+    z.object({ limit: z.number().int().min(1).max(20).optional().default(10) }).parse(d ?? {}),
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase as unknown as SbLike;
@@ -138,9 +138,7 @@ export interface AluxFeedbackStats {
 export const getAluxFeedbackStats = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z
-      .object({ days: z.number().int().min(1).max(90).optional().default(30) })
-      .parse(d ?? {}),
+    z.object({ days: z.number().int().min(1).max(90).optional().default(30) }).parse(d ?? {}),
   )
   .handler(async ({ data, context }): Promise<AluxFeedbackStats> => {
     const sb = context.supabase as unknown as SbLike;
@@ -150,20 +148,14 @@ export const getAluxFeedbackStats = createServerFn({ method: "POST" })
       sb.rpc?.("has_role", { _user_id: context.userId, _role: "super_admin" }),
       sb.rpc?.("has_role", { _user_id: context.userId, _role: "admin" }),
     ]);
-    const isAdmin = roleChecks.some(
-      (r) => (r as { data?: boolean } | undefined)?.data === true,
-    );
+    const isAdmin = roleChecks.some((r) => (r as { data?: boolean } | undefined)?.data === true);
     if (!isAdmin) throw new Error("Forbidden");
 
-    const sinceIso = new Date(
-      Date.now() - data.days * 24 * 60 * 60 * 1000,
-    ).toISOString();
+    const sinceIso = new Date(Date.now() - data.days * 24 * 60 * 60 * 1000).toISOString();
 
     const { data: rows, error } = await sb
       .from("alux_feedback")
-      .select(
-        "id, capability, rating, reason, suggestion_excerpt, knowledge_ids, created_at",
-      )
+      .select("id, capability, rating, reason, suggestion_excerpt, knowledge_ids, created_at")
       .gte("created_at", sinceIso)
       .order("created_at", { ascending: false })
       .limit(2000);

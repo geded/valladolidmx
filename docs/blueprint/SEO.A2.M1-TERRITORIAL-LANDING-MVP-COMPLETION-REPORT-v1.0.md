@@ -31,14 +31,14 @@ Idéntico a lo que ya existía en `/oriente-maya` (Región) → **paridad arquit
 
 ## 2 · Componentes / bloques reutilizados (cero nuevos)
 
-| Categoría | Bloque `vmx.*` | Componente productivo |
-| --- | --- | --- |
-| Superficie Región | `vmx.surface.region` | `RegionSurface` |
-| Superficie Destino | `vmx.surface.destination` | `DestinationSurface` |
-| Shell público | — | `PublicShell` (Discovery Layer) |
-| Contexto operativo | — | `ContextEngineProvider` (Context Registry) |
-| Hidratación surface | — | `DestinationSurfaceProvider` (extendido para `mapPoints` / `galleryUrls`) |
-| Renderer | — | `CompositionRenderer` (Experience Builder) |
+| Categoría           | Bloque `vmx.*`            | Componente productivo                                                     |
+| ------------------- | ------------------------- | ------------------------------------------------------------------------- |
+| Superficie Región   | `vmx.surface.region`      | `RegionSurface`                                                           |
+| Superficie Destino  | `vmx.surface.destination` | `DestinationSurface`                                                      |
+| Shell público       | —                         | `PublicShell` (Discovery Layer)                                           |
+| Contexto operativo  | —                         | `ContextEngineProvider` (Context Registry)                                |
+| Hidratación surface | —                         | `DestinationSurfaceProvider` (extendido para `mapPoints` / `galleryUrls`) |
+| Renderer            | —                         | `CompositionRenderer` (Experience Builder)                                |
 
 **Bloques `vmx.*` internos que consume `DestinationSurface`:** `vmx.experience.hero` (variant `gallery`), `vmx.experience.subnav`, `vmx.experience.cta-bar`, `vmx.experience.section`, `vmx.experience.features`, `vmx.experience.institutional-badges`, `vmx.experience.related-collection`, `vmx.experience.gallery`, `vmx.discovery.navigator`. Todos preexistentes.
 
@@ -46,12 +46,12 @@ Idéntico a lo que ya existía en `/oriente-maya` (Región) → **paridad arquit
 
 ## 3 · Rutas creadas / modificadas
 
-| Ruta | Estado | Cambio |
-| --- | --- | --- |
-| `/oriente-maya` | Sin cambios | Ya usaba Composition-first vía `__tpl_region__`. |
-| `/oriente-maya/$destino` | Refactorizada | Ahora Composition-first (plantilla + override por slug), con provider hidratado. |
-| `/oriente-maya/valladolid` | Validada | Renderiza vía `vmx.surface.destination` a partir de `__tpl_destination__`. |
-| `/oriente-maya/chichen-itza` | **Nueva landing** | Destino insertado en BD; resuelve por la misma plantilla. |
+| Ruta                         | Estado            | Cambio                                                                           |
+| ---------------------------- | ----------------- | -------------------------------------------------------------------------------- |
+| `/oriente-maya`              | Sin cambios       | Ya usaba Composition-first vía `__tpl_region__`.                                 |
+| `/oriente-maya/$destino`     | Refactorizada     | Ahora Composition-first (plantilla + override por slug), con provider hidratado. |
+| `/oriente-maya/valladolid`   | Validada          | Renderiza vía `vmx.surface.destination` a partir de `__tpl_destination__`.       |
+| `/oriente-maya/chichen-itza` | **Nueva landing** | Destino insertado en BD; resuelve por la misma plantilla.                        |
 
 Sin nuevas rutas físicas: la landing de Chichén Itzá emerge del contrato dinámico `/oriente-maya/$destino` — **coste marginal cero**, en línea con el principio arquitectónico A2.
 
@@ -114,17 +114,17 @@ Las tres landings emiten, sin cambios en `seo.ts`:
 
 ## 9 · Cumplimiento de reglas vinculantes
 
-| Regla / Política | Estado |
-| --- | --- |
-| Single Studio Principle | ✅ toda edición territorial vive en Experience Builder. |
-| Zero Duplicated Architecture | ✅ una sola superficie por familia territorial. |
-| Workspace First / Discovery First | ✅ Región y Destino en Discovery Layer (`PublicShell`). |
-| Founder Discovery Standard | ✅ listados internos conservan `TourismListingSurface`. |
-| Tourist Hero Policy | ✅ Hero por variante `gallery` — sin Heros paralelos. |
-| Institutional Badges Rule | ✅ badges gestionados vía bloque oficial. |
-| Geolocation Mandatory | ✅ Chichén Itzá alta con lat/long reales. |
-| Founder Entity First SEO | ✅ modelada la entidad `TouristDestination` antes que la página. |
-| Product First Validation | ✅ capacidad incorporada, flujo completo, cero capacidades perdidas, mejora arquitectónica visible en `$destino`. |
+| Regla / Política                  | Estado                                                                                                            |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Single Studio Principle           | ✅ toda edición territorial vive en Experience Builder.                                                           |
+| Zero Duplicated Architecture      | ✅ una sola superficie por familia territorial.                                                                   |
+| Workspace First / Discovery First | ✅ Región y Destino en Discovery Layer (`PublicShell`).                                                           |
+| Founder Discovery Standard        | ✅ listados internos conservan `TourismListingSurface`.                                                           |
+| Tourist Hero Policy               | ✅ Hero por variante `gallery` — sin Heros paralelos.                                                             |
+| Institutional Badges Rule         | ✅ badges gestionados vía bloque oficial.                                                                         |
+| Geolocation Mandatory             | ✅ Chichén Itzá alta con lat/long reales.                                                                         |
+| Founder Entity First SEO          | ✅ modelada la entidad `TouristDestination` antes que la página.                                                  |
+| Product First Validation          | ✅ capacidad incorporada, flujo completo, cero capacidades perdidas, mejora arquitectónica visible en `$destino`. |
 
 ---
 

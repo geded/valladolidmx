@@ -19,7 +19,10 @@ import {
 
 const N = Number(process.argv[2] ?? 100);
 const assetId = Array.from(SHADOW_ALLOWLIST)[0];
-const goodCtx = { headerToken: process.env.MEDIA_SHADOW_INTERNAL_SECRET ?? "", host: "id-preview--c0.lovable.app" };
+const goodCtx = {
+  headerToken: process.env.MEDIA_SHADOW_INTERNAL_SECRET ?? "",
+  host: "id-preview--c0.lovable.app",
+};
 
 function pct(arr, p) {
   if (arr.length === 0) return null;
@@ -37,7 +40,15 @@ let signErrors = 0;
 const warm = await preloadShadowAssetBundle(assetId);
 await evaluateMediaSourceShadow(
   { id: assetId, original_width: 1600 },
-  { _silent: true, preloaded: warm.bundle, preloadTelemetry: { latencyMs: warm.result.latencyMs, queryCount: warm.result.queryCount, error: warm.result.error } },
+  {
+    _silent: true,
+    preloaded: warm.bundle,
+    preloadTelemetry: {
+      latencyMs: warm.result.latencyMs,
+      queryCount: warm.result.queryCount,
+      error: warm.result.error,
+    },
+  },
   goodCtx,
 );
 
@@ -51,7 +62,11 @@ for (let i = 0; i < N; i++) {
     {
       _silent: true,
       preloaded: preload.bundle,
-      preloadTelemetry: { latencyMs: preload.result.latencyMs, queryCount: preload.result.queryCount, error: preload.result.error },
+      preloadTelemetry: {
+        latencyMs: preload.result.latencyMs,
+        queryCount: preload.result.queryCount,
+        error: preload.result.error,
+      },
     },
     goodCtx,
   );
@@ -61,7 +76,9 @@ for (let i = 0; i < N; i++) {
 const globalMs = Date.now() - globalStart;
 
 const totalLatencies = results.map((r) => r.latencyMs ?? 0);
-const signLatencies = results.filter((r) => typeof r.signedUrlLatencyMs === "number").map((r) => r.signedUrlLatencyMs);
+const signLatencies = results
+  .filter((r) => typeof r.signedUrlLatencyMs === "number")
+  .map((r) => r.signedUrlLatencyMs);
 const wouldPipeline = results.filter((r) => r.decision === "would_use_pipeline").length;
 const wouldLegacy = results.filter((r) => r.decision === "would_use_legacy").length;
 const fallbackDist = results.reduce((acc, r) => {

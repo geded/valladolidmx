@@ -9,7 +9,12 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, findFirstSmartBlockNode, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
+import {
+  buildPublicHead,
+  findFirstSmartBlockNode,
+  pickFirstMediaUrl,
+  webPageJsonLd,
+} from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { resolveSmartBlock } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock } from "@/lib/experience-builder/block-registry";
@@ -33,7 +38,14 @@ export const Route = createFileRoute("/p/$slug")({
   },
   head: (ctx) => {
     const loaderData = ctx.loaderData as
-      | { page?: { title: string; description: string | null; snapshot?: { chrome?: { seo?: Record<string, unknown> } } }; ogImageFallback?: string }
+      | {
+          page?: {
+            title: string;
+            description: string | null;
+            snapshot?: { chrome?: { seo?: Record<string, unknown> } };
+          };
+          ogImageFallback?: string;
+        }
       | undefined;
     const page = loaderData?.page;
     const seo = (page?.snapshot?.chrome?.seo ?? {}) as {
@@ -54,7 +66,9 @@ export const Route = createFileRoute("/p/$slug")({
       ogType: "website",
       ogImage,
       noindex: Boolean(seo.noindex),
-      jsonLd: seo.noindex ? undefined : [webPageJsonLd({ title, description, path, image: ogImage })],
+      jsonLd: seo.noindex
+        ? undefined
+        : [webPageJsonLd({ title, description, path, image: ogImage })],
     });
   },
   notFoundComponent: NotFoundPage,
@@ -98,7 +112,8 @@ async function resolveFirstSmartBlockImage(tree: unknown): Promise<string | unde
     const baseQuery = contract?.data_sources?.[0]?.query as SmartBlockQuery | undefined;
     if (!baseQuery) return undefined;
     const cfg = node.config ?? {};
-    const limit = typeof cfg.limit === "number" && cfg.limit > 0 ? Math.min(6, Math.floor(cfg.limit)) : 3;
+    const limit =
+      typeof cfg.limit === "number" && cfg.limit > 0 ? Math.min(6, Math.floor(cfg.limit)) : 3;
     const query: SmartBlockQuery = { ...baseQuery, limit };
     const res = await resolveSmartBlock({ data: { query } });
     for (const item of res.items ?? []) {

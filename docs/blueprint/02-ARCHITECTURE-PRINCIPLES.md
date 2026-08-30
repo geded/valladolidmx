@@ -1,6 +1,7 @@
 # 02-ARCHITECTURE-PRINCIPLES.md
 
 # Architecture Principles
+
 Versión: 1.0
 
 ## Objetivo
@@ -49,6 +50,7 @@ Oriente Maya
 Ejemplo:
 
 Inicio
+
 > Oriente Maya
 > Valladolid
 > Restaurantes
@@ -174,16 +176,20 @@ El modelo debe soportar múltiples territorios utilizando la misma arquitectura.
 Arquitectura prevista:
 
 Frontend:
+
 - Lovable
 - PWA
 
 Backend:
+
 - Supabase
 
 IA:
+
 - OpenAI (Alux)
 
 Servicios:
+
 - Google Maps
 - Email
 - WhatsApp

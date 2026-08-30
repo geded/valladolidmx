@@ -28,8 +28,7 @@ function pickGreeting(seed: number) {
 }
 
 export function ContinuityWelcomeSurface() {
-  const { status, trip, hasReturningTrip, acknowledgeReturn, reset } =
-    useAnonymousTrip();
+  const { status, trip, hasReturningTrip, acknowledgeReturn, reset } = useAnonymousTrip();
 
   const summary = useMemo(() => {
     if (!trip) return null;
@@ -38,18 +37,10 @@ export function ContinuityWelcomeSurface() {
     if (favs === 0 && items === 0) return null;
     const parts: string[] = [];
     if (items > 0) {
-      parts.push(
-        items === 1
-          ? "1 experiencia en tu ruta"
-          : `${items} experiencias en tu ruta`,
-      );
+      parts.push(items === 1 ? "1 experiencia en tu ruta" : `${items} experiencias en tu ruta`);
     }
     if (favs > 0) {
-      parts.push(
-        favs === 1
-          ? "1 lugar guardado"
-          : `${favs} lugares guardados`,
-      );
+      parts.push(favs === 1 ? "1 lugar guardado" : `${favs} lugares guardados`);
     }
     return parts.join(" · ");
   }, [trip]);
@@ -64,9 +55,7 @@ export function ContinuityWelcomeSurface() {
   const importantNow = hasItems
     ? "Tienes experiencias esperando ser confirmadas en tu ruta."
     : "Tienes lugares que te gustaron listos para sumarse a tu ruta.";
-  const nextStepLabel = hasItems
-    ? "Revisar mi ruta"
-    : "Empezar a armar mi ruta";
+  const nextStepLabel = hasItems ? "Revisar mi ruta" : "Empezar a armar mi ruta";
 
   return (
     <section
@@ -86,12 +75,8 @@ export function ContinuityWelcomeSurface() {
           </header>
 
           <div className="space-y-1.5">
-            <h2 className="font-serif text-2xl leading-tight md:text-3xl">
-              {greeting.title}
-            </h2>
-            <p className="text-sm text-muted-foreground md:text-base">
-              {greeting.body}
-            </p>
+            <h2 className="font-serif text-2xl leading-tight md:text-3xl">{greeting.title}</h2>
+            <p className="text-sm text-muted-foreground md:text-base">{greeting.body}</p>
           </div>
 
           <div className="grid gap-3 md:grid-cols-3">
@@ -114,9 +99,7 @@ export function ContinuityWelcomeSurface() {
                 <Compass className="size-3.5" aria-hidden />
                 {ANON_COPY.continuity.nextStep.label}
               </p>
-              <p className="mt-1 text-sm font-semibold leading-snug">
-                {nextStepLabel}
-              </p>
+              <p className="mt-1 text-sm font-semibold leading-snug">{nextStepLabel}</p>
             </div>
           </div>
 

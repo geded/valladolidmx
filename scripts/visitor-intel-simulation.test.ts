@@ -33,28 +33,63 @@ const scenario: SimulationScenario = {
   destinations: {
     primary_destination: "valladolid",
     weights: {
-      valladolid: 10, "chichen-itza": 5, "ek-balam": 2.5, izamal: 1.6,
-      "rio-lagartos": 1.4, "las-coloradas": 1.4, espita: 0.8,
+      valladolid: 10,
+      "chichen-itza": 5,
+      "ek-balam": 2.5,
+      izamal: 1.6,
+      "rio-lagartos": 1.4,
+      "las-coloradas": 1.4,
+      espita: 0.8,
     },
   },
   profile_mix: [
-    { profile: "couple_international", weight: 3, propensities: {
-      exploration_depth: 0.75, favorite_to_plan: 0.55, concierge_acceptance: 0.6,
-      purchase_intent: 0.65, weather_sensitivity: 0.55, language_diversity: 0.8,
-      ticket_size_usd: [180, 420] } },
-    { profile: "family", weight: 3, propensities: {
-      exploration_depth: 0.55, favorite_to_plan: 0.6, concierge_acceptance: 0.55,
-      purchase_intent: 0.6, weather_sensitivity: 0.7, language_diversity: 0.3,
-      ticket_size_usd: [140, 380] } },
-    { profile: "backpacker", weight: 2, propensities: {
-      exploration_depth: 0.85, favorite_to_plan: 0.35, concierge_acceptance: 0.2,
-      purchase_intent: 0.3, weather_sensitivity: 0.25, language_diversity: 0.9,
-      ticket_size_usd: [30, 90] } },
+    {
+      profile: "couple_international",
+      weight: 3,
+      propensities: {
+        exploration_depth: 0.75,
+        favorite_to_plan: 0.55,
+        concierge_acceptance: 0.6,
+        purchase_intent: 0.65,
+        weather_sensitivity: 0.55,
+        language_diversity: 0.8,
+        ticket_size_usd: [180, 420],
+      },
+    },
+    {
+      profile: "family",
+      weight: 3,
+      propensities: {
+        exploration_depth: 0.55,
+        favorite_to_plan: 0.6,
+        concierge_acceptance: 0.55,
+        purchase_intent: 0.6,
+        weather_sensitivity: 0.7,
+        language_diversity: 0.3,
+        ticket_size_usd: [140, 380],
+      },
+    },
+    {
+      profile: "backpacker",
+      weight: 2,
+      propensities: {
+        exploration_depth: 0.85,
+        favorite_to_plan: 0.35,
+        concierge_acceptance: 0.2,
+        purchase_intent: 0.3,
+        weather_sensitivity: 0.25,
+        language_diversity: 0.9,
+        ticket_size_usd: [30, 90],
+      },
+    },
   ],
   planted_issues: {
-    early_abandonment_rate: 0.08, low_conversion_categories: [],
-    wrong_language_rate: 0.03, slow_business_response_rate: 0.05,
-    late_proposals_rate: 0.04, underexplored_destinations: [],
+    early_abandonment_rate: 0.08,
+    low_conversion_categories: [],
+    wrong_language_rate: 0.03,
+    slow_business_response_rate: 0.05,
+    late_proposals_rate: 0.04,
+    underexplored_destinations: [],
   },
   locales: ["es", "en"],
 };
@@ -99,8 +134,10 @@ function main() {
     assert(canonical.has(e.event.transition.id), `transición no canónica ${e.event.transition.id}`);
     assert(!!e.causality.prerequisite, "causalidad sin prerequisite");
     assert(!!e.causality.influencer, "causalidad sin influencer");
-    assert(e.causality.scenario_probability >= 0 && e.causality.scenario_probability <= 1,
-      "scenario_probability fuera de rango");
+    assert(
+      e.causality.scenario_probability >= 0 && e.causality.scenario_probability <= 1,
+      "scenario_probability fuera de rango",
+    );
     assert(e.causality.gap_ms >= 0, "gap_ms negativo");
   }
 
@@ -117,7 +154,8 @@ function main() {
     for (let i = 0; i < transitions.length; i += 1) {
       const t = transitions[i]!;
       const canonicalIdx = CANONICAL_ORDER.indexOf(
-        (t.event as { transition: { id: string } }).transition.id as (typeof CANONICAL_ORDER)[number],
+        (t.event as { transition: { id: string } }).transition
+          .id as (typeof CANONICAL_ORDER)[number],
       );
       assert(canonicalIdx === i, `sujeto ${sid} salta transición en posición ${i}`);
     }
@@ -139,7 +177,10 @@ function main() {
     }
   }
   const vallUnique = uniqueByDest.get("valladolid")?.size ?? 0;
-  assert(vallUnique === runA.stats.visitors, `Valladolid no es nodo base de todos (${vallUnique}/${runA.stats.visitors})`);
+  assert(
+    vallUnique === runA.stats.visitors,
+    `Valladolid no es nodo base de todos (${vallUnique}/${runA.stats.visitors})`,
+  );
   for (const [k, s] of uniqueByDest.entries()) {
     if (k === "valladolid") continue;
     assert(s.size < vallUnique, `${k} (${s.size}) supera a Valladolid (${vallUnique})`);
@@ -161,8 +202,12 @@ function main() {
   for (const e of events) {
     if (e.event.kind !== "decision.offered") continue;
     const cap = e.event.decision.capability;
-    if (cap.startsWith("alux") || cap.startsWith("concierge") ||
-        cap.startsWith("commerce") || cap.startsWith("reviews")) {
+    if (
+      cap.startsWith("alux") ||
+      cap.startsWith("concierge") ||
+      cap.startsWith("commerce") ||
+      cap.startsWith("reviews")
+    ) {
       assert(!!e.event.decision.rationale, `${cap} sin rationale`);
     }
   }
@@ -225,26 +270,33 @@ function main() {
   assert(s.alux_totals.accepted > 0, "Alux no registró aceptaciones");
   assert(s.alux_totals.rejected > 0, "Alux no registró rechazos");
   const conciergeOpened = Object.entries(s.concierge_status_histogram)
-    .filter(([k]) => k !== "none").reduce((a, [, n]) => a + n, 0);
+    .filter(([k]) => k !== "none")
+    .reduce((a, [, n]) => a + n, 0);
   assert(conciergeOpened > 0, "Concierge no abrió casos");
   const paid = s.commerce_status_histogram.paid ?? 0;
   assert(paid > 0, "Commerce no registró pagos exitosos");
 
-  console.log(JSON.stringify({
-    ok: true,
-    visitors: runA.stats.visitors,
-    events_total: runA.stats.events_total,
-    events_by_transition: runA.stats.events_by_transition,
-    events_by_kind: runA.stats.events_by_kind,
-    final_stage_histogram: finals,
-    territorial_touches: runA.stats.territorial_touches,
-    alux_totals: runA.stats.alux_totals,
-    concierge_status_histogram: runA.stats.concierge_status_histogram,
-    commerce_status_histogram: runA.stats.commerce_status_histogram,
-    commerce_revenue_usd: runA.stats.commerce_revenue_usd,
-    reviews_summary: runA.stats.reviews_summary,
-    digest: digestA,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        ok: true,
+        visitors: runA.stats.visitors,
+        events_total: runA.stats.events_total,
+        events_by_transition: runA.stats.events_by_transition,
+        events_by_kind: runA.stats.events_by_kind,
+        final_stage_histogram: finals,
+        territorial_touches: runA.stats.territorial_touches,
+        alux_totals: runA.stats.alux_totals,
+        concierge_status_histogram: runA.stats.concierge_status_histogram,
+        commerce_status_histogram: runA.stats.commerce_status_histogram,
+        commerce_revenue_usd: runA.stats.commerce_revenue_usd,
+        reviews_summary: runA.stats.reviews_summary,
+        digest: digestA,
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 main();

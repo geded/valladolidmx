@@ -89,9 +89,7 @@ export interface PresenceReport {
 
 export const getBusinessPresenceReport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { businessId: string; windowDays?: number }) => input,
-  )
+  .inputValidator((input: { businessId: string; windowDays?: number }) => input)
   .handler(async ({ data, context }): Promise<PresenceReport> => {
     // Resolver plan activo
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,15 +100,12 @@ export const getBusinessPresenceReport = createServerFn({ method: "GET" })
     const planRow = Array.isArray(planRows) ? planRows[0] : planRows;
     const tier = getTierForSlug(planRow?.plan_slug ?? "basico");
     const requested = data.windowDays ?? 30;
-    const windowDays = Math.min(
-      Math.max(requested, 1),
-      tier.maxWindowDays,
-    );
+    const windowDays = Math.min(Math.max(requested, 1), tier.maxWindowDays);
 
-    const { data: rows, error } = await supa.rpc(
-      "get_business_presence_report",
-      { _business_id: data.businessId, _window_days: windowDays },
-    );
+    const { data: rows, error } = await supa.rpc("get_business_presence_report", {
+      _business_id: data.businessId,
+      _window_days: windowDays,
+    });
     if (error) throw error;
     const row = Array.isArray(rows) ? rows[0] : rows;
     if (!row) throw new Error("Sin datos");
@@ -118,10 +113,7 @@ export const getBusinessPresenceReport = createServerFn({ method: "GET" })
     // Consolidar series por día (sumando por event_type)
     type Ev = { date: string; event_type: string; count: number };
     const raw = (row.series ?? []) as Ev[];
-    const byDay = new Map<
-      string,
-      { impressions: number; interactions: number }
-    >();
+    const byDay = new Map<string, { impressions: number; interactions: number }>();
     for (const e of raw) {
       const entry = byDay.get(e.date) ?? { impressions: 0, interactions: 0 };
       if (e.event_type === "impression") entry.impressions += Number(e.count);

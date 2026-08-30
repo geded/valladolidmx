@@ -117,15 +117,13 @@ export const listMyBusinesses = createServerFn({ method: "GET" })
  */
 export const getMyBusinessAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { businessId: string; minRole?: PortalBusinessAccessRole }) => {
-      if (!input || typeof input.businessId !== "string") {
-        throw new Error("invalid_input");
-      }
-      const minRole = normalizeAccessRole(input.minRole ?? "viewer");
-      return { businessId: input.businessId, minRole };
-    },
-  )
+  .inputValidator((input: { businessId: string; minRole?: PortalBusinessAccessRole }) => {
+    if (!input || typeof input.businessId !== "string") {
+      throw new Error("invalid_input");
+    }
+    const minRole = normalizeAccessRole(input.minRole ?? "viewer");
+    return { businessId: input.businessId, minRole };
+  })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: allowed, error } = await supabase.rpc("has_business_access", {
@@ -207,9 +205,7 @@ function readVisibilityPlan(metadata: Record<string, unknown>): string | null {
 }
 
 function isVisibilityPackageName(name: string): boolean {
-  return /visibilidad|destacad|premium|profesional|aliado|campaña|campana/i.test(
-    name,
-  );
+  return /visibilidad|destacad|premium|profesional|aliado|campaña|campana/i.test(name);
 }
 
 export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" })
@@ -240,9 +236,7 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
 
     const { data: businessRow, error: businessError } = await supabaseAdmin
       .from("businesses")
-      .select(
-        "id, slug, display_name, status, verified, published_at, metadata, deleted_at",
-      )
+      .select("id, slug, display_name, status, verified, published_at, metadata, deleted_at")
       .eq("id", data.businessId)
       .maybeSingle();
     if (businessError) throw new Error(`business_read_failed: ${businessError.message}`);
@@ -260,9 +254,7 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
 
     const { data: itemRows, error: itemError } = await supabaseAdmin
       .from("order_items")
-      .select(
-        "id, order_id, product_id, quantity, unit_price, currency, snapshot_name",
-      )
+      .select("id, order_id, product_id, quantity, unit_price, currency, snapshot_name")
       .eq("business_id", data.businessId)
       .limit(2000);
     if (itemError) throw new Error(`order_items_read_failed: ${itemError.message}`);
@@ -320,8 +312,7 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
       (item) => orderById.get(item.order_id)?.payment_status === "paid",
     );
     const paidAmount = paidItems.reduce(
-      (sum, item) =>
-        sum + Number(item.quantity ?? 0) * Number(item.unit_price ?? 0),
+      (sum, item) => sum + Number(item.quantity ?? 0) * Number(item.unit_price ?? 0),
       0,
     );
     const currency =
@@ -331,26 +322,24 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
 
     const visibilityPackages: VisibilityPackage[] = [];
     for (const item of items) {
-        const product = item.product_id ? productById.get(item.product_id) : undefined;
-        const name = item.snapshot_name ?? product?.name ?? "Paquete";
-        const level = product?.visibility_level ?? null;
-        const looksLikeVisibilityPackage =
-          level === "destacado" || level === "premium" || isVisibilityPackageName(name);
-        if (!looksLikeVisibilityPackage) continue;
-        const order = orderById.get(item.order_id);
-        visibilityPackages.push({
-          order_id: item.order_id,
-          item_id: item.id,
-          product_name: name,
-          visibility_level: level,
-          payment_status: order?.payment_status ?? "unpaid",
-          paid_at: order?.paid_at ?? null,
-          amount: Number(
-            (Number(item.quantity ?? 0) * Number(item.unit_price ?? 0)).toFixed(2),
-          ),
-          currency: item.currency ?? currency,
-        });
-      }
+      const product = item.product_id ? productById.get(item.product_id) : undefined;
+      const name = item.snapshot_name ?? product?.name ?? "Paquete";
+      const level = product?.visibility_level ?? null;
+      const looksLikeVisibilityPackage =
+        level === "destacado" || level === "premium" || isVisibilityPackageName(name);
+      if (!looksLikeVisibilityPackage) continue;
+      const order = orderById.get(item.order_id);
+      visibilityPackages.push({
+        order_id: item.order_id,
+        item_id: item.id,
+        product_name: name,
+        visibility_level: level,
+        payment_status: order?.payment_status ?? "unpaid",
+        paid_at: order?.paid_at ?? null,
+        amount: Number((Number(item.quantity ?? 0) * Number(item.unit_price ?? 0)).toFixed(2)),
+        currency: item.currency ?? currency,
+      });
+    }
     visibilityPackages.sort(
       (a, b) => Number(b.payment_status === "paid") - Number(a.payment_status === "paid"),
     );
@@ -390,9 +379,8 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
         products_total: products.length,
         products_published: products.filter((p) => p.status === "published").length,
         accepts_online_payment: products.filter((p) => p.accepts_online_payment).length,
-        eligible_for_visibility_campaigns: products.filter(
-          (p) => p.eligible_for_ems_campaigns,
-        ).length,
+        eligible_for_visibility_campaigns: products.filter((p) => p.eligible_for_ems_campaigns)
+          .length,
         visibility_levels: visibilityLevels,
       },
       payments: {

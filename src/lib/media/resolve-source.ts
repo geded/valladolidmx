@@ -72,14 +72,7 @@ export interface MediaAssetInput {
   original_width?: number | null;
   original_height?: number | null;
   original_mime?: string | null;
-  pipeline_status?:
-    | "disabled"
-    | "pending"
-    | "processing"
-    | "ready"
-    | "failed"
-    | "skipped"
-    | null;
+  pipeline_status?: "disabled" | "pending" | "processing" | "ready" | "failed" | "skipped" | null;
   variants?: MediaVariantInput[] | null;
 }
 
@@ -160,9 +153,7 @@ export function resolveMediaSource(
   }
 
   const contextFilter = options.context ?? "generic";
-  const contextual = variants.filter(
-    (v) => !v.usage_context || v.usage_context === contextFilter,
-  );
+  const contextual = variants.filter((v) => !v.usage_context || v.usage_context === contextFilter);
   const pool = contextual.length > 0 ? contextual : variants;
 
   const byFormat = new Map<MediaVariantFormat, MediaVariantInput[]>();
@@ -204,12 +195,8 @@ export function resolveMediaSource(
   };
 }
 
-export function isMediaPipelineReady(
-  asset: MediaAssetInput | null | undefined,
-): boolean {
+export function isMediaPipelineReady(asset: MediaAssetInput | null | undefined): boolean {
   if (!asset) return false;
   if (asset.pipeline_status !== "ready") return false;
-  return (asset.variants ?? []).some(
-    (v) => v.status === undefined || v.status === "ready",
-  );
+  return (asset.variants ?? []).some((v) => v.status === undefined || v.status === "ready");
 }

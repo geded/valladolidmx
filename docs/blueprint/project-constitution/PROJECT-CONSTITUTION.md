@@ -57,7 +57,7 @@ Ninguna capa inferior puede sobrescribir una superior sin aprobación escrita.
 - La **memoria oficial** (`mem://index.md`) sigue siendo la lista viva de reglas Core.
 - La **Constitución** es la puerta de entrada: consolida las decisiones estratégicas y permanentes.
 
-No se elimina documentación histórica. Cuando exista información obsoleta, se marca como *deprecada* y se referencia la política vigente.
+No se elimina documentación histórica. Cuando exista información obsoleta, se marca como _deprecada_ y se referencia la política vigente.
 
 ---
 

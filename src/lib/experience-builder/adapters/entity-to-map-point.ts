@@ -88,9 +88,7 @@ interface AnyDestination {
   cover_url?: string | null;
 }
 
-export function destinationToMapPoint(
-  d: AnyDestination,
-): ExperienceMapPoint | null {
+export function destinationToMapPoint(d: AnyDestination): ExperienceMapPoint | null {
   const c = coerceLatLng(d.latitude, d.longitude);
   if (!c) return null;
   return {

@@ -9,10 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function assertCanEditBusiness(
-  ctx: { supabase: any; userId: string },
-  businessId: string,
-) {
+async function assertCanEditBusiness(ctx: { supabase: any; userId: string }, businessId: string) {
   const { data: editorial } = await ctx.supabase.rpc("is_editor_or_admin", {
     _user_id: ctx.userId,
   });
@@ -85,9 +82,7 @@ export const signBusinessImageUpload = createServerFn({ method: "POST" })
       .slice(2, 8)}-${clean}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = context.supabase.storage as any;
-    const { data: signed, error } = await storage
-      .from(BUCKET)
-      .createSignedUploadUrl(path);
+    const { data: signed, error } = await storage.from(BUCKET).createSignedUploadUrl(path);
     if (error) throw error;
     return {
       path: signed.path as string,
@@ -114,10 +109,8 @@ interface RegisterMediaInput {
 export const registerBusinessMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: RegisterMediaInput) => {
-    if (!d?.businessId || !d?.storagePath || !d?.role)
-      throw new Error("invalid_input");
-    if (!["logo", "cover", "gallery"].includes(d.role))
-      throw new Error("invalid_role");
+    if (!d?.businessId || !d?.storagePath || !d?.role) throw new Error("invalid_input");
+    if (!["logo", "cover", "gallery"].includes(d.role)) throw new Error("invalid_role");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -256,8 +249,7 @@ interface ReorderInput {
 export const reorderBusinessGallery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ReorderInput) => {
-    if (!d?.businessId || !Array.isArray(d.orderedIds))
-      throw new Error("invalid_input");
+    if (!d?.businessId || !Array.isArray(d.orderedIds)) throw new Error("invalid_input");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -294,9 +286,7 @@ export const removeBusinessMedia = createServerFn({ method: "POST" })
 
     const { data: link, error: readErr } = await db
       .from("business_media")
-      .select(
-        "id, role, business_id, media_asset_id, media_assets:media_assets ( storage_path )",
-      )
+      .select("id, role, business_id, media_asset_id, media_assets:media_assets ( storage_path )")
       .eq("id", data.businessMediaId)
       .maybeSingle();
     if (readErr) throw readErr;
@@ -325,8 +315,7 @@ export const removeBusinessMedia = createServerFn({ method: "POST" })
       /* ignore */
     }
     try {
-      const storagePath = (link.media_assets as { storage_path?: string } | null)
-        ?.storage_path;
+      const storagePath = (link.media_assets as { storage_path?: string } | null)?.storage_path;
       if (storagePath) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const storage = context.supabase.storage as any;

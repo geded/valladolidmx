@@ -225,7 +225,7 @@ export function useTranslation(): I18nContextValue {
     return {
       locale: DEFAULT_LOCALE,
       setLocale: () => undefined,
-      t: (k) => (defDict ? resolveKey(defDict, k) ?? k : k),
+      t: (k) => (defDict ? (resolveKey(defDict, k) ?? k) : k),
       locales: staticLocales(),
       defaultLocale: DEFAULT_LOCALE,
     };

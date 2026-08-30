@@ -32,8 +32,20 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users, Headset } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Clock,
+  Compass,
+  MapPin,
+  Sparkles,
+  Tag,
+  Ticket,
+  Navigation,
+  Users,
+  Headset,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
@@ -48,7 +60,21 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useAluxContext, type AluxContext, type AluxContextSlot } from "@/lib/alux/use-alux-context";
+import {
+  useAluxContext,
+  type AluxContext,
+  type AluxContextSlot,
+} from "@/lib/alux/use-alux-context";
+import {
+  buildAluxUnifiedContext,
+  hasSufficientAluxContext,
+  ALUX_UNIFIED_CONTEXT_VERSION,
+} from "@/lib/alux/unified-context";
+import { rankAluxCandidates } from "@/lib/alux/personalization";
+import { attachDistance } from "@/lib/alux/proximity";
+import { useAluxMemory } from "@/lib/alux/use-alux-memory";
+import { emitAluxSignal } from "@/lib/alux/signal-emitter";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
@@ -60,6 +86,9 @@ import { getAluxTerritorialMemory } from "@/lib/alux/territorial-memory.function
 import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
+import { AluxMark } from "@/components/alux/AluxMark";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -90,20 +119,24 @@ export function AluxFloatingTrigger() {
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
   // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
   const contextIsRelevant = pathname.startsWith("/oriente-maya/");
-  const ctx: AluxContext = contextIsRelevant
-    ? rawCtx
-    : {
-        hasContext: false,
-        related: [],
-        reason: rawCtx.reason,
-        origin: "none",
-        region: undefined,
-        destination: undefined,
-        category: undefined,
-        business: undefined,
-        product: undefined,
-        canonical: undefined,
-      };
+  const ctx: AluxContext = useMemo(
+    () =>
+      contextIsRelevant
+        ? rawCtx
+        : {
+            hasContext: false,
+            related: [],
+            reason: rawCtx.reason,
+            origin: "none",
+            region: undefined,
+            destination: undefined,
+            category: undefined,
+            business: undefined,
+            product: undefined,
+            canonical: undefined,
+          },
+    [contextIsRelevant, rawCtx],
+  );
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
 
@@ -175,9 +208,7 @@ export function AluxFloatingTrigger() {
   const lens = lensQuery.data;
   const plan = lens?.plan ?? null;
   const activeCouponBusinessSlugs =
-    lens?.active_coupons
-      .map((c) => c.business_slug)
-      .filter((s): s is string => Boolean(s)) ?? [];
+    lens?.active_coupons.map((c) => c.business_slug).filter((s): s is string => Boolean(s)) ?? [];
   const concierge = lens?.concierge ?? null;
   const hasConcierge = Boolean(concierge?.has_concierge);
 
@@ -199,6 +230,62 @@ export function AluxFloatingTrigger() {
   useEffect(() => {
     if (open && nudge) markNudgeShown(nudge.intent);
   }, [open, nudge]);
+
+  /**
+   * G8-R1-E-R1 — Memoria funcional y continuidad anónima.
+   * `summary` es el resumen permitido de señales (vacío si el viajero pausó
+   * la personalización). `anonymousTrip` aporta la composición declarada
+   * antes del registro. Ninguno crea un motor ni un perfil paralelo.
+   */
+  const { summary: behaviorSummary } = useAluxMemory();
+  const { trip: anonymousTrip } = useAnonymousTrip();
+
+  /**
+   * G8-R1-D-R1 · DEF-R1D-005 — Composición ÚNICA del contexto unificado.
+   *
+   * Es la sola autoridad de contexto de Alux en superficies públicas
+   * (Home, Destino, Listados, Empresa/hotel/restaurante, Producto/
+   * experiencia/tour, Evento, Lugar y Landing SEO en preview staff): el
+   * dock es el único punto de entrada montado en todas ellas. El contrato
+   * anterior (`AluxContext`) permanece como fuente territorial de entrada,
+   * nunca como segunda autoridad.
+   */
+  const unified = useMemo(
+    () =>
+      buildAluxUnifiedContext({
+        context: ctx,
+        plan: plan
+          ? {
+              id: "active",
+              start_date: plan.start_date,
+              end_date: plan.end_date,
+              party_size: plan.party_size,
+              item_count: plan.item_count,
+            }
+          : null,
+        savedItemCount: plan?.saved_items.length ?? 0,
+        profileHints: lens
+          ? {
+              homeCountry: lens.hints.home_country ?? null,
+              preferredLanguage: lens.hints.preferred_language ?? null,
+              travelStyle: lens.hints.travel_style ?? null,
+              budgetBand: lens.hints.budget_band ?? null,
+              interests: lens.hints.interests ?? [],
+            }
+          : null,
+        hasCompletedProfile: Boolean(lens?.hints.travel_style),
+        isAuthenticated: isAuthed,
+        hasAnonymousDraft: Boolean(sessionKey) && !isAuthed,
+        locationConsent: geo.status === "granted",
+        coords: geo.location ?? null,
+        // DEF-R1E-006 · Composición del viaje con orden de autoridad:
+        // perfil/plan declarado → continuidad anónima → desconocido.
+        profilePartySize: plan?.party_size ?? null,
+        anonymousTravelerCount: anonymousTrip?.travelerCount ?? null,
+      }),
+    [ctx, plan, lens, isAuthed, sessionKey, geo, anonymousTrip],
+  );
+  const contextIsSufficient = hasSufficientAluxContext(unified);
 
   const suggestionsQuery = useQuery({
     queryKey: [
@@ -264,13 +351,122 @@ export function AluxFloatingTrigger() {
           conciergeLatestProposalSummary: concierge?.latest_proposal_summary ?? undefined,
         },
       }),
+    // Contexto insuficiente ⇒ Alux no sugiere (nunca inventa).
     enabled:
       open &&
+      contextIsSufficient &&
       ctx.hasContext &&
       Boolean(ctx.destination?.slug) &&
       (!isAuthed || !lensQuery.isLoading),
     staleTime: 60_000,
   });
+
+  /**
+   * G8-R1-E · Fase 4 — Priorización explicable y determinista.
+   * No reemplaza el catálogo ni al modelo: reordena los candidatos ya
+   * devueltos por `aluxContextualSuggest` con la jerarquía aprobada y
+   * añade la razón humana cuando aporta información real.
+   */
+  const personalized = useMemo(() => {
+    const remote = suggestionsQuery.data?.suggestions ?? [];
+    if (!remote.length) return null;
+    const planSlugs = new Set(
+      (plan?.saved_items ?? []).map((i) => (i.slug ?? "").toLowerCase()).filter(Boolean),
+    );
+    const savedCategorySlugs = remote
+      .filter((s) => planSlugs.has(s.slug.toLowerCase()))
+      .map((s) => s.categorySlug ?? "")
+      .filter(Boolean);
+    const result = rankAluxCandidates({
+      unified,
+      limit: remote.length,
+      savedCategorySlugs,
+      requiredAccessibility: lens?.hints.accessibility ?? [],
+      // DEF-R1E-001/004 — señales reales del visitante (vacías si pausó).
+      signals: behaviorSummary,
+      // R1-E-R3 · distancia real (transitoria) antes del ranking.
+      candidates: attachDistance({
+        origin: geo.location,
+        consentGranted: geo.status === "granted" && Boolean(geo.location),
+        getCoords: (c: { coords?: { lat: number; lng: number; source: string } | null }) =>
+          c.coords
+            ? {
+                lat: c.coords.lat,
+                lng: c.coords.lng,
+                source: c.coords.source as never,
+              }
+            : null,
+        candidates: remote.map((s) => ({
+          coords: s.coords ?? null,
+          entityId: s.entityId ?? s.source.id,
+          entityKind: s.kind,
+          slug: s.slug,
+          label: s.label,
+          canonicalUrl: s.canonicalUrl ?? s.href,
+          published: true,
+          destinationSlug: unified.territory.destinationSlug,
+          categorySlug: s.categorySlug ?? null,
+          categoryName: s.categoryName ?? null,
+          openState: s.openState,
+          alreadyInPlan: planSlugs.has(s.slug.toLowerCase()),
+        })),
+      }),
+    });
+    const bySlug = new Map(remote.map((s) => [s.slug, s] as const));
+    return {
+      result,
+      items: result.ranked
+        .map((r) => {
+          const base = bySlug.get(r.candidate.slug);
+          if (!base) return null;
+          const extra = r.reasons[0];
+          return extra && !base.rationale.includes(extra)
+            ? { ...base, rationale: `${base.rationale} ${extra}`.slice(0, 220) }
+            : base;
+        })
+        .filter((v): v is AluxContextualSuggestion => Boolean(v)),
+    };
+  }, [suggestionsQuery.data, unified, plan, lens, behaviorSummary, geo.location, geo.status]);
+
+  /**
+   * DEF-R1E-001/004 — Emisores reales de navegación. Un solo punto: el
+   * contexto ya resuelto por el Context Engine. Sin PII, con deduplicación
+   * y rate limit en `emitAluxSignal`, escritura server-side por la
+   * autoridad existente de `visitor_intel`.
+   */
+  useEffect(() => {
+    const base = {
+      isAuthenticated: isAuthed,
+      locale,
+      surface: "alux_dock",
+      route: pathname,
+      destinationId: null,
+      travelStage: unified.trip.stage,
+      recommendationSource: "alux",
+      algorithmVersion: ALUX_UNIFIED_CONTEXT_VERSION,
+    } as const;
+    const emit = (
+      kind: "territory_viewed" | "category_explored" | "entity_viewed",
+      key?: string | null,
+      targetType?: string,
+    ) => {
+      if (!key) return;
+      void emitAluxSignal({ kind, key, context: { ...base, targetType: targetType ?? null } });
+    };
+    emit("territory_viewed", ctx.destination?.slug, "destination");
+    emit("category_explored", ctx.category?.slug, "category");
+    emit("entity_viewed", ctx.business?.slug, "business");
+    emit("entity_viewed", ctx.product?.slug, "product");
+  }, [
+    ctx.destination?.slug,
+    ctx.category?.slug,
+    ctx.business?.slug,
+    ctx.product?.slug,
+    isAuthed,
+    locale,
+    pathname,
+    unified.trip.stage,
+  ]);
 
   // AT-0: en superficies con CTA sticky comercial, cedemos el espacio.
   if (presence.shouldHide) return null;
@@ -289,13 +485,25 @@ export function AluxFloatingTrigger() {
       : "Contexto reciente"
     : "Modo descubrimiento";
 
-  const triggerLabel = ctx.hasContext
-    ? current?.label ?? "Concierge IA"
-    : t("alux_floating");
+  const triggerLabel = ctx.hasContext ? (current?.label ?? "Concierge IA") : t("alux_floating");
 
   return (
     <>
       <div
+        data-alux-dock
+        data-omxds-chrome="alux-dock"
+        data-alux-context-version={ALUX_UNIFIED_CONTEXT_VERSION}
+        data-alux-context-sufficient={contextIsSufficient ? "true" : "false"}
+        data-alux-entity-kind={unified.entity.entityKind ?? ""}
+        data-alux-entity-id={unified.entity.entityId ?? ""}
+        data-alux-destination={unified.territory.destinationSlug ?? ""}
+        data-alux-zone={unified.territory.zoneSlug ?? ""}
+        data-alux-stage={unified.trip.stage}
+        data-alux-location-consent={unified.permissions.canUseLocation ? "true" : "false"}
+        data-alux-plan-items={String(unified.trip.planItemCount)}
+        data-alux-saved-items={String(unified.trip.savedItemCount)}
+        data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
+        data-alux-reason={unified.reason}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
@@ -307,8 +515,9 @@ export function AluxFloatingTrigger() {
           title={`Alux · ${triggerLabel}`}
           className="pointer-events-auto group flex max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
-          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
-            <Sparkles className="size-3.5" aria-hidden />
+          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+            {/* Sistema visual canónico Alux IA (activo gobernado). */}
+            <AluxMark family="avatar" size={20} decorative loading="eager" />
             {nudge && !open && (
               <span
                 aria-hidden
@@ -316,10 +525,9 @@ export function AluxFloatingTrigger() {
               />
             )}
           </span>
+
           <span className="hidden sm:inline">Alux</span>
-          <span className="hidden text-xs text-muted-foreground sm:inline">
-            · Concierge IA
-          </span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">· Concierge IA</span>
           <span className="ml-1 truncate text-xs text-muted-foreground sm:hidden">
             {triggerLabel}
           </span>
@@ -337,14 +545,11 @@ export function AluxFloatingTrigger() {
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-md flex-col gap-6 overflow-y-auto"
-        >
+        <SheetContent side="right" className="flex w-full max-w-md flex-col gap-6 overflow-y-auto">
           <SheetHeader className="text-left">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-full bg-primary/15 text-primary">
-                <Sparkles className="size-4" aria-hidden />
+              <span className="grid size-8 place-items-center rounded-full bg-primary/15">
+                <AluxMark family="avatar" size={28} decorative loading="eager" />
               </span>
               <div>
                 <SheetTitle className="text-lg">Alux · Concierge IA del Oriente Maya</SheetTitle>
@@ -412,7 +617,8 @@ export function AluxFloatingTrigger() {
                 )}
                 {plan.item_count > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
-                    {plan.item_count} lugar{plan.item_count === 1 ? "" : "es"} guardado{plan.item_count === 1 ? "" : "s"}
+                    {plan.item_count} lugar{plan.item_count === 1 ? "" : "es"} guardado
+                    {plan.item_count === 1 ? "" : "s"}
                   </span>
                 )}
               </div>
@@ -452,9 +658,7 @@ export function AluxFloatingTrigger() {
               </div>
               {concierge.reserved_business_names.length > 0 && (
                 <>
-                  <p className="mt-2 text-[12px] text-foreground">
-                    Ya está trabajando con:
-                  </p>
+                  <p className="mt-2 text-[12px] text-foreground">Ya está trabajando con:</p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {concierge.reserved_business_names.slice(0, 6).map((name) => (
                       <span
@@ -498,14 +702,14 @@ export function AluxFloatingTrigger() {
             </div>
             {geo.status === "granted" && geo.location ? (
               <p className="mt-2 text-sm text-foreground">
-                Compartiste tu ubicación. Puedo calcular distancias reales a
-                hoteles, restaurantes y experiencias del Oriente Maya.
+                Compartiste tu ubicación. Puedo calcular distancias reales a hoteles, restaurantes y
+                experiencias del Oriente Maya.
               </p>
             ) : (
               <>
                 <p className="mt-2 text-sm text-foreground">
-                  Compartir tu ubicación me permite priorizar lugares que
-                  están realmente cerca de ti y calcular tiempos de traslado.
+                  Compartir tu ubicación me permite priorizar lugares que están realmente cerca de
+                  ti y calcular tiempos de traslado.
                 </p>
                 <button
                   type="button"
@@ -542,7 +746,10 @@ export function AluxFloatingTrigger() {
               </section>
 
               {/* ¿Qué estoy explorando? + ¿Por qué? */}
-              <section aria-labelledby="alux-what" className="rounded-2xl border border-border bg-card/60 p-4">
+              <section
+                aria-labelledby="alux-what"
+                className="rounded-2xl border border-border bg-card/60 p-4"
+              >
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   <Compass className="size-3.5" aria-hidden />
                   <span id="alux-what">Qué estás explorando</span>
@@ -570,13 +777,16 @@ export function AluxFloatingTrigger() {
                 <span id="alux-discover">Empieza a explorar</span>
               </div>
               <p className="mt-2 text-sm text-foreground">
-                Aún no exploras un destino del Oriente Maya. Elige un Pueblo
-                Mágico para que te acompañe con recomendaciones basadas en
-                tu recorrido, nunca inventadas.
+                Aún no exploras un destino del Oriente Maya. Elige un Pueblo Mágico para que te
+                acompañe con recomendaciones basadas en tu recorrido, nunca inventadas.
               </p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 <ContextChip
-                  slot={{ slug: "valladolid", label: "Valladolid", href: "/oriente-maya/valladolid" }}
+                  slot={{
+                    slug: "valladolid",
+                    label: "Valladolid",
+                    href: "/oriente-maya/valladolid",
+                  }}
                 />
                 <ContextChip
                   slot={{ slug: "izamal", label: "Izamal", href: "/oriente-maya/izamal" }}
@@ -609,17 +819,18 @@ export function AluxFloatingTrigger() {
               </p>
             )}
             {(() => {
-              const remote = suggestionsQuery.data?.suggestions ?? [];
-              const items: AluxContextualSuggestion[] = remote.length > 0
-                ? [...remote]
-                : ctx.related.slice(0, 6).map((slot) => ({
-                    kind: "business" as const,
-                    slug: slot.slug,
-                    label: slot.label,
-                    href: slot.href ?? "#",
-                    rationale: `Relacionado con ${ctx.destination?.label ?? "tu recorrido"}.`,
-                    source: { table: "context-engine", id: slot.slug },
-                  }));
+              const remote = personalized?.items ?? suggestionsQuery.data?.suggestions ?? [];
+              const items: AluxContextualSuggestion[] =
+                remote.length > 0
+                  ? [...remote]
+                  : ctx.related.slice(0, 6).map((slot) => ({
+                      kind: "business" as const,
+                      slug: slot.slug,
+                      label: slot.label,
+                      href: slot.href ?? "#",
+                      rationale: `Relacionado con ${ctx.destination?.label ?? "tu recorrido"}.`,
+                      source: { table: "context-engine", id: slot.slug },
+                    }));
               if (suggestionsQuery.isLoading && items.length === 0) {
                 return (
                   <ul className="mt-2 grid gap-2" aria-label="Cargando sugerencias">
@@ -635,13 +846,16 @@ export function AluxFloatingTrigger() {
               if (items.length === 0) {
                 return (
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {suggestionsQuery.data?.reason
-                      ?? `Sigue explorando ${ctx.destination?.label ?? "el Oriente Maya"} y Alux te sugerirá qué visitar a continuación.`}
+                    {suggestionsQuery.data?.reason ??
+                      `Sigue explorando ${ctx.destination?.label ?? "el Oriente Maya"} y Alux te sugerirá qué visitar a continuación.`}
                   </p>
                 );
               }
               // Agrupar por categoría publicada para volver navegable el bloque.
-              const groups = new Map<string, { label: string; items: AluxContextualSuggestion[] }>();
+              const groups = new Map<
+                string,
+                { label: string; items: AluxContextualSuggestion[] }
+              >();
               for (const it of items) {
                 const key = it.categorySlug ?? "otras";
                 const label = it.categoryName ?? "Otras opciones";
@@ -665,13 +879,29 @@ export function AluxFloatingTrigger() {
                             <div className="rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground">
                               <a
                                 href={item.href}
-                                onClick={() =>
+                                onClick={() => {
                                   logAluxPublicSignal({
                                     action: "view_business",
                                     label: item.label,
                                     slug: item.source.id,
-                                  })
-                                }
+                                  });
+                                  // DEF-R1E-001 · recomendación aceptada.
+                                  void emitAluxSignal({
+                                    kind: "suggestion_accepted",
+                                    key: item.slug,
+                                    context: {
+                                      isAuthenticated: isAuthed,
+                                      locale,
+                                      surface: "alux_dock",
+                                      route: pathname,
+                                      destinationId: null,
+                                      travelStage: unified.trip.stage,
+                                      targetType: item.kind,
+                                      recommendationSource: "alux",
+                                      algorithmVersion: ALUX_UNIFIED_CONTEXT_VERSION,
+                                    },
+                                  });
+                                }}
                                 className="group flex items-start justify-between gap-3"
                               >
                                 <span className="min-w-0">
@@ -711,7 +941,10 @@ export function AluxFloatingTrigger() {
                                     </span>
                                   )}
                                 </span>
-                                <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
+                                <ArrowRight
+                                  className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                                  aria-hidden
+                                />
                               </a>
                               {item.ctas && item.ctas.length > 1 && (
                                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -722,13 +955,18 @@ export function AluxFloatingTrigger() {
                                         key={`${cta.kind}-${cta.href}`}
                                         href={cta.href}
                                         target={cta.kind === "directions" ? "_blank" : undefined}
-                                        rel={cta.kind === "directions" ? "noopener noreferrer" : undefined}
+                                        rel={
+                                          cta.kind === "directions"
+                                            ? "noopener noreferrer"
+                                            : undefined
+                                        }
                                         onClick={() => {
-                                          const map: Record<string, AluxPublicSignalAction | null> = {
-                                            directions: "request_directions",
-                                            promotion: "view_promotion",
-                                            coupon: "save_coupon",
-                                          };
+                                          const map: Record<string, AluxPublicSignalAction | null> =
+                                            {
+                                              directions: "request_directions",
+                                              promotion: "view_promotion",
+                                              coupon: "save_coupon",
+                                            };
                                           const action = map[cta.kind] ?? null;
                                           if (action) {
                                             logAluxPublicSignal({
@@ -740,12 +978,44 @@ export function AluxFloatingTrigger() {
                                         }}
                                         className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
                                       >
-                                        {cta.kind === "directions" && <Navigation className="size-2.5" aria-hidden />}
-                                        {cta.kind === "promotion" && <Tag className="size-2.5" aria-hidden />}
-                                        {cta.kind === "coupon" && <Ticket className="size-2.5" aria-hidden />}
+                                        {cta.kind === "directions" && (
+                                          <Navigation className="size-2.5" aria-hidden />
+                                        )}
+                                        {cta.kind === "promotion" && (
+                                          <Tag className="size-2.5" aria-hidden />
+                                        )}
+                                        {cta.kind === "coupon" && (
+                                          <Ticket className="size-2.5" aria-hidden />
+                                        )}
                                         {cta.label}
                                       </a>
                                     ))}
+                                </div>
+                              )}
+                              {/* G8-R1-D3 · Guardar y Agregar a Mi Viaje son
+                                  acciones DISTINTAS. Alux sólo propone: nada
+                                  entra al viaje sin confirmación del viajero. */}
+                              {item.entityId && (item.favoriteKind || item.planKind) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                  {item.favoriteKind && (
+                                    <FavoriteButton
+                                      entityKind={item.favoriteKind}
+                                      entityId={item.entityId}
+                                      entityTitle={item.label}
+                                      entitySlug={item.slug}
+                                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
+                                    />
+                                  )}
+                                  {item.planKind && (
+                                    <AddToTravelPlanButton
+                                      kind={item.planKind}
+                                      targetId={item.entityId}
+                                      title={item.label}
+                                      slug={item.slug}
+                                      subtitle={item.categoryName ?? null}
+                                      variant="compact"
+                                    />
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -758,7 +1028,8 @@ export function AluxFloatingTrigger() {
               );
             })()}
             <p className="mt-3 text-[11px] text-muted-foreground">
-              Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido, nunca inventadas.
+              Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido,
+              nunca inventadas.
             </p>
           </section>
 
@@ -794,41 +1065,49 @@ export function AluxFloatingTrigger() {
           )}
 
           {/* A6 · Promociones activas del destino */}
-          {suggestionsQuery.data?.activePromotions && suggestionsQuery.data.activePromotions.length > 0 && (
-            <section
-              aria-labelledby="alux-promos"
-              className="rounded-2xl border border-border bg-card/60 p-4"
-            >
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                <Tag className="size-3.5" aria-hidden />
-                <span id="alux-promos">Promociones en {ctx.destination?.label ?? "el destino"}</span>
-              </div>
-              <ul className="mt-2 grid gap-1.5">
-                {suggestionsQuery.data.activePromotions.slice(0, 4).map((p) => (
-                  <li key={p.slug} className="flex items-center justify-between gap-2 text-sm">
-                    <span className="min-w-0 truncate">
-                      <span className="text-foreground">{p.title}</span>
-                      {p.businessName && (
-                        <span className="ml-1 text-[11px] text-muted-foreground">· {p.businessName}</span>
-                      )}
-                    </span>
-                    <a
-                      href={p.href}
-                      className="shrink-0 text-[11px] font-medium text-primary hover:underline"
-                    >
-                      Ver
+          {suggestionsQuery.data?.activePromotions &&
+            suggestionsQuery.data.activePromotions.length > 0 && (
+              <section
+                aria-labelledby="alux-promos"
+                className="rounded-2xl border border-border bg-card/60 p-4"
+              >
+                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  <Tag className="size-3.5" aria-hidden />
+                  <span id="alux-promos">
+                    Promociones en {ctx.destination?.label ?? "el destino"}
+                  </span>
+                </div>
+                <ul className="mt-2 grid gap-1.5">
+                  {suggestionsQuery.data.activePromotions.slice(0, 4).map((p) => (
+                    <li key={p.slug} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="min-w-0 truncate">
+                        <span className="text-foreground">{p.title}</span>
+                        {p.businessName && (
+                          <span className="ml-1 text-[11px] text-muted-foreground">
+                            · {p.businessName}
+                          </span>
+                        )}
+                      </span>
+                      <a
+                        href={p.href}
+                        className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+                      >
+                        Ver
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                {!isAuthed && (
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Crea tu cuenta para reclamar cupones digitales en{" "}
+                    <a href="/promociones" className="text-primary hover:underline">
+                      /promociones
                     </a>
-                  </li>
-                ))}
-              </ul>
-              {!isAuthed && (
-                <p className="mt-2 text-[11px] text-muted-foreground">
-                  Crea tu cuenta para reclamar cupones digitales en{" "}
-                  <a href="/promociones" className="text-primary hover:underline">/promociones</a>.
-                </p>
-              )}
-            </section>
-          )}
+                    .
+                  </p>
+                )}
+              </section>
+            )}
 
           {/* Invitación a completar y publicar perfil — para asesoría más precisa */}
           <section
@@ -840,9 +1119,9 @@ export function AluxFloatingTrigger() {
               <span id="alux-profile">Ayúdame a asesorarte mejor</span>
             </div>
             <p className="mt-2 text-sm text-foreground">
-              Si completas tu perfil de viajero (estilo, intereses, compañía, presupuesto, fechas)
-              y también tu perfil público, puedo recomendarte hoteles, restaurantes,
-              experiencias y rutas del Oriente Maya con mucha más precisión.
+              Si completas tu perfil de viajero (estilo, intereses, compañía, presupuesto, fechas) y
+              también tu perfil público, puedo recomendarte hoteles, restaurantes, experiencias y
+              rutas del Oriente Maya con mucha más precisión.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <a

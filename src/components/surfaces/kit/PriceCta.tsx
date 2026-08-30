@@ -5,9 +5,7 @@ export function KitPriceCta({ vm }: { vm: PriceCtaVM }) {
   const price = formatPrice(vm.price ?? null);
   const stickyCls = vm.sticky ? "md:sticky md:top-20" : "";
   return (
-    <section
-      className={`mt-8 rounded-2xl border border-border bg-card p-5 ${stickyCls}`.trim()}
-    >
+    <section className={`mt-8 rounded-2xl border border-border bg-card p-5 ${stickyCls}`.trim()}>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           {price ? (

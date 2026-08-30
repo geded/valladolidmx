@@ -8,10 +8,7 @@
  * Regla vinculante: prohibido bypassear el registry desde superficies
  * (ver `mem://policies/founder-destination-context-engine.md`).
  */
-import type {
-  DestinationContextContributor,
-  DestinationSignalKind,
-} from "./types";
+import type { DestinationContextContributor, DestinationSignalKind } from "./types";
 
 const registry = new Map<string, DestinationContextContributor>();
 

@@ -1,0 +1,1 @@
+ALTER TYPE public.eb_page_kind ADD VALUE IF NOT EXISTS 'place';

@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-031",
+  "title": "19.28 · G5 · Runtime visual Premium compartido e integración Business elegible",
+  "status": "Approved",
+  "branch": "feature/omxds-g5-premium-system-v1",
+  "blueprint": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · Construir el sistema completo con el estilo ya aprobado, probarlo como conjunto y preparar las entidades válidas para publicación. Autoriza implementación técnica incremental y gobernada; no autoriza datos, migraciones, producción, merge, despliegue, activación del flag ni publicación de demos.",
+  "permissions": [
+    { "operation": "create", "path": "src/components/premium/PremiumAction.tsx" },
+    { "operation": "create", "path": "src/components/premium/PremiumCard.tsx" },
+    { "operation": "create", "path": "src/components/premium/PremiumHero.tsx" },
+    { "operation": "create", "path": "src/components/premium/PremiumPresentationControl.tsx" },
+    { "operation": "create", "path": "src/components/premium/PremiumSection.tsx" },
+    { "operation": "create", "path": "src/components/premium/PremiumTerritorialBreadcrumb.tsx" },
+    { "operation": "create", "path": "src/components/premium/index.ts" },
+    { "operation": "create", "path": "src/components/premium/types.ts" },
+    { "operation": "create", "path": "src/lib/omxds/presentation/presentation.ts" },
+    { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-destination-microsite-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-event-premium-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-experience-premium-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-home-premium-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-hotel-premium-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun scripts/omxds/i3/business-premium-surface.evidence.mjs",
+    "bun scripts/governance/validate-full-suite.mjs",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

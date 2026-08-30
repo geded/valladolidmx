@@ -65,8 +65,7 @@ function RelatedOverridesPage() {
   });
 
   const upsertMut = useMutation({
-    mutationFn: (input: Parameters<typeof upsertFn>[0]["data"]) =>
-      upsertFn({ data: input }),
+    mutationFn: (input: Parameters<typeof upsertFn>[0]["data"]) => upsertFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["cms", "related-overrides"] }),
   });
   const deleteMut = useMutation({
@@ -81,9 +80,9 @@ function RelatedOverridesPage() {
       <header>
         <h1 className="text-2xl font-semibold">Colecciones relacionadas</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Fija (<code>pin</code>) u oculta (<code>hide</code>) ítems del bloque
-          Related Collection en fichas de empresa, producto, destino y evento.
-          Complementa las reglas automáticas — no las reemplaza.
+          Fija (<code>pin</code>) u oculta (<code>hide</code>) ítems del bloque Related Collection
+          en fichas de empresa, producto, destino y evento. Complementa las reglas automáticas — no
+          las reemplaza.
         </p>
       </header>
 
@@ -104,7 +103,9 @@ function RelatedOverridesPage() {
             >
               <option value="">Todos los tipos</option>
               {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-                <option key={k} value={k}>{KIND_LABELS[k]}</option>
+                <option key={k} value={k}>
+                  {KIND_LABELS[k]}
+                </option>
               ))}
             </select>
             <input
@@ -116,9 +117,7 @@ function RelatedOverridesPage() {
           </div>
         </div>
 
-        {query.isLoading && (
-          <p className="text-sm text-muted-foreground">Cargando…</p>
-        )}
+        {query.isLoading && <p className="text-sm text-muted-foreground">Cargando…</p>}
         {query.isError && (
           <p className="text-sm text-destructive">
             {query.error instanceof Error ? query.error.message : "Error al cargar."}
@@ -163,11 +162,17 @@ function RelatedOverridesPage() {
                     </td>
                     <td className="py-2 pr-3">
                       <div className="font-medium">{KIND_LABELS[r.related_entity_type]}</div>
-                      <code className="text-[10px] text-muted-foreground">{r.related_entity_id}</code>
+                      <code className="text-[10px] text-muted-foreground">
+                        {r.related_entity_id}
+                      </code>
                     </td>
-                    <td className="py-2 pr-3"><code>{r.surface}</code></td>
+                    <td className="py-2 pr-3">
+                      <code>{r.surface}</code>
+                    </td>
                     <td className="py-2 pr-3">{r.position ?? "—"}</td>
-                    <td className="py-2 pr-3 max-w-[220px] text-muted-foreground">{r.note ?? "—"}</td>
+                    <td className="py-2 pr-3 max-w-[220px] text-muted-foreground">
+                      {r.note ?? "—"}
+                    </td>
                     <td className="py-2 text-right">
                       <button
                         type="button"
@@ -215,8 +220,7 @@ function CreateForm({
 }) {
   const [entityType, setEntityType] = useState<RelatedEntityKind>("business");
   const [entityId, setEntityId] = useState("");
-  const [relatedEntityType, setRelatedEntityType] =
-    useState<RelatedEntityKind>("business");
+  const [relatedEntityType, setRelatedEntityType] = useState<RelatedEntityKind>("business");
   const [relatedEntityId, setRelatedEntityId] = useState("");
   const [mode, setMode] = useState<RelatedOverrideMode>("pin");
   const [position, setPosition] = useState("");
@@ -254,7 +258,9 @@ function CreateForm({
           className="h-9 w-full rounded-md border bg-background px-2"
         >
           {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-            <option key={k} value={k}>{KIND_LABELS[k]}</option>
+            <option key={k} value={k}>
+              {KIND_LABELS[k]}
+            </option>
           ))}
         </select>
       </label>
@@ -275,7 +281,9 @@ function CreateForm({
           className="h-9 w-full rounded-md border bg-background px-2"
         >
           {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-            <option key={k} value={k}>{KIND_LABELS[k]}</option>
+            <option key={k} value={k}>
+              {KIND_LABELS[k]}
+            </option>
           ))}
         </select>
       </label>
@@ -333,9 +341,7 @@ function CreateForm({
         Superficie asignada automáticamente: <code>{surface}</code>. La unicidad
         <code> (ficha, superficie, relacionado)</code> hace un upsert idempotente.
       </p>
-      {error && (
-        <p className="md:col-span-6 text-xs text-destructive">{error}</p>
-      )}
+      {error && <p className="md:col-span-6 text-xs text-destructive">{error}</p>}
     </form>
   );
 }

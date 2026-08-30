@@ -38,9 +38,7 @@ function PropiedadPage() {
   const acceptFn = useServerFn(acceptOwnershipTransfer);
   const rejectFn = useServerFn(rejectOwnershipTransfer);
 
-  const [activeBusinessId, setActiveBusinessId] = useState<string | null>(
-    null,
-  );
+  const [activeBusinessId, setActiveBusinessId] = useState<string | null>(null);
   useEffect(() => {
     if (typeof window === "undefined") return;
     setActiveBusinessId(window.localStorage.getItem(STORAGE_KEY));
@@ -60,8 +58,7 @@ function PropiedadPage() {
 
   const outgoingQ = useQuery({
     queryKey: ["portal", "ownership", "outgoing", activeBusinessId],
-    queryFn: () =>
-      fetchOutgoing({ data: { businessId: activeBusinessId as string } }),
+    queryFn: () => fetchOutgoing({ data: { businessId: activeBusinessId as string } }),
     enabled: Boolean(activeBusinessId),
   });
 
@@ -96,8 +93,7 @@ function PropiedadPage() {
         queryKey: ["portal", "ownership", "outgoing", activeBusinessId],
       });
     },
-    onError: (e: unknown) =>
-      setFormError(e instanceof Error ? translateError(e.message) : "Error"),
+    onError: (e: unknown) => setFormError(e instanceof Error ? translateError(e.message) : "Error"),
   });
 
   const cancelM = useMutation({
@@ -118,8 +114,7 @@ function PropiedadPage() {
 
   const rejectM = useMutation({
     mutationFn: (id: string) => rejectFn({ data: { transferId: id } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", "ownership", "incoming"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", "ownership", "incoming"] }),
   });
 
   return (
@@ -128,34 +123,26 @@ function PropiedadPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Portal Empresarial
         </p>
-        <h1 className="mt-1 text-2xl font-semibold">
-          Transferencia de propiedad
-        </h1>
+        <h1 className="mt-1 text-2xl font-semibold">Transferencia de propiedad</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          La transferencia requiere aceptación explícita del nuevo propietario.
-          No modifica productos, promociones, galería, horarios, órdenes ni el
-          historial de la empresa.
+          La transferencia requiere aceptación explícita del nuevo propietario. No modifica
+          productos, promociones, galería, horarios, órdenes ni el historial de la empresa.
         </p>
       </header>
 
       {!active ? (
-        <p className="text-sm text-muted-foreground">
-          Selecciona una empresa en la barra lateral.
-        </p>
+        <p className="text-sm text-muted-foreground">Selecciona una empresa en la barra lateral.</p>
       ) : (
         <>
           <section className="rounded-lg border border-border bg-card p-5">
-            <h2 className="text-base font-semibold">
-              Solicitar transferencia
-            </h2>
+            <h2 className="text-base font-semibold">Solicitar transferencia</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               Empresa activa: <strong>{active.display_name}</strong> · Tu rol:{" "}
               <strong>{active.role}</strong>
             </p>
             {!isOwner ? (
               <p className="mt-4 rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-                Solo el propietario actual de la empresa puede iniciar una
-                transferencia.
+                Solo el propietario actual de la empresa puede iniciar una transferencia.
               </p>
             ) : (
               <form
@@ -166,9 +153,7 @@ function PropiedadPage() {
                 }}
               >
                 <label className="grid gap-1 text-sm">
-                  <span className="font-medium">
-                    ID de usuario destinatario
-                  </span>
+                  <span className="font-medium">ID de usuario destinatario</span>
                   <input
                     className="rounded-md border border-border bg-background px-3 py-2 text-sm"
                     placeholder="uuid del nuevo propietario"
@@ -189,18 +174,14 @@ function PropiedadPage() {
                     onChange={(e) => setNotes(e.target.value)}
                   />
                 </label>
-                {formError && (
-                  <p className="text-sm text-destructive">{formError}</p>
-                )}
+                {formError && <p className="text-sm text-destructive">{formError}</p>}
                 <div>
                   <button
                     type="submit"
                     disabled={requestM.isPending}
                     className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
                   >
-                    {requestM.isPending
-                      ? "Enviando…"
-                      : "Solicitar transferencia"}
+                    {requestM.isPending ? "Enviando…" : "Solicitar transferencia"}
                   </button>
                 </div>
               </form>
@@ -208,22 +189,18 @@ function PropiedadPage() {
           </section>
 
           <section className="mt-8">
-            <h2 className="text-base font-semibold">
-              Historial de solicitudes (esta empresa)
-            </h2>
+            <h2 className="text-base font-semibold">Historial de solicitudes (esta empresa)</h2>
             <TransferList
               items={outgoingQ.data ?? []}
               currentUserId={user?.id ?? null}
               role="outgoing"
               onCancel={(id) => cancelM.mutate(id)}
-              busyId={cancelM.isPending ? cancelM.variables ?? null : null}
+              busyId={cancelM.isPending ? (cancelM.variables ?? null) : null}
             />
           </section>
 
           <section className="mt-8">
-            <h2 className="text-base font-semibold">
-              Solicitudes recibidas (cualquier empresa)
-            </h2>
+            <h2 className="text-base font-semibold">Solicitudes recibidas (cualquier empresa)</h2>
             <TransferList
               items={incomingQ.data ?? []}
               currentUserId={user?.id ?? null}
@@ -232,9 +209,9 @@ function PropiedadPage() {
               onReject={(id) => rejectM.mutate(id)}
               busyId={
                 acceptM.isPending
-                  ? acceptM.variables ?? null
+                  ? (acceptM.variables ?? null)
                   : rejectM.isPending
-                    ? rejectM.variables ?? null
+                    ? (rejectM.variables ?? null)
                     : null
               }
             />
@@ -273,10 +250,7 @@ function TransferList({
       {items.map((t) => {
         const isBusy = busyId === t.id;
         return (
-          <li
-            key={t.id}
-            className="rounded-md border border-border bg-card p-4 text-sm"
-          >
+          <li key={t.id} className="rounded-md border border-border bg-card p-4 text-sm">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 {role === "incoming" && t.business_name && (
@@ -294,11 +268,7 @@ function TransferList({
                 ? `Destinatario: ${t.to_user_id}`
                 : `Solicitada por: ${t.from_user_id}`}
             </p>
-            {t.notes && (
-              <p className="mt-2 rounded-md bg-muted/40 p-2 text-xs">
-                {t.notes}
-              </p>
-            )}
+            {t.notes && <p className="mt-2 rounded-md bg-muted/40 p-2 text-xs">{t.notes}</p>}
             {t.status === "pending" && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {role === "outgoing" && onCancel && (
@@ -356,9 +326,7 @@ function StatusPill({ status }: { status: OwnershipTransfer["status"] }) {
     expired: "Expirada",
   };
   return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${map[status]}`}
-    >
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${map[status]}`}>
       {label[status]}
     </span>
   );
@@ -369,9 +337,7 @@ function translateError(code: string): string {
     return "Solo el propietario actual puede iniciar una transferencia.";
   if (code.includes("transfer_already_pending"))
     return "Ya existe una solicitud pendiente para esta empresa.";
-  if (code.includes("recipient_not_found"))
-    return "El usuario destinatario no existe.";
-  if (code.includes("invalid_recipient"))
-    return "Destinatario inválido.";
+  if (code.includes("recipient_not_found")) return "El usuario destinatario no existe.";
+  if (code.includes("invalid_recipient")) return "Destinatario inválido.";
   return code;
 }

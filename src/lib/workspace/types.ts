@@ -14,13 +14,7 @@
  */
 import type { LucideIcon } from "lucide-react";
 
-export type WorkspaceAccent =
-  | "primary"
-  | "selva"
-  | "cenote"
-  | "atardecer"
-  | "caliza"
-  | "muted";
+export type WorkspaceAccent = "primary" | "selva" | "cenote" | "atardecer" | "caliza" | "muted";
 
 export type NavSurface = "sidebar" | "bottom" | "palette" | "switcher";
 
@@ -168,13 +162,7 @@ export interface InspectorViewDescriptor {
 /** ReactNode sin importar React aquí (evita ciclos en /lib). */
 type ReactNodeLike = unknown;
 
-export type WorkspaceViewKind =
-  | "list"
-  | "board"
-  | "calendar"
-  | "map"
-  | "timeline"
-  | "detail";
+export type WorkspaceViewKind = "list" | "board" | "calendar" | "map" | "timeline" | "detail";
 
 export interface ViewDescriptor {
   id: string;

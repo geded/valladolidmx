@@ -921,6 +921,67 @@ export type Database = {
           },
         ]
       }
+      business_claim_snapshots: {
+        Row: {
+          actor_user_id: string | null
+          audit_ref: string | null
+          business_id: string
+          claim_id: string | null
+          created_at: string
+          id: string
+          reason: string
+          snapshot: Json
+          snapshot_hash: string
+          snapshot_version: number
+        }
+        Insert: {
+          actor_user_id?: string | null
+          audit_ref?: string | null
+          business_id: string
+          claim_id?: string | null
+          created_at?: string
+          id?: string
+          reason: string
+          snapshot: Json
+          snapshot_hash: string
+          snapshot_version?: number
+        }
+        Update: {
+          actor_user_id?: string | null
+          audit_ref?: string | null
+          business_id?: string
+          claim_id?: string | null
+          created_at?: string
+          id?: string
+          reason?: string
+          snapshot?: Json
+          snapshot_hash?: string
+          snapshot_version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claim_snapshots_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_claim_snapshots_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_snapshots_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "business_ownership_transfers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_contacts: {
         Row: {
           business_id: string
@@ -994,7 +1055,9 @@ export type Database = {
           is_closed: boolean
           notes: string | null
           opens_at: string | null
+          source_verified_at: string | null
           updated_at: string
+          valid_until: string | null
         }
         Insert: {
           business_id: string
@@ -1005,7 +1068,9 @@ export type Database = {
           is_closed?: boolean
           notes?: string | null
           opens_at?: string | null
+          source_verified_at?: string | null
           updated_at?: string
+          valid_until?: string | null
         }
         Update: {
           business_id?: string
@@ -1016,7 +1081,9 @@ export type Database = {
           is_closed?: boolean
           notes?: string | null
           opens_at?: string | null
+          source_verified_at?: string | null
           updated_at?: string
+          valid_until?: string | null
         }
         Relationships: [
           {
@@ -1483,19 +1550,23 @@ export type Database = {
           display_name: string
           id: string
           is_demo_seed: boolean
+          last_verified_at: string | null
           legal_name: string | null
           logo_media_id: string | null
           metadata: Json
           primary_category_id: string | null
           published_at: string | null
+          record_origin: string
           review_notes: string | null
           slug: string
+          source_review_state: string
           status: Database["public"]["Enums"]["content_status"]
           submitted_for_review_at: string | null
           tagline: string | null
           updated_at: string
           updated_by: string | null
           verification_document_url: string | null
+          verification_due_at: string | null
           verification_notes: string | null
           verified: boolean
         }
@@ -1513,19 +1584,23 @@ export type Database = {
           display_name: string
           id?: string
           is_demo_seed?: boolean
+          last_verified_at?: string | null
           legal_name?: string | null
           logo_media_id?: string | null
           metadata?: Json
           primary_category_id?: string | null
           published_at?: string | null
+          record_origin?: string
           review_notes?: string | null
           slug: string
+          source_review_state?: string
           status?: Database["public"]["Enums"]["content_status"]
           submitted_for_review_at?: string | null
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_document_url?: string | null
+          verification_due_at?: string | null
           verification_notes?: string | null
           verified?: boolean
         }
@@ -1543,19 +1618,23 @@ export type Database = {
           display_name?: string
           id?: string
           is_demo_seed?: boolean
+          last_verified_at?: string | null
           legal_name?: string | null
           logo_media_id?: string | null
           metadata?: Json
           primary_category_id?: string | null
           published_at?: string | null
+          record_origin?: string
           review_notes?: string | null
           slug?: string
+          source_review_state?: string
           status?: Database["public"]["Enums"]["content_status"]
           submitted_for_review_at?: string | null
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_document_url?: string | null
+          verification_due_at?: string | null
           verification_notes?: string | null
           verified?: boolean
         }
@@ -1653,13 +1732,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           expires_at: string
-          revoke_reason: string | null
-          revoked_at: string | null
-          revoked_by: string | null
-          snapshot: Json | null
-          snapshot_hash: string | null
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          snapshot?: Json | null
+          snapshot_hash?: string | null
           token: string
-          token_digest: string | null
+          token_digest?: string | null
         }
         Update: {
           composition_id?: string
@@ -3062,6 +3141,181 @@ export type Database = {
         }
         Relationships: []
       }
+      entity_field_provenance: {
+        Row: {
+          captured_at: string
+          created_at: string
+          created_by: string | null
+          entity_id: string
+          entity_type: string
+          evidence_checksum: string | null
+          evidence_ref: string | null
+          field_path: string
+          id: string
+          metadata: Json
+          observed_at: string
+          source_kind: string
+          source_owner: string
+          source_url: string
+          superseded_at: string | null
+          superseded_by: string | null
+          updated_at: string
+          verification_level: string
+        }
+        Insert: {
+          captured_at?: string
+          created_at?: string
+          created_by?: string | null
+          entity_id: string
+          entity_type: string
+          evidence_checksum?: string | null
+          evidence_ref?: string | null
+          field_path: string
+          id?: string
+          metadata?: Json
+          observed_at: string
+          source_kind: string
+          source_owner: string
+          source_url: string
+          superseded_at?: string | null
+          superseded_by?: string | null
+          updated_at?: string
+          verification_level?: string
+        }
+        Update: {
+          captured_at?: string
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          evidence_checksum?: string | null
+          evidence_ref?: string | null
+          field_path?: string
+          id?: string
+          metadata?: Json
+          observed_at?: string
+          source_kind?: string
+          source_owner?: string
+          source_url?: string
+          superseded_at?: string | null
+          superseded_by?: string | null
+          updated_at?: string
+          verification_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_field_provenance_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "entity_field_provenance"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_presentation_mode_history: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          from_mode: string | null
+          from_state: string | null
+          id: string
+          reason: string | null
+          to_mode: string | null
+          to_state: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_kind: string
+          from_mode?: string | null
+          from_state?: string | null
+          id?: string
+          reason?: string | null
+          to_mode?: string | null
+          to_state?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_kind?: string
+          from_mode?: string | null
+          from_state?: string | null
+          id?: string
+          reason?: string | null
+          to_mode?: string | null
+          to_state?: string | null
+        }
+        Relationships: []
+      }
+      entity_presentation_modes: {
+        Row: {
+          approved_mode: string
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          id: string
+          reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_mode: string
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_mode?: string
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_kind: string
+          id?: string
+          reason?: string | null
+          requested_at?: string | null
+          requested_by?: string | null
+          requested_mode?: string
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_mode?: string
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_kind?: string
+          id?: string
+          reason?: string | null
+          requested_at?: string | null
+          requested_by?: string | null
+          requested_mode?: string
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_presentation_modes_cover_media_asset_id_fkey"
+            columns: ["cover_media_asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           body: string | null
@@ -4102,8 +4356,6 @@ export type Database = {
           is_active: boolean
           label: string | null
           owner_user_id: string
-          secret_current: string
-          secret_previous: string | null
           updated_at: string
           url: string
         }
@@ -4114,8 +4366,6 @@ export type Database = {
           is_active?: boolean
           label?: string | null
           owner_user_id: string
-          secret_current: string
-          secret_previous?: string | null
           updated_at?: string
           url: string
         }
@@ -4126,8 +4376,6 @@ export type Database = {
           is_active?: boolean
           label?: string | null
           owner_user_id?: string
-          secret_current?: string
-          secret_previous?: string | null
           updated_at?: string
           url?: string
         }
@@ -4322,10 +4570,10 @@ export type Database = {
           created_at: string
           created_by: string | null
           current_draft: Json
-          draft_hash: string | null
-          draft_version: number
           description: string | null
           draft_author_id: string | null
+          draft_hash: string | null
+          draft_version: number
           editing_lock: Json | null
           id: string
           is_template: boolean
@@ -4364,10 +4612,10 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_draft?: Json
-          draft_hash?: string | null
-          draft_version?: number
           description?: string | null
           draft_author_id?: string | null
+          draft_hash?: string | null
+          draft_version?: number
           editing_lock?: Json | null
           id?: string
           is_template?: boolean
@@ -4406,10 +4654,10 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_draft?: Json
-          draft_hash?: string | null
-          draft_version?: number
           description?: string | null
           draft_author_id?: string | null
+          draft_hash?: string | null
+          draft_version?: number
           editing_lock?: Json | null
           id?: string
           is_template?: boolean
@@ -4442,6 +4690,20 @@ export type Database = {
           {
             foreignKeyName: "page_compositions_active_revision_fk"
             columns: ["active_revision_id"]
+            isOneToOne: false
+            referencedRelation: "page_revisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_compositions_approved_revision_id_fkey"
+            columns: ["approved_revision_id"]
+            isOneToOne: false
+            referencedRelation: "page_revisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_compositions_scheduled_revision_id_fkey"
+            columns: ["scheduled_revision_id"]
             isOneToOne: false
             referencedRelation: "page_revisions"
             referencedColumns: ["id"]
@@ -4717,6 +4979,385 @@ export type Database = {
         }
         Relationships: []
       }
+      place_authorities: {
+        Row: {
+          authority_kind_id: string
+          authority_name: string | null
+          business_id: string | null
+          created_at: string
+          id: string
+          is_primary: boolean
+          notes: string | null
+          place_id: string
+          updated_at: string
+        }
+        Insert: {
+          authority_kind_id: string
+          authority_name?: string | null
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          place_id: string
+          updated_at?: string
+        }
+        Update: {
+          authority_kind_id?: string
+          authority_name?: string | null
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          place_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_authorities_authority_kind_id_fkey"
+            columns: ["authority_kind_id"]
+            isOneToOne: false
+            referencedRelation: "place_authority_kinds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_authorities_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "place_authorities_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_authorities_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_authority_kinds: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      place_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      place_category_links: {
+        Row: {
+          category_id: string
+          created_at: string
+          place_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          place_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          place_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_category_links_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "place_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_category_links_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_events: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          notes: string | null
+          place_id: string
+          relation_kind: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          place_id: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          place_id?: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_hours: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          day_of_week: number
+          id: string
+          is_closed: boolean
+          notes: string | null
+          opens_at: string | null
+          place_id: string
+          updated_at: string
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          day_of_week: number
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          opens_at?: string | null
+          place_id: string
+          updated_at?: string
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          opens_at?: string | null
+          place_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_hours_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_media: {
+        Row: {
+          created_at: string
+          id: string
+          media_asset_id: string
+          place_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_asset_id: string
+          place_id: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_asset_id?: string
+          place_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_media_media_asset_id_fkey"
+            columns: ["media_asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_media_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_products: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          place_id: string
+          product_id: string
+          relation_kind: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          place_id: string
+          product_id: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          place_id?: string
+          product_id?: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_products_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       platform_locales: {
         Row: {
           code: string
@@ -4785,6 +5426,15 @@ export type Database = {
       }
       points_of_interest: {
         Row: {
+          accessibility: Json
+          address_line: string | null
+          admission_kind: string | null
+          amenities: Json
+          best_time_to_visit: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contact_website: string | null
+          contact_whatsapp: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
@@ -4794,18 +5444,40 @@ export type Database = {
           description: string | null
           destination_id: string
           destination_zone_id: string | null
+          directions: string | null
+          entry_fee_notes: string | null
+          google_place_id: string | null
+          highlights: Json
           id: string
           is_demo_seed: boolean
           latitude: number | null
           longitude: number | null
           metadata: Json
           name: string
+          official_name: string | null
+          place_type_id: string | null
+          price_currency: string
+          price_from: number | null
+          price_to: number | null
+          published_at: string | null
+          short_description: string | null
           slug: string
+          social_links: Json
           status: Database["public"]["Enums"]["content_status"]
           updated_at: string
           updated_by: string | null
+          visit_duration_minutes: number | null
         }
         Insert: {
+          accessibility?: Json
+          address_line?: string | null
+          admission_kind?: string | null
+          amenities?: Json
+          best_time_to_visit?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_website?: string | null
+          contact_whatsapp?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -4815,18 +5487,40 @@ export type Database = {
           description?: string | null
           destination_id: string
           destination_zone_id?: string | null
+          directions?: string | null
+          entry_fee_notes?: string | null
+          google_place_id?: string | null
+          highlights?: Json
           id?: string
           is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
           name: string
+          official_name?: string | null
+          place_type_id?: string | null
+          price_currency?: string
+          price_from?: number | null
+          price_to?: number | null
+          published_at?: string | null
+          short_description?: string | null
           slug: string
+          social_links?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
+          visit_duration_minutes?: number | null
         }
         Update: {
+          accessibility?: Json
+          address_line?: string | null
+          admission_kind?: string | null
+          amenities?: Json
+          best_time_to_visit?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_website?: string | null
+          contact_whatsapp?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -4836,16 +5530,29 @@ export type Database = {
           description?: string | null
           destination_id?: string
           destination_zone_id?: string | null
+          directions?: string | null
+          entry_fee_notes?: string | null
+          google_place_id?: string | null
+          highlights?: Json
           id?: string
           is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
           name?: string
+          official_name?: string | null
+          place_type_id?: string | null
+          price_currency?: string
+          price_from?: number | null
+          price_to?: number | null
+          published_at?: string | null
+          short_description?: string | null
           slug?: string
+          social_links?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
+          visit_duration_minutes?: number | null
         }
         Relationships: [
           {
@@ -4860,6 +5567,13 @@ export type Database = {
             columns: ["destination_zone_id"]
             isOneToOne: false
             referencedRelation: "destination_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "points_of_interest_place_type_id_fkey"
+            columns: ["place_type_id"]
+            isOneToOne: false
+            referencedRelation: "place_types"
             referencedColumns: ["id"]
           },
         ]
@@ -6037,6 +6751,42 @@ export type Database = {
         }
         Relationships: []
       }
+      traveler_memory_projection: {
+        Row: {
+          anonymous_subject_hash: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          linked_at: string | null
+          personalization: string
+          summary: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anonymous_subject_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          linked_at?: string | null
+          personalization?: string
+          summary?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anonymous_subject_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          linked_at?: string | null
+          personalization?: string
+          summary?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       traveler_profiles: {
         Row: {
           accessibility: string[]
@@ -6475,6 +7225,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_create_place: {
+        Args: {
+          _description?: string
+          _destination_id: string
+          _name: string
+          _place_type_id: string
+          _slug: string
+        }
+        Returns: string
+      }
       admin_evaluate_functional_alerts: {
         Args: { p_window_minutes?: number }
         Returns: Json
@@ -6575,6 +7335,14 @@ export type Database = {
         Returns: undefined
       }
       admin_search_metrics_summary: { Args: { p_days?: number }; Returns: Json }
+      admin_set_place_categories: {
+        Args: { _category_ids: string[]; _place_id: string }
+        Returns: undefined
+      }
+      admin_set_place_presentation_mode: {
+        Args: { _mode: string; _place_id: string }
+        Returns: undefined
+      }
       admin_top_products: {
         Args: { p_days?: number; p_kind?: string; p_limit?: number }
         Returns: {
@@ -6586,6 +7354,10 @@ export type Database = {
         }[]
       }
       admin_travel_plan_overview: { Args: never; Returns: Json }
+      admin_update_place_details: {
+        Args: { _patch: Json; _place_id: string }
+        Returns: undefined
+      }
       alux_get_concierge_context_for_user: {
         Args: { _user_id: string }
         Returns: Json
@@ -6629,6 +7401,10 @@ export type Database = {
           _user_id: string
         }
         Returns: string
+      }
+      business_public_source_summary: {
+        Args: { _business_id: string }
+        Returns: Json
       }
       cancel_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -6929,6 +7705,10 @@ export type Database = {
         Returns: Json[]
       }
       concierge_workload_for_lead: { Args: never; Returns: Json[] }
+      create_business_claim_snapshot: {
+        Args: { _business_id: string; _claim_id?: string; _reason: string }
+        Returns: string
+      }
       create_business_product: {
         Args: {
           _business_id: string
@@ -7081,6 +7861,16 @@ export type Database = {
         Args: { _composition_id: string }
         Returns: Json
       }
+      eb_i4_snapshot_hash: { Args: { _snapshot: Json }; Returns: string }
+      eb_i4_token_digest: { Args: { _token: string }; Returns: string }
+      eb_issue_composition_preview: {
+        Args: {
+          _composition_id: string
+          _token_digest: string
+          _ttl_minutes: number
+        }
+        Returns: Json
+      }
       eb_list_block_library: {
         Args: never
         Returns: {
@@ -7144,6 +7934,10 @@ export type Database = {
         Args: { _id: string; _new_title: string }
         Returns: undefined
       }
+      eb_resolve_composition_preview: {
+        Args: { _token: string }
+        Returns: Json
+      }
       eb_resolve_public_route: {
         Args: { _path: string }
         Returns: {
@@ -7154,26 +7948,22 @@ export type Database = {
           target_path: string
         }[]
       }
-      eb_resolve_composition_preview: {
-        Args: { _token: string }
-        Returns: Json
-      }
-      eb_restore_revision: {
-        Args: { _expected_hash: string; _id: string; _revision_id: string }
-        Returns: Json
-      }
+      eb_restore_revision:
+        | { Args: { _id: string; _revision_id: string }; Returns: undefined }
+        | {
+            Args: { _expected_hash: string; _id: string; _revision_id: string }
+            Returns: Json
+          }
       eb_revoke_composition_preview: {
         Args: { _reason?: string; _token_digest: string }
         Returns: Json
       }
-      eb_save_composition_draft: {
-        Args: { _expected_hash: string; _id: string; _tree: Json }
-        Returns: Json
-      }
-      eb_issue_composition_preview: {
-        Args: { _composition_id: string; _token_digest: string; _ttl_minutes: number }
-        Returns: Json
-      }
+      eb_save_composition_draft:
+        | { Args: { _id: string; _tree: Json }; Returns: undefined }
+        | {
+            Args: { _expected_hash: string; _id: string; _tree: Json }
+            Returns: Json
+          }
       eb_schedule_publish_composition: {
         Args: { _id: string; _notes?: string; _when: string }
         Returns: undefined
@@ -7191,10 +7981,26 @@ export type Database = {
         Args: { _id: string; _new_slug: string }
         Returns: undefined
       }
+      efp_can_read_row: {
+        Args: { _entity_id: string; _entity_type: string; _user_id: string }
+        Returns: boolean
+      }
       email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      epm_can_request: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: boolean
+      }
+      epm_eligible_cover: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: string
+      }
+      epm_owning_business: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: string
       }
       expire_stale_coupons: { Args: never; Returns: undefined }
       expire_visibility_grants: { Args: never; Returns: number }
@@ -7256,6 +8062,19 @@ export type Database = {
           redeemed_at: string
           traveler_first_name: string
           user_id: string
+        }[]
+      }
+      get_entity_presentation_mode: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: {
+          approved_mode: string
+          cover_eligible: boolean
+          cover_media_asset_id: string
+          effective_mode: string
+          fallback_reason: string
+          requested_mode: string
+          review_state: string
+          source: string
         }[]
       }
       get_orders_needing_trip_email: {
@@ -7571,6 +8390,15 @@ export type Database = {
         Args: { "": string }
         Returns: Record<string, unknown>[]
       }
+      place_duplicate_warnings: {
+        Args: { _name: string }
+        Returns: {
+          destination_id: string
+          place_id: string
+          place_name: string
+          slug: string
+        }[]
+      }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       publish_business: {
         Args: { _approve: boolean; _business_id: string; _notes?: string }
@@ -7687,6 +8515,40 @@ export type Database = {
         Args: { _notes?: string; _promotion_id: string }
         Returns: undefined
       }
+      resolve_business_claim_state: {
+        Args: { _business_id: string }
+        Returns: string
+      }
+      review_entity_presentation_mode: {
+        Args: {
+          _decision: string
+          _entity_id: string
+          _entity_kind: string
+          _reason?: string
+        }
+        Returns: {
+          approved_mode: string
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          id: string
+          reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_mode: string
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "entity_presentation_modes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       revoke_zone_scope: { Args: { _scope_id: string }; Returns: boolean }
       search_marketplace: {
         Args: {
@@ -7726,6 +8588,36 @@ export type Database = {
           id: string
         }[]
       }
+      set_entity_presentation_mode: {
+        Args: {
+          _entity_id: string
+          _entity_kind: string
+          _mode: string
+          _reason?: string
+        }
+        Returns: {
+          approved_mode: string
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          id: string
+          reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_mode: string
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "entity_presentation_modes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       submit_business_for_review: {
         Args: { _business_id: string }
         Returns: undefined
@@ -7751,6 +8643,7 @@ export type Database = {
         Returns: boolean
       }
       traveler_alux_context_for_user: { Args: never; Returns: Json }
+      unaccent_immutable_fallback: { Args: { _value: string }; Returns: string }
       unc_activity_admin: {
         Args: { _limit?: number }
         Returns: {
@@ -8054,6 +8947,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      unc_webhook_secret_set: {
+        Args: { _endpoint_id: string; _secret: string }
+        Returns: undefined
+      }
       unpublish_business_product: {
         Args: { _product_id: string }
         Returns: undefined
@@ -8130,6 +9027,7 @@ export type Database = {
           scope_type: string
         }[]
       }
+      visitor_intel_ingest_event: { Args: { p_row: Json }; Returns: boolean }
       withdraw_business_review: {
         Args: { _business_id: string; _notes?: string }
         Returns: undefined
@@ -8199,6 +9097,7 @@ export type Database = {
         | "trip_builder"
         | "custom"
         | "region"
+        | "place"
       entity_kind:
         | "country"
         | "state"
@@ -8487,6 +9386,7 @@ export const Constants = {
         "trip_builder",
         "custom",
         "region",
+        "place",
       ],
       entity_kind: [
         "country",

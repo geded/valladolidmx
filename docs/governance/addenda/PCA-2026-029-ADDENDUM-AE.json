@@ -1,0 +1,59 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AE",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AE · G8-R1-F1H · Piloto publico navegable con corpus real",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorizacion Founder G8-R1-F1H (2026-08-30). Autoriza allowlist inmutable de 22 entidades reales acreditadas, navegacion publica controlada con noindex,nofollow, exclusion total del corpus demo y del sitemap, presentacion Editorial por ausencia de portada G8-M1 y flag global en OFF.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/pilot-allowlist.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/eb-sitemap.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-subnav/ExperienceSubnav.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md"
+    },
+    {
+      "operation": "create",
+      "path": "docs/governance/evidence/g8-r1-f1h-public-pilot.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run governance:check"
+  ],
+  "file_hashes": {
+    "src/lib/omxds/pilot-allowlist.ts": "a5a161af73ba9ea79f6d1edab23c49fe4d015821cabdd678e9b0f6701ee76acd",
+    "src/lib/alux/canonical-catalog.server.ts": "d99a2b0f6c1e476c12845df2ec4bfd4ae81710b1235cf25647cba075749914c9",
+    "src/lib/experience-builder/eb-sitemap.functions.ts": "9c61f5359926a5f0ab19e960f25b4563a9ef172fc76d181f5dd36b4781db0a9c",
+    "src/routes/oriente-maya/$destino.lugares.$slug.tsx": "d47a07d0072cb1382204a07c5f7a91cb70dbe0c3bfdaa1739be2d4e5f917ac6a",
+    "src/components/experience-builder/blocks/experience-subnav/ExperienceSubnav.tsx": "19f9cf861d7702370d96d10f5cdad62b6479898e04b55f0470257930e81ecfe8"
+  }
+}

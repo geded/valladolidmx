@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-N",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · G8-Q2A · Places Data Model v1.0. Reconoce exclusivamente la regeneración automática del archivo de tipos derivada de la migración aditiva 20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql. Sin contenido turístico creado o modificado, sin publicación, flags, PR, merge ni despliegue. El addendum se registra bajo PCA-2026-029 por ser la única autorización Approved que contiene el permiso modify y la acknowledged revision de esta ruta; la autoridad de paquete es PCA-2026-042.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "6a6adee2c50bc212a89e5e68a230ca82352d47baab979aeb8658c70b52ca831e",
+    "current_sha256": "6ba6062972e159d97bf9ac3d486486ac5903f29553b30c84ba6f9e053166e0ff",
+    "semantic_change": "G8-Q2A · Regeneración automática de tipos tras la migración aditiva de Lugares y Atractivos: altas de place_types, place_categories, place_authority_kinds, place_category_links, place_hours, place_media y place_authorities, más las columnas operativas añadidas a points_of_interest y las funciones admin_create_place, admin_update_place_details, admin_set_place_categories y place_duplicate_warnings. Estrictamente aditivo: no elimina ni renombra tablas, columnas, enums, vistas ni funciones existentes.",
+    "authority": "PCA-2026-042"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Los cinco POI existentes permanecen sin modificación",
+    "Cero filas nuevas de lugares, sin CMS, rutas públicas, publicación ni despliegue"
+  ],
+  "recorded_at": "2026-08-28"
+}

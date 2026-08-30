@@ -93,9 +93,7 @@ export const upsertMyPersonalProfile = createServerFn({ method: "POST" })
       phone: data.phone,
       avatar_url: data.avatar_url,
       country: data.country,
-      ...(data.preferred_language
-        ? { preferred_language: data.preferred_language }
-        : {}),
+      ...(data.preferred_language ? { preferred_language: data.preferred_language } : {}),
     };
     const { data: row, error } = await context.supabase
       .from("profiles")

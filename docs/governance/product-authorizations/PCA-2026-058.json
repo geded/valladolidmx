@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-058",
+  "title": "G8-R1-F1L · PR #58 · Addendum de trazabilidad exacta del control #287",
+  "status": "Approved",
+  "branch": "integration/lovable-valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-08-30 limitada a corregir exclusivamente la trazabilidad documental exacta de las dos migraciones reportadas por Governance Integrity #287 mediante su ruta y SHA-256 actuales. Autoriza únicamente este PCA, el manifiesto de consolidación, el Índice Maestro 06 y la regeneración de 07, 08 e inventario; prohíbe modificar migraciones, código funcional, datos, medios, flags, comportamiento, noindex, despliegue y Home rev.30/rev.33.",
+  "permissions": [
+    { "operation": "create", "path": "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql" },
+    { "operation": "create", "path": "supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql",
+      "sha256": "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9",
+      "authority": "Founder addendum PR #58 · Governance Integrity #287 · exact historical migration reconciliation"
+    },
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql",
+      "sha256": "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9",
+      "authority": "Founder addendum PR #58 · Governance Integrity #287 · exact historical migration reconciliation"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "pilot_noindex_nofollow=true"
+  ],
+  "required_tests": [
+    "bun scripts/governance/validate-full-suite.mjs --base=d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2"
+  ]
+}

@@ -34,7 +34,10 @@ export const getPortalProductPublishSnapshot = createServerFn({ method: "POST" }
     return data;
   })
   .handler(
-    async ({ data, context }): Promise<{
+    async ({
+      data,
+      context,
+    }): Promise<{
       snapshot: ProductPublishSnapshot;
       check: PublishCheckResult;
     }> => {
@@ -58,25 +61,21 @@ export const getPortalProductPublishSnapshot = createServerFn({ method: "POST" }
       });
       if (!ok) throw new Error("forbidden");
 
-      const [{ data: biz }, { data: media }, { count: faqCount }] =
-        await Promise.all([
-          supabase
-            .from("businesses")
-            .select("verified, can_self_publish, status")
-            .eq("id", prod.business_id)
-            .maybeSingle(),
-          supabase
-            .from("product_media")
-            .select("id, role")
-            .eq("product_id", data.productId),
-          supabase
-            .from("faqs")
-            .select("id", { count: "exact", head: true })
-            .eq("entity_kind", "product")
-            .eq("entity_id", data.productId)
-            .eq("status", "published")
-            .is("deleted_at", null),
-        ]);
+      const [{ data: biz }, { data: media }, { count: faqCount }] = await Promise.all([
+        supabase
+          .from("businesses")
+          .select("verified, can_self_publish, status")
+          .eq("id", prod.business_id)
+          .maybeSingle(),
+        supabase.from("product_media").select("id, role").eq("product_id", data.productId),
+        supabase
+          .from("faqs")
+          .select("id", { count: "exact", head: true })
+          .eq("entity_kind", "product")
+          .eq("entity_id", data.productId)
+          .eq("status", "published")
+          .is("deleted_at", null),
+      ]);
 
       const mediaRows = (media ?? []) as Array<{ id: string; role: string }>;
       const hasCoverRow = mediaRows.some((m) => m.role === "cover");
@@ -114,7 +113,10 @@ export const publishPortalProduct = createServerFn({ method: "POST" })
     return data;
   })
   .handler(
-    async ({ data, context }): Promise<{
+    async ({
+      data,
+      context,
+    }): Promise<{
       published: boolean;
       reason?: string;
       message?: string;
@@ -143,10 +145,9 @@ export const unpublishPortalProduct = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (context.supabase.rpc as any)(
-      "unpublish_business_product",
-      { _product_id: data.productId },
-    );
+    const { error } = await (context.supabase.rpc as any)("unpublish_business_product", {
+      _product_id: data.productId,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -237,7 +238,9 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
         .limit(6),
       supabase
         .from("reviews")
-        .select("id, author_display_name, rating, title, body, published_at, status, subject_kind, subject_id")
+        .select(
+          "id, author_display_name, rating, title, body, published_at, status, subject_kind, subject_id",
+        )
         .eq("subject_kind", "product")
         .eq("subject_id", prod.id)
         .is("deleted_at", null)
@@ -334,13 +337,15 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
           label: contactRows[0].label,
         }
       : null;
-    const locRow = ((locations ?? []) as Array<{
-      label: string | null;
-      address_line1: string | null;
-      address_line2: string | null;
-      latitude: number | string | null;
-      longitude: number | string | null;
-    }>)[0];
+    const locRow = (
+      (locations ?? []) as Array<{
+        label: string | null;
+        address_line1: string | null;
+        address_line2: string | null;
+        latitude: number | string | null;
+        longitude: number | string | null;
+      }>
+    )[0];
     const primaryLocation = locRow
       ? {
           label: locRow.label,
@@ -360,9 +365,7 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
       tagline: (p.tagline as string) ?? "",
       product_type: String(p.product_type),
       price_amount:
-        p.price_amount !== null && p.price_amount !== undefined
-          ? Number(p.price_amount)
-          : null,
+        p.price_amount !== null && p.price_amount !== undefined ? Number(p.price_amount) : null,
       price_currency: String(p.price_currency ?? "MXN"),
       business_slug: biz.slug as string,
       business_name: biz.display_name as string,

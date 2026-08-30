@@ -5,12 +5,12 @@ SearchAction condicionado a búsqueda pública/indexable/estable/sin auth.
 
 ## 1. Cambios de código
 
-| Archivo | Cambio |
-| --- | --- |
-| `src/lib/discovery/seo.ts` | + `ORG_ID`, `WEBSITE_ID`, `LOGO_ID`; + `organizationJsonLd()`, `websiteJsonLd()`; `breadcrumbListJsonLd` ahora emite `@id` estable por página (`{url}#breadcrumb`). |
-| `src/routes/__root.tsx` | Reemplaza JSON-LD inline por helpers. WebSite ya NO emite `potentialAction/SearchAction`. `publisher` referencia Organization por `@id`. |
-| `src/routes/mapa.tsx` | `noindex: true` (Founder Decision: sin contenido editorial independiente). |
-| `src/routes/viajero.$handle.tsx` | `noindex: true` (Founder Decision: superficies personales fuera del índice). |
+| Archivo                          | Cambio                                                                                                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/discovery/seo.ts`       | + `ORG_ID`, `WEBSITE_ID`, `LOGO_ID`; + `organizationJsonLd()`, `websiteJsonLd()`; `breadcrumbListJsonLd` ahora emite `@id` estable por página (`{url}#breadcrumb`). |
+| `src/routes/__root.tsx`          | Reemplaza JSON-LD inline por helpers. WebSite ya NO emite `potentialAction/SearchAction`. `publisher` referencia Organization por `@id`.                            |
+| `src/routes/mapa.tsx`            | `noindex: true` (Founder Decision: sin contenido editorial independiente).                                                                                          |
+| `src/routes/viajero.$handle.tsx` | `noindex: true` (Founder Decision: superficies personales fuera del índice).                                                                                        |
 
 Fuente única preservada: toda la implementación pasa por `src/lib/discovery/seo.ts`. Cero duplicación.
 
@@ -30,10 +30,10 @@ Se reintroducirá cuando la búsqueda cumpla los 4 criterios Founder.
 
 ## 4. Evidencia SSR (curl → localhost:8080)
 
-- `/`  → robots="index, follow…"; WebSite@id + Organization@id emitidos.
-- `/blog`  → robots="index, follow…"; canonical=/blog; CollectionPage presente.
-- `/mapa`  → robots="noindex, nofollow"; canonical self.
-- `/viajero/mati`  → robots="noindex, nofollow"; canonical self.
+- `/` → robots="index, follow…"; WebSite@id + Organization@id emitidos.
+- `/blog` → robots="index, follow…"; canonical=/blog; CollectionPage presente.
+- `/mapa` → robots="noindex, nofollow"; canonical self.
+- `/viajero/mati` → robots="noindex, nofollow"; canonical self.
 
 Cero JSON-LD con SearchAction. `publisher` reconciliado por `@id`.
 

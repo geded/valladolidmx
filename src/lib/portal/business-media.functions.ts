@@ -18,10 +18,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  assertUnderLimit,
-  getEffectiveLimits,
-} from "@/lib/visibility/plan-limits";
+import { assertUnderLimit, getEffectiveLimits } from "@/lib/visibility/plan-limits";
 
 // ---------------- Tipos ---------------------------------------------------
 
@@ -54,13 +51,7 @@ export interface SignedUploadTicket {
 // ---------------- Constantes ---------------------------------------------
 
 const ALLOWED_ROLES: PortalMediaRole[] = ["logo", "cover", "gallery"];
-const ALLOWED_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-  "image/gif",
-]);
+const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"]);
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 const SIGNED_URL_TTL = 60 * 60; // 1 h
 
@@ -84,8 +75,7 @@ function extFromMime(mime: string): string {
 function assertBusinessId(input: unknown): string {
   if (!input || typeof input !== "object") throw new Error("invalid_input");
   const id = (input as { businessId?: unknown }).businessId;
-  if (typeof id !== "string" || id.length < 8)
-    throw new Error("invalid_business");
+  if (typeof id !== "string" || id.length < 8) throw new Error("invalid_business");
   return id;
 }
 
@@ -110,14 +100,11 @@ async function ensureAccess(
   businessId: string,
   minRole: "viewer" | "editor",
 ) {
-  const { data: allowed, error } = await context.supabase.rpc(
-    "has_business_access",
-    {
-      _user_id: context.userId,
-      _business_id: businessId,
-      _min_role: minRole,
-    },
-  );
+  const { data: allowed, error } = await context.supabase.rpc("has_business_access", {
+    _user_id: context.userId,
+    _business_id: businessId,
+    _min_role: minRole,
+  });
   if (error) throw new Error(`access_check_failed: ${error.message}`);
   if (!allowed) throw new Error("forbidden_business_access");
 }
@@ -197,8 +184,7 @@ export const createBusinessMediaUploadTicket = createServerFn({ method: "POST" }
       })(),
       sizeBytes: (() => {
         const n = Number(input?.sizeBytes);
-        if (!Number.isFinite(n) || n <= 0 || n > MAX_BYTES)
-          throw new Error("invalid_size");
+        if (!Number.isFinite(n) || n <= 0 || n > MAX_BYTES) throw new Error("invalid_size");
         return Math.floor(n);
       })(),
       filename: trimOrNull(input?.filename ?? null, 120, "filename"),
@@ -223,16 +209,14 @@ export const createBusinessMediaUploadTicket = createServerFn({ method: "POST" }
     const bucket = roleToBucket(data.role);
     const ext = extFromMime(data.mime);
     const uniq = crypto.randomUUID();
-    const folder =
-      data.role === "cover" ? `${data.businessId}/cover` : data.businessId;
+    const folder = data.role === "cover" ? `${data.businessId}/cover` : data.businessId;
     const path = `${folder}/${uniq}.${ext}`;
 
     const { data: signed, error } = await context.supabase.storage
       .from(bucket)
       .createSignedUploadUrl(path);
 
-    if (error || !signed)
-      throw new Error(`signed_upload_failed: ${error?.message ?? "unknown"}`);
+    if (error || !signed) throw new Error(`signed_upload_failed: ${error?.message ?? "unknown"}`);
 
     return {
       bucket,
@@ -280,8 +264,7 @@ export const registerBusinessMedia = createServerFn({ method: "POST" })
       })(),
       sizeBytes: (() => {
         const n = Number(input?.sizeBytes);
-        if (!Number.isFinite(n) || n <= 0 || n > MAX_BYTES)
-          throw new Error("invalid_size");
+        if (!Number.isFinite(n) || n <= 0 || n > MAX_BYTES) throw new Error("invalid_size");
         return Math.floor(n);
       })(),
       width:
@@ -301,28 +284,22 @@ export const registerBusinessMedia = createServerFn({ method: "POST" })
     }),
   )
   .handler(
-    async ({
-      data,
-      context,
-    }): Promise<{ business_media_id: string; media_asset_id: string }> => {
+    async ({ data, context }): Promise<{ business_media_id: string; media_asset_id: string }> => {
       await ensureAccess(context, data.businessId, "editor");
 
-      const { data: out, error } = await context.supabase.rpc(
-        "register_business_media",
-        {
-          _business_id: data.businessId,
-          _role: data.role,
-          _bucket: data.bucket,
-          _path: data.path,
-          _mime: data.mime,
-          _size_bytes: data.sizeBytes,
-          _width: data.width ?? undefined,
-          _height: data.height ?? undefined,
-          _alt_text: data.altText ?? undefined,
-          _caption: data.caption ?? undefined,
-          _sort_order: data.sortOrder,
-        },
-      );
+      const { data: out, error } = await context.supabase.rpc("register_business_media", {
+        _business_id: data.businessId,
+        _role: data.role,
+        _bucket: data.bucket,
+        _path: data.path,
+        _mime: data.mime,
+        _size_bytes: data.sizeBytes,
+        _width: data.width ?? undefined,
+        _height: data.height ?? undefined,
+        _alt_text: data.altText ?? undefined,
+        _caption: data.caption ?? undefined,
+        _sort_order: data.sortOrder,
+      });
       if (error) throw new Error(`register_media_failed: ${error.message}`);
       const r = out as { business_media_id: string; media_asset_id: string };
       return r;
@@ -354,15 +331,12 @@ export const updateBusinessMediaMeta = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc(
-      "update_business_media_meta",
-      {
-        _business_media_id: data.businessMediaId,
-        _alt_text: data.altText ?? undefined,
-        _caption: data.caption ?? undefined,
-        _sort_order: data.sortOrder ?? undefined,
-      },
-    );
+    const { error } = await context.supabase.rpc("update_business_media_meta", {
+      _business_media_id: data.businessMediaId,
+      _alt_text: data.altText ?? undefined,
+      _caption: data.caption ?? undefined,
+      _sort_order: data.sortOrder ?? undefined,
+    });
     if (error) throw new Error(`update_media_failed: ${error.message}`);
     return { ok: true as const };
   });

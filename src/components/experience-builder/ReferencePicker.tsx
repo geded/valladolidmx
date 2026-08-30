@@ -42,27 +42,51 @@ async function fetchRows(kind: string, search: string): Promise<Row[]> {
     switch (kind) {
       case "region": {
         const r = await listRegionsCms(params);
-        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({ id: x.id, label: x.name, hint: x.slug }));
+        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({
+          id: x.id,
+          label: x.name,
+          hint: x.slug,
+        }));
       }
       case "destination": {
         const r = await listDestinationsCms(params);
-        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({ id: x.id, label: x.name, hint: x.slug }));
+        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({
+          id: x.id,
+          label: x.name,
+          hint: x.slug,
+        }));
       }
       case "zone": {
         const r = await listZonesCms(params);
-        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({ id: x.id, label: x.name, hint: x.slug }));
+        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({
+          id: x.id,
+          label: x.name,
+          hint: x.slug,
+        }));
       }
       case "category": {
         const r = await listCategoriesCms(params);
-        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({ id: x.id, label: x.name, hint: x.slug }));
+        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({
+          id: x.id,
+          label: x.name,
+          hint: x.slug,
+        }));
       }
       case "business": {
         const r = await listBusinessesCms(params);
-        return (r.rows ?? []).map((x: { id: string; display_name: string; slug: string }) => ({ id: x.id, label: x.display_name, hint: x.slug }));
+        return (r.rows ?? []).map((x: { id: string; display_name: string; slug: string }) => ({
+          id: x.id,
+          label: x.display_name,
+          hint: x.slug,
+        }));
       }
       case "product": {
         const r = await listProductsCms(params);
-        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({ id: x.id, label: x.name, hint: x.slug }));
+        return (r.rows ?? []).map((x: { id: string; name: string; slug: string }) => ({
+          id: x.id,
+          label: x.name,
+          hint: x.slug,
+        }));
       }
       default:
         return [];
@@ -84,7 +108,13 @@ export function ReferencePicker({
   className?: string;
 }) {
   const meta = KIND_META[kind ?? ""] ?? { title: "Referencia", empty: "Sin resultados" };
-  const supported = Boolean(KIND_META[kind ?? ""] && kind !== "event" && kind !== "promotion" && kind !== "page" && kind !== "media_asset");
+  const supported = Boolean(
+    KIND_META[kind ?? ""] &&
+    kind !== "event" &&
+    kind !== "promotion" &&
+    kind !== "page" &&
+    kind !== "media_asset",
+  );
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
@@ -158,7 +188,9 @@ export function ReferencePicker({
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className={`truncate ${value ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
+        <span className={`truncate ${value ? "text-foreground" : "text-muted-foreground"}`}>
+          {label}
+        </span>
         <span className="flex items-center gap-1">
           {value ? (
             <span
@@ -225,7 +257,9 @@ export function ReferencePicker({
                         <span className="flex flex-col overflow-hidden">
                           <span className="truncate">{r.label}</span>
                           {r.hint ? (
-                            <span className="truncate text-[10px] text-muted-foreground">{r.hint}</span>
+                            <span className="truncate text-[10px] text-muted-foreground">
+                              {r.hint}
+                            </span>
                           ) : null}
                         </span>
                         {isSel ? <Check className="size-3 shrink-0 text-primary" /> : null}

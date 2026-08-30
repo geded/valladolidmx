@@ -42,22 +42,19 @@ function useContextFrom(): SwitchFromRef | null {
   // ese caso explícitamente para que el switcher también monte en la
   // superficie del destino.
   const destination =
-    ctx.destination?.slug
-    ?? (ctx.current.kind === "destination" ? ctx.current.slug ?? null : null);
+    ctx.destination?.slug ??
+    (ctx.current.kind === "destination" ? (ctx.current.slug ?? null) : null);
   if (!destination) return null;
   const category =
-    ctx.category?.slug
-    ?? (ctx.current.kind === "category" ? ctx.current.slug ?? null : null);
-  const business = ctx.ancestors.find((n) => n.kind === "business")?.slug
-    ?? (ctx.current.kind === "business" ? ctx.current.slug ?? null : null);
-  const product = ctx.current.kind === "product" ? ctx.current.slug ?? null : null;
+    ctx.category?.slug ?? (ctx.current.kind === "category" ? (ctx.current.slug ?? null) : null);
+  const business =
+    ctx.ancestors.find((n) => n.kind === "business")?.slug ??
+    (ctx.current.kind === "business" ? (ctx.current.slug ?? null) : null);
+  const product = ctx.current.kind === "product" ? (ctx.current.slug ?? null) : null;
   return { destination, category, business, product };
 }
 
-export function TerritorialSwitcherMount({
-  className,
-  from,
-}: TerritorialSwitcherMountProps) {
+export function TerritorialSwitcherMount({ className, from }: TerritorialSwitcherMountProps) {
   const contextFrom = useContextFrom();
   const effectiveFrom = from ?? contextFrom;
   const query = useQuery(switchableDestinationsQueryOptions());

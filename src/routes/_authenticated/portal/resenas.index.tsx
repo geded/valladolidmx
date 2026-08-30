@@ -154,9 +154,7 @@ function ReviewCard({ review }: { review: OwnerReview }) {
                 ? ` · ${new Date(review.businessResponseAt).toLocaleDateString()}`
                 : ""}
             </p>
-            <p className="whitespace-pre-line text-sm text-foreground">
-              {review.businessResponse}
-            </p>
+            <p className="whitespace-pre-line text-sm text-foreground">{review.businessResponse}</p>
             <div className="flex flex-wrap justify-end gap-2">
               <Button
                 variant="ghost"
@@ -199,7 +197,11 @@ function ReviewCard({ review }: { review: OwnerReview }) {
 
 function PortalResenasIndex() {
   const fetchFn = useServerFn(listOwnerReviews);
-  const { data: reviews = [], isLoading, error } = useQuery({
+  const {
+    data: reviews = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["portal", "owner-reviews"],
     queryFn: () => fetchFn({ data: {} }),
     staleTime: 30_000,
@@ -220,8 +222,8 @@ function PortalResenasIndex() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Bandeja de reseñas</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Reseñas de tus empresas y productos. Responde públicamente para reforzar
-          la confianza de tus futuros huéspedes.
+          Reseñas de tus empresas y productos. Responde públicamente para reforzar la confianza de
+          tus futuros huéspedes.
         </p>
       </header>
 

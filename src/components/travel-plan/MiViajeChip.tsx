@@ -95,9 +95,7 @@ export function MiViajeChip({ isOverlay = false }: Props) {
         <span
           className={cn(
             "inline-flex min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold leading-none",
-            isOverlay
-              ? "bg-white/20 text-white"
-              : "bg-primary/20 text-primary",
+            isOverlay ? "bg-white/20 text-white" : "bg-primary/20 text-primary",
           )}
         >
           {badge}

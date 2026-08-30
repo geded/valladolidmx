@@ -1,0 +1,37 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AA",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AA · G8-R1-F1C-A · Alta de las rutas internas de preview premium en el Route Inventory",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-F1C-A (2026-08-29), alcance corregido a presentación y plantillas. Autoriza sustituir de forma append-only el digest acreditado de la ruta sensible indicada como consecuencia directa de la autoridad única de presentación. No autoriza checkout, pagos, publicación, activación de flags, sitemap, redirects, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "a6714e798a322a55543fe2343d61f4edb9ca6ebaf37700798bea9460cde88d14",
+    "current_sha256": "2a501f25c2e0d8ecc57ccec09d5a2493af3901ed18d8fffd78dde675a5282b52",
+    "semantic_change": "Alta aditiva de las rutas internas noindex de preview premium y del hub en SCANNED_ROUTE_FILES y sus fichas de metadatos. Sin cambios de lógica, heurística, overrides ni API del inventario.",
+    "authority": "Autorización Founder G8-R1-F1C-A (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run validate:r1:f1c:a",
+    "bun run governance:check"
+  ]
+}

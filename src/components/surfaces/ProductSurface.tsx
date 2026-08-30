@@ -15,6 +15,7 @@ import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions"
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import { PremiumHero } from "@/components/premium";
 import {
   createProductSurfaceContract,
   type ProductSurfaceContractInput,
@@ -158,9 +159,9 @@ export function ProductSurface({
 
   return (
     <PublicShell
-      eyebrow={p.product_type}
-      title={p.name}
-      description={p.tagline}
+      eyebrow={activeContract ? undefined : p.product_type}
+      title={activeContract ? undefined : p.name}
+      description={activeContract ? undefined : p.tagline}
       crumbs={[
         { label: "Catálogo", to: "/oriente-maya" },
         { label: p.business.display_name, to: `/marketplace/${p.business.slug}` },
@@ -168,6 +169,35 @@ export function ProductSurface({
       ]}
       useContextCrumbs
     >
+      {activeContract ? (
+        <PremiumHero
+          vm={{
+            presentation: p.cover_url ? "cinematic" : "editorial",
+            crumbs: [
+              { label: "Inicio", href: "/" },
+              { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+              ...(p.business.destination_slug
+                ? [
+                    {
+                      label: p.business.destination_slug,
+                      href: `/oriente-maya/${encodeURIComponent(p.business.destination_slug)}`,
+                    },
+                  ]
+                : []),
+              { label: p.business.display_name },
+              { label: p.name },
+            ],
+            eyebrow: p.product_type,
+            title: p.name,
+            description: p.tagline || p.description || undefined,
+            media:
+              p.cover_url && !activeContract.omissions.includes("media")
+                ? { url: p.cover_url, alt: p.name }
+                : null,
+          }}
+        />
+      ) : null}
+
       {p.description ? (
         <p className="max-w-3xl text-sm text-foreground/80">{p.description}</p>
       ) : null}

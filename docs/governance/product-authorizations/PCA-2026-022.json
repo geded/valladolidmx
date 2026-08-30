@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-022",
+  "title": "OMXDS Visual V1 · Flag State Reconciliation (omxds_visual_v1_contracts_enabled true -> false)",
+  "status": "Approved",
+  "branch": "fix/omxds-visual-v1-flag-state-reconciliation-v1",
+  "blueprint": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-25 · AUTORIZO EXCLUSIVAMENTE EL PAQUETE DE RECONCILIACION DEL FLAG. Estado inicial observado: true (updated_at 2026-08-25 06:57:54.807278+00). Estado gobernado requerido y postcondicion: false. Divergencia detectada el 2026-08-25. Dependencia bloqueante: V1-P1.d no puede iniciarse mientras la divergencia siga abierta. false NO es precondicion de esta autorizacion, es su postcondicion verificable. Alcance limitado a blueprint 19.20, esta autorizacion, una migracion idempotente unica sobre la fila omxds_visual_v1_contracts_enabled, su aplicacion al backend Cloud compartido, la relectura de la fila, la evidencia de reconciliacion y los gates autorizados. Prohibido iniciar V1-P1.d, tocar superficies, contratos, plantillas, rutas o types, cambiar otros settings, activar otro flag o convertir validate:i4:d en PASS.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run build",
+    "bun run lint",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

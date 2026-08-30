@@ -59,9 +59,14 @@ export function withMcpGuardrails<I>(config: {
       await logInvocation({
         toolName: config.toolName,
         contractVersion: config.contractVersion,
-        clientId, userId, inputHash: hash, locale: meta.localeUsed,
+        clientId,
+        userId,
+        inputHash: hash,
+        locale: meta.localeUsed,
         durationMs: Date.now() - startedAt,
-        success: false, errorCode: "UNAUTHENTICATED", resultCount: 0,
+        success: false,
+        errorCode: "UNAUTHENTICATED",
+        resultCount: 0,
       });
       return res;
     }
@@ -88,9 +93,14 @@ export function withMcpGuardrails<I>(config: {
       await logInvocation({
         toolName: config.toolName,
         contractVersion: config.contractVersion,
-        clientId, userId, inputHash: hash, locale: meta.localeUsed,
+        clientId,
+        userId,
+        inputHash: hash,
+        locale: meta.localeUsed,
         durationMs: Date.now() - startedAt,
-        success: false, errorCode: "RATE_LIMITED", resultCount: 0,
+        success: false,
+        errorCode: "RATE_LIMITED",
+        resultCount: 0,
       });
       return res;
     }
@@ -100,7 +110,10 @@ export function withMcpGuardrails<I>(config: {
       await logInvocation({
         toolName: config.toolName,
         contractVersion: config.contractVersion,
-        clientId, userId, inputHash: hash, locale: meta.localeUsed,
+        clientId,
+        userId,
+        inputHash: hash,
+        locale: meta.localeUsed,
         durationMs: Date.now() - startedAt,
         success: !result.isError,
         errorCode: result.isError ? "HANDLER_ERROR" : null,
@@ -113,9 +126,14 @@ export function withMcpGuardrails<I>(config: {
       await logInvocation({
         toolName: config.toolName,
         contractVersion: config.contractVersion,
-        clientId, userId, inputHash: hash, locale: meta.localeUsed,
+        clientId,
+        userId,
+        inputHash: hash,
+        locale: meta.localeUsed,
         durationMs: Date.now() - startedAt,
-        success: false, errorCode: "UNCAUGHT", resultCount: 0,
+        success: false,
+        errorCode: "UNCAUGHT",
+        resultCount: 0,
       });
       return {
         content: [{ type: "text", text: `Error: ${message}` }],

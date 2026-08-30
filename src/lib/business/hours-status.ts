@@ -87,7 +87,13 @@ function nowInTz(now: Date, tz: string): { dow: number; minutes: number } {
   const hStr = parts.find((p) => p.type === "hour")?.value ?? "00";
   const mStr = parts.find((p) => p.type === "minute")?.value ?? "00";
   const dowMap: Record<string, number> = {
-    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
   };
   const dow = dowMap[wk] ?? 0;
   const h = Number(hStr) === 24 ? 0 : Number(hStr);
@@ -154,8 +160,7 @@ export function evaluateHoursStatus(
     if (minutes >= slot.start && minutes < slot.end) {
       const minutesToClose = slot.end - minutes;
       const closesAt = fmt(slot.end);
-      const status: HoursStatus =
-        minutesToClose <= soon ? "closing_soon" : "open_now";
+      const status: HoursStatus = minutesToClose <= soon ? "closing_soon" : "open_now";
       return {
         status,
         closesAt,
@@ -176,8 +181,7 @@ export function evaluateHoursStatus(
     if (minutes < carryEnd) {
       const minutesToClose = carryEnd - minutes;
       const closesAt = fmt(carryEnd);
-      const status: HoursStatus =
-        minutesToClose <= soon ? "closing_soon" : "open_now";
+      const status: HoursStatus = minutesToClose <= soon ? "closing_soon" : "open_now";
       return {
         status,
         closesAt,
@@ -196,12 +200,9 @@ export function evaluateHoursStatus(
     for (const slot of slots) {
       if (offset === 0 && slot.start <= minutes) continue;
       const opensAt = fmt(slot.start);
-      const opensDayLabel =
-        offset === 0 ? "hoy" : offset === 1 ? "mañana" : WEEKDAY_LABEL_ES[d];
+      const opensDayLabel = offset === 0 ? "hoy" : offset === 1 ? "mañana" : WEEKDAY_LABEL_ES[d];
       const minutesToOpen =
-        offset === 0
-          ? slot.start - minutes
-          : offset * 1440 - minutes + slot.start;
+        offset === 0 ? slot.start - minutes : offset * 1440 - minutes + slot.start;
       let status: HoursStatus;
       if (offset === 0) {
         status = minutesToOpen <= soon ? "opening_soon" : "closed_now";

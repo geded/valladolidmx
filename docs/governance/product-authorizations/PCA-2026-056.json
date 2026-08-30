@@ -1,0 +1,371 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-056",
+  "title": "G8-R1-F1L · Admisión exacta de revisión DestinationSurface para consolidación pública",
+  "status": "Approved",
+  "branch": "integration/lovable-valladolidmx",
+  "blueprint": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-08-30 limitadas a corregir la trazabilidad del PR #58: admiten exclusivamente las parejas exactas path + SHA-256 enumeradas en acknowledged_revisions para cinco archivos funcionales ya existentes y 24 migraciones históricas, preservando el flag OFF y sin modificar archivos funcionales, migraciones, funcionalidad, datos, medios ni alcance; quedan prohibidos comodines, prefijos y futuros digests.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/page-kind-registry.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/composition-renderer.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/discovery/seo.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/catalog/product-related.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/events/public-reads.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260828204226_4793613a-f45d-4635-a595-c53ee101cf58.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260828220117_e2fcc5fa-be09-4350-9f74-2344a2c13c5b.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260829064842_283114c3-9498-491d-846f-1db486601eb6.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260829070641_959a44c6-4ddf-4810-aba3-7f80895563a1.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260829074909_55bc2a54-6904-4c1e-88e3-6653cee1e03d.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830010427_7eabcc34-63e3-46a9-8a44-5fd07956065b.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830010547_4b12cc68-4b53-44ab-a63d-1111d2ea99e9.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830012531_0ec3e62d-a748-4699-882b-c00c46e3d42b.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830013318_5ba0c631-644e-440f-8736-b4a631837a3b.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830023112_3fa6c24e-b35f-40e4-9a11-40f101d8d4ee.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830031550_88a59552-8f9e-4575-acc9-7721b2015fe0.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032801_a07b4165-db34-49c6-8ba3-fcef32be4975.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032821_2b64c84f-7d91-4f68-bd79-76f6423013b0.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032831_c6039095-dd13-4846-b408-ee3ebbba271c.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032850_7124625f-09a6-4e7b-9e26-ed9cf9335a4a.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032901_6377dfbe-e823-4196-bbcc-f19aa032707b.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032925_695e1257-6844-42b2-946f-8f4e5df36184.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032934_956967e9-6362-448d-9082-2c792658ee5c.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830034311_63bb4c3a-49e6-46f2-9055-67ba6f42ccb5.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830055802_b9ccf253-32dc-4d95-8a35-1e34926abd53.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830143421_d5d27075-8fd6-4b15-b115-a16b7ed7aa4b.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830143533_2b67c92f-81d4-4199-bbb1-8a613b12352c.sql"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "sha256": "05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx",
+      "sha256": "86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/page-kind-registry.ts",
+      "sha256": "3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/composition-renderer.tsx",
+      "sha256": "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/discovery/seo.ts",
+      "sha256": "53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/catalog/product-related.functions.ts",
+      "sha256": "d4f4d4f9aef25bb08228a5f50d1de6a42fb9f572f7946e8c039761c869b802fc",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/events/public-reads.functions.ts",
+      "sha256": "c40ae17d1aa9697de5ad8c1c492b43472454ffe695339fa3d7e8689ab2fef7a6",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx",
+      "sha256": "f414f6107ee1f7696ad211e2a0700d3d23e7f3834e9313f5c17784276d494261",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "sha256": "bce561c2214a411f4bb6f968fe86301132d85aed829201fe9608c76992114624",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.$slug.tsx",
+      "sha256": "1ce68f037ab27c43d79b4abba1ac7d1c3f4927378595268e8fd1feae6efdd4f0",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "sha256": "517fb6f0479f46fbd712d0bd2030ca53ef4d0c6ce8bf792734619a4ac35994be",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql",
+      "sha256": "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql",
+      "sha256": "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260828204226_4793613a-f45d-4635-a595-c53ee101cf58.sql",
+      "sha256": "6088b5b936439f34a20e7085765116f030095e3f0d24b1a1e206ecce89fec373",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260828220117_e2fcc5fa-be09-4350-9f74-2344a2c13c5b.sql",
+      "sha256": "ab5a719e0880f55239d5fe982d26f499ea7392c750457ec7f982dcc75ff18b21",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260829064842_283114c3-9498-491d-846f-1db486601eb6.sql",
+      "sha256": "1e6dbedbf4cac5a08613d8fdc7f4efcef8e517f411046524de6b19dfd426b0a8",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260829070641_959a44c6-4ddf-4810-aba3-7f80895563a1.sql",
+      "sha256": "99b81f982a95df01e894e30cfe1ed9a4a2c11f0b6562190b21b49af3fd2c079d",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260829074909_55bc2a54-6904-4c1e-88e3-6653cee1e03d.sql",
+      "sha256": "a3825853c690fba1739268a47295f69264d0c36b21b7946924da9150ce70bb85",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830010427_7eabcc34-63e3-46a9-8a44-5fd07956065b.sql",
+      "sha256": "770b3b7cec5ea91f15c9b57c30a74252ec96a68a70f81ce9584bdb00e7d15216",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830010547_4b12cc68-4b53-44ab-a63d-1111d2ea99e9.sql",
+      "sha256": "deb6546e1690f3bc4c1fc137b9ce84f03ebb99df982a0fa5dea527c1fdb9e67f",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830012531_0ec3e62d-a748-4699-882b-c00c46e3d42b.sql",
+      "sha256": "3fc920f383e4f43d4e76476e1f9e93cffdeae2fc21ca9ff558225957b213d75a",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830013318_5ba0c631-644e-440f-8736-b4a631837a3b.sql",
+      "sha256": "7fb1a8438ce8b3bfb10567bd4c852dcce535ad50a2c18fd408f2eb71e892e74d",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830023112_3fa6c24e-b35f-40e4-9a11-40f101d8d4ee.sql",
+      "sha256": "765c5572598da4aad5c968c24fb4afe1aa17feefb861c853e545384a32cca13d",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830031550_88a59552-8f9e-4575-acc9-7721b2015fe0.sql",
+      "sha256": "5fe1792a72d43b35af85f1916df6ae389dc1ada09fa6f8b01504e039ac713afe",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032801_a07b4165-db34-49c6-8ba3-fcef32be4975.sql",
+      "sha256": "ff786dd354683a94104454d9e9b54f5cf2f72546cc1393a96127a776e83550ac",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032821_2b64c84f-7d91-4f68-bd79-76f6423013b0.sql",
+      "sha256": "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032831_c6039095-dd13-4846-b408-ee3ebbba271c.sql",
+      "sha256": "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032850_7124625f-09a6-4e7b-9e26-ed9cf9335a4a.sql",
+      "sha256": "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032901_6377dfbe-e823-4196-bbcc-f19aa032707b.sql",
+      "sha256": "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032925_695e1257-6844-42b2-946f-8f4e5df36184.sql",
+      "sha256": "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830032934_956967e9-6362-448d-9082-2c792658ee5c.sql",
+      "sha256": "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830034311_63bb4c3a-49e6-46f2-9055-67ba6f42ccb5.sql",
+      "sha256": "41acc445b69a622b31af8d60bd520b9c4d954c364a3f37e2eaa560db6ae2aef6",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830055802_b9ccf253-32dc-4d95-8a35-1e34926abd53.sql",
+      "sha256": "61a0754ced03d009753bd4a31cd46f7f40ef5e183cd3f108220d5ed0979a938d",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830143421_d5d27075-8fd6-4b15-b115-a16b7ed7aa4b.sql",
+      "sha256": "3398df13e6a1637460642b9b5ace266113026a180b2cd2c3b93045435d0aeffa",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "supabase/migrations/20260830143533_2b67c92f-81d4-4199-bbb1-8a613b12352c.sql",
+      "sha256": "df9065196a7ccc91651e47849b7fd48c7b35cb34abe8ef44ed1ba2fbd5e49d67",
+      "authority": "Founder G8-R1-F1L PR #58 exact historical migration reconciliation"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run validate:i3:a",
+    "bun run governance:check"
+  ]
+}

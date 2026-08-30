@@ -101,10 +101,7 @@ export function StudioPreviewContextBar<TData>({
           onChange={(e) => {
             const next = e.target.value;
             setSelected(next);
-            writeStoredPreviewSlug(
-              provider.kind,
-              next === DEMO_SENTINEL ? null : next,
-            );
+            writeStoredPreviewSlug(provider.kind, next === DEMO_SENTINEL ? null : next);
           }}
           disabled={loading}
           className="min-w-[240px] rounded-md border border-border bg-background px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
@@ -131,9 +128,7 @@ export function StudioPreviewContextBar<TData>({
       >
         <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} aria-hidden /> Refrescar
       </button>
-      {error ? (
-        <span className="text-destructive">Error al listar: {error}</span>
-      ) : null}
+      {error ? <span className="text-destructive">Error al listar: {error}</span> : null}
       <span className="ml-auto text-[10px] text-muted-foreground">
         Este selector no altera la ficha pública; sólo hidrata el canvas.
       </span>

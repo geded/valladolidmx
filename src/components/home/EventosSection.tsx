@@ -36,7 +36,10 @@ export function EventosSection({ config }: { config?: Record<string, unknown> } 
   });
   const events: PublicEventCard[] = data ?? [];
   if (events.length === 0) return null;
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : "Próximos eventos";
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : "Próximos eventos";
   return (
     <section id="eventos" className="@container bg-secondary/40 py-20 @3xl:py-28">
       <Container>
@@ -53,7 +56,10 @@ export function EventosSection({ config }: { config?: Record<string, unknown> } 
             </Link>
           }
         />
-        <ul data-home-grid="eventos" className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        <ul
+          data-home-grid="eventos"
+          className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3"
+        >
           {events.map((e) => (
             <li key={e.id}>
               <Link

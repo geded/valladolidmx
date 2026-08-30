@@ -3,6 +3,7 @@ name: Founder Human Governance Principle
 description: Visitor Intelligence es dirección asistida, no autónoma. Toda recomendación de alto impacto conserva responsable humano, motivo, acción aprobada, KPI esperado, evidencia posterior y trazabilidad completa.
 type: constraint
 ---
+
 **Founder Human Governance Principle** (vinculante, CV8.9+).
 
 La inteligencia recomienda y prioriza. El humano decide. CV8.9 y sub-olas

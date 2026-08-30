@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-051",
+  "title": "19.46 · G8-R1-C2 · Conexión de entidades reales al resolutor canónico",
+  "status": "Approved",
+  "branch": "edit/edt-c7198000-478b-43e1-90b7-919fb8422f7a",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-C+L (2026-08-29): aprobada la paridad visual L2 de premium-seo-landing (variante única acreditada authority-editorial-zazil v1.0.0, Editorial como única presentación publicable, Cinematográfica fail-closed). Se autoriza iniciar exclusivamente C2 · Conexión de entidades reales al resolutor canónico para hotel, restaurante, evento, experiencia, tour, lugar o atractivo y producto genérico, respetando el orden override editorial aprobado → preset premium de familia → superficie estándar fail-closed, consumiendo únicamente datos reales del CMS y medios gobernados G8-M1, y omitiendo toda sección sin datos reales. La familia place delega íntegramente en premium-entity-place con sus seis variantes; vacation_rental se conserva en el resolutor técnico pero no se autoasigna ni se activa productivamente. Prohibido: botón 'Crear Landing SEO', composiciones SEO reales, CL3, modificar las cuatro landings legacy, publicar entidades o landings, redirects, sitemap, activar omxds_visual_v1_contracts_enabled, migraciones, R1-D/E/F, PR, merge y despliegue. STOP CONDITION obligatoria al cerrar C2.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/canonical-entity-binding.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:r1:a",
+    "bun run validate:r1:cl",
+    "bun run validate:r1:c2"
+  ]
+}

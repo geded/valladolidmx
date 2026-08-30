@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-033",
+  "title": "19.28 · G5 · Presentación Premium compartida para listados turísticos",
+  "status": "Approved",
+  "branch": "feature/omxds-g5-premium-system-v1",
+  "blueprint": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · Aplicar el estilo aprobado de forma acelerada a todas las plantillas restantes y probar el sitio como conjunto. Este incremento modifica únicamente la superficie visual compartida de listados; preserva tarjetas, consultas, filtros, mapas, favoritos, Travel Plan y Alux.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/TourismListingSurface.tsx"
+    }
+  ],
+  "public_routes": [
+    "/hoteles",
+    "/restaurantes",
+    "/experiencias",
+    "/eventos",
+    "/casas-de-vacaciones",
+    "/promociones",
+    "/que-hacer",
+    "/oriente-maya/:destino/:categoria"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun scripts/omxds/g5/premium-presentation.contract.test.ts",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

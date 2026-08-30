@@ -183,8 +183,7 @@ function singleGroupDTO(
     variant,
     columns: variant === "grid" ? 3 : base.columns,
     heading: "Sigue descubriendo el Oriente Maya",
-    subheading:
-      "Recomendaciones útiles para decidir qué explorar después de tu reserva.",
+    subheading: "Recomendaciones útiles para decidir qué explorar después de tu reserva.",
     groups: [
       {
         id: "sigue-descubriendo",
@@ -288,11 +287,9 @@ function Page() {
         </p>
         <h1 className="text-3xl font-semibold">Sigue descubriendo el Oriente Maya</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Validación visual U1.2. Related Collection reutiliza la
-          Tourism Card oficial — cero cards paralelas — y responde
-          arriba de la línea a las cinco preguntas Founder Experience
-          Rule. Cada card aporta contexto, confianza, relevancia y
-          siguiente acción.
+          Validación visual U1.2. Related Collection reutiliza la Tourism Card oficial — cero cards
+          paralelas — y responde arriba de la línea a las cinco preguntas Founder Experience Rule.
+          Cada card aporta contexto, confianza, relevancia y siguiente acción.
         </p>
       </header>
 
@@ -384,13 +381,9 @@ function Case({
   return (
     <section className="flex flex-col gap-4 border-t border-border pt-6">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">
-          Caso {n}
-        </p>
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">Caso {n}</p>
         <h2 className="mt-1 text-xl font-semibold">{title}</h2>
-        {note ? (
-          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{note}</p>
-        ) : null}
+        {note ? <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{note}</p> : null}
       </div>
       {children}
     </section>

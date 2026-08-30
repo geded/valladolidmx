@@ -44,10 +44,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { workspaceToast } from "@/lib/workspace/toast-bus";
-import {
-  listEntitiesFor,
-  listQuickActionsFor,
-} from "@/lib/workspace/context-registry";
+import { listEntitiesFor, listQuickActionsFor } from "@/lib/workspace/context-registry";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/lovable/workspace-foundations")({
@@ -81,11 +78,10 @@ function FoundationsContent() {
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Adenda 15.10.5a · Workspace Foundations
           </div>
-          <h1 className="mt-1 truncate font-display text-2xl">
-            {workspace?.label ?? "Workspace"}
-          </h1>
+          <h1 className="mt-1 truncate font-display text-2xl">{workspace?.label ?? "Workspace"}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Breakpoint actual: <code className="rounded bg-muted px-1.5 py-0.5">{bp}</code> · Densidad: <code className="rounded bg-muted px-1.5 py-0.5">{density}</code>
+            Breakpoint actual: <code className="rounded bg-muted px-1.5 py-0.5">{bp}</code> ·
+            Densidad: <code className="rounded bg-muted px-1.5 py-0.5">{density}</code>
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -97,7 +93,11 @@ function FoundationsContent() {
             <Type className="h-4 w-4" aria-hidden /> {density === "compact" ? "Cómoda" : "Compacta"}
           </Button>
           <Button size="sm" variant="outline" onClick={() => setDark((d) => !d)}>
-            {dark ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
+            {dark ? (
+              <Sun className="h-4 w-4" aria-hidden />
+            ) : (
+              <Moon className="h-4 w-4" aria-hidden />
+            )}
             {dark ? "Claro" : "Oscuro"}
           </Button>
           <Button size="sm" variant="outline" onClick={() => setLoading((l) => !l)}>
@@ -109,7 +109,8 @@ function FoundationsContent() {
       <section>
         <SectionTitle>Workspaces registrados</SectionTitle>
         <p className="mb-3 text-sm text-muted-foreground">
-          Cada workspace está declarado como <code>WorkspaceDefinition</code>. El Engine los descubre por el registry — sin acoplamientos.
+          Cada workspace está declarado como <code>WorkspaceDefinition</code>. El Engine los
+          descubre por el registry — sin acoplamientos.
         </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {workspaces.map((w) => (
@@ -128,8 +129,20 @@ function FoundationsContent() {
       <section>
         <SectionTitle>Narrativa · Hoy · Pulso · Cambió</SectionTitle>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <MetricCard label="Reservas hoy" value="124" delta={12.4} intent="positive" hint="vs. ayer" />
-          <MetricCard label="Reseñas pendientes" value="12" delta={-3.1} intent="warning" hint="moderación" />
+          <MetricCard
+            label="Reservas hoy"
+            value="124"
+            delta={12.4}
+            intent="positive"
+            hint="vs. ayer"
+          />
+          <MetricCard
+            label="Reseñas pendientes"
+            value="12"
+            delta={-3.1}
+            intent="warning"
+            hint="moderación"
+          />
           <MetricCard label="Empresas activas" value="318" delta={0} hint="sin cambio" />
         </div>
       </section>
@@ -246,8 +259,7 @@ function ContextRegistryPreview({ workspaceId }: { workspaceId: string }) {
                   key={e.type}
                   className="rounded-full border border-border bg-surface-raised px-2 py-0.5 text-xs"
                 >
-                  {e.label}{" "}
-                  <span className="text-muted-foreground">·{e.type}</span>
+                  {e.label} <span className="text-muted-foreground">·{e.type}</span>
                 </li>
               ))
             )}
@@ -264,9 +276,7 @@ function ContextRegistryPreview({ workspaceId }: { workspaceId: string }) {
               actions.map((a) => (
                 <li key={a.id} className="flex justify-between gap-2">
                   <span>{a.label}</span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {a.scope}
-                  </span>
+                  <span className="text-[11px] text-muted-foreground">{a.scope}</span>
                 </li>
               ))
             )}
@@ -332,9 +342,7 @@ function SelectionShowcase() {
               }}
               className={cn(
                 "flex items-center justify-between gap-2 rounded-xl border bg-surface p-3 text-left text-sm transition",
-                selected
-                  ? "border-primary bg-primary/10"
-                  : "border-border hover:bg-surface-raised",
+                selected ? "border-primary bg-primary/10" : "border-border hover:bg-surface-raised",
               )}
             >
               <span className="min-w-0">
@@ -351,8 +359,8 @@ function SelectionShowcase() {
         })}
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Long-press en cualquier tarjeta activa el modo multi. La selección y el
-        foco persisten en <code>sessionStorage</code> por workspace.
+        Long-press en cualquier tarjeta activa el modo multi. La selección y el foco persisten en{" "}
+        <code>sessionStorage</code> por workspace.
       </p>
     </div>
   );
@@ -360,10 +368,8 @@ function SelectionShowcase() {
 
 function GesturesShowcase() {
   const swipe = useSwipeActions({
-    onSwipeLeft: () =>
-      workspaceToast.info("Swipe ←", { description: "Posponer ejemplo" }),
-    onSwipeRight: () =>
-      workspaceToast.success("Swipe →", { description: "Aprobado ejemplo" }),
+    onSwipeLeft: () => workspaceToast.info("Swipe ←", { description: "Posponer ejemplo" }),
+    onSwipeRight: () => workspaceToast.success("Swipe →", { description: "Aprobado ejemplo" }),
   });
   return (
     <div>
@@ -374,8 +380,8 @@ function GesturesShowcase() {
       >
         <ArrowLeft className="h-4 w-4 text-muted-foreground" aria-hidden />
         <span className="flex items-center gap-2 text-muted-foreground">
-          <Hand className="h-4 w-4" aria-hidden /> Swipe horizontal sobre esta
-          tarjeta (touch o mouse)
+          <Hand className="h-4 w-4" aria-hidden /> Swipe horizontal sobre esta tarjeta (touch o
+          mouse)
         </span>
         <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden />
       </div>
@@ -483,9 +489,9 @@ function ContextSnapshotPreview() {
         {JSON.stringify(ctx.snapshot(), null, 2)}
       </pre>
       <p className="mt-1 text-[11px] text-muted-foreground">
-        Este snapshot se persiste en <code>sessionStorage</code> y se restaura al
-        volver al workspace — la selección, el foco y los filtros sobreviven a
-        recargas, cambios de inspector y aperturas de sheets.
+        Este snapshot se persiste en <code>sessionStorage</code> y se restaura al volver al
+        workspace — la selección, el foco y los filtros sobreviven a recargas, cambios de inspector
+        y aperturas de sheets.
       </p>
     </div>
   );
@@ -500,16 +506,56 @@ function SubTitle({ children }: { children: React.ReactNode }) {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="mb-2 font-display text-lg">{children}</h2>
-  );
+  return <h2 className="mb-2 font-display text-lg">{children}</h2>;
 }
 
 const SAMPLE_ENTITIES = [
-  { id: "1", eyebrow: "Hotel boutique", title: "Casa Hipil", meta: "Centro Histórico · 4.8 ★", description: "Hospedaje de autor con patio colonial y cenote privado.", badge: "Premium" },
-  { id: "2", eyebrow: "Experiencia", title: "Sendero Ek Balam al amanecer", meta: "Temozón · 3 h", description: "Ruta guiada con desayuno regional y baño en cenote.", badge: "Hoy" },
-  { id: "3", eyebrow: "Restaurante", title: "Cocina de la Plaza", meta: "Valladolid · $$", description: "Cocina yucateca contemporánea con producto local.", badge: "Top" },
-  { id: "4", eyebrow: "Reseña", title: "“Una experiencia inolvidable”", meta: "Hace 2 h · pendiente moderar", description: "Excelente trato y guías locales muy preparados.", badge: "Mod." },
-  { id: "5", eyebrow: "Ruta", title: "Oriente Maya en 3 días", meta: "Ruta sugerida · 12 paradas", description: "Selección curada de cenotes, ruinas y mercados.", badge: "Ruta" },
-  { id: "6", eyebrow: "Empresa", title: "Tours Sak-Lu", meta: "Operador local · verificado", description: "Operador de excursiones a cenotes y sitios mayas.", badge: "Verif." },
+  {
+    id: "1",
+    eyebrow: "Hotel boutique",
+    title: "Casa Hipil",
+    meta: "Centro Histórico · 4.8 ★",
+    description: "Hospedaje de autor con patio colonial y cenote privado.",
+    badge: "Premium",
+  },
+  {
+    id: "2",
+    eyebrow: "Experiencia",
+    title: "Sendero Ek Balam al amanecer",
+    meta: "Temozón · 3 h",
+    description: "Ruta guiada con desayuno regional y baño en cenote.",
+    badge: "Hoy",
+  },
+  {
+    id: "3",
+    eyebrow: "Restaurante",
+    title: "Cocina de la Plaza",
+    meta: "Valladolid · $$",
+    description: "Cocina yucateca contemporánea con producto local.",
+    badge: "Top",
+  },
+  {
+    id: "4",
+    eyebrow: "Reseña",
+    title: "“Una experiencia inolvidable”",
+    meta: "Hace 2 h · pendiente moderar",
+    description: "Excelente trato y guías locales muy preparados.",
+    badge: "Mod.",
+  },
+  {
+    id: "5",
+    eyebrow: "Ruta",
+    title: "Oriente Maya en 3 días",
+    meta: "Ruta sugerida · 12 paradas",
+    description: "Selección curada de cenotes, ruinas y mercados.",
+    badge: "Ruta",
+  },
+  {
+    id: "6",
+    eyebrow: "Empresa",
+    title: "Tours Sak-Lu",
+    meta: "Operador local · verificado",
+    description: "Operador de excursiones a cenotes y sitios mayas.",
+    badge: "Verif.",
+  },
 ];

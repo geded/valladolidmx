@@ -113,9 +113,7 @@ export const DISCOVERY_SECTIONS_REGISTRY: Readonly<
   },
 });
 
-export function getDiscoverySection(
-  kind: DiscoverySectionKind,
-): DiscoverySectionDefinition {
+export function getDiscoverySection(kind: DiscoverySectionKind): DiscoverySectionDefinition {
   const def = DISCOVERY_SECTIONS_REGISTRY[kind];
   if (!def) throw new Error(`[discovery/sections] Unknown section kind: ${kind}`);
   return def;
@@ -125,10 +123,6 @@ export function listDiscoverySectionKinds(): readonly DiscoverySectionKind[] {
   return Object.keys(DISCOVERY_SECTIONS_REGISTRY) as DiscoverySectionKind[];
 }
 
-export function listSectionsForSurface(
-  surface: string,
-): readonly DiscoverySectionDefinition[] {
-  return Object.values(DISCOVERY_SECTIONS_REGISTRY).filter((s) =>
-    s.surfaces.includes(surface),
-  );
+export function listSectionsForSurface(surface: string): readonly DiscoverySectionDefinition[] {
+  return Object.values(DISCOVERY_SECTIONS_REGISTRY).filter((s) => s.surfaces.includes(surface));
 }

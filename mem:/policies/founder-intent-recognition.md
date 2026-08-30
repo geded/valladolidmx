@@ -3,6 +3,7 @@ name: Founder Intent Recognition Principle (AC1.2)
 description: Cada interacción del viajero es una intención. Alux la reconoce con microinteracciones conversacionales del Concierge, nunca con confirmaciones técnicas. Sin IA generativa, sin memoria paralela, sin inferencias permanentes.
 type: constraint
 ---
+
 Vinculante desde AC1.2 y en toda superficie futura donde el viajero actúe (favorito, plan, remove, share, contact, etc.).
 
 Reglas:

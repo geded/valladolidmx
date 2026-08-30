@@ -15,12 +15,8 @@ export function KitFaq({
         {faqs.map((f) => (
           <li key={f.id} className="p-4">
             <details>
-              <summary className="cursor-pointer text-sm font-semibold">
-                {f.question}
-              </summary>
-              <p className="mt-2 whitespace-pre-line text-sm text-foreground/85">
-                {f.answer}
-              </p>
+              <summary className="cursor-pointer text-sm font-semibold">{f.question}</summary>
+              <p className="mt-2 whitespace-pre-line text-sm text-foreground/85">{f.answer}</p>
             </details>
           </li>
         ))}

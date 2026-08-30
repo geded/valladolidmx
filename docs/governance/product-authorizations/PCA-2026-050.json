@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-050",
+  "title": "19.46 · G8-R1-C+L · Resolutor canónico de fichas y Landing SEO Premium",
+  "status": "Approved",
+  "branch": "edit/edt-c7198000-478b-43e1-90b7-919fb8422f7a",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-C+L (2026-08-28): se acepta la secuencia integrada R1-C+L. Autoridad visual acreditada Zazil Tunich, composición biz-zazil-tunich, revisión #2 SEO.A3.M2, SHA-256 61913a4fa92bdb1c671a392caabc0b08f55a6ec946ed737abcd9038e01113d9c. Alcance autorizado: (C1) resolutor canónico único para las ocho familias de ficha individual con orden override aprobado → preset de familia → superficie estándar fail-closed; (L1) plantilla reusable premium-seo-landing variante authority-editorial-zazil con los 17 bloques extraídos como estructura neutral, sin copiar contenido de la entidad de origen y sin migración de esquema, persistiendo el metadato editorial en chrome.seo.landing; (L2) preview interna noindex de paridad entre autoridad y plantilla neutral, con sondas de resolución de configuración. Invariantes estrictas: omxds_visual_v1_contracts_enabled=false, cero publicación, cero redirects, cero rutas públicas nuevas, cero sitemap, cero migración, cero escritura de datos reales, cero contenido inventado, Chichén Itzá y Ek' Balam en draft, una única superficie y un único renderer. STOP CONDITION obligatoria en L2 tras la preview de paridad; no se autoriza iniciar C2. Prohibido expresamente: migraciones o schema nuevo, publicación, redirects, activación de flags, PR, merge y despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/canonical-entity-resolver.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-template.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:r1:a",
+    "bun run validate:r1:cl"
+  ]
+}

@@ -8,10 +8,7 @@
  *
  * Pura: sin side effects, sin acceso a `window`. Determinística.
  */
-import {
-  DEFAULT_INHERITANCE_RULES,
-  findInheritanceRule,
-} from "./inheritance-rules";
+import { DEFAULT_INHERITANCE_RULES, findInheritanceRule } from "./inheritance-rules";
 import type {
   ContextNode,
   ContextSource,
@@ -23,10 +20,7 @@ import type {
 
 type Slot = "region" | "destination" | "category";
 
-function pickSlot(
-  slot: Slot,
-  nodes: readonly ContextNode[],
-): ContextNode | undefined {
+function pickSlot(slot: Slot, nodes: readonly ContextNode[]): ContextNode | undefined {
   return nodes.find((n) => n.kind === slot);
 }
 
@@ -80,10 +74,7 @@ export function resolveContext(opts: ResolveOptions): ResolveResult {
     }
   }
 
-  let ancestors: ContextNode[] = dedupeByKindSlug([
-    ...inheritedNodes,
-    ...explicitAncestors,
-  ]);
+  let ancestors: ContextNode[] = dedupeByKindSlug([...inheritedNodes, ...explicitAncestors]);
 
   let usedFallback = false;
   if (ancestors.length === 0 && declaration.kindDefaults && declaration.kindDefaults.length > 0) {

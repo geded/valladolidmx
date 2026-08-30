@@ -27,7 +27,17 @@ const fullDTO = {
   center: { lat: 20.69, lng: -88.2, zoom: 13 },
   points: [
     { ...validPoint },
-    { ...validPoint, id: "p-2", title: "Cenote Zací", kind: "destination" as const, subtitle: "5 min", href: "/oriente-maya/valladolid/cenotes/zaci", thumbUrl: "https://cdn.example.com/z.jpg", priceLabel: "Desde $80", badge: null },
+    {
+      ...validPoint,
+      id: "p-2",
+      title: "Cenote Zací",
+      kind: "destination" as const,
+      subtitle: "5 min",
+      href: "/oriente-maya/valladolid/cenotes/zaci",
+      thumbUrl: "https://cdn.example.com/z.jpg",
+      priceLabel: "Desde $80",
+      badge: null,
+    },
   ],
   capabilities: {
     showDistance: false,
@@ -45,9 +55,7 @@ function equivalent(input: unknown, label: string) {
   const renderOut = applyExperienceMapDefaults(input);
   // Comparamos por JSON estable (ambos serializan igual). Los campos
   // opcionales `undefined` colapsan en ambos serializadores.
-  expect(JSON.stringify(renderOut), `[${label}] render vs zod`).toBe(
-    JSON.stringify(zodOut),
-  );
+  expect(JSON.stringify(renderOut), `[${label}] render vs zod`).toBe(JSON.stringify(zodOut));
 }
 
 describe("experience-map · applyRenderDefaults ↔ zod parse equivalence", () => {
@@ -87,17 +95,8 @@ describe("experience-map · applyRenderDefaults ↔ zod parse equivalence", () =
   });
 
   test("todos los kinds válidos", () => {
-    for (const k of [
-      "business",
-      "product",
-      "destination",
-      "event",
-      "promotion",
-    ] as const) {
-      equivalent(
-        { points: [{ ...validPoint, kind: k, id: `k-${k}` }] },
-        `kind:${k}`,
-      );
+    for (const k of ["business", "product", "destination", "event", "promotion"] as const) {
+      equivalent({ points: [{ ...validPoint, kind: k, id: `k-${k}` }] }, `kind:${k}`);
     }
   });
 });

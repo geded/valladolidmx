@@ -3,6 +3,7 @@ name: Founder Journey State Principle
 description: El estado del Journey nunca se persiste como fuente de verdad — se deriva siempre del historial append-only de eventos. Proyección explicable (qué eventos, qué transición, cuándo, con qué confianza) y recomputable en su totalidad. Prohibido estado editable manualmente o dependencias irreproducibles.
 type: constraint
 ---
+
 **Founder Journey State Principle** (vinculante, CV8.2+).
 
 El estado del Journey de cada visitante NO se persiste como fuente de verdad. Es una **vista derivada** del historial append-only en `visitor_intel.events`.

@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-P",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Cierre y remediación G8-Q2B. Reconoce exclusivamente la regeneración automática del archivo de tipos asociada a la construcción del CMS de Lugares y Atractivos, sin migración ni cambio de esquema. Sin contenido turístico creado o modificado, sin publicación, flags, PR, merge ni despliegue. El addendum se registra bajo PCA-2026-029 por ser la única autorización Approved que contiene el permiso modify y la acknowledged revision de esta ruta; la autoridad de paquete es PCA-2026-044.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "eb05e15249c0162dc03ac3303aad41f286175ba6ee3e4710ea9f19b3ccb28c1f",
+    "current_sha256": "8306d156e914f3a3ec0581b1f058148ac378422c8cb2f7e6a095c589b3ed70ed",
+    "semantic_change": "G8-Q2B · Sincronización del archivo de tipos generado con el esquema ya migrado en Q2A y Q2A-R1. Estrictamente derivado: no elimina ni renombra tablas, columnas, enums, vistas ni funciones existentes y no introduce esquema nuevo.",
+    "authority": "PCA-2026-044"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Los cinco POI históricos permanecen sin modificación",
+    "Cero migraciones, cero publicación, cero rutas públicas"
+  ],
+  "recorded_at": "2026-08-28"
+}

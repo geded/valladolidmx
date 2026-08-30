@@ -16,10 +16,14 @@ export const Route = createFileRoute("/_authenticated/portal/empresas/")({
 function BusinessesIndex() {
   const fetchBusinesses = useServerFn(listMyBusinesses);
   const { roles } = useAuth();
-  const canCreateBusiness = roles.some((r) =>
-    r === "admin" || r === "super_admin" || r === "editor",
+  const canCreateBusiness = roles.some(
+    (r) => r === "admin" || r === "super_admin" || r === "editor",
   );
-  const { data: businesses = [], isLoading, error } = useQuery({
+  const {
+    data: businesses = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["portal", "my-businesses"],
     queryFn: () => fetchBusinesses(),
     staleTime: 60_000,
@@ -30,9 +34,7 @@ function BusinessesIndex() {
     const q = query.trim().toLowerCase();
     if (!q) return businesses;
     return businesses.filter(
-      (b) =>
-        b.display_name.toLowerCase().includes(q) ||
-        b.slug.toLowerCase().includes(q),
+      (b) => b.display_name.toLowerCase().includes(q) || b.slug.toLowerCase().includes(q),
     );
   }, [businesses, query]);
 
@@ -60,8 +62,8 @@ function BusinessesIndex() {
             {isAdminContext ? "Todas las empresas" : "Tus empresas"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Selecciona una empresa para ver su configuración, paquetes de
-            visibilidad detectados y sus órdenes y pagos.
+            Selecciona una empresa para ver su configuración, paquetes de visibilidad detectados y
+            sus órdenes y pagos.
           </p>
         </div>
         {canCreateBusiness ? (

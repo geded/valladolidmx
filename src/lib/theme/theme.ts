@@ -6,10 +6,7 @@ export function parseOmxdsTheme(value: unknown): OmxdsTheme | null {
   return value === "sol" || value === "luna" ? value : null;
 }
 
-export function resolveOmxdsTheme(
-  storedValue: unknown,
-  prefersDark: boolean,
-): OmxdsTheme {
+export function resolveOmxdsTheme(storedValue: unknown, prefersDark: boolean): OmxdsTheme {
   return parseOmxdsTheme(storedValue) ?? (prefersDark ? "luna" : "sol");
 }
 

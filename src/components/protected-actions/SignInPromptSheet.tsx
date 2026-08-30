@@ -12,10 +12,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "@/lib/toast";
-import {
-  SheetController,
-  type ActiveGate,
-} from "@/lib/protected-actions/sheet-controller";
+import { SheetController, type ActiveGate } from "@/lib/protected-actions/sheet-controller";
 import { PendingActionRegistry } from "@/lib/protected-actions/registry";
 import { emitProtectedActionEvent } from "@/lib/protected-actions/observability";
 import { supabase } from "@/integrations/supabase/client";
@@ -215,8 +212,8 @@ function GateBody({
         {magicSent
           ? t("protected_actions.magic_sent")
           : busy === "magic"
-          ? t("auth.processing")
-          : t("protected_actions.magic_cta")}
+            ? t("auth.processing")
+            : t("protected_actions.magic_cta")}
       </button>
 
       {error ? (

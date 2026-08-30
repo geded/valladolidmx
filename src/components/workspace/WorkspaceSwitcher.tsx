@@ -38,13 +38,14 @@ export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
               <span className="block truncate font-display text-sm font-semibold leading-tight">
                 {workspace.shortLabel ?? workspace.label}
               </span>
-              <span className="block truncate text-[11px] text-muted-foreground">
-                Workspace
-              </span>
+              <span className="block truncate text-[11px] text-muted-foreground">Workspace</span>
             </span>
           ) : null}
           {!compact ? (
-            <ChevronsUpDown className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+            <ChevronsUpDown
+              className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground"
+              aria-hidden
+            />
           ) : null}
         </button>
       </DropdownMenuTrigger>

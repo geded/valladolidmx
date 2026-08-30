@@ -19,7 +19,15 @@ export type BadgeVM = {
   icon?: ReactNode;
 };
 
-export type MediaVM = { id?: string; url: string; alt?: string };
+export type MediaVM = {
+  id?: string;
+  url: string;
+  alt?: string;
+  /** G8-F1D — Caption acreditado del medio (jamás inventado). */
+  caption?: string;
+  /** G8-F1D — Crédito público acreditado (jamás inventado). */
+  credit?: string;
+};
 
 export type PriceVM = { amount: number; currency: string };
 

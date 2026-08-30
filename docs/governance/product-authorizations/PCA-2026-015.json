@@ -32,12 +32,8 @@
       "path": "package.json"
     }
   ],
-  "public_routes": [
-    "/preview/composition/$token"
-  ],
-  "required_feature_flags": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "public_routes": ["/preview/composition/$token"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bun install --frozen-lockfile",
     "bun run lint",

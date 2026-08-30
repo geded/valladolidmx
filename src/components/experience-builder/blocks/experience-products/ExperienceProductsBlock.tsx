@@ -14,10 +14,7 @@
 import { useContext, useMemo } from "react";
 import { ExperienceProducts } from "./ExperienceProducts";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
-import {
-  ProductActions,
-  type ProductActionsProduct,
-} from "@/components/commerce/ProductActions";
+import { ProductActions, type ProductActionsProduct } from "@/components/commerce/ProductActions";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
 import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
 import {
@@ -36,18 +33,14 @@ function safeParse(raw: unknown): ExperienceProductsConfig {
 /* ------------------------------------------------------------------ *
  * Adapter: MarketplaceProductCard → ExperienceProductItem
  * ------------------------------------------------------------------ */
-export function marketplaceProductToItem(
-  p: MarketplaceProductCard,
-): ExperienceProductItem {
+export function marketplaceProductToItem(p: MarketplaceProductCard): ExperienceProductItem {
   return {
     id: p.id,
     name: p.name,
     tagline: p.tagline || null,
     productType: p.product_type || null,
     entityKind: "product",
-    href: p.business_slug && p.slug
-      ? `/marketplace/${p.business_slug}#p-${p.slug}`
-      : null,
+    href: p.business_slug && p.slug ? `/marketplace/${p.business_slug}#p-${p.slug}` : null,
     mediaUrl: null,
     mediaAlt: null,
     priceAmount: p.price_amount != null ? Number(p.price_amount) : null,
@@ -125,9 +118,7 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
 
     if (cfg.source === "business" && business) {
       const filtered =
-        cfg.filters?.businessId && cfg.filters.businessId !== business.id
-          ? []
-          : business.products;
+        cfg.filters?.businessId && cfg.filters.businessId !== business.id ? [] : business.products;
       baseItems = filtered.map((p) => {
         interactive.set(p.id, {
           id: p.id,
@@ -155,9 +146,7 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
         const interactive = interactiveMap.get(item.id);
         return (
           <>
-            {showFav ? (
-              <FavoriteButton entityKind="product" entityId={item.id} />
-            ) : null}
+            {showFav ? <FavoriteButton entityKind="product" entityId={item.id} /> : null}
             {dto.capabilities.showActions && interactive ? (
               <ProductActions product={interactive} />
             ) : null}

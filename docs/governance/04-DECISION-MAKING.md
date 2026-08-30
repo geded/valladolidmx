@@ -415,9 +415,9 @@ Este documento se alinea con el CANON, el GLOSSARY, ARCHITECTURAL PRINCIPLES y D
 
 # 12. Control de Versiones
 
-| Versión | Fecha       | Autor    | Descripción                                                               |
-|---------|-------------|----------|---------------------------------------------------------------------------|
-| v1.0    | 2026-07-18  | Founder  | Emisión inicial del marco oficial de toma de decisiones de Valladolid.mx. |
+| Versión | Fecha      | Autor   | Descripción                                                               |
+| ------- | ---------- | ------- | ------------------------------------------------------------------------- |
+| v1.0    | 2026-07-18 | Founder | Emisión inicial del marco oficial de toma de decisiones de Valladolid.mx. |
 
 Este documento se versiona junto al CANON, al GLOSSARY, a ARCHITECTURAL PRINCIPLES y a DOCUMENTATION STANDARD. Su versión mayor sólo cambia cuando se redefine su alcance o su filosofía; los cambios editoriales incrementan la versión menor.
 

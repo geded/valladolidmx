@@ -15,10 +15,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
-import {
-  projectVisitorState,
-  type ProjectedVisitorState,
-} from "./projection";
+import { projectVisitorState, type ProjectedVisitorState } from "./projection";
 
 const InputSchema = z.object({ subject_id: z.string().min(1) });
 
@@ -40,23 +37,25 @@ export const projectVisitorStateFromDb = createServerFn({ method: "POST" })
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await (supabaseAdmin as unknown as {
-      schema: (s: string) => {
-        from: (t: string) => {
-          select: (cols: string) => {
-            eq: (
-              col: string,
-              val: string,
-            ) => {
-              order: (
+    const { data: rows, error } = await (
+      supabaseAdmin as unknown as {
+        schema: (s: string) => {
+          from: (t: string) => {
+            select: (cols: string) => {
+              eq: (
                 col: string,
-                opts: { ascending: boolean },
-              ) => Promise<{ data: Array<{ payload: unknown }> | null; error: unknown }>;
+                val: string,
+              ) => {
+                order: (
+                  col: string,
+                  opts: { ascending: boolean },
+                ) => Promise<{ data: Array<{ payload: unknown }> | null; error: unknown }>;
+              };
             };
           };
         };
-      };
-    })
+      }
+    )
       .schema("visitor_intel")
       .from("events")
       .select("payload")

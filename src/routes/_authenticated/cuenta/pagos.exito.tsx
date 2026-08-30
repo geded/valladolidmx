@@ -1,20 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  getConciergeOrder,
-  getMyConfirmedTravel,
-} from "@/lib/concierge/orders.functions";
-import {
-  CalendarCheck,
-  Compass,
-  LifeBuoy,
-  MessageCircle,
-  Sparkles,
-  MapPin,
-} from "lucide-react";
+import { getConciergeOrder, getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
+import { CalendarCheck, Compass, LifeBuoy, MessageCircle, Sparkles, MapPin } from "lucide-react";
 
-interface S { order?: string }
+interface S {
+  order?: string;
+}
 
 export const Route = createFileRoute("/_authenticated/cuenta/pagos/exito")({
   validateSearch: (s: Record<string, unknown>): S => ({
@@ -29,8 +21,7 @@ function ExitoPage() {
   const fetchConfirmed = useServerFn(getMyConfirmedTravel);
   const orderQ = useQuery({
     queryKey: ["concierge-order", order],
-    queryFn: () =>
-      order ? fetchOrder({ data: { orderId: order } }) : Promise.resolve(null),
+    queryFn: () => (order ? fetchOrder({ data: { orderId: order } }) : Promise.resolve(null)),
     enabled: Boolean(order),
   });
   const confirmedQ = useQuery({
@@ -45,8 +36,7 @@ function ExitoPage() {
     orderData?.editorial_title ??
     confirmed?.editorial_title ??
     "Tu viaje al Oriente Maya de Yucatán";
-  const destination =
-    orderData?.destination_name ?? confirmed?.destination_name ?? null;
+  const destination = orderData?.destination_name ?? confirmed?.destination_name ?? null;
 
   const dateFmt = (iso?: string | null) =>
     iso
@@ -91,8 +81,14 @@ function ExitoPage() {
     <div className="mx-auto max-w-3xl space-y-8 pb-16">
       {/* Portada editorial */}
       <section className="relative overflow-hidden rounded-3xl border border-success/30 bg-gradient-to-br from-success/15 via-primary/5 to-card p-8 shadow-elevated">
-        <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-primary/10 blur-3xl" aria-hidden />
-        <div className="absolute -bottom-20 -left-10 h-52 w-52 rounded-full bg-success/10 blur-3xl" aria-hidden />
+        <div
+          className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-primary/10 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="absolute -bottom-20 -left-10 h-52 w-52 rounded-full bg-success/10 blur-3xl"
+          aria-hidden
+        />
         <div className="relative">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-success-foreground/80">
             Bienvenido al Oriente Maya de Yucatán
@@ -104,7 +100,8 @@ function ExitoPage() {
             <strong>{title}</strong>
             {destination ? (
               <>
-                {" "}quedó reservado con los anfitriones de{" "}
+                {" "}
+                quedó reservado con los anfitriones de{" "}
                 <span className="text-primary">{destination}</span>.
               </>
             ) : (
@@ -128,9 +125,7 @@ function ExitoPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 Fechas
               </p>
-              <p className="mt-1 text-sm font-medium text-foreground">
-                {dateRange}
-              </p>
+              <p className="mt-1 text-sm font-medium text-foreground">{dateRange}</p>
             </div>
             {confirmed?.party_size ? (
               <div className="rounded-xl border border-border/60 bg-background/80 px-4 py-3">
@@ -167,9 +162,7 @@ function ExitoPage() {
                 <div>
                   <p className="text-sm font-medium text-foreground">{it.title}</p>
                   {it.description ? (
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {it.description}
-                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{it.description}</p>
                   ) : null}
                 </div>
                 <span className="shrink-0 text-xs font-medium text-muted-foreground">
@@ -194,21 +187,30 @@ function ExitoPage() {
         <h2 className="font-serif text-xl">Próximos pasos</h2>
         <ol className="mt-4 space-y-3 text-sm text-foreground/85">
           <li className="flex gap-3">
-            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">1</span>
+            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">
+              1
+            </span>
             <span>
-              Recibirás por correo tu <strong>comprobante de viaje</strong> con el folio {folio ?? "de tu reservación"}.
+              Recibirás por correo tu <strong>comprobante de viaje</strong> con el folio{" "}
+              {folio ?? "de tu reservación"}.
             </span>
           </li>
           <li className="flex gap-3">
-            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">2</span>
+            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">
+              2
+            </span>
             <span>
-              Tu concierge te escribirá para afinar detalles: llegada, preferencias y recomendaciones del Oriente Maya.
+              Tu concierge te escribirá para afinar detalles: llegada, preferencias y
+              recomendaciones del Oriente Maya.
             </span>
           </li>
           <li className="flex gap-3">
-            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">3</span>
+            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">
+              3
+            </span>
             <span>
-              Antes de tu llegada recibirás una guía de bienvenida y Alux te acompañará durante todo el viaje.
+              Antes de tu llegada recibirás una guía de bienvenida y Alux te acompañará durante todo
+              el viaje.
             </span>
           </li>
         </ol>
@@ -222,7 +224,8 @@ function ExitoPage() {
             <h3 className="text-sm font-semibold">Tu concierge sigue contigo</h3>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Cualquier cambio, duda o preferencia se coordina directamente con tu concierge desde <em>Mi viaje</em>. No estás solo frente a la pantalla.
+            Cualquier cambio, duda o preferencia se coordina directamente con tu concierge desde{" "}
+            <em>Mi viaje</em>. No estás solo frente a la pantalla.
           </p>
         </div>
         <div className="rounded-2xl border border-border/60 bg-card p-5">
@@ -231,7 +234,9 @@ function ExitoPage() {
             <h3 className="text-sm font-semibold">Cancelación y cambios</h3>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Aplica la política acordada con tu concierge. Guarda tu folio {folio ? <span className="font-mono">{folio}</span> : "de reservación"} para cualquier gestión.
+            Aplica la política acordada con tu concierge. Guarda tu folio{" "}
+            {folio ? <span className="font-mono">{folio}</span> : "de reservación"} para cualquier
+            gestión.
           </p>
         </div>
       </section>

@@ -1,0 +1,44 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-042",
+  "title": "19.38 · G8-Q2A · Places Data Model v1.0",
+  "status": "Approved",
+  "branch": "feature/omxds-g8-q2a-places-taxonomy-v1",
+  "blueprint": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Autorización limitada de ejecución G8-Q2A · Places Data Model sobre la base exacta 180df4ff15e6a4a3b689aa519996ad41c4bb6a06, rama feature/omxds-g8-q2a-places-taxonomy-v1, manifiesto máximo de 23 rutas y omxds_visual_v1_contracts_enabled=false. Autoriza schema aditivo, tablas y relaciones del manifiesto, catálogo estructural place_types, RLS y funciones administrativas acotadas, contratos, regeneración de tipos, pruebas, evidencia, Blueprint 19.38, PCA-2026-042, corrección de 19.37, Master Index v0.66 y sincronización de artefactos gobernados. Correcciones vinculantes aplicadas: (1) cero modificación de los cinco POI existentes, place_type_id nullable, obligatorio sólo para lugares nuevos, prohibido borrar un tipo asignado y clasificación diferida a G8-Q2C; (2) autoridad única de SEO en seo_metadata (entity_kind point_of_interest, verificado) y prohibición de relacionar place_categories con business_categories por ser taxonomía comercial que no cubre museo, zona arqueológica ni patrimonio; (3) reconciliación completa de las políticas históricas de points_of_interest con snapshot para rollback y matriz efectiva por rol; (4) nombre canónico numérico de migración. Prohibido G8-Q2B, CMS de Lugares, fixtures productivas, reclamación, filas nuevas de lugares, Tinum, Temozón, Chichén Itzá, Ek' Balam, Casa de los Venados, Zazil Tunich, Cenote Suytun, medios reales, rutas públicas, redirects, sitemap, plantillas, Qué hacer, publicación, activación del flag, PR, merge y despliegue. Ratifica además las escrituras documentales previas 19.36, 19.37 y Master Index v0.64/v0.65.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-taxonomy.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-contracts.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:q2a",
+    "bun run governance:sync",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

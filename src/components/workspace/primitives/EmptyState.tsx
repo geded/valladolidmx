@@ -37,7 +37,9 @@ export function EmptyState({
         className,
       )}
     >
-      <div className={cn("mb-4 grid size-12 place-items-center rounded-full bg-muted", TONE[variant])}>
+      <div
+        className={cn("mb-4 grid size-12 place-items-center rounded-full bg-muted", TONE[variant])}
+      >
         <Icon className="h-6 w-6" aria-hidden />
       </div>
       <h3 className="font-display text-lg">{title}</h3>

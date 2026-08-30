@@ -34,12 +34,8 @@ function surfacesOf(item: NavItem): NavSurface[] {
   return item.surfaces ?? ["sidebar", "palette"];
 }
 
-export function getNavItemsForWorkspace(
-  workspaceId: string,
-  surface: NavSurface,
-): NavItem[] {
-  const fromDef =
-    listWorkspaces().find((w) => w.id === workspaceId)?.navigation ?? [];
+export function getNavItemsForWorkspace(workspaceId: string, surface: NavSurface): NavItem[] {
+  const fromDef = listWorkspaces().find((w) => w.id === workspaceId)?.navigation ?? [];
   const all = [...fromDef, ...extra.values()].filter(
     (i) => i.workspaceId === workspaceId && surfacesOf(i).includes(surface),
   );

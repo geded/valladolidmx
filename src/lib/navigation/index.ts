@@ -14,11 +14,7 @@ export type {
   ProfileRef,
 } from "./types";
 export { DEFAULT_REGION_SLUG } from "./types";
-export {
-  resolveCanonicalPath,
-  resolveContextFromPath,
-  switchDestination,
-} from "./canonical-paths";
+export { resolveCanonicalPath, resolveContextFromPath, switchDestination } from "./canonical-paths";
 export { buildBreadcrumbs, type BuildBreadcrumbsOptions } from "./breadcrumbs";
 export {
   navigationContextToDeclaration,

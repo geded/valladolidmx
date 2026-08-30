@@ -7,22 +7,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  ArrowRight,
-  Check,
-  Circle,
-  Loader2,
-  Send,
-} from "lucide-react";
+import { ArrowRight, Check, Circle, Loader2, Send } from "lucide-react";
 import {
   getBusinessPublishChecklist,
   submitBusinessForReview,
   type PublishChecklist,
 } from "@/lib/hosting/hosting.functions";
 
-export const Route = createFileRoute(
-  "/_authenticated/cuenta/empresa/$businessId/publicacion",
-)({
+export const Route = createFileRoute("/_authenticated/cuenta/empresa/$businessId/publicacion")({
   head: () => ({
     meta: [
       { title: "Prepara tu ficha para publicar · Valladolid.mx" },
@@ -65,40 +57,32 @@ function PublicacionRoute() {
 
   return (
     <div className="max-w-3xl">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        Publicación
-      </p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Publicación</p>
       <h1 className="mt-2 text-4xl">Prepara tu ficha para publicar</h1>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-        Completa los siguientes puntos y envíanos tu ficha a revisión. Un
-        administrador la publicará una vez validada.
+        Completa los siguientes puntos y envíanos tu ficha a revisión. Un administrador la publicará
+        una vez validada.
       </p>
 
       {data.status === "in_review" && (
         <div className="mt-6 rounded-2xl border border-info/30 bg-info/5 p-4 text-sm">
-          <p className="font-medium text-foreground">
-            Tu ficha está en revisión
-          </p>
+          <p className="font-medium text-foreground">Tu ficha está en revisión</p>
           <p className="mt-1 text-muted-foreground">
-            Te avisaremos por notificación cuando un administrador la publique
-            o te devuelva con comentarios.
+            Te avisaremos por notificación cuando un administrador la publique o te devuelva con
+            comentarios.
           </p>
         </div>
       )}
 
       {data.status === "published" && (
         <div className="mt-6 rounded-2xl border border-success/30 bg-success/5 p-4 text-sm">
-          <p className="font-medium text-foreground">
-            Tu ficha está publicada
-          </p>
+          <p className="font-medium text-foreground">Tu ficha está publicada</p>
         </div>
       )}
 
       {data.review_notes && data.status === "draft" && (
         <div className="mt-6 rounded-2xl border border-warning/40 bg-warning/5 p-4 text-sm">
-          <p className="font-medium text-foreground">
-            Notas del administrador
-          </p>
+          <p className="font-medium text-foreground">Notas del administrador</p>
           <p className="mt-1 text-muted-foreground">{data.review_notes}</p>
         </div>
       )}
@@ -110,16 +94,10 @@ function PublicacionRoute() {
           ok={data.checks.gallery_count >= 3}
           label={`Galería con al menos 3 fotos (${data.checks.gallery_count})`}
         />
-        <ChecklistRow
-          ok={data.checks.description}
-          label="Descripción de al menos 80 caracteres"
-        />
+        <ChecklistRow ok={data.checks.description} label="Descripción de al menos 80 caracteres" />
         <ChecklistRow ok={data.checks.category} label="Categoría principal" />
         <ChecklistRow ok={data.checks.location} label="Ubicación" />
-        <ChecklistRow
-          ok={data.checks.contact}
-          label="Al menos un canal de contacto público"
-        />
+        <ChecklistRow ok={data.checks.contact} label="Al menos un canal de contacto público" />
       </ul>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -157,9 +135,7 @@ function ChecklistRow({ ok, label }: { ok: boolean; label: string }) {
   return (
     <li
       className={`flex items-center gap-3 rounded-xl border p-3 text-sm ${
-        ok
-          ? "border-success/30 bg-success/5"
-          : "border-border bg-card"
+        ok ? "border-success/30 bg-success/5" : "border-border bg-card"
       }`}
     >
       {ok ? (
@@ -167,9 +143,7 @@ function ChecklistRow({ ok, label }: { ok: boolean; label: string }) {
       ) : (
         <Circle className="size-4 text-muted-foreground" aria-hidden />
       )}
-      <span className={ok ? "text-foreground" : "text-muted-foreground"}>
-        {label}
-      </span>
+      <span className={ok ? "text-foreground" : "text-muted-foreground"}>{label}</span>
     </li>
   );
 }

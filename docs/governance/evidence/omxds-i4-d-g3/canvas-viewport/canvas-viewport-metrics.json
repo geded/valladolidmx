@@ -1,0 +1,245 @@
+{
+  "390": {
+    "before": {
+      "innerWidth": 390,
+      "clientWidth": 390,
+      "docScrollWidth": 390,
+      "bodyScrollWidth": 390,
+      "scrollY": 0,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 65,
+        "top": 0,
+        "right": 390,
+        "bottom": 65,
+        "left": 0
+      },
+      "headerPosition": "sticky",
+      "search": {
+        "x": 16,
+        "y": 948.015625,
+        "width": 358,
+        "height": 48.75,
+        "top": 948.015625,
+        "right": 374,
+        "bottom": 996.765625,
+        "left": 16
+      },
+      "button": {
+        "x": 330,
+        "y": 952.015625,
+        "width": 40,
+        "height": 40.75,
+        "top": 952.015625,
+        "right": 370,
+        "bottom": 992.765625,
+        "left": 330
+      }
+    },
+    "after": {
+      "innerWidth": 390,
+      "clientWidth": 390,
+      "docScrollWidth": 390,
+      "bodyScrollWidth": 390,
+      "scrollY": 600,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 65,
+        "top": 0,
+        "right": 390,
+        "bottom": 65,
+        "left": 0
+      },
+      "headerPosition": "sticky",
+      "search": {
+        "x": 16,
+        "y": 348.015625,
+        "width": 358,
+        "height": 48.75,
+        "top": 348.015625,
+        "right": 374,
+        "bottom": 396.765625,
+        "left": 16
+      },
+      "button": {
+        "x": 330,
+        "y": 352.015625,
+        "width": 40,
+        "height": 40.75,
+        "top": 352.015625,
+        "right": 370,
+        "bottom": 392.765625,
+        "left": 330
+      }
+    },
+    "headerVisibleAfter": true,
+    "buttonContained": true,
+    "overflowX": 0
+  },
+  "768": {
+    "before": {
+      "innerWidth": 768,
+      "clientWidth": 768,
+      "docScrollWidth": 768,
+      "bodyScrollWidth": 768,
+      "scrollY": 0,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 65,
+        "top": 0,
+        "right": 768,
+        "bottom": 65,
+        "left": 0
+      },
+      "headerPosition": "sticky",
+      "search": {
+        "x": 24,
+        "y": 1469.25,
+        "width": 448,
+        "height": 48.75,
+        "top": 1469.25,
+        "right": 472,
+        "bottom": 1518,
+        "left": 24
+      },
+      "button": {
+        "x": 372,
+        "y": 1473.25,
+        "width": 96,
+        "height": 40.75,
+        "top": 1473.25,
+        "right": 468,
+        "bottom": 1514,
+        "left": 372
+      }
+    },
+    "after": {
+      "innerWidth": 768,
+      "clientWidth": 768,
+      "docScrollWidth": 768,
+      "bodyScrollWidth": 768,
+      "scrollY": 600,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 65,
+        "top": 0,
+        "right": 768,
+        "bottom": 65,
+        "left": 0
+      },
+      "headerPosition": "sticky",
+      "search": {
+        "x": 24,
+        "y": 869.25,
+        "width": 448,
+        "height": 48.75,
+        "top": 869.25,
+        "right": 472,
+        "bottom": 918,
+        "left": 24
+      },
+      "button": {
+        "x": 372,
+        "y": 873.25,
+        "width": 96,
+        "height": 40.75,
+        "top": 873.25,
+        "right": 468,
+        "bottom": 914,
+        "left": 372
+      }
+    },
+    "headerVisibleAfter": true,
+    "buttonContained": true,
+    "overflowX": 0
+  },
+  "1280": {
+    "before": {
+      "innerWidth": 1280,
+      "clientWidth": 1280,
+      "docScrollWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "scrollY": 0,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 65,
+        "top": 0,
+        "right": 1280,
+        "bottom": 65,
+        "left": 0
+      },
+      "headerPosition": "sticky",
+      "search": {
+        "x": 32,
+        "y": 2030.25,
+        "width": 448,
+        "height": 48.75,
+        "top": 2030.25,
+        "right": 480,
+        "bottom": 2079,
+        "left": 32
+      },
+      "button": {
+        "x": 380,
+        "y": 2034.25,
+        "width": 96,
+        "height": 40.75,
+        "top": 2034.25,
+        "right": 476,
+        "bottom": 2075,
+        "left": 380
+      }
+    },
+    "after": {
+      "innerWidth": 1280,
+      "clientWidth": 1280,
+      "docScrollWidth": 1280,
+      "bodyScrollWidth": 1280,
+      "scrollY": 633,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 98,
+        "top": 0,
+        "right": 1280,
+        "bottom": 98,
+        "left": 0
+      },
+      "headerPosition": "sticky",
+      "search": {
+        "x": 32,
+        "y": 1430.25,
+        "width": 448,
+        "height": 48.75,
+        "top": 1430.25,
+        "right": 480,
+        "bottom": 1479,
+        "left": 32
+      },
+      "button": {
+        "x": 380,
+        "y": 1434.25,
+        "width": 96,
+        "height": 40.75,
+        "top": 1434.25,
+        "right": 476,
+        "bottom": 1475,
+        "left": 380
+      }
+    },
+    "headerVisibleAfter": true,
+    "buttonContained": true,
+    "overflowX": 0
+  }
+}

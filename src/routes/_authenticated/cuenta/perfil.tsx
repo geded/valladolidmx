@@ -6,15 +6,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Briefcase,
-  Headphones,
-  Shield,
-  Mail,
-  UserRound,
-  Sparkles,
-  Check,
-} from "lucide-react";
+import { Briefcase, Headphones, Shield, Mail, UserRound, Sparkles, Check } from "lucide-react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,10 +20,7 @@ import {
   upsertMyPersonalProfile,
   type PersonalProfileInput,
 } from "@/lib/traveler/profile-personal.functions";
-import {
-  getProfileModeState,
-  type ProfileMode,
-} from "@/lib/profile-mode/mode.functions";
+import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
 import { ROLE_LABELS } from "@/types/auth";
 import { AvatarUploader } from "@/components/traveler/AvatarUploader";
 import { toast } from "@/lib/toast";
@@ -222,11 +211,7 @@ function CuentaPerfilPage() {
           <AvatarUploader
             userId={user?.id}
             currentUrl={personalForm.avatar_url ?? personal?.avatar_url}
-            displayName={
-              personalForm.first_name ||
-              personal?.display_name ||
-              user?.email
-            }
+            displayName={personalForm.first_name || personal?.display_name || user?.email}
             onUploaded={(url) => setPersonalForm({ ...personalForm, avatar_url: url })}
           />
           <div className="min-w-0 flex-1">
@@ -284,30 +269,21 @@ function CuentaPerfilPage() {
             />
           </div>
 
-          <FieldShell
-            label="Correo electrónico"
-            hint="Se toma de tu inicio de sesión."
-          >
+          <FieldShell label="Correo electrónico" hint="Se toma de tu inicio de sesión.">
             <div className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
               <Mail className="size-4 shrink-0" aria-hidden />
               <span className="truncate">{personal?.email ?? user?.email ?? "—"}</span>
             </div>
           </FieldShell>
 
-          <FieldShell
-            label="Teléfono"
-            hint="Con lada internacional. Elige tu país en la bandera."
-          >
+          <FieldShell label="Teléfono" hint="Con lada internacional. Elige tu país en la bandera.">
             <PhoneInput
               defaultCountry="mx"
               value={personalForm.phone ?? ""}
-              onChange={(v) =>
-                setPersonalForm({ ...personalForm, phone: v || null })
-              }
+              onChange={(v) => setPersonalForm({ ...personalForm, phone: v || null })}
               inputClassName="!w-full !rounded-r-md !border-border !bg-background !py-2 !text-sm"
               countrySelectorStyleProps={{
-                buttonClassName:
-                  "!rounded-l-md !border-border !bg-background !py-2 !px-2",
+                buttonClassName: "!rounded-l-md !border-border !bg-background !py-2 !px-2",
               }}
               className="w-full"
             />
@@ -323,18 +299,13 @@ function CuentaPerfilPage() {
             />
           </FieldShell>
 
-          <FieldShell
-            label="Idioma preferido"
-            hint="Alux te responderá en este idioma."
-          >
+          <FieldShell label="Idioma preferido" hint="Alux te responderá en este idioma.">
             <div className="flex flex-wrap gap-2">
               {LANGS.map((l) => (
                 <ChipButton
                   key={l.value}
                   active={personalForm.preferred_language === l.value}
-                  onClick={() =>
-                    setPersonalForm({ ...personalForm, preferred_language: l.value })
-                  }
+                  onClick={() => setPersonalForm({ ...personalForm, preferred_language: l.value })}
                 >
                   <span aria-hidden>{l.flag}</span> {l.label}
                 </ChipButton>
@@ -357,7 +328,10 @@ function CuentaPerfilPage() {
                   onClick={() => setForm({ ...form, travel_style: s.value })}
                   block
                 >
-                  <span aria-hidden className="text-base">{s.emoji}</span> {s.label}
+                  <span aria-hidden className="text-base">
+                    {s.emoji}
+                  </span>{" "}
+                  {s.label}
                 </ChipButton>
               ))}
             </div>
@@ -382,18 +356,13 @@ function CuentaPerfilPage() {
                       <Check className="size-3.5 text-primary" aria-hidden />
                     )}
                   </div>
-                  <div className="mt-0.5 text-[11px] text-muted-foreground">
-                    {b.hint}
-                  </div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">{b.hint}</div>
                 </button>
               ))}
             </div>
           </FieldShell>
 
-          <FieldShell
-            label="Intereses"
-            hint="Elige todos los que apliquen."
-          >
+          <FieldShell label="Intereses" hint="Elige todos los que apliquen.">
             <div className="flex flex-wrap gap-2">
               {INTEREST_SUGGESTIONS.map((i) => (
                 <ChipButton
@@ -434,9 +403,7 @@ function CuentaPerfilPage() {
         </SectionCard>
 
         {mutation.error ? (
-          <p className="text-sm text-destructive">
-            {String((mutation.error as Error).message)}
-          </p>
+          <p className="text-sm text-destructive">{String((mutation.error as Error).message)}</p>
         ) : null}
 
         <div className="sticky bottom-0 -mx-1 flex items-center justify-end gap-3 rounded-2xl border border-border bg-card/95 p-3 backdrop-blur">
@@ -473,13 +440,9 @@ function SectionCard({
 }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-        {eyebrow}
-      </p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
       <h2 className="mt-1 text-lg font-semibold">{title}</h2>
-      {subtitle && (
-        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-      )}
+      {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       <div className="mt-5 grid gap-5">{children}</div>
     </section>
   );
@@ -554,13 +517,7 @@ const COUNTRIES = [
   { code: "AU", flag: "🇦🇺", name: "Australia" },
 ];
 
-function CountrySelect({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function CountrySelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const known = COUNTRIES.find((c) => c.name === value);
   return (
     <div className="flex items-center gap-2">
@@ -682,14 +639,11 @@ function NonTravelerAccount({ mode }: { mode: Exclude<ProfileMode, "traveler"> }
   const { Icon } = meta;
   return (
     <div className="max-w-3xl">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        {meta.eyebrow}
-      </p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{meta.eyebrow}</p>
       <h1 className="mt-2 text-4xl">Mi cuenta</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Datos personales y funciones asociadas a este modo. Para editar tus
-        preferencias de viaje cambia al modo <strong>Viajero</strong> desde el
-        menú de tu foto.
+        Datos personales y funciones asociadas a este modo. Para editar tus preferencias de viaje
+        cambia al modo <strong>Viajero</strong> desde el menú de tu foto.
       </p>
 
       <section className="mt-8 rounded-2xl border border-border bg-card p-5">

@@ -111,8 +111,8 @@ function CatalogoPage() {
         </p>
         <h1 className="mt-1 text-3xl font-semibold">Catálogo</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {active.display_name} · Productos y promociones de tu empresa. La
-          publicación final permanece reservada al equipo editorial.
+          {active.display_name} · Productos y promociones de tu empresa. La publicación final
+          permanece reservada al equipo editorial.
         </p>
       </header>
 
@@ -149,13 +149,16 @@ function ProductsPanel({ businessId }: { businessId: string }) {
   const reqRevFn = useServerFn(requestProductReview);
   const wdRevFn = useServerFn(withdrawProductReview);
 
-  const { data: items = [], isLoading, error } = useQuery({
+  const {
+    data: items = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["portal", "products", businessId],
     queryFn: () => listFn({ data: { businessId } }),
   });
 
-  const refresh = () =>
-    qc.invalidateQueries({ queryKey: ["portal", "products", businessId] });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "products", businessId] });
 
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
@@ -186,12 +189,11 @@ function ProductsPanel({ businessId }: { businessId: string }) {
       setStatus("Producto creado.");
       refresh();
     },
-    onError: (e) =>
-      {
-        const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
-        setStatus(msg);
-        toast.error(msg);
-      },
+    onError: (e) => {
+      const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
+      setStatus(msg);
+      toast.error(msg);
+    },
   });
 
   return (
@@ -206,9 +208,7 @@ function ProductsPanel({ businessId }: { businessId: string }) {
           {creating ? "Cancelar" : "Nuevo producto"}
         </button>
       </div>
-      {status && (
-        <p className="mb-3 text-xs text-muted-foreground">{status}</p>
-      )}
+      {status && <p className="mb-3 text-xs text-muted-foreground">{status}</p>}
 
       {creating && (
         <form
@@ -283,9 +283,7 @@ function ProductsPanel({ businessId }: { businessId: string }) {
         </form>
       )}
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Cargando productos…</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Cargando productos…</p>}
       {error && (
         <p className="text-sm text-destructive">
           {error instanceof Error ? error.message : "Error desconocido"}
@@ -303,18 +301,10 @@ function ProductsPanel({ businessId }: { businessId: string }) {
           <ProductRow
             key={p.id}
             product={p}
-            onUpdate={(patch) =>
-              updateFn({ data: { productId: p.id, ...patch } }).then(refresh)
-            }
-            onArchive={() =>
-              archiveFn({ data: { productId: p.id } }).then(refresh)
-            }
-            onRequestReview={() =>
-              reqRevFn({ data: { productId: p.id } }).then(refresh)
-            }
-            onWithdrawReview={() =>
-              wdRevFn({ data: { productId: p.id } }).then(refresh)
-            }
+            onUpdate={(patch) => updateFn({ data: { productId: p.id, ...patch } }).then(refresh)}
+            onArchive={() => archiveFn({ data: { productId: p.id } }).then(refresh)}
+            onRequestReview={() => reqRevFn({ data: { productId: p.id } }).then(refresh)}
+            onWithdrawReview={() => wdRevFn({ data: { productId: p.id } }).then(refresh)}
             onRefresh={refresh}
           />
         ))}
@@ -479,13 +469,16 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
   const reqRevFn = useServerFn(requestPromotionReview);
   const wdRevFn = useServerFn(withdrawPromotionReview);
 
-  const { data: items = [], isLoading, error } = useQuery({
+  const {
+    data: items = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["portal", "promotions", businessId],
     queryFn: () => listFn({ data: { businessId } }),
   });
 
-  const refresh = () =>
-    qc.invalidateQueries({ queryKey: ["portal", "promotions", businessId] });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "promotions", businessId] });
 
   const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState("");
@@ -517,12 +510,11 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
       setStatus("Promoción creada.");
       refresh();
     },
-    onError: (e) =>
-      {
-        const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
-        setStatus(msg);
-        toast.error(msg);
-      },
+    onError: (e) => {
+      const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
+      setStatus(msg);
+      toast.error(msg);
+    },
   });
 
   return (
@@ -537,9 +529,7 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
           {creating ? "Cancelar" : "Nueva promoción"}
         </button>
       </div>
-      {status && (
-        <p className="mb-3 text-xs text-muted-foreground">{status}</p>
-      )}
+      {status && <p className="mb-3 text-xs text-muted-foreground">{status}</p>}
 
       {creating && (
         <form
@@ -611,18 +601,14 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
         </form>
       )}
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Cargando promociones…</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Cargando promociones…</p>}
       {error && (
         <p className="text-sm text-destructive">
           {error instanceof Error ? error.message : "Error desconocido"}
         </p>
       )}
       {!isLoading && !items.length && (
-        <p className="text-sm text-muted-foreground">
-          Aún no hay promociones registradas.
-        </p>
+        <p className="text-sm text-muted-foreground">Aún no hay promociones registradas.</p>
       )}
 
       <ul className="grid gap-3">
@@ -630,18 +616,10 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
           <PromotionRow
             key={p.id}
             promo={p}
-            onUpdate={(patch) =>
-              updateFn({ data: { promotionId: p.id, ...patch } }).then(refresh)
-            }
-            onArchive={() =>
-              archiveFn({ data: { promotionId: p.id } }).then(refresh)
-            }
-            onRequestReview={() =>
-              reqRevFn({ data: { promotionId: p.id } }).then(refresh)
-            }
-            onWithdrawReview={() =>
-              wdRevFn({ data: { promotionId: p.id } }).then(refresh)
-            }
+            onUpdate={(patch) => updateFn({ data: { promotionId: p.id, ...patch } }).then(refresh)}
+            onArchive={() => archiveFn({ data: { promotionId: p.id } }).then(refresh)}
+            onRequestReview={() => reqRevFn({ data: { promotionId: p.id } }).then(refresh)}
+            onWithdrawReview={() => wdRevFn({ data: { promotionId: p.id } }).then(refresh)}
           />
         ))}
       </ul>
@@ -667,14 +645,10 @@ function PromotionRow({
   onWithdrawReview: () => Promise<unknown>;
 }) {
   const [title, setTitle] = useState(promo.title);
-  const [discount, setDiscount] = useState(
-    promo.discount_percent?.toString() ?? "",
-  );
+  const [discount, setDiscount] = useState(promo.discount_percent?.toString() ?? "");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const dirty =
-    title !== promo.title ||
-    discount !== (promo.discount_percent?.toString() ?? "");
+  const dirty = title !== promo.title || discount !== (promo.discount_percent?.toString() ?? "");
 
   async function run<T>(fn: () => Promise<T>) {
     setBusy(true);

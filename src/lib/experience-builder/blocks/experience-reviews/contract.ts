@@ -32,25 +32,25 @@ export const EXPERIENCE_REVIEWS_CONTRACT_VERSION = "1.0.0";
  * Enums
  * ------------------------------------------------------------------ */
 export const experienceReviewsVariantSchema = z.enum([
-  "summary",   // Sólo tarjeta de reputación agregada (compacta).
-  "list",      // Lista vertical (default).
-  "grid",      // Grid de tarjetas (2/3 col).
-  "carousel",  // Scroll horizontal con snap.
-  "featured",  // Una reseña hero + secundarias.
-  "wall",      // Muro tipo masonry (densidad alta).
-  "compact",   // Franja mini con avatar + estrellas (widget-like).
+  "summary", // Sólo tarjeta de reputación agregada (compacta).
+  "list", // Lista vertical (default).
+  "grid", // Grid de tarjetas (2/3 col).
+  "carousel", // Scroll horizontal con snap.
+  "featured", // Una reseña hero + secundarias.
+  "wall", // Muro tipo masonry (densidad alta).
+  "compact", // Franja mini con avatar + estrellas (widget-like).
 ]);
 export type ExperienceReviewsVariant = z.infer<typeof experienceReviewsVariantSchema>;
 
 export const experienceReviewsSourceSchema = z.enum([
-  "manual",       // Items provistos por el editor.
-  "business",     // Reseñas de la ficha empresa (BusinessSurfaceContext).
-  "product",      // Reservado — ficha producto.
-  "destination",  // Reservado — destino.
-  "region",       // Reservado.
-  "category",     // Reservado.
-  "context",      // Reservado — Context Engine / Alux.
-  "aggregator",   // Reservado — pull server-side (Google/TripAdvisor/etc.).
+  "manual", // Items provistos por el editor.
+  "business", // Reseñas de la ficha empresa (BusinessSurfaceContext).
+  "product", // Reservado — ficha producto.
+  "destination", // Reservado — destino.
+  "region", // Reservado.
+  "category", // Reservado.
+  "context", // Reservado — Context Engine / Alux.
+  "aggregator", // Reservado — pull server-side (Google/TripAdvisor/etc.).
 ]);
 export type ExperienceReviewsSource = z.infer<typeof experienceReviewsSourceSchema>;
 
@@ -139,9 +139,7 @@ export const experienceReviewItemSchema = z.object({
   /** Respuesta oficial del negocio a esta reseña. */
   response: experienceReviewResponseSchema.nullable().default(null),
   /** Estado de moderación consultable (mostrar sólo `approved` en público). */
-  moderationStatus: z
-    .enum(["approved", "pending", "flagged", "hidden"])
-    .default("approved"),
+  moderationStatus: z.enum(["approved", "pending", "flagged", "hidden"]).default("approved"),
   /** Marca de "destacada" — puede provenir del editor o de Alux. */
   featured: z.boolean().default(false),
   /** Recomendación de Alux (reservado — I3+). */
@@ -306,10 +304,7 @@ export function computeAggregateFromItems(
   }
   let sum = 0;
   const dist: Record<1 | 2 | 3 | 4 | 5, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-  const platforms = new Map<
-    ExperienceReviewsPlatform,
-    { sum: number; count: number }
-  >();
+  const platforms = new Map<ExperienceReviewsPlatform, { sum: number; count: number }>();
   for (const it of items) {
     const norm = (it.rating / (it.ratingScale || 5)) * 5;
     sum += norm;

@@ -16,9 +16,5 @@
   "html_lang": "es",
   "h1": "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n.",
   "hreflang_count": 0,
-  "jsonld_types": [
-    "WebSite",
-    "Organization",
-    "WebPage"
-  ]
+  "jsonld_types": ["WebSite", "Organization", "WebPage"]
 }

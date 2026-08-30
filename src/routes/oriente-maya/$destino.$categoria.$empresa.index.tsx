@@ -7,10 +7,14 @@
  * Nada de UX profunda ni composición nueva: eso llega en N2.2.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
+import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
+import { getNonDiscoverableBusinessSlugs } from "@/lib/omxds/public-eligibility.functions";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceBusinessBySlug } from "@/lib/catalog/marketplace-reads.functions";
+import { stableIndexableImageUrl } from "@/lib/media/stable-public-url";
 import { getBusinessRelated } from "@/lib/catalog/business-related.functions";
 import {
   resolveTerritorialPath,
@@ -27,6 +31,7 @@ import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contr
 import { getBusinessPremiumEligibility } from "@/lib/omxds/surfaces/business-premium-eligibility.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {
@@ -38,28 +43,37 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       },
     });
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
-    const [business, specific, template, surfaceContractsEnabled] = await Promise.all([
-      getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
-      // SEO.A3.M1 · Authority Business Landing — composition-first.
-      // Se resuelve primero una composición específica por slug
-      // (`biz-<slug>`) que permite landings editoriales premium; en su
-      // ausencia la ruta cae a la plantilla oficial de negocio y, en
-      // último término, al render directo de `BusinessSurface`. Misma
-      // arquitectura que Región y Destino — cero excepciones por empresa.
-      getPublishedCompositionBySlug({
-        data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
-      }).catch(() => null),
-      getPublishedCompositionBySlug({
-        data: { slug: "__tpl_business__" },
-      }).catch(() => null),
-      getOmxdsSurfaceContractsFlag().catch(() => false),
-    ]);
+    const [business, specific, template, surfaceContractsEnabled, evaluationLot, nonDiscoverable] =
+      await Promise.all([
+        getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
+        // SEO.A3.M1 · Authority Business Landing — composition-first.
+        // Se resuelve primero una composición específica por slug
+        // (`biz-<slug>`) que permite landings editoriales premium; en su
+        // ausencia la ruta cae a la plantilla oficial de negocio y, en
+        // último término, al render directo de `BusinessSurface`. Misma
+        // arquitectura que Región y Destino — cero excepciones por empresa.
+        getPublishedCompositionBySlug({
+          data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
+        }).catch(() => null),
+        getPublishedCompositionBySlug({
+          data: { slug: "__tpl_business__" },
+        }).catch(() => null),
+        getOmxdsSurfaceContractsFlag().catch(() => false),
+        // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
+        getEvaluationLotSlugs().catch(() => null),
+        // G8-R1-F1I-R1 · DEF-F1I-001 — revisión de fuente no aprobada ⇒ noindex.
+        getNonDiscoverableBusinessSlugs().catch(() => [] as readonly string[]),
+      ]);
     if (!business) throw notFound();
-    // I3-D · lectura Premium estrictamente posterior al flag. OFF conserva
-    // incluso el mismo conjunto de consultas heredadas.
-    const premiumEligibility = surfaceContractsEnabled
-      ? await getBusinessPremiumEligibility({ data: { businessId: business.id } }).catch(() => null)
-      : null;
+    // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
+    // (fail-closed dentro del evaluador: published, is_demo_seed=false, grant
+    // activo, plan efectivo, procedencia portal, auditoría, ubicación,
+    // contacto, SEO y media aprobada). La presentación Premium depende
+    // exclusivamente de `premiumEligibility.eligible === true`; el flag global
+    // conserva su función para el resto de contratos gobernados.
+    const premiumEligibility = await getBusinessPremiumEligibility({
+      data: { businessId: business.id },
+    }).catch(() => null);
     // E2 · US-E2.1 — Related Collection contextual del negocio.
     // Fallback silencioso: si falla no rompe el render de la ficha.
     let related = null as Awaited<ReturnType<typeof getBusinessRelated>> | null;
@@ -75,6 +89,14 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       related = null;
     }
     const composition = specific ?? template ?? null;
+    // G8-R1-C2 · La decisión de presentación pasa por el resolutor canónico:
+    // override editorial aprobado → preset premium de familia → superficie
+    // estándar fail-closed. `vacation_rental` nunca se autoasigna.
+    const canonicalBinding = bindBusinessRoute({
+      businessId: business.id,
+      categorySlug: business.category_slug,
+      premiumEligible: premiumEligibility?.eligible === true,
+    });
     return {
       resolution,
       business,
@@ -82,15 +104,17 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       composition,
       surfaceContractsEnabled,
       premiumEligibility,
+      canonicalBinding,
+      inEvaluationLot:
+        isInEvaluationLot(evaluationLot, "business", params.empresa) ||
+        // G8-R1-F1I-R1 · empresa publicada sin revisión de fuente aprobada.
+        (nonDiscoverable ?? []).includes(params.empresa),
     };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
     const b = loaderData.business;
-    const premium =
-      loaderData.surfaceContractsEnabled && loaderData.premiumEligibility?.eligible
-        ? loaderData.premiumEligibility
-        : null;
+    const premium = loaderData.premiumEligibility?.eligible ? loaderData.premiumEligibility : null;
     const destName = loaderData.resolution.destination?.label ?? params.destino;
     const catName = loaderData.resolution.category?.label ?? params.categoria;
     const path = `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`;
@@ -99,11 +123,13 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       b.description.slice(0, 300) ||
       `${b.display_name} en ${destName}, Oriente Maya de Yucatán.`;
     return buildPublicHead({
+      noindex: loaderData.inEvaluationLot,
       title: `${b.display_name} · ${destName} — ${SITE.name}`,
       description,
       path,
       ogType: "profile",
-      ogImage: premium?.cover?.url ?? b.cover_url ?? undefined,
+      // 19.24 — Sólo ruta pública estable en metadatos indexables.
+      ogImage: stableIndexableImageUrl(premium?.cover?.stableUrl ?? b.cover_url),
       breadcrumbs: [
         { label: "Inicio", path: "/" },
         { label: "Oriente Maya", path: "/oriente-maya" },
@@ -116,7 +142,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
           name: b.display_name,
           description,
           path,
-          image: premium?.cover?.url ?? b.cover_url ?? undefined,
+          image: stableIndexableImageUrl(premium?.cover?.stableUrl ?? b.cover_url),
           telephone:
             (premium?.contact ?? b.primary_contact)?.type === "phone" ||
             (premium?.contact ?? b.primary_contact)?.type === "whatsapp"
@@ -162,6 +188,7 @@ function EmpresaTerritorialPage() {
     composition,
     surfaceContractsEnabled,
     premiumEligibility,
+    canonicalBinding,
   } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
@@ -173,14 +200,20 @@ function EmpresaTerritorialPage() {
     currentLabel: business.display_name,
   });
 
+  // 19.21 · V1-P1.d — la presentación Premium depende exclusivamente de la
+  // elegibilidad efectiva por ficha. El flag global sigue gobernando el resto
+  // de contratos: con el flag OFF y ficha no elegible, el render es el legado.
+  // G8-R1-C2 — punto único de decisión: el resolutor canónico.
+  const premiumEnabled = canonicalBinding.surface === "premium";
+
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
         <BusinessSurfaceContractBoundary
-          enabled={surfaceContractsEnabled}
+          enabled={surfaceContractsEnabled || premiumEnabled}
           business={business}
           related={related}
-          premiumEligibility={premiumEligibility}
+          premiumEligibility={premiumEnabled ? premiumEligibility : null}
           legacy={
             composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
           }

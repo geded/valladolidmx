@@ -38,10 +38,10 @@ export const Route = createFileRoute("/api/public/hooks/eb-process-scheduled-pub
         );
         const { data, error } = await supabase.rpc("eb_process_scheduled_publishes");
         if (error) {
-          return new Response(
-            JSON.stringify({ ok: false, error: error.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: error.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         return Response.json({
           ok: true,

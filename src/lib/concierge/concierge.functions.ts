@@ -31,12 +31,12 @@ export const listConciergeCases = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ListInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await context.supabase.rpc(
-      "concierge_case_list_for_role",
-      { _scope: data.scope, _limit: data.limit },
-    );
+    const { data: rows, error } = await context.supabase.rpc("concierge_case_list_for_role", {
+      _scope: data.scope,
+      _limit: data.limit,
+    });
     if (error) throw new Error(error.message);
-    return ((rows ?? []) as unknown as ConciergeCase[]);
+    return (rows ?? []) as unknown as ConciergeCase[];
   });
 
 const GetInput = z.object({ caseId: z.string().uuid() });
@@ -100,15 +100,12 @@ export const createConciergeCaseFromTravelPlan = createServerFn({ method: "POST"
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => FromTravelPlanInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: caseId, error } = await context.supabase.rpc(
-      "concierge_case_from_travel_plan",
-      {
-        _traveler_user_id: context.userId,
-        _summary: data.summary,
-        _items: (data.items ?? []) as Json,
-        ...(data.travelPlanId ? { _travel_plan_id: data.travelPlanId } : {}),
-      },
-    );
+    const { data: caseId, error } = await context.supabase.rpc("concierge_case_from_travel_plan", {
+      _traveler_user_id: context.userId,
+      _summary: data.summary,
+      _items: (data.items ?? []) as Json,
+      ...(data.travelPlanId ? { _travel_plan_id: data.travelPlanId } : {}),
+    });
     if (error) throw new Error(error.message);
     return caseId as string;
   });
@@ -151,14 +148,11 @@ export const requestConciergeQuote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => QuoteRequestInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: quoteId, error } = await context.supabase.rpc(
-      "concierge_quote_request",
-      {
-        _request_id: data.requestId,
-        _business_id: data.businessId,
-        _valid_for_hours: data.validForHours,
-      },
-    );
+    const { data: quoteId, error } = await context.supabase.rpc("concierge_quote_request", {
+      _request_id: data.requestId,
+      _business_id: data.businessId,
+      _valid_for_hours: data.validForHours,
+    });
     if (error) throw new Error(error.message);
     return quoteId as string;
   });
@@ -236,16 +230,13 @@ export const listBusinessConciergeQuotes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => BusinessQuotesInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await context.supabase.rpc(
-      "concierge_quotes_list_for_business",
-      {
-        _business_id: data.businessId,
-        _scope: data.scope,
-        _limit: data.limit,
-      },
-    );
+    const { data: rows, error } = await context.supabase.rpc("concierge_quotes_list_for_business", {
+      _business_id: data.businessId,
+      _scope: data.scope,
+      _limit: data.limit,
+    });
     if (error) throw new Error(error.message);
-    return ((rows ?? []) as unknown as ConciergeBusinessQuote[]);
+    return (rows ?? []) as unknown as ConciergeBusinessQuote[];
   });
 
 /* ============================================================
@@ -270,17 +261,14 @@ export const createConciergeProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ProposalCreateInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: pid, error } = await context.supabase.rpc(
-      "concierge_proposal_create",
-      {
-        _case_id: data.caseId,
-        _items: data.items as unknown as Json,
-        _summary: data.summary ?? undefined,
-        _terms: data.terms ?? undefined,
-        _valid_until: data.validUntil ?? undefined,
-        _supersedes_proposal_id: data.supersedesProposalId ?? undefined,
-      },
-    );
+    const { data: pid, error } = await context.supabase.rpc("concierge_proposal_create", {
+      _case_id: data.caseId,
+      _items: data.items as unknown as Json,
+      _summary: data.summary ?? undefined,
+      _terms: data.terms ?? undefined,
+      _valid_until: data.validUntil ?? undefined,
+      _supersedes_proposal_id: data.supersedesProposalId ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return pid as string;
   });
@@ -313,10 +301,9 @@ export const acceptConciergeProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ProposalIdInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: res, error } = await context.supabase.rpc(
-      "concierge_proposal_accept",
-      { _proposal_id: data.proposalId },
-    );
+    const { data: res, error } = await context.supabase.rpc("concierge_proposal_accept", {
+      _proposal_id: data.proposalId,
+    });
     if (error) throw new Error(error.message);
     return res as Json;
   });
@@ -342,10 +329,10 @@ export const withdrawConciergeProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ProposalReasonInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc(
-      "concierge_proposal_withdraw",
-      { _proposal_id: data.proposalId, _reason: data.reason ?? undefined },
-    );
+    const { error } = await context.supabase.rpc("concierge_proposal_withdraw", {
+      _proposal_id: data.proposalId,
+      _reason: data.reason ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -362,16 +349,13 @@ export const supersedeConciergeProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ProposalSupersedeInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: pid, error } = await context.supabase.rpc(
-      "concierge_proposal_supersede",
-      {
-        _proposal_id: data.proposalId,
-        _new_items: data.items as unknown as Json,
-        _summary: data.summary ?? undefined,
-        _terms: data.terms ?? undefined,
-        _valid_until: data.validUntil ?? undefined,
-      },
-    );
+    const { data: pid, error } = await context.supabase.rpc("concierge_proposal_supersede", {
+      _proposal_id: data.proposalId,
+      _new_items: data.items as unknown as Json,
+      _summary: data.summary ?? undefined,
+      _terms: data.terms ?? undefined,
+      _valid_until: data.validUntil ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return pid as string;
   });
@@ -381,21 +365,11 @@ export const supersedeConciergeProposal = createServerFn({ method: "POST" })
  * ============================================================ */
 
 const PriorityEnum = z.enum(["low", "normal", "high", "urgent"]);
-const PrioritySource = z.enum([
-  "manual",
-  "sla",
-  "trip_date",
-  "payment",
-  "system",
-  "alux",
-  "other",
-]);
+const PrioritySource = z.enum(["manual", "sla", "trip_date", "payment", "system", "alux", "other"]);
 const SlaStatus = z.enum(["on_time", "due_soon", "overdue"]);
 
 const ListExtendedInput = z.object({
-  scope: z
-    .enum(["traveler", "concierge", "lead", "admin", "unassigned"])
-    .default("traveler"),
+  scope: z.enum(["traveler", "concierge", "lead", "admin", "unassigned"]).default("traveler"),
   limit: z.number().int().min(1).max(200).default(50),
   sort: z
     .enum([
@@ -418,18 +392,15 @@ export const listConciergeCasesExtended = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ListExtendedInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await context.supabase.rpc(
-      "concierge_case_list_for_role",
-      {
-        _scope: data.scope,
-        _limit: data.limit,
-        _sort: data.sort,
-        _priority: data.priority ?? null,
-        _sla_status: data.slaStatus ?? null,
-        _assigned_concierge_user_id: data.assignedConciergeUserId ?? null,
-        _min_idle_minutes: data.minIdleMinutes ?? null,
-      } as never,
-    );
+    const { data: rows, error } = await context.supabase.rpc("concierge_case_list_for_role", {
+      _scope: data.scope,
+      _limit: data.limit,
+      _sort: data.sort,
+      _priority: data.priority ?? null,
+      _sla_status: data.slaStatus ?? null,
+      _assigned_concierge_user_id: data.assignedConciergeUserId ?? null,
+      _min_idle_minutes: data.minIdleMinutes ?? null,
+    } as never);
     if (error) throw new Error(error.message);
     return (rows ?? []) as unknown as Json[];
   });
@@ -465,14 +436,11 @@ export const reassignConciergeCase = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { data: id, error } = await context.supabase.rpc(
-      "concierge_case_reassign",
-      {
-        _case_id: data.caseId,
-        _new_concierge_user_id: data.newConciergeUserId,
-        _reason: data.reason ?? undefined,
-      },
-    );
+    const { data: id, error } = await context.supabase.rpc("concierge_case_reassign", {
+      _case_id: data.caseId,
+      _new_concierge_user_id: data.newConciergeUserId,
+      _reason: data.reason ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return id as string;
   });
@@ -505,15 +473,12 @@ export const setConciergeCasePriority = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => SetPriorityInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc(
-      "concierge_case_set_priority",
-      {
-        _case_id: data.caseId,
-        _priority: data.priority,
-        _source: data.source,
-        _reason: data.reason ?? undefined,
-      },
-    );
+    const { error } = await context.supabase.rpc("concierge_case_set_priority", {
+      _case_id: data.caseId,
+      _priority: data.priority,
+      _source: data.source,
+      _reason: data.reason ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -528,14 +493,11 @@ export const setConciergeCaseTargetResponse = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => SetTargetInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc(
-      "concierge_case_set_target_response",
-      {
-        _case_id: data.caseId,
-        _target_response_at: data.targetResponseAt ?? (undefined as unknown as string),
-        _reason: data.reason ?? undefined,
-      },
-    );
+    const { error } = await context.supabase.rpc("concierge_case_set_target_response", {
+      _case_id: data.caseId,
+      _target_response_at: data.targetResponseAt ?? (undefined as unknown as string),
+      _reason: data.reason ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -551,9 +513,7 @@ export const getConciergeMyWorkload = createServerFn({ method: "GET" })
 export const getConciergeWorkloadForLead = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc(
-      "concierge_workload_for_lead",
-    );
+    const { data, error } = await context.supabase.rpc("concierge_workload_for_lead");
     if (error) throw new Error(error.message);
-    return ((data ?? []) as unknown as Json[]);
+    return (data ?? []) as unknown as Json[];
   });

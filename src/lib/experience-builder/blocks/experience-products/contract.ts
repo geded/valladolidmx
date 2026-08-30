@@ -43,20 +43,20 @@ export type ExperienceEntityKind = z.infer<typeof experienceEntityKindSchema>;
  * Enums
  * ------------------------------------------------------------------ */
 export const experienceProductsVariantSchema = z.enum([
-  "grid",       // Grid de tarjetas — default.
-  "list",       // Lista vertical (mobile-first, denso).
-  "carousel",   // Scroll horizontal con snap.
-  "featured",   // Uno destacado + secundarios.
+  "grid", // Grid de tarjetas — default.
+  "list", // Lista vertical (mobile-first, denso).
+  "carousel", // Scroll horizontal con snap.
+  "featured", // Uno destacado + secundarios.
 ]);
 export type ExperienceProductsVariant = z.infer<typeof experienceProductsVariantSchema>;
 
 export const experienceProductsSourceSchema = z.enum([
-  "manual",       // Items provistos por el editor.
-  "business",     // Hidrata desde `BusinessSurfaceContext` (I2.a).
-  "destination",  // Reservado (I2.d+ / Ola I3).
-  "region",       // Reservado.
-  "category",     // Reservado.
-  "context",      // Reservado — resolución vía Context Engine + Alux.
+  "manual", // Items provistos por el editor.
+  "business", // Hidrata desde `BusinessSurfaceContext` (I2.a).
+  "destination", // Reservado (I2.d+ / Ola I3).
+  "region", // Reservado.
+  "category", // Reservado.
+  "context", // Reservado — resolución vía Context Engine + Alux.
 ]);
 export type ExperienceProductsSource = z.infer<typeof experienceProductsSourceSchema>;
 

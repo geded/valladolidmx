@@ -1,0 +1,84 @@
+{
+  "preview_invalid_token": {
+    "failClosedMessage": true,
+    "excerpt": "Saltar al contenido ES Empresas Contacto Blog ES Iniciar sesi\u00f3n Vista previa no disponible Este enlace no es v\u00e1lido o ya caduc\u00f3. Plataforma oficial del Oriente Maya de Yucat\u00e1n. Explorar Destinos Exper",
+    "robots": "noindex, nofollow"
+  },
+  "keyboard_sweep": {
+    "steps": 25,
+    "uniqueStops": 17,
+    "noFocusIndicator": [],
+    "first10": [
+      {
+        "tag": "A",
+        "label": "Saltar al contenido",
+        "outline": "solid 2px",
+        "ring": false,
+        "visible": true
+      },
+      {
+        "tag": "A",
+        "label": "Inicio",
+        "outline": "solid 2px",
+        "ring": false,
+        "visible": true
+      },
+      {
+        "tag": "BUTTON",
+        "label": "ES",
+        "outline": "solid 0px",
+        "ring": false,
+        "visible": true
+      },
+      {
+        "tag": "A",
+        "label": "Iniciar sesi\u00f3n",
+        "outline": "solid 0px",
+        "ring": true,
+        "visible": true
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Men\u00fa",
+        "outline": "solid 0px",
+        "ring": false,
+        "visible": true
+      },
+      {
+        "tag": "A",
+        "label": "Mapa Oriente Maya",
+        "outline": "solid 0px",
+        "ring": true,
+        "visible": true
+      },
+      {
+        "tag": "BUTTON",
+        "label": "DESTINO\n\u00bfA d\u00f3nde vas?",
+        "outline": "none 0px",
+        "ring": true,
+        "visible": true
+      },
+      {
+        "tag": "BUTTON",
+        "label": "CATEGOR\u00cdA\n\u00bfQu\u00e9 buscas?",
+        "outline": "none 0px",
+        "ring": true,
+        "visible": true
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Buscar",
+        "outline": "none 0px",
+        "ring": true,
+        "visible": true
+      },
+      {
+        "tag": "A",
+        "label": "Valladolid",
+        "outline": "solid 2px",
+        "ring": false,
+        "visible": true
+      }
+    ]
+  }
+}

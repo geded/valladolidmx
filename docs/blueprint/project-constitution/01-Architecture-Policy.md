@@ -11,7 +11,7 @@ Cada dominio funcional tiene **una única fuente de verdad**. El dominio editori
 
 Prohibido crear un segundo modelo de persistencia para la misma capacidad sin autorización expresa del Founder.
 
-Fuente: `15.10.4d-INICIATIVA-3-FASE-3.3c-COMPLETION-REPORT.md`, memoria Core *Single Source of Truth Policy*.
+Fuente: `15.10.4d-INICIATIVA-3-FASE-3.3c-COMPLETION-REPORT.md`, memoria Core _Single Source of Truth Policy_.
 
 ## 2. CompositionRenderer Freeze
 
@@ -35,7 +35,7 @@ El núcleo del Workspace Engine es estable (15.10.5a). Futuras adendas migran ca
 
 Único constructor editorial de la plataforma. Cubre todas las superficies públicas (presentes y futuras). Ninguna funcionalidad editorial se desarrolla fuera del Experience Builder sin justificación técnica documentada y aprobada.
 
-Fuente: memoria Core *Single Studio Principle*, *Experience Builder Vision*, *Experience Builder Mission Rule*.
+Fuente: memoria Core _Single Studio Principle_, _Experience Builder Vision_, _Experience Builder Mission Rule_.
 
 ## 7. Preview Registry
 
@@ -53,7 +53,7 @@ El cliente **nunca** consulta tablas directamente. Toda lectura/escritura pasa p
 
 Todo componente de Workspace, Surface Kit, Experience Builder o Discovery se diseña como infraestructura reutilizable por Founder, Portal, Concierge, CMS, Cuenta y Discovery.
 
-Fuente: memoria Core *Build Once, Reuse Everywhere*.
+Fuente: memoria Core _Build Once, Reuse Everywhere_.
 
 ## 11. No Duplicate Models
 
@@ -63,7 +63,7 @@ Prohibido duplicar modelos de dominio. Ejemplo vigente: Travel Workspace usa exc
 
 Prohibido crear nuevos engines, providers, registries, capas o sistemas de navegación/diseño paralelos. Reutilizar exclusivamente: Experience Builder, Workspace Engine, Discovery Layer, PWA, Lovable Cloud y AI Gateway.
 
-Fuente: memoria Core *Infrastructure Freeze reforzada*.
+Fuente: memoria Core _Infrastructure Freeze reforzada_.
 
 ## 13. Estándares oficiales aprobados
 

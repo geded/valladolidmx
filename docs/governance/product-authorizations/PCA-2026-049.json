@@ -1,0 +1,83 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-049",
+  "title": "19.45 · G8-R1 · Paridad productiva de todas las plantillas premium",
+  "status": "Approved",
+  "branch": "edit/edt-7fc66f31-57a7-4121-b168-b2486cd846c2",
+  "blueprint": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1 (2026-08-28) sobre el inventario probatorio de Fase 0. Se acepta el manifiesto de seis olas R1-A..R1-F y se fija el tratamiento vinculante de H-R1-01: vía canónica única de datos reales, las consultas productivas de las seis rutas de listado son la fuente de verdad, los presets premium G5 consumen esas mismas lecturas tipadas, prohibido publicar o convertir fixtures en contenido productivo, Studio/preview/ruta pública renderizan el mismo contrato y la misma superficie reusable, sin dos implementaciones visuales divergentes y sin modificar datos reales ni su estado editorial. premium-entity-vacation-rental se conserva en el programa con autoAssign=false y status pendiente_aceptacion_founder, sin conexión pública ni asignación a negocios reales, con preview controlada sometida a aprobación visual Founder en R1-D. Invariantes: omxds_visual_v1_contracts_enabled=false, cero publicación, cero redirects, cero modificación de entidades reales, Chichén Itzá y Ek' Balam en draft, la plantilla de Lugares no se degrada, ningún fixture llega a ruta productiva, ninguna plantilla se declara productiva sólo por aparecer en Studio, ningún selector Editorial/Cinematográfica queda decorativo y todos los medios cumplen G8-M1. Prohibido expresamente: migraciones o schema nuevo, publicación, redirects, activación de flags, PR, merge y despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/listings/listing-public-contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/listings/listing-public-reads.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/ListingPremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/listing-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/hoteles.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/restaurantes.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/experiencias.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/casas-de-vacaciones.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/que-hacer.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/entity-premium-templates.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/premium-template-registry.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:q2d:a",
+    "bun run validate:q2d:b",
+    "bun run validate:r1:a"
+  ]
+}

@@ -453,9 +453,9 @@ Cuando la realidad técnica del proyecto entre en conflicto con estos principios
 
 ## 15. Control de Versiones
 
-| Versión | Fecha       | Autor    | Descripción                                                       |
-|---------|-------------|----------|-------------------------------------------------------------------|
-| v1.0    | 2026-07-18  | Founder  | Emisión inicial de la Constitución Técnica de Valladolid.mx.      |
+| Versión | Fecha      | Autor   | Descripción                                                  |
+| ------- | ---------- | ------- | ------------------------------------------------------------ |
+| v1.0    | 2026-07-18 | Founder | Emisión inicial de la Constitución Técnica de Valladolid.mx. |
 
 Este documento se versiona junto al CANON y al GLOSSARY. Su versión mayor sólo cambia cuando se redefine su alcance o su filosofía; los cambios editoriales incrementan la versión menor.
 

@@ -90,11 +90,7 @@ export function PromocionesGate({
   return (
     <div className="space-y-5">
       {!eligible && status !== "loading" ? (
-        <GateBanner
-          status={status}
-          onOpen={() => setOpen(true)}
-          promoCount={promoCount}
-        />
+        <GateBanner status={status} onOpen={() => setOpen(true)} promoCount={promoCount} />
       ) : null}
 
       <div className="relative">
@@ -159,23 +155,20 @@ function GateBanner({
                 : "Completa tu perfil público para desbloquear las promociones"}
             </p>
             <p className="mt-1 text-muted-foreground">
-              Los descuentos del Oriente Maya son exclusivos para viajeros
-              con perfil público completo. Así los negocios saben que eres un
-              viajero real y te reservan la promoción a ti.
+              Los descuentos del Oriente Maya son exclusivos para viajeros con perfil público
+              completo. Así los negocios saben que eres un viajero real y te reservan la promoción a
+              ti.
             </p>
             {promoCount > 0 ? (
               <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
                 <Sparkles className="size-3.5" aria-hidden />
-                {promoCount} {promoCount === 1 ? "promoción activa" : "promociones activas"} ahora mismo
+                {promoCount} {promoCount === 1 ? "promoción activa" : "promociones activas"} ahora
+                mismo
               </p>
             ) : null}
           </div>
         </div>
-        <Button
-          type="button"
-          onClick={onOpen}
-          className="w-full shrink-0 sm:w-auto"
-        >
+        <Button type="button" onClick={onOpen} className="w-full shrink-0 sm:w-auto">
           {isGuest ? "Registrarme" : "Completar mi perfil"}
         </Button>
       </div>
@@ -200,13 +193,11 @@ function UnlockDialog({
           <div className="mx-auto mb-2 grid size-12 place-items-center rounded-full bg-primary/15 text-primary">
             <Lock className="size-6" aria-hidden />
           </div>
-          <DialogTitle className="text-center">
-            Promoción bloqueada
-          </DialogTitle>
+          <DialogTitle className="text-center">Promoción bloqueada</DialogTitle>
           <DialogDescription className="text-center">
-            Los descuentos son exclusivos para viajeros del Oriente Maya con
-            perfil público completo. Es la forma de proteger la promoción
-            para quienes realmente viajan con nosotros.
+            Los descuentos son exclusivos para viajeros del Oriente Maya con perfil público
+            completo. Es la forma de proteger la promoción para quienes realmente viajan con
+            nosotros.
           </DialogDescription>
         </DialogHeader>
 
@@ -214,44 +205,35 @@ function UnlockDialog({
           <li className="flex items-start gap-2.5">
             <UserCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
             <span>
-              <strong className="text-foreground">Viajero verificado.</strong>{" "}
-              El negocio sabe que eres un viajero real, no alguien que sólo
-              vio el descuento en internet.
+              <strong className="text-foreground">Viajero verificado.</strong> El negocio sabe que
+              eres un viajero real, no alguien que sólo vio el descuento en internet.
             </span>
           </li>
           <li className="flex items-start gap-2.5">
             <QrCode className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
             <span>
-              <strong className="text-foreground">Cupón digital personal
-              (próximamente).</strong>{" "}
-              Con QR y tus datos, para presentarlo desde tu celular al
-              llegar. Nadie más puede usarlo.
+              <strong className="text-foreground">Cupón digital personal (próximamente).</strong>{" "}
+              Con QR y tus datos, para presentarlo desde tu celular al llegar. Nadie más puede
+              usarlo.
             </span>
           </li>
           <li className="flex items-start gap-2.5">
             <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
             <span>
-              <strong className="text-foreground">Alux te recomienda mejor.</strong>{" "}
-              Con tu perfil completo, tus promos aparecen ordenadas por tu
-              estilo de viaje, presupuesto e intereses.
+              <strong className="text-foreground">Alux te recomienda mejor.</strong> Con tu perfil
+              completo, tus promos aparecen ordenadas por tu estilo de viaje, presupuesto e
+              intereses.
             </span>
           </li>
         </ul>
 
         <DialogFooter className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Ahora no
           </Button>
           {isGuest ? (
             <Button asChild>
-              <Link
-                to="/auth"
-                search={{ next: "/cuenta/perfil-publico" } as never}
-              >
+              <Link to="/auth" search={{ next: "/cuenta/perfil-publico" } as never}>
                 Registrarme
               </Link>
             </Button>

@@ -11,21 +11,21 @@
 
 13 contratos, todos importan `zod` a nivel de módulo (`import { z } from "zod"`).
 
-| Contrato | Refs Zod | Madurez schema |
-|---|---:|---|
-| experience-related-collection | 146 | Alta (unions, refinements, defaults) |
-| experience-reviews | 120 | Alta |
-| experience-promotions | 94 | Alta |
-| experience-products | 87 | Alta |
-| experience-hero | 69 | Alta |
-| experience-gallery | 48 | Media |
-| experience-section | 45 | Media |
-| experience-cta-bar | 40 | Media |
-| experience-institutional-badges | 39 | Media |
-| experience-features | 35 | Baja |
-| experience-subnav | 33 | Baja |
-| experience-info-grid | 33 | Baja |
-| experience-map | 30 | Baja |
+| Contrato                        | Refs Zod | Madurez schema                       |
+| ------------------------------- | -------: | ------------------------------------ |
+| experience-related-collection   |      146 | Alta (unions, refinements, defaults) |
+| experience-reviews              |      120 | Alta                                 |
+| experience-promotions           |       94 | Alta                                 |
+| experience-products             |       87 | Alta                                 |
+| experience-hero                 |       69 | Alta                                 |
+| experience-gallery              |       48 | Media                                |
+| experience-section              |       45 | Media                                |
+| experience-cta-bar              |       40 | Media                                |
+| experience-institutional-badges |       39 | Media                                |
+| experience-features             |       35 | Baja                                 |
+| experience-subnav               |       33 | Baja                                 |
+| experience-info-grid            |       33 | Baja                                 |
+| experience-map                  |       30 | Baja                                 |
 
 ### 1.2 Otros imports de Zod (58 archivos)
 
@@ -47,6 +47,7 @@ Los 13 `*Block.tsx` wrappers importan a runtime el schema Zod del contrato corre
 Atribución P3: **≈ 68 KB raw / ≈ 22 KB gzip** asignados a `npm:zod` en el entry.
 
 Confirmado en cliente:
+
 - `Experience*.tsx` (presentacional puro): `import type` únicamente. No es la fuente de la fuga.
 - `Experience*Block.tsx`: `import { *ConfigSchema }` runtime. **Fuente confirmada.**
 - `adapters/*.ts`: `import type` únicamente.
@@ -55,15 +56,15 @@ Confirmado en cliente:
 
 ## 2. Qué contratos requieren validación runtime
 
-| Superficie | ¿Runtime validation? | Motivo |
-|---|---|---|
-| Studio (Visual + Profesional) | Sí | Editar/guardar `config`; feedback en línea. |
-| CMS server fns (`savePageComposition`, `syncBlockLibrary`, `validateComposition`) | Sí | Único punto de escritura; integridad de datos. |
-| Experience Builder canvas | Sí | Aplicación de mutaciones cliente. |
-| Preview (`/preview/composition.$token`) | Parcial | `config` ya persistido y validado; render puede confiar en tipos. |
-| Superficies públicas (`/`, `/l/*`, `/p/*`, `/producto/*`, `/oriente-maya/*`, `/arma-tu-viaje`, `/alux`) | **No** | Lectura de `config` ya validado en escritura. |
-| Adapters (`adapters/*.ts`) | No | Sólo tipos. |
-| Renderers presentacionales (`Experience*.tsx`) | No | Sólo tipos. |
+| Superficie                                                                                              | ¿Runtime validation? | Motivo                                                            |
+| ------------------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
+| Studio (Visual + Profesional)                                                                           | Sí                   | Editar/guardar `config`; feedback en línea.                       |
+| CMS server fns (`savePageComposition`, `syncBlockLibrary`, `validateComposition`)                       | Sí                   | Único punto de escritura; integridad de datos.                    |
+| Experience Builder canvas                                                                               | Sí                   | Aplicación de mutaciones cliente.                                 |
+| Preview (`/preview/composition.$token`)                                                                 | Parcial              | `config` ya persistido y validado; render puede confiar en tipos. |
+| Superficies públicas (`/`, `/l/*`, `/p/*`, `/producto/*`, `/oriente-maya/*`, `/arma-tu-viaje`, `/alux`) | **No**               | Lectura de `config` ya validado en escritura.                     |
+| Adapters (`adapters/*.ts`)                                                                              | No                   | Sólo tipos.                                                       |
+| Renderers presentacionales (`Experience*.tsx`)                                                          | No                   | Sólo tipos.                                                       |
 
 **Conclusión:** validación runtime imprescindible sólo en la ruta de **escritura/edición**. La ruta de **lectura/render público** requiere únicamente tipos + defaults.
 
@@ -86,16 +87,16 @@ Todas se benefician del contrato render-only.
 
 ## 4. Dependencias por consumidor
 
-| Consumidor | Necesita | Estado actual | Objetivo C2 |
-|---|---|---|---|
-| Studio Visual (`VisualStudio.tsx`) | Schemas Zod + tipos + defaults + validación campo a campo | Runtime Zod completo | Sin cambios (chunk Studio ya aislado en H2·P2) |
-| Studio Profesional | Idem | Runtime Zod | Sin cambios |
-| Server fns `savePageComposition` / `syncBlockLibrary` / `validateComposition` | Schemas Zod | Runtime Zod (server bundle) | Sin cambios |
-| Preview | Tipos + renderer | Runtime Zod vía Blocks | **Renderer render-only** |
-| CMS admin panels de edición | Schemas Zod | Runtime Zod | Sin cambios |
-| `CompositionRenderer` (público) | Tipos + defaults ligeros | Runtime Zod (leak entry) | **Renderer render-only** |
-| Adapters | Tipos | `import type` ya | Sin cambios |
-| `block-library.ts` / `block-registry.ts` | Metadatos + schema descriptor | Sin Zod runtime propio | Sin cambios |
+| Consumidor                                                                    | Necesita                                                  | Estado actual               | Objetivo C2                                    |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------- | ---------------------------------------------- |
+| Studio Visual (`VisualStudio.tsx`)                                            | Schemas Zod + tipos + defaults + validación campo a campo | Runtime Zod completo        | Sin cambios (chunk Studio ya aislado en H2·P2) |
+| Studio Profesional                                                            | Idem                                                      | Runtime Zod                 | Sin cambios                                    |
+| Server fns `savePageComposition` / `syncBlockLibrary` / `validateComposition` | Schemas Zod                                               | Runtime Zod (server bundle) | Sin cambios                                    |
+| Preview                                                                       | Tipos + renderer                                          | Runtime Zod vía Blocks      | **Renderer render-only**                       |
+| CMS admin panels de edición                                                   | Schemas Zod                                               | Runtime Zod                 | Sin cambios                                    |
+| `CompositionRenderer` (público)                                               | Tipos + defaults ligeros                                  | Runtime Zod (leak entry)    | **Renderer render-only**                       |
+| Adapters                                                                      | Tipos                                                     | `import type` ya            | Sin cambios                                    |
+| `block-library.ts` / `block-registry.ts`                                      | Metadatos + schema descriptor                             | Sin Zod runtime propio      | Sin cambios                                    |
 
 ---
 
@@ -149,11 +150,11 @@ Atribución P3 a `npm:zod` en el entry: **68 068 B raw / ≈ 22 KB gzip**.
 
 Escenarios sobre el entry:
 
-| Escenario | Zod removido del entry | Δ raw | Δ gzip | Δ brotli |
-|---|---|---:|---:|---:|
-| A · 13 bloques render-only | 100 % | ≈ −68 KB | **−20 a −22 KB** | −16 a −18 KB |
-| B · 5 bloques altos únicamente | ~70 % | ≈ −48 KB | −14 a −15 KB | −12 KB |
-| C · Solo lazy-load Studio (no refactor) | 0 % del entry | 0 | 0 | 0 |
+| Escenario                               | Zod removido del entry |    Δ raw |           Δ gzip |     Δ brotli |
+| --------------------------------------- | ---------------------- | -------: | ---------------: | -----------: |
+| A · 13 bloques render-only              | 100 %                  | ≈ −68 KB | **−20 a −22 KB** | −16 a −18 KB |
+| B · 5 bloques altos únicamente          | ~70 %                  | ≈ −48 KB |     −14 a −15 KB |       −12 KB |
+| C · Solo lazy-load Studio (no refactor) | 0 % del entry          |        0 |                0 |            0 |
 
 **Objetivo declarado C2:** Escenario A → **≈ −13 % gzip** del entry (154 KB → ~132 KB) sin degradar Studio ni Preview.
 
@@ -210,16 +211,16 @@ Ahorro atribuible medido con el mismo protocolo H2·FASE 1 (comparación baselin
 
 Patrón repetido para los 13 bloques. Se muestra `experience-hero` como plantilla:
 
-| Archivo | Contrato actual | Contrato propuesto | Consumidores | Riesgo |
-|---|---|---|---|---|
-| `blocks/experience-hero/contract.ts` | Zod + types + defaults inline | Zod + re-export types + import defaults | Studio, server fns, adapters (tipos), editor wrapper | Medio |
-| `blocks/experience-hero/types.ts` | — | Types TS puros (**nuevo**) | Renderer render-only, adapters, presentacional | Bajo |
-| `blocks/experience-hero/defaults.ts` | — | Defaults tipados (**nuevo**) | Renderer render-only, `contract.ts` `.default()` | Bajo |
-| `components/.../ExperienceHeroBlock.tsx` | Importa schema Zod, ejecuta `safeParse` | Se divide en `.render.tsx` (types+defaults) y `.editor.tsx` (schema) | `CompositionRenderer` (render), `VisualStudio` (editor) | Medio |
-| `composition-renderer.tsx` | Importa `Block.tsx` (con Zod) | Importa `Block.render.tsx` (sin Zod) | Todas las rutas públicas | Alto (SSR) |
-| `VisualStudio.tsx` | Importa `Block.tsx` | Importa `Block.editor.tsx` | Studio only | Bajo |
-| `adapters/*.ts` | `import type` | Sin cambios | Todas las superficies | Nulo |
-| `block-library.ts` | Descriptores metadata | Sin cambios | Registry, sync DB | Bajo |
+| Archivo                                  | Contrato actual                         | Contrato propuesto                                                   | Consumidores                                            | Riesgo     |
+| ---------------------------------------- | --------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------- | ---------- |
+| `blocks/experience-hero/contract.ts`     | Zod + types + defaults inline           | Zod + re-export types + import defaults                              | Studio, server fns, adapters (tipos), editor wrapper    | Medio      |
+| `blocks/experience-hero/types.ts`        | —                                       | Types TS puros (**nuevo**)                                           | Renderer render-only, adapters, presentacional          | Bajo       |
+| `blocks/experience-hero/defaults.ts`     | —                                       | Defaults tipados (**nuevo**)                                         | Renderer render-only, `contract.ts` `.default()`        | Bajo       |
+| `components/.../ExperienceHeroBlock.tsx` | Importa schema Zod, ejecuta `safeParse` | Se divide en `.render.tsx` (types+defaults) y `.editor.tsx` (schema) | `CompositionRenderer` (render), `VisualStudio` (editor) | Medio      |
+| `composition-renderer.tsx`               | Importa `Block.tsx` (con Zod)           | Importa `Block.render.tsx` (sin Zod)                                 | Todas las rutas públicas                                | Alto (SSR) |
+| `VisualStudio.tsx`                       | Importa `Block.tsx`                     | Importa `Block.editor.tsx`                                           | Studio only                                             | Bajo       |
+| `adapters/*.ts`                          | `import type`                           | Sin cambios                                                          | Todas las superficies                                   | Nulo       |
+| `block-library.ts`                       | Descriptores metadata                   | Sin cambios                                                          | Registry, sync DB                                       | Bajo       |
 
 13 bloques × 3 archivos + 1 wire-up global = 40 unidades de trabajo, agrupadas en fases (§10).
 

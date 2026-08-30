@@ -22,10 +22,7 @@ export const Route = createFileRoute("/_authenticated/concierge")({
 
 function ConciergeWorkspaceRoute() {
   const { roles } = useAuth();
-  const allowed = useMemo(
-    () => roles.some((r) => CONCIERGE_ROLES.includes(r)),
-    [roles],
-  );
+  const allowed = useMemo(() => roles.some((r) => CONCIERGE_ROLES.includes(r)), [roles]);
 
   if (!allowed) {
     return (

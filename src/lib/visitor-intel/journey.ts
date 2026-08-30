@@ -14,16 +14,16 @@ export const VISITOR_JOURNEY_CONTRACT_VERSION = "1.0.0" as const;
 
 /** 10 etapas oficiales del Visitor Journey (orden canónico). */
 export type VisitorStage =
-  | "stranger"      // 0 · Extraño — impresión externa sin sesión
-  | "anonymous"     // 1 · Anónimo — primera sesión sin identidad
-  | "identified"    // 2 · Identificado — provee email/tel o sign-in
-  | "explorer"      // 3 · Explorador — consumo con profundidad
-  | "interested"    // 4 · Interesado — señales de intención (fav/save/compare)
-  | "travel_plan"   // 5 · Travel Plan — plan propio con ≥1 item real
-  | "concierge"     // 6 · Concierge — plan promovido a caso
-  | "reservation"   // 7 · Reserva — orden/reserva confirmada
-  | "traveler"      // 8 · Viajero — Live Day activo o estancia completada
-  | "ambassador";   // 9 · Embajador — acción post-viaje que ayuda a otros
+  | "stranger" // 0 · Extraño — impresión externa sin sesión
+  | "anonymous" // 1 · Anónimo — primera sesión sin identidad
+  | "identified" // 2 · Identificado — provee email/tel o sign-in
+  | "explorer" // 3 · Explorador — consumo con profundidad
+  | "interested" // 4 · Interesado — señales de intención (fav/save/compare)
+  | "travel_plan" // 5 · Travel Plan — plan propio con ≥1 item real
+  | "concierge" // 6 · Concierge — plan promovido a caso
+  | "reservation" // 7 · Reserva — orden/reserva confirmada
+  | "traveler" // 8 · Viajero — Live Day activo o estancia completada
+  | "ambassador"; // 9 · Embajador — acción post-viaje que ayuda a otros
 
 export const VISITOR_STAGES: readonly VisitorStage[] = [
   "stranger",
@@ -170,4 +170,9 @@ export function findTransition(from: VisitorStage, to: VisitorStage): JourneyTra
  * agregaciones (anónimo vs identificado vs cliente). Reutiliza contratos
  * existentes; no inventa uno paralelo.
  */
-export type TrustLevel = "N0_anonymous" | "N1_continuity" | "N2_personalization" | "N3_operational" | "N4_transactional";
+export type TrustLevel =
+  | "N0_anonymous"
+  | "N1_continuity"
+  | "N2_personalization"
+  | "N3_operational"
+  | "N4_transactional";

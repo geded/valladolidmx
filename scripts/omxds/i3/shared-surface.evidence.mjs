@@ -2,6 +2,10 @@ import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "799cf248a92894893c75df22a229bf0255c72f91";
 const i3ZeroHead = "6ca2ebc61dbea827a28c80f5d8254096a9123e7b";
@@ -47,12 +51,8 @@ const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], { encoding: "utf8" }),
-  "",
-);
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-0");
+assertGovernedLockBaseline(base, "I3-0");
 
 const flagAlias = readFileSync("src/lib/omxds/surfaces/surface-contracts-flag.server.ts", "utf8");
 assert.match(flagAlias, /OMXDS_CARD_CONTRACTS_FLAG as OMXDS_SURFACE_CONTRACTS_FLAG/);

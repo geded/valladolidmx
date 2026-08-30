@@ -31,7 +31,9 @@ export const Route = createFileRoute("/resenar/negocio/$slug")({
   notFoundComponent: () => (
     <div className="mx-auto max-w-lg p-6 text-center">
       <p>No encontramos esta empresa.</p>
-      <Button asChild className="mt-4"><Link to="/">Volver al inicio</Link></Button>
+      <Button asChild className="mt-4">
+        <Link to="/">Volver al inicio</Link>
+      </Button>
     </div>
   ),
 });
@@ -67,7 +69,9 @@ function ReviewRoute() {
     return (
       <div className="mx-auto max-w-lg p-6 text-center">
         <p>No encontramos esta empresa.</p>
-        <Button asChild className="mt-4"><Link to="/">Volver al inicio</Link></Button>
+        <Button asChild className="mt-4">
+          <Link to="/">Volver al inicio</Link>
+        </Button>
       </div>
     );
   }

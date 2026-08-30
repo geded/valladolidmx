@@ -101,8 +101,8 @@ export function HeroSearchPill({
     >
       <div
         className={cn(
-          "flex w-full items-stretch rounded-full bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5 backdrop-blur-sm",
-          "p-1 gap-1",
+          "flex w-full min-w-0 flex-col items-stretch rounded-3xl bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5 backdrop-blur-sm",
+          "p-1 gap-1 sm:flex-row sm:rounded-full",
           maxWidthClass,
         )}
       >
@@ -112,7 +112,7 @@ export function HeroSearchPill({
             <button
               type="button"
               className={cn(
-                "group relative flex flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
+                "group relative flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
@@ -131,7 +131,10 @@ export function HeroSearchPill({
                   {destino?.name ?? destinoPlaceholder}
                 </span>
               </span>
-              <ChevronDown className="ml-auto size-3.5 shrink-0 text-muted-foreground/70" aria-hidden />
+              <ChevronDown
+                className="ml-auto size-3.5 shrink-0 text-muted-foreground/70"
+                aria-hidden
+              />
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-72 p-1.5">
@@ -149,7 +152,7 @@ export function HeroSearchPill({
         </Popover>
 
         {/* Divisor */}
-        <div aria-hidden className="my-auto h-6 w-px bg-border/70" />
+        <div aria-hidden className="mx-3 h-px bg-border/70 sm:my-auto sm:mx-0 sm:h-6 sm:w-px" />
 
         {/* Segmento: Categoría */}
         <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
@@ -157,7 +160,7 @@ export function HeroSearchPill({
             <button
               type="button"
               className={cn(
-                "group relative flex flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
+                "group relative flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openCategoria && "bg-muted/70",
               )}
@@ -176,7 +179,10 @@ export function HeroSearchPill({
                   {categoria?.name ?? categoriaPlaceholder}
                 </span>
               </span>
-              <ChevronDown className="ml-auto size-3.5 shrink-0 text-muted-foreground/70" aria-hidden />
+              <ChevronDown
+                className="ml-auto size-3.5 shrink-0 text-muted-foreground/70"
+                aria-hidden
+              />
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-1.5">
@@ -197,12 +203,13 @@ export function HeroSearchPill({
           type="submit"
           aria-label={submitLabel}
           className={cn(
-            "ml-1 inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-3 text-primary-foreground shadow-md",
+            "inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-primary-foreground shadow-md",
+            "sm:ml-1 sm:w-auto sm:px-3 sm:py-0",
             "transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
           )}
         >
           <Search className="size-4" aria-hidden />
-          <span className="hidden text-sm font-semibold sm:inline">{submitLabel}</span>
+          <span className="text-sm font-semibold">{submitLabel}</span>
         </button>
       </div>
     </form>

@@ -7,10 +7,7 @@
  * cards que quieran invocar a Alux con contexto pre-cargado.
  */
 
-export type AluxOpenReason =
-  | "nearby-suggestion"
-  | "context-chip"
-  | "manual";
+export type AluxOpenReason = "nearby-suggestion" | "context-chip" | "manual";
 
 export interface AluxOpenPayload {
   reason: AluxOpenReason;
@@ -24,9 +21,7 @@ export function openAluxFloating(payload: AluxOpenPayload): void {
   window.dispatchEvent(new CustomEvent<AluxOpenPayload>(EVENT, { detail: payload }));
 }
 
-export function onAluxFloatingOpen(
-  handler: (payload: AluxOpenPayload) => void,
-): () => void {
+export function onAluxFloatingOpen(handler: (payload: AluxOpenPayload) => void): () => void {
   if (typeof window === "undefined") return () => {};
   const listener = (ev: Event) => {
     const detail = (ev as CustomEvent<AluxOpenPayload>).detail;

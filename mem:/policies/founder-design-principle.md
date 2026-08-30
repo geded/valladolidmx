@@ -3,11 +3,13 @@ name: Founder Design Principle — Identidad ValladolidMX / Oriente Maya
 description: UX de Airbnb/TripAdvisor/Google Travel sólo como patrón; identidad visual propia. Prioridades de evolución de la Biblioteca Oficial.
 type: design
 ---
+
 Referencias externas (Airbnb, TripAdvisor, Google Travel) se usan SÓLO para adoptar patrones de usabilidad y claridad, nunca para copiar identidad visual.
 
 Cada evolución de la Biblioteca Oficial debe reforzar la sensación de estar explorando el Oriente Maya, no un directorio genérico.
 
 Prioridades obligatorias en cada iteración de bloques y superficies:
+
 1. Contexto territorial visible (destino, región, breadcrumbs, place-cues).
 2. Identidad cultural del destino (colonial, maya, artesanía, hospitalidad).
 3. Distintivos institucionales (Pueblo Mágico, Despierta en Valladolid, Oriente Maya, verificaciones).

@@ -27,8 +27,7 @@ export function MemoriesSection({ planId, orderId }: Props) {
     queryFn: () => listFn(),
   });
 
-  const invalidate = () =>
-    qc.invalidateQueries({ queryKey: ["travel-memories"] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["travel-memories"] });
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -112,13 +111,11 @@ export function MemoriesSection({ planId, orderId }: Props) {
       <section className="rounded-lg border bg-card p-5">
         <div className="mb-3 flex items-center gap-2">
           <Heart className="size-4 text-primary" aria-hidden />
-          <h2 className="font-serif text-base text-foreground">
-            Escribe un recuerdo
-          </h2>
+          <h2 className="font-serif text-base text-foreground">Escribe un recuerdo</h2>
         </div>
         <p className="mb-4 text-sm text-muted-foreground">
-          Guarda un momento, una comida, un atardecer. Sólo tú lo verás y viajará
-          contigo entre dispositivos.
+          Guarda un momento, una comida, un atardecer. Sólo tú lo verás y viajará contigo entre
+          dispositivos.
         </p>
         <form
           onSubmit={(e) => {
@@ -223,9 +220,7 @@ export function MemoriesSection({ planId, orderId }: Props) {
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between">
-          <h3 className="font-serif text-sm text-foreground">
-            Tu diario de viaje
-          </h3>
+          <h3 className="font-serif text-sm text-foreground">Tu diario de viaje</h3>
           <span className="text-xs text-muted-foreground">
             {memories.length} {memories.length === 1 ? "recuerdo" : "recuerdos"}
           </span>
@@ -285,9 +280,7 @@ function MemoryCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             {memory.title ? (
-              <h4 className="truncate font-serif text-sm text-foreground">
-                {memory.title}
-              </h4>
+              <h4 className="truncate font-serif text-sm text-foreground">{memory.title}</h4>
             ) : null}
             <span className="text-xs text-muted-foreground">{formatted}</span>
             {memory.rating ? (
@@ -298,9 +291,7 @@ function MemoryCard({
               </span>
             ) : null}
           </div>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/90">
-            {memory.body}
-          </p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/90">{memory.body}</p>
         </div>
         <button
           type="button"

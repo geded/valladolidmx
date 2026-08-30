@@ -68,13 +68,11 @@ function addMonths(d: Date, months: number): Date {
 /** Lista grants con filtros opcionales (status, business_id). */
 export const listVisibilityGrantsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { status?: string; business_id?: string; limit?: number } = {}) => ({
-      status: input?.status ?? undefined,
-      business_id: input?.business_id ?? undefined,
-      limit: Math.min(Math.max(input?.limit ?? 100, 1), 500),
-    }),
-  )
+  .inputValidator((input: { status?: string; business_id?: string; limit?: number } = {}) => ({
+    status: input?.status ?? undefined,
+    business_id: input?.business_id ?? undefined,
+    limit: Math.min(Math.max(input?.limit ?? 100, 1), 500),
+  }))
   .handler(async ({ data, context }): Promise<AdminGrantRow[]> => {
     await assertAdmin(context as never);
     let q = context.supabase
@@ -136,9 +134,7 @@ export const activateVisibilityGrant = createServerFn({ method: "POST" })
 
     const startsAt = new Date();
     const expiresAt = addMonths(startsAt, monthsForCycle(data.cycle));
-    const combinedNotes = [grant.notes, data.admin_notes]
-      .filter(Boolean)
-      .join("\n---\n");
+    const combinedNotes = [grant.notes, data.admin_notes].filter(Boolean).join("\n---\n");
 
     const { error: uErr } = await context.supabase
       .from("business_visibility_grants")
@@ -157,14 +153,15 @@ export const activateVisibilityGrant = createServerFn({ method: "POST" })
     // Ola 7.9 · Notificar activación (silent-fail).
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const [{ getVisibilityRecipient, sendVisibilityEmail }, { data: planRow }] = await Promise.all([
-        import("@/lib/visibility/visibility-notifications.server"),
-        context.supabase
-          .from("business_visibility_grants")
-          .select("plan:visibility_plans(name)")
-          .eq("id", data.grant_id)
-          .maybeSingle(),
-      ]);
+      const [{ getVisibilityRecipient, sendVisibilityEmail }, { data: planRow }] =
+        await Promise.all([
+          import("@/lib/visibility/visibility-notifications.server"),
+          context.supabase
+            .from("business_visibility_grants")
+            .select("plan:visibility_plans(name)")
+            .eq("id", data.grant_id)
+            .maybeSingle(),
+        ]);
       const recipient = await getVisibilityRecipient(supabaseAdmin, grant.business_id);
       if (recipient) {
         const result = await sendVisibilityEmail(supabaseAdmin, {
@@ -219,13 +216,9 @@ export const rejectVisibilityGrant = createServerFn({ method: "POST" })
     if (grantRow?.business_id) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { getVisibilityRecipient, sendVisibilityEmail } = await import(
-          "@/lib/visibility/visibility-notifications.server"
-        );
-        const recipient = await getVisibilityRecipient(
-          supabaseAdmin,
-          grantRow.business_id,
-        );
+        const { getVisibilityRecipient, sendVisibilityEmail } =
+          await import("@/lib/visibility/visibility-notifications.server");
+        const recipient = await getVisibilityRecipient(supabaseAdmin, grantRow.business_id);
         if (recipient) {
           const result = await sendVisibilityEmail(supabaseAdmin, {
             templateName: "visibility-rejected",

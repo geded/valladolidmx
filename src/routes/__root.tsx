@@ -33,6 +33,11 @@ import {
 // interactúa (clic, hidratación completa, evento) el chunk ya está en
 // caché del router (`preload` durante idle vía onIdlePrefetchWidgets).
 import * as React from "react";
+const AluxMemorySyncRunner = React.lazy(() =>
+  import("@/components/alux/AluxMemorySyncRunner").then((m) => ({
+    default: m.AluxMemorySyncRunner,
+  })),
+);
 const AluxFloatingTrigger = React.lazy(() =>
   import("@/components/layout/AluxFloatingTrigger").then((m) => ({
     default: m.AluxFloatingTrigger,
@@ -119,9 +124,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-2xl">Algo no cargó</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Intenta de nuevo o vuelve al inicio.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Intenta de nuevo o vuelve al inicio.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -168,7 +171,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-title", content: SITE.name },
       { name: "format-detection", content: "telephone=no" },
       // H1 · SEO Sweep — Directiva por defecto para crawlers y AI (indexable).
-      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
       { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1" },
     ],
     links: [
@@ -212,7 +218,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html
       lang="es"
       suppressHydrationWarning
-      data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : "disabled"}
+      data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>
         <HeadContent />
@@ -268,8 +274,11 @@ function RootComponent() {
       void import("@/components/travel-plan/ConciergeProposalObserver");
       void import("@/components/protected-actions/SignInPromptSheet");
     };
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number })
-      .requestIdleCallback;
+    const ric = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
     if (typeof ric === "function") {
       ric(prefetch, { timeout: 2500 });
     } else {
@@ -281,46 +290,53 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <AuthProvider>
-        {!isAppShellRoute ? <SkipLink /> : null}
-        {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
-        {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" /> : null}
-        {!isAppShellRoute ? <OfflineBanner /> : null}
-        <SyncStatusBanner />
-        <UpdateBanner />
-        <Outlet />
-        {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
-        {!isAppShellRoute ? (
+          {!isAppShellRoute ? <SkipLink /> : null}
+          {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
+          {!isAppShellRoute ? (
+            <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
+          ) : null}
+          {!isAppShellRoute ? <OfflineBanner /> : null}
+          <SyncStatusBanner />
+          <UpdateBanner />
+          <Outlet />
+          {!isAppShellRoute ? (
+            <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />
+          ) : null}
+          {!isAppShellRoute ? (
+            <React.Suspense fallback={null}>
+              <AluxFloatingTrigger />
+            </React.Suspense>
+          ) : null}
           <React.Suspense fallback={null}>
-            <AluxFloatingTrigger />
+            <FloatingTravelPlanDock />
           </React.Suspense>
-        ) : null}
-        <React.Suspense fallback={null}>
-          <FloatingTravelPlanDock />
-        </React.Suspense>
-        <React.Suspense fallback={null}>
-          <ConciergeProposalObserver />
-        </React.Suspense>
-        <LazyToasterHost />
-        {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
-            <EditThisPageButton pathname={pathname} />
+            <AluxMemorySyncRunner />
           </React.Suspense>
-        ) : null}
-        {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
-        <ProtectedActionResumeRunner />
-        {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
-        <React.Suspense fallback={null}>
-          <SignInPromptSheet />
-        </React.Suspense>
-        <React.Suspense fallback={null}>
-          <AnonymousDraftImportRunner />
-        </React.Suspense>
-        {/*
+          <React.Suspense fallback={null}>
+            <ConciergeProposalObserver />
+          </React.Suspense>
+          <LazyToasterHost />
+          {!isAppShellRoute ? (
+            <React.Suspense fallback={null}>
+              <EditThisPageButton pathname={pathname} />
+            </React.Suspense>
+          ) : null}
+          {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
+          <ProtectedActionResumeRunner />
+          {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
+          <React.Suspense fallback={null}>
+            <SignInPromptSheet />
+          </React.Suspense>
+          <React.Suspense fallback={null}>
+            <AnonymousDraftImportRunner />
+          </React.Suspense>
+          {/*
           Navigation Blueprint · N3 — Único punto de suscripción global
           al Context Engine para persistir la cadena territorial en
           sessionStorage (deep-links, refresh, back/forward).
         */}
-        <GlobalNavigationSessionBridge />
+          <GlobalNavigationSessionBridge />
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
@@ -328,8 +344,14 @@ function RootComponent() {
 }
 
 function PublicChrome({
-  pathname, headerVariant, position,
-}: { pathname: string; headerVariant: "solid" | "overlay"; position: "header" | "footer" }) {
+  pathname,
+  headerVariant,
+  position,
+}: {
+  pathname: string;
+  headerVariant: "solid" | "overlay";
+  position: "header" | "footer";
+}) {
   // El encabezado y pie del sitio se leen desde la composición publicada de la
   // Home y se reutilizan en TODAS las páginas públicas. Esto permite editar
   // menú, botón destacado y columnas del footer una sola vez desde el

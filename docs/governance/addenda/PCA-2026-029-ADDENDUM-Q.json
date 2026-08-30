@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-Q",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+  "founder_authority": "Addendum Founder 2026-08-28 · G8-Q2D-0. Reconoce exclusivamente el alta declarativa de la vista interna noindex /lovable/g8-place-premium-visual-approval en el Route Inventory, exigida por la Route Inventory Rule. Cambio aditivo: no elimina, renombra ni reclasifica rutas existentes y no crea rutas públicas. El addendum se registra bajo PCA-2026-029 por ser la única autorización Approved que contiene el permiso modify y la acknowledged revision de esta ruta; la autoridad de paquete es PCA-2026-046.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "838130f47fdd367a996b76147af6105ccaa28e46a8394e360a2d8ff389078563",
+    "current_sha256": "8c250b6c4445de1b727275d44ede5a3fea808527220fd6072a2cf63ee7eb4203",
+    "semantic_change": "G8-Q2D-0 · Registro aditivo de una única ruta interna noindex de aprobación visual. Sin cambios en rutas públicas, categorías, madurez ni propiedad funcional de rutas existentes.",
+    "authority": "PCA-2026-046"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero rutas públicas, cero redirects, cero datos",
+    "Chichén Itzá y Ek' Balam permanecen en draft"
+  ],
+  "recorded_at": "2026-08-28"
+}

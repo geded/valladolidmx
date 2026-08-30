@@ -51,8 +51,7 @@ function InvitationsPage() {
 
   const invitationsQuery = useQuery({
     queryKey: ["portal", "invitations", activeBusinessId],
-    queryFn: () =>
-      fetchInvitations({ data: { businessId: activeBusinessId as string } }),
+    queryFn: () => fetchInvitations({ data: { businessId: activeBusinessId as string } }),
     enabled: Boolean(activeBusinessId && isOwner),
     staleTime: 30_000,
   });
@@ -60,9 +59,7 @@ function InvitationsPage() {
   const invitations: PortalInvitation[] = invitationsQuery.data ?? [];
 
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"editor" | "business_owner" | "admin">(
-    "editor",
-  );
+  const [role, setRole] = useState<"editor" | "business_owner" | "admin">("editor");
   const [formError, setFormError] = useState<string | null>(null);
 
   const createMutation = useMutation({
@@ -91,7 +88,10 @@ function InvitationsPage() {
 
   if (!activeBusinessId || !active) {
     return (
-      <Empty title="Sin empresa seleccionada" body="Elige una empresa en el selector lateral para administrar sus invitaciones." />
+      <Empty
+        title="Sin empresa seleccionada"
+        body="Elige una empresa en el selector lateral para administrar sus invitaciones."
+      />
     );
   }
   if (!isOwner) {
@@ -111,8 +111,8 @@ function InvitationsPage() {
         </p>
         <h1 className="mt-2 text-3xl">{active.display_name}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Invita a colaboradores con un enlace personal. Sólo el destinatario
-          podrá aceptar la invitación, una sola vez, antes de su expiración.
+          Invita a colaboradores con un enlace personal. Sólo el destinatario podrá aceptar la
+          invitación, una sola vez, antes de su expiración.
         </p>
       </header>
 
@@ -138,9 +138,7 @@ function InvitationsPage() {
           />
           <select
             value={role}
-            onChange={(e) =>
-              setRole(e.target.value as typeof role)
-            }
+            onChange={(e) => setRole(e.target.value as typeof role)}
             className="rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="editor">Editor</option>
@@ -155,12 +153,9 @@ function InvitationsPage() {
             {createMutation.isPending ? "Enviando…" : "Crear"}
           </button>
         </form>
-        {formError && (
-          <p className="mt-2 text-xs text-destructive">{formError}</p>
-        )}
+        {formError && <p className="mt-2 text-xs text-destructive">{formError}</p>}
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Vigencia por defecto: 7 días. El enlace se genera al crear la
-          invitación.
+          Vigencia por defecto: 7 días. El enlace se genera al crear la invitación.
         </p>
       </section>
 
@@ -175,19 +170,14 @@ function InvitationsPage() {
                 ? `${window.location.origin}/portal/invitaciones/${inv.token}`
                 : `/portal/invitaciones/${inv.token}`;
             const expired = new Date(inv.expires_at).getTime() <= Date.now();
-            const effectiveStatus =
-              inv.status === "pending" && expired ? "expired" : inv.status;
+            const effectiveStatus = inv.status === "pending" && expired ? "expired" : inv.status;
             return (
-              <li
-                key={inv.id}
-                className="rounded-lg border border-border bg-card p-4"
-              >
+              <li key={inv.id} className="rounded-lg border border-border bg-card p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-semibold">{inv.email}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      Rol: {inv.role} · Expira:{" "}
-                      {new Date(inv.expires_at).toLocaleString("es-MX")}
+                      Rol: {inv.role} · Expira: {new Date(inv.expires_at).toLocaleString("es-MX")}
                     </p>
                     {effectiveStatus === "pending" && (
                       <code className="mt-2 block truncate rounded bg-muted px-2 py-1 text-[11px]">

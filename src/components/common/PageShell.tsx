@@ -23,12 +23,12 @@ export function PageShell({ title, eyebrow, description, crumbs, children }: Pro
         <BreadcrumbTerritorial crumbs={crumbs} />
         <header className="mt-6 max-w-3xl">
           {eyebrow ? (
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {eyebrow}
+            </p>
           ) : null}
           <h1 className="text-balance text-4xl md:text-5xl">{title}</h1>
-          {description ? (
-            <p className="mt-4 text-lg text-muted-foreground">{description}</p>
-          ) : null}
+          {description ? <p className="mt-4 text-lg text-muted-foreground">{description}</p> : null}
         </header>
         <div className="mt-12">{children}</div>
       </Container>

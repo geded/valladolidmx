@@ -1,0 +1,65 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-055",
+  "title": "G8-R1-F1C-A · Paridad productiva de plantillas y autoridad de presentación",
+  "status": "Approved",
+  "branch": "edit/edt-8201d320-4634-436b-b0cb-b6629a6a759a",
+  "blueprint": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-F1C-A (2026-08-29), alcance corregido a presentación y plantillas. Autoriza: autoridad única de presentación con dos modos de una misma ficha (Editorial y Cinematográfica) persistida, versionada y auditada para empresa, producto, evento y lugar; RPC gobernadas de solicitud, revisión y lectura con fail-closed por portada aprobada G8-M1 y caída automática a Editorial; selector con copy comprensible en Portal Empresa (solicitar) y Administración (aprobar o devolver) limitado a las nueve familias de ficha individual; asignación automática de familia con orden override aprobado, preset canónico y superficie estándar fail-closed, incluyendo casa de vacaciones, empresa turística genérica y producto genérico; y contrato determinista de elegibilidad premium equivalente por familia. No autoriza checkout, pagos, órdenes, reembolsos, publicación, activación del flag omxds_visual_v1_contracts_enabled, sitemap, redirects, PR, merge ni despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/entity-presentation.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/entity-presentation.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/premium-eligibility.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/presentation-family.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PresentationModePanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumPresentationControl.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql"
+    },
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260829174459_87b15ae7-59d4-4fb5-8170-b0c0834a37f6.sql"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run test:r1:f1c:a",
+    "bun run validate:r1:f1c:a"
+  ]
+}

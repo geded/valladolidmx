@@ -1,6 +1,6 @@
 /**
  * cms/public-reads.functions.ts — Lecturas públicas read-only para la
- * Ola 2 (Migración de Contenido). 
+ * Ola 2 (Migración de Contenido).
  *
  * Reglas:
  *  - Server publishable client (anon, RLS aplica como anon).
@@ -14,6 +14,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { Destination } from "@/types/territory";
 import type { SuggestedRoute, BusinessTeaser, Review } from "@/types/entities";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -57,7 +58,9 @@ export const listHomeFeaturedCategories = createServerFn({ method: "GET" }).hand
     return (data ?? []).map((row) => {
       const metadata = (row.metadata ?? {}) as Record<string, unknown>;
       const rawPalette = typeof metadata.palette === "string" ? metadata.palette : "primary";
-      const palette = (ALLOWED_PALETTES.has(rawPalette) ? rawPalette : "primary") as PublicHomeCategory["palette"];
+      const palette = (
+        ALLOWED_PALETTES.has(rawPalette) ? rawPalette : "primary"
+      ) as PublicHomeCategory["palette"];
       return {
         id: row.id,
         slug: row.slug,
@@ -80,7 +83,9 @@ export const listFeaturedReviews = createServerFn({ method: "GET" }).handler(
     const supabase = publicClient();
     const { data, error } = await supabase
       .from("reviews")
-      .select("id, author_display_name, rating, body, language, published_at, created_at, metadata, status, deleted_at")
+      .select(
+        "id, author_display_name, rating, body, language, published_at, created_at, metadata, status, deleted_at",
+      )
       .eq("status", "published")
       .is("deleted_at", null)
       .filter("metadata->>home_featured", "eq", "true")
@@ -120,6 +125,8 @@ export const listFeaturedBusinesses = createServerFn({ method: "GET" }).handler(
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .filter("metadata->>home_featured", "eq", "true")
       .order("display_name", { ascending: true })
       .limit(24);
@@ -127,9 +134,9 @@ export const listFeaturedBusinesses = createServerFn({ method: "GET" }).handler(
     return (data ?? []).map((row) => {
       const metadata = (row.metadata ?? {}) as Record<string, unknown>;
       const rawPalette = typeof metadata.palette === "string" ? metadata.palette : "territorio";
-      const palette = (ALLOWED_BUSINESS_PALETTES.has(rawPalette)
-        ? rawPalette
-        : "territorio") as BusinessTeaser["palette"];
+      const palette = (
+        ALLOWED_BUSINESS_PALETTES.has(rawPalette) ? rawPalette : "territorio"
+      ) as BusinessTeaser["palette"];
       const destSlug =
         row.destinations && typeof (row.destinations as { slug?: unknown }).slug === "string"
           ? (row.destinations as { slug: string }).slug
@@ -176,7 +183,7 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
     return (data ?? []).map((row) => {
       const regionSlug =
         row.tourism_regions && typeof (row.tourism_regions as { slug?: unknown }).slug === "string"
-          ? ((row.tourism_regions as { slug: string }).slug)
+          ? (row.tourism_regions as { slug: string }).slug
           : "oriente-maya";
       const heroPalette = ALLOWED_HERO_PALETTES.has(row.hero_palette)
         ? (row.hero_palette as Destination["hero_palette"])
@@ -206,7 +213,9 @@ export const listPublishedRoutes = createServerFn({ method: "GET" }).handler(
     const supabase = publicClient();
     const { data: routes, error } = await supabase
       .from("editorial_routes")
-      .select("id, slug, name, summary, duration_days, palette, destination_ids, status, deleted_at, published_at")
+      .select(
+        "id, slug, name, summary, duration_days, palette, destination_ids, status, deleted_at, published_at",
+      )
       .eq("status", "published")
       .is("deleted_at", null)
       .order("published_at", { ascending: true })

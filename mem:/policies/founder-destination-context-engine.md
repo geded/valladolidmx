@@ -3,9 +3,11 @@ name: Founder Destination Context Engine Principle
 description: CV6.4 establece la arquitectura oficial de Destination Context Contributors. Toda fuente de contexto del destino (clima, horarios, tráfico, eventos, disponibilidad, cierres, incidencias, recomendaciones, protección civil, ocupación, promociones, festividades, alertas) se integra como Contributor independiente publicando vía Context Engine. Prohibido consumir un proveedor directamente desde una superficie.
 type: constraint
 ---
+
 CV6.4 no es sólo "clima + horarios + tráfico". Es la arquitectura oficial mediante la cual cualquier fuente de contexto del destino podrá enriquecer las decisiones del Travel Companion sin refactor.
 
 Reglas vinculantes:
+
 1. Toda nueva fuente de contexto del destino se integra como `DestinationContextContributor` reutilizando el Context Engine existente. Prohibido crear un nuevo motor de contexto.
 2. Cada Contributor es un proveedor independiente. NUNCA lógica embebida en Alux, Concierge, Mi Viaje, Now·Next·Later o cualquier superficie.
 3. Los Contributors publican al Context Engine (canal `destination.*`). Consumidores (Alux, Mi Viaje, Concierge, Decision Center, futuras capacidades) SÓLO leen del Context Engine — jamás directo del proveedor.

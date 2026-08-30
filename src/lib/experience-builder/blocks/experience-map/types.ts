@@ -11,11 +11,7 @@
 
 export const EXPERIENCE_MAP_CONTRACT_VERSION = "1.0.0" as const;
 
-export type ExperienceMapVariant =
-  | "single"
-  | "multi"
-  | "list-sync"
-  | "cluster";
+export type ExperienceMapVariant = "single" | "multi" | "list-sync" | "cluster";
 
 export type ExperienceMapEntityKind =
   | "business"

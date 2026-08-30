@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-O",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · G8-Q2A-R1 · Places Model Remediation v1.0. Reconoce exclusivamente la regeneración automática del archivo de tipos derivada de la migración aditiva 20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql. Sin contenido turístico creado o modificado, sin publicación, flags, PR, merge ni despliegue. El addendum se registra bajo PCA-2026-029 por ser la única autorización Approved que contiene el permiso modify y la acknowledged revision de esta ruta; la autoridad de paquete es PCA-2026-043.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "6ba6062972e159d97bf9ac3d486486ac5903f29553b30c84ba6f9e053166e0ff",
+    "current_sha256": "eb05e15249c0162dc03ac3303aad41f286175ba6ee3e4710ea9f19b3ccb28c1f",
+    "semantic_change": "G8-Q2A-R1 · Regeneración automática de tipos tras la migración aditiva de remediación de Lugares: altas de place_products y place_events, y columnas nuevas de points_of_interest (directions, admission_kind, price_to, contact_whatsapp, social_links, published_at). Estrictamente aditivo: no elimina ni renombra tablas, columnas, enums, vistas ni funciones existentes.",
+    "authority": "PCA-2026-043"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Los cinco POI existentes permanecen sin modificación y con place_type_id nulo",
+    "Cero filas nuevas de lugares, sin CMS, rutas públicas, publicación ni despliegue"
+  ],
+  "recorded_at": "2026-08-28"
+}

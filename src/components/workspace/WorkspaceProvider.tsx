@@ -114,10 +114,7 @@ export function WorkspaceProvider({
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         const tgt = e.target as HTMLElement | null;
         const editable =
-          tgt &&
-          (tgt.isContentEditable ||
-            tgt.tagName === "INPUT" ||
-            tgt.tagName === "TEXTAREA");
+          tgt && (tgt.isContentEditable || tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA");
         if (!editable || (tgt as HTMLElement).getAttribute("data-allow-palette") === "true") {
           e.preventDefault();
           setPaletteOpen((o) => !o);
@@ -137,9 +134,10 @@ export function WorkspaceProvider({
       return requiredRoles.some((role) => roles.includes(role as never));
     };
     const accessibleWorkspaces = listWorkspaces().filter(canAccessWorkspace);
-    const ws = accessibleWorkspaces.find((w) => w.id === prefs.activeWorkspaceId)
-      ?? accessibleWorkspaces.find((w) => w.id === initialWorkspaceId)
-      ?? getWorkspace(prefs.activeWorkspaceId);
+    const ws =
+      accessibleWorkspaces.find((w) => w.id === prefs.activeWorkspaceId) ??
+      accessibleWorkspaces.find((w) => w.id === initialWorkspaceId) ??
+      getWorkspace(prefs.activeWorkspaceId);
     return {
       workspace: ws,
       workspaces: accessibleWorkspaces,

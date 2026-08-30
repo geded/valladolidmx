@@ -17,9 +17,9 @@ export const EXPERIENCE_GALLERY_CONTRACT_VERSION = "1.0.0";
 
 export const experienceGalleryVariantSchema = z.enum([
   "mosaic", // Grid asimétrico editorial (default).
-  "grid",   // Grid uniforme.
+  "grid", // Grid uniforme.
   "carousel", // Carrusel horizontal snap.
-  "strip",  // Tira compacta (usable dentro de secciones).
+  "strip", // Tira compacta (usable dentro de secciones).
 ]);
 export type ExperienceGalleryVariant = z.infer<typeof experienceGalleryVariantSchema>;
 
@@ -37,6 +37,10 @@ export const experienceGalleryItemSchema = z.object({
   url: z.string().min(1),
   alt: z.string().default(""),
   caption: z.string().optional(),
+  /** G8-F1D — Crédito público acreditado (jamás inventado). */
+  credit: z.string().optional(),
+  /** G8-F1D — Naturaleza declarada para etiquetar el crédito. */
+  nature: z.enum(["documentary", "conceptual"]).optional(),
   width: z.number().optional(),
   height: z.number().optional(),
 });

@@ -133,16 +133,22 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const [mounted, setMounted] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (variant !== "overlay") return;
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    // 18.54 · El scroll se observa sobre la ventana propietaria del header.
+    // En el sitio público es `window`; dentro del viewport aislado del
+    // Experience Builder es la ventana del iframe. Paridad 1:1 sin
+    // duplicar el componente canónico.
+    const view = headerRef.current?.ownerDocument?.defaultView ?? window;
+    const onScroll = () => setScrolled(view.scrollY > 24);
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [variant]);
+    view.addEventListener("scroll", onScroll, { passive: true });
+    return () => view.removeEventListener("scroll", onScroll);
+  }, [variant, mounted]);
 
   // Bloqueo de scroll del documento + cierre con Escape + focus trap.
   // El drawer se porta al body para escapar del stacking context del Header:
@@ -235,65 +241,81 @@ export function SiteHeader({ variant = "solid", config }: Props) {
       visible: true,
     },
     { kind: "language", label: "", href: "", icon: "", variant: "ghost", visible: showLanguage },
-    { kind: "user_menu", label: "Iniciar sesión", href: "", icon: "User", variant: "primary", visible: showUserMenu },
+    {
+      kind: "user_menu",
+      label: "Iniciar sesión",
+      href: "",
+      icon: "User",
+      variant: "primary",
+      visible: showUserMenu,
+    },
     { kind: "menu_toggle", label: "", href: "", icon: "Menu", variant: "ghost", visible: true },
   ];
   const visibleButtons = buttons.filter((b) => b.visible);
 
-  const mobileDrawer = mounted && open
-    ? createPortal(
-        <>
-          <div
-            aria-hidden
-            className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm lg:hidden"
-            onClick={() => setOpen(false)}
-          />
-          <aside
-            ref={drawerRef}
-            id="mobile-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navegación principal"
-            tabIndex={-1}
-            style={{ backgroundColor: "var(--background)" }}
-            className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(76vw,21rem)] flex-col overflow-y-auto rounded-2xl border border-border/70 shadow-2xl outline-none lg:hidden"
-          >
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
-              <BrandLogo tone="dark" size="sm" />
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Cerrar menú"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-all active:scale-[0.98]"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-            <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
-              <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
-              <a
-                href={ctaHref}
-                onClick={() => setOpen(false)}
-                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-              >
-                <Compass className="size-4" aria-hidden />
-                {ctaLabel}
-              </a>
-              {showUserMenu ? <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
-                <UserMenu />
-              </div> : null}
-            </nav>
-          </aside>
-        </>,
-        document.body,
-      )
-    : null;
+  const mobileDrawer =
+    mounted && open
+      ? createPortal(
+          <>
+            <div
+              aria-hidden
+              className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm lg:hidden"
+              onClick={() => setOpen(false)}
+            />
+            <aside
+              ref={drawerRef}
+              id="mobile-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navegación principal"
+              tabIndex={-1}
+              style={{ backgroundColor: "var(--background)" }}
+              className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(76vw,21rem)] flex-col overflow-y-auto rounded-2xl border border-border/70 shadow-2xl outline-none lg:hidden"
+            >
+              <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
+                <BrandLogo tone="dark" size="sm" />
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Cerrar menú"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-all active:scale-[0.98]"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
+                <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
+                <a
+                  href={ctaHref}
+                  onClick={() => setOpen(false)}
+                  className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                >
+                  <Compass className="size-4" aria-hidden />
+                  {ctaLabel}
+                </a>
+                {showUserMenu ? (
+                  <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
+                    <UserMenu />
+                  </div>
+                ) : null}
+              </nav>
+            </aside>
+          </>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
       <header
+        data-omxds-chrome="site-header"
+        ref={headerRef}
         className={cn(
-          "@container sticky top-0 z-30 transition-colors duration-300",
+          // 18.54 · `@container` se separa del elemento sticky: en Safari (iPad)
+          // la contención del contenedor invalida `position: sticky` dentro del
+          // scrollport del iframe. El contexto de contenedor vive ahora en el
+          // wrapper interno, sin cambiar la maquetación ni la paridad visual.
+          "sticky top-0 z-30 transition-colors duration-300",
           isOverlay
             ? "border-b border-transparent bg-transparent"
             : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
@@ -310,27 +332,31 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-[linear-gradient(180deg,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.18)_55%,rgba(0,0,0,0)_100%)]"
           />
         )}
-        <SiteTopBar hidden={isOverlay} />
-        <Container className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
-          <Link to="/" aria-label="Inicio" className="flex items-center">
-            <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
-          </Link>
+        <div className="@container">
+          <SiteTopBar hidden={isOverlay} />
+          <Container className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
+            <Link to="/" aria-label="Inicio" className="flex items-center">
+              <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
+            </Link>
 
-          <div className="flex min-w-0 items-center justify-center">
-            <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
-          </div>
+            <div className="flex min-w-0 items-center justify-center">
+              <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
+            </div>
 
-          <div className="flex items-center gap-2">
-            <MiViajeChip isOverlay={isOverlay} />
-            {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
-              isOverlay,
-              open,
-              setOpen,
-              menuButtonRef,
-              ctaFallback: { label: ctaLabel, href: ctaHref },
-            }))}
-          </div>
-        </Container>
+            <div className="flex min-w-0 items-center gap-2">
+              <MiViajeChip isOverlay={isOverlay} />
+              {visibleButtons.map((btn, idx) =>
+                renderHeaderButton(btn, idx, {
+                  isOverlay,
+                  open,
+                  setOpen,
+                  menuButtonRef,
+                  ctaFallback: { label: ctaLabel, href: ctaHref },
+                }),
+              )}
+            </div>
+          </Container>
+        </div>
       </header>
       {mobileDrawer}
     </>
@@ -355,7 +381,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
     // topbar está oculta, para preservar acceso al cambio de idioma sobre
     // el Hero (overlay) o en tabletas.
     return (
-      <div key={key} className="xl:hidden">
+      <div key={key} className="lg:hidden">
         <LanguageSwitcher />
       </div>
     );
@@ -432,9 +458,7 @@ function getVariantClass(variant: HeaderButton["variant"], isOverlay: boolean): 
         ? "border border-white/50 text-white hover:bg-white/10"
         : "border border-border text-foreground hover:bg-accent";
     case "ghost":
-      return isOverlay
-        ? "text-white/90 hover:bg-white/10"
-        : "text-foreground hover:bg-accent";
+      return isOverlay ? "text-white/90 hover:bg-white/10" : "text-foreground hover:bg-accent";
     case "light":
       return isOverlay
         ? "border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"

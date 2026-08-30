@@ -14,10 +14,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/destinos/")({
   head: () => ({
-    meta: [
-      { title: "Destinos · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Destinos · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: DestinosPage,
 });
@@ -28,7 +25,6 @@ function DestinosPage() {
       queryKey="destinations"
       fn={listDestinationsCms}
       title="Destinos"
-
       description="Pueblos, ciudades y enclaves del Oriente Maya."
       rowKey={(r) => r.id}
       headerActions={
@@ -40,9 +36,25 @@ function DestinosPage() {
         </Link>
       }
       columns={[
-        { key: "name", header: "Nombre", render: (r) => <span className="font-medium">{r.name}</span> },
-        { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
-        { key: "region", header: "Región", render: (r) => <span className="text-xs text-muted-foreground">{r.tourism_region_id?.slice(0, 8) ?? "—"}</span> },
+        {
+          key: "name",
+          header: "Nombre",
+          render: (r) => <span className="font-medium">{r.name}</span>,
+        },
+        {
+          key: "slug",
+          header: "Slug",
+          render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
+        },
+        {
+          key: "region",
+          header: "Región",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {r.tourism_region_id?.slice(0, 8) ?? "—"}
+            </span>
+          ),
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
           key: "updated",

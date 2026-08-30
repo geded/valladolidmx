@@ -51,11 +51,7 @@ export function DirectSaleBuyButton({
   const [step, setStep] = useState<"review" | "confirming" | "done">("review");
 
   const disabled = !ready && !demoMode;
-  const label = ready
-    ? "Comprar ahora"
-    : demoMode
-      ? "Comprar (demo)"
-      : "Comprar · próximamente";
+  const label = ready ? "Comprar ahora" : demoMode ? "Comprar (demo)" : "Comprar · próximamente";
 
   function handleClick() {
     if (disabled) return;
@@ -76,11 +72,7 @@ export function DirectSaleBuyButton({
         navigate({ to: "/cuenta/checkout/$orderId", params: { orderId } });
       } catch (err) {
         setStep("review");
-        toast.error(
-          err instanceof Error
-            ? err.message
-            : "No se pudo iniciar la confirmación",
-        );
+        toast.error(err instanceof Error ? err.message : "No se pudo iniciar la confirmación");
       }
       return;
     }
@@ -101,11 +93,7 @@ export function DirectSaleBuyButton({
       <Button
         type="button"
         disabled={disabled}
-        title={
-          disabled
-            ? "Se activará cuando la plataforma de pagos esté configurada."
-            : undefined
-        }
+        title={disabled ? "Se activará cuando la plataforma de pagos esté configurada." : undefined}
         onClick={handleClick}
         className={className}
       >
@@ -141,21 +129,17 @@ export function DirectSaleBuyButton({
               </div>
               {!ready ? (
                 <p className="text-[11px] text-amber-700">
-                  Esta compra es simulada. No se cobrará y sirve para probar
-                  el flujo antes de conectar el proveedor real.
+                  Esta compra es simulada. No se cobrará y sirve para probar el flujo antes de
+                  conectar el proveedor real.
                 </p>
               ) : null}
             </div>
           ) : step === "confirming" ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              Procesando…
-            </p>
+            <p className="py-6 text-center text-sm text-muted-foreground">Procesando…</p>
           ) : (
             <div className="space-y-2 py-4 text-center text-sm">
               <p className="text-2xl">✓</p>
-              <p className="font-medium">
-                {ready ? "Pago iniciado" : "Compra demo confirmada"}
-              </p>
+              <p className="font-medium">{ready ? "Pago iniciado" : "Compra demo confirmada"}</p>
               <p className="text-xs text-muted-foreground">
                 Folio ficticio: VMX-{Math.random().toString(36).slice(2, 8).toUpperCase()}
                 {!ready ? "-DEMO" : ""}

@@ -1,0 +1,116 @@
+{
+  "1024_sol": {
+    "before": {
+      "innerWidth": 1024,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerPosition": "sticky",
+      "theme": null,
+      "dark": false,
+      "ctaCount": 60
+    },
+    "after": {
+      "scrollY": 933,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  },
+  "1440_sol": {
+    "before": {
+      "innerWidth": 1440,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerPosition": "sticky",
+      "theme": null,
+      "dark": false,
+      "ctaCount": 60
+    },
+    "after": {
+      "scrollY": 933,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  },
+  "1024_luna": {
+    "before": {
+      "innerWidth": 1024,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerPosition": "sticky",
+      "theme": null,
+      "dark": false,
+      "ctaCount": 60
+    },
+    "after": {
+      "scrollY": 933,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  },
+  "1440_luna": {
+    "before": {
+      "innerWidth": 1440,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerPosition": "sticky",
+      "theme": null,
+      "dark": false,
+      "ctaCount": 60
+    },
+    "after": {
+      "scrollY": 933,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  },
+  "reflow_320": {
+    "before": {
+      "innerWidth": 320,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerPosition": "sticky",
+      "theme": null,
+      "dark": false,
+      "ctaCount": 60
+    },
+    "after": {
+      "scrollY": 900,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  },
+  "zoom200_1440": {
+    "before": {
+      "innerWidth": 720,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerPosition": "sticky",
+      "theme": null,
+      "dark": false,
+      "ctaCount": 60
+    },
+    "after": {
+      "scrollY": 900,
+      "overflowX": 0,
+      "headerTop": 0,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-T",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum T · C2 · Reconocimiento de la revisión vigente de src/lib/experience-builder/route-inventory.ts",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-C+L · C2 (2026-08-29). Reconoce la revisión vigente de la ruta sensible preexistente tras la conexión de las rutas reales de ficha al resolutor canónico. No autoriza publicación, migraciones, redirects, sitemap, cambios de flag, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "2682ea1a3156a8b6142e0b247d41930199d7c921f3211a82ffd989479f65f1da",
+    "current_sha256": "80d33eb454556babda35df0a9b7c1e348b4a9f703ac691d257342c7b2c4c6af1",
+    "authority": "Autorización Founder G8-R1-C+L · inicio de C2 (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:r1:c2",
+    "bun run governance:check"
+  ]
+}

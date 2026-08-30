@@ -13,9 +13,9 @@ import { z } from "zod";
 export const EXPERIENCE_CTA_BAR_CONTRACT_VERSION = "1.0.0";
 
 export const experienceCtaBarVariantSchema = z.enum([
-  "floating",  // Píldora flotante (mobile bottom, desktop bottom-right).
-  "bar",       // Barra full-width sticky (mobile bottom, desktop bottom).
-  "inline",    // Bar inline (no sticky) — para colocar dentro de secciones.
+  "floating", // Píldora flotante (mobile bottom, desktop bottom-right).
+  "bar", // Barra full-width sticky (mobile bottom, desktop bottom).
+  "inline", // Bar inline (no sticky) — para colocar dentro de secciones.
 ]);
 export type ExperienceCtaBarVariant = z.infer<typeof experienceCtaBarVariantSchema>;
 
@@ -28,16 +28,61 @@ export const experienceCtaBarSourceSchema = z.enum([
 ]);
 export type ExperienceCtaBarSource = z.infer<typeof experienceCtaBarSourceSchema>;
 
+/**
+ * G8-R1-C+L · GAP-01 — Referencia canónica de entidad para la acción
+ * `add-to-trip`. La barra NO implementa lógica de Travel Plan: delega
+ * íntegramente en `AddToTravelPlanButton` (acción canónica ya existente).
+ * Sin esta referencia la acción se omite (fail-closed).
+ */
+export const experienceCtaBarTravelItemSchema = z.object({
+  kind: z.enum(["product", "business", "event", "destination"]),
+  targetId: z.string().min(1),
+  title: z.string().min(1),
+  slug: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  subtitle: z.string().nullable().optional(),
+  eligibilityMode: z.enum(["universal", "legacy"]).optional(),
+});
+export type ExperienceCtaBarTravelItem = z.infer<typeof experienceCtaBarTravelItemSchema>;
+
+/**
+ * G8-R1-C+L · GAP-01 — Referencia canónica para "Guardar" (favoritos).
+ * ACCIÓN DISTINTA de `add-to-trip`: Guardar NO agrega a Mi Viaje.
+ * Guardar   → `traveler_favorites` (guardado rápido, vía `FavoriteButton`).
+ * Mi Viaje  → Travel Plan (expediente estructurado, `AddToTravelPlanButton`).
+ * Sin esta referencia la acción se omite (fail-closed).
+ */
+export const experienceCtaBarFavoriteItemSchema = z.object({
+  entityKind: z.enum(["business", "product", "promotion"]),
+  entityId: z.string().min(1),
+  entityTitle: z.string().min(1).optional(),
+  entitySlug: z.string().optional(),
+  entityImageUrl: z.string().optional(),
+});
+export type ExperienceCtaBarFavoriteItem = z.infer<typeof experienceCtaBarFavoriteItemSchema>;
+
 export const experienceCtaBarActionSchema = z.object({
   label: z.string().min(1),
   href: z.string().min(1).optional(),
   iconKey: z.string().optional(),
   action: z
-    .enum(["navigate", "favorite", "contact", "book", "share", "phone", "whatsapp"])
+    .enum([
+      "navigate",
+      "favorite",
+      "contact",
+      "book",
+      "share",
+      "phone",
+      "whatsapp",
+      "add-to-trip",
+    ])
     .default("navigate"),
   emphasis: z.enum(["primary", "secondary", "ghost"]).default("secondary"),
+  travelItem: experienceCtaBarTravelItemSchema.optional(),
+  favoriteItem: experienceCtaBarFavoriteItemSchema.optional(),
 });
 export type ExperienceCtaBarAction = z.infer<typeof experienceCtaBarActionSchema>;
+
 
 export const experienceCtaBarConfigSchema = z.object({
   contractVersion: z.string().default(EXPERIENCE_CTA_BAR_CONTRACT_VERSION),
@@ -97,7 +142,13 @@ export function buildExperienceCtaBarPreviewDTO(): ExperienceCtaBarDTO {
     meta: "Desde $2,400 MXN · noche",
     actions: [
       { label: "Reservar", action: "book", href: "#", emphasis: "primary", iconKey: "calendar" },
-      { label: "Contactar", action: "contact", href: "#", emphasis: "secondary", iconKey: "message-circle" },
+      {
+        label: "Contactar",
+        action: "contact",
+        href: "#",
+        emphasis: "secondary",
+        iconKey: "message-circle",
+      },
       { label: "Guardar", action: "favorite", href: "#", emphasis: "ghost", iconKey: "heart" },
     ],
     revealAfterScroll: 0,

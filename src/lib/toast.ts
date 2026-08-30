@@ -35,7 +35,11 @@ function flushPending() {
   const queue = pending.splice(0);
   for (const { method, args } of queue) {
     const target: any = method ? (mod.toast as any)[method] : mod.toast;
-    try { target(...args); } catch { /* noop */ }
+    try {
+      target(...args);
+    } catch {
+      /* noop */
+    }
   }
 }
 
@@ -87,7 +91,9 @@ function call(method: string | null, args: unknown[]): unknown {
   // sonner drops toasts emitted before any Toaster has subscribed.
   pending.push({ method, args });
   if (pending.length > PENDING_MAX) pending.shift();
-  void loadSonner().then(flushPending).catch(() => {});
+  void loadSonner()
+    .then(flushPending)
+    .catch(() => {});
   return undefined;
 }
 

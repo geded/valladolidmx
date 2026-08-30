@@ -309,11 +309,7 @@ function DesktopMenu({
   useEffect(() => () => cancelClose(), []);
 
   return (
-    <nav
-      ref={rootRef}
-      aria-label="Principal"
-      className="hidden xl:block"
-    >
+    <nav ref={rootRef} aria-label="Principal" className="hidden xl:block">
       <ul className="flex items-center gap-1 xl:gap-2">
         {sections.map((section) => {
           const isOpen = open === section.id;
@@ -341,11 +337,17 @@ function DesktopMenu({
                   isOverlay
                     ? "text-white/90 hover:text-white"
                     : "text-foreground/75 hover:text-foreground",
-                  isOpen && (isOverlay ? "text-white after:scale-x-100" : "text-foreground after:scale-x-100"),
+                  isOpen &&
+                    (isOverlay
+                      ? "text-white after:scale-x-100"
+                      : "text-foreground after:scale-x-100"),
                 )}
               >
                 {section.label}
-                <ChevronDown className={cn("size-3.5 transition-transform", isOpen && "rotate-180")} aria-hidden />
+                <ChevronDown
+                  className={cn("size-3.5 transition-transform", isOpen && "rotate-180")}
+                  aria-hidden
+                />
               </a>
               {isOpen ? (
                 <div
@@ -361,10 +363,7 @@ function DesktopMenu({
                     )}
                   >
                     <div
-                      className={cn(
-                        "grid gap-6",
-                        cols.length > 1 ? "grid-cols-2" : "grid-cols-1",
-                      )}
+                      className={cn("grid gap-6", cols.length > 1 ? "grid-cols-2" : "grid-cols-1")}
                     >
                       {cols.map((col, idx) => (
                         <div key={idx}>
@@ -445,7 +444,10 @@ function MobileMenu({
                 onClick={() => setOpen(isOpen ? null : section.id)}
                 className="inline-flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
               >
-                <ChevronDown className={cn("size-4 transition-transform", isOpen && "rotate-180")} aria-hidden />
+                <ChevronDown
+                  className={cn("size-4 transition-transform", isOpen && "rotate-180")}
+                  aria-hidden
+                />
               </button>
             </div>
             {isOpen ? (
@@ -453,9 +455,7 @@ function MobileMenu({
                 {cols.map((col, idx) => (
                   <div key={idx} className="mt-2">
                     {col.title ? (
-                      <p className="text-caption mb-1 px-2 text-muted-foreground">
-                        {col.title}
-                      </p>
+                      <p className="text-caption mb-1 px-2 text-muted-foreground">{col.title}</p>
                     ) : null}
                     <ul className="flex flex-col gap-0.5">
                       {col.links.map((link) => (

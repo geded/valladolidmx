@@ -183,30 +183,22 @@ export const getMyPublicProfile = createServerFn({ method: "GET" })
       .filter((s) => typeof s === "string" && (s as string).trim())
       .join(" ")
       .trim();
-    const suggestedName =
-      fullName || ((p.display_name as string | null) ?? null) || null;
+    const suggestedName = fullName || ((p.display_name as string | null) ?? null) || null;
 
     const rawLangs = Array.isArray(row.languages) ? (row.languages as string[]) : [];
     const suggestedLangs =
-      rawLangs.length > 0
-        ? rawLangs
-        : p.preferred_language
-          ? [String(p.preferred_language)]
-          : [];
+      rawLangs.length > 0 ? rawLangs : p.preferred_language ? [String(p.preferred_language)] : [];
 
     return {
       public_handle: (row.public_handle as string | null) ?? null,
       is_public: Boolean(row.is_public),
-      public_display_name:
-        ((row.public_display_name as string | null) ?? null) || suggestedName,
+      public_display_name: ((row.public_display_name as string | null) ?? null) || suggestedName,
       public_bio: (row.public_bio as string | null) ?? null,
       avatar_url: await signAvatar(
-        ((row.avatar_url as string | null) ?? null) ||
-          ((p.avatar_url as string | null) ?? null),
+        ((row.avatar_url as string | null) ?? null) || ((p.avatar_url as string | null) ?? null),
       ),
       home_country:
-        ((row.home_country as string | null) ?? null) ||
-        ((p.country as string | null) ?? null),
+        ((row.home_country as string | null) ?? null) || ((p.country as string | null) ?? null),
       languages: suggestedLangs,
     };
   });
@@ -254,7 +246,9 @@ export const updateMyPublicProfile = createServerFn({ method: "POST" })
 
       const { data: p } = await context.supabase
         .from("profiles")
-        .select("first_name, last_name, display_name, phone, country, preferred_language, avatar_url")
+        .select(
+          "first_name, last_name, display_name, phone, country, preferred_language, avatar_url",
+        )
         .eq("user_id", context.userId)
         .maybeSingle();
       const { data: t } = await context.supabase
@@ -271,8 +265,10 @@ export const updateMyPublicProfile = createServerFn({ method: "POST" })
         Boolean(p?.avatar_url) &&
         Boolean(t?.travel_style) &&
         Boolean(t?.budget_range) &&
-        Array.isArray(t?.interests) && (t!.interests as unknown[]).length > 0 &&
-        Array.isArray(t?.preferred_destinations) && (t!.preferred_destinations as unknown[]).length > 0 &&
+        Array.isArray(t?.interests) &&
+        (t!.interests as unknown[]).length > 0 &&
+        Array.isArray(t?.preferred_destinations) &&
+        (t!.preferred_destinations as unknown[]).length > 0 &&
         Boolean(trip.travel_window);
       if (!complete) throw new Error("profile_incomplete");
     }

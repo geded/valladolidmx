@@ -57,13 +57,9 @@ export function EntityListView<Row>(props: Props<Row>) {
               {stage}
             </p>
           )}
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            {title}
-          </h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{title}</h1>
           {description && (
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              {description}
-            </p>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -141,10 +137,7 @@ export function EntityListView<Row>(props: Props<Row>) {
                 </tr>
               ) : (
                 rows.map((row) => (
-                  <tr
-                    key={rowKey(row)}
-                    className="border-t border-border hover:bg-accent/30"
-                  >
+                  <tr key={rowKey(row)} className="border-t border-border hover:bg-accent/30">
                     {columns.map((c) => (
                       <td key={c.key} className={`px-3 py-2 align-top ${c.className ?? ""}`}>
                         {c.render(row)}
@@ -157,7 +150,6 @@ export function EntityListView<Row>(props: Props<Row>) {
           </table>
         </div>
       </div>
-
     </section>
   );
 }

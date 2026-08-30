@@ -56,17 +56,12 @@ function isoDay(d: Date): string {
 
 export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { business_id: string; window_days?: number }) => {
-      const business_id = String(input?.business_id ?? "").trim();
-      if (!business_id) throw new Error("invalid_business");
-      const window_days = Math.min(
-        Math.max(Number(input?.window_days ?? 30), 7),
-        180,
-      );
-      return { business_id, window_days };
-    },
-  )
+  .inputValidator((input: { business_id: string; window_days?: number }) => {
+    const business_id = String(input?.business_id ?? "").trim();
+    if (!business_id) throw new Error("invalid_business");
+    const window_days = Math.min(Math.max(Number(input?.window_days ?? 30), 7), 180);
+    return { business_id, window_days };
+  })
   .handler(async ({ data, context }): Promise<CouponMetrics> => {
     const now = new Date();
     const from = new Date(now.getTime() - data.window_days * 24 * 60 * 60 * 1000);
@@ -75,9 +70,7 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
     // Cupones creados en la ventana (para emisión / activos / expirados).
     const { data: issuedRows, error: e1 } = await context.supabase
       .from("traveler_coupons")
-      .select(
-        "id, status, created_at, redeemed_at, promotion_slug, title, user_id",
-      )
+      .select("id, status, created_at, redeemed_at, promotion_slug, title, user_id")
       .eq("business_id", data.business_id)
       .gte("created_at", fromIso)
       .limit(5000);
@@ -144,10 +137,7 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
     const series = Array.from(seriesMap.values());
 
     // Top promociones (por canjes; empatan por emitidos).
-    const promoAgg = new Map<
-      string,
-      { title: string; issued: number; redeemed: number }
-    >();
+    const promoAgg = new Map<string, { title: string; issued: number; redeemed: number }>();
     for (const r of issued) {
       const p = promoAgg.get(r.promotion_slug) ?? {
         title: r.title,
@@ -168,9 +158,7 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
         });
       }
     }
-    const top_promotions: CouponMetricsTopPromo[] = Array.from(
-      promoAgg.entries(),
-    )
+    const top_promotions: CouponMetricsTopPromo[] = Array.from(promoAgg.entries())
       .map(([slug, v]) => ({
         promotion_slug: slug,
         title: v.title,
@@ -190,10 +178,10 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
         .select("user_id, country")
         .in("user_id", userIds);
       const cby = new Map<string, string | null>();
-      for (const p of ((profs ?? []) as Array<{
+      for (const p of (profs ?? []) as Array<{
         user_id: string;
         country: string | null;
-      }>)) {
+      }>) {
         cby.set(p.user_id, p.country);
       }
       for (const r of redeemed) {
@@ -223,8 +211,7 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
     if (e3) throw new Error(`metrics_reviews_failed: ${e3.message}`);
     const rev = (revRows ?? []) as Array<{ rating: number | null }>;
     totals.reviewed = rev.length;
-    totals.review_conversion =
-      redeemed.length > 0 ? rev.length / redeemed.length : 0;
+    totals.review_conversion = redeemed.length > 0 ? rev.length / redeemed.length : 0;
     if (rev.length > 0) {
       const sum = rev.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
       totals.avg_verified_rating = sum / rev.length;

@@ -51,10 +51,8 @@ const listPromotions = createServerFn({ method: "GET" }).handler(async (): Promi
     slug: r.slug as string,
     title: (r.title as string) ?? (r.slug as string),
     description: (r.description as string) ?? null,
-    businessName:
-      ((r as { businesses?: { display_name?: string } | null }).businesses?.display_name ?? null) as
-        | string
-        | null,
+    businessName: ((r as { businesses?: { display_name?: string } | null }).businesses
+      ?.display_name ?? null) as string | null,
     discountPercent: (r as { discount_percent?: number | null }).discount_percent ?? null,
     endsAt: (r as { ends_at?: string | null }).ends_at ?? null,
   }));
@@ -65,7 +63,8 @@ export const Route = createFileRoute("/promociones")({
   head: () =>
     buildPublicHead({
       title: `Promociones · ${SITE.name}`,
-      description: "Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya.",
+      description:
+        "Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya.",
       path: "/promociones",
     }),
   component: PromosRoute,

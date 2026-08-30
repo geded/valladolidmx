@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-interface S { order?: string }
+interface S {
+  order?: string;
+}
 
 export const Route = createFileRoute("/_authenticated/cuenta/pagos/error")({
   validateSearch: (s: Record<string, unknown>): S => ({
@@ -18,9 +20,8 @@ function ErrorPage() {
       </p>
       <h1 className="mt-2 font-serif text-4xl">Tu viaje aún no se confirmó</h1>
       <p className="mt-3 text-base leading-relaxed text-foreground/80">
-        Algo se interrumpió en el último paso. No pasa nada: tu itinerario
-        sigue guardado y puedes retomarlo cuando quieras. Tu concierge ya está
-        al tanto por si prefieres que te llame.
+        Algo se interrumpió en el último paso. No pasa nada: tu itinerario sigue guardado y puedes
+        retomarlo cuando quieras. Tu concierge ya está al tanto por si prefieres que te llame.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         {order ? (

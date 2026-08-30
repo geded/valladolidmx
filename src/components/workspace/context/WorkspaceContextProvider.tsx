@@ -141,18 +141,14 @@ export function WorkspaceContextProvider({ children }: { children: ReactNode }) 
       ts: Date.now(),
     };
     try {
-      window.sessionStorage.setItem(
-        STORAGE_PREFIX + workspaceId,
-        JSON.stringify(snap),
-      );
+      window.sessionStorage.setItem(STORAGE_PREFIX + workspaceId, JSON.stringify(snap));
     } catch {
       /* noop */
     }
   }, [workspaceId, state]);
 
   const value = useMemo<Ctx>(() => {
-    const isSelected = (ref: EntityRef) =>
-      state.selection.some((r) => refKey(r) === refKey(ref));
+    const isSelected = (ref: EntityRef) => state.selection.some((r) => refKey(r) === refKey(ref));
 
     const setSelection = (next: EntityRef[]) =>
       setState((s) => ({ ...s, selection: next, focused: next[next.length - 1] ?? s.focused }));
@@ -185,8 +181,7 @@ export function WorkspaceContextProvider({ children }: { children: ReactNode }) 
       setFocused: (ref) => setState((s) => ({ ...s, focused: ref })),
 
       filters: state.filters,
-      setFilter: (k, v) =>
-        setState((s) => ({ ...s, filters: { ...s.filters, [k]: v } })),
+      setFilter: (k, v) => setState((s) => ({ ...s, filters: { ...s.filters, [k]: v } })),
       clearFilters: () => setState((s) => ({ ...s, filters: {} })),
       scroll: state.scroll,
       setScroll: (n) => setState((s) => ({ ...s, scroll: n })),
@@ -228,24 +223,14 @@ export function WorkspaceContextProvider({ children }: { children: ReactNode }) 
   }, [workspace, workspaceId, state]);
 
   // Información sólo lectura útil para introspección.
-  useMemo(
-    () => getWorkspaceContextDefinition(workspaceId),
-    [workspaceId],
-  );
+  useMemo(() => getWorkspaceContextDefinition(workspaceId), [workspaceId]);
 
-  return (
-    <WorkspaceContextCtx.Provider value={value}>
-      {children}
-    </WorkspaceContextCtx.Provider>
-  );
+  return <WorkspaceContextCtx.Provider value={value}>{children}</WorkspaceContextCtx.Provider>;
 }
 
 export function useWorkspaceContext(): Ctx {
   const v = useContext(WorkspaceContextCtx);
-  if (!v)
-    throw new Error(
-      "useWorkspaceContext debe usarse dentro de <WorkspaceContextProvider>.",
-    );
+  if (!v) throw new Error("useWorkspaceContext debe usarse dentro de <WorkspaceContextProvider>.");
   return v;
 }
 

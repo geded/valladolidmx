@@ -23,17 +23,12 @@ import type { TravelItemKind } from "./travel-plans.functions";
  * en modo legacy (opt-in de la superficie) — no se universaliza en esta
  * iniciativa. `region` y `promotion` quedan fuera por decisión Founder.
  */
-export const TRIP_UNIVERSAL_KINDS = new Set<TravelItemKind>([
-  "product",
-  "business",
-  "event",
-]);
+export const TRIP_UNIVERSAL_KINDS = new Set<TravelItemKind>(["product", "business", "event"]);
 
 export const TRIP_LEGACY_KINDS = new Set<TravelItemKind>(["destination"]);
 
 /** UUID v1–v5 (RFC 4122) — identidad canónica requerida. */
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function isCanonicalId(value: unknown): value is string {
   return typeof value === "string" && UUID_RE.test(value);
@@ -69,9 +64,7 @@ export interface TripEligibilityResult {
  * Decide si la acción "Agregar a Mi Viaje" debe renderizarse para una
  * entidad dada. NO consulta estado remoto ni de sesión — decisión pura.
  */
-export function evaluateTripEligibility(
-  input: TripEligibilityInput,
-): TripEligibilityResult {
+export function evaluateTripEligibility(input: TripEligibilityInput): TripEligibilityResult {
   const mode = input.mode ?? "universal";
   const kind = input.kind as TravelItemKind;
   const allowed =
@@ -80,8 +73,7 @@ export function evaluateTripEligibility(
       : TRIP_UNIVERSAL_KINDS.has(kind);
 
   if (!allowed) {
-    const known =
-      TRIP_UNIVERSAL_KINDS.has(kind) || TRIP_LEGACY_KINDS.has(kind);
+    const known = TRIP_UNIVERSAL_KINDS.has(kind) || TRIP_LEGACY_KINDS.has(kind);
     return {
       eligible: false,
       reason: known ? "kind_not_universal" : "kind_not_supported",

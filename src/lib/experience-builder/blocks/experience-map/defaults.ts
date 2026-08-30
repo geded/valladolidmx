@@ -112,15 +112,13 @@ function coerceCenter(input: unknown): ExperienceMapCenter | null | undefined {
   const lat = typeof input.lat === "number" ? input.lat : null;
   const lng = typeof input.lng === "number" ? input.lng : null;
   if (lat === null || lng === null) return undefined;
-  const zoom =
-    typeof input.zoom === "number" ? input.zoom : EXPERIENCE_MAP_DEFAULT_CENTER_ZOOM;
+  const zoom = typeof input.zoom === "number" ? input.zoom : EXPERIENCE_MAP_DEFAULT_CENTER_ZOOM;
   return { lat, lng, zoom };
 }
 
 function coerceCapabilities(input: unknown): ExperienceMapCapabilities {
   if (!isRecord(input)) return { ...EXPERIENCE_MAP_DEFAULT_CAPABILITIES };
-  const b = (v: unknown, fallback: boolean): boolean =>
-    typeof v === "boolean" ? v : fallback;
+  const b = (v: unknown, fallback: boolean): boolean => (typeof v === "boolean" ? v : fallback);
   return {
     showDistance: b(input.showDistance, EXPERIENCE_MAP_DEFAULT_CAPABILITIES.showDistance),
     showDirections: b(input.showDirections, EXPERIENCE_MAP_DEFAULT_CAPABILITIES.showDirections),
@@ -151,9 +149,7 @@ function coerceCapabilities(input: unknown): ExperienceMapCapabilities {
 export function applyExperienceMapDefaults(input: unknown): ExperienceMapDTO {
   const src = isRecord(input) ? input : {};
   const points = Array.isArray(src.points)
-    ? (src.points
-        .map(coercePoint)
-        .filter((p): p is ExperienceMapPoint => p !== null))
+    ? src.points.map(coercePoint).filter((p): p is ExperienceMapPoint => p !== null)
     : [];
 
   // Orden de claves canónico (paridad byte-exact con

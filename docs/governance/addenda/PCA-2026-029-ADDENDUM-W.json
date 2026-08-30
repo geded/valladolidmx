@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-W",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-E-R3 (2026-08-29). Reconoce exclusivamente la regeneración de los tipos generados de Lovable Cloud derivada de dos migraciones aditivas: alta de la tabla public.traveler_memory_projection (RLS propia por usuario) y alta de la función interna public.visitor_intel_ingest_event, restringida a service_role. Cambio derivado y no autoral: no elimina tablas, columnas, políticas ni privilegios, y no altera datos existentes.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "1ded53a723701b405188b219035f54db56fa32914593a947f9fc9a7721b1da0a",
+    "current_sha256": "0fdb89a43b9a62667e347801a7ec26839e4614a16cf91d059e6526a99def9488",
+    "semantic_change": "G8-R1-E-R3 · Alta de public.traveler_memory_projection y de la función interna public.visitor_intel_ingest_event. Sin bajas ni cambios de contratos existentes.",
+    "authority": "Autorización Founder G8-R1-E-R3 (2026-08-29)"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero rutas públicas nuevas, cero redirects, cero sitemap, cero publicación",
+    "visitor_intel.events permanece append-only y fuera de la Data API pública"
+  ],
+  "recorded_at": "2026-08-29"
+}

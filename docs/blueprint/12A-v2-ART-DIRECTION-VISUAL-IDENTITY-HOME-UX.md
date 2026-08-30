@@ -1,6 +1,7 @@
 # Valladolid.mx Platform Blueprint
 
 # 12A – ART DIRECTION, VISUAL IDENTITY & HOME UX
+
 ## Manual Oficial de Dirección de Arte
 
 **Versión:** 2.0 (Definitiva)

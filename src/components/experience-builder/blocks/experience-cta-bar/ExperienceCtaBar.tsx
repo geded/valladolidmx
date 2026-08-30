@@ -20,6 +20,9 @@ import type {
   ExperienceCtaBarDTO,
 } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+
 
 const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar,
@@ -75,7 +78,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
       : cn(
           "fixed left-0 right-0 z-40 transition-transform duration-300",
           desktopPosition === "top" ? "top-0" : "bottom-0",
-          visible ? "translate-y-0 opacity-100" : desktopPosition === "top" ? "-translate-y-full opacity-0" : "translate-y-full opacity-0",
+          visible
+            ? "translate-y-0 opacity-100"
+            : desktopPosition === "top"
+              ? "-translate-y-full opacity-0"
+              : "translate-y-full opacity-0",
         );
 
   const inner = (
@@ -97,17 +104,52 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
     >
       {(label || meta) && (
         <div className="min-w-0 flex-1">
-          {label ? (
-            <p className="truncate text-sm font-semibold text-foreground">{label}</p>
-          ) : null}
-          {meta ? (
-            <p className="truncate text-xs text-muted-foreground">{meta}</p>
-          ) : null}
+          {label ? <p className="truncate text-sm font-semibold text-foreground">{label}</p> : null}
+          {meta ? <p className="truncate text-xs text-muted-foreground">{meta}</p> : null}
         </div>
       )}
       <div className="ml-auto flex items-center gap-2">
         {actions.map((a, i) => {
+          // GAP-01 · "Agregar a Mi Viaje" delega SIEMPRE en la acción
+          // canónica de Travel Plan. Sin entidad real se omite (fail-closed).
+          if (a.action === "add-to-trip") {
+            if (!a.travelItem) return null;
+            const t = a.travelItem;
+            return (
+              <AddToTravelPlanButton
+                key={i}
+                kind={t.kind}
+                targetId={t.targetId}
+                title={t.title}
+                slug={t.slug ?? null}
+                imageUrl={t.imageUrl ?? null}
+                subtitle={t.subtitle ?? null}
+                variant="full"
+                eligibilityMode={t.eligibilityMode ?? "universal"}
+                className="min-h-11 rounded-pill"
+              />
+            );
+          }
+          // GAP-01 · "Guardar" es una acción canónica DISTINTA: escribe en
+          // favoritos del viajero, nunca en Mi Viaje. Sin entidad real se
+          // omite (fail-closed).
+          if (a.action === "favorite") {
+            if (!a.favoriteItem) return null;
+            const f = a.favoriteItem;
+            return (
+              <FavoriteButton
+                key={i}
+                entityKind={f.entityKind}
+                entityId={f.entityId}
+                entityTitle={f.entityTitle}
+                entitySlug={f.entitySlug}
+                entityImageUrl={f.entityImageUrl}
+                className="min-h-11 rounded-pill"
+              />
+            );
+          }
           const iconOnly = !a.label && Boolean(a.iconKey);
+
           const classes = cn(
             "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-pill text-sm font-semibold transition",
             "focus-visible:outline-none focus-visible:ring-focus",

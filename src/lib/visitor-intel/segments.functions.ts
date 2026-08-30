@@ -21,10 +21,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
-import {
-  JOURNEY_TRANSITIONS,
-  type JourneyTransitionId,
-} from "./journey";
+import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "./journey";
 
 export const SEGMENT_SNAPSHOT_CONTRACT_VERSION = "1.0.0" as const;
 
@@ -68,14 +65,7 @@ export interface JourneySegmentSnapshot {
 }
 
 const InputSchema = z.object({
-  dimension: z.enum([
-    "locale",
-    "destination",
-    "capability",
-    "country",
-    "channel",
-    "device",
-  ]),
+  dimension: z.enum(["locale", "destination", "capability", "country", "channel", "device"]),
   window_days: z.union([z.literal(7), z.literal(30), z.literal(90)]).default(30),
 });
 
@@ -219,9 +209,7 @@ export const aggregateJourneySegments = createServerFn({ method: "POST" })
 
     const baselineActive = globalActive.size;
     const baselineJpr =
-      baselineActive === 0
-        ? 0
-        : Number((globalProgressed.size / baselineActive).toFixed(4));
+      baselineActive === 0 ? 0 : Number((globalProgressed.size / baselineActive).toFixed(4));
 
     if (perBucket.size === 0) {
       return {

@@ -19,9 +19,7 @@ export interface BusinessCardContract {
   actions: readonly CardActionContract[];
 }
 
-export function validateBusinessCardContract(
-  value: BusinessCardContract,
-): ContractValidation {
+export function validateBusinessCardContract(value: BusinessCardContract): ContractValidation {
   const errors: string[] = [];
   if (value.family !== "business") errors.push("family must be business");
   if (!value.id.trim()) errors.push("id is required");

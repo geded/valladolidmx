@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProductEditor } from "@/components/cms/ProductEditor";
 
-export const Route = createFileRoute(
-  "/_authenticated/cms/productos/$productId/editar",
-)({
+export const Route = createFileRoute("/_authenticated/cms/productos/$productId/editar")({
   head: () => ({
     meta: [
       { title: "Editar producto · CMS Studio" },

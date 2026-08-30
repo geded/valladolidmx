@@ -34,10 +34,9 @@ export const getMarketplaceFunnel = createServerFn({ method: "GET" })
     days: Math.min(Math.max(Math.floor(input?.days ?? 30), 1), 365),
   }))
   .handler(async ({ data, context }): Promise<MarketplaceFunnel> => {
-    const { data: row, error } = await rpc(context.supabase)(
-      "admin_marketplace_funnel",
-      { p_days: data.days },
-    );
+    const { data: row, error } = await rpc(context.supabase)("admin_marketplace_funnel", {
+      p_days: data.days,
+    });
     if (error) throw new Error(`funnel_failed: ${error.message}`);
     const r = (row ?? {}) as Record<string, number>;
     return {
@@ -70,10 +69,11 @@ export const getTopProducts = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data, context }): Promise<TopProduct[]> => {
-    const { data: rows, error } = await rpc(context.supabase)(
-      "admin_top_products",
-      { p_kind: data.kind, p_days: data.days, p_limit: data.limit },
-    );
+    const { data: rows, error } = await rpc(context.supabase)("admin_top_products", {
+      p_kind: data.kind,
+      p_days: data.days,
+      p_limit: data.limit,
+    });
     if (error) throw new Error(`top_products_failed: ${error.message}`);
     const list = (Array.isArray(rows) ? rows : []) as Array<Record<string, unknown>>;
     return list.map((r) => ({
@@ -101,10 +101,9 @@ export const getSearchMetricsSummary = createServerFn({ method: "GET" })
     days: Math.min(Math.max(Math.floor(input?.days ?? 7), 1), 90),
   }))
   .handler(async ({ data, context }): Promise<SearchMetricsSummary> => {
-    const { data: row, error } = await rpc(context.supabase)(
-      "admin_search_metrics_summary",
-      { p_days: data.days },
-    );
+    const { data: row, error } = await rpc(context.supabase)("admin_search_metrics_summary", {
+      p_days: data.days,
+    });
     if (error) throw new Error(`search_metrics_failed: ${error.message}`);
     const r = (row ?? {}) as Record<string, unknown>;
     const top = Array.isArray(r.top_zero_terms) ? r.top_zero_terms : [];
@@ -156,30 +155,26 @@ export const listSystemAlerts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { status?: string } | undefined) => ({
     status:
-      input?.status &&
-      ["open", "acknowledged", "resolved", "all"].includes(input.status)
+      input?.status && ["open", "acknowledged", "resolved", "all"].includes(input.status)
         ? input.status
         : "open",
   }))
   .handler(async ({ data, context }): Promise<SystemAlert[]> => {
-    const { data: rows, error } = await rpc(context.supabase)(
-      "admin_list_system_alerts",
-      { p_status: data.status, p_limit: 200 },
-    );
+    const { data: rows, error } = await rpc(context.supabase)("admin_list_system_alerts", {
+      p_status: data.status,
+      p_limit: 200,
+    });
     if (error) throw new Error(`alerts_list_failed: ${error.message}`);
-    return (Array.isArray(rows) ? rows : []).map((r) =>
-      toAlert(r as Record<string, unknown>),
-    );
+    return (Array.isArray(rows) ? rows : []).map((r) => toAlert(r as Record<string, unknown>));
   });
 
 export const acknowledgeSystemAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => ({ id: String(input.id) }))
   .handler(async ({ data, context }) => {
-    const { data: row, error } = await rpc(context.supabase)(
-      "admin_acknowledge_system_alert",
-      { p_id: data.id },
-    );
+    const { data: row, error } = await rpc(context.supabase)("admin_acknowledge_system_alert", {
+      p_id: data.id,
+    });
     if (error) throw new Error(`ack_failed: ${error.message}`);
     return row ? toAlert(row as Record<string, unknown>) : null;
   });
@@ -188,10 +183,9 @@ export const resolveSystemAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => ({ id: String(input.id) }))
   .handler(async ({ data, context }) => {
-    const { data: row, error } = await rpc(context.supabase)(
-      "admin_resolve_system_alert",
-      { p_id: data.id },
-    );
+    const { data: row, error } = await rpc(context.supabase)("admin_resolve_system_alert", {
+      p_id: data.id,
+    });
     if (error) throw new Error(`resolve_failed: ${error.message}`);
     return row ? toAlert(row as Record<string, unknown>) : null;
   });
@@ -199,16 +193,12 @@ export const resolveSystemAlert = createServerFn({ method: "POST" })
 export const evaluateFunctionalAlerts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { windowMinutes?: number } | undefined) => ({
-    windowMinutes: Math.min(
-      Math.max(Math.floor(input?.windowMinutes ?? 60), 5),
-      24 * 60,
-    ),
+    windowMinutes: Math.min(Math.max(Math.floor(input?.windowMinutes ?? 60), 5), 24 * 60),
   }))
   .handler(async ({ data, context }) => {
-    const { data: row, error } = await rpc(context.supabase)(
-      "admin_evaluate_functional_alerts",
-      { p_window_minutes: data.windowMinutes },
-    );
+    const { data: row, error } = await rpc(context.supabase)("admin_evaluate_functional_alerts", {
+      p_window_minutes: data.windowMinutes,
+    });
     if (error) throw new Error(`eval_alerts_failed: ${error.message}`);
     const r = (row ?? {}) as Record<string, unknown>;
     return {

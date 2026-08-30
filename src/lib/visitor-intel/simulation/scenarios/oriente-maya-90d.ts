@@ -7,10 +7,7 @@
  * Fuente única de configuración base para la UI admin.
  */
 import type { SimulationScenario, SimulationScale } from "../scenario";
-import {
-  SimulationScenarioSchema,
-  SIMULATION_SCENARIO_SCHEMA_VERSION,
-} from "../scenario";
+import { SimulationScenarioSchema, SIMULATION_SCENARIO_SCHEMA_VERSION } from "../scenario";
 import { PROFILE_CATALOG } from "../profiles";
 
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;

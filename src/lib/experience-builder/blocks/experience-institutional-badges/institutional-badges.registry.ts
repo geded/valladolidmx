@@ -211,7 +211,8 @@ export function isBadgeEligible(
   if (entry.verificationMode === "disabled") return false;
   if (entry.verificationMode === "registry") return true;
   if (item.verificationStatus !== "verified") return false;
-  if (!item.sourceOwner?.trim() || !item.evidenceUrl || !isValidInstant(item.verifiedAt)) return false;
+  if (!item.sourceOwner?.trim() || !item.evidenceUrl || !isValidInstant(item.verifiedAt))
+    return false;
   try {
     new URL(item.evidenceUrl);
   } catch {

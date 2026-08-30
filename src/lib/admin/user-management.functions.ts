@@ -52,25 +52,23 @@ export const inviteUser = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1) Invitación por email (magic link). Usa plantilla `invite` de Lovable Emails.
-    const { data: invited, error: inviteError } =
-      await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
+    const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+      data.email,
+      {
         data: data.displayName ? { display_name: data.displayName } : undefined,
-      });
+      },
+    );
     if (inviteError || !invited?.user) {
-      throw new Error(
-        inviteError?.message ?? "No se pudo enviar la invitación.",
-      );
+      throw new Error(inviteError?.message ?? "No se pudo enviar la invitación.");
     }
 
     // 2) Asigna el rol solicitado (además del rol traveler por defecto que crea el trigger).
     if (data.role !== "traveler") {
-      const { error: roleError } = await supabaseAdmin
-        .from("user_roles")
-        .insert({
-          user_id: invited.user.id,
-          role: data.role,
-          created_by: context.userId,
-        });
+      const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
+        user_id: invited.user.id,
+        role: data.role,
+        created_by: context.userId,
+      });
       if (roleError && !roleError.message.includes("duplicate")) {
         throw new Error(`Invitación enviada, pero no se pudo asignar el rol: ${roleError.message}`);
       }
@@ -148,7 +146,9 @@ export const updateUserPassword = createServerFn({ method: "POST" })
 
 export const sendPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ email: z.string().email(), userId: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ email: z.string().email(), userId: z.string().uuid() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     await assertSuperAdmin({ supabase: context.supabase, userId: context.userId });
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

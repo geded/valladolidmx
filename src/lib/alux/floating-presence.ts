@@ -18,10 +18,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { useHasStickyCta } from "@/lib/alux/sticky-cta-presence";
 
 /** Prefijos de ruta con CTA sticky propio donde el flotante debe ocultarse. */
-const HIDDEN_PATH_PREFIXES: readonly string[] = [
-  "/cuenta/carrito",
-  "/cuenta/pagos",
-];
+const HIDDEN_PATH_PREFIXES: readonly string[] = ["/cuenta/carrito", "/cuenta/pagos"];
 
 /**
  * Detecta fichas comerciales por URL (no por contexto rehidratado).
@@ -35,7 +32,10 @@ const HIDDEN_PATH_PREFIXES: readonly string[] = [
  */
 function detectFicha(pathname: string): "business" | "product" | null {
   if (!pathname.startsWith("/oriente-maya/")) return null;
-  const segs = pathname.replace(/^\/oriente-maya\//, "").split("/").filter(Boolean);
+  const segs = pathname
+    .replace(/^\/oriente-maya\//, "")
+    .split("/")
+    .filter(Boolean);
   if (segs.length >= 4) return "product";
   if (segs.length >= 3) return "business";
   return null;
@@ -45,12 +45,7 @@ export interface AluxFloatingPresence {
   /** El flotante debe ocultarse en la superficie actual. */
   readonly shouldHide: boolean;
   /** Motivo (para tooling/debug; nunca visible al usuario). */
-  readonly reason:
-    | "ficha-business"
-    | "ficha-product"
-    | "checkout"
-    | "sticky-cta"
-    | "none";
+  readonly reason: "ficha-business" | "ficha-product" | "checkout" | "sticky-cta" | "none";
   /**
    * Offset vertical adicional (px) que el flotante debe respetar para no
    * solapar barras sticky comerciales. 0 cuando no hay barra activa.
@@ -63,14 +58,11 @@ export function useAluxFloatingPresence(): AluxFloatingPresence {
   const hasStickyCta = useHasStickyCta();
 
   const ficha = detectFicha(pathname);
-  if (ficha === "product")
-    return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
-  if (ficha === "business")
-    return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
+  if (ficha === "product") return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
+  if (ficha === "business") return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
   if (HIDDEN_PATH_PREFIXES.some((p) => pathname.startsWith(p))) {
     return { shouldHide: true, reason: "checkout", bottomOffset: 0 };
   }
-  if (hasStickyCta)
-    return { shouldHide: false, reason: "sticky-cta", bottomOffset: 88 };
+  if (hasStickyCta) return { shouldHide: false, reason: "sticky-cta", bottomOffset: 88 };
   return { shouldHide: false, reason: "none", bottomOffset: 0 };
 }

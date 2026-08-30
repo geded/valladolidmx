@@ -26,8 +26,7 @@ export const Route = createFileRoute("/_authenticated/cms/travel-plans")({
       { title: "Viajes en curso · CMS · Valladolid.mx" },
       {
         name: "description",
-        content:
-          "Panel operativo de Travel Plans activos para Founder, Admin y Concierge.",
+        content: "Panel operativo de Travel Plans activos para Founder, Admin y Concierge.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -102,8 +101,8 @@ function TravelPlansOpsPage() {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Viajes en curso</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Vista operativa de viajes activos, propuestas de Alux y casos concierge.
-              Sólo lectura — todas las acciones se realizan desde el expediente correspondiente.
+              Vista operativa de viajes activos, propuestas de Alux y casos concierge. Sólo lectura
+              — todas las acciones se realizan desde el expediente correspondiente.
             </p>
           </div>
           <button

@@ -45,26 +45,27 @@ function institutionalBadgesForDestination(
   return out;
 }
 
-function categoryToEntityKind(
-  categorySlug: string | null | undefined,
-): TourismEntityKind {
+function categoryToEntityKind(categorySlug: string | null | undefined): TourismEntityKind {
   if (!categorySlug) return "business";
   const s = categorySlug.toLowerCase();
   if (["hoteles", "hospedaje"].includes(s)) return "hotel";
   if (["restaurantes", "gastronomia"].includes(s)) return "restaurant";
   if (["experiencias", "experiencias-tours", "tours"].includes(s)) return "experience";
   if (
-    ["casas-de-vacaciones", "casas-vacacionales", "villas", "rentas-vacacionales", "airbnb", "casas"].includes(
-      s,
-    )
+    [
+      "casas-de-vacaciones",
+      "casas-vacacionales",
+      "villas",
+      "rentas-vacacionales",
+      "airbnb",
+      "casas",
+    ].includes(s)
   )
     return "hotel";
   return "business";
 }
 
-function categoryToEyebrowLabel(
-  categorySlug: string | null | undefined,
-): string | null {
+function categoryToEyebrowLabel(categorySlug: string | null | undefined): string | null {
   const map: Record<string, string> = {
     hoteles: "Hospedaje",
     hospedaje: "Hospedaje",
@@ -95,8 +96,7 @@ export function businessToTourismCard(
   opts: BusinessAdapterOptions = {},
 ): TourismCardVM {
   const categorySlug = opts.forcedCategorySlug ?? b.category_slug ?? null;
-  const destinationLabel =
-    opts.destinationLabel ?? humanizeSlug(b.destination_slug) ?? null;
+  const destinationLabel = opts.destinationLabel ?? humanizeSlug(b.destination_slug) ?? null;
   const href =
     b.destination_slug && categorySlug
       ? resolveCanonicalPath({
@@ -112,25 +112,29 @@ export function businessToTourismCard(
   // Ola 7.4.a · Badge de paquete de visibilidad (Destacado/Premium/Élite…)
   const allowedTones = new Set(["default", "primary", "success", "warning", "info"]);
   const rawTone = (b.visibility_badge_variant ?? "").toLowerCase();
-  const visibilityTone = (allowedTones.has(rawTone) ? rawTone : "primary") as
-    TourismCardVM["badges"][number]["tone"];
+  const visibilityTone = (
+    allowedTones.has(rawTone) ? rawTone : "primary"
+  ) as TourismCardVM["badges"][number]["tone"];
   const visibilityBadges: TourismCardVM["badges"] = b.visibility_plan_name
     ? [{ label: b.visibility_plan_name, tone: visibilityTone }]
     : [];
   // Ola 7.8 · Founder Spotlight (sobre-exposición manual)
-  const spotlightBadges: TourismCardVM["badges"] = (b as {
-    spotlight_headline?: string | null;
-    spotlight_boost?: number;
-  }).spotlight_headline || ((b as { spotlight_boost?: number }).spotlight_boost ?? 0) > 0
-    ? [
-        {
-          label:
-            (b as { spotlight_headline?: string | null }).spotlight_headline ||
-            "Destacado por Valladolid",
-          tone: "warning",
-        },
-      ]
-    : [];
+  const spotlightBadges: TourismCardVM["badges"] =
+    (
+      b as {
+        spotlight_headline?: string | null;
+        spotlight_boost?: number;
+      }
+    ).spotlight_headline || ((b as { spotlight_boost?: number }).spotlight_boost ?? 0) > 0
+      ? [
+          {
+            label:
+              (b as { spotlight_headline?: string | null }).spotlight_headline ||
+              "Destacado por Valladolid",
+            tone: "warning",
+          },
+        ]
+      : [];
   return {
     id: b.id,
     entityKind: categoryToEntityKind(categorySlug),
@@ -142,9 +146,7 @@ export function businessToTourismCard(
     mediaUrl: null,
     mediaAlt: null,
     rating: null,
-    location: destinationLabel
-      ? { label: destinationLabel, distanceKm: null }
-      : null,
+    location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
     coordinates:
       b.latitude != null && b.longitude != null
         ? { lat: Number(b.latitude), lng: Number(b.longitude) }
@@ -181,9 +183,7 @@ function formatDate(iso: string | null | undefined): string | null {
 
 export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
   const destinationLabel = humanizeSlug(e.destination_slug);
-  const dateLabel =
-    formatDate(e.starts_at) +
-    (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
+  const dateLabel = formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
   return {
     id: e.id,
     entityKind: "event",
@@ -195,9 +195,7 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
     mediaUrl: e.cover_url || null,
     mediaAlt: e.title,
     rating: null,
-    location: destinationLabel
-      ? { label: destinationLabel, distanceKm: null }
-      : null,
+    location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
     territorialContext: null,
     highlights: [],
     badges: e.is_free ? [{ label: "Entrada libre", tone: "success" }] : [],
@@ -215,9 +213,7 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
 /* ------------------------------------------------------------------ *
  * Promotion (marketplace) → TourismCardVM
  * ------------------------------------------------------------------ */
-export function promotionToTourismCard(
-  p: MarketplacePromotionCard,
-): TourismCardVM {
+export function promotionToTourismCard(p: MarketplacePromotionCard): TourismCardVM {
   const discount =
     p.discount_percent != null && p.discount_percent > 0
       ? [

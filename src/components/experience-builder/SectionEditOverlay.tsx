@@ -42,9 +42,9 @@ interface WrapArgs {
  * Fabrica el render-prop `wrap` para `CompositionRenderer`. Cuando el
  * usuario no es editor, devuelve `undefined` para no envolver nada.
  */
-export function useSectionEditWrap({ pageSlug }: WrapArgs):
-  | ((node: CompositionNode, content: ReactNode) => ReactNode)
-  | undefined {
+export function useSectionEditWrap({
+  pageSlug,
+}: WrapArgs): ((node: CompositionNode, content: ReactNode) => ReactNode) | undefined {
   const editor = useEditorMode();
   if (!editor) return undefined;
   return (node, content) => (

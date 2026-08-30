@@ -21,14 +21,12 @@ export const getPaymentsReadyPublic = createServerFn({ method: "GET" }).handler(
     let hasKeys = false;
     if (provider === "stripe") {
       hasKeys =
-        Boolean(process.env.STRIPE_SECRET_KEY) &&
-        Boolean(process.env.STRIPE_WEBHOOK_SECRET);
+        Boolean(process.env.STRIPE_SECRET_KEY) && Boolean(process.env.STRIPE_WEBHOOK_SECRET);
     }
     // Modo demo: la fuente de verdad es platform_settings.payments.demo_mode
     // (administrable desde /cms/pagos). La env var actúa como fallback
     // cuando la fila aún no existe o la consulta falla.
-    const envFallback =
-      (process.env.PAYMENTS_DEMO_MODE ?? "true").toLowerCase() !== "false";
+    const envFallback = (process.env.PAYMENTS_DEMO_MODE ?? "true").toLowerCase() !== "false";
     let demoMode = envFallback;
     try {
       const supabase = createClient<Database>(

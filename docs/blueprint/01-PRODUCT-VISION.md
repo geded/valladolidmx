@@ -1,6 +1,7 @@
 # 01-PRODUCT-VISION.md
 
 # Product Vision
+
 ## Valladolid.mx / Oriente Maya Digital Platform
 
 **Versión:** 1.0  
@@ -80,12 +81,12 @@ Valladolid.mx permite al visitante:
 
 Valladolid.mx puede inspirarse en patrones de TripAdvisor, como reseñas, rankings y fichas de productos, pero no debe convertirse en una copia.
 
-| Plataforma | Enfoque |
-|---|---|
-| TripAdvisor | Comparar y opinar |
-| Booking | Reservar hospedaje |
-| Google Maps | Ubicar y navegar |
-| Instagram | Inspirar visualmente |
+| Plataforma    | Enfoque                                                         |
+| ------------- | --------------------------------------------------------------- |
+| TripAdvisor   | Comparar y opinar                                               |
+| Booking       | Reservar hospedaje                                              |
+| Google Maps   | Ubicar y navegar                                                |
+| Instagram     | Inspirar visualmente                                            |
 | Valladolid.mx | Inspirar, planear, solicitar y vivir un viaje regional completo |
 
 La ventaja de Valladolid.mx es la especialización territorial y la conexión con un concierge experto local.

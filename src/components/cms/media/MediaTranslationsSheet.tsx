@@ -136,18 +136,11 @@ export function MediaTranslationsSheet({
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
           {LOCALES.map(({ code, label }) => {
             const r = byLocale[code];
-            const draft =
-              drafts[code] ??
-              r?.alt_text ??
-              r?.alt_text_ai ??
-              "";
+            const draft = drafts[code] ?? r?.alt_text ?? r?.alt_text_ai ?? "";
             const isHuman = r?.source === "human";
             const isApproved = r?.review_state === "approved";
             return (
-              <div
-                key={code}
-                className="rounded-lg border border-border bg-card p-3"
-              >
+              <div key={code} className="rounded-lg border border-border bg-card p-3">
                 <div className="mb-1.5 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold uppercase">{code}</span>
@@ -179,9 +172,7 @@ export function MediaTranslationsSheet({
                   rows={2}
                   placeholder={`ALT en ${label}`}
                   value={draft}
-                  onChange={(e) =>
-                    setDrafts((d) => ({ ...d, [code]: e.target.value }))
-                  }
+                  onChange={(e) => setDrafts((d) => ({ ...d, [code]: e.target.value }))}
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Button
@@ -202,10 +193,7 @@ export function MediaTranslationsSheet({
                   </Button>
                   <Button
                     size="sm"
-                    disabled={
-                      busy === code ||
-                      (!r?.alt_text_ai && !drafts[code] && code !== "es")
-                    }
+                    disabled={busy === code || (!r?.alt_text_ai && !drafts[code] && code !== "es")}
                     onClick={() => handleApprove(code)}
                   >
                     Aprobar

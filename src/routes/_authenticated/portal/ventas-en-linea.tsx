@@ -57,7 +57,11 @@ function DirectSalesPage() {
     staleTime: 60_000,
   });
 
-  const { data: products = [], isLoading, error } = useQuery({
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["portal", "products", businessId],
     queryFn: () => fetchProducts({ data: { businessId: businessId as string } }),
     enabled: Boolean(businessId),
@@ -83,10 +87,10 @@ function DirectSalesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Ventas en línea</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Activa la venta directa de tus experiencias: precio final para el viajero,
-          moneda, comisión de la plataforma, políticas y anticipación mínima. Sólo
-          las experiencias que marques aquí podrán venderse directo desde su ficha
-          y desde los recorridos que arme el Concierge en el Oriente Maya de Yucatán.
+          Activa la venta directa de tus experiencias: precio final para el viajero, moneda,
+          comisión de la plataforma, políticas y anticipación mínima. Sólo las experiencias que
+          marques aquí podrán venderse directo desde su ficha y desde los recorridos que arme el
+          Concierge en el Oriente Maya de Yucatán.
         </p>
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{enabledCount} activas</Badge>
@@ -130,9 +134,7 @@ function PaymentsStatusBanner({ ready }: { ready: boolean }) {
   if (ready) {
     return (
       <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-4 text-sm">
-        <p className="font-medium text-emerald-700">
-          ✓ Pagos activos
-        </p>
+        <p className="font-medium text-emerald-700">✓ Pagos activos</p>
         <p className="mt-1 text-xs text-muted-foreground">
           Los viajeros ya pueden completar la compra directa de tus experiencias.
         </p>
@@ -141,14 +143,11 @@ function PaymentsStatusBanner({ ready }: { ready: boolean }) {
   }
   return (
     <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm">
-      <p className="font-medium text-amber-700">
-        ⚠ Pagos pendientes de activar
-      </p>
+      <p className="font-medium text-amber-700">⚠ Pagos pendientes de activar</p>
       <p className="mt-1 text-xs text-muted-foreground">
-        El botón <strong>Comprar</strong> ya está listo en las fichas de
-        experiencia, pero permanece deshabilitado hasta que un
-        administrador cargue las llaves del proveedor de pagos y active la
-        plataforma en{" "}
+        El botón <strong>Comprar</strong> ya está listo en las fichas de experiencia, pero permanece
+        deshabilitado hasta que un administrador cargue las llaves del proveedor de pagos y active
+        la plataforma en{" "}
         <Link to="/cms/pagos" className="underline">
           CMS · Pagos
         </Link>
@@ -185,21 +184,15 @@ function ProductDirectSaleCard({
   );
   const [terms, setTerms] = useState(product.direct_sale_terms ?? "");
   const [minLeadHours, setMinLeadHours] = useState<string>(
-    product.direct_sale_min_lead_hours != null
-      ? String(product.direct_sale_min_lead_hours)
-      : "",
+    product.direct_sale_min_lead_hours != null ? String(product.direct_sale_min_lead_hours) : "",
   );
   const [maxQuantity, setMaxQuantity] = useState<string>(
-    product.direct_sale_max_quantity != null
-      ? String(product.direct_sale_max_quantity)
-      : "",
+    product.direct_sale_max_quantity != null ? String(product.direct_sale_max_quantity) : "",
   );
 
   const dirty = useMemo(() => {
     const priceCents = price ? Math.round(Number(price) * 100) : null;
-    const commissionBps = commissionPct
-      ? Math.round(Number(commissionPct) * 100)
-      : null;
+    const commissionBps = commissionPct ? Math.round(Number(commissionPct) * 100) : null;
     return (
       enabled !== product.direct_sale_enabled ||
       priceCents !== product.direct_sale_price_amount ||
@@ -207,10 +200,8 @@ function ProductDirectSaleCard({
       commissionBps !== product.direct_sale_commission_bps ||
       cancellationPolicy !== (product.direct_sale_cancellation_policy ?? "") ||
       terms !== (product.direct_sale_terms ?? "") ||
-      (minLeadHours ? Number(minLeadHours) : null) !==
-        product.direct_sale_min_lead_hours ||
-      (maxQuantity ? Number(maxQuantity) : null) !==
-        product.direct_sale_max_quantity
+      (minLeadHours ? Number(minLeadHours) : null) !== product.direct_sale_min_lead_hours ||
+      (maxQuantity ? Number(maxQuantity) : null) !== product.direct_sale_max_quantity
     );
   }, [
     enabled,
@@ -227,9 +218,7 @@ function ProductDirectSaleCard({
   const mutation = useMutation({
     mutationFn: async () => {
       const priceCents = price ? Math.round(Number(price) * 100) : null;
-      const commissionBps = commissionPct
-        ? Math.round(Number(commissionPct) * 100)
-        : null;
+      const commissionBps = commissionPct ? Math.round(Number(commissionPct) * 100) : null;
       return update({
         data: {
           productId: product.id,
@@ -245,9 +234,7 @@ function ProductDirectSaleCard({
       });
     },
     onSuccess: () => {
-      toast.success(
-        enabled ? "Venta en línea activada" : "Venta en línea desactivada",
-      );
+      toast.success(enabled ? "Venta en línea activada" : "Venta en línea desactivada");
       qc.invalidateQueries({ queryKey: ["portal", "products", businessId] });
     },
     onError: (e: unknown) => {
@@ -373,10 +360,7 @@ function ProductDirectSaleCard({
           />
         </Field>
 
-        <Field
-          label="Términos adicionales"
-          className="sm:col-span-2 lg:col-span-3"
-        >
+        <Field label="Términos adicionales" className="sm:col-span-2 lg:col-span-3">
           <Textarea
             rows={2}
             value={terms}
@@ -387,9 +371,7 @@ function ProductDirectSaleCard({
       </div>
 
       <div className="mt-4 flex items-center justify-end gap-2">
-        {dirty ? (
-          <p className="text-xs text-amber-600">Cambios sin guardar</p>
-        ) : null}
+        {dirty ? <p className="text-xs text-amber-600">Cambios sin guardar</p> : null}
         {enabled && price ? (
           <div className="mr-auto flex items-center gap-2">
             <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
@@ -401,10 +383,7 @@ function ProductDirectSaleCard({
             />
           </div>
         ) : null}
-        <Button
-          onClick={() => mutation.mutate()}
-          disabled={!dirty || mutation.isPending}
-        >
+        <Button onClick={() => mutation.mutate()} disabled={!dirty || mutation.isPending}>
           {mutation.isPending ? "Guardando…" : "Guardar cambios"}
         </Button>
       </div>

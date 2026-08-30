@@ -75,9 +75,7 @@ function buildDeclaration(scenario: Scenario): RouteContextDeclaration {
         },
         inherit: ["region", "destination", "category"],
         canonical: "/marketplace/hacienda-selva",
-        kindDefaults: [
-          { kind: "marketplace", label: "Catálogo", href: "/oriente-maya" },
-        ],
+        kindDefaults: [{ kind: "marketplace", label: "Catálogo", href: "/oriente-maya" }],
       });
   }
 }
@@ -108,8 +106,8 @@ function PlaygroundPage() {
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Context Engine</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Ejercita el resolver, la herencia por whitelist y la persistencia del
-          recorrido previo. Cero impacto en el sitio público.
+          Ejercita el resolver, la herencia por whitelist y la persistencia del recorrido previo.
+          Cero impacto en el sitio público.
         </p>
       </header>
 
@@ -117,18 +115,10 @@ function PlaygroundPage() {
         <ScenarioButton current={scenario} value="destination" onSelect={setScenario}>
           1. Ir a destino (Valladolid)
         </ScenarioButton>
-        <ScenarioButton
-          current={scenario}
-          value="category_from_destination"
-          onSelect={setScenario}
-        >
+        <ScenarioButton current={scenario} value="category_from_destination" onSelect={setScenario}>
           2. Ir a categoría (Hoteles)
         </ScenarioButton>
-        <ScenarioButton
-          current={scenario}
-          value="detail_from_category"
-          onSelect={setScenario}
-        >
+        <ScenarioButton current={scenario} value="detail_from_category" onSelect={setScenario}>
           3. Ir a detalle (Hacienda Selva)
         </ScenarioButton>
         <button
@@ -153,8 +143,8 @@ function PlaygroundPage() {
         </h2>
         <p className="mb-3 text-xs text-muted-foreground">
           Este bloque monta un <code>PublicShell</code> de producción con
-          <code> contextDeclaration</code> y <code>useContextCrumbs</code>.
-          El breadcrumb refleja ancestros + herencia del recorrido previo.
+          <code> contextDeclaration</code> y <code>useContextCrumbs</code>. El breadcrumb refleja
+          ancestros + herencia del recorrido previo.
         </p>
         <div className="rounded-lg border">
           <PublicShell
@@ -180,9 +170,7 @@ function PlaygroundPage() {
             log.map((row, i) => (
               <li key={i} className="rounded bg-muted/40 px-2 py-1">
                 <span className="font-semibold">{row.event}</span>{" "}
-                <span className="text-muted-foreground">
-                  {JSON.stringify(row.meta)}
-                </span>
+                <span className="text-muted-foreground">{JSON.stringify(row.meta)}</span>
               </li>
             ))
           )}
@@ -232,8 +220,7 @@ function ContextDebugPanel() {
         <span className="font-semibold">canonical:</span> {ctx.canonical}
       </div>
       <div className="mb-2">
-        <span className="font-semibold">current:</span>{" "}
-        {ctx.current.kind} · {ctx.current.label}
+        <span className="font-semibold">current:</span> {ctx.current.kind} · {ctx.current.label}
       </div>
       <div className="mb-2">
         <span className="font-semibold">ancestors:</span>{" "}
@@ -242,10 +229,9 @@ function ContextDebugPanel() {
           : ctx.ancestors.map((a) => `${a.kind}:${a.label}`).join(" › ")}
       </div>
       <div className="mb-2">
-        <span className="font-semibold">region:</span>{" "}
-        {ctx.region?.label ?? "—"} · <span className="font-semibold">destination:</span>{" "}
-        {ctx.destination?.label ?? "—"} · <span className="font-semibold">category:</span>{" "}
-        {ctx.category?.label ?? "—"}
+        <span className="font-semibold">region:</span> {ctx.region?.label ?? "—"} ·{" "}
+        <span className="font-semibold">destination:</span> {ctx.destination?.label ?? "—"} ·{" "}
+        <span className="font-semibold">category:</span> {ctx.category?.label ?? "—"}
       </div>
       <div>
         <span className="font-semibold">previous:</span>{" "}

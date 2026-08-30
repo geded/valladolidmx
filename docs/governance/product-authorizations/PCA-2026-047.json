@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-047",
+  "title": "19.43 · G8-Q2D-A · Plantilla reusable premium-entity-place v1.0",
+  "status": "Approved",
+  "branch": "feature/omxds-g8-q2d-a-premium-entity-place-v1",
+  "blueprint": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+  "founder_authority": "Aprobación Founder 2026-08-28 · G8-Q2D-0. El Founder aprueba como autoridad visual de la familia premium-entity-place la dirección Cinematográfica (predeterminada para zona arqueológica, cenote y atractivo natural, sólo cuando exista una fotografía de portada gobernada, aprobada y atribuida) y la dirección Editorial (predeterminada para museo, patrimonio religioso y mercado/artesanal, y fallback obligatorio para cualquier variante sin portada acreditada). Quedan congelados tipografía, paleta, estructura Editorial, estructura Cinematográfica, breadcrumb territorial, CTA Agregar a Mi Viaje, Header y Footer canónicos, ubicación de Alux con zona segura, tratamiento neutral y honesto cuando no existe imagen y ausencia de contenido o imágenes falsas. Se autoriza expresamente: convertir la autoridad visual en la plantilla reusable premium-entity-place; crear pageKind=place mediante migración aditiva e idempotente del enum eb_page_kind; registrar la plantilla en el Experience Builder (bloque compuesto vmx.place.premium-q2d, política editorial y presets); implementar las seis variantes cerradas zona-arqueologica, cenote, area-natural, museo, templo-convento y mercado-artesanal; hacer persistible el selector Editorial/Cinematografica mediante presentation_mode; conservar la regla automática de fallback fail-closed de medios con el aviso oficial del constructor; y validar en Studio y catálogo. Prohibido expresamente: publicación pública, rutas públicas, redirects 301, sitemap, modificación de Qué hacer, despublicación de destinos históricos, activación de flags, uso de imágenes de otro lugar para conservar el modo cinematográfico, publicación de un hero cinematográfico con bloque vacío, PR, merge y despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/components/place-premium/place-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/place-premium/PlacePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/page-kind-registry.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/premium-template-registry.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/composition-renderer.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/editorial-builder-policy.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run scripts/route-inventory-coverage.ts",
+    "bun run validate:q2d:a",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

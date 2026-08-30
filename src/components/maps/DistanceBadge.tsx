@@ -27,27 +27,14 @@ function formatDuration(seconds: number) {
   return m === 0 ? `${h} h` : `${h} h ${m} min`;
 }
 
-export function DistanceBadge({
-  destLat,
-  destLng,
-}: {
-  destLat: number;
-  destLng: number;
-}) {
+export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: number }) {
   const { location, status, request } = useVisitorGeolocation();
   const fn = useServerFn(computeRoute);
 
   const { data, isLoading, isError } = useQuery({
     enabled: Boolean(location),
     staleTime: 1000 * 60 * 60 * 24,
-    queryKey: [
-      "maps",
-      "route",
-      location?.lat,
-      location?.lng,
-      destLat,
-      destLng,
-    ],
+    queryKey: ["maps", "route", location?.lat, location?.lng, destLat, destLng],
     queryFn: () =>
       fn({
         data: {
@@ -65,12 +52,7 @@ export function DistanceBadge({
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4" aria-hidden />
         <span>¿Qué tan lejos estás?</span>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={request}
-          disabled={status === "prompting"}
-        >
+        <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"}>
           {status === "prompting"
             ? "Solicitando…"
             : status === "denied"
@@ -84,17 +66,11 @@ export function DistanceBadge({
   }
 
   if (isLoading) {
-    return (
-      <p className="text-sm text-muted-foreground">Calculando distancia…</p>
-    );
+    return <p className="text-sm text-muted-foreground">Calculando distancia…</p>;
   }
 
   if (isError || !data?.ok || data.distanceMeters == null) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No pudimos calcular la ruta ahora.
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">No pudimos calcular la ruta ahora.</p>;
   }
 
   return (

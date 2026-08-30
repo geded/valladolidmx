@@ -221,9 +221,23 @@ const NARRATIVE: Record<WorkspaceId, Narrative> = {
   founder: {
     greeting: "3 cosas requieren tu atención antes del mediodía.",
     hoy: [
-      { title: "Cobrar $4,820 MXN a Hotel Zaci", body: "Factura vence hoy · 14 días de mora", cta: "Cobrar ahora", tone: "cash" },
-      { title: "Aprobar respuesta de Alux a queja de huésped", body: "Tour Cenote Suytun · 2★ · Borrador listo", cta: "Revisar", tone: "warn" },
-      { title: "Confirmar tour privado 14:00", body: "Familia Pérez · 4 pax · sin guía asignado", cta: "Asignar guía" },
+      {
+        title: "Cobrar $4,820 MXN a Hotel Zaci",
+        body: "Factura vence hoy · 14 días de mora",
+        cta: "Cobrar ahora",
+        tone: "cash",
+      },
+      {
+        title: "Aprobar respuesta de Alux a queja de huésped",
+        body: "Tour Cenote Suytun · 2★ · Borrador listo",
+        cta: "Revisar",
+        tone: "warn",
+      },
+      {
+        title: "Confirmar tour privado 14:00",
+        body: "Familia Pérez · 4 pax · sin guía asignado",
+        cta: "Asignar guía",
+      },
     ],
     pulso: [
       { label: "Ingresos hoy", value: "$28,940", delta: "+12%", up: true },
@@ -243,9 +257,22 @@ const NARRATIVE: Record<WorkspaceId, Narrative> = {
   portal: {
     greeting: "Tienes 2 reservas sin confirmar y 1 cobro pendiente.",
     hoy: [
-      { title: "Confirmar reserva — Familia García", body: "Tour cenotes · sábado 09:00 · 5 pax", cta: "Confirmar" },
-      { title: "Cobrar saldo — Reserva #4821", body: "$2,400 MXN · pago parcial el lunes", cta: "Enviar cobro", tone: "cash" },
-      { title: "Responder chat — Huésped Lee", body: "Pregunta por transporte aeropuerto", cta: "Responder" },
+      {
+        title: "Confirmar reserva — Familia García",
+        body: "Tour cenotes · sábado 09:00 · 5 pax",
+        cta: "Confirmar",
+      },
+      {
+        title: "Cobrar saldo — Reserva #4821",
+        body: "$2,400 MXN · pago parcial el lunes",
+        cta: "Enviar cobro",
+        tone: "cash",
+      },
+      {
+        title: "Responder chat — Huésped Lee",
+        body: "Pregunta por transporte aeropuerto",
+        cta: "Responder",
+      },
     ],
     pulso: [
       { label: "Ocupación semana", value: "78%", delta: "+8%", up: true },
@@ -264,9 +291,23 @@ const NARRATIVE: Record<WorkspaceId, Narrative> = {
   concierge: {
     greeting: "5 casos esperan respuesta. 1 lleva más de 4h sin tocar.",
     hoy: [
-      { title: "Caso #882 sin tocar 4h 12m", body: "Huésped premium · solicitud transporte privado", cta: "Tomar caso", tone: "warn" },
-      { title: "Propuesta vencida — Boda Méndez", body: "Esperando aprobación cliente 2 días", cta: "Empujar" },
-      { title: "Confirmación de pago — Caso #874", body: "Cliente pagó $8,400 · falta confirmar al proveedor", cta: "Confirmar", tone: "cash" },
+      {
+        title: "Caso #882 sin tocar 4h 12m",
+        body: "Huésped premium · solicitud transporte privado",
+        cta: "Tomar caso",
+        tone: "warn",
+      },
+      {
+        title: "Propuesta vencida — Boda Méndez",
+        body: "Esperando aprobación cliente 2 días",
+        cta: "Empujar",
+      },
+      {
+        title: "Confirmación de pago — Caso #874",
+        body: "Cliente pagó $8,400 · falta confirmar al proveedor",
+        cta: "Confirmar",
+        tone: "cash",
+      },
     ],
     pulso: [
       { label: "Casos abiertos", value: "12", delta: "−3 vs ayer", up: true },
@@ -279,15 +320,32 @@ const NARRATIVE: Record<WorkspaceId, Narrative> = {
       { dot: T.warn, text: "1 caso escalado a tu atención" },
       { dot: T.cenote, text: "Alux redactó 6 borradores de respuesta" },
     ],
-    money: { in: "$18,200 comisión semana", pending: "$3,400 por liquidar", action: "Revisar liquidaciones" },
+    money: {
+      in: "$18,200 comisión semana",
+      pending: "$3,400 por liquidar",
+      action: "Revisar liquidaciones",
+    },
     next: "Tomar el caso #882 antes de que rompa SLA",
   },
   cms: {
     greeting: "2 piezas listas para publicar · 1 borrador a punto de caducar.",
     hoy: [
-      { title: "Publicar — Guía Cenotes Sur", body: "Aprobado por Editorial · esperando tu publish", cta: "Publicar" },
-      { title: "Revisar — Pieza Día de Muertos", body: "Caduca relevancia en 6 días", cta: "Revisar", tone: "warn" },
-      { title: "Aprobar imagen hero — Ek Balam", body: "Foto enviada por colaborador", cta: "Aprobar" },
+      {
+        title: "Publicar — Guía Cenotes Sur",
+        body: "Aprobado por Editorial · esperando tu publish",
+        cta: "Publicar",
+      },
+      {
+        title: "Revisar — Pieza Día de Muertos",
+        body: "Caduca relevancia en 6 días",
+        cta: "Revisar",
+        tone: "warn",
+      },
+      {
+        title: "Aprobar imagen hero — Ek Balam",
+        body: "Foto enviada por colaborador",
+        cta: "Aprobar",
+      },
     ],
     pulso: [
       { label: "Publicados mes", value: "24", delta: "+6", up: true },
@@ -306,8 +364,18 @@ const NARRATIVE: Record<WorkspaceId, Narrative> = {
   eb: {
     greeting: "Test A/B del hero termina en 6 horas. Variante B va arriba.",
     hoy: [
-      { title: "Decidir ganador A/B Hero", body: "Variante B +18% CTR · n=4,200", cta: "Promover B", tone: "ok" },
-      { title: "Sección 'Cenotes' sin foto destacada", body: "Visible para 12,400 visitantes hoy", cta: "Asignar foto", tone: "warn" },
+      {
+        title: "Decidir ganador A/B Hero",
+        body: "Variante B +18% CTR · n=4,200",
+        cta: "Promover B",
+        tone: "ok",
+      },
+      {
+        title: "Sección 'Cenotes' sin foto destacada",
+        body: "Visible para 12,400 visitantes hoy",
+        cta: "Asignar foto",
+        tone: "warn",
+      },
       { title: "Programar release nocturno", body: "3 cambios en cola", cta: "Programar" },
     ],
     pulso: [
@@ -418,7 +486,9 @@ function WorkspacePreview() {
           className="mx-auto max-w-[1400px] px-6 pb-3 text-[11px] flex flex-wrap items-center gap-x-4 gap-y-1"
           style={{ color: T.ink2 }}
         >
-          <span>Principio rector: <em>"la mejor interfaz reduce decisiones, no agrega información"</em>.</span>
+          <span>
+            Principio rector: <em>"la mejor interfaz reduce decisiones, no agrega información"</em>.
+          </span>
           <span>· {ws.voice}</span>
           <span>· Mobile-first · Touch-first · PWA</span>
         </div>
@@ -493,7 +563,10 @@ function DeviceFrame({
           borderRadius: isPhone ? 44 : isPad ? 28 : 14,
           padding: isPhone ? 12 : isPad ? 16 : 0,
           background: isPhone || isPad ? "#0F0B08" : "transparent",
-          boxShadow: isPhone || isPad ? "0 24px 60px -20px rgba(0,0,0,0.35)" : "0 12px 32px -16px rgba(0,0,0,0.18)",
+          boxShadow:
+            isPhone || isPad
+              ? "0 24px 60px -20px rgba(0,0,0,0.35)"
+              : "0 12px 32px -16px rgba(0,0,0,0.18)",
         }}
       >
         <div
@@ -543,12 +616,22 @@ function PulsoSection({ ws }: { ws: WS }) {
               <div className="text-[10px] uppercase tracking-wide" style={{ color: T.ink2 }}>
                 {p.label}
               </div>
-              <div className="text-lg font-bold truncate" style={{ fontFamily: "Fraunces, Georgia, serif" }}>
+              <div
+                className="text-lg font-bold truncate"
+                style={{ fontFamily: "Fraunces, Georgia, serif" }}
+              >
                 {p.value}
               </div>
               {p.delta && (
-                <div className="text-[11px] flex items-center gap-1" style={{ color: p.up ? T.ok : T.warn }}>
-                  {p.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                <div
+                  className="text-[11px] flex items-center gap-1"
+                  style={{ color: p.up ? T.ok : T.warn }}
+                >
+                  {p.up ? (
+                    <ArrowUpRight className="h-3 w-3" />
+                  ) : (
+                    <ArrowDownRight className="h-3 w-3" />
+                  )}
                   {p.delta}
                 </div>
               )}
@@ -575,7 +658,10 @@ function CambioSection({ ws }: { ws: WS }) {
             className="flex items-start gap-2 text-[13px] rounded-lg px-2.5 py-1.5"
             style={{ background: T.bone }}
           >
-            <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: c.dot }} />
+            <span
+              className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
+              style={{ background: c.dot }}
+            />
             <span>{c.text}</span>
           </li>
         ))}
@@ -615,10 +701,10 @@ function ActionCard({
     item.tone === "cash"
       ? T.cash
       : item.tone === "warn"
-      ? T.warn
-      : item.tone === "ok"
-      ? T.ok
-      : accent;
+        ? T.warn
+        : item.tone === "ok"
+          ? T.ok
+          : accent;
   return (
     <div
       className="rounded-xl border p-3 flex items-start gap-3 relative overflow-hidden"
@@ -655,19 +741,34 @@ function ContextoPanel({ ws, mode, compact }: { ws: WS; mode: ContextMode; compa
       className="h-full flex flex-col border-l"
       style={{ background: T.bone, borderColor: T.line }}
     >
-      <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: T.line }}>
-        <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: T.ink2 }}>
+      <div
+        className="px-4 py-3 border-b flex items-center justify-between"
+        style={{ borderColor: T.line }}
+      >
+        <div
+          className="text-[11px] uppercase tracking-wider font-semibold"
+          style={{ color: T.ink2 }}
+        >
           Contexto
         </div>
-        <div className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: T.cal, color: T.ink2 }}>
+        <div
+          className="text-[10px] px-1.5 py-0.5 rounded-full"
+          style={{ background: T.cal, color: T.ink2 }}
+        >
           {mode === "alux" ? "Copiloto Alux" : "Inspector"}
         </div>
       </div>
 
       {mode === "alux" ? (
         <div className="flex-1 overflow-auto p-4 space-y-3">
-          <div className="rounded-lg p-3" style={{ background: T.cal, border: "1px solid " + T.line }}>
-            <div className="flex items-center gap-2 text-[11px] font-semibold" style={{ color: ws.accent }}>
+          <div
+            className="rounded-lg p-3"
+            style={{ background: T.cal, border: "1px solid " + T.line }}
+          >
+            <div
+              className="flex items-center gap-2 text-[11px] font-semibold"
+              style={{ color: ws.accent }}
+            >
               <Sparkles className="h-3.5 w-3.5" /> Siguiente acción de mayor impacto
             </div>
             <div className="mt-1.5 text-[13px] font-medium">{n.next}</div>
@@ -706,7 +807,10 @@ function ContextoPanel({ ws, mode, compact }: { ws: WS; mode: ContextMode; compa
               className="rounded-lg p-3 text-[11px]"
               style={{ background: T.cal, border: "1px dashed " + T.line2, color: T.ink2 }}
             >
-              Escribe a Alux o pulsa <kbd className="px-1 rounded border" style={{ borderColor: T.line2 }}>⌘K</kbd>{" "}
+              Escribe a Alux o pulsa{" "}
+              <kbd className="px-1 rounded border" style={{ borderColor: T.line2 }}>
+                ⌘K
+              </kbd>{" "}
               para invocar el copiloto desde cualquier pantalla.
             </div>
           )}
@@ -717,7 +821,10 @@ function ContextoPanel({ ws, mode, compact }: { ws: WS; mode: ContextMode; compa
             <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: T.ink2 }}>
               Selección
             </div>
-            <div className="rounded-md p-2.5" style={{ background: T.cal, border: "1px solid " + T.line }}>
+            <div
+              className="rounded-md p-2.5"
+              style={{ background: T.cal, border: "1px solid " + T.line }}
+            >
               <div className="font-semibold">Factura #4821 — Hotel Zaci</div>
               <div className="text-[11px]" style={{ color: T.ink2 }}>
                 Emitida 16 jun · Vence hoy · $4,820 MXN
@@ -792,7 +899,10 @@ function DesktopCanvas({ ws, mode }: { ws: WS; mode: ContextMode }) {
     <div className="h-full grid" style={{ gridTemplateColumns: "220px 1fr 340px" }}>
       <nav className="border-r flex flex-col" style={{ background: T.bone, borderColor: T.line }}>
         <div className="px-4 py-3 flex items-center gap-2 border-b" style={{ borderColor: T.line }}>
-          <div className="h-7 w-7 rounded-md grid place-items-center" style={{ background: ws.accent }}>
+          <div
+            className="h-7 w-7 rounded-md grid place-items-center"
+            style={{ background: ws.accent }}
+          >
             <ws.icon className="h-3.5 w-3.5 text-white" />
           </div>
           <div className="min-w-0">
@@ -887,12 +997,18 @@ function IpadCanvas({ ws, mode }: { ws: WS; mode: ContextMode }) {
         </div>
       </div>
 
-      <div className="flex-1 grid overflow-hidden" style={{ gridTemplateColumns: "76px 1fr 280px" }}>
+      <div
+        className="flex-1 grid overflow-hidden"
+        style={{ gridTemplateColumns: "76px 1fr 280px" }}
+      >
         <nav
           className="border-r flex flex-col items-center py-3 gap-1"
           style={{ background: T.bone, borderColor: T.line }}
         >
-          <div className="h-10 w-10 rounded-xl grid place-items-center mb-2" style={{ background: ws.accent }}>
+          <div
+            className="h-10 w-10 rounded-xl grid place-items-center mb-2"
+            style={{ background: ws.accent }}
+          >
             <ws.icon className="h-5 w-5 text-white" />
           </div>
           {ws.rail.map((it, i) => (
@@ -1043,7 +1159,10 @@ function IphoneCanvas({ ws, mode }: { ws: WS; mode: ContextMode }) {
                   <div className="text-[9px] uppercase" style={{ color: T.ink2 }}>
                     {p.label}
                   </div>
-                  <div className="text-[14px] font-bold" style={{ fontFamily: "Fraunces, Georgia, serif" }}>
+                  <div
+                    className="text-[14px] font-bold"
+                    style={{ fontFamily: "Fraunces, Georgia, serif" }}
+                  >
                     {p.value}
                   </div>
                 </div>
@@ -1059,7 +1178,10 @@ function IphoneCanvas({ ws, mode }: { ws: WS; mode: ContextMode }) {
           <ul className="space-y-1">
             {n.cambio.map((c, i) => (
               <li key={i} className="flex items-start gap-2 text-[12px]">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: c.dot }} />
+                <span
+                  className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
+                  style={{ background: c.dot }}
+                />
                 <span>{c.text}</span>
               </li>
             ))}
@@ -1111,7 +1233,10 @@ function IphoneCanvas({ ws, mode }: { ws: WS; mode: ContextMode }) {
         </div>
       </div>
 
-      <nav className="grid grid-cols-5 border-t" style={{ background: T.bone, borderColor: T.line2 }}>
+      <nav
+        className="grid grid-cols-5 border-t"
+        style={{ background: T.bone, borderColor: T.line2 }}
+      >
         {ws.tabs.map((t, i) => (
           <button
             key={i}
@@ -1133,7 +1258,13 @@ function IphoneCanvas({ ws, mode }: { ws: WS; mode: ContextMode }) {
 function Legend({ ws, device, mode }: { ws: WS; device: Device; mode: ContextMode }) {
   const checks = [
     { ok: true, t: "Founder Home en formato Hoy · Pulso · Cambió" },
-    { ok: true, t: "Panel derecho dual-mode (ahora: " + (mode === "alux" ? "Copiloto Alux" : "Inspector") + ")" },
+    {
+      ok: true,
+      t:
+        "Panel derecho dual-mode (ahora: " +
+        (mode === "alux" ? "Copiloto Alux" : "Inspector") +
+        ")",
+    },
     { ok: device === "ipad", t: "iPad con layout propio (rail icónico, Pencil, dock, 2 dedos)" },
     { ok: device === "iphone", t: "iPhone con thumb-zone, sheets, swipe actions, sin FAB" },
     { ok: true, t: "Widgets narrativos accionables (no solo métricas)" },

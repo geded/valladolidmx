@@ -1,0 +1,139 @@
+{
+  "package": "19.25",
+  "title": "P0 · Data Readiness for G4/G5",
+  "authorization": "PCA-2026-027",
+  "blueprint": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+  "migration": "supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql",
+  "executed_at": "2026-08-25",
+  "feature_flag": { "omxds_visual_v1_contracts_enabled": false },
+  "fail_closed_criteria": [
+    "governed cover asset with stable public URL (/api/public/studio-media)",
+    "real geolocation (latitude/longitude)",
+    "public contact record"
+  ],
+  "unpublished": [
+    {
+      "kind": "business",
+      "id": "55555555-aaaa-4aaa-8aaa-000000000001",
+      "slug": "hacienda-selva-maya",
+      "from": "published",
+      "to": "draft",
+      "cause": "no governed cover"
+    },
+    {
+      "kind": "business",
+      "id": "55555555-aaaa-4aaa-8aaa-000000000002",
+      "slug": "cocina-de-dona-elsa",
+      "from": "published",
+      "to": "draft",
+      "cause": "legacy non-governed cover"
+    },
+    {
+      "kind": "business",
+      "id": "55555555-aaaa-4aaa-8aaa-000000000003",
+      "slug": "manglar-expediciones",
+      "from": "published",
+      "to": "draft",
+      "cause": "no governed cover"
+    },
+    {
+      "kind": "business",
+      "id": "55555555-aaaa-4aaa-8aaa-000000000004",
+      "slug": "taller-de-bordado-uayma",
+      "from": "published",
+      "to": "draft",
+      "cause": "no governed cover"
+    },
+    {
+      "kind": "destination",
+      "id": "ec9eb324-1952-4849-a1d4-00506d7cabb5",
+      "slug": "chichen-itza",
+      "from": "published",
+      "to": "draft",
+      "cause": "no governed cover"
+    }
+  ],
+  "media_unlinked": [
+    {
+      "business_id": "55555555-aaaa-4aaa-8aaa-000000000002",
+      "media_asset_id": "cb8ccb0d-60de-4d37-b178-7802f6d39b24",
+      "rows_removed": 1,
+      "asset_deleted": false,
+      "binary_deleted": false
+    }
+  ],
+  "seo_metadata_seeded": [
+    {
+      "kind": "destination",
+      "id": "11111111-aaaa-4aaa-8aaa-000000000001",
+      "slug": "valladolid",
+      "locale": "es",
+      "canonical_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+      "og_image_url": "https://quehacerenvalladolid.com/api/public/studio-media/governed/v1p1c/destination-cover.jpg",
+      "og_image_media_id": "453dd8fd-7d1e-419e-95ea-9afa365f363c",
+      "json_ld_type": "TouristDestination"
+    },
+    {
+      "kind": "business",
+      "id": "7d1d0001-1111-4111-8111-000000000001",
+      "slug": "hacienda-san-servacio-boutique",
+      "locale": "es",
+      "canonical_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+      "og_image_url": "https://quehacerenvalladolid.com/api/public/studio-media/7d1d0001-1111-4111-8111-000000000001/cover.jpg",
+      "og_image_media_id": "b95017a9-72cb-4b19-aa4d-24d96b5feb50",
+      "json_ld_type": "Hotel"
+    },
+    {
+      "kind": "business",
+      "id": "7d1d0002-1111-4111-8111-000000000002",
+      "slug": "cocina-del-frailes",
+      "locale": "es",
+      "canonical_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/restaurantes/cocina-del-frailes",
+      "og_image_url": "https://quehacerenvalladolid.com/api/public/studio-media/7d1d0002-1111-4111-8111-000000000002/cover.jpg",
+      "og_image_media_id": "61cea08a-9436-45ec-9e1c-9f0eca42fd6d",
+      "json_ld_type": "Restaurant"
+    },
+    {
+      "kind": "business",
+      "id": "7d1d0003-1111-4111-8111-000000000003",
+      "slug": "ruta-cenotes-y-selva",
+      "locale": "es",
+      "canonical_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/experiencias/ruta-cenotes-y-selva",
+      "og_image_url": "https://quehacerenvalladolid.com/api/public/studio-media/7d1d0003-1111-4111-8111-000000000003/cover.jpg",
+      "og_image_media_id": "8376763c-253b-428f-8122-6c30a12d32cb",
+      "json_ld_type": "TouristAttraction"
+    }
+  ],
+  "declared_debt": {
+    "published_products_without_media": [
+      "bici-nocturna-frailes-ticket-demo",
+      "cena-romantica-en-cenote",
+      "ceremonia-maya",
+      "menu-cochinita-tradicional-demo",
+      "nado-en-cenote",
+      "recorrido-cenote-museo",
+      "suite-selva-maya-demo",
+      "tour-cenote-suytun-guiado-demo",
+      "tour-manglar-amanecer-demo"
+    ],
+    "seo_metadata_locales_missing": ["en", "fr", "de", "it", "pt"]
+  },
+  "post_execution_verification": {
+    "flag": "false",
+    "accredited_published": 4,
+    "drafted_entities": 5,
+    "elsa_media_links": 0,
+    "elsa_asset_alive": true,
+    "seo_rows": 4,
+    "signed_urls_in_seo_metadata": 0,
+    "audit_rows_package_19_25": 6
+  },
+  "invariants": [
+    "no product code changes",
+    "no new public routes",
+    "no storage policy changes",
+    "no deploy or publication",
+    "validate:i4:d remains FAIL-CLOSED (H07/H11/H12, pre-existing)",
+    "G4 and G5 not started"
+  ]
+}

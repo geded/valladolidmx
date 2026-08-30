@@ -35,9 +35,7 @@ function StatsSummary({ stats }: { stats: ReviewStatsVM }) {
   return (
     <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-border bg-card p-4">
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-semibold text-foreground">
-          {stats.average.toFixed(1)}
-        </span>
+        <span className="text-3xl font-semibold text-foreground">{stats.average.toFixed(1)}</span>
         <Stars rating={Math.round(stats.average)} />
       </div>
       <span className="text-sm text-muted-foreground">
@@ -76,9 +74,7 @@ export function KitReviews({
       <ul className="mt-4 space-y-4">
         {reviews.map((r) => {
           const published = formatDate(r.publishedAt ?? null);
-          const verifiedLabel = r.verifiedSource
-            ? VERIFIED_LABEL[r.verifiedSource]
-            : null;
+          const verifiedLabel = r.verifiedSource ? VERIFIED_LABEL[r.verifiedSource] : null;
           const isTrusted =
             r.verifiedSource === "verified_purchase" ||
             r.verifiedSource === "managed_visit" ||
@@ -107,16 +103,12 @@ export function KitReviews({
                 </p>
               )}
               {r.title ? <p className="mt-1 font-medium">{r.title}</p> : null}
-              <p className="mt-1 whitespace-pre-line text-sm text-foreground/85">
-                {r.body}
-              </p>
+              <p className="mt-1 whitespace-pre-line text-sm text-foreground/85">{r.body}</p>
               {r.businessResponse ? (
                 <div className="mt-3 rounded-xl border border-border/70 bg-muted/40 p-3">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                     Respuesta del negocio
-                    {r.businessResponseAt
-                      ? ` · ${formatDate(r.businessResponseAt) ?? ""}`
-                      : ""}
+                    {r.businessResponseAt ? ` · ${formatDate(r.businessResponseAt) ?? ""}` : ""}
                   </p>
                   <p className="mt-1 whitespace-pre-line text-sm text-foreground/85">
                     {r.businessResponse}

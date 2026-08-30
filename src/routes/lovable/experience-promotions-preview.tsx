@@ -92,9 +92,8 @@ function Page() {
         </p>
         <h1 className="text-3xl font-semibold">vmx.experience.promotions</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Bloque oficial de oportunidades comerciales. Convive con
-          `vmx.experience.products` sin acoplarse — ambos son piezas
-          independientes de la capa Commerce. Contrato preparado para
+          Bloque oficial de oportunidades comerciales. Convive con `vmx.experience.products` sin
+          acoplarse — ambos son piezas independientes de la capa Commerce. Contrato preparado para
           Alux, Discovery Navigator, Context Engine y campañas.
         </p>
       </header>

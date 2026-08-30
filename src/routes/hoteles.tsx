@@ -2,21 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import {
-  listMarketplaceBusinesses,
-  type MarketplaceBusinessCard,
-} from "@/lib/catalog/marketplace-reads.functions";
+import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
-import {
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
-import {
-  TourismListingSurface,
-  buildDestinationFacet,
-} from "@/components/surfaces/TourismListingSurface";
-import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
+import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
+import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
 const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
 
@@ -68,10 +59,10 @@ export const Route = createFileRoute("/hoteles")({
   validateSearch: (search: Record<string, unknown>) => ({
     destino: typeof search.destino === "string" ? search.destino : undefined,
   }),
-  loader: async () => {
-    const all = await listMarketplaceBusinesses();
-    return { businesses: all.filter((b) => CATEGORY_SLUGS.has(b.category_slug)) };
-  },
+  loaderDeps: ({ search }) => ({ destino: search.destino }),
+  loader: async ({ deps }) => ({
+    dto: await getPublicListing({ data: { family: "hoteles", destino: deps.destino ?? null } }),
+  }),
   head: () =>
     buildPublicHead({
       title: `Hoteles · ${SITE.name}`,
@@ -83,47 +74,19 @@ export const Route = createFileRoute("/hoteles")({
 });
 
 function HotelesRoute() {
-  const { businesses } = Route.useLoaderData();
+  const { dto } = Route.useLoaderData();
   const { destino } = Route.useSearch();
-  const filtered = destino
-    ? businesses.filter((b: MarketplaceBusinessCard) => b.destination_slug === destino)
-    : businesses;
   const contextDeclaration = buildHotelesContext(destino);
   const legacyCrumbs = [
     { label: "Hoteles", to: "/hoteles" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
-  const cards = filtered.map((b: MarketplaceBusinessCard) =>
-    businessToTourismCard(b, {
-      destinationLabel: destinationLabel(b.destination_slug),
-      regionLabel: ORIENTE_MAYA.name,
-      forcedCategorySlug: "hoteles",
-    }),
-  );
-  const destinoFacet = buildDestinationFacet(cards);
+  const destinoFacet = buildDestinationFacet([...dto.items]);
   return (
-    <PublicShell
-      crumbs={legacyCrumbs}
-      contextDeclaration={contextDeclaration}
-      useContextCrumbs
-    >
-      <TourismListingSurface
-        hero={{
-          eyebrow: "Descansa en el Oriente Maya",
-          title: destino ? `Hoteles en ${destinationLabel(destino)}` : "Hoteles",
-          subtitle:
-            "Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya.",
-          metaLabel: destino ? destinationLabel(destino) : ORIENTE_MAYA.name,
-        }}
-        items={cards}
+    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
+      <ListingPremiumSurfaceFromDTO
+        dto={dto}
         facets={destino || !destinoFacet ? [] : [destinoFacet]}
-        destinationSlug={destino ?? null}
-        destinationLabel={destino ? destinationLabel(destino) : null}
-        emptyMessage={
-          destino
-            ? `Aún no hay hoteles publicados en ${destinationLabel(destino)}.`
-            : "Aún no hay hoteles publicados. Vuelve pronto para descubrir hospedajes verificados."
-        }
       />
     </PublicShell>
   );

@@ -65,10 +65,7 @@ function TravelerOnboardingMount() {
       profile={profileQ.data}
       knownFirstName={personalQ.data?.first_name ?? null}
       ready={
-        !profileQ.isLoading &&
-        profileQ.isFetched &&
-        !personalQ.isLoading &&
-        personalQ.isFetched
+        !profileQ.isLoading && profileQ.isFetched && !personalQ.isLoading && personalQ.isFetched
       }
     />
   );

@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-H",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORSHIP-PARITY-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · AUTORIZACIÓN G8-D · Registro del contrato compuesto vmx.home.premium-g4. Autoriza exclusivamente: (a) registrar el contrato compuesto y su política editorial, (b) enrutar su render único a HomePremiumSurface en el CompositionRenderer, (c) incorporar la ruta interna de evidencia de paridad al Route Inventory. No autoriza publicar, aprobar, programar ni generar token, ni modificar la Home pública 50d2f632-70bc-4c79-b569-a8a2885d8030.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "c1bf1b30b1bfccfd8364baced98b83e85be5a9fad898b5cab73147217af5f59d",
+    "current_sha256": "8997ddc18516787736a61ea4e823ae3d143ca03e9839bf8aa6c0b62651687177",
+    "semantic_change": "G8-D · Alta en SCANNED_ROUTE_FILES de la ruta interna no indexable src/routes/lovable/g8d-premium-parity.tsx, usada exclusivamente como evidencia de paridad visual del bloque compuesto vmx.home.premium-g4 frente a la autoridad visual /lovable/g4-home-premium-preview. Cero cambio en rutas públicas, backend, datos, storage, migraciones, publicación y flags; omxds_visual_v1_contracts_enabled permanece en false.",
+    "authority": "PCA-2026-029/PCA-2026-039"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-27"
+}

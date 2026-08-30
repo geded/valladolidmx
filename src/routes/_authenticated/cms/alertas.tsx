@@ -44,9 +44,7 @@ function AlertsPage() {
   const fnRes = useServerFn(resolveSystemAlert);
   const fnEval = useServerFn(evaluateFunctionalAlerts);
 
-  const [status, setStatus] = useState<(typeof STATUS_OPTIONS)[number]["value"]>(
-    "open",
-  );
+  const [status, setStatus] = useState<(typeof STATUS_OPTIONS)[number]["value"]>("open");
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -59,9 +57,7 @@ function AlertsPage() {
         setAlerts(rows);
         setError(null);
       })
-      .catch((e: unknown) =>
-        setError(e instanceof Error ? e.message : String(e)),
-      )
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setBusy(false));
   }, [fnList, status]);
 
@@ -78,8 +74,8 @@ function AlertsPage() {
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Alertas</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Alertas técnicas y funcionales agregadas en{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5">system_alerts</code>.
-          Cada alerta es idempotente por <em>kind</em> mientras esté abierta.
+          <code className="rounded bg-muted px-1.5 py-0.5">system_alerts</code>. Cada alerta es
+          idempotente por <em>kind</em> mientras esté abierta.
         </p>
       </header>
 
@@ -111,9 +107,7 @@ function AlertsPage() {
                   ),
                 )
                 .then(load)
-                .catch((e: unknown) =>
-                  setError(e instanceof Error ? e.message : String(e)),
-                );
+                .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
             }}
             className="rounded-md border border-border bg-card px-3 py-1.5 font-medium hover:bg-accent"
           >
@@ -186,9 +180,11 @@ function AlertsPage() {
                       <button
                         type="button"
                         onClick={() =>
-                          fnAck({ data: { id: a.id } }).then(load).catch((e: unknown) =>
-                            setError(e instanceof Error ? e.message : String(e)),
-                          )
+                          fnAck({ data: { id: a.id } })
+                            .then(load)
+                            .catch((e: unknown) =>
+                              setError(e instanceof Error ? e.message : String(e)),
+                            )
                         }
                         className="rounded-md border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
                       >
@@ -199,9 +195,11 @@ function AlertsPage() {
                       <button
                         type="button"
                         onClick={() =>
-                          fnRes({ data: { id: a.id } }).then(load).catch((e: unknown) =>
-                            setError(e instanceof Error ? e.message : String(e)),
-                          )
+                          fnRes({ data: { id: a.id } })
+                            .then(load)
+                            .catch((e: unknown) =>
+                              setError(e instanceof Error ? e.message : String(e)),
+                            )
                         }
                         className="rounded-md border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
                       >

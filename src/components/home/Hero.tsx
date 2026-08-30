@@ -15,7 +15,11 @@ import { ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
 import { HeroSearchPill } from "@/components/home/HeroSearchPill";
-import { readFieldTypography, typographyToStyle, type FieldTypography } from "@/lib/experience-builder/typography";
+import {
+  readFieldTypography,
+  typographyToStyle,
+  type FieldTypography,
+} from "@/lib/experience-builder/typography";
 import heroBg01 from "@/assets/brand/hero/bg01.webp";
 import heroBg02 from "@/assets/brand/hero/bg02.webp";
 
@@ -73,6 +77,19 @@ export interface HeroConfig {
   search_size?: string;
   /** "sm" | "md" | "lg" | "xl" | "full" */
   search_max_width?: string;
+  /**
+   * G7 · Variante gobernada del Hero. `undefined` o `"cinematic"` conservan
+   * exactamente el comportamiento histórico (fondo a sangre + overlay).
+   * `"editorial-split"` activa la composición editorial en dos columnas.
+   * La familia `vmx.hero` NUNCA se duplica: crece sólo por variante.
+   */
+  variant?: string;
+  /** editorial-split · orden en móvil: "media-first" (default) o "text-first". */
+  mobile_order?: string;
+  /** editorial-split · zona segura del texto: "sm" | "md" | "lg". */
+  text_safe_zone?: string;
+  /** editorial-split · lado del panel de medios en escritorio: "left" | "right". */
+  media_side?: string;
   /** Overrides tipográficos por campo, guardados por el Experience Builder. */
   __typography?: Record<string, FieldTypography>;
 }
@@ -91,11 +108,16 @@ export function Hero({ config }: HeroProps = {}) {
     : null;
   const legacyBg = config?.background_image?.trim();
   const slides: readonly string[] =
-    configSlides && configSlides.length > 0
-      ? configSlides
-      : legacyBg
-        ? [legacyBg]
-        : DEFAULT_SLIDES;
+    configSlides && configSlides.length > 0 ? configSlides : legacyBg ? [legacyBg] : DEFAULT_SLIDES;
+  /**
+   * G8-R1-F1J-HOME-PREMIUM · Marcador neutral piedra/caliza.
+   * Cuando el editor declara explícitamente `background_images: []` (sin
+   * portada real acreditada G8-M1), la variante editorial NO cae a las
+   * imágenes por defecto: renderiza un panel neutral de piedra/caliza con
+   * tokens del Design System. Cero fixtures, cero medios ajenos.
+   */
+  const useNeutralStoneMarker = Boolean(configSlides && configSlides.length === 0 && !legacyBg);
+
 
   const intervalMs = Math.max(
     2000,
@@ -106,10 +128,7 @@ export function Hero({ config }: HeroProps = {}) {
     if (slides.length < 2) return;
     const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
-    const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % slides.length),
-      intervalMs,
-    );
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % slides.length), intervalMs);
     return () => window.clearInterval(id);
   }, [slides.length, intervalMs]);
 
@@ -209,6 +228,115 @@ export function Hero({ config }: HeroProps = {}) {
   const titleStyle = typographyToStyle(readFieldTypography(cfgRecord, "title"));
   const subtitleStyle = typographyToStyle(readFieldTypography(cfgRecord, "subtitle"));
 
+  // G7 · Variante editorial-split. Cualquier otro valor (incluido undefined)
+  // conserva intacta la variante cinematográfica por defecto.
+  if ((config?.variant ?? "cinematic").trim() === "editorial-split") {
+    const mediaFirst = (config?.mobile_order ?? "media-first").trim() !== "text-first";
+    const safeZone = (config?.text_safe_zone ?? "md").trim();
+    const safeZoneClass =
+      safeZone === "sm" ? "px-5 py-10" : safeZone === "lg" ? "px-8 py-16" : "px-6 py-12";
+    const mediaRight = (config?.media_side ?? "right").trim() !== "left";
+    return (
+      <section
+        data-hero-variant="editorial-split"
+        className="@container relative isolate overflow-hidden bg-background text-foreground"
+      >
+        <div
+          className={`flex flex-col ${mediaFirst ? "" : "flex-col-reverse"} @3xl:grid @3xl:min-h-[70svh] @3xl:grid-cols-2 @3xl:items-stretch`}
+        >
+          <div
+            data-hero-media
+            data-hero-media-mode={useNeutralStoneMarker ? "stone-marker" : "photo"}
+            className={`relative min-h-[42svh] w-full overflow-hidden @3xl:min-h-[70svh] ${
+              useNeutralStoneMarker ? "bg-muted" : "bg-foreground"
+            } ${mediaRight ? "@3xl:order-2" : "@3xl:order-1"}`}
+          >
+            {useNeutralStoneMarker ? (
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-gradient-to-br from-muted via-secondary/40 to-muted"
+              >
+                <div className="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle_at_18%_22%,color-mix(in_oklab,var(--color-foreground)_9%,transparent)_0,transparent_38%),radial-gradient(circle_at_74%_68%,color-mix(in_oklab,var(--color-foreground)_7%,transparent)_0,transparent_42%)]" />
+                <div className="absolute inset-x-6 bottom-6 text-xs uppercase tracking-[0.28em] text-muted-foreground @3xl:inset-x-10">
+                  Oriente Maya
+                </div>
+              </div>
+            ) : (
+              slides.map((src, i) => (
+                <img
+                  key={`${src}-${i}`}
+                  src={src}
+                  alt=""
+                  aria-hidden
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+                    slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ objectPosition: backgroundPosition }}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              ))
+            )}
+          </div>
+
+          <div
+            data-hero-safe-zone={safeZone}
+            className={`flex w-full min-w-0 flex-col justify-center gap-4 ${safeZoneClass} ${mediaRight ? "@3xl:order-1" : "@3xl:order-2"} ${textAlignClass}`}
+          >
+            {eyebrow ? (
+              <p
+                data-eb-field="eyebrow"
+                suppressHydrationWarning
+                className={`font-script text-[1.375rem] leading-tight text-primary @3xl:text-[1.75rem] ${textSelfClass}`}
+                style={eyebrowStyle}
+              >
+                {eyebrow}
+              </p>
+            ) : null}
+            {title ? (
+              <h1
+                data-eb-field="title"
+                suppressHydrationWarning
+                className={`max-w-2xl text-balance font-display text-[1.75rem] leading-[1.12] text-foreground @2xl:text-[2.25rem] @3xl:text-[2.75rem] ${textSelfClass}`}
+                style={titleStyle}
+              >
+                {title}
+              </h1>
+            ) : null}
+            {subtitle ? (
+              <p
+                data-eb-field="subtitle"
+                suppressHydrationWarning
+                className={`max-w-xl text-pretty text-base text-muted-foreground @3xl:text-lg ${textSelfClass}`}
+                style={subtitleStyle}
+              >
+                {subtitle}
+              </p>
+            ) : null}
+            {showCtas && ctas.length > 0 ? (
+              <div className={`flex w-full flex-wrap items-center gap-3 ${ctaAlignmentClass}`}>
+                {ctas.map((cta, i) => (
+                  <HeroButton key={i} cta={cta} isPrimary={i === 0} onLight />
+                ))}
+              </div>
+            ) : null}
+            {showSearch ? (
+              <div className={`mt-2 flex w-full min-w-0 ${searchJustifyClass}`}>
+                <div className={`w-full min-w-0 ${searchMaxWidthClass}`}>
+                  <HeroSearchPill
+                    align={searchAlignment as "left" | "center" | "right"}
+                    maxWidth={(searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"}
+                    submitLabel={t("hero.search_button")}
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       className="@container relative isolate overflow-hidden text-white"
@@ -216,7 +344,11 @@ export function Hero({ config }: HeroProps = {}) {
       style={{ marginTop: "-4rem" }}
     >
       {/* Carrusel cinematográfico con las fotografías oficiales del Hero. */}
-      <div data-hero-media aria-hidden className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground">
+      <div
+        data-hero-media
+        aria-hidden
+        className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground"
+      >
         {slides.map((src, i) => (
           <img
             key={`${src}-${i}`}
@@ -283,7 +415,9 @@ export function Hero({ config }: HeroProps = {}) {
         ) : null}
 
         {showCtas && ctas.length > 0 ? (
-          <div className={`flex w-full flex-wrap items-center gap-3 @3xl:mt-8 ${ctaAlignmentClass}`}>
+          <div
+            className={`flex w-full flex-wrap items-center gap-3 @3xl:mt-8 ${ctaAlignmentClass}`}
+          >
             {ctas.map((cta, i) => (
               <HeroButton key={i} cta={cta} isPrimary={i === 0} />
             ))}
@@ -296,9 +430,7 @@ export function Hero({ config }: HeroProps = {}) {
             <div className={`w-full ${searchMaxWidthClass}`}>
               <HeroSearchPill
                 align={searchAlignment as "left" | "center" | "right"}
-                maxWidth={
-                  (searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"
-                }
+                maxWidth={(searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"}
                 submitLabel={t("hero.search_button")}
               />
             </div>
@@ -309,7 +441,16 @@ export function Hero({ config }: HeroProps = {}) {
   );
 }
 
-function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
+function HeroButton({
+  cta,
+  isPrimary,
+  onLight = false,
+}: {
+  cta: HeroCta;
+  isPrimary: boolean;
+  /** G7 · true en superficies claras (variante editorial-split). */
+  onLight?: boolean;
+}) {
   const label = cta.label ?? "";
   const href = cta.href || "#";
   const variant = cta.variant ?? (isPrimary ? "primary" : "secondary");
@@ -331,15 +472,17 @@ function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
   }`;
   let icon: ReactNode = null;
   if (variant === "primary") {
-    cls +=
-      " bg-primary text-primary-foreground shadow-md hover:opacity-95";
+    cls += " bg-primary text-primary-foreground shadow-md hover:opacity-95";
     icon = <ArrowRight className="size-4" aria-hidden />;
   } else if (variant === "secondary") {
-    cls +=
-      " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
+    cls += onLight
+      ? " border border-border bg-background text-foreground hover:bg-muted"
+      : " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
     icon = <Compass className="size-4" aria-hidden />;
   } else {
-    cls += " bg-transparent font-medium text-white/95 hover:text-white";
+    cls += onLight
+      ? " bg-transparent font-medium text-foreground hover:text-primary"
+      : " bg-transparent font-medium text-white/95 hover:text-white";
   }
   return (
     <a href={href} className={cls}>

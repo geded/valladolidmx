@@ -14,6 +14,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 import { resolveMediaAlt, type MediaLocale } from "@/lib/media/resolve-alt";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -179,7 +180,11 @@ export interface ProductReviewItem {
   language: string | null;
   visit_type: string | null;
   verified_source:
-    "verified_purchase" | "managed_visit" | "verified_visit" | "declared_visitor" | null;
+    | "verified_purchase"
+    | "managed_visit"
+    | "verified_visit"
+    | "declared_visitor"
+    | null;
   business_response: string | null;
   business_response_at: string | null;
 }
@@ -281,6 +286,9 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .eq("id", businessId)
         .eq("status", "published")
         .is("deleted_at", null)
+        // G8-R1-F1I-R1 · lectura de FICHA DIRECTA: no se aplica elegibilidad
+        // pública (la ruta sigue respondiendo 200 con `noindex, nofollow`).
+        // La elegibilidad sólo gobierna superficies de descubrimiento.
         .maybeSingle(),
       supabase
         .from("product_media")
@@ -611,6 +619,8 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(120);
     if (error) throw new Error(`marketplace_businesses_failed: ${error.message}`);
@@ -734,6 +744,10 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       .eq("slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · lectura de FICHA DIRECTA: no se aplica elegibilidad
+      // pública (la ruta sigue respondiendo 200 con `noindex, nofollow`).
+      // La elegibilidad sólo gobierna superficies de descubrimiento.
+
       .maybeSingle();
     if (error) throw new Error(`marketplace_business_failed: ${error.message}`);
     if (!biz) return null;

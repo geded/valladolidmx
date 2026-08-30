@@ -55,11 +55,7 @@ function fromContextRefs(pathname: string): SwitchFromRef {
   };
 }
 
-function noticeFor(
-  requested: string,
-  kept: string,
-  reason: string,
-): string | null {
+function noticeFor(requested: string, kept: string, reason: string): string | null {
   if (requested === kept) return null;
   switch (reason) {
     case "product_not_in_destination":

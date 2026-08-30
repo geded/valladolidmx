@@ -1,0 +1,24 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-Y",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-F1B-S1 (2026-08-29). Reconoce la regeneración derivada de los tipos generados de Lovable Cloud y la actualización del manifiesto de scripts producidas por la migración aditiva del modelo de procedencia y reclamación. No autoriza cambios funcionales adicionales, captura de lote, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "19352a114a414e0fb9a902e81e03f9d8b24cbbea17c9b99b6a8393483f6fb767",
+    "current_sha256": "8605f841b2867068eee1281fb4c504aa3dfcc0484fa502c947922f05135097fc",
+    "semantic_change": "G8-R1-F1B-S1 · Alta de public.entity_field_provenance y public.business_claim_snapshots, columnas aditivas record_origin, source_review_state, last_verified_at y verification_due_at en public.businesses, source_verified_at y valid_until en public.business_hours, y funciones resolve_business_claim_state, business_public_source_summary y create_business_claim_snapshot. Sin bajas ni renombrados.",
+    "authority": "Autorización Founder G8-R1-F1B-S1 (2026-08-29)"
+  },
+  "permissions": [{ "operation": "modify", "path": "package.json" }],
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero fichas creadas, publicadas o modificadas",
+    "Cero backfill de filas históricas",
+    "anon sin privilegios sobre entity_field_provenance ni business_claim_snapshots",
+    "seo_metadata.noindex permanece como autoridad SEO única"
+  ],
+  "recorded_at": "2026-08-29"
+}

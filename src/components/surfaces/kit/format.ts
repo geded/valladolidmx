@@ -4,10 +4,7 @@
  */
 import type { PriceVM } from "./types";
 
-export function formatPrice(
-  price: PriceVM | null | undefined,
-  locale = "es-MX",
-): string | null {
+export function formatPrice(price: PriceVM | null | undefined, locale = "es-MX"): string | null {
   if (!price || price.amount == null) return null;
   try {
     return new Intl.NumberFormat(locale, {

@@ -35,9 +35,7 @@ export function KitPromos({
               ) : null}
             </div>
             {p.description ? (
-              <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
-                {p.description}
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{p.description}</p>
             ) : null}
           </li>
         ))}

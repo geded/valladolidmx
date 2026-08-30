@@ -27,6 +27,14 @@ import type {
 } from "@/lib/experience-builder/blocks/experience-map/contract";
 import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
+import {
+  emptyAttribution,
+  resolveAttributedAlt,
+  resolveAttributedCaption,
+  resolveAttributedCredit,
+  type PublicMediaAttribution,
+} from "@/lib/media/public-attribution";
+
 /**
  * Modelo unificado consumido por los adapters. Se compone en la ruta a
  * partir de la BD (`PublicDestinationDTO`) y el mock territorial, de
@@ -40,6 +48,12 @@ export interface DestinationBlockInput {
   highlights: string[];
   heroUrl: string | null;
   galleryUrls: string[];
+  /**
+   * G8-F1D — Atribución acreditada por medio (ALT, caption, crédito,
+   * naturaleza), indexada por URL. Aditivo: vacío conserva el
+   * comportamiento previo.
+   */
+  mediaAttribution?: PublicMediaAttribution[];
   latitude: number | null;
   longitude: number | null;
   mapPoints: ExperienceMapPoint[];
@@ -67,6 +81,7 @@ export function toDestinationBlockInput(
     regionName: string;
     counts?: DestinationBlockInput["relatedCounts"];
     galleryUrls?: string[];
+    mediaAttribution?: PublicMediaAttribution[];
     mapPoints?: ExperienceMapPoint[];
   },
 ): DestinationBlockInput {
@@ -75,18 +90,43 @@ export function toDestinationBlockInput(
     name: dbData?.name ?? mock?.name ?? ctx.slug,
     tagline: dbData?.tagline ?? mock?.tagline ?? null,
     description: dbData?.description ?? null,
-    highlights: (dbData?.highlights?.length ? dbData.highlights : mock?.highlights ?? []) as string[],
+    highlights: (dbData?.highlights?.length
+      ? dbData.highlights
+      : (mock?.highlights ?? [])) as string[],
     heroUrl: dbData?.hero_url ?? null,
     galleryUrls: ctx.galleryUrls ?? [],
+    mediaAttribution: [
+      ...(dbData?.hero_media ? [dbData.hero_media] : []),
+      ...(ctx.mediaAttribution ?? []),
+    ],
     latitude: dbData?.latitude ?? null,
     longitude: dbData?.longitude ?? null,
     mapPoints: ctx.mapPoints ?? [],
     regionSlug: ctx.regionSlug,
     regionName: ctx.regionName,
     relatedCounts: ctx.counts ?? {
-      hoteles: 0, restaurantes: 0, experiencias: 0, otras: 0, productos: 0, eventos: 0,
+      hoteles: 0,
+      restaurantes: 0,
+      experiencias: 0,
+      otras: 0,
+      productos: 0,
+      eventos: 0,
     },
   };
+}
+
+/**
+ * G8-F1D — Índice URL → atribución acreditada. Las URLs firmadas son
+ * únicas por lectura, por lo que el índice se construye por petición.
+ */
+function attributionIndex(
+  list: PublicMediaAttribution[] | undefined,
+): Map<string, PublicMediaAttribution> {
+  const map = new Map<string, PublicMediaAttribution>();
+  for (const item of list ?? []) {
+    if (item?.url) map.set(item.url, item);
+  }
+  return map;
 }
 
 /* ------------------------------------------------------------------ *
@@ -96,12 +136,44 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
   // Tourist Hero `gallery` (v1.2.0) — Airbnb-style: carrusel + contador,
   // acciones back/share/favorito en overlay e info debajo. Evolución vía
   // `variant` del contrato oficial (Tourist Hero Policy).
+  // G8-F1D — El ALT, caption y crédito acreditados mandan sobre el
+  // fallback genérico. Sólo se usa "— foto N" cuando no hay metadata.
+  const attribution = attributionIndex(d.mediaAttribution);
+  const seen = new Set<string>();
   const slides = [
-    ...(d.heroUrl ? [{ url: d.heroUrl, alt: d.name, focalPoint: "center" }] : []),
-    ...d.galleryUrls
-      .filter((u) => u && u !== d.heroUrl)
-      .map((u, i) => ({ url: u, alt: `${d.name} — foto ${i + 2}`, focalPoint: "center" })),
-  ];
+    ...(d.heroUrl ? [d.heroUrl] : []),
+    ...d.galleryUrls.filter((u) => u && u !== d.heroUrl),
+  ]
+    .map((url, i) => {
+      const a = attribution.get(url) ?? emptyAttribution(url);
+      if (a.mediaAssetId) {
+        if (seen.has(a.mediaAssetId)) return null;
+        seen.add(a.mediaAssetId);
+      }
+      const credit = resolveAttributedCredit(a);
+      const caption = resolveAttributedCaption(a);
+      return {
+        url,
+        // G8-F1D · El fallback nunca puede reducirse al nombre del destino:
+        // sólo aplica cuando no existe ALT acreditado.
+        alt: resolveAttributedAlt(a, {
+          fallback:
+            i === 0
+              ? `Vista de ${d.name}, Oriente Maya de Yucatán`
+              : `${d.name} — foto ${i + 1}, Oriente Maya de Yucatán`,
+        }),
+
+        focalPoint: "center",
+        ...(caption ? { caption } : {}),
+        ...(credit ? { credit } : {}),
+        ...(a.aiGenerated || a.conceptual
+          ? { nature: "conceptual" as const }
+          : a.documentary
+            ? { nature: "documentary" as const }
+            : {}),
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
   if (slides.length > 0) {
     return {
       variant: "gallery",
@@ -139,9 +211,7 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
  * institucionales) + Institutional Badges Rule (jamás hardcodeados en
  * plantillas; el registry autoriza).
  * ------------------------------------------------------------------ */
-export function destinationToBadgeItems(
-  d: DestinationBlockInput,
-): InstitutionalBadgeItem[] {
+export function destinationToBadgeItems(d: DestinationBlockInput): InstitutionalBadgeItem[] {
   const items: InstitutionalBadgeItem[] = [];
   const slug = d.slug.toLowerCase();
   if ((PUEBLOS_MAGICOS_AUTORIZADOS as readonly string[]).includes(slug)) {
@@ -181,8 +251,7 @@ export function destinationToSubnavDTO(d: DestinationBlockInput): ExperienceSubn
     anchors.push({ id: "ubicacion", label: "Ubicación" });
   }
   const c = d.relatedCounts;
-  const total =
-    c.hoteles + c.restaurantes + c.experiencias + c.otras + c.eventos + c.productos;
+  const total = c.hoteles + c.restaurantes + c.experiencias + c.otras + c.eventos + c.productos;
   if (total > 0) {
     // H-03 · I3.b — sección unificada de descubrimiento contextual
     // orquestada por `vmx.experience.related-collection`.
@@ -293,9 +362,7 @@ const VALLADOLID_STOCK_FALLBACK: string[] = [
   "https://images.unsplash.com/photo-1512813498716-3e640fed3f39?auto=format&fit=crop&w=1200&q=75",
 ];
 
-export function destinationToGalleryDTO(
-  d: DestinationBlockInput,
-): ExperienceGalleryDTO | null {
+export function destinationToGalleryDTO(d: DestinationBlockInput): ExperienceGalleryDTO | null {
   const urls: string[] = [];
   if (d.heroUrl) urls.push(d.heroUrl);
   urls.push(...d.galleryUrls);
@@ -307,15 +374,29 @@ export function destinationToGalleryDTO(
     urls.push(next);
   }
   if (urls.length === 0) return null;
+  const galleryAttribution = attributionIndex(d.mediaAttribution);
   return {
     variant: "mosaic",
     heading: null,
     subheading: null,
-    items: urls.slice(0, 5).map((url, i) => ({
-      kind: "image",
-      url,
-      alt: `${d.name} — foto ${i + 1}`,
-    })),
+    items: urls.slice(0, 5).map((url, i) => {
+      // G8-F1D — ALT/caption/crédito acreditados; genérico sólo si falta.
+      const a = galleryAttribution.get(url) ?? emptyAttribution(url);
+      const credit = resolveAttributedCredit(a);
+      const caption = resolveAttributedCaption(a);
+      return {
+        kind: "image" as const,
+        url,
+        alt: resolveAttributedAlt(a, { fallback: `${d.name} — foto ${i + 1}` }),
+        ...(caption ? { caption } : {}),
+        ...(credit ? { credit } : {}),
+        ...(a.aiGenerated || a.conceptual
+          ? { nature: "conceptual" as const }
+          : a.documentary
+            ? { nature: "documentary" as const }
+            : {}),
+      };
+    }),
     maxVisible: 5,
     aspect: "landscape",
     ariaLabel: `Galería de ${d.name}`,
@@ -347,9 +428,7 @@ const DESTINATION_CENTROIDS: Record<string, { lat: number; lng: number }> = {
   espita: { lat: 21.0114, lng: -88.3086 },
 };
 
-export function destinationToMapDTO(
-  d: DestinationBlockInput,
-): ExperienceMapDTO | null {
+export function destinationToMapDTO(d: DestinationBlockInput): ExperienceMapDTO | null {
   const fallback = DESTINATION_CENTROIDS[d.slug.toLowerCase()] ?? null;
   const lat = d.latitude ?? fallback?.lat ?? null;
   const lng = d.longitude ?? fallback?.lng ?? null;

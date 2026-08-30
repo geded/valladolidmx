@@ -39,8 +39,7 @@ function useActiveBusinessId(): string | null {
       setId(detail ?? null);
     };
     window.addEventListener("portal:active-business-changed", handler);
-    return () =>
-      window.removeEventListener("portal:active-business-changed", handler);
+    return () => window.removeEventListener("portal:active-business-changed", handler);
   }, []);
   return id;
 }
@@ -94,13 +93,9 @@ function RedemptionsPage() {
       if (d >= startOfDay) today++;
       if (d >= startOfWeek) week++;
       if (d >= startOfMonth) month++;
-      promoCount.set(
-        r.promotion_slug,
-        (promoCount.get(r.promotion_slug) ?? 0) + 1,
-      );
+      promoCount.set(r.promotion_slug, (promoCount.get(r.promotion_slug) ?? 0) + 1);
     }
-    const top =
-      [...promoCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+    const top = [...promoCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
     return { today, week, month, top };
   }, [rows]);
 
@@ -144,9 +139,7 @@ function RedemptionsPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-            Portal empresa
-          </p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Portal empresa</p>
           <h1 className="text-2xl font-semibold">Historial de canjes</h1>
           <p className="text-sm text-muted-foreground">
             Auditoría de todos los cupones digitales canjeados en esta empresa.
@@ -178,19 +171,11 @@ function RedemptionsPage() {
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <div>
           <label className="text-xs text-muted-foreground">Desde</label>
-          <Input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
+          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Hasta</label>
-          <Input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
+          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Canal</label>
@@ -210,10 +195,7 @@ function RedemptionsPage() {
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Promoción</label>
-          <Select
-            value={promo || "all"}
-            onValueChange={(v) => setPromo(v === "all" ? "" : v)}
-          >
+          <Select value={promo || "all"} onValueChange={(v) => setPromo(v === "all" ? "" : v)}>
             <SelectTrigger>
               <SelectValue placeholder="Todas" />
             </SelectTrigger>
@@ -285,15 +267,9 @@ function Kpi({
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-3 shadow-soft">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-        {label}
-      </p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
       <p
-        className={
-          small
-            ? "mt-1 truncate text-base font-semibold"
-            : "mt-1 text-2xl font-semibold"
-        }
+        className={small ? "mt-1 truncate text-base font-semibold" : "mt-1 text-2xl font-semibold"}
       >
         {value}
       </p>
@@ -318,9 +294,7 @@ function RedemptionRow({ r }: { r: BusinessRedemptionRow }) {
       </td>
       <td className="px-3 py-2">
         <div className="flex items-center gap-1">
-          <span className="text-lg leading-none">
-            {countryFlag(r.traveler_country_code)}
-          </span>
+          <span className="text-lg leading-none">{countryFlag(r.traveler_country_code)}</span>
           <span>{r.traveler_name ?? "—"}</span>
         </div>
       </td>
@@ -335,9 +309,7 @@ function RedemptionRow({ r }: { r: BusinessRedemptionRow }) {
           </span>
         )}
       </td>
-      <td className="px-3 py-2 text-xs text-muted-foreground">
-        {r.redeemed_by_name ?? "—"}
-      </td>
+      <td className="px-3 py-2 text-xs text-muted-foreground">{r.redeemed_by_name ?? "—"}</td>
     </tr>
   );
 }

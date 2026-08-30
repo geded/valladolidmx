@@ -24,7 +24,13 @@ export const publishInAppNotification = createServerFn({ method: "POST" })
       category: Category;
       payloadRef?: Record<string, unknown>;
     }) => {
-      if (!input?.eventId || !input?.eventType || !input?.recipientUserId || !input?.audience || !input?.category) {
+      if (
+        !input?.eventId ||
+        !input?.eventType ||
+        !input?.recipientUserId ||
+        !input?.audience ||
+        !input?.category
+      ) {
         throw new Error("publishInAppNotification: parámetros incompletos");
       }
       return input;

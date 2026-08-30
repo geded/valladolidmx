@@ -93,9 +93,7 @@ export const signProductImageUpload = createServerFn({ method: "POST" })
       .slice(2, 8)}-${clean}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = context.supabase.storage as any;
-    const { data: signed, error } = await storage
-      .from(BUCKET)
-      .createSignedUploadUrl(path);
+    const { data: signed, error } = await storage.from(BUCKET).createSignedUploadUrl(path);
     if (error) throw error;
     return {
       path: signed.path as string,
@@ -122,10 +120,8 @@ interface RegisterMediaInput {
 export const registerProductMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: RegisterMediaInput) => {
-    if (!d?.productId || !d?.storagePath || !d?.role)
-      throw new Error("invalid_input");
-    if (!["cover", "gallery"].includes(d.role))
-      throw new Error("invalid_role");
+    if (!d?.productId || !d?.storagePath || !d?.role) throw new Error("invalid_input");
+    if (!["cover", "gallery"].includes(d.role)) throw new Error("invalid_role");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -153,11 +149,7 @@ export const registerProductMedia = createServerFn({ method: "POST" })
     if (assetErr) throw assetErr;
 
     if (data.role === "cover") {
-      await db
-        .from("product_media")
-        .delete()
-        .eq("product_id", data.productId)
-        .eq("role", "cover");
+      await db.from("product_media").delete().eq("product_id", data.productId).eq("role", "cover");
       const { error: linkErr } = await db.from("product_media").insert({
         product_id: data.productId,
         media_asset_id: asset.id,
@@ -262,8 +254,7 @@ interface ReorderInput {
 export const reorderProductGallery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ReorderInput) => {
-    if (!d?.productId || !Array.isArray(d.orderedIds))
-      throw new Error("invalid_input");
+    if (!d?.productId || !Array.isArray(d.orderedIds)) throw new Error("invalid_input");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -300,9 +291,7 @@ export const removeProductMedia = createServerFn({ method: "POST" })
 
     const { data: link, error: readErr } = await db
       .from("product_media")
-      .select(
-        "id, role, product_id, media_asset_id, media_assets:media_assets ( storage_path )",
-      )
+      .select("id, role, product_id, media_asset_id, media_assets:media_assets ( storage_path )")
       .eq("id", data.productMediaId)
       .maybeSingle();
     if (readErr) throw readErr;
@@ -329,8 +318,7 @@ export const removeProductMedia = createServerFn({ method: "POST" })
       /* ignore */
     }
     try {
-      const storagePath = (link.media_assets as { storage_path?: string } | null)
-        ?.storage_path;
+      const storagePath = (link.media_assets as { storage_path?: string } | null)?.storage_path;
       if (storagePath) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const storage = context.supabase.storage as any;

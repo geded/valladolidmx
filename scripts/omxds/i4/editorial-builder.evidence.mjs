@@ -1,7 +1,12 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "69f4767ec2773f0948c4a61177d4141357dcc5a2";
 const authorizedCommit = "1e6541eef0c27d58dd1afc56863070ee2a1f4f88";
@@ -145,12 +150,12 @@ const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], { encoding: "utf8" }),
-  "",
-);
+// 19.26 · I4-0 adopta el baseline de dependencias ya gobernado (PCA-2026-019):
+// la ÚNICA diferencia tolerada frente al baseline canónico es el bump de plataforma
+// @lovable.dev/vite-tanstack-config 2.7.7 -> 2.13.1 y las entradas de bun.lock que ese
+// bump reescribe. Cualquier otra dependencia, versión o cambio adicional falla cerrado.
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I4-0");
+assertGovernedLockBaseline(base, "I4-0");
 
 function filesBelow(directory) {
   const files = [];
@@ -166,6 +171,7 @@ const authorizedI4AConsumers = [
   "src/lib/experience-builder/block-registry.ts",
   "src/lib/experience-builder/block-library.ts",
   "src/components/experience-builder/VisualStudio.tsx",
+  "src/lib/experience-builder/premium-template-registry.ts",
   "src/lib/experience-builder/studio.functions.ts",
 ];
 const i4AConsumers = filesBelow("src")
@@ -185,6 +191,22 @@ if (i4AConsumers.length) {
   );
   assert.equal(i4AAuthorization.status, "Approved");
   assert.deepEqual(i4AConsumers, [...authorizedI4AConsumers].sort());
+  const premiumTemplateRegistryPath = "src/lib/experience-builder/premium-template-registry.ts";
+  const premiumTemplateRegistrySha256 =
+    "5f05a70a0ebb8e8ea8880e3b2531eb430251c87f565d7ea35ce38f910daadbb1";
+  assert.equal(
+    createHash("sha256").update(readFileSync(premiumTemplateRegistryPath)).digest("hex"),
+    premiumTemplateRegistrySha256,
+    "I4-0 premium template registry changed after exact acknowledgment",
+  );
+  assert.ok(
+    (i4AAuthorization.permissions ?? []).some(
+      (permission) =>
+        permission.operation === "create" && permission.path === premiumTemplateRegistryPath,
+    ),
+    "PCA-2026-013 does not authorize the exact premium template registry path",
+  );
+  assert.match(i4AAuthorization.founder_authority, new RegExp(premiumTemplateRegistrySha256));
 } else {
   assert.deepEqual(i4AConsumers, []);
 }

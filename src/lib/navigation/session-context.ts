@@ -57,22 +57,16 @@ function toSlot(node: ContextNode | undefined): NavigationSessionSlot | undefine
  * Devuelve `null` si no hay ancla territorial (evita persistir Home,
  * Blog, Contacto, etc. y contaminar el store con contexto vacío).
  */
-export function snapshotFromContext(
-  ctx: ResolvedContext,
-): NavigationSessionSnapshot | null {
+export function snapshotFromContext(ctx: ResolvedContext): NavigationSessionSnapshot | null {
   const destinationNode =
-    ctx.destination
-    ?? (ctx.current.kind === "destination" ? ctx.current : undefined);
+    ctx.destination ?? (ctx.current.kind === "destination" ? ctx.current : undefined);
   if (!destinationNode || !destinationNode.slug) return null;
 
-  const categoryNode =
-    ctx.category
-    ?? (ctx.current.kind === "category" ? ctx.current : undefined);
+  const categoryNode = ctx.category ?? (ctx.current.kind === "category" ? ctx.current : undefined);
   const businessNode =
-    ctx.ancestors.find((n) => n.kind === "business")
-    ?? (ctx.current.kind === "business" ? ctx.current : undefined);
-  const productNode =
-    ctx.current.kind === "product" ? ctx.current : undefined;
+    ctx.ancestors.find((n) => n.kind === "business") ??
+    (ctx.current.kind === "business" ? ctx.current : undefined);
+  const productNode = ctx.current.kind === "product" ? ctx.current : undefined;
 
   return {
     v: SCHEMA_VERSION,
@@ -113,9 +107,7 @@ export function readNavigationSession(): NavigationSessionSnapshot | null {
 }
 
 /** Escribe el snapshot, evitando writes redundantes. */
-export function writeNavigationSession(
-  snapshot: NavigationSessionSnapshot,
-): void {
+export function writeNavigationSession(snapshot: NavigationSessionSnapshot): void {
   if (!hasWindow()) return;
   try {
     const current = sessionStorage.getItem(STORAGE_KEY);
@@ -124,9 +116,7 @@ export function writeNavigationSession(
     sessionStorage.setItem(STORAGE_KEY, next);
     // storage event no dispara en la pestaña actual — notificamos
     // vía CustomEvent para permitir sincronización intra-pestaña.
-    window.dispatchEvent(
-      new CustomEvent("vll:nav:session", { detail: snapshot }),
-    );
+    window.dispatchEvent(new CustomEvent("vll:nav:session", { detail: snapshot }));
   } catch {
     // storage lleno / bloqueado → silencioso
   }
@@ -149,9 +139,7 @@ export function clearNavigationSession(): void {
  *  · `vll:nav:session` (cambios intra-pestaña, disparado por el bridge)
  */
 export function useNavigationSession(): NavigationSessionSnapshot | null {
-  const [snapshot, setSnapshot] = useState<NavigationSessionSnapshot | null>(
-    null,
-  );
+  const [snapshot, setSnapshot] = useState<NavigationSessionSnapshot | null>(null);
   useEffect(() => {
     setSnapshot(readNavigationSession());
     function refresh() {

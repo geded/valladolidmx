@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import { PremiumHero } from "@/components/premium";
 import type { ReactNode } from "react";
 import { createEventSurfaceContract } from "@/lib/omxds/surfaces/event-surface.contract";
 import {
@@ -89,24 +90,55 @@ export function EventSurface({
     (!activeContract || Boolean(dominantAction));
   return (
     <PublicShell
-      eyebrow="Evento"
-      title={event.title}
-      description={event.summary ?? undefined}
+      eyebrow={activeContract ? undefined : "Evento"}
+      title={activeContract ? undefined : event.title}
+      description={activeContract ? undefined : (event.summary ?? undefined)}
       crumbs={[{ label: "Eventos", to: "/eventos" }, { label: event.title }]}
       useContextCrumbs
     >
+      {activeContract ? (
+        <PremiumHero
+          vm={{
+            presentation: event.cover_url ? "cinematic" : "editorial",
+            crumbs: [
+              { label: "Inicio", href: "/" },
+              { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+              ...(event.destination_slug && event.destination_name
+                ? [
+                    {
+                      label: event.destination_name,
+                      href: `/oriente-maya/${encodeURIComponent(event.destination_slug)}`,
+                    },
+                  ]
+                : []),
+              { label: "Eventos", href: "/eventos" },
+              { label: event.title },
+            ],
+            eyebrow: when ? `Evento · ${when}` : "Evento",
+            title: event.title,
+            description: event.summary ?? undefined,
+            media:
+              event.cover_url && !activeContract.omissions.includes("media")
+                ? { url: event.cover_url, alt: event.title }
+                : null,
+          }}
+        />
+      ) : null}
+
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          {event.cover_url ? (
-            <img
-              src={event.cover_url}
-              alt={event.title}
-              className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
-              loading="eager"
-            />
-          ) : activeContract?.omissions.includes("media") ? null : (
-            <div className="aspect-video w-full rounded-2xl border border-dashed border-border bg-muted/30" />
-          )}
+          {!activeContract ? (
+            event.cover_url ? (
+              <img
+                src={event.cover_url}
+                alt={event.title}
+                className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
+                loading="eager"
+              />
+            ) : (
+              <div className="aspect-video w-full rounded-2xl border border-dashed border-border bg-muted/30" />
+            )
+          ) : null}
           {event.summary ? (
             <p className="text-base leading-relaxed text-foreground/90">{event.summary}</p>
           ) : null}

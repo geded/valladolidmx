@@ -56,12 +56,7 @@ export const TOURISM_ENTITY_LABEL: Record<TourismEntityKind, string> = {
   mixed: "Descubrir",
 };
 
-export type TourismCardBadgeTone =
-  | "default"
-  | "primary"
-  | "success"
-  | "warning"
-  | "info";
+export type TourismCardBadgeTone = "default" | "primary" | "success" | "warning" | "info";
 
 export interface TourismCardBadge {
   label: string;
@@ -291,10 +286,7 @@ function MediaPlaceholder({ kind }: { kind: TourismEntityKind | null }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "h-full w-full bg-gradient-to-br",
-        gradient[kind ?? "default"],
-      )}
+      className={cn("h-full w-full bg-gradient-to-br", gradient[kind ?? "default"])}
     />
   );
 }
@@ -324,14 +316,10 @@ export function TourismCard({
   const caps = withDefaultCapabilities(capabilities);
   const price = caps.showPrice ? formatPrice(vm.priceAmount, vm.priceCurrency) : null;
   const eyebrow = caps.showEyebrow ? entityEyebrow(vm) : null;
-  const distance = caps.showDistance
-    ? formatDistance(vm.location?.distanceKm ?? null)
-    : null;
+  const distance = caps.showDistance ? formatDistance(vm.location?.distanceKm ?? null) : null;
   const highlights = caps.showHighlights ? vm.highlights.slice(0, 3) : [];
   const badges = caps.showBadges ? vm.badges.slice(0, 2) : [];
-  const institutional = caps.showInstitutionalBadges
-    ? vm.institutionalBadges.slice(0, 2)
-    : [];
+  const institutional = caps.showInstitutionalBadges ? vm.institutionalBadges.slice(0, 2) : [];
   return (
     <article
       data-eb-entity={vm.entityKind ?? undefined}
@@ -356,47 +344,52 @@ export function TourismCard({
           ) : (
             <MediaPlaceholder kind={vm.entityKind} />
           )}
-          {(eyebrow || vm.mapLabel) ? (
-            <div className="absolute left-3 top-3 flex items-center gap-2">
-              {vm.mapLabel ? (
-                <span
-                  aria-label={`Ubicación ${vm.mapLabel} en el mapa`}
-                  className="grid h-6 w-6 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-soft"
-                >
-                  {vm.mapLabel}
-                </span>
+          {eyebrow || vm.mapLabel || institutional.length + badges.length > 0 ? (
+            <div
+              data-tourism-card-badges="top"
+              className="absolute inset-x-3 top-3 flex flex-wrap items-start justify-between gap-x-2 gap-y-1"
+            >
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                {vm.mapLabel ? (
+                  <span
+                    aria-label={`Ubicación ${vm.mapLabel} en el mapa`}
+                    className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-soft"
+                  >
+                    {vm.mapLabel}
+                  </span>
+                ) : null}
+                {eyebrow ? (
+                  <span className="max-w-full truncate rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
+                    {eyebrow}
+                  </span>
+                ) : null}
+              </div>
+              {institutional.length + badges.length > 0 ? (
+                <div className="flex min-w-0 flex-wrap justify-end gap-1">
+                  {institutional.map((b, i) => (
+                    <span
+                      key={`inst-${i}`}
+                      className={cn(
+                        "max-w-full truncate rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
+                        badgeToneClass(b.tone),
+                      )}
+                    >
+                      {b.label}
+                    </span>
+                  ))}
+                  {badges.map((b, i) => (
+                    <span
+                      key={`b-${i}`}
+                      className={cn(
+                        "max-w-full truncate rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
+                        badgeToneClass(b.tone),
+                      )}
+                    >
+                      {b.label}
+                    </span>
+                  ))}
+                </div>
               ) : null}
-              {eyebrow ? (
-                <span className="rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
-                  {eyebrow}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
-          {institutional.length + badges.length > 0 ? (
-            <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-1">
-              {institutional.map((b, i) => (
-                <span
-                  key={`inst-${i}`}
-                  className={cn(
-                    "rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
-                    badgeToneClass(b.tone),
-                  )}
-                >
-                  {b.label}
-                </span>
-              ))}
-              {badges.map((b, i) => (
-                <span
-                  key={`b-${i}`}
-                  className={cn(
-                    "rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
-                    badgeToneClass(b.tone),
-                  )}
-                >
-                  {b.label}
-                </span>
-              ))}
             </div>
           ) : null}
           {caps.showDate && vm.dateLabel ? (
@@ -446,21 +439,15 @@ export function TourismCard({
           <p className="mt-0.5 text-xs text-muted-foreground">{vm.businessName}</p>
         ) : null}
         {caps.showTagline && vm.tagline ? (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-            {vm.tagline}
-          </p>
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{vm.tagline}</p>
         ) : null}
 
         {caps.showRating && vm.rating ? (
           <p className="mt-2 flex items-center gap-1 text-xs">
             <StarIcon className="text-warning" />
-            <span className="font-semibold text-foreground">
-              {vm.rating.value.toFixed(1)}
-            </span>
+            <span className="font-semibold text-foreground">{vm.rating.value.toFixed(1)}</span>
             {vm.rating.count > 0 ? (
-              <span className="text-muted-foreground">
-                ({vm.rating.count} reseñas)
-              </span>
+              <span className="text-muted-foreground">({vm.rating.count} reseñas)</span>
             ) : null}
           </p>
         ) : null}
@@ -487,15 +474,9 @@ export function TourismCard({
         <div className="mt-auto pt-4">
           {caps.showPrice && (price || vm.priceHint) ? (
             <p className="flex items-baseline gap-1.5">
-              {price ? (
-                <span className="text-base font-bold text-foreground">
-                  {price}
-                </span>
-              ) : null}
+              {price ? <span className="text-base font-bold text-foreground">{price}</span> : null}
               {vm.priceHint ? (
-                <span className="text-xs text-muted-foreground">
-                  {vm.priceHint}
-                </span>
+                <span className="text-xs text-muted-foreground">{vm.priceHint}</span>
               ) : null}
             </p>
           ) : null}
@@ -521,11 +502,11 @@ function PrimaryCta({
 }) {
   if (!primary && !secondary) return null;
   return (
-    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+    <div className="mt-3 flex min-w-0 flex-col flex-wrap gap-2 sm:flex-row">
       {primary ? (
         <a
           href={primary.href ?? "#"}
-          className="inline-flex flex-1 items-center justify-center rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+          className="inline-flex min-h-11 min-w-0 flex-1 basis-full items-center justify-center rounded-pill bg-primary px-4 py-2 text-center text-sm font-semibold sm:basis-0 text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
         >
           {primary.label}
         </a>
@@ -533,7 +514,7 @@ function PrimaryCta({
       {secondary ? (
         <a
           href={secondary.href ?? "#"}
-          className="inline-flex items-center justify-center rounded-pill border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+          className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-pill border border-border px-4 py-2 text-center text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
         >
           {secondary.label}
         </a>
@@ -556,31 +537,22 @@ export function TourismCardRow({
   const caps = withDefaultCapabilities(capabilities);
   const price = caps.showPrice ? formatPrice(vm.priceAmount, vm.priceCurrency) : null;
   const eyebrow = caps.showEyebrow ? entityEyebrow(vm) : null;
-  const distance = caps.showDistance
-    ? formatDistance(vm.location?.distanceKm ?? null)
-    : null;
+  const distance = caps.showDistance ? formatDistance(vm.location?.distanceKm ?? null) : null;
   const badges = caps.showBadges ? vm.badges.slice(0, 2) : [];
-  const institutional = caps.showInstitutionalBadges
-    ? vm.institutionalBadges.slice(0, 2)
-    : [];
+  const institutional = caps.showInstitutionalBadges ? vm.institutionalBadges.slice(0, 2) : [];
   const size = caps.compact ? "h-16 w-16" : "h-24 w-24";
   return (
     <article
       data-eb-entity={vm.entityKind ?? undefined}
       data-tourism-card="row"
       className={cn(
-        "flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated",
+        "flex min-w-0 gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated",
         caps.compact ? "p-3" : "",
         className,
       )}
     >
       {caps.showMedia ? (
-        <div
-          className={cn(
-            "shrink-0 overflow-hidden rounded-xl bg-muted",
-            size,
-          )}
-        >
+        <div className={cn("shrink-0 overflow-hidden rounded-xl bg-muted", size)}>
           {vm.mediaUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -621,9 +593,7 @@ export function TourismCardRow({
               <p className="text-xs text-muted-foreground">{vm.businessName}</p>
             ) : null}
             {!caps.compact && caps.showTagline && vm.tagline ? (
-              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
-                {vm.tagline}
-              </p>
+              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{vm.tagline}</p>
             ) : null}
             {caps.showLocation && vm.location ? (
               <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
@@ -639,18 +609,14 @@ export function TourismCardRow({
             {caps.showRating && vm.rating ? (
               <p className="mt-1 flex items-center gap-1 text-xs">
                 <StarIcon className="text-warning" />
-                <span className="font-semibold text-foreground">
-                  {vm.rating.value.toFixed(1)}
-                </span>
+                <span className="font-semibold text-foreground">{vm.rating.value.toFixed(1)}</span>
                 {vm.rating.count > 0 ? (
-                  <span className="text-muted-foreground">
-                    ({vm.rating.count})
-                  </span>
+                  <span className="text-muted-foreground">({vm.rating.count})</span>
                 ) : null}
               </p>
             ) : null}
           </div>
-          <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+          <div className="flex min-w-0 shrink flex-col items-end gap-1 text-right">
             {institutional.length > 0 ? (
               <div className="flex flex-wrap justify-end gap-1">
                 {institutional.map((b, i) => (
@@ -673,9 +639,7 @@ export function TourismCardRow({
               </p>
             ) : null}
             {caps.showPrice && (price || vm.priceHint) ? (
-              <p className="text-sm font-semibold">
-                {price ?? vm.priceHint}
-              </p>
+              <p className="text-sm font-semibold">{price ?? vm.priceHint}</p>
             ) : null}
           </div>
         </div>
@@ -716,23 +680,15 @@ export function FeaturedTourismLayout({
   const [featured, ...rest] = items;
   if (!featured) return null;
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      <div className="lg:col-span-2">
-        <TourismCard
-          vm={featured}
-          capabilities={capabilities}
-          renderActions={renderActions}
-        />
+    <div className="grid min-w-0 gap-4 lg:grid-cols-3">
+      <div className="min-w-0 lg:col-span-2">
+        <TourismCard vm={featured} capabilities={capabilities} renderActions={renderActions} />
       </div>
       {rest.length > 0 ? (
-        <ul role="list" className="flex flex-col gap-3">
+        <ul role="list" className="flex min-w-0 flex-col gap-3">
           {rest.slice(0, 3).map((it) => (
-            <li key={it.id}>
-              <TourismCardRow
-                vm={it}
-                capabilities={capabilities}
-                renderActions={renderActions}
-              />
+            <li key={it.id} className="min-w-0">
+              <TourismCardRow vm={it} capabilities={capabilities} renderActions={renderActions} />
             </li>
           ))}
         </ul>

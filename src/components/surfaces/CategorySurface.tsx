@@ -21,8 +21,9 @@ export interface CategorySurfaceRelatedValue {
   related: CategoryRelatedDTO | null;
 }
 
-export const CategorySurfaceRelatedContext =
-  createContext<CategorySurfaceRelatedValue | null>(null);
+export const CategorySurfaceRelatedContext = createContext<CategorySurfaceRelatedValue | null>(
+  null,
+);
 
 export function CategorySurfaceRelatedProvider({
   value,

@@ -18,13 +18,9 @@ import { EXPERIENCE_SUBNAV_PRESETS } from "@/lib/experience-builder/blocks/exper
 import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 import type { ExperienceCtaBarDTO } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
-import type {
-  ExperienceProductsDTO,
-} from "@/lib/experience-builder/blocks/experience-products/contract";
+import type { ExperienceProductsDTO } from "@/lib/experience-builder/blocks/experience-products/contract";
 import { marketplaceProductToItem } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
-import type {
-  ExperiencePromotionsDTO,
-} from "@/lib/experience-builder/blocks/experience-promotions/contract";
+import type { ExperiencePromotionsDTO } from "@/lib/experience-builder/blocks/experience-promotions/contract";
 import { marketplacePromotionToItem } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 
 /* ------------------------------------------------------------------ *
@@ -51,9 +47,7 @@ export function businessToHeroDTO(b: MarketplaceBusinessDetail): ExperienceHeroD
     eyebrow: variant.eyebrow,
     title: b.display_name,
     description: b.tagline || null,
-    media: slides[0]
-      ? { url: slides[0].url, alt: slides[0].alt, overlay: 0 }
-      : null,
+    media: slides[0] ? { url: slides[0].url, alt: slides[0].alt, overlay: 0 } : null,
     mediaSlides: slides,
     badges,
     meta,
@@ -72,9 +66,7 @@ export function businessToSubnavDTO(b: MarketplaceBusinessDetail): ExperienceSub
     sticky: true,
     scrollOffset: 80,
     ariaLabel: "Secciones de la ficha",
-    anchors: EXPERIENCE_SUBNAV_PRESETS.business.filter(
-      (a) => a.id !== "promociones" || showPromos,
-    ),
+    anchors: EXPERIENCE_SUBNAV_PRESETS.business.filter((a) => a.id !== "promociones" || showPromos),
     capabilities: { scrollSpy: true, collapseOnMobile: true, showIcons: false },
   };
 }
@@ -105,9 +97,7 @@ export function businessToDescriptionSectionDTO(
 /* ------------------------------------------------------------------ *
  * Info-grid — datos rápidos.
  * ------------------------------------------------------------------ */
-export function businessToInfoGridDTO(
-  b: MarketplaceBusinessDetail,
-): ExperienceInfoGridDTO | null {
+export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceInfoGridDTO | null {
   const variant = resolveBusinessVariant(b.category_slug);
   const items: ExperienceInfoGridDTO["items"] = [];
   if (b.destination_slug) {
@@ -151,9 +141,7 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
     variant: "bar",
     label: b.display_name,
     meta: b.tagline || null,
-    actions: [
-      { label: "Contactar", action: "contact", href: "#contacto", emphasis: "primary" },
-    ],
+    actions: [{ label: "Contactar", action: "contact", href: "#contacto", emphasis: "primary" }],
     revealAfterScroll: 480,
     desktopPosition: "bottom",
     ariaLabel: "Acciones principales de la ficha",
@@ -173,9 +161,7 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
  * por `vmx.experience.products`. La Plantilla Business no vuelve a
  * pintar `<ul>` — sólo orquesta bloques oficiales.
  * ------------------------------------------------------------------ */
-export function businessToProductsDTO(
-  b: MarketplaceBusinessDetail,
-): ExperienceProductsDTO {
+export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
   return {
     variant: "grid",
@@ -212,9 +198,7 @@ export function businessToProductsDTO(
  * consumible por `vmx.experience.promotions`. La Plantilla Business no
  * vuelve a pintar `<ul>` — sólo orquesta bloques oficiales.
  * ------------------------------------------------------------------ */
-export function businessToPromotionsDTO(
-  b: MarketplaceBusinessDetail,
-): ExperiencePromotionsDTO {
+export function businessToPromotionsDTO(b: MarketplaceBusinessDetail): ExperiencePromotionsDTO {
   return {
     variant: "grid",
     heading: "Promociones vigentes",

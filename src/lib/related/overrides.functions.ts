@@ -19,11 +19,7 @@ import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
-export type RelatedEntityKind =
-  | "business"
-  | "product"
-  | "destination"
-  | "event";
+export type RelatedEntityKind = "business" | "product" | "destination" | "event";
 
 export type RelatedOverrideMode = "pin" | "hide";
 
@@ -81,18 +77,16 @@ function normalizeKind(k: unknown): RelatedEntityKind {
  * PUBLIC · Lectura para fetchers de superficie
  * ------------------------------------------------------------------ */
 export const getRelatedOverrides = createServerFn({ method: "GET" })
-  .inputValidator(
-    (data: { entityType: string; entityId: string; surface: string }) => {
-      if (!data?.entityId || typeof data.entityId !== "string") {
-        throw new Error("invalid_entity_id");
-      }
-      return {
-        entityType: normalizeKind(data.entityType),
-        entityId: data.entityId,
-        surface: normalizeSurface(data.surface),
-      };
-    },
-  )
+  .inputValidator((data: { entityType: string; entityId: string; surface: string }) => {
+    if (!data?.entityId || typeof data.entityId !== "string") {
+      throw new Error("invalid_entity_id");
+    }
+    return {
+      entityType: normalizeKind(data.entityType),
+      entityId: data.entityId,
+      surface: normalizeSurface(data.surface),
+    };
+  })
   .handler(async ({ data }): Promise<RelatedOverridesDTO> => {
     const supabase = publicClient();
     const { data: rows, error } = await supabase
@@ -210,8 +204,7 @@ export const upsertOverride = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("related_overrides")
       .upsert(payload, {
-        onConflict:
-          "entity_type,entity_id,surface,related_entity_type,related_entity_id",
+        onConflict: "entity_type,entity_id,surface,related_entity_type,related_entity_id",
       })
       .select("*")
       .single();
@@ -227,10 +220,7 @@ export const deleteOverride = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
-    const { error } = await context.supabase
-      .from("related_overrides")
-      .delete()
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("related_overrides").delete().eq("id", data.id);
     if (error) throw new Error(`related_overrides_delete_failed: ${error.message}`);
     return { ok: true as const };
   });
@@ -249,10 +239,7 @@ export function computeHiddenIds(
   return out;
 }
 
-export function pinnedIdsFor(
-  overrides: RelatedOverridesDTO,
-  kind: RelatedEntityKind,
-): string[] {
+export function pinnedIdsFor(overrides: RelatedOverridesDTO, kind: RelatedEntityKind): string[] {
   return overrides.pins
     .filter((p) => p.related_entity_type === kind)
     .map((p) => p.related_entity_id);

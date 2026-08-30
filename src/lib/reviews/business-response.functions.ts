@@ -11,12 +11,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type OwnerReviewStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
+export type OwnerReviewStatus = "draft" | "in_review" | "approved" | "published" | "archived";
 
 export interface OwnerReview {
   id: string;
@@ -85,10 +80,7 @@ export const listOwnerReviews = createServerFn({ method: "GET" })
             .in("id", Array.from(productIds))
         : Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
       businessIds.size > 0
-        ? supabase
-            .from("businesses")
-            .select("id, display_name")
-            .in("id", Array.from(businessIds))
+        ? supabase.from("businesses").select("id, display_name").in("id", Array.from(businessIds))
         : Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
     ]);
     if ((productsRes as { error: unknown }).error) {
@@ -131,13 +123,14 @@ export const listOwnerReviews = createServerFn({ method: "GET" })
       const kind = r.subject_kind === "product" ? "product" : "business";
       const sid = String(r.subject_id);
       const p = kind === "product" ? productMap.get(sid) : null;
-      const businessId = kind === "business" ? sid : p?.businessId ?? null;
-      const businessName = kind === "business" ? bizMap.get(sid) ?? null : p?.businessName ?? null;
+      const businessId = kind === "business" ? sid : (p?.businessId ?? null);
+      const businessName =
+        kind === "business" ? (bizMap.get(sid) ?? null) : (p?.businessName ?? null);
       return {
         id: String(r.id),
         subjectKind: kind,
         subjectId: sid,
-        subjectLabel: kind === "business" ? businessName : p?.name ?? null,
+        subjectLabel: kind === "business" ? businessName : (p?.name ?? null),
         businessId,
         businessDisplayName: businessName,
         rating: Number(r.rating ?? 0),

@@ -4,20 +4,9 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Calendar,
-  Users,
-  MapPin,
-  Sparkles,
-  Headset,
-  Clock,
-} from "lucide-react";
+import { Calendar, Users, MapPin, Sparkles, Headset, Clock } from "lucide-react";
 import { getTravelPlanOperationalDetail } from "@/lib/admin/travel-plans-operations.functions";
-import {
-  PlanStatusBadge,
-  ConciergeStatusBadge,
-  ProposalStatusBadge,
-} from "./badges";
+import { PlanStatusBadge, ConciergeStatusBadge, ProposalStatusBadge } from "./badges";
 
 interface Props {
   planId: string;
@@ -95,12 +84,8 @@ export function TravelPlanOperationalDrawer({ planId }: Props) {
         </h2>
         <p className="text-sm text-muted-foreground">
           Viajero: <span className="font-medium text-foreground">{d.traveler.display_name}</span>
-          {d.traveler.handle ? (
-            <span className="ml-1 text-xs">@{d.traveler.handle}</span>
-          ) : null}
-          {d.traveler.email ? (
-            <span className="ml-2 text-xs">· {d.traveler.email}</span>
-          ) : null}
+          {d.traveler.handle ? <span className="ml-1 text-xs">@{d.traveler.handle}</span> : null}
+          {d.traveler.email ? <span className="ml-2 text-xs">· {d.traveler.email}</span> : null}
         </p>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
@@ -181,9 +166,7 @@ export function TravelPlanOperationalDrawer({ planId }: Props) {
               </span>
             </div>
             {d.latest_concierge_proposal.summary ? (
-              <p className="text-sm text-muted-foreground">
-                {d.latest_concierge_proposal.summary}
-              </p>
+              <p className="text-sm text-muted-foreground">{d.latest_concierge_proposal.summary}</p>
             ) : null}
             {d.latest_concierge_proposal.items?.length ? (
               <ul className="mt-1 space-y-1 text-xs">
@@ -211,10 +194,7 @@ export function TravelPlanOperationalDrawer({ planId }: Props) {
         ) : (
           <ul className="mt-2 space-y-2">
             {d.alux_proposals.slice(0, 8).map((p) => (
-              <li
-                key={p.id}
-                className="rounded-xl border border-border bg-card p-3 text-sm"
-              >
+              <li key={p.id} className="rounded-xl border border-border bg-card p-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
                   <span className="font-medium">{p.title ?? "Sugerencia"}</span>
@@ -277,9 +257,7 @@ export function TravelPlanOperationalDrawer({ planId }: Props) {
             {d.timeline.map((t, i) => (
               <li key={i} className="relative text-sm">
                 <span className="absolute -left-[21px] top-1 h-2 w-2 rounded-full bg-primary" />
-                <p className="text-xs text-muted-foreground">
-                  {fmtDateTime(t.occurred_at)}
-                </p>
+                <p className="text-xs text-muted-foreground">{fmtDateTime(t.occurred_at)}</p>
                 <p>
                   <span className="font-medium">{t.event_type}</span>
                   {t.summary ? ` — ${t.summary}` : null}

@@ -1,0 +1,25 @@
+{
+  "id": "PCA-2026-022-ADDENDUM-A",
+  "type": "append-only-addendum",
+  "addendum_to": "PCA-2026-022",
+  "status": "Approved",
+  "package": "19.26",
+  "founder_authority": "Founder Directive 2026-08-25 · AUTORIZACION CONSOLIDADA · 19.26 · Reconciliacion final previa al cierre, punto 2: no modificar retroactivamente PCA-2026-022; crear un addendum append-only que documente el desfase temporal y reconozca exclusivamente la migracion de reconciliacion del flag por digest SHA-256 exacto. Prohibido editar, recrear o reejecutar la migracion. Prohibido eliminar globalmente la precondicion del flag OFF en el gate I3-C.",
+  "temporal_offset_rationale": "PCA-2026-022 (19.20) fue emitida para llevar omxds_visual_v1_contracts_enabled de true a false. Por eso su campo required_feature_flags quedo vacio: el estado false es su POSTCONDICION verificable, no su precondicion. El gate I3-C construye su conjunto de rutas autorizadas filtrando unicamente autorizaciones Approved cuyo required_feature_flags incluye 'omxds_visual_v1_contracts_enabled=false', de modo que la migracion legitimamente autorizada por PCA-2026-022 queda fuera del conjunto. Este addendum documenta ese desfase temporal y lo reconoce de forma nominal, fail-closed y no generica, sin relajar la precondicion del flag OFF para ninguna otra ruta.",
+  "acknowledged_paths": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "sha256": "cf0c31ab1eeb8b051154697b6d26c671b5e2105dba9770c0aa8e6e5b46dba252",
+      "state": "applied",
+      "note": "Migracion idempotente ya aplicada en el backend (updated_at 2026-08-25 16:35:31). No se edita, no se recrea, no se reejecuta."
+    }
+  ],
+  "postcondition_verified": "omxds_visual_v1_contracts_enabled=false",
+  "does_not_authorize": [
+    "editar, recrear o reejecutar la migracion reconocida",
+    "reconocer cualquier otra migracion, ruta o digest",
+    "eliminar o debilitar globalmente la precondicion del flag OFF en I3-C",
+    "cambios funcionales, datos, produccion, merge, G4 o G5"
+  ]
+}

@@ -17,10 +17,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  assertAllowedTransition,
-  type ContentStatus,
-} from "@/lib/cms/workflow";
+import { assertAllowedTransition, type ContentStatus } from "@/lib/cms/workflow";
 
 const EDITABLE_TABLES = [
   "tourism_regions",
@@ -127,10 +124,9 @@ async function assertCanEditBusiness(
   context: { supabase: any; userId: string },
   businessId?: string | null,
 ) {
-  const { data: editorial } = await context.supabase.rpc(
-    "is_editor_or_admin",
-    { _user_id: context.userId },
-  );
+  const { data: editorial } = await context.supabase.rpc("is_editor_or_admin", {
+    _user_id: context.userId,
+  });
   if (editorial) return;
   if (!businessId) throw new Error("forbidden");
   const { data: owns } = await context.supabase.rpc("has_business_access", {
@@ -152,10 +148,9 @@ async function assertCanEditProduct(
   productId: string | null,
   payload: Record<string, unknown>,
 ) {
-  const { data: editorial } = await context.supabase.rpc(
-    "is_editor_or_admin",
-    { _user_id: context.userId },
-  );
+  const { data: editorial } = await context.supabase.rpc("is_editor_or_admin", {
+    _user_id: context.userId,
+  });
   if (editorial) return;
   let businessId = (payload.business_id as string | undefined) ?? null;
   if (!businessId && productId) {
@@ -262,8 +257,7 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
   .inputValidator((d: UpsertInput) => {
     if (!d || typeof d !== "object") throw new Error("invalid_input");
     if (typeof d.table !== "string") throw new Error("invalid_table");
-    if (!d.payload || typeof d.payload !== "object")
-      throw new Error("invalid_payload");
+    if (!d.payload || typeof d.payload !== "object") throw new Error("invalid_payload");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -334,9 +328,7 @@ async function autoTranslateContent(
   context: { supabase: any; userId: string },
 ) {
   try {
-    const { translateEntityContentBestEffort } = await import(
-      "./translate-content.server"
-    );
+    const { translateEntityContentBestEffort } = await import("./translate-content.server");
     await translateEntityContentBestEffort(context.supabase, {
       table,
       entityId,
@@ -424,10 +416,7 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       patch.published_at = new Date().toISOString();
     }
 
-    const { error: updErr } = await db
-      .from(data.table)
-      .update(patch)
-      .eq("id", data.id);
+    const { error: updErr } = await db.from(data.table).update(patch).eq("id", data.id);
     if (updErr) throw updErr;
 
     await logCmsAudit(db, {
@@ -503,9 +492,7 @@ export const listEntityHistory = createServerFn({ method: "POST" })
     const kind = TABLE_TO_ENTITY_KIND[data.table];
     const { data: rows, error } = await db
       .from("content_audit_log")
-      .select(
-        "id, action, from_status, to_status, actor_user_id, notes, created_at",
-      )
+      .select("id, action, from_status, to_status, actor_user_id, notes, created_at")
       .eq("entity_kind", kind)
       .eq("entity_id", data.id)
       .order("created_at", { ascending: false })

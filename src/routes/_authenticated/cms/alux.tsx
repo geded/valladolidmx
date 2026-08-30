@@ -130,17 +130,15 @@ function AluxConsolePage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-8 space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-          CMS · Inteligencia
-        </p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">CMS · Inteligencia</p>
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-2xl font-serif">Consola de Alux</h1>
           <Badge variant="secondary">Ola A1</Badge>
         </div>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Ajusta la personalidad, los guardrails y las capas de memoria que
-          Alux consume en tiempo real. Los cambios se aplican sin redeploy y
-          se auditan por usuario. Alux es copiloto y concierge IA — no chatbot.
+          Ajusta la personalidad, los guardrails y las capas de memoria que Alux consume en tiempo
+          real. Los cambios se aplican sin redeploy y se auditan por usuario. Alux es copiloto y
+          concierge IA — no chatbot.
         </p>
         {data?.updated_at && (
           <p className="text-xs text-muted-foreground">
@@ -189,8 +187,8 @@ function AluxConsolePage() {
         <div>
           <h2 className="font-serif text-lg">Guardrails</h2>
           <p className="text-xs text-muted-foreground">
-            Reglas obligatorias que se anexan al final de cada prompt. No inventar,
-            no sustituir al concierge, priorizar al viajero, Explainable by Default.
+            Reglas obligatorias que se anexan al final de cada prompt. No inventar, no sustituir al
+            concierge, priorizar al viajero, Explainable by Default.
           </p>
         </div>
         <Textarea
@@ -247,9 +245,7 @@ function AluxConsolePage() {
               min={64}
               max={8000}
               value={form.max_tokens}
-              onChange={(e) =>
-                setForm({ ...form, max_tokens: Number(e.target.value) || 1200 })
-              }
+              onChange={(e) => setForm({ ...form, max_tokens: Number(e.target.value) || 1200 })}
             />
           </div>
         </div>
@@ -303,10 +299,7 @@ function AluxConsolePage() {
         >
           Descartar
         </Button>
-        <Button
-          onClick={() => mutation.mutate(form)}
-          disabled={mutation.isPending}
-        >
+        <Button onClick={() => mutation.mutate(form)} disabled={mutation.isPending}>
           {mutation.isPending ? "Guardando…" : "Guardar configuración"}
         </Button>
       </footer>

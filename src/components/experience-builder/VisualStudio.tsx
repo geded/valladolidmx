@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
@@ -1187,7 +1188,7 @@ function PageVisualEditor({
   const [deviceViewport, setDeviceViewport] = useState<DeviceViewport>(() => {
     if (typeof window === "undefined") return "mobile";
     const stored = window.localStorage.getItem("eb.canvas.device");
-    return stored === "tablet" || stored === "desktop" ? stored : "mobile";
+    return isDeviceViewport(stored) ? stored : "mobile";
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1762,6 +1763,31 @@ function PageVisualEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
+  // G7-C · Altura acotada real del editor: el shell del Studio se mide contra
+  // la ventana (sin alturas mágicas) para que el canvas nunca sobresalga del
+  // área visible y exista un único scrollport.
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const [shellHeight, setShellHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const measure = () => {
+      const el = shellRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const height = Math.max(360, Math.round(window.innerHeight - top));
+      setShellHeight((current) =>
+        current === null || Math.abs(current - height) > 1 ? height : current,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (shellRef.current) observer.observe(shellRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [page, tree]);
+
   if (loadError)
     return (
       <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />
@@ -1777,7 +1803,12 @@ function PageVisualEditor({
     );
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div
+      ref={shellRef}
+      data-eb-studio-shell=""
+      style={shellHeight ? { height: shellHeight } : undefined}
+      className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background"
+    >
       <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <button
           type="button"
@@ -2007,7 +2038,7 @@ function PageVisualEditor({
         </div>
       ) : null}
 
-      <div className="relative flex flex-1">
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {!previewMode ? (
           <aside
             className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col"
@@ -2116,7 +2147,7 @@ function PageVisualEditor({
           if (!previewProvider) return canvas;
           const Provider = previewProvider.Provider;
           return (
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               <StudioPreviewContextBar
                 provider={previewProvider}
                 onDataChange={handlePreviewDataChange}
@@ -2208,7 +2239,11 @@ function PageVisualEditor({
               onChange={(next) => updateSelectedConfig(next)}
               simple={!advanced}
               activeBreakpoint={
-                deviceViewport === "desktop" ? "lg" : deviceViewport === "tablet" ? "md" : "base"
+                deviceViewport === "tablet"
+                  ? "md"
+                  : deviceViewport === "mobile" || deviceViewport === "mobile430"
+                    ? "base"
+                    : "lg"
               }
             />
 
@@ -2496,16 +2531,87 @@ function SharePreviewModal({
 
 const HOME_CANVAS_WIDTH = 1280;
 
-/** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
-export type DeviceViewport = "mobile" | "tablet" | "desktop";
-const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
-  mobile: 390,
-  tablet: 768,
-  desktop: 1280,
-};
+/**
+ * G7-C · Presets exactos del canvas (ancho y alto lógicos del dispositivo).
+ * El iframe siempre recibe estas medidas lógicas; cuando el editor dispone de
+ * menos espacio se aplica una escala visual externa que NO altera container
+ * queries, breakpoints ni medidas internas del documento aislado.
+ */
+type DeviceViewport = "mobile" | "mobile430" | "tablet" | "w1024" | "desktop" | "w1440";
+
+interface DevicePreset {
+  id: DeviceViewport;
+  width: number;
+  height: number;
+  short: string;
+  label: string;
+}
+
+const DEVICE_PRESETS: readonly DevicePreset[] = [
+  { id: "mobile", width: 390, height: 844, short: "390", label: "Móvil · 390 × 844" },
+  { id: "mobile430", width: 430, height: 932, short: "430", label: "Móvil grande · 430 × 932" },
+  { id: "tablet", width: 768, height: 1024, short: "768", label: "Tablet · 768 × 1024" },
+  { id: "w1024", width: 1024, height: 1366, short: "1024", label: "iPad Pro · 1024 × 1366" },
+  { id: "desktop", width: 1280, height: 800, short: "1280", label: "Escritorio · 1280 × 800" },
+  { id: "w1440", width: 1440, height: 900, short: "1440", label: "Escritorio amplio · 1440 × 900" },
+] as const;
+
+const DEVICE_PRESET_BY_ID = new Map<DeviceViewport, DevicePreset>(
+  DEVICE_PRESETS.map((preset) => [preset.id, preset]),
+);
+
+const DEVICE_WIDTHS: Record<DeviceViewport, number> = Object.fromEntries(
+  DEVICE_PRESETS.map((preset) => [preset.id, preset.width]),
+) as Record<DeviceViewport, number>;
+
+function getDevicePreset(id: DeviceViewport): DevicePreset {
+  return DEVICE_PRESET_BY_ID.get(id) ?? DEVICE_PRESETS[0];
+}
+
+function isDeviceViewport(value: unknown): value is DeviceViewport {
+  return typeof value === "string" && DEVICE_PRESET_BY_ID.has(value as DeviceViewport);
+}
 
 /**
- * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
+ * G7-C · Variante determinista del encabezado dentro del canvas.
+ *
+ * overlay  → el primer bloque visible es un Hero cinematográfico (full-bleed)
+ *            con al menos un medio válido.
+ * solid    → Hero editorial dividido, Hero sin medio, primer bloque no Hero
+ *            o estado desconocido (fail-closed).
+ */
+function resolveCanvasHeaderVariant(tree: CompositionTree | null | undefined): "overlay" | "solid" {
+  const first = tree?.root?.children?.find((node) => !node.hidden);
+  if (!first || first.type !== "vmx.hero") return "solid";
+  const config = (first.config ?? {}) as Record<string, unknown>;
+  const variant = typeof config.variant === "string" ? config.variant : "cinematic";
+  if (variant !== "cinematic") return "solid";
+  const media = Array.isArray(config.background_images) ? config.background_images : [];
+  const hasMedia = media.some((item) => {
+    const src = (item as { src?: unknown } | null)?.src;
+    return typeof src === "string" && src.trim() !== "";
+  });
+  return hasMedia ? "overlay" : "solid";
+}
+
+/**
+ * Anchos exactos de auditoría (G3-H03 = 1024 px, G3-H04 = 1440 px).
+ * Sólo disponibles en entornos NO productivos (preview / local). No añaden
+ * rutas, no activan flags y no alteran el comportamiento del canvas.
+ */
+const AUDIT_HOSTNAMES_BLOCKED = new Set([
+  "valladolidmx.lovable.app",
+  "quehacerenvalladolid.com",
+  "www.quehacerenvalladolid.com",
+]);
+
+function auditWidthsEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  return !AUDIT_HOSTNAMES_BLOCKED.has(window.location.hostname);
+}
+
+/**
+ * G7-C · Selector de presets del canvas (seis dispositivos exactos).
  * Default móvil — el turismo se consume mayormente en celular y así el
  * empresario ve la verdad del turista sin publicar.
  */
@@ -2516,31 +2622,28 @@ function DeviceToggle({
   value: DeviceViewport;
   onChange: (v: DeviceViewport) => void;
 }) {
-  const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
-    { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
-    { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
-    { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
-  ];
   return (
     <div
       role="group"
       aria-label="Vista previa por dispositivo"
+      data-eb-device-presets={DEVICE_PRESETS.length}
       className="inline-flex items-center overflow-hidden rounded-md border border-border bg-background"
     >
-      {items.map((it) => {
-        const active = it.id === value;
+      {DEVICE_PRESETS.map((preset) => {
+        const active = preset.id === value;
         return (
           <button
-            key={it.id}
+            key={preset.id}
             type="button"
-            onClick={() => onChange(it.id)}
+            onClick={() => onChange(preset.id)}
             aria-pressed={active}
-            title={it.label}
+            title={preset.label}
+            data-eb-device-preset={preset.id}
             className={`px-2.5 py-1.5 text-[11px] font-medium transition ${
               active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
             }`}
           >
-            {it.short}
+            {preset.short}
           </button>
         );
       })}
@@ -2576,9 +2679,8 @@ function HomeCanvas({
   commentCounts?: Record<string, number>;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
-  const frameRef = useRef<HTMLDivElement | null>(null);
-  const frameWidth = DEVICE_WIDTHS[deviceViewport];
-  const [metrics, setMetrics] = useState({ width: frameWidth, height: 900 });
+  const preset = getDevicePreset(deviceViewport);
+  const [available, setAvailable] = useState({ width: preset.width, height: preset.height });
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
@@ -2590,158 +2692,285 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
+  // G7-C · La altura del canvas se deriva SIEMPRE del contenedor acotado del
+  // editor (medición + ResizeObserver), nunca de una altura mágica.
   useEffect(() => {
     const measure = () => {
-      const width = outerRef.current?.clientWidth ?? HOME_CANVAS_WIDTH;
-      const height = frameRef.current?.scrollHeight ?? 900;
-      setMetrics((current) =>
+      const el = outerRef.current;
+      if (!el) return;
+      const width = Math.max(120, el.clientWidth - 24);
+      // 24px de padding + 32px reservados para la barra indicadora del canvas.
+      const height = Math.max(240, el.clientHeight - 24 - 32);
+      setAvailable((current) =>
         Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
           ? { width, height }
           : current,
       );
     };
-
     measure();
-    const frame = frameRef.current;
     const outer = outerRef.current;
     const observer = new ResizeObserver(measure);
-    if (frame) observer.observe(frame);
     if (outer) observer.observe(outer);
     window.addEventListener("resize", measure);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [tree, previewMode, selectedId, deviceViewport]);
+  }, [deviceViewport]);
 
-  // Móvil y tablet caben casi siempre a 1:1; desktop se auto-escala si el
-  // contenedor del editor es más angosto que 1280.
-  const scale = Math.min(1, Math.max(0.45, metrics.width / frameWidth));
+  // G7-C · Escala proporcional sólo cuando el espacio visible es menor que el
+  // preset. El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
+  // por lo que container queries y breakpoints no se ven alterados.
+  const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
+  const headerVariant = resolveCanvasHeaderVariant(tree);
 
   return (
-    <div ref={outerRef} className="flex-1 overflow-y-auto bg-muted/20 px-3 py-3">
-      <div
-        className="relative mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-        style={{
-          width: frameWidth * scale,
-          height: metrics.height * scale,
-        }}
+    <div
+      ref={outerRef}
+      data-eb-canvas-scrollport="editor"
+      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-hidden bg-muted/20 p-3"
+    >
+      <CanvasViewport
+        device={deviceViewport}
+        width={preset.width}
+        height={preset.height}
+        scale={scale}
+        presetLabel={preset.label}
       >
-        <div
-          ref={frameRef}
-          data-eb-canvas-device={deviceViewport}
-          className="absolute left-0 top-0 bg-background"
-          style={{
-            width: frameWidth,
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-          }}
+        <InertChrome
+          label="Encabezado"
+          selected={selectedId === HEADER_CHROME_ID}
+          onSelect={() => onSelectChrome("header")}
+          sticky
         >
-          <StudioDeviceCss />
-          <InertChrome
-            label="Encabezado"
-            selected={selectedId === HEADER_CHROME_ID}
-            onSelect={() => onSelectChrome("header")}
-          >
-            <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
-          </InertChrome>
-          <DndContext
-            sensors={canvasSensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleCanvasDragEnd}
-          >
-            <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
-              <CompositionRenderer
-                tree={tree}
-                pageType="home"
-                wrap={
-                  previewMode
-                    ? undefined
-                    : (node, content) => (
-                        <BlockOverlay
-                          key={node.id}
-                          node={node}
-                          selected={selectedId === node.id}
-                          onSelect={() => onSelect(node.id)}
-                          onDelete={() => onDelete(node.id)}
-                          onDuplicate={() => onDuplicate(node.id)}
-                          onToggleHidden={() => onToggleHidden(node.id)}
-                          onMoveUp={() => onMove(node.id, -1)}
-                          onMoveDown={() => onMove(node.id, 1)}
-                          sortable={rootIdSet.has(node.id)}
-                          commentCount={commentCounts?.[node.id] ?? 0}
-                        >
-                          {content}
-                        </BlockOverlay>
-                      )
-                }
-              />
-            </SortableContext>
-          </DndContext>
-          <InertChrome
-            label="Pie de página"
-            selected={selectedId === FOOTER_CHROME_ID}
-            onSelect={() => onSelectChrome("footer")}
-          >
-            <PublicFooter config={getChromeConfig(tree, "footer")} />
-          </InertChrome>
-        </div>
-      </div>
+          <PublicHeader variant={headerVariant} config={getChromeConfig(tree, "header")} />
+        </InertChrome>
+        <DndContext
+          sensors={canvasSensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleCanvasDragEnd}
+        >
+          <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
+            <CompositionRenderer
+              tree={tree}
+              pageType="home"
+              wrap={
+                previewMode
+                  ? undefined
+                  : (node, content) => (
+                      <BlockOverlay
+                        key={node.id}
+                        node={node}
+                        selected={selectedId === node.id}
+                        onSelect={() => onSelect(node.id)}
+                        onDelete={() => onDelete(node.id)}
+                        onDuplicate={() => onDuplicate(node.id)}
+                        onToggleHidden={() => onToggleHidden(node.id)}
+                        onMoveUp={() => onMove(node.id, -1)}
+                        onMoveDown={() => onMove(node.id, 1)}
+                        sortable={rootIdSet.has(node.id)}
+                        commentCount={commentCounts?.[node.id] ?? 0}
+                      >
+                        {content}
+                      </BlockOverlay>
+                    )
+              }
+            />
+          </SortableContext>
+        </DndContext>
+        <InertChrome
+          label="Pie de página"
+          selected={selectedId === FOOTER_CHROME_ID}
+          onSelect={() => onSelectChrome("footer")}
+        >
+          <PublicFooter config={getChromeConfig(tree, "footer")} />
+        </InertChrome>
+      </CanvasViewport>
     </div>
   );
 }
 
 /**
- * Fallback exclusivo del Studio: el canvas simula 390/768/1280px dentro de
- * una ventana desktop. Si algún breakpoint de viewport o container-query no
- * alcanza a recalcularse dentro del editor, estas reglas fuerzan las mismas
- * columnas que ve el sitio público para cada dispositivo seleccionado.
+ * CanvasViewport — viewport aislado del Studio (18.54).
+ *
+ * Renderiza el árbol del canvas dentro de un `<iframe>` same-origin con el
+ * ancho real del dispositivo seleccionado. Al ser un documento propio:
+ *  - las media queries (`sm:`, `md:`, `lg:`) se resuelven contra 390/768/1280
+ *    y no contra la ventana del editor;
+ *  - el scroll y el `sticky` del encabezado se comportan como en producción;
+ *  - el overflow horizontal aparece (o no) exactamente igual que en público.
+ *
+ * No duplica componentes: el árbol React se porta al documento del iframe,
+ * conservando providers, contextos y los componentes canónicos.
+ * El canvas permanece inerte: se cancelan navegaciones y envíos de formulario.
  */
-function StudioDeviceCss() {
+function CanvasViewport({
+  device,
+  width,
+  height,
+  scale,
+  presetLabel,
+  children,
+}: {
+  device: DeviceViewport;
+  width: number;
+  height: number;
+  scale: number;
+  presetLabel: string;
+  children: React.ReactNode;
+}) {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [mount, setMount] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    const doc = iframe?.contentDocument;
+    if (!doc) return;
+
+    doc.documentElement.lang = document.documentElement.lang || "es";
+    doc.body.style.margin = "0";
+    doc.body.style.background = "";
+
+    // El componente canónico conserva sus contratos. Esta normalización sólo
+    // actúa dentro del viewport aislado: Safari respeta el ancho útil de 390 px
+    // aunque los controles flex tengan contenido intrínseco más largo.
+    const viewportStyle = doc.createElement("style");
+    viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
+    viewportStyle.textContent = `
+      html, body { overflow-x: hidden; }
+      form[role="search"],
+      form[role="search"] > div,
+      form[role="search"] > div > button {
+        min-width: 0;
+        max-width: 100%;
+      }
+      /* G7-C · El pie de página respeta la safe area inferior del móvil. */
+      footer { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+    `;
+    doc.head.appendChild(viewportStyle);
+
+    let frame = 0;
+    const syncStyles = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        doc.documentElement.className = document.documentElement.className;
+        doc.head.querySelectorAll("[data-eb-canvas-style]").forEach((n) => n.remove());
+        document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
+          const clone = node.cloneNode(true) as HTMLElement;
+          clone.setAttribute("data-eb-canvas-style", "");
+          doc.head.appendChild(clone);
+        });
+      });
+    };
+    syncStyles();
+
+    const observer = new MutationObserver(syncStyles);
+    observer.observe(document.head, { childList: true, subtree: true });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    // Inercia del canvas: ninguna navegación ni envío desde la vista previa.
+    const blockNavigation = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.("a[href], button[type='submit'], form")) {
+        event.preventDefault();
+      }
+    };
+    doc.addEventListener("click", blockNavigation, true);
+    doc.addEventListener("submit", blockNavigation, true);
+
+    setMount(doc.body);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      doc.removeEventListener("click", blockNavigation, true);
+      doc.removeEventListener("submit", blockNavigation, true);
+      viewportStyle.remove();
+    };
+  }, []);
+
+  // HUD de medición (sólo entornos no productivos): innerWidth real del
+  // iframe, overflow horizontal y posición efectiva del encabezado.
+  const [hud, setHud] = useState(false);
+  const [metrics, setMetrics] = useState<{
+    innerWidth: number;
+    overflowX: number;
+    scrollY: number;
+    headerPosition: string;
+    headerTop: number;
+    headerVisible: boolean;
+  } | null>(null);
+
+  useEffect(() => setHud(auditWidthsEnabled()), []);
+
+  useEffect(() => {
+    if (!hud || !mount) return;
+    const win = mount.ownerDocument.defaultView;
+    const doc = mount.ownerDocument;
+    if (!win) return;
+    const read = () => {
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      const header = doc.querySelector("header");
+      const rect = header?.getBoundingClientRect();
+      setMetrics({
+        innerWidth: win.innerWidth,
+        overflowX: Math.max(0, Math.round(scroller.scrollWidth - scroller.clientWidth)),
+        scrollY: Math.round(win.scrollY),
+        headerPosition: header ? win.getComputedStyle(header).position : "n/a",
+        headerTop: rect ? Math.round(rect.top) : -1,
+        headerVisible: !!rect && rect.bottom > 0 && rect.top < win.innerHeight,
+      });
+    };
+    read();
+    const id = win.setInterval(read, 250);
+    win.addEventListener("scroll", read, true);
+    win.addEventListener("resize", read);
+    return () => {
+      win.clearInterval(id);
+      win.removeEventListener("scroll", read, true);
+      win.removeEventListener("resize", read);
+    };
+  }, [hud, mount, width]);
+
+  const scaled = Math.min(1, Math.max(0.2, scale));
   return (
-    <style>{`
-      [data-eb-canvas-device="mobile"] [data-home-grid] {
-        grid-template-columns: minmax(0, 1fr) !important;
-      }
-      [data-eb-canvas-device="mobile"] [data-home-layout="consejo-alux"] {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-      }
-
-      [data-eb-canvas-device="tablet"] [data-home-grid="destinos"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="categorias"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="empresas"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-grid="rutas"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="resenas"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="en-vivo"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-grid="arma-tu-viaje"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-layout="consejo-alux"] {
-        flex-direction: row !important;
-        align-items: center !important;
-      }
-
-      [data-eb-canvas-device="desktop"] [data-home-grid="destinos"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="rutas"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="resenas"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="categorias"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="empresas"] {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="en-vivo"] {
-        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="arma-tu-viaje"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-    `}</style>
+    <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
+      <div
+        data-eb-canvas-indicator=""
+        className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
+      >
+        <span>{presetLabel}</span>
+        <span>{scaled < 1 ? `escala ${Math.round(scaled * 100)}%` : "escala 100%"}</span>
+        {hud && metrics ? (
+          <span data-eb-canvas-hud="">
+            innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+            {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+            {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+          </span>
+        ) : null}
+      </div>
+      <div
+        data-eb-canvas-frame=""
+        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        style={{ width: Math.round(width * scaled), height: Math.round(height * scaled) }}
+      >
+        <iframe
+          ref={iframeRef}
+          title="Vista previa del canvas"
+          data-eb-canvas-device={device}
+          data-eb-canvas-width={width}
+          data-eb-canvas-height={height}
+          data-eb-canvas-scale={scaled}
+          className="block border-0 bg-background"
+          style={{
+            width,
+            height,
+            transform: `scale(${scaled})`,
+            transformOrigin: "top left",
+          }}
+        />
+        {mount ? createPortal(children, mount) : null}
+      </div>
+    </div>
   );
 }
 
@@ -2751,11 +2980,13 @@ function InertChrome({
   label,
   selected,
   onSelect,
+  sticky = false,
   children,
 }: {
   label: string;
   selected: boolean;
   onSelect: () => void;
+  sticky?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -2772,10 +3003,10 @@ function InertChrome({
           onSelect();
         }
       }}
-      className={`group relative cursor-pointer outline-none ring-inset ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
+      className={`group cursor-pointer outline-none ring-inset ${sticky ? "sticky top-0 z-30" : "relative"} ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
-      <div className="pointer-events-none select-none opacity-90" aria-hidden>
+      <div className="pointer-events-none select-none" aria-hidden>
         {children}
       </div>
       <span

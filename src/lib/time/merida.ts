@@ -43,7 +43,14 @@ export function formatMeridaTime(input: DestinationDateInput, locale?: string): 
 export function formatMeridaDateTime(input: DestinationDateInput, locale?: string): string | null {
   return format(
     input,
-    { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false },
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    },
     locale,
   );
 }

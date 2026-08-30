@@ -19,12 +19,18 @@ describe("Institutional Badges fail-closed policy", () => {
       expiresAt: "2027-01-01T00:00:00Z",
     };
     expect(isBadgeEligible(valid, undefined, now)).toBe(true);
-    expect(isBadgeEligible({ ...valid, verificationStatus: "unverified" }, undefined, now)).toBe(false);
-    expect(isBadgeEligible({ ...valid, expiresAt: "2026-01-01T00:00:00Z" }, undefined, now)).toBe(false);
+    expect(isBadgeEligible({ ...valid, verificationStatus: "unverified" }, undefined, now)).toBe(
+      false,
+    );
+    expect(isBadgeEligible({ ...valid, expiresAt: "2026-01-01T00:00:00Z" }, undefined, now)).toBe(
+      false,
+    );
     expect(isBadgeEligible({ ...valid, evidenceUrl: undefined }, undefined, now)).toBe(false);
   });
 
   test("custom is never accepted as an open factual bypass", () => {
-    expect(isBadgeEligible({ kind: "custom", verificationStatus: "verified" }, undefined, now)).toBe(false);
+    expect(
+      isBadgeEligible({ kind: "custom", verificationStatus: "verified" }, undefined, now),
+    ).toBe(false);
   });
 });

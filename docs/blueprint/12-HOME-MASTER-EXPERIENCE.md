@@ -1,6 +1,7 @@
 # Valladolid.mx Platform Blueprint
 
 # 12 – HOME MASTER EXPERIENCE
+
 ## Especificación de la Experiencia Principal
 
 **Versión:** 1.0

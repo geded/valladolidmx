@@ -85,8 +85,7 @@ function SimulationConsole() {
   });
 
   const execute = useMutation({
-    mutationFn: () =>
-      executeFn({ data: { scale, seed, confirm_full: confirmFull } }),
+    mutationFn: () => executeFn({ data: { scale, seed, confirm_full: confirmFull } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["cv8s4", "runs"] });
       setConfirmFull(false);
@@ -106,9 +105,7 @@ function SimulationConsole() {
   });
 
   const allowFull = info.data?.allow_full ?? false;
-  const disabled =
-    execute.isPending ||
-    (scale === "full" && (!allowFull || !confirmFull));
+  const disabled = execute.isPending || (scale === "full" && (!allowFull || !confirmFull));
 
   const activeRuns = useMemo(
     () => (runs.data?.runs ?? []).filter((r) => r.status !== "wiped"),
@@ -125,29 +122,24 @@ function SimulationConsole() {
           Motor de simulación del Destination OS
         </h1>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          Ensaya operación, capacitación y validación del Oriente Maya sin
-          afectar datos reales. Cada corrida es explícita, identificable,
-          reversible y auditable.
+          Ensaya operación, capacitación y validación del Oriente Maya sin afectar datos reales.
+          Cada corrida es explícita, identificable, reversible y auditable.
         </p>
       </header>
 
       <div className="rounded-lg border-2 border-amber-500 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
         <strong>🧪 Modo simulación.</strong> Los eventos generados aquí llevan{" "}
-        <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/40">
-          is_simulation = true
-        </code>{" "}
-        y viven aislados en <code>visitor_intel.events</code> por{" "}
-        <code>simulation_run_id</code>. El Wipe sólo elimina un run; los
-        registros administrativos se preservan como evidencia.
+        <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/40">is_simulation = true</code>{" "}
+        y viven aislados en <code>visitor_intel.events</code> por <code>simulation_run_id</code>. El
+        Wipe sólo elimina un run; los registros administrativos se preservan como evidencia.
       </div>
 
       {/* ── Configurador ─────────────────────────────────────────────── */}
       <section className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Configurar corrida</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Escenario:{" "}
-          <strong>{info.data?.scenario_id ?? "oriente-maya-90d"}</strong>{" "}
-          v{info.data?.scenario_version ?? "1.0.0"}
+          Escenario: <strong>{info.data?.scenario_id ?? "oriente-maya-90d"}</strong> v
+          {info.data?.scenario_version ?? "1.0.0"}
         </p>
 
         <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -204,9 +196,7 @@ function SimulationConsole() {
 
             {preview.data && (
               <div className="rounded-md border border-border bg-muted/30 p-3 text-xs">
-                <div className="font-semibold text-foreground">
-                  Estimación previa
-                </div>
+                <div className="font-semibold text-foreground">Estimación previa</div>
                 <ul className="mt-1 space-y-0.5 text-muted-foreground">
                   <li>Visitantes: {fmt(preview.data.volume.visitors)}</li>
                   <li>
@@ -219,13 +209,8 @@ function SimulationConsole() {
                   </li>
                   <li>
                     Ventana:{" "}
-                    {new Date(preview.data.calendar.start_date).toLocaleDateString(
-                      "es-MX",
-                    )}{" "}
-                    →{" "}
-                    {new Date(preview.data.calendar.end_date).toLocaleDateString(
-                      "es-MX",
-                    )}
+                    {new Date(preview.data.calendar.start_date).toLocaleDateString("es-MX")} →{" "}
+                    {new Date(preview.data.calendar.end_date).toLocaleDateString("es-MX")}
                   </li>
                 </ul>
               </div>
@@ -305,13 +290,10 @@ function SimulationConsole() {
             </thead>
             <tbody>
               {(runs.data?.runs ?? []).map((r) => {
-                const events =
-                  (r.rows_inserted as { events?: number })?.events ?? 0;
+                const events = (r.rows_inserted as { events?: number })?.events ?? 0;
                 return (
                   <tr key={r.run_id} className="border-b border-border/50">
-                    <td className="py-2 font-mono text-xs">
-                      {r.run_id.slice(0, 8)}…
-                    </td>
+                    <td className="py-2 font-mono text-xs">{r.run_id.slice(0, 8)}…</td>
                     <td className="py-2">{r.scale}</td>
                     <td className="py-2 font-mono text-xs">{r.seed}</td>
                     <td className="py-2">
@@ -362,10 +344,7 @@ function SimulationConsole() {
                           </>
                         )}
                         {r.status === "failed" && r.error_message && (
-                          <span
-                            title={r.error_message}
-                            className="text-xs text-destructive"
-                          >
+                          <span title={r.error_message} className="text-xs text-destructive">
                             ⚠ error
                           </span>
                         )}
@@ -376,10 +355,7 @@ function SimulationConsole() {
               })}
               {(runs.data?.runs.length ?? 0) === 0 && (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="py-6 text-center text-sm text-muted-foreground"
-                  >
+                  <td colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
                     Aún no hay corridas. Configura una arriba y ejecuta.
                   </td>
                 </tr>
@@ -397,14 +373,12 @@ function SimulationConsole() {
           aria-modal="true"
         >
           <div className="w-full max-w-lg rounded-xl border border-destructive/40 bg-card p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-destructive">
-              Confirmar Wipe de simulación
-            </h3>
+            <h3 className="text-lg font-semibold text-destructive">Confirmar Wipe de simulación</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Se eliminarán todos los eventos con{" "}
-              <code>simulation_run_id = {wipeTarget.run_id.slice(0, 8)}…</code>.
-              El registro del run se conservará como evidencia con estado{" "}
-              <strong>wiped</strong>. Esta acción no se puede deshacer.
+              <code>simulation_run_id = {wipeTarget.run_id.slice(0, 8)}…</code>. El registro del run
+              se conservará como evidencia con estado <strong>wiped</strong>. Esta acción no se
+              puede deshacer.
             </p>
             <label className="mt-4 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Escribe <code>BORRAR SIMULACION</code> para confirmar
@@ -434,9 +408,7 @@ function SimulationConsole() {
               </button>
               <button
                 type="button"
-                disabled={
-                  wipePhrase !== "BORRAR SIMULACION" || wipe.isPending
-                }
+                disabled={wipePhrase !== "BORRAR SIMULACION" || wipe.isPending}
                 onClick={() => wipe.mutate(wipeTarget.run_id)}
                 className="rounded-md bg-destructive px-3 py-2 text-sm font-medium text-destructive-foreground disabled:opacity-50"
               >

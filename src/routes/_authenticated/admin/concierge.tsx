@@ -26,10 +26,26 @@ function AdminConciergeHub() {
         {
           title: "Centro operativo",
           links: [
-            { to: "/concierge", label: "Centro Concierge", description: "Expedientes, propuestas y asignaciones." },
-            { to: "/portal/concierge", label: "Concierge (Portal)", description: "Vista del empresario." },
-            { to: "/cuenta/concierge", label: "Concierge (Viajero)", description: "Vista del solicitante." },
-            { to: "/cms/travel-plans", label: "Viajes en curso", description: "Vista operativa read-only del Travel Plan (CV1.1)." },
+            {
+              to: "/concierge",
+              label: "Centro Concierge",
+              description: "Expedientes, propuestas y asignaciones.",
+            },
+            {
+              to: "/portal/concierge",
+              label: "Concierge (Portal)",
+              description: "Vista del empresario.",
+            },
+            {
+              to: "/cuenta/concierge",
+              label: "Concierge (Viajero)",
+              description: "Vista del solicitante.",
+            },
+            {
+              to: "/cms/travel-plans",
+              label: "Viajes en curso",
+              description: "Vista operativa read-only del Travel Plan (CV1.1).",
+            },
           ],
         },
       ]}

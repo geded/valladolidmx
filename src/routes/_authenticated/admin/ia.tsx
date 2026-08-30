@@ -26,13 +26,12 @@ function AdminIaHub() {
       sections={[
         {
           title: "Conversación con Alux",
-          links: [
-            { to: "/alux", label: "Alux Concierge", description: "Asistente IA público." },
-          ],
+          links: [{ to: "/alux", label: "Alux Concierge", description: "Asistente IA público." }],
         },
         {
           title: "Feed inteligente",
-          description: "Feed estructurado que consume Alux para razonar sobre la actividad del sistema.",
+          description:
+            "Feed estructurado que consume Alux para razonar sobre la actividad del sistema.",
           links: [
             { to: "/cms/actividad", label: "Activity Center (admin)" },
             { to: "/portal/actividad", label: "Activity Center (empresa)" },
@@ -42,9 +41,9 @@ function AdminIaHub() {
       ]}
       footer={
         <p className="text-[11px] text-muted-foreground">
-          Capacidades diferidas a olas posteriores (Embeddings Queue, AI Prompts panel,
-          AI Usage Log) están documentadas como deuda en la Matriz de Trazabilidad
-          15.10.4R y no forman parte del alcance de esta superficie.
+          Capacidades diferidas a olas posteriores (Embeddings Queue, AI Prompts panel, AI Usage
+          Log) están documentadas como deuda en la Matriz de Trazabilidad 15.10.4R y no forman parte
+          del alcance de esta superficie.
         </p>
       }
     />

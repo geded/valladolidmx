@@ -22,16 +22,16 @@ export interface StagePermissionCue {
 
 export interface StageExperience {
   stage: TravelStage;
-  label: string;              // etiqueta visible de la etapa
+  label: string; // etiqueta visible de la etapa
   tone: StageTone;
-  eyebrow: string;            // supralínea corta
+  eyebrow: string; // supralínea corta
   greeting: (firstName?: string | null) => string;
-  narrative: string;          // qué está haciendo Alux por el viajero ahora
+  narrative: string; // qué está haciendo Alux por el viajero ahora
   primaryCtaLabel: string;
-  primaryCtaHref: string;     // ruta relativa dentro de la plataforma
-  secondary: string[];        // hasta 3 apoyos secundarios (no compiten con la misión)
+  primaryCtaHref: string; // ruta relativa dentro de la plataforma
+  secondary: string[]; // hasta 3 apoyos secundarios (no compiten con la misión)
   permissionCue?: StagePermissionCue; // sólo cuando `stageAllowsPermission` lo autoriza
-  accentClass: string;        // token semántico (bg/tint) para reforzar el cambio visual
+  accentClass: string; // token semántico (bg/tint) para reforzar el cambio visual
 }
 
 /**
@@ -45,7 +45,8 @@ export const STAGE_EXPERIENCE: Record<TravelStage, StageExperience> = {
     label: "Inspiración",
     tone: "curious",
     eyebrow: "Deja que el Oriente Maya te sorprenda",
-    greeting: (n) => (n ? `${n}, ¿y si hoy descubres algo nuevo?` : "¿Y si hoy descubres algo nuevo?"),
+    greeting: (n) =>
+      n ? `${n}, ¿y si hoy descubres algo nuevo?` : "¿Y si hoy descubres algo nuevo?",
     narrative:
       "Alux te acompaña en la etapa más libre del viaje: soñar. Aún no necesitas fechas, ni itinerario, ni permisos. Solo curiosidad.",
     primaryCtaLabel: "Explorar Oriente Maya",
@@ -61,7 +62,10 @@ export const STAGE_EXPERIENCE: Record<TravelStage, StageExperience> = {
     label: "Exploración",
     tone: "warm",
     eyebrow: "Estás explorando",
-    greeting: (n) => (n ? `Bien hecho, ${n}. Sigamos afinando lo que te gustará.` : "Sigamos afinando lo que te gustará."),
+    greeting: (n) =>
+      n
+        ? `Bien hecho, ${n}. Sigamos afinando lo que te gustará.`
+        : "Sigamos afinando lo que te gustará.",
     narrative:
       "Alux ya conoce lo básico de ti. Ahora te muestra experiencias y lugares alineados con tu estilo. No pediremos tu ubicación en esta etapa.",
     primaryCtaLabel: "Ver recomendaciones para ti",
@@ -93,7 +97,8 @@ export const STAGE_EXPERIENCE: Record<TravelStage, StageExperience> = {
     label: "Pre-viaje",
     tone: "prepared",
     eyebrow: "Faltan pocos días",
-    greeting: (n) => (n ? `${n}, revisemos lo que falta antes de salir.` : "Revisemos lo que falta antes de salir."),
+    greeting: (n) =>
+      n ? `${n}, revisemos lo que falta antes de salir.` : "Revisemos lo que falta antes de salir.",
     narrative:
       "Alux prepara documentos, reservas y llegada. Este es un buen momento para activar el acompañamiento en tiempo real durante el viaje.",
     primaryCtaLabel: "Revisar mi checklist",
@@ -116,7 +121,8 @@ export const STAGE_EXPERIENCE: Record<TravelStage, StageExperience> = {
     label: "En destino",
     tone: "live",
     eyebrow: "Estás en el Oriente Maya",
-    greeting: (n) => (n ? `${n}, esto es lo más importante para hoy.` : "Esto es lo más importante para hoy."),
+    greeting: (n) =>
+      n ? `${n}, esto es lo más importante para hoy.` : "Esto es lo más importante para hoy.",
     narrative:
       "Ahora la ubicación sí aporta valor inmediato: distancias reales, tiempos de traslado y qué hacer ahora mismo cerca de ti. Sin ella, Alux sigue funcionando; con ella, te acompaña mucho mejor.",
     primaryCtaLabel: "Ver mi día",

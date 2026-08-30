@@ -74,9 +74,7 @@ export function assertUnderLimit(
   if (max === undefined || max === null) return;
   if (!Number.isFinite(max) || max <= 0) return;
   if (currentCount >= max) {
-    const err = new Error(
-      `plan_limit_reached:${key}:${max}:${limits.plan_slug ?? "unknown"}`,
-    );
+    const err = new Error(`plan_limit_reached:${key}:${max}:${limits.plan_slug ?? "unknown"}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (err as any).code = "plan_limit_reached";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

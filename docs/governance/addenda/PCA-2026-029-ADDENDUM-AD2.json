@@ -1,0 +1,31 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AD2",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AD2 · G8-R1-F1G · noindex del lote de evaluación en la ficha pública de empresa",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-F1G (2026-08-30). Autoriza exclusivamente emitir noindex,nofollow en la ficha pública de empresa cuando la entidad pertenece al lote interno G8-R1-F1G-EVALUATION-CONTENT. Sin cambios de contenido, layout, datos ni publicación.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+    "previous_sha256": "c1bbfd584d1c3e6b2a91b3355aeb2677ee5d7be9f6fbeaa79bfeb491325b2060",
+    "current_sha256": "087a3a81f02dc907db9a66f9bfee5219464d0446b3a727f1a08ef04b4246089d",
+    "semantic_change": "El loader consulta la membresía del lote de evaluación y pasa noindex a buildPublicHead. Sin cambios de render ni de datos.",
+    "authority": "Autorización Founder G8-R1-F1G (2026-08-30)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": ["bun run typecheck", "bun run governance:check"]
+}

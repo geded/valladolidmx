@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.0.0",
+  "batch": "G8-R1-F1L-R2-OPEN-DESTINATION-MEDIA",
+  "licensePolicy": "Wikimedia Commons files with an explicit Creative Commons license",
+  "items": [
+    {
+      "destinationSlug": "valladolid",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Valladolid,_Yucatan,_Mexico_April_2021_-_Parque_Francisco_Canton_-_01.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Valladolid,_Yucatan,_Mexico_April_2021_-_Parque_Francisco_Canton_-_01.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "credit": "Sharon Hahn Darlin · CC BY 2.0 · Wikimedia Commons",
+      "alt": "Parque Francisco Cantón y arquitectura histórica del centro de Valladolid, Yucatán",
+      "place": "Valladolid, Yucatán"
+    },
+    {
+      "destinationSlug": "izamal",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Exterior_del_Convento_de_Izamal,_Yucat%C3%A1n_01.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Exterior_del_Convento_de_Izamal,_Yucat%C3%A1n_01.jpg",
+      "author": "Isaacvp",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Isaacvp · CC BY-SA 4.0 · Wikimedia Commons",
+      "alt": "Exterior del convento de San Antonio de Padua en Izamal, Yucatán",
+      "place": "Izamal, Yucatán"
+    },
+    {
+      "destinationSlug": "espita",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Casa_de_la_Cultura,_Espita,_Yucat%C3%A1n.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Casa_de_la_Cultura,_Espita,_Yucat%C3%A1n.jpg",
+      "author": "Addicted04",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Addicted04 · CC BY-SA 4.0 · Wikimedia Commons",
+      "alt": "Casa de la Cultura de Espita, Yucatán",
+      "place": "Espita, Yucatán"
+    },
+    {
+      "destinationSlug": "ek-balam",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:El_Arco_Maya_-_Ek_Balam_Yucatan_Enero_2020.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/El_Arco_Maya_-_Ek_Balam_Yucatan_Enero_2020.jpg",
+      "author": "Bernard DUPONT",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "credit": "Bernard DUPONT · CC BY-SA 2.0 · Wikimedia Commons",
+      "alt": "Arco maya de la zona arqueológica de Ek Balam, Yucatán",
+      "place": "Ek Balam, Yucatán"
+    },
+    {
+      "destinationSlug": "rio-lagartos",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rio_Lagartos.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Rio_Lagartos.jpg",
+      "author": "Wasquewhat",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Wasquewhat · CC BY-SA 4.0 · Wikimedia Commons",
+      "alt": "Paisaje costero de Río Lagartos, Yucatán",
+      "place": "Río Lagartos, Yucatán"
+    },
+    {
+      "destinationSlug": "las-coloradas",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Las_Coloradas2.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Las_Coloradas2.jpg",
+      "author": "Wasquewhat",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Wasquewhat · CC BY-SA 4.0 · Wikimedia Commons",
+      "alt": "Lagunas rosadas de Las Coloradas, Yucatán",
+      "place": "Las Coloradas, Yucatán"
+    },
+    {
+      "destinationSlug": "uayma",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Convento_de_santo_domingo,_Uayma_,_Yucat%C3%A1n._-_panoramio.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Convento_de_santo_domingo,_Uayma_,_Yucat%C3%A1n._-_panoramio.jpg",
+      "author": "Misael Lavadores",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "credit": "Misael Lavadores · CC BY-SA 3.0 · Wikimedia Commons",
+      "alt": "Templo y exconvento de Santo Domingo en Uayma, Yucatán",
+      "place": "Uayma, Yucatán"
+    }
+  ]
+}

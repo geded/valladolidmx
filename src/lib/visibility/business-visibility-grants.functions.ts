@@ -97,12 +97,7 @@ export const getBusinessActiveGrant = createServerFn({ method: "GET" })
 export const requestVisibilityGrant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: {
-      business_id: string;
-      plan_id: string;
-      cycle: string;
-      notes?: string;
-    }) => {
+    (input: { business_id: string; plan_id: string; cycle: string; notes?: string }) => {
       if (!input?.business_id) throw new Error("missing_business_id");
       if (!input?.plan_id) throw new Error("missing_plan_id");
       if (!input?.cycle) throw new Error("missing_cycle");
@@ -127,9 +122,7 @@ export const requestVisibilityGrant = createServerFn({ method: "POST" })
       throw new Error("cycle_unavailable");
     }
 
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("business_visibility_grants")
       .insert({
@@ -151,13 +144,9 @@ export const requestVisibilityGrant = createServerFn({ method: "POST" })
 
     // Ola 7.9 · Notificar solicitud recibida (silent-fail).
     try {
-      const { getVisibilityRecipient, sendVisibilityEmail } = await import(
-        "@/lib/visibility/visibility-notifications.server"
-      );
-      const recipient = await getVisibilityRecipient(
-        supabaseAdmin,
-        data.business_id,
-      );
+      const { getVisibilityRecipient, sendVisibilityEmail } =
+        await import("@/lib/visibility/visibility-notifications.server");
+      const recipient = await getVisibilityRecipient(supabaseAdmin, data.business_id);
       if (recipient) {
         await sendVisibilityEmail(supabaseAdmin, {
           templateName: "visibility-request-received",

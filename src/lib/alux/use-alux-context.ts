@@ -24,10 +24,7 @@ import {
   type ResolvedContext,
   type ContextNode,
 } from "@/lib/context-engine";
-import {
-  useNavigationSession,
-  type NavigationSessionSlot,
-} from "@/lib/navigation/session-context";
+import { useNavigationSession, type NavigationSessionSlot } from "@/lib/navigation/session-context";
 
 export interface AluxContextSlot {
   readonly slug: string;
@@ -97,8 +94,7 @@ function fromLive(ctx: ResolvedContext): AluxContext {
     ctx.destination ?? (ctx.current.kind === "destination" ? ctx.current : undefined);
   if (!destinationNode || !destinationNode.slug) return EMPTY;
 
-  const categoryNode =
-    ctx.category ?? (ctx.current.kind === "category" ? ctx.current : undefined);
+  const categoryNode = ctx.category ?? (ctx.current.kind === "category" ? ctx.current : undefined);
   const businessNode =
     ctx.ancestors.find((n) => n.kind === "business") ??
     (ctx.current.kind === "business" ? ctx.current : undefined);
@@ -109,9 +105,7 @@ function fromLive(ctx: ResolvedContext): AluxContext {
   const business = nodeToSlot(businessNode);
   const product = nodeToSlot(productNode);
 
-  const related = ctx.related
-    .map(nodeToSlot)
-    .filter((n): n is AluxContextSlot => Boolean(n));
+  const related = ctx.related.map(nodeToSlot).filter((n): n is AluxContextSlot => Boolean(n));
 
   return {
     hasContext: true,

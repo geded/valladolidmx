@@ -1,0 +1,48 @@
+{
+  "1024": {
+    "before": {
+      "innerWidth": 1024,
+      "clientWidth": 1024,
+      "overflowX": 0,
+      "scrollY": 0,
+      "headerTop": 0,
+      "headerHeight": 65,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "after": {
+      "innerWidth": 1024,
+      "clientWidth": 1024,
+      "overflowX": 0,
+      "scrollY": 933,
+      "headerTop": 0,
+      "headerHeight": 98,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  },
+  "1440": {
+    "before": {
+      "innerWidth": 1440,
+      "clientWidth": 1440,
+      "overflowX": 0,
+      "scrollY": 0,
+      "headerTop": 0,
+      "headerHeight": 65,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "after": {
+      "innerWidth": 1440,
+      "clientWidth": 1440,
+      "overflowX": 0,
+      "scrollY": 933,
+      "headerTop": 0,
+      "headerHeight": 98,
+      "headerVisible": true,
+      "headerPosition": "sticky"
+    },
+    "consoleErrors": []
+  }
+}

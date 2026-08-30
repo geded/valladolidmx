@@ -10,6 +10,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitemap.functions";
 import { createClient } from "@supabase/supabase-js";
+import { EVALUATION_LOT_ID } from "@/lib/omxds/evaluation-lot";
+import {
+  PUBLIC_BUSINESS_ELIGIBILITY_EQ,
+  isPubliclyDiscoverableBusiness,
+} from "@/lib/omxds/public-eligibility";
+
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { absoluteUrl } from "@/config/site";
@@ -54,11 +60,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         ]);
         const dynamicEntries: SitemapEntry[] = published.map((row) => {
           const priority =
-            typeof row.priority === "number"
-              ? clamp01(row.priority)
-              : row.featured
-                ? 0.8
-                : 0.6;
+            typeof row.priority === "number" ? clamp01(row.priority) : row.featured ? 0.8 : 0.6;
           const prefix = LANDING_KINDS.has(row.page_type) ? "/l" : "/p";
           return {
             path: `${prefix}/${row.slug}`,
@@ -156,7 +158,10 @@ function clamp01(n: number): number {
   return n;
 }
 
-interface EntityRow { slug: string; updated_at: string | null }
+interface EntityRow {
+  slug: string;
+  updated_at: string | null;
+}
 interface BusinessRow extends EntityRow {
   destination_slug: string | null;
   category_slug: string | null;
@@ -180,8 +185,16 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
   const sb = createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
+  // G8-R1-F1G · El lote interno de evaluación jamás entra al sitemap.
   const [d, b, p, e] = await Promise.all([
-    sb.from("destinations").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(500),
+    sb
+      .from("destinations")
+      .select("slug, updated_at")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
+      .limit(500),
+    // G8-R1-F1I-R1 · DEF-F1I-001 — autoridad única de elegibilidad pública.
     sb
       .from("businesses")
       .select(
@@ -189,16 +202,26 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .limit(1000),
     sb
       .from("products")
       .select(
-        "slug, updated_at, businesses!inner ( slug, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ) )",
+        "slug, updated_at, businesses!inner ( slug, status, deleted_at, source_review_state, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ) )",
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .limit(2000),
-    sb.from("events").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
+
+    sb
+      .from("events")
+      .select("slug, updated_at")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
+      .limit(1000),
   ]);
   const norm = (rows: { slug: string; updated_at: string | null }[] | null) =>
     (rows ?? []).filter((r) => typeof r.slug === "string" && r.slug.length > 0);
@@ -206,6 +229,8 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
     const s = (rel as { slug?: unknown } | null)?.slug;
     return typeof s === "string" && s.length > 0 ? s : null;
   };
+  // G8-R1-F1I-R1 · sólo empresas con revisión de fuente aprobada (y sus
+  // productos) entran al sitemap. Autoridad única: `public-eligibility`.
   const empresas: BusinessRow[] = ((b.data as any[]) ?? [])
     .filter((r) => typeof r?.slug === "string" && r.slug.length > 0)
     .map((r) => ({
@@ -215,7 +240,13 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
       category_slug: pickSlug(r.business_categories),
     }));
   const productos: ProductRow[] = ((p.data as any[]) ?? [])
-    .filter((r) => typeof r?.slug === "string" && r.slug.length > 0)
+    .filter(
+      (r) =>
+        typeof r?.slug === "string" &&
+        r.slug.length > 0 &&
+        isPubliclyDiscoverableBusiness(r.businesses as { source_review_state?: unknown } | null),
+    )
+
     .map((r) => {
       const biz = r.businesses as any;
       return {

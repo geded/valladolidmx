@@ -17,8 +17,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface Input {
   planId: string;
@@ -46,9 +45,7 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
   const s =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((a.lat * Math.PI) / 180) *
-      Math.cos((b.lat * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
+    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
@@ -92,8 +89,7 @@ export const optimizePlanDay = createServerFn({ method: "POST" })
         updated: 0,
         previousOrder,
         newOrder: previousOrder,
-        rationale:
-          "Este día tiene una sola actividad; no hay nada que optimizar todavía.",
+        rationale: "Este día tiene una sola actividad; no hay nada que optimizar todavía.",
         sources: [],
         effect: "sin cambios",
         reversible: true,
@@ -140,9 +136,7 @@ export const optimizePlanDay = createServerFn({ method: "POST" })
         .in("id", Array.from(destIds));
       for (const r of dayItems) {
         if (r.item_kind !== "destination" || !r.target_id) continue;
-        const d = (dests ?? []).find(
-          (x) => (x as { id: string }).id === r.target_id,
-        );
+        const d = (dests ?? []).find((x) => (x as { id: string }).id === r.target_id);
         if (!d) continue;
         const lat = Number((d as { latitude: unknown }).latitude);
         const lng = Number((d as { longitude: unknown }).longitude);

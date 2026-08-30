@@ -14,10 +14,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/categorias/")({
   head: () => ({
-    meta: [
-      { title: "Categorías · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Categorías · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: CategoriasPage,
 });
@@ -28,7 +25,6 @@ function CategoriasPage() {
       queryKey="categories"
       fn={listCategoriesCms}
       title="Categorías"
-
       description="Taxonomía oficial de empresas y productos."
       rowKey={(r) => r.id}
       headerActions={
@@ -40,7 +36,14 @@ function CategoriasPage() {
         </Link>
       }
       columns={[
-        { key: "order", header: "#", render: (r) => <span className="text-xs text-muted-foreground">{r.sort_order ?? "—"}</span>, className: "w-12" },
+        {
+          key: "order",
+          header: "#",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">{r.sort_order ?? "—"}</span>
+          ),
+          className: "w-12",
+        },
         {
           key: "name",
           header: "Nombre",
@@ -54,9 +57,21 @@ function CategoriasPage() {
             </Link>
           ),
         },
-        { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
+        {
+          key: "slug",
+          header: "Slug",
+          render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
-        { key: "updated", header: "Actualizado", render: (r) => <span className="text-xs text-muted-foreground">{new Date(r.updated_at).toLocaleDateString("es-MX")}</span> },
+        {
+          key: "updated",
+          header: "Actualizado",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {new Date(r.updated_at).toLocaleDateString("es-MX")}
+            </span>
+          ),
+        },
         {
           key: "actions",
           header: "",

@@ -89,11 +89,10 @@ export function SyncStatusBanner() {
         <CloudUpload className="h-3.5 w-3.5" aria-hidden />
       )}
       <span>
-        {snap.pending > 0 && `Sincronizando ${snap.pending} acción${snap.pending === 1 ? "" : "es"}. `}
-        {snap.failed > 0 &&
-          `${snap.failed} sin sincronizar — se reintentará automáticamente. `}
-        {snap.conflict > 0 &&
-          `${snap.conflict} con conflicto — requiere revisión.`}
+        {snap.pending > 0 &&
+          `Sincronizando ${snap.pending} acción${snap.pending === 1 ? "" : "es"}. `}
+        {snap.failed > 0 && `${snap.failed} sin sincronizar — se reintentará automáticamente. `}
+        {snap.conflict > 0 && `${snap.conflict} con conflicto — requiere revisión.`}
       </span>
     </div>
   );

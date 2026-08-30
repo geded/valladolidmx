@@ -58,12 +58,17 @@ function PreviewCompositionView() {
     return <div className="p-8 text-sm text-muted-foreground">Cargando vista previa…</div>;
   }
 
+  // `timeZoneName` no puede combinarse con `dateStyle`/`timeStyle`:
+  // hacerlo lanza `TypeError: Invalid option` y tumbaba toda la vista previa.
   const expiresLabel = new Intl.DateTimeFormat("es-MX", {
-    dateStyle: "medium",
-    timeStyle: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
     timeZone: "America/Merida",
-    timeZoneName: "short",
   }).format(new Date(payload.expires_at));
+
   // 18.51 · La identidad y los valores gobernados los resuelve el
   // servidor desde `page_type` y `slug` persistidos. Sin fuente válida
   // la vista previa falla en cerrado, nunca con datos ficticios.
@@ -82,9 +87,7 @@ function PreviewCompositionView() {
     );
   }
 
-  const rendered = (
-    <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />
-  );
+  const rendered = <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />;
   return (
     <div className="min-h-screen">
       <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">

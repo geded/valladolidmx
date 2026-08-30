@@ -65,8 +65,12 @@ export function emitAluxInteractions(
   const events: SimulatedEvent[] = [];
   let cursor = ctx.cursor_ms;
   const interactions = {
-    asks: 0, recommendations: 0, accepted: 0, rejected: 0,
-    itinerary_optimizations: 0, onsite_queries: 0,
+    asks: 0,
+    recommendations: 0,
+    accepted: 0,
+    rejected: 0,
+    itinerary_optimizations: 0,
+    onsite_queries: 0,
   };
   let lastAccepted: string | null = null;
 
@@ -78,29 +82,37 @@ export function emitAluxInteractions(
 
   if (!prng.bool(interactRate)) {
     return {
-      events, cursor_ms: cursor, last_accepted_recommendation_id: null,
-      interactions, probability_modifier: 1,
+      events,
+      cursor_ms: cursor,
+      last_accepted_recommendation_id: null,
+      interactions,
+      probability_modifier: 1,
     };
   }
 
   // 1. Pregunta del viajero — prerequisito para toda recomendación.
   cursor += sampleGap(prng, 20_000, 5 * MINUTE_MS);
-  const askAction =
-    stage === "onsite" ? "alux.onsite_query" : `alux.ask.${stage}`;
+  const askAction = stage === "onsite" ? "alux.onsite_query" : `alux.ask.${stage}`;
   events.push(
-    makeEvent(ctx, "intent.signal", cursor, {
-      intent: {
-        action: askAction,
-        target_type: "destination",
-        target_id: ctx.destination,
-        strength: 0.5 + prng.next() * 0.4,
+    makeEvent(
+      ctx,
+      "intent.signal",
+      cursor,
+      {
+        intent: {
+          action: askAction,
+          target_type: "destination",
+          target_id: ctx.destination,
+          strength: 0.5 + prng.next() * 0.4,
+        },
       },
-    }, {
-      prerequisite: ctx.from_transition,
-      influencer: "alux",
-      gap_ms: 0,
-      scenario_probability: interactRate,
-    }),
+      {
+        prerequisite: ctx.from_transition,
+        influencer: "alux",
+        gap_ms: 0,
+        scenario_probability: interactRate,
+      },
+    ),
   );
   if (stage === "onsite") interactions.onsite_queries += 1;
   else interactions.asks += 1;
@@ -112,8 +124,7 @@ export function emitAluxInteractions(
   for (let i = 0; i < recCount; i += 1) {
     cursor += sampleGap(prng, 5_000, 45_000);
     const recommendationId = `rec_${ctx.prng.uuid().slice(0, 12)}`;
-    const capability =
-      stage === "travel_plan" ? "alux.itinerary" : "alux";
+    const capability = stage === "travel_plan" ? "alux.itinerary" : "alux";
     const rationale =
       stage === "travel_plan"
         ? `Optimización de itinerario en ${ctx.destination} para perfil ${profile.id}`
@@ -121,19 +132,25 @@ export function emitAluxInteractions(
 
     // Recomendación emitida (accepted=null).
     events.push(
-      makeEvent(ctx, "decision.offered", cursor, {
-        decision: {
-          capability,
-          recommendation_id: recommendationId,
-          rationale,
-          accepted: null,
+      makeEvent(
+        ctx,
+        "decision.offered",
+        cursor,
+        {
+          decision: {
+            capability,
+            recommendation_id: recommendationId,
+            rationale,
+            accepted: null,
+          },
         },
-      }, {
-        prerequisite: askAction,
-        influencer: capability,
-        gap_ms: 0,
-        scenario_probability: interactRate,
-      }),
+        {
+          prerequisite: askAction,
+          influencer: capability,
+          gap_ms: 0,
+          scenario_probability: interactRate,
+        },
+      ),
     );
     if (stage === "travel_plan") interactions.itinerary_optimizations += 1;
     interactions.recommendations += 1;
@@ -142,21 +159,25 @@ export function emitAluxInteractions(
     cursor += sampleGap(prng, 3_000, 60_000);
     const accepted = prng.bool(acceptBase);
     events.push(
-      makeEvent(ctx, "decision.offered", cursor, {
-        decision: {
-          capability,
-          recommendation_id: recommendationId,
-          rationale: accepted
-            ? "Aceptada por el viajero"
-            : "Rechazada por el viajero",
-          accepted,
+      makeEvent(
+        ctx,
+        "decision.offered",
+        cursor,
+        {
+          decision: {
+            capability,
+            recommendation_id: recommendationId,
+            rationale: accepted ? "Aceptada por el viajero" : "Rechazada por el viajero",
+            accepted,
+          },
         },
-      }, {
-        prerequisite: recommendationId,
-        influencer: capability,
-        gap_ms: 0,
-        scenario_probability: acceptBase,
-      }),
+        {
+          prerequisite: recommendationId,
+          influencer: capability,
+          gap_ms: 0,
+          scenario_probability: acceptBase,
+        },
+      ),
     );
     if (accepted) {
       interactions.accepted += 1;
@@ -168,9 +189,7 @@ export function emitAluxInteractions(
 
   // Modificador de probabilidad para la siguiente transición del Journey.
   const acceptedRatio =
-    interactions.recommendations > 0
-      ? interactions.accepted / interactions.recommendations
-      : 0;
+    interactions.recommendations > 0 ? interactions.accepted / interactions.recommendations : 0;
   const probability_modifier = 0.9 + 0.35 * acceptedRatio;
 
   return {

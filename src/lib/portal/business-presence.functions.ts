@@ -67,13 +67,7 @@ export interface PortalSocialLink {
 
 // --- Helpers --------------------------------------------------------------
 
-const CONTACT_TYPES = new Set([
-  "phone",
-  "whatsapp",
-  "email",
-  "website",
-  "other",
-]);
+const CONTACT_TYPES = new Set(["phone", "whatsapp", "email", "website", "other"]);
 
 const SOCIAL_PLATFORMS = new Set([
   "facebook",
@@ -90,16 +84,14 @@ const SOCIAL_PLATFORMS = new Set([
 function assertBusinessId(input: unknown): string {
   if (!input || typeof input !== "object") throw new Error("invalid_input");
   const id = (input as { businessId?: unknown }).businessId;
-  if (typeof id !== "string" || id.length < 8)
-    throw new Error("invalid_business");
+  if (typeof id !== "string" || id.length < 8) throw new Error("invalid_business");
   return id;
 }
 
 function assertId(input: unknown, key = "id"): string {
   if (!input || typeof input !== "object") throw new Error("invalid_input");
   const id = (input as Record<string, unknown>)[key];
-  if (typeof id !== "string" || id.length < 8)
-    throw new Error(`invalid_${key}`);
+  if (typeof id !== "string" || id.length < 8) throw new Error(`invalid_${key}`);
   return id;
 }
 
@@ -118,25 +110,14 @@ function trimRequired(value: unknown, max: number, field: string): string {
   return t;
 }
 
-function clampInt(
-  value: unknown,
-  min: number,
-  max: number,
-  field: string,
-): number {
+function clampInt(value: unknown, min: number, max: number, field: string): number {
   const n = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(n) || !Number.isInteger(n))
-    throw new Error(`invalid_${field}`);
+  if (!Number.isFinite(n) || !Number.isInteger(n)) throw new Error(`invalid_${field}`);
   if (n < min || n > max) throw new Error(`invalid_${field}_range`);
   return n;
 }
 
-function optionalNumber(
-  value: unknown,
-  min: number,
-  max: number,
-  field: string,
-): number | null {
+function optionalNumber(value: unknown, min: number, max: number, field: string): number | null {
   if (value === null || value === undefined || value === "") return null;
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) throw new Error(`invalid_${field}`);
@@ -148,8 +129,7 @@ function timeOrNull(value: unknown, field: string): string | null {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value !== "string") throw new Error(`invalid_${field}`);
   // Accept HH:MM or HH:MM:SS
-  if (!/^\d{2}:\d{2}(:\d{2})?$/.test(value))
-    throw new Error(`invalid_${field}_format`);
+  if (!/^\d{2}:\d{2}(:\d{2})?$/.test(value)) throw new Error(`invalid_${field}_format`);
   return value.length === 5 ? `${value}:00` : value;
 }
 
@@ -157,8 +137,7 @@ function urlOrThrow(value: unknown, field: string): string {
   const t = trimRequired(value, 500, field);
   try {
     const u = new URL(t);
-    if (!["http:", "https:"].includes(u.protocol))
-      throw new Error(`invalid_${field}_protocol`);
+    if (!["http:", "https:"].includes(u.protocol)) throw new Error(`invalid_${field}_protocol`);
   } catch {
     throw new Error(`invalid_${field}`);
   }
@@ -169,12 +148,13 @@ function urlOrThrow(value: unknown, field: string): string {
  * Verifica acceso editor sobre la empresa y devuelve el supabase scoped.
  * Lanza forbidden_business_access si el usuario no es editor+/admin.
  */
-async function ensureEditor(context: {
-  supabase: ReturnType<
-    typeof Object
-  >; // simplified — real type lives in middleware
-  userId: string;
-}, businessId: string) {
+async function ensureEditor(
+  context: {
+    supabase: ReturnType<typeof Object>; // simplified — real type lives in middleware
+    userId: string;
+  },
+  businessId: string,
+) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = context.supabase as any;
   const { data: allowed, error } = await sb.rpc("has_business_access", {
@@ -186,10 +166,13 @@ async function ensureEditor(context: {
   if (!allowed) throw new Error("forbidden_business_access");
 }
 
-async function ensureViewer(context: {
-  supabase: ReturnType<typeof Object>;
-  userId: string;
-}, businessId: string) {
+async function ensureViewer(
+  context: {
+    supabase: ReturnType<typeof Object>;
+    userId: string;
+  },
+  businessId: string,
+) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = context.supabase as any;
   const { data: allowed, error } = await sb.rpc("has_business_access", {
@@ -260,8 +243,7 @@ export const createBusinessContact = createServerFn({ method: "POST" })
     }) => {
       const businessId = assertBusinessId(input);
       const contact_type = trimRequired(input.contact_type, 32, "contact_type");
-      if (!CONTACT_TYPES.has(contact_type))
-        throw new Error("invalid_contact_type");
+      if (!CONTACT_TYPES.has(contact_type)) throw new Error("invalid_contact_type");
       const value = trimRequired(input.value, 500, "value");
       const label = trimOrNull(input.label ?? null, 120, "label");
       const is_public = Boolean(input.is_public);
@@ -284,9 +266,7 @@ export const createBusinessContact = createServerFn({ method: "POST" })
         created_by: userId,
         updated_by: userId,
       })
-      .select(
-        "id, business_id, contact_type, label, value, is_public, sort_order, updated_at",
-      )
+      .select("id, business_id, contact_type, label, value, is_public, sort_order, updated_at")
       .single();
     if (error) throw new Error(`create_contact_failed: ${error.message}`);
     await logAudit(supabase, {
@@ -314,20 +294,16 @@ export const updateBusinessContact = createServerFn({ method: "POST" })
     }) => {
       const businessId = assertBusinessId(input);
       const id = assertId(input);
-      if (!input.patch || typeof input.patch !== "object")
-        throw new Error("invalid_patch");
+      if (!input.patch || typeof input.patch !== "object") throw new Error("invalid_patch");
       const p: Record<string, unknown> = {};
       if ("contact_type" in input.patch) {
         const v = trimRequired(input.patch.contact_type, 32, "contact_type");
         if (!CONTACT_TYPES.has(v)) throw new Error("invalid_contact_type");
         p.contact_type = v;
       }
-      if ("value" in input.patch)
-        p.value = trimRequired(input.patch.value, 500, "value");
-      if ("label" in input.patch)
-        p.label = trimOrNull(input.patch.label ?? null, 120, "label");
-      if ("is_public" in input.patch)
-        p.is_public = Boolean(input.patch.is_public);
+      if ("value" in input.patch) p.value = trimRequired(input.patch.value, 500, "value");
+      if ("label" in input.patch) p.label = trimOrNull(input.patch.label ?? null, 120, "label");
+      if ("is_public" in input.patch) p.is_public = Boolean(input.patch.is_public);
       if ("sort_order" in input.patch)
         p.sort_order = clampInt(input.patch.sort_order, 0, 9999, "sort_order");
       if (Object.keys(p).length === 0) throw new Error("empty_patch");
@@ -349,9 +325,7 @@ export const updateBusinessContact = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("business_id", data.businessId)
       .is("deleted_at", null)
-      .select(
-        "id, business_id, contact_type, label, value, is_public, sort_order, updated_at",
-      )
+      .select("id, business_id, contact_type, label, value, is_public, sort_order, updated_at")
       .single();
     if (error) throw new Error(`update_contact_failed: ${error.message}`);
     await logAudit(supabase, {
@@ -501,8 +475,7 @@ export const updateBusinessLocation = createServerFn({ method: "POST" })
     }) => {
       const businessId = assertBusinessId(input);
       const id = assertId(input);
-      if (!input.patch || typeof input.patch !== "object")
-        throw new Error("invalid_patch");
+      if (!input.patch || typeof input.patch !== "object") throw new Error("invalid_patch");
       const built = buildLocationPayload(input.patch);
       const p: Record<string, unknown> = {};
       for (const k of Object.keys(input.patch)) {
@@ -579,9 +552,7 @@ export const listBusinessHours = createServerFn({ method: "POST" })
     await ensureViewer(context, data.businessId);
     const { data: rows, error } = await context.supabase
       .from("business_hours")
-      .select(
-        "id, business_id, day_of_week, is_closed, opens_at, closes_at, notes, updated_at",
-      )
+      .select("id, business_id, day_of_week, is_closed, opens_at, closes_at, notes, updated_at")
       .eq("business_id", data.businessId)
       .order("day_of_week", { ascending: true });
     if (error) throw new Error(`list_hours_failed: ${error.message}`);
@@ -606,8 +577,7 @@ function buildHourPayload(input: {
   const is_closed = Boolean(input.is_closed);
   const opens_at = is_closed ? null : timeOrNull(input.opens_at ?? null, "opens_at");
   const closes_at = is_closed ? null : timeOrNull(input.closes_at ?? null, "closes_at");
-  if (!is_closed && (!opens_at || !closes_at))
-    throw new Error("hours_open_close_required");
+  if (!is_closed && (!opens_at || !closes_at)) throw new Error("hours_open_close_required");
   return {
     day_of_week,
     is_closed,
@@ -638,9 +608,7 @@ export const createBusinessHour = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase
       .from("business_hours")
       .insert({ business_id: data.businessId, ...data.payload })
-      .select(
-        "id, business_id, day_of_week, is_closed, opens_at, closes_at, notes, updated_at",
-      )
+      .select("id, business_id, day_of_week, is_closed, opens_at, closes_at, notes, updated_at")
       .single();
     if (error) throw new Error(`create_hour_failed: ${error.message}`);
     await logAudit(supabase, {
@@ -678,9 +646,7 @@ export const updateBusinessHour = createServerFn({ method: "POST" })
       .update({ ...data.payload, updated_at: new Date().toISOString() } as any)
       .eq("id", data.id)
       .eq("business_id", data.businessId)
-      .select(
-        "id, business_id, day_of_week, is_closed, opens_at, closes_at, notes, updated_at",
-      )
+      .select("id, business_id, day_of_week, is_closed, opens_at, closes_at, notes, updated_at")
       .single();
     if (error) throw new Error(`update_hour_failed: ${error.message}`);
     await logAudit(supabase, {
@@ -737,16 +703,10 @@ export const listBusinessSocialLinks = createServerFn({ method: "POST" })
 export const createBusinessSocialLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: {
-      businessId: string;
-      platform: string;
-      url: string;
-      sort_order?: number;
-    }) => {
+    (input: { businessId: string; platform: string; url: string; sort_order?: number }) => {
       const businessId = assertBusinessId(input);
       const platform = trimRequired(input.platform, 32, "platform").toLowerCase();
-      if (!SOCIAL_PLATFORMS.has(platform))
-        throw new Error("invalid_platform");
+      if (!SOCIAL_PLATFORMS.has(platform)) throw new Error("invalid_platform");
       const url = urlOrThrow(input.url, "url");
       const sort_order = clampInt(input.sort_order ?? 0, 0, 9999, "sort_order");
       return { businessId, platform, url, sort_order };
@@ -785,8 +745,7 @@ export const updateBusinessSocialLink = createServerFn({ method: "POST" })
     }) => {
       const businessId = assertBusinessId(input);
       const id = assertId(input);
-      if (!input.patch || typeof input.patch !== "object")
-        throw new Error("invalid_patch");
+      if (!input.patch || typeof input.patch !== "object") throw new Error("invalid_patch");
       const p: Record<string, unknown> = {};
       if ("platform" in input.patch) {
         const v = trimRequired(input.patch.platform, 32, "platform").toLowerCase();

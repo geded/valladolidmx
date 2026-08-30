@@ -46,26 +46,22 @@ type Step = {
 const STEPS: Step[] = [
   {
     title: "Tu viaje, en un solo lugar",
-    body:
-      "Mi Viaje es tu compañero digital del Oriente Maya — antes, durante y después. Todas las vistas comparten el mismo viaje, así nada se pierde.",
+    body: "Mi Viaje es tu compañero digital del Oriente Maya — antes, durante y después. Todas las vistas comparten el mismo viaje, así nada se pierde.",
     icon: LayoutDashboard,
   },
   {
     title: "Siete vistas, un mismo expediente",
-    body:
-      "Resumen, Itinerario, Reservas, Concierge, Alux, Documentos y Recuerdos. Cambias de vista sin salir del contexto; el orden se adapta a la fase de tu viaje.",
+    body: "Resumen, Itinerario, Reservas, Concierge, Alux, Documentos y Recuerdos. Cambias de vista sin salir del contexto; el orden se adapta a la fase de tu viaje.",
     icon: RouteIcon,
   },
   {
     title: "Alux y el Concierge trabajan contigo",
-    body:
-      "Alux propone y explica; el Concierge humano confirma y coordina. Acepta o compara propuestas y confirma tu viaje sin sentir que estás pagando: estás confirmando lo que armaron juntos.",
+    body: "Alux propone y explica; el Concierge humano confirma y coordina. Acepta o compara propuestas y confirma tu viaje sin sentir que estás pagando: estás confirmando lo que armaron juntos.",
     icon: Sparkles,
   },
   {
     title: "Avisos y deep-links",
-    body:
-      "La campanita reúne propuestas por confirmar, cuenta regresiva y mensajes del Concierge. Cada aviso te lleva justo a la sección relevante con un resaltado breve.",
+    body: "La campanita reúne propuestas por confirmar, cuenta regresiva y mensajes del Concierge. Cada aviso te lleva justo a la sección relevante con un resaltado breve.",
     icon: Bell,
   },
 ];
@@ -84,11 +80,7 @@ function storageKey(userId: string | null | undefined): string {
   return `${STORAGE_PREFIX}:${userId ?? "anon"}`;
 }
 
-export function WorkspaceOnboardingTour({
-  userId,
-}: {
-  userId: string | null | undefined;
-}) {
+export function WorkspaceOnboardingTour({ userId }: { userId: string | null | undefined }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
 
@@ -141,9 +133,7 @@ export function WorkspaceOnboardingTour({
             <Icon className="h-6 w-6" />
           </div>
           <DialogTitle className="text-center text-xl">{current.title}</DialogTitle>
-          <DialogDescription className="text-center text-sm">
-            {current.body}
-          </DialogDescription>
+          <DialogDescription className="text-center text-sm">{current.body}</DialogDescription>
         </DialogHeader>
 
         {step === 1 ? (

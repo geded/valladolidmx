@@ -54,11 +54,7 @@ async function assertSuperAdmin(ctx: Ctx) {
   if (!data) throw new Error("Acceso denegado: se requiere super_admin.");
 }
 
-async function auditRolesAction(
-  ctx: Ctx,
-  action: string,
-  metadata: Record<string, unknown>,
-) {
+async function auditRolesAction(ctx: Ctx, action: string, metadata: Record<string, unknown>) {
   await ctx.supabase.from("permissions_audit_log").insert({
     actor_user_id: ctx.userId,
     action,
@@ -194,9 +190,7 @@ export const updateRole = createServerFn({ method: "POST" })
           permission_id,
           granted_by: context.userId,
         }));
-        const { error: insErr } = await context.supabase
-          .from("role_permissions")
-          .insert(rows);
+        const { error: insErr } = await context.supabase.from("role_permissions").insert(rows);
         if (insErr) throw new Error(`No se pudieron asignar permisos: ${insErr.message}`);
       }
     }
@@ -224,10 +218,7 @@ export const deleteRole = createServerFn({ method: "POST" })
     if (getErr) throw new Error(`No se encontró el rol: ${getErr.message}`);
     if (role.is_system) throw new Error("No se puede eliminar un rol de sistema.");
 
-    const { error } = await context.supabase
-      .from("roles_catalog")
-      .delete()
-      .eq("id", data.roleId);
+    const { error } = await context.supabase.from("roles_catalog").delete().eq("id", data.roleId);
     if (error) throw new Error(`No se pudo eliminar el rol: ${error.message}`);
 
     await auditRolesAction(context, "role.delete", {

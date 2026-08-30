@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-R",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+  "founder_authority": "Founder Review 2026-08-28 · G8-Q2D-0. Autoriza exclusivamente eliminar el selector de idioma duplicado en el encabezado canónico, corrigiendo el breakpoint del LanguageSwitcher móvil de xl:hidden a lg:hidden para no colisionar con SiteTopBar (activa desde lg). Cambio de presentación puro: sin datos, sin rutas, sin flags, sin lógica de negocio. La autoridad de paquete es PCA-2026-046.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/layout/SiteHeader.tsx",
+    "previous_sha256": "b9d9269c46d716504ab45872aa6065165f231d565c134e8a16d08a7f8df3fd5e",
+    "current_sha256": "7b6821faab28b836e38a5dd900d45cc6d1901e88a10cdcda6d366887c90d562a",
+    "semantic_change": "Corrección de breakpoint del selector de idioma móvil (xl:hidden → lg:hidden). Sin cambios de navegación, estructura ni contratos del header canónico.",
+    "authority": "PCA-2026-046"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero rutas públicas, cero redirects, cero datos",
+    "Header y Footer canónicos conservan estructura aprobada"
+  ],
+  "recorded_at": "2026-08-28"
+}

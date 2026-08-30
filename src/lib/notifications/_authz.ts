@@ -28,10 +28,7 @@ export async function assertUncPublisher(context: Ctx): Promise<void> {
  * Variante para webhooks: además de staff, el dueño registrado del endpoint
  * puede publicar hacia su propio endpoint.
  */
-export async function assertWebhookPublisher(
-  context: Ctx,
-  endpointId: string,
-): Promise<void> {
+export async function assertWebhookPublisher(context: Ctx, endpointId: string): Promise<void> {
   const { data: endpoint } = await context.supabase
     .from("notification_webhook_endpoints")
     .select("owner_user_id")

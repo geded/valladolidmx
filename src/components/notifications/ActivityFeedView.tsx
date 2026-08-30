@@ -97,7 +97,15 @@ export function ActivityFeedView({ scope, businessId = null, title, description,
   );
 }
 
-function Header({ eyebrow, title, description }: { eyebrow?: string; title: string; description: string }) {
+function Header({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow?: string;
+  title: string;
+  description: string;
+}) {
   return (
     <header>
       {eyebrow ? (
@@ -153,7 +161,10 @@ function GroupSection({ items }: { items: SubjectGroup[] }) {
       <ul className="mt-3 divide-y divide-border rounded-lg border border-border bg-card">
         {items.map((g) => (
           <li key={`${g.subject_type}-${g.subject_id}`} className="flex items-start gap-3 p-3">
-            <span className={`mt-1 inline-block h-2 w-2 shrink-0 rounded-full ${severityClass[g.last_severity ?? "info"] ?? "bg-primary"}`} aria-hidden />
+            <span
+              className={`mt-1 inline-block h-2 w-2 shrink-0 rounded-full ${severityClass[g.last_severity ?? "info"] ?? "bg-primary"}`}
+              aria-hidden
+            />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">{g.last_summary ?? g.subject_type}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -182,11 +193,15 @@ function FeedSection({ items }: { items: AluxFeedItem[] }) {
         <ul className="mt-3 divide-y divide-border rounded-lg border border-border bg-card">
           {items.map((it, i) => (
             <li key={`${it.event_id}-${i}`} className="flex items-start gap-3 p-4">
-              <span className={`mt-1 inline-block h-2 w-2 shrink-0 rounded-full ${severityClass[it.severity] ?? "bg-primary"}`} aria-hidden />
+              <span
+                className={`mt-1 inline-block h-2 w-2 shrink-0 rounded-full ${severityClass[it.severity] ?? "bg-primary"}`}
+                aria-hidden
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{it.summary}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {it.event_type} · {categoryLabel[it.category] ?? it.category} · {new Date(it.occurred_at).toLocaleString()}
+                  {it.event_type} · {categoryLabel[it.category] ?? it.category} ·{" "}
+                  {new Date(it.occurred_at).toLocaleString()}
                 </p>
               </div>
               <span className="text-[11px] uppercase tracking-wider text-muted-foreground">

@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-028",
+  "title": "19.26 · Rama efectiva · Remediacion Prettier de diff semantico nulo (0f190484)",
+  "status": "Approved",
+  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
+  "blueprint": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-25 · AUTORIZACION CONSOLIDADA · 19.26, punto 4: crear autorizacion append-only para la rama efectiva feature/omxds-i4-d-g3-integration-evidence-closure-v1, limitada a operacion modify sobre los cuatro archivos reformateados por Prettier en el commit 0f190484. La autorizacion reconoce unicamente la remediacion de formato de diff semantico nulo; no autoriza cambios funcionales, datos, migraciones nuevas, reejecucion de migraciones, produccion, merge ni el inicio de G4/G5. Invariante: omxds_visual_v1_contracts_enabled permanece false antes y despues.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/media/stable-public-url.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}

@@ -36,9 +36,7 @@ function AdminTuristasHub() {
         },
         {
           title: "Concierge del viajero",
-          links: [
-            { to: "/cuenta/concierge", label: "Casos del viajero" },
-          ],
+          links: [{ to: "/cuenta/concierge", label: "Casos del viajero" }],
         },
       ]}
     />

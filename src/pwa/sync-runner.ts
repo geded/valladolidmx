@@ -21,12 +21,7 @@
  *    limpia la cola local.
  */
 
-import {
-  listQueue,
-  updateEntry,
-  type SyncEntry,
-  __SYNC_QUEUE_INTERNAL__,
-} from "./sync-queue";
+import { listQueue, updateEntry, type SyncEntry, __SYNC_QUEUE_INTERNAL__ } from "./sync-queue";
 
 const MAX_ATTEMPTS = 5;
 const MIN_INTERVAL_MS = 60_000;

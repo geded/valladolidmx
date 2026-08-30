@@ -20,12 +20,7 @@ export interface ProfileModeState {
   available: ProfileMode[];
 }
 
-const ALLOWED: ReadonlyArray<ProfileMode> = [
-  "traveler",
-  "business",
-  "concierge",
-  "staff",
-];
+const ALLOWED: ReadonlyArray<ProfileMode> = ["traveler", "business", "concierge", "staff"];
 
 function normalizeMode(m: unknown): ProfileMode {
   if (typeof m === "string" && (ALLOWED as readonly string[]).includes(m)) {
@@ -39,28 +34,23 @@ export const getProfileModeState = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<ProfileModeState> => {
     const { supabase, userId } = context;
 
-    const [{ data: profileRow }, { data: availableRaw, error: availErr }] =
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .select("active_mode")
-          .eq("user_id", userId)
-          .maybeSingle(),
-        supabase.rpc("get_available_modes", { _user_id: userId }),
-      ]);
+    const [{ data: profileRow }, { data: availableRaw, error: availErr }] = await Promise.all([
+      supabase.from("profiles").select("active_mode").eq("user_id", userId).maybeSingle(),
+      supabase.rpc("get_available_modes", { _user_id: userId }),
+    ]);
 
     if (availErr) {
       throw new Error(`available_modes_failed: ${availErr.message}`);
     }
 
-    const available = ((availableRaw as ProfileMode[] | null) ?? ["traveler"])
-      .filter((m): m is ProfileMode => (ALLOWED as readonly string[]).includes(m));
+    const available = ((availableRaw as ProfileMode[] | null) ?? ["traveler"]).filter(
+      (m): m is ProfileMode => (ALLOWED as readonly string[]).includes(m),
+    );
 
     const stored = profileRow?.active_mode as ProfileMode | null | undefined;
     // Fallback Airbnb: si el modo almacenado ya no está disponible
     // (p.ej. le retiraron el rol), degradamos a traveler.
-    const active: ProfileMode =
-      stored && available.includes(stored) ? stored : "traveler";
+    const active: ProfileMode = stored && available.includes(stored) ? stored : "traveler";
 
     return { active, available };
   });
@@ -75,12 +65,12 @@ export const setActiveMode = createServerFn({ method: "POST" })
     const { error } = await supabase.rpc("set_active_mode", { _mode: data.mode });
     if (error) throw new Error(`set_active_mode_failed: ${error.message}`);
     // Devolvemos el estado completo para que el cliente refresque en un solo round-trip.
-    const { data: availableRaw, error: availErr } = await supabase.rpc(
-      "get_available_modes",
-      { _user_id: userId },
-    );
+    const { data: availableRaw, error: availErr } = await supabase.rpc("get_available_modes", {
+      _user_id: userId,
+    });
     if (availErr) throw new Error(`available_modes_failed: ${availErr.message}`);
-    const available = ((availableRaw as ProfileMode[] | null) ?? ["traveler"])
-      .filter((m): m is ProfileMode => (ALLOWED as readonly string[]).includes(m));
+    const available = ((availableRaw as ProfileMode[] | null) ?? ["traveler"]).filter(
+      (m): m is ProfileMode => (ALLOWED as readonly string[]).includes(m),
+    );
     return { active: data.mode, available };
   });

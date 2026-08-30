@@ -84,19 +84,14 @@ export function mapTree(
       .map((n) => {
         const mapped = fn(n);
         if (!mapped) return null;
-        return mapped.children
-          ? { ...mapped, children: walk(mapped.children) }
-          : mapped;
+        return mapped.children ? { ...mapped, children: walk(mapped.children) } : mapped;
       })
       .filter((n): n is CompositionNode => n !== null);
   return { ...tree, root: { children: walk(tree.root.children) } };
 }
 
 /** Localiza un nodo por id (devuelve referencia + ruta). */
-export function findNode(
-  tree: CompositionTree,
-  id: string,
-): CompositionNode | null {
+export function findNode(tree: CompositionTree, id: string): CompositionNode | null {
   const stack: CompositionNode[] = [...tree.root.children];
   while (stack.length) {
     const cur = stack.pop()!;
@@ -107,26 +102,17 @@ export function findNode(
 }
 
 /** Inserta un nodo al final del root. */
-export function appendToRoot(
-  tree: CompositionTree,
-  node: CompositionNode,
-): CompositionTree {
+export function appendToRoot(tree: CompositionTree, node: CompositionNode): CompositionTree {
   return { ...tree, root: { children: [...tree.root.children, node] } };
 }
 
 /** Elimina un nodo por id (recursivamente). */
-export function removeNode(
-  tree: CompositionTree,
-  id: string,
-): CompositionTree {
+export function removeNode(tree: CompositionTree, id: string): CompositionTree {
   return mapTree(tree, (n) => (n.id === id ? null : n));
 }
 
 /** Duplica un nodo de root (no recursivo en jerarquía profunda en v0). */
-export function duplicateRootNode(
-  tree: CompositionTree,
-  id: string,
-): CompositionTree {
+export function duplicateRootNode(tree: CompositionTree, id: string): CompositionTree {
   const idx = tree.root.children.findIndex((n) => n.id === id);
   if (idx < 0) return tree;
   const clone = cloneNodeWithNewIds(tree.root.children[idx]);
@@ -136,11 +122,7 @@ export function duplicateRootNode(
 }
 
 /** Reordena un nodo de root entre posiciones. */
-export function moveRootNode(
-  tree: CompositionTree,
-  from: number,
-  to: number,
-): CompositionTree {
+export function moveRootNode(tree: CompositionTree, from: number, to: number): CompositionTree {
   const arr = [...tree.root.children];
   if (from < 0 || from >= arr.length || to < 0 || to >= arr.length) return tree;
   const [item] = arr.splice(from, 1);

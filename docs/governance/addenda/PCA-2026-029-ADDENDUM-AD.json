@@ -1,0 +1,44 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AD",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AD · G8-R1-F1G · Conversión y retiro del lote de contenido de evaluación",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-F1G (2026-08-30) sobre los seis puntos de la sección 7 de docs/governance/audit/2026-08-30-G8-R1-F1G-EVALUATION-CONTENT-MATRIX-v1.0.md. Autoriza exclusivamente: marcar el lote interno G8-R1-F1G-EVALUATION-CONTENT; convertir a contenido real acreditado las entidades de Clase A verificadas; retirar de forma reversible las Clases C y E; archivar los eventos de Clase D; corregir la pertenencia territorial de cenote-ik-kil; excluir el lote del sitemap y del catálogo canónico de Alux; emitir noindex,nofollow en las fichas del lote; y crear la herramienta interna /cms/contenido-evaluacion. No autoriza publicación de sustituciones de Clase B, indexación, activación del flag, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "de44f29b9fe7118159e93cfec79907232fcc5f63459e44d971cb5d967c2651c5",
+    "current_sha256": "10403dc178eea22c1c39ea03a6b6c373480e14824cb71892c067c655529a4ae3",
+    "semantic_change": "Alta aditiva de la ruta interna autenticada noindex /cms/contenido-evaluacion en SCANNED_ROUTE_FILES y su entrada de metadatos. Sin cambios de lógica, heurística ni API del inventario.",
+    "authority": "Autorización Founder G8-R1-F1G (2026-08-30)"
+  },
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" },
+    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" },
+    { "operation": "modify", "path": "src/lib/alux/canonical-catalog.server.ts" },
+    { "operation": "modify", "path": "src/routes/sitemap[.]xml.ts" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx"
+    },
+    { "operation": "create", "path": "src/lib/omxds/evaluation-lot.ts" },
+    { "operation": "create", "path": "src/lib/omxds/evaluation-lot.functions.ts" },
+    { "operation": "create", "path": "src/lib/omxds/evaluation-lot-admin.functions.ts" },
+    { "operation": "create", "path": "src/routes/_authenticated/cms/contenido-evaluacion.tsx" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": ["bun run typecheck", "bun run governance:check"]
+}

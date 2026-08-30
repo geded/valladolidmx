@@ -135,7 +135,13 @@ type CaseFile = {
   } | null;
 };
 
-export function CaseFileView({ data, hideInternal = false }: { data: unknown; hideInternal?: boolean }) {
+export function CaseFileView({
+  data,
+  hideInternal = false,
+}: {
+  data: unknown;
+  hideInternal?: boolean;
+}) {
   const f = data as CaseFile | null;
   if (!f) return <p className="text-sm text-muted-foreground">Expediente no disponible.</p>;
   const internal = f.viewer.is_internal && !hideInternal;
@@ -173,10 +179,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
         <Section title="Empresas participantes">
           <ul className="flex flex-wrap gap-2 text-xs">
             {f.businesses.map((b) => (
-              <li
-                key={b.id}
-                className="rounded-full border border-border bg-card px-3 py-1"
-              >
+              <li key={b.id} className="rounded-full border border-border bg-card px-3 py-1">
                 {b.display_name}
               </li>
             ))}
@@ -201,7 +204,9 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
                   {q.total_amount_cents != null
                     ? `${(q.total_amount_cents / 100).toLocaleString("es-MX", { style: "currency", currency: q.currency })}`
                     : "Sin monto"}
-                  {q.valid_until ? ` · Vigente hasta ${new Date(q.valid_until).toLocaleString()}` : ""}
+                  {q.valid_until
+                    ? ` · Vigente hasta ${new Date(q.valid_until).toLocaleString()}`
+                    : ""}
                 </p>
                 {q.notes ? <p className="mt-1 text-xs text-foreground/80">{q.notes}</p> : null}
               </li>
@@ -266,9 +271,7 @@ function Header({ f }: { f: CaseFile }) {
         {new Date(f.case.created_at).toLocaleString()}
       </p>
       {f.traveler.display_name && (
-        <p className="mt-1 text-xs text-muted-foreground">
-          Viajero: {f.traveler.display_name}
-        </p>
+        <p className="mt-1 text-xs text-muted-foreground">Viajero: {f.traveler.display_name}</p>
       )}
     </header>
   );
@@ -277,7 +280,9 @@ function Header({ f }: { f: CaseFile }) {
 function Section({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
   return (
     <section id={id} className={id ? "scroll-mt-24" : undefined}>
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h3>
       <div className="mt-2">{children}</div>
     </section>
   );
@@ -328,12 +333,7 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           ) : (
             <ul className="grid gap-3">
               {proposals.map((p) => (
-                <ProposalCard
-                  key={p.proposal_id}
-                  p={p}
-                  caseId={f.case.id}
-                  internal={internal}
-                />
+                <ProposalCard key={p.proposal_id} p={p} caseId={f.case.id} internal={internal} />
               ))}
             </ul>
           )}
@@ -431,7 +431,9 @@ function ProposalCard({
             label="Retirar"
             variant="ghost"
             disabled={busy}
-            onClick={() => run(() => withdrawFn({ data: { proposalId: p.proposal_id, reason: null } }))}
+            onClick={() =>
+              run(() => withdrawFn({ data: { proposalId: p.proposal_id, reason: null } }))
+            }
           />
         )}
         {!internal && ["sent", "viewed", "accepted"].includes(p.status) && (
@@ -470,7 +472,9 @@ function ProposalCard({
                 label="Rechazar"
                 variant="ghost"
                 disabled={busy}
-                onClick={() => run(() => rejectFn({ data: { proposalId: p.proposal_id, reason: null } }))}
+                onClick={() =>
+                  run(() => rejectFn({ data: { proposalId: p.proposal_id, reason: null } }))
+                }
               />
             ) : null}
           </>
@@ -510,7 +514,9 @@ function ProposalCompare({
           >
             <header className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">v{p.version}</span>
-              <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${statusTone(p.status)}`}>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${statusTone(p.status)}`}
+              >
                 {p.status}
               </span>
             </header>
@@ -607,9 +613,7 @@ function ProposalComposer({
             <input
               type="checkbox"
               checked={!!selected[q.quote_id]}
-              onChange={(e) =>
-                setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))
-              }
+              onChange={(e) => setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))}
             />
             <span className="flex-1">
               {q.business_name ?? "Empresa"} · {q.request_title} ·{" "}
@@ -647,8 +651,7 @@ function ActionButton({
   disabled?: boolean;
   variant?: "primary" | "ghost";
 }) {
-  const base =
-    "rounded-md px-3 py-1.5 text-xs font-medium transition disabled:opacity-50";
+  const base = "rounded-md px-3 py-1.5 text-xs font-medium transition disabled:opacity-50";
   const cls =
     variant === "primary"
       ? `${base} bg-primary text-primary-foreground hover:bg-primary/90`
@@ -735,9 +738,7 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {!assignment && (
-            <ActionButton label="Asignarme" onClick={doAssignSelf} disabled={busy} />
-          )}
+          {!assignment && <ActionButton label="Asignarme" onClick={doAssignSelf} disabled={busy} />}
           {assignment && isAssignedToMe && (
             <ActionButton label="Liberar" variant="ghost" onClick={doRelease} disabled={busy} />
           )}
@@ -782,7 +783,12 @@ type HandoffPayload = {
   territorial_memory?: Record<string, unknown> | null;
   plan_snapshot?: {
     item_count?: number;
-    items?: Array<{ kind?: string; title?: string | null; slug?: string | null; subtitle?: string | null }>;
+    items?: Array<{
+      kind?: string;
+      title?: string | null;
+      slug?: string | null;
+      subtitle?: string | null;
+    }>;
   } | null;
 };
 
@@ -836,7 +842,8 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
       )}
       {state === "empty" && (
         <p className="mt-3 text-xs text-muted-foreground">
-          Sin fotografía adjunta todavía. Se capturará automáticamente al promover el plan del viajero.
+          Sin fotografía adjunta todavía. Se capturará automáticamente al promover el plan del
+          viajero.
         </p>
       )}
       {state === "error" && (

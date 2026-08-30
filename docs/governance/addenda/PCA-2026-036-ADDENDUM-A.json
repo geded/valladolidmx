@@ -1,0 +1,42 @@
+{
+  "id": "PCA-2026-036-ADDENDUM-A",
+  "status": "Approved",
+  "parent": "PCA-2026-036",
+  "blueprint": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · Autorización documental exclusiva para corregir el defecto D-11 · Governance Future-Date Drift. Establece 2026-08-26 como fecha efectiva única de la autoridad asociada a 19.29 y 19.30.",
+  "defect": {
+    "id": "D-11",
+    "title": "Governance Future-Date Drift",
+    "description": "Los artefactos de autoridad de 19.29 y 19.30 fueron fechados con fechas futuras respecto de la fecha real de autoridad del Founder.",
+    "incorrect_future_dates": ["2026-08-27", "2026-08-28"],
+    "effective_date": "2026-08-26"
+  },
+  "scope": {
+    "type": "documental",
+    "modified_paths": [
+      "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+      "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "docs/governance/product-authorizations/PCA-2026-035.json",
+      "docs/governance/product-authorizations/PCA-2026-036.json",
+      "docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json"
+    ],
+    "created_paths": ["docs/governance/addenda/PCA-2026-036-ADDENDUM-A.json"],
+    "regenerated_paths": [
+      "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+      "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+      "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json"
+    ]
+  },
+  "no_changes": {
+    "source_code": true,
+    "scripts": true,
+    "visual_behavior": true,
+    "data": true,
+    "backend": true,
+    "storage": true,
+    "migrations": true,
+    "feature_flags": true
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-26"
+}

@@ -41,6 +41,8 @@ import { ExperienceRelatedCollectionBlock } from "@/components/experience-builde
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { AluxNearbySuggestionBanner } from "@/components/alux/AluxNearbySuggestionBanner";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import {
   toDestinationBlockInput,
@@ -54,6 +56,12 @@ import {
   destinationToGalleryDTO,
   type DestinationBlockInput,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
+import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
+import { hasForbiddenDestinationMedia } from "@/lib/destinations/public-media-policy";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { buildDestinationPremiumRuntime } from "@/components/destination-premium/destination-premium-runtime";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -73,6 +81,8 @@ export interface DestinationSurfaceContextValue {
   mapPoints?: ExperienceMapPoint[];
   /** SEO.A2.M1 — galería (URLs) hidratada por la ruta. */
   galleryUrls?: string[];
+  /** G8-F1D — atribución acreditada por medio (ALT, caption, crédito). */
+  galleryMedia?: PublicMediaAttribution[];
 }
 
 export const DestinationSurfaceContext = createContext<DestinationSurfaceContextValue | null>(null);
@@ -83,10 +93,13 @@ export function DestinationSurfaceProvider({
   slug,
   mapPoints,
   galleryUrls,
+  galleryMedia,
   children,
 }: DestinationSurfaceContextValue & { children: React.ReactNode }) {
   return (
-    <DestinationSurfaceContext.Provider value={{ db, related, slug, mapPoints, galleryUrls }}>
+    <DestinationSurfaceContext.Provider
+      value={{ db, related, slug, mapPoints, galleryUrls, galleryMedia }}
+    >
       {children}
     </DestinationSurfaceContext.Provider>
   );
@@ -107,8 +120,12 @@ export interface DestinationSurfaceProps {
   mapPoints?: ExperienceMapPoint[];
   /** U-VISUAL · V4.2 — URLs de galería (BD) para `vmx.experience.gallery`. */
   galleryUrls?: string[];
+  /** G8-F1D — atribución acreditada de los medios (ALT, caption, crédito). */
+  galleryMedia?: PublicMediaAttribution[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
+  /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
+  premiumEnabled?: boolean;
 }
 
 function destinationRelatedCounts(related?: DestinationRelatedDTO | null) {
@@ -169,6 +186,62 @@ export interface DestinationSurfaceContractBoundaryProps extends DestinationSurf
   legacy: ReactNode;
 }
 
+function PremiumRelatedCollection({ service, name }: { service: string; name: string }) {
+  const kind =
+    service === "hoteles"
+      ? "hotel"
+      : service === "restaurantes"
+        ? "restaurant"
+        : service === "eventos"
+          ? "event"
+          : service === "experiencias" || service === "que-hacer"
+            ? "experience"
+            : "business";
+  return (
+    <ExperienceRelatedCollectionBlock
+      config={{
+        source: "destination",
+        entityKind: kind,
+        variant: "grid",
+        columns: 3,
+        heading: `${service === "que-hacer" ? "Qué hacer" : service.charAt(0).toUpperCase() + service.slice(1)} en ${name}`,
+        emptyMessage: "Aún no hay opciones publicadas en esta categoría.",
+        groups: [
+          { id: service, entityKind: kind, categorySlug: service, maxItems: 6, variant: "grid" },
+        ],
+        capabilities: {
+          showImage: true,
+          showMeta: true,
+          showBadges: true,
+          showPrice: true,
+          showDate: true,
+          showKindBadge: true,
+          dedupe: true,
+        },
+      }}
+    />
+  );
+}
+
+function withoutUnaccreditedRelatedMedia(
+  related?: DestinationRelatedDTO,
+): DestinationRelatedDTO | null {
+  if (!related) return null;
+  const stripBusiness = <T extends { cover_url?: string | null }>(item: T): T => ({
+    ...item,
+    cover_url: null,
+  });
+  return {
+    ...related,
+    hoteles: related.hoteles.map(stripBusiness),
+    restaurantes: related.restaurantes.map(stripBusiness),
+    experiencias: related.experiencias.map(stripBusiness),
+    otras: related.otras.map(stripBusiness),
+    productos: related.productos.map(stripBusiness),
+    eventos: related.eventos?.map((event) => ({ ...event, cover_url: null })) ?? [],
+  };
+}
+
 export function DestinationSurfaceContractBoundary({
   enabled,
   legacy,
@@ -177,7 +250,60 @@ export function DestinationSurfaceContractBoundary({
   related,
   mapPoints,
   galleryUrls,
+  galleryMedia,
+  premiumEnabled,
 }: DestinationSurfaceContractBoundaryProps) {
+  if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
+    const accreditedMedia = (galleryMedia ?? []).filter(
+      (item) => !hasForbiddenDestinationMedia(item),
+    );
+    const safeRelated = withoutUnaccreditedRelatedMedia(related);
+    const content = buildDestinationPremiumRuntime({
+      id: `destination:${destinationSlug}`,
+      destination: dbData,
+      media: accreditedMedia,
+      mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
+    });
+    return (
+      <div
+        data-omxds-visual-foundations="enabled"
+        data-destination-template="premium-g4"
+        data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}
+      >
+        <DestinationSurfaceProvider
+          db={dbData}
+          related={safeRelated}
+          slug={destinationSlug}
+          mapPoints={mapPoints}
+          galleryUrls={accreditedMedia.map((item) => item.url)}
+          galleryMedia={accreditedMedia}
+        >
+          <DestinationPremiumSurface
+            content={content}
+            heroVariant={premiumEnabled ? "cinematic" : "editorial"}
+            sections={{ gallery: accreditedMedia.length > 0 }}
+            heroAction={
+              dbData.id ? (
+                <AddToTravelPlanButton
+                  kind="destination"
+                  targetId={dbData.id}
+                  title={dbData.name}
+                  slug={destinationSlug}
+                  imageUrl={content.hero.cover.url || null}
+                  subtitle={dbData.tagline}
+                  variant="full"
+                  eligibilityMode="legacy"
+                />
+              ) : null
+            }
+            renderServicePreview={(service) => (
+              <PremiumRelatedCollection service={service.key} name={dbData.name} />
+            )}
+          />
+        </DestinationSurfaceProvider>
+      </div>
+    );
+  }
   if (!enabled || !destinationSlug) return legacy;
 
   const mock = DESTINOS_MOCK.find(
@@ -192,6 +318,7 @@ export function DestinationSurfaceContractBoundary({
     regionName: ORIENTE_MAYA.name,
     counts: destinationRelatedCounts(related),
     galleryUrls: galleryUrls ?? [],
+    mediaAttribution: galleryMedia ?? [],
     mapPoints: mapPoints ?? [],
   });
   const surfaceContract = buildDestinationSurfaceContract(input);
@@ -204,7 +331,9 @@ export function DestinationSurfaceContractBoundary({
       related={related}
       mapPoints={mapPoints}
       galleryUrls={galleryUrls}
+      galleryMedia={galleryMedia}
       surfaceContract={surfaceContract}
+      premiumEnabled={premiumEnabled}
     />
   );
 }
@@ -215,7 +344,9 @@ export function DestinationSurface({
   related,
   mapPoints,
   galleryUrls,
+  galleryMedia,
   surfaceContract,
+  premiumEnabled = false,
 }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
   const routeSearch = useSearch({ strict: false }) as { explora?: string };
@@ -226,6 +357,7 @@ export function DestinationSurface({
   const rel = related ?? ctx?.related ?? null;
   const effectiveMapPoints = mapPoints ?? ctx?.mapPoints ?? [];
   const effectiveGalleryUrls = galleryUrls ?? ctx?.galleryUrls ?? [];
+  const effectiveGalleryMedia = galleryMedia ?? ctx?.galleryMedia ?? [];
   const mock = slug
     ? DESTINOS_MOCK.find((d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug)
     : undefined;
@@ -247,11 +379,30 @@ export function DestinationSurface({
     regionName: ORIENTE_MAYA.name,
     counts: destinationRelatedCounts(rel),
     galleryUrls: effectiveGalleryUrls,
+    mediaAttribution: effectiveGalleryMedia,
     mapPoints: effectiveMapPoints,
   });
 
   const galleryDto = destinationToGalleryDTO(input);
   const heroDtoRaw = destinationToHeroDTO(input);
+  // G8-F1D · Medio acreditado para el renderer Premium compartido: se
+  // reutiliza la primera diapositiva ya resuelta por el adaptador.
+  const heroSlide = heroDtoRaw.mediaSlides?.[0] ?? null;
+  const premiumHeroUrl = input.galleryUrls[0] ?? input.heroUrl ?? "";
+  const premiumHeroMedia = premiumHeroUrl
+    ? {
+        url: premiumHeroUrl,
+        alt:
+          (heroSlide?.url === premiumHeroUrl ? heroSlide?.alt : null) ||
+          `Vista de ${input.name}, Oriente Maya de Yucatán`,
+        ...(heroSlide?.url === premiumHeroUrl && heroSlide?.caption
+          ? { caption: heroSlide.caption }
+          : {}),
+        ...(heroSlide?.url === premiumHeroUrl && heroSlide?.credit
+          ? { credit: heroSlide.credit }
+          : {}),
+      }
+    : null;
   // Tourist Hero `gallery` v1.2.0 — el propio Hero es el carrusel
   // Airbnb-style. Cuando se activa, el mosaico `ExperienceGallery`
   // se omite para no duplicar la imagen dominante.
@@ -308,11 +459,33 @@ export function DestinationSurface({
           </section>
         ) : null}
 
-        <ExperienceHero
-          dto={heroDto}
-          headingLevel="h1"
-          className={showGalleryMosaic ? "mt-6" : undefined}
-        />
+        {premiumEnabled && activeContract ? (
+          <div className={showGalleryMosaic ? "mt-6" : undefined}>
+            <PremiumHero
+              vm={{
+                presentation: DEFAULT_PREMIUM_PRESENTATION,
+                // D-03 · La ruta territorial navegable la emite PublicShell.
+                // El Hero no repite el breadcrumb decorativo.
+                eyebrow: "Destino · Oriente Maya de Yucatán",
+                title: input.name,
+                description: input.tagline || input.description || undefined,
+                // G8-F1D · El medio Premium hereda ALT, caption y crédito
+                // acreditados del hero gobernado; sin metadata conserva
+                // el ALT descriptivo previo.
+                media: premiumHeroMedia,
+                primaryAction: dominantAction?.href
+                  ? { label: dominantAction.label, href: dominantAction.href }
+                  : undefined,
+              }}
+            />
+          </div>
+        ) : (
+          <ExperienceHero
+            dto={heroDto}
+            headingLevel="h1"
+            className={showGalleryMosaic ? "mt-6" : undefined}
+          />
+        )}
 
         {nearbyPoints.length >= 3 ? (
           <AluxNearbySuggestionBanner destinationLabel={input.name} points={nearbyPoints} />

@@ -11,10 +11,7 @@
  */
 import { useMemo } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import {
-  deriveTravelStage,
-  type TravelStage,
-} from "@/lib/traveler/journey-stage";
+import { deriveTravelStage, type TravelStage } from "@/lib/traveler/journey-stage";
 import type { TravelerProfile } from "@/lib/traveler/traveler-account.functions";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -55,16 +52,14 @@ export function useTravelStage(sources: TravelStageSources): ResolvedTravelStage
   // sólo es válido para Founder/Admin o en entornos de desarrollo. Un
   // viajero real jamás puede forzar una etapa distinta a la derivada
   // (evita provocar solicitudes de permisos o superficies fuera de su Journey).
-  const canOverride =
-    import.meta.env.DEV === true || role === "super_admin" || role === "admin";
+  const canOverride = import.meta.env.DEV === true || role === "super_admin" || role === "admin";
 
   return useMemo(() => {
     const override = canOverride ? parseOverride(search) : null;
     if (override) return { stage: override, override: true };
     const p = sources.profile ?? null;
     const hasCompletedProfile = Boolean(
-      p &&
-        (p.travel_style || (p.interests?.length ?? 0) > 0 || p.trip_context?.travel_window),
+      p && (p.travel_style || (p.interests?.length ?? 0) > 0 || p.trip_context?.travel_window),
     );
     return {
       stage: deriveTravelStage({

@@ -62,9 +62,7 @@ export interface AluxSpatialProposal {
   primaryCta: AluxProposalCta;
   /** Explainable by Default. */
   rationale: string;
-  sources: Array<
-    "live_day" | "decision_center" | "destination_context" | "travel_plan"
-  >;
+  sources: Array<"live_day" | "decision_center" | "destination_context" | "travel_plan">;
   expected_effect: string;
   reversible: true;
   confidence: AluxConfidence;
@@ -112,17 +110,14 @@ function proposalFromDecision(
 ): AluxSpatialProposal | null {
   const planItemId = card.planItemId ?? null;
   const item =
-    planItemId && liveDay
-      ? liveDay.items.find((i) => i.id === planItemId) ?? null
-      : null;
+    planItemId && liveDay ? (liveDay.items.find((i) => i.id === planItemId) ?? null) : null;
 
   // Deriva un CTA a partir del intent principal (o `open_plan_item` por
   // defecto — nunca inventamos acciones nuevas).
   const cta: AluxProposalCta = card.primaryAction
     ? {
         label: card.primaryAction.label,
-        intent:
-          (card.primaryAction.intent as AluxProposalIntent) ?? "open_plan_item",
+        intent: (card.primaryAction.intent as AluxProposalIntent) ?? "open_plan_item",
         payload: card.primaryAction.payload,
       }
     : {
@@ -207,10 +202,7 @@ function proposalFromDecision(
     ifIgnored,
     primaryCta: cta,
     rationale: card.rationale,
-    sources: [
-      "decision_center",
-      ...(item ? (["live_day", "travel_plan"] as const) : []),
-    ],
+    sources: ["decision_center", ...(item ? (["live_day", "travel_plan"] as const) : [])],
     expected_effect: expectedBenefit,
     reversible: true,
     confidence,
@@ -231,9 +223,7 @@ function proposalFromDecision(
  *  - `decisionCenter.empty === true`
  *  - ninguna tarjeta cumple la Regla de Oportunidad.
  */
-export function deriveAluxSpatialProposals(
-  input: DeriveAluxSpatialInput,
-): AluxSpatialProposal[] {
+export function deriveAluxSpatialProposals(input: DeriveAluxSpatialInput): AluxSpatialProposal[] {
   if (input.phase !== "onsite") return [];
   if (input.decisionCenter.empty) return [];
 
@@ -260,7 +250,7 @@ export function deriveAluxSpatialProposals(
   for (const card of all) {
     if (out.length >= cap) break;
     if (perSlotUsed.has(card.slot)) continue; // 1 por slot (No Saturación)
-    if (seen.has(card.id)) continue;           // dedupe sesión
+    if (seen.has(card.id)) continue; // dedupe sesión
 
     const proposal = proposalFromDecision(card, input.liveDay);
     if (!proposal) continue; // Regla de Oportunidad

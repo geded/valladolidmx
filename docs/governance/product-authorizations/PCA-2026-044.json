@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-044",
+  "title": "19.40 · G8-Q2B · Places CMS v1.0 · Cierre y remediación",
+  "status": "Approved",
+  "branch": "feature/omxds-g8-q2b-places-cms-v1",
+  "blueprint": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Cierre y remediación G8-Q2B sobre la base exacta 6d729a7742344f47a0f9b3fb7c97ff7b828b94eb (diff funcional de 17 rutas desde 3ba3db23) con omxds_visual_v1_contracts_enabled=false y techo de 18 rutas incrementales. Autoriza exclusivamente: aplicación de Prettier a los ocho archivos Q2B con deuda nueva sin cambio semántico ni visual; incorporación de content_audit_log mediante el mecanismo existente en las once operaciones mutables del CMS de Lugares (creación, actualización, ubicación, tipo, categorías, horarios, productos, eventos, autoridades, medios y transición de estado) registrando actor, entidad, acción y antes/después, con escritura best-effort que nunca revierte la operación; creación del contrato de matriz de permisos Q2B para traveler, business_owner, concierge, editor, admin, super_admin, portador de poi.write y usuario sin autoridad, más la no concesión de administración por relación de producto, evento o autoridad; creación del gate validate:q2b (contrato y evidencia estática) y su registro en package.json; evidencia de smoke autenticado read-only y mediciones responsive en 390, 430, 768, 1024, 1280 y 1440 px; alta documental del Blueprint 19.40, este instrumento, los addenda PCA-2026-029-ADDENDUM-P y PCA-2026-029-ADDENDUM-Q, el Master Index v0.69 y las proyecciones regeneradas por el sincronizador canónico. Prohibido expresamente: migraciones y cualquier cambio de esquema, relajación de RLS o grants, contenido turístico real, publicación, activación de flags, reclamación empresarial, clasificación de los cinco POI históricos, Tinum, Temozón, Chichén Itzá, Ek' Balam, Casa de los Venados, rutas públicas, plantillas premium, conexión de Qué hacer, cambios en Home, listados o fichas, G8-Q2C, PR, merge y despliegue.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/places/places-cms.functions.ts" },
+    { "operation": "modify", "path": "src/lib/places/places-cms-contracts.ts" },
+    { "operation": "modify", "path": "src/components/cms/places/PlaceEditor.tsx" },
+    { "operation": "modify", "path": "src/components/cms/places/PlaceMediaPanel.tsx" },
+    { "operation": "modify", "path": "src/components/cms/places/PlaceSection.tsx" },
+    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" },
+    { "operation": "modify", "path": "src/routes/_authenticated/cms/lugares.index.tsx" },
+    { "operation": "modify", "path": "src/routes/_authenticated/cms/lugares.nuevo.tsx" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:q2a",
+    "bun run validate:q2a-r1",
+    "bun run validate:q2b",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

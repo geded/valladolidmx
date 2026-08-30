@@ -46,21 +46,47 @@ async function detectEngineVersion() {
     const p = join(__dirname, "..", "..", "node_modules", "sharp", "package.json");
     const raw = await readFile(p, "utf8");
     return `sharp@${JSON.parse(raw).version}`;
-  } catch { return "sharp@unknown"; }
+  } catch {
+    return "sharp@unknown";
+  }
 }
 const ENGINE_VERSION = await detectEngineVersion();
 
 // Matriz oficial por contexto (adenda benchmark M0).
 const MATRIX = {
-  hero:       { widths: [800, 1200, 1600, 2000], formats: ["avif", "webp", "jpeg"], quality: { avif: 50, webp: 75, jpeg: 82 } },
-  card:       { widths: [400, 800, 1200],        formats: ["avif", "webp", "jpeg"], quality: { avif: 50, webp: 75, jpeg: 80 } },
-  gallery:    { widths: [800, 1200, 1600],       formats: ["avif", "webp", "jpeg"], quality: { avif: 52, webp: 78, jpeg: 82 } },
-  thumbnail:  { widths: [200, 400],              formats: ["avif", "webp", "jpeg"], quality: { avif: 45, webp: 72, jpeg: 78 } },
-  og:         { widths: [1200],                  formats: ["jpeg"],                 quality: { jpeg: 85 } },
-  editorial:  { widths: [800, 1200, 1600],       formats: ["avif", "webp", "jpeg"], quality: { avif: 55, webp: 80, jpeg: 85 } },
-  logo:       { widths: [200, 400, 800],         formats: ["webp", "png"],          quality: { webp: 90, png: 100 } },
-  icon:       { widths: [64, 128, 256],          formats: ["webp", "png"],          quality: { webp: 90, png: 100 } },
-  generic:    { widths: [400, 800, 1200],        formats: ["avif", "webp", "jpeg"], quality: { avif: 50, webp: 75, jpeg: 80 } },
+  hero: {
+    widths: [800, 1200, 1600, 2000],
+    formats: ["avif", "webp", "jpeg"],
+    quality: { avif: 50, webp: 75, jpeg: 82 },
+  },
+  card: {
+    widths: [400, 800, 1200],
+    formats: ["avif", "webp", "jpeg"],
+    quality: { avif: 50, webp: 75, jpeg: 80 },
+  },
+  gallery: {
+    widths: [800, 1200, 1600],
+    formats: ["avif", "webp", "jpeg"],
+    quality: { avif: 52, webp: 78, jpeg: 82 },
+  },
+  thumbnail: {
+    widths: [200, 400],
+    formats: ["avif", "webp", "jpeg"],
+    quality: { avif: 45, webp: 72, jpeg: 78 },
+  },
+  og: { widths: [1200], formats: ["jpeg"], quality: { jpeg: 85 } },
+  editorial: {
+    widths: [800, 1200, 1600],
+    formats: ["avif", "webp", "jpeg"],
+    quality: { avif: 55, webp: 80, jpeg: 85 },
+  },
+  logo: { widths: [200, 400, 800], formats: ["webp", "png"], quality: { webp: 90, png: 100 } },
+  icon: { widths: [64, 128, 256], formats: ["webp", "png"], quality: { webp: 90, png: 100 } },
+  generic: {
+    widths: [400, 800, 1200],
+    formats: ["avif", "webp", "jpeg"],
+    quality: { avif: 50, webp: 75, jpeg: 80 },
+  },
 };
 
 function parseArgs(argv) {
@@ -88,7 +114,15 @@ function admin() {
 
 async function deriveOne(sb, assetId, report, dryRun) {
   const t0 = performance.now();
-  const perAsset = { assetId, variants: [], errors: [], skipped: 0, generated: 0, failed: 0, asset_failed: false };
+  const perAsset = {
+    assetId,
+    variants: [],
+    errors: [],
+    skipped: 0,
+    generated: 0,
+    failed: 0,
+    asset_failed: false,
+  };
   report.assets.push(perAsset);
 
   // Envolvemos toda la fase de "preparación" (carga asset, descarga
@@ -100,12 +134,15 @@ async function deriveOne(sb, assetId, report, dryRun) {
     perAsset.errors.push(msg);
     if (!dryRun) {
       try {
-        await sb.from("media_assets").update({
-          pipeline_status: "failed",
-          pipeline_engine: ENGINE,
-          pipeline_processed_at: new Date().toISOString(),
-          pipeline_last_error: `M1: ${msg}`.slice(0, 500),
-        }).eq("id", assetId);
+        await sb
+          .from("media_assets")
+          .update({
+            pipeline_status: "failed",
+            pipeline_engine: ENGINE,
+            pipeline_processed_at: new Date().toISOString(),
+            pipeline_last_error: `M1: ${msg}`.slice(0, 500),
+          })
+          .eq("id", assetId);
       } catch (u) {
         perAsset.errors.push(`mark-failed update: ${u?.message ?? u}`);
       }
@@ -115,7 +152,9 @@ async function deriveOne(sb, assetId, report, dryRun) {
   // 1. Cargar asset
   const { data: asset, error: aErr } = await sb
     .from("media_assets")
-    .select("id, storage_bucket, storage_path, original_bucket, original_path, original_checksum, original_bytes, original_width, usage_context, pipeline_status")
+    .select(
+      "id, storage_bucket, storage_path, original_bucket, original_path, original_checksum, original_bytes, original_width, usage_context, pipeline_status",
+    )
     .eq("id", assetId)
     .maybeSingle();
   if (aErr || !asset) {
@@ -160,13 +199,14 @@ async function deriveOne(sb, assetId, report, dryRun) {
     .eq("asset_id", assetId)
     .eq("engine", ENGINE);
 
-  const existingIndex = new Map(
-    (existing ?? []).map((v) => [`${v.format}:${v.width}`, v]),
-  );
+  const existingIndex = new Map((existing ?? []).map((v) => [`${v.format}:${v.width}`, v]));
 
   // 4. Marcar asset como processing (best-effort, no bloqueante)
   if (!dryRun) {
-    await sb.from("media_assets").update({ pipeline_status: "processing", pipeline_engine: ENGINE }).eq("id", assetId);
+    await sb
+      .from("media_assets")
+      .update({ pipeline_status: "processing", pipeline_engine: ENGINE })
+      .eq("id", assetId);
   }
 
   // 5. Derivar y subir
@@ -205,12 +245,26 @@ async function deriveOne(sb, assetId, report, dryRun) {
         perAsset.variants.push({ format, width, status: "failed", error: String(e?.message ?? e) });
         if (!dryRun) {
           await sb.from("media_asset_variants").upsert(
-            [{
-              asset_id: assetId, engine: ENGINE, format, width, quality,
-              bucket: "media-derived", path, usage_context: ctx,
-              status: "failed", error: String(e?.message ?? e),
-              metadata: { engine_version: ENGINE_VERSION, source_checksum: sourceChecksum, quality, generated_at: new Date().toISOString() },
-            }],
+            [
+              {
+                asset_id: assetId,
+                engine: ENGINE,
+                format,
+                width,
+                quality,
+                bucket: "media-derived",
+                path,
+                usage_context: ctx,
+                status: "failed",
+                error: String(e?.message ?? e),
+                metadata: {
+                  engine_version: ENGINE_VERSION,
+                  source_checksum: sourceChecksum,
+                  quality,
+                  generated_at: new Date().toISOString(),
+                },
+              },
+            ],
             { onConflict: "asset_id,format,width,engine" },
           );
         }
@@ -227,39 +281,67 @@ async function deriveOne(sb, assetId, report, dryRun) {
         });
         if (up.error) {
           perAsset.failed++;
-          perAsset.variants.push({ format, width, status: "failed", error: `upload: ${up.error.message}` });
+          perAsset.variants.push({
+            format,
+            width,
+            status: "failed",
+            error: `upload: ${up.error.message}`,
+          });
           continue;
         }
 
         const { error: upsertErr } = await sb.from("media_asset_variants").upsert(
-          [{
-            asset_id: assetId, engine: ENGINE, format, width, quality,
-            bucket: "media-derived", path, usage_context: ctx,
-            bytes: out.length, checksum: contentHash,
-            processing_ms: Math.round(dt),
-            status: "ready", error: null,
-            metadata: {
-              engine_version: ENGINE_VERSION,
-              source_checksum: sourceChecksum,
-              content_hash: contentHash,
+          [
+            {
+              asset_id: assetId,
+              engine: ENGINE,
+              format,
+              width,
               quality,
-              generated_at: new Date().toISOString(),
+              bucket: "media-derived",
+              path,
+              usage_context: ctx,
+              bytes: out.length,
+              checksum: contentHash,
+              processing_ms: Math.round(dt),
+              status: "ready",
+              error: null,
+              metadata: {
+                engine_version: ENGINE_VERSION,
+                source_checksum: sourceChecksum,
+                content_hash: contentHash,
+                quality,
+                generated_at: new Date().toISOString(),
+              },
             },
-          }],
+          ],
           { onConflict: "asset_id,format,width,engine" },
         );
         if (upsertErr) {
           perAsset.failed++;
-          perAsset.variants.push({ format, width, status: "failed", error: `db: ${upsertErr.message}` });
+          perAsset.variants.push({
+            format,
+            width,
+            status: "failed",
+            error: `db: ${upsertErr.message}`,
+          });
           continue;
         }
       }
 
       perAsset.generated++;
-      const reduction = perAsset.source_bytes ? +(100 - (out.length * 100) / perAsset.source_bytes).toFixed(1) : null;
+      const reduction = perAsset.source_bytes
+        ? +(100 - (out.length * 100) / perAsset.source_bytes).toFixed(1)
+        : null;
       perAsset.variants.push({
-        format, width, quality, bytes: out.length, processing_ms: Math.round(dt),
-        reduction_pct: reduction, content_hash: contentHash, status: dryRun ? "dry-run" : "ready",
+        format,
+        width,
+        quality,
+        bytes: out.length,
+        processing_ms: Math.round(dt),
+        reduction_pct: reduction,
+        content_hash: contentHash,
+        status: dryRun ? "dry-run" : "ready",
       });
     }
   }
@@ -267,12 +349,15 @@ async function deriveOne(sb, assetId, report, dryRun) {
   // 6. Promocionar asset sólo si TODAS las variantes planificadas están ok
   const allOk = perAsset.failed === 0 && perAsset.errors.length === 0;
   if (!dryRun) {
-    await sb.from("media_assets").update({
-      pipeline_status: allOk ? "ready" : "failed",
-      pipeline_engine: ENGINE,
-      pipeline_processed_at: new Date().toISOString(),
-      pipeline_last_error: allOk ? null : `M1: ${perAsset.failed} variant(s) failed`,
-    }).eq("id", assetId);
+    await sb
+      .from("media_assets")
+      .update({
+        pipeline_status: allOk ? "ready" : "failed",
+        pipeline_engine: ENGINE,
+        pipeline_processed_at: new Date().toISOString(),
+        pipeline_last_error: allOk ? null : `M1: ${perAsset.failed} variant(s) failed`,
+      })
+      .eq("id", assetId);
   }
 
   perAsset.total_ms = Math.round(performance.now() - t0);
@@ -283,35 +368,54 @@ async function main() {
   let ids = [...args.assetIds];
   if (args.file) {
     const contents = await readFile(args.file, "utf8");
-    ids.push(...contents.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#")));
+    ids.push(
+      ...contents
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith("#")),
+    );
   }
   ids = Array.from(new Set(ids));
   if (ids.length === 0) {
     console.error("No asset IDs provided. Use --asset-id=<uuid> or --file=<list.txt>");
     process.exit(2);
   }
-  console.log(`H3·A4·M1 · derive · engine=${ENGINE_VERSION} · assets=${ids.length} · dryRun=${args.dryRun}`);
+  console.log(
+    `H3·A4·M1 · derive · engine=${ENGINE_VERSION} · assets=${ids.length} · dryRun=${args.dryRun}`,
+  );
 
   const sb = admin();
   await mkdir(OUT_DIR, { recursive: true });
   const runId = crypto.randomUUID();
-  const report = { runId, engine: ENGINE_VERSION, startedAt: new Date().toISOString(), dryRun: args.dryRun, assets: [] };
+  const report = {
+    runId,
+    engine: ENGINE_VERSION,
+    startedAt: new Date().toISOString(),
+    dryRun: args.dryRun,
+    assets: [],
+  };
 
   for (const id of ids) {
     console.log(`\n→ ${id}`);
-    try { await deriveOne(sb, id, report, args.dryRun); }
-    catch (e) {
+    try {
+      await deriveOne(sb, id, report, args.dryRun);
+    } catch (e) {
       console.error(`  fatal: ${e?.message ?? e}`);
       report.assets.push({ assetId: id, fatal: String(e?.message ?? e), asset_failed: true });
       if (!args.dryRun) {
         try {
-          await sb.from("media_assets").update({
-            pipeline_status: "failed",
-            pipeline_engine: ENGINE,
-            pipeline_processed_at: new Date().toISOString(),
-            pipeline_last_error: `M1 fatal: ${String(e?.message ?? e)}`.slice(0, 500),
-          }).eq("id", id);
-        } catch { /* no-op */ }
+          await sb
+            .from("media_assets")
+            .update({
+              pipeline_status: "failed",
+              pipeline_engine: ENGINE,
+              pipeline_processed_at: new Date().toISOString(),
+              pipeline_last_error: `M1 fatal: ${String(e?.message ?? e)}`.slice(0, 500),
+            })
+            .eq("id", id);
+        } catch {
+          /* no-op */
+        }
       }
     }
   }
@@ -320,15 +424,23 @@ async function main() {
   const outPath = join(OUT_DIR, `${runId}.json`);
   await writeFile(outPath, JSON.stringify(report, null, 2));
 
-  const totals = report.assets.reduce((a, r) => ({
-    generated: a.generated + (r.generated || 0),
-    skipped: a.skipped + (r.skipped || 0),
-    failed: a.failed + (r.failed || 0),
-    asset_failed: a.asset_failed + (r.asset_failed ? 1 : 0),
-  }), { generated: 0, skipped: 0, failed: 0, asset_failed: 0 });
-  console.log(`\n✓ run ${runId} · generated=${totals.generated} skipped=${totals.skipped} failed=${totals.failed} asset_failed=${totals.asset_failed}`);
+  const totals = report.assets.reduce(
+    (a, r) => ({
+      generated: a.generated + (r.generated || 0),
+      skipped: a.skipped + (r.skipped || 0),
+      failed: a.failed + (r.failed || 0),
+      asset_failed: a.asset_failed + (r.asset_failed ? 1 : 0),
+    }),
+    { generated: 0, skipped: 0, failed: 0, asset_failed: 0 },
+  );
+  console.log(
+    `\n✓ run ${runId} · generated=${totals.generated} skipped=${totals.skipped} failed=${totals.failed} asset_failed=${totals.asset_failed}`,
+  );
   console.log(`  report → ${outPath}`);
   if (totals.failed > 0 || totals.asset_failed > 0) process.exit(1);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

@@ -40,7 +40,8 @@ export const KPI_CATALOG: readonly KpiDefinition[] = [
       "Proporción de visitantes que avanzaron ≥1 etapa del Journey en los últimos 30 días.",
     actionable_decision:
       "Priorizar inversión en las transiciones con menor progresión relativa al benchmark del trimestre.",
-    formula: "count(distinct subject_id con transition en 30d) / count(distinct subject_id activo en 30d)",
+    formula:
+      "count(distinct subject_id con transition en 30d) / count(distinct subject_id activo en 30d)",
     segments: ["trust_level", "destination", "stage"],
     refresh: "daily",
   },
@@ -151,8 +152,6 @@ export const KPI_CATALOG: readonly KpiDefinition[] = [
 /** Guardrail: falla en tiempo de compilación si se registra un KPI sin `actionable_decision`. */
 export function assertActionable(kpi: KpiDefinition): asserts kpi is KpiDefinition {
   if (!kpi.actionable_decision || kpi.actionable_decision.trim().length === 0) {
-    throw new Error(
-      `KPI ${kpi.id} viola Regla de Accionabilidad: falta actionable_decision.`,
-    );
+    throw new Error(`KPI ${kpi.id} viola Regla de Accionabilidad: falta actionable_decision.`);
   }
 }

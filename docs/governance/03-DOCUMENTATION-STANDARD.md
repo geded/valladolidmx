@@ -343,11 +343,11 @@ Las tablas se utilizan para información estructurada, comparaciones, matrices, 
 
 Ejemplo de uso correcto:
 
-| Tipo | Propósito | Ubicación |
-|------|-----------|-----------|
-| CANON | Identidad y principios constitucionales | `docs/governance/00-CANON.md` |
-| ADR | Decisiones arquitectónicas | `docs/decisions/` |
-| Runbook | Procedimientos operativos | `docs/runbooks/` |
+| Tipo    | Propósito                               | Ubicación                     |
+| ------- | --------------------------------------- | ----------------------------- |
+| CANON   | Identidad y principios constitucionales | `docs/governance/00-CANON.md` |
+| ADR     | Decisiones arquitectónicas              | `docs/decisions/`             |
+| Runbook | Procedimientos operativos               | `docs/runbooks/`              |
 
 ## 6.3 Listas
 
@@ -625,10 +625,10 @@ Cuando surja un nuevo tipo de documento, un nuevo formato o una nueva convenció
 
 # 14. Control de Versiones
 
-| Versión | Fecha       | Autor    | Descripción                                                                 |
-|---------|-------------|----------|-----------------------------------------------------------------------------|
-| v1.0    | 2026-07-18  | Founder  | Emisión inicial del estándar oficial de documentación de Valladolid.mx.     |
-| v1.1    | 2026-07-20  | Founder  | Consolidación de Documentation Governance y referencia al marco de decisiones. |
+| Versión | Fecha      | Autor   | Descripción                                                                    |
+| ------- | ---------- | ------- | ------------------------------------------------------------------------------ |
+| v1.0    | 2026-07-18 | Founder | Emisión inicial del estándar oficial de documentación de Valladolid.mx.        |
+| v1.1    | 2026-07-20 | Founder | Consolidación de Documentation Governance y referencia al marco de decisiones. |
 
 Este documento se versiona junto al CANON, al GLOSSARY y a ARCHITECTURAL PRINCIPLES. Su versión mayor sólo cambia cuando se redefine su alcance o su filosofía; los cambios editoriales incrementan la versión menor.
 

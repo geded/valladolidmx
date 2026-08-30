@@ -66,7 +66,11 @@ function seedEvent(): CompositionTree {
       },
     })
     .add({ id: "ev-location", type: "vmx.kit.location", config: { address_line1: "" } })
-    .add({ id: "ev-contact", type: "vmx.kit.contact", config: { contact_type: "whatsapp", value: "" } })
+    .add({
+      id: "ev-contact",
+      type: "vmx.kit.contact",
+      config: { contact_type: "whatsapp", value: "" },
+    })
     .add({ id: "ev-faq", type: "vmx.kit.faq", config: { items: [] } })
     .build();
 }
@@ -83,7 +87,11 @@ function seedExperience(): CompositionTree {
       },
     })
     .add({ id: "ex-gallery", type: "vmx.kit.gallery", config: { items: [] } })
-    .add({ id: "ex-about", type: "vmx.kit.rich-text", config: { heading: "La experiencia", body: "" } })
+    .add({
+      id: "ex-about",
+      type: "vmx.kit.rich-text",
+      config: { heading: "La experiencia", body: "" },
+    })
     .add({
       id: "ex-info",
       type: "vmx.kit.info-table",
@@ -99,7 +107,11 @@ function seedExperience(): CompositionTree {
     .add({ id: "ex-location", type: "vmx.kit.location", config: { address_line1: "" } })
     .add({ id: "ex-reviews", type: "vmx.kit.reviews", config: { items: [] } })
     .add({ id: "ex-faq", type: "vmx.kit.faq", config: { items: [] } })
-    .add({ id: "ex-contact", type: "vmx.kit.contact", config: { contact_type: "whatsapp", value: "" } })
+    .add({
+      id: "ex-contact",
+      type: "vmx.kit.contact",
+      config: { contact_type: "whatsapp", value: "" },
+    })
     .build();
 }
 
@@ -129,7 +141,11 @@ function seedHotel(): CompositionTree {
     .add({ id: "ho-location", type: "vmx.kit.location", config: { address_line1: "" } })
     .add({ id: "ho-reviews", type: "vmx.kit.reviews", config: { items: [] } })
     .add({ id: "ho-faq", type: "vmx.kit.faq", config: { items: [] } })
-    .add({ id: "ho-contact", type: "vmx.kit.contact", config: { contact_type: "whatsapp", value: "" } })
+    .add({
+      id: "ho-contact",
+      type: "vmx.kit.contact",
+      config: { contact_type: "whatsapp", value: "" },
+    })
     .build();
 }
 
@@ -138,10 +154,18 @@ function seedRestaurant(): CompositionTree {
     .add({
       id: "re-hero",
       type: "vmx.kit.hero",
-      config: { eyebrow: "Restaurante", title: "Nombre del restaurante", subtitle: "Cocina · Ambiente" },
+      config: {
+        eyebrow: "Restaurante",
+        title: "Nombre del restaurante",
+        subtitle: "Cocina · Ambiente",
+      },
     })
     .add({ id: "re-gallery", type: "vmx.kit.gallery", config: { items: [] } })
-    .add({ id: "re-about", type: "vmx.kit.rich-text", config: { heading: "La propuesta", body: "" } })
+    .add({
+      id: "re-about",
+      type: "vmx.kit.rich-text",
+      config: { heading: "La propuesta", body: "" },
+    })
     .add({
       id: "re-hours",
       type: "vmx.kit.info-table",
@@ -157,7 +181,11 @@ function seedRestaurant(): CompositionTree {
     .add({ id: "re-promos", type: "vmx.kit.promos", config: { items: [] } })
     .add({ id: "re-location", type: "vmx.kit.location", config: { address_line1: "" } })
     .add({ id: "re-reviews", type: "vmx.kit.reviews", config: { items: [] } })
-    .add({ id: "re-contact", type: "vmx.kit.contact", config: { contact_type: "phone", value: "" } })
+    .add({
+      id: "re-contact",
+      type: "vmx.kit.contact",
+      config: { contact_type: "phone", value: "" },
+    })
     .build();
 }
 
@@ -166,7 +194,11 @@ function seedDestination(): CompositionTree {
     .add({
       id: "de-hero",
       type: "vmx.kit.hero",
-      config: { eyebrow: "Destino", title: "Nombre del destino", subtitle: "Región · Qué lo hace único" },
+      config: {
+        eyebrow: "Destino",
+        title: "Nombre del destino",
+        subtitle: "Región · Qué lo hace único",
+      },
     })
     .add({ id: "de-gallery", type: "vmx.kit.gallery", config: { items: [] } })
     .add({ id: "de-about", type: "vmx.kit.rich-text", config: { heading: "El destino", body: "" } })
@@ -196,7 +228,11 @@ function seedRegion(): CompositionTree {
     .add({
       id: "rg-hero",
       type: "vmx.kit.hero",
-      config: { eyebrow: "Región", title: "Nombre de la región", subtitle: "Descubre sus destinos" },
+      config: {
+        eyebrow: "Región",
+        title: "Nombre de la región",
+        subtitle: "Descubre sus destinos",
+      },
     })
     .add({ id: "rg-about", type: "vmx.kit.rich-text", config: { heading: "La región", body: "" } })
     .add({
@@ -225,12 +261,42 @@ function seedRegion(): CompositionTree {
  * ------------------------------------------------------------------ */
 
 export const KIT_SEEDS: readonly KitSeedDefinition[] = [
-  { kind: "event",       label: "Evento (Kit)",       description: "Semilla neutra para eventos.",     build: seedEvent },
-  { kind: "experience",  label: "Experiencia (Kit)",  description: "Semilla neutra para experiencias.", build: seedExperience },
-  { kind: "hotel",       label: "Hotel (Kit)",        description: "Semilla neutra para hoteles.",     build: seedHotel },
-  { kind: "restaurant",  label: "Restaurante (Kit)",  description: "Semilla neutra para restaurantes.", build: seedRestaurant },
-  { kind: "destination", label: "Destino (Kit)",      description: "Semilla neutra para destinos.",    build: seedDestination },
-  { kind: "region",      label: "Región (Kit)",       description: "Semilla neutra para regiones.",    build: seedRegion },
+  {
+    kind: "event",
+    label: "Evento (Kit)",
+    description: "Semilla neutra para eventos.",
+    build: seedEvent,
+  },
+  {
+    kind: "experience",
+    label: "Experiencia (Kit)",
+    description: "Semilla neutra para experiencias.",
+    build: seedExperience,
+  },
+  {
+    kind: "hotel",
+    label: "Hotel (Kit)",
+    description: "Semilla neutra para hoteles.",
+    build: seedHotel,
+  },
+  {
+    kind: "restaurant",
+    label: "Restaurante (Kit)",
+    description: "Semilla neutra para restaurantes.",
+    build: seedRestaurant,
+  },
+  {
+    kind: "destination",
+    label: "Destino (Kit)",
+    description: "Semilla neutra para destinos.",
+    build: seedDestination,
+  },
+  {
+    kind: "region",
+    label: "Región (Kit)",
+    description: "Semilla neutra para regiones.",
+    build: seedRegion,
+  },
 ] as const;
 
 const SEEDS_BY_KIND = new Map<PageKind, KitSeedDefinition>(

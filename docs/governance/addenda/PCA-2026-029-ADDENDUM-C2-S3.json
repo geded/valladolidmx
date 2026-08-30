@@ -1,0 +1,38 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-C2-S3",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum C2 · Reconocimiento de la revisión vigente de src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-C+L · C2 (2026-08-29). Reconoce la revisión vigente de la ruta sensible preexistente tras la conexión de las rutas reales de ficha al resolutor canónico. No autoriza publicación, migraciones, redirects, sitemap, cambios de flag, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+    "previous_sha256": "a615c0a480b5d9881e47629b895f20413531561ab9b7c92332cb82dbdb1d5549",
+    "current_sha256": "c1bbfd584d1c3e6b2a91b3355aeb2677ee5d7be9f6fbeaa79bfeb491325b2060",
+    "authority": "Autorización Founder G8-R1-C+L · inicio de C2 (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:r1:c2",
+    "bun run governance:check"
+  ]
+}

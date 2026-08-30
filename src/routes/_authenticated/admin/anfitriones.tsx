@@ -44,11 +44,7 @@ function AdminHostingInbox() {
   });
 
   const decide = useMutation({
-    mutationFn: async (input: {
-      row: PendingRequestRow;
-      approve: boolean;
-      notes?: string;
-    }) => {
+    mutationFn: async (input: { row: PendingRequestRow; approve: boolean; notes?: string }) => {
       if (input.row.kind === "claim") {
         await approveClaim({
           data: { transfer_id: input.row.ref_id, approve: input.approve, notes: input.notes },
@@ -83,12 +79,10 @@ function AdminHostingInbox() {
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Admin · E-PS
         </p>
-        <h1 className="mt-1 text-2xl font-semibold text-foreground">
-          Solicitudes de anfitrión
-        </h1>
+        <h1 className="mt-1 text-2xl font-semibold text-foreground">Solicitudes de anfitrión</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Dos puertas de aprobación: primero verificamos la identidad del
-          anfitrión, después revisamos la ficha antes de publicarla.
+          Dos puertas de aprobación: primero verificamos la identidad del anfitrión, después
+          revisamos la ficha antes de publicarla.
         </p>
       </header>
 
@@ -109,9 +103,7 @@ function AdminHostingInbox() {
           <Loader2 className="size-3 animate-spin" aria-hidden /> Cargando…
         </p>
       )}
-      {q.error instanceof Error && (
-        <p className="text-sm text-destructive">{q.error.message}</p>
-      )}
+      {q.error instanceof Error && <p className="text-sm text-destructive">{q.error.message}</p>}
       {q.data && visible.length === 0 && (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           No hay solicitudes en esta bandeja.
@@ -189,19 +181,13 @@ function RequestCard({
             >
               {label.text}
             </span>
-            <span className="text-sm font-medium text-foreground">
-              {row.business_name}
-            </span>
+            <span className="text-sm font-medium text-foreground">{row.business_name}</span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Solicitante: {row.requester_name ?? "—"}{" "}
             {row.requester_email && `(${row.requester_email})`}
           </p>
-          {row.notes && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              Notas: {row.notes}
-            </p>
-          )}
+          {row.notes && <p className="mt-1 text-xs text-muted-foreground">Notas: {row.notes}</p>}
           <p className="mt-1 text-[11px] text-muted-foreground">
             {new Date(row.created_at).toLocaleString("es-MX")}
           </p>

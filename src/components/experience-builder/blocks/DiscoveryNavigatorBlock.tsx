@@ -33,6 +33,26 @@ export interface DiscoveryNavigatorBlockConfig {
   mode?: "navigate" | "inline";
   /** Tarjetas por página en el explorador embebido. */
   pageSize?: number;
+  /**
+   * G7-A · Curaduría manual opcional. Lista estable de slugs en el orden
+   * deseado. Si está vacía o ausente, se conserva la derivación automática.
+   * Fail-closed: un slug desconocido se descarta (no se inventa etiqueta ni
+   * ícono) porque la única fuente válida es el DTO del Context Engine.
+   */
+  categorySlugs?: Array<string | { slug?: string }>;
+  /** G7-A · Categorías ocultas (se aplican también en modo automático). */
+  hiddenSlugs?: Array<string | { slug?: string }>;
+  /** G7-A · Límite máximo de categorías visibles. */
+  maxItems?: number;
+}
+
+/** Normaliza listas del Experience Builder (`["x"]` o `[{ slug: "x" }]`). */
+function readSlugList(raw: DiscoveryNavigatorBlockConfig["categorySlugs"]): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((it) => (typeof it === "string" ? it : (it?.slug ?? "")))
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export function DiscoveryNavigatorBlock({
@@ -51,22 +71,35 @@ export function DiscoveryNavigatorBlock({
       : scope === "destination"
         ? (config.manualDestinationSlug ?? params.destino ?? null)
         : (params.destino ?? null);
-  const regionSlug =
-    scope === "region" ? (config.manualRegionSlug ?? "oriente-maya") : null;
+  const regionSlug = scope === "region" ? (config.manualRegionSlug ?? "oriente-maya") : null;
 
   const options = discoveryNavigatorQueryOptions({ destinationSlug, regionSlug });
   const query = useQuery({ ...options, initialData: previewData });
 
   const dto = query.data;
-  const categories = dto?.categories ?? [];
+  const derived = dto?.categories ?? [];
+
+  // G7-A · Curaduría manual gobernada (orden, ocultamiento y límite).
+  const manualOrder = readSlugList(config.categorySlugs);
+  const hidden = new Set(readSlugList(config.hiddenSlugs));
+  const curated =
+    manualOrder.length > 0
+      ? manualOrder
+          .map((slug) => derived.find((c) => c.slug === slug))
+          .filter((c): c is (typeof derived)[number] => Boolean(c))
+      : derived;
+  const visible = curated.filter((c) => !hidden.has(c.slug));
+  const limit =
+    typeof config.maxItems === "number" && config.maxItems > 0
+      ? Math.floor(config.maxItems)
+      : undefined;
+  const categories = limit ? visible.slice(0, limit) : visible;
   const scopeLabel = dto?.scope.label ?? null;
   const defaultTitle = scopeLabel ? `Explora ${scopeLabel}` : "Explora el destino";
   const defaultCtaLabel = scopeLabel
     ? `Ver todo lo que ofrece ${scopeLabel}`
     : "Ver todo el destino";
-  const defaultCtaHref = destinationSlug
-    ? `/oriente-maya/${destinationSlug}`
-    : "/oriente-maya";
+  const defaultCtaHref = destinationSlug ? `/oriente-maya/${destinationSlug}` : "/oriente-maya";
 
   const mode = config.mode ?? "navigate";
   const isInline = mode === "inline" && Boolean(destinationSlug);
@@ -83,7 +116,6 @@ export function DiscoveryNavigatorBlock({
     ? {
         slug: "todo",
         label: "Todo el destino",
-        iconKey: "layers",
         count: totalCount,
         href: destinationSlug ? `/oriente-maya/${destinationSlug}` : "#explora",
       }
@@ -109,9 +141,7 @@ export function DiscoveryNavigatorBlock({
   };
 
   const activeCategoryItem =
-    activeCategory != null
-      ? chipCategories.find((c) => c.slug === activeCategory) ?? null
-      : null;
+    activeCategory != null ? (chipCategories.find((c) => c.slug === activeCategory) ?? null) : null;
 
   return (
     <div className="space-y-4">
@@ -138,9 +168,7 @@ export function DiscoveryNavigatorBlock({
           categorySlug={activeCategory}
           categoryLabel={activeCategoryItem?.label ?? activeCategory}
           pageSize={config.pageSize ?? 8}
-          onClose={
-            activeCategory === "todo" ? undefined : () => setActive("todo")
-          }
+          onClose={activeCategory === "todo" ? undefined : () => setActive("todo")}
         />
       ) : null}
     </div>
@@ -152,11 +180,26 @@ export function DiscoveryNavigatorPreview() {
   const demo: DiscoveryNavigatorDTO = {
     scope: { kind: "destination", slug: "valladolid", label: "Valladolid" },
     categories: [
-      { slug: "hoteles", label: "Hoteles", iconKey: "bed-double", count: 39, href: "/hoteles?destino=valladolid" },
-      { slug: "restaurantes", label: "Restaurantes", iconKey: "utensils", count: 30, href: "/restaurantes?destino=valladolid" },
-      { slug: "experiencias", label: "Experiencias", iconKey: "compass", count: 10, href: "/experiencias?destino=valladolid" },
-      { slug: "casas-de-vacaciones", label: "Casas de vacaciones", iconKey: "home", count: 20, href: "/casas-de-vacaciones?destino=valladolid" },
-      { slug: "que-hacer", label: "¿Qué hacer?", iconKey: "binoculars", count: 22, href: "/que-hacer?destino=valladolid" },
+      { slug: "hoteles", label: "Hoteles", count: 39, href: "/hoteles?destino=valladolid" },
+      {
+        slug: "restaurantes",
+        label: "Restaurantes",
+        count: 30,
+        href: "/restaurantes?destino=valladolid",
+      },
+      {
+        slug: "experiencias",
+        label: "Experiencias",
+        count: 10,
+        href: "/experiencias?destino=valladolid",
+      },
+      {
+        slug: "casas-de-vacaciones",
+        label: "Casas de vacaciones",
+        count: 20,
+        href: "/casas-de-vacaciones?destino=valladolid",
+      },
+      { slug: "que-hacer", label: "¿Qué hacer?", count: 22, href: "/que-hacer?destino=valladolid" },
     ],
     extensions: [],
   };

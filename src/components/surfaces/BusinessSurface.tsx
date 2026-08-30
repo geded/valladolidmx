@@ -63,6 +63,8 @@ import {
   createBusinessPremiumSurfaceContract,
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -228,7 +230,13 @@ export function BusinessSurfaceContractBoundary({
   const verticalContract =
     adaptHotelSurfaceContract(input) ?? adaptRestaurantSurfaceContract(input);
   if (verticalContract)
-    return <BusinessSurface business={business} surfaceContract={verticalContract} />;
+    return (
+      <BusinessSurface
+        business={business}
+        surfaceContract={verticalContract}
+        premiumEligibility={premiumEligibility}
+      />
+    );
 
   const premiumResolution = premiumEligibility
     ? createBusinessPremiumSurfaceContract(input, premiumEligibility)
@@ -275,9 +283,12 @@ export function BusinessSurface({
       ? surfaceContract
       : null;
   const activePremium =
-    activeContract?.family === "business" && premiumEligibility?.eligible
+    activeContract &&
+    ["business", "hotel", "restaurant"].includes(activeContract.family) &&
+    premiumEligibility?.eligible
       ? premiumEligibility
       : null;
+
   const b: MarketplaceBusinessDetail = activePremium
     ? {
         ...sourceBusiness,
@@ -397,17 +408,43 @@ export function BusinessSurface({
       crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: b.display_name }]}
       useContextCrumbs
     >
-      <ExperienceHero
-        dto={heroDto}
-        headingLevel="h1"
-        headerActionsSlot={
-          <>
+      {activePremium ? (
+        <>
+          <PremiumHero
+            vm={{
+              presentation: DEFAULT_PREMIUM_PRESENTATION,
+              // D-03 · La ruta territorial navegable la emite PublicShell.
+              // El Hero no repite el breadcrumb decorativo.
+              eyebrow: variant.eyebrow,
+              title: b.display_name,
+              description: b.tagline || undefined,
+              media: activePremium.cover
+                ? {
+                    url: activePremium.cover.url,
+                    alt: activePremium.cover.alt,
+                  }
+                : null,
+              badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
+            }}
+          />
+          <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
             <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
-          </>
-        }
-        extensionsSlot={null}
-      />
+          </div>
+        </>
+      ) : (
+        <ExperienceHero
+          dto={heroDto}
+          headingLevel="h1"
+          headerActionsSlot={
+            <>
+              <ShareButton title={b.display_name} />
+              <FavoriteButton entityKind="business" entityId={b.id} />
+            </>
+          }
+          extensionsSlot={null}
+        />
+      )}
 
       <AluxContextChip
         businessId={b.id}

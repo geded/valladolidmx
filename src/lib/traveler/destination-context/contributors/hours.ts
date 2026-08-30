@@ -13,10 +13,7 @@
  *
  * Datos incompletos → `hours_unknown`. Nunca inventar horarios.
  */
-import type {
-  DestinationContextContributor,
-  DestinationSignal,
-} from "../types";
+import type { DestinationContextContributor, DestinationSignal } from "../types";
 import { evaluateHoursStatus, type HoursStatus } from "@/lib/business/hours-status";
 import type { BusinessHourRow } from "@/lib/business/open-now";
 
@@ -94,9 +91,9 @@ export const hoursContributor: DestinationContextContributor = {
         minutesToOpen: evalResult.minutesToOpen ?? null,
         timezone: tz,
       };
-      const slotsText = evalResult.evaluatedSlots
-        .map((s) => `${s.opens}–${s.closes}`)
-        .join(", ") || "sin franjas hoy";
+      const slotsText =
+        evalResult.evaluatedSlots.map((s) => `${s.opens}–${s.closes}`).join(", ") ||
+        "sin franjas hoy";
       signals.push({
         kind: "hours",
         scope: { ...scope, entityType: ent.type, entityId: ent.id },

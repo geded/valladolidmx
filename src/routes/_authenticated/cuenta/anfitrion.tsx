@@ -29,15 +29,13 @@ function CuentaAnfitrionRoute() {
       </p>
       <h1 className="mt-2 text-4xl">Convierte tu negocio en anfitrión</h1>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-        Sigue nuestros pasos estilo Airbnb: verificamos tu identidad primero y
-        después revisamos tu ficha antes de publicarla en Valladolid.mx.
+        Sigue nuestros pasos estilo Airbnb: verificamos tu identidad primero y después revisamos tu
+        ficha antes de publicarla en Valladolid.mx.
       </p>
 
       {mine.data && mine.data.length > 0 && (
         <section className="mt-8 rounded-2xl border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold text-foreground">
-            Mis empresas
-          </h2>
+          <h2 className="text-sm font-semibold text-foreground">Mis empresas</h2>
           <ul className="mt-3 space-y-2">
             {mine.data.map((b) => (
               <li
@@ -47,18 +45,12 @@ function CuentaAnfitrionRoute() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <Building2 className="size-4 text-primary" aria-hidden />
-                    <span className="truncate text-sm font-medium">
-                      {b.display_name}
-                    </span>
+                    <span className="truncate text-sm font-medium">{b.display_name}</span>
                     <StatusBadge status={b.status} />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {b.destination_name ?? "—"}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{b.destination_name ?? "—"}</p>
                   {b.review_notes && (
-                    <p className="mt-1 text-xs text-warning">
-                      Notas del admin: {b.review_notes}
-                    </p>
+                    <p className="mt-1 text-xs text-warning">Notas del admin: {b.review_notes}</p>
                   )}
                 </div>
                 <Link
@@ -92,7 +84,9 @@ function StatusBadge({ status }: { status: string }) {
   };
   const v = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${v.cls}`}>
+    <span
+      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${v.cls}`}
+    >
       {v.label}
     </span>
   );

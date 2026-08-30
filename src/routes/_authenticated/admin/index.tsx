@@ -97,9 +97,8 @@ function AdminCockpit() {
         </p>
         <h1 className="mt-2 text-3xl">Cockpit del Fundador</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Compuesto en su totalidad mediante el Experience Builder. Para añadir
-          un nuevo widget basta con registrar un Block Contract; este Cockpit
-          se reorganiza por composición.
+          Compuesto en su totalidad mediante el Experience Builder. Para añadir un nuevo widget
+          basta con registrar un Block Contract; este Cockpit se reorganiza por composición.
         </p>
       </header>
 

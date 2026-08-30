@@ -52,9 +52,7 @@ export const listActiveLocales = createServerFn({ method: "GET" }).handler(
       });
       const { data, error } = await supabase
         .from("platform_locales")
-        .select(
-          "code, label, native_label, flag, is_default, is_active, sort_order",
-        )
+        .select("code, label, native_label, flag, is_default, is_active, sort_order")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (error || !data || data.length === 0) return staticFallback();

@@ -14,7 +14,10 @@ export interface ProfileCompletionMeterProps {
   travel: TravelerProfile | null | undefined;
 }
 
-function score(personal: PersonalProfile | null | undefined, travel: TravelerProfile | null | undefined) {
+function score(
+  personal: PersonalProfile | null | undefined,
+  travel: TravelerProfile | null | undefined,
+) {
   const p = personal ?? null;
   const t = travel ?? null;
   const checks: Array<{ label: string; done: boolean }> = [
@@ -48,7 +51,8 @@ export function ProfileCompletionMeter({ personal, travel }: ProfileCompletionMe
             {done}/{total} completado
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Mientras más nos cuentes, mejor te acompaña Alux para descubrir el Oriente Maya de Yucatán.
+            Mientras más nos cuentes, mejor te acompaña Alux para descubrir el Oriente Maya de
+            Yucatán.
           </p>
         </div>
         <Sparkles className="size-5 shrink-0 text-primary" aria-hidden />

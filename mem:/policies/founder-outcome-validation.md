@@ -3,6 +3,7 @@ name: Founder Outcome Validation Principle
 description: Una épica no se cierra sólo porque compile/pase tests/ejecute Blueprint. Todo Completion Report debe incluir sección Outcome Validation que demuestre capacidad de producir el cambio de comportamiento del Behavioral Change Statement.
 type: preference
 ---
+
 **Founder Outcome Validation Principle** (vinculante, complementa Founder Behavioral First Principle).
 
 Una épica NO se considera completamente finalizada únicamente porque el código compile, los tests pasen, la arquitectura sea correcta o el Blueprint se haya ejecutado. Además debe demostrarse que la experiencia tiene capacidad de producir el cambio de comportamiento declarado en su **Behavioral Change Statement**.

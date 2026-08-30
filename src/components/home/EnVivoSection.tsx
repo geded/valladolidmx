@@ -20,7 +20,10 @@ const TILES: { label: string; palette: PlaceholderPalette }[] = [
 
 export function EnVivoSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.envivo_title");
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : t("sections.envivo_title");
   return (
     <section id="en-vivo" className="@container bg-secondary/40 py-20 @3xl:py-28">
       <Container>
@@ -29,7 +32,10 @@ export function EnVivoSection({ config }: { config?: Record<string, unknown> } =
           subtitle={t("sections.envivo_sub")}
           actions={<ComingSoonBadge label={t("common.coming_soon")} />}
         />
-        <div data-home-grid="en-vivo" className="grid grid-cols-1 gap-3 @2xl:grid-cols-3 @3xl:grid-cols-6">
+        <div
+          data-home-grid="en-vivo"
+          className="grid grid-cols-1 gap-3 @2xl:grid-cols-3 @3xl:grid-cols-6"
+        >
           {TILES.map((tile) => (
             <PlaceholderImage
               key={tile.label}

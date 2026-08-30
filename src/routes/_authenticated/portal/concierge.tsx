@@ -42,8 +42,7 @@ function PortalConciergePage() {
 
   const { data, isLoading, error } = useQuery({
     queryKey,
-    queryFn: () =>
-      fetchQuotes({ data: { businessId: businessId!, scope, limit: 100 } }),
+    queryFn: () => fetchQuotes({ data: { businessId: businessId!, scope, limit: 100 } }),
     enabled: Boolean(businessId),
   });
 
@@ -63,8 +62,8 @@ function PortalConciergePage() {
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Solicitudes de cotización</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Responde cotizaciones que el Concierge te envía. No tendrás acceso al
-          expediente ni a la identidad del viajero.
+          Responde cotizaciones que el Concierge te envía. No tendrás acceso al expediente ni a la
+          identidad del viajero.
         </p>
       </header>
 

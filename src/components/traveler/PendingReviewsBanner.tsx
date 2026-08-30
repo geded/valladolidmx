@@ -85,9 +85,7 @@ export function PendingReviewsBanner() {
           <MessageSquareHeart className="h-5 w-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-foreground">
-            Cuéntanos cómo te fue
-          </p>
+          <p className="text-sm font-semibold text-foreground">Cuéntanos cómo te fue</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Tu reseña se publica con el sello <strong>Canje verificado</strong>.
           </p>

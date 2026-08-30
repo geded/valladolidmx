@@ -3,6 +3,7 @@ name: Travel Assistance Layer Principle
 description: CV6.7 establece el Travel Assistance Layer como única capa de asistencia al viajero durante fase onsite (y extensiones a confirmed/T-3). Un solo contrato de dominio, un solo punto de entrada y una sola experiencia. Prohibido crear flujos paralelos (Concierge, Chat, SOS, Premium, Voz, Llamadas, WhatsApp, Incidencias, IA colaborativa, Automatizaciones, Seguimiento). Toda evolución se realiza extendiendo el contrato existente.
 type: constraint
 ---
+
 CV6.7 no es un banner del Concierge: es la primera capa del Travel Assistance Layer de Alux. Reglas vinculantes:
 
 1. Single Entry Point: toda interacción de asistencia durante el viaje (concierge, chat, SOS, voz, llamadas, WhatsApp, incidencias, IA colaborativa, seguimiento) se origina desde este contrato. Prohibidos flujos paralelos.

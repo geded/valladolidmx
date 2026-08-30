@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-043",
+  "title": "19.39 · G8-Q2A-R1 · Places Model Remediation v1.0",
+  "status": "Approved",
+  "branch": "feature/omxds-g8-q2a-places-taxonomy-v1",
+  "blueprint": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Autorización limitada de ejecución G8-Q2A-R1 sobre la base exacta ffb2fe9dd40bb7b73ce69e8b6b2c1c5c4ced32f8 con omxds_visual_v1_contracts_enabled=false y manifiesto máximo de 19 rutas. Autoriza: place_products y place_events con códigos de relación contratados; columnas directions, admission_kind (texto con CHECK cerrado gratuito|pago|mixto|no_aplica, prohibido enum de PostgreSQL), price_to, contact_whatsapp, social_links y published_at; REVOKE ALL y grants mínimos tabla por tabla en todas las tablas place_* de Q2A y Q2A-R1; conversión de place_duplicate_warnings a SECURITY INVOKER con guardia de staff; arnés empírico de RLS en clúster PostgreSQL efímero local para los ocho sujetos; prueba de rollback e idempotencia en clúster efímero; acta de reconciliación del historial de migración; registro obligatorio del gate validate:q2a-r1 en package.json; Blueprint 19.39, PCA-2026-043, evidencia Q2A-R1, Master Index v0.67 y proyecciones generadas por el sincronizador canónico. Prohibido expresamente: ampliar el REVOKE a points_of_interest, modificar default privileges globales o el ACL de destinations, businesses, products, events y media_assets, elevar privilegios, manipular el historial protegido de Supabase, ejecutar rollback contra la base compartida, crear usuarios o modificar roles en la base compartida, Q2B, CMS, contenido real, clasificación de POI, reclamación, Tinum, Temozón, Chichén Itzá, Ek' Balam, Casa de los Venados, Zazil Tunich, Cenote Suytun, rutas públicas, plantillas, Qué hacer, PR, merge y despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-taxonomy.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-contracts.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:q2a",
+    "bun run validate:q2a-r1",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

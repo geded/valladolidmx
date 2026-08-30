@@ -1,6 +1,7 @@
 # 05-BRAND-AND-DESIGN-PHILOSOPHY.md
 
 # Filosofía de Marca y Diseño
+
 Versión 1.0
 
 ## Objetivo

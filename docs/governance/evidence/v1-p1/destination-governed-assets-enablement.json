@@ -1,0 +1,126 @@
+{
+  "package": "19.23",
+  "title": "V1-P1 · Destination Governed Assets Enablement",
+  "authorization": "PCA-2026-025",
+  "blueprint": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+  "base_commit": "92911980041c2c381f5bdffa8814b1ef5c12b1ac",
+  "branch": "edit/edt-42417d62-69b1-4c49-97b6-ae3c761f4f68",
+  "executed_at": "2026-08-25T20:10:00Z",
+  "flag": {
+    "key": "omxds_visual_v1_contracts_enabled",
+    "before": false,
+    "after": false
+  },
+  "destination": {
+    "id": "11111111-aaaa-4aaa-8aaa-000000000001",
+    "slug": "valladolid",
+    "status": "published",
+    "is_demo_seed_before": true,
+    "is_demo_seed_after": false,
+    "latitude": 20.6896,
+    "longitude": -88.202,
+    "reclassification_cause": "Canonical Valladolid destination reclassified from historical demo seed to governed published destination for V1-P1 destination enablement."
+  },
+  "linked_master_assets": [
+    {
+      "media_asset_id": "453dd8fd-7d1e-419e-95ea-9afa365f363c",
+      "role": "cover",
+      "sort_order": 0,
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/destination-cover.jpg",
+      "sha256": "5bb19d90a602874c49f354dd81a28c051602ae60d7f27c8af82f724fd04b3488",
+      "pipeline_status": "ready",
+      "review_state": "approved",
+      "alt_text_present": true,
+      "rights_status": "declared",
+      "stable_url": "/api/public/studio-media/governed/v1p1c/destination-cover.jpg"
+    },
+    {
+      "media_asset_id": "48bdb6fd-91ec-40b4-8262-070cffdbdaf3",
+      "role": "gallery",
+      "sort_order": 1,
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/destination-gallery-1.jpg",
+      "sha256": "6246da339f87cced4b9c25e800f1cf6690e718512710d5fd364f38ea6b260b0d",
+      "pipeline_status": "ready",
+      "review_state": "approved",
+      "alt_text_present": true,
+      "rights_status": "declared",
+      "stable_url": "/api/public/studio-media/governed/v1p1c/destination-gallery-1.jpg"
+    },
+    {
+      "media_asset_id": "4c1ffec3-c57f-44e5-99f3-b8c9ffb0b93b",
+      "role": "gallery",
+      "sort_order": 2,
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/destination-gallery-2.jpg",
+      "sha256": "ef3d7604309c92bc9eb06a3b8dbdfef0ab65a886d828381118674cea1e94db5e",
+      "pipeline_status": "ready",
+      "review_state": "approved",
+      "alt_text_present": true,
+      "rights_status": "declared",
+      "stable_url": "/api/public/studio-media/governed/v1p1c/destination-gallery-2.jpg"
+    }
+  ],
+  "binaries_created": 0,
+  "media_assets_created": 0,
+  "rows_written": {
+    "destinations_updated": 1,
+    "destination_media_inserted": 3,
+    "content_audit_log_inserted": 4
+  },
+  "schema_change": {
+    "table": "public.destination_media",
+    "change": "role CHECK widened to (gallery, hero, cover) + unique partial index destination_media_one_cover_per_destination",
+    "reason": "minimo necesario para materializar los enlaces gobernados autorizados"
+  },
+  "code_changes": [
+    "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts (create)",
+    "src/routes/oriente-maya/$destino.index.tsx (modify)"
+  ],
+  "eligibility_criteria": [
+    "destination.status = published",
+    "destination.is_demo_seed = false",
+    "governed cover approved",
+    "governed gallery >= 2 approved",
+    "rights declared",
+    "sha-256 checksum present",
+    "human ALT non-empty",
+    "pipeline_status = ready",
+    "review_state = approved",
+    "valid geography",
+    "reclassification and media.link audits present",
+    "stable canonical media source (no signed URL persisted)"
+  ],
+  "runtime_verification": {
+    "positive": {
+      "route": "/oriente-maya/valladolid",
+      "http_status": 200,
+      "html_bytes": 153786,
+      "premium": true,
+      "governed_media_referenced": 3,
+      "og_image": "https://quehacerenvalladolid.com/api/public/studio-media/governed/v1p1c/destination-cover.jpg",
+      "og_image_signed": false,
+      "stable_proxy_http_status": 302
+    },
+    "negative_barrier": [
+      {
+        "route": "/oriente-maya/ek-balam",
+        "http_status": 200,
+        "html_bytes": 69289,
+        "premium": false
+      },
+      {
+        "route": "/oriente-maya/chichen-itza",
+        "http_status": 200,
+        "html_bytes": 67484,
+        "premium": false
+      }
+    ]
+  },
+  "storage_policy_changes": "none",
+  "public_routes_added": [],
+  "production_published": false,
+  "not_started": ["19.22.c", "G4", "G5"],
+  "validate_i4_d": "FAIL-CLOSED (H07/H11/H12)"
+}

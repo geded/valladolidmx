@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-020",
+  "title": "OMXDS V1 · I4-D · Experience Builder Canvas Isolated Viewport",
+  "status": "Approved",
+  "branch": "fix/omxds-i4-abc-governed-source-reconciliation-v1",
+  "blueprint": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-22 · Se autoriza la remediación canónica del defecto responsive del canvas del Experience Builder mediante un viewport aislado con iframe de anchos reales (Móvil 390, Tablet 768, Desktop 1280). Alcance mínimo: src/components/experience-builder/VisualStudio.tsx y src/components/layout/SiteHeader.tsx. Se reutilizan el shell y los componentes canónicos; prohibido duplicar SiteHeader, HeroSearchPill o bloques. StudioDeviceCss se retira sólo por quedar completamente reemplazado. El canvas permanece inerte. Se mantiene omxds_visual_v1_contracts_enabled=false y producción sin tocar. No se autoriza cambiar el Acceptance Report G3 a PASS: el defecto se registra como corregido y G3 permanece BLOCKED hasta repetir la validación humana.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/VisualStudio.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/SiteHeader.tsx"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run validate:i4:r",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

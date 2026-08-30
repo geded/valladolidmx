@@ -8,9 +8,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RouteInventoryPanel } from "@/components/experience-builder/RouteInventoryPanel";
 
-export const Route = createFileRoute(
-  "/_authenticated/cms/experience-builder/inventory",
-)({
+export const Route = createFileRoute("/_authenticated/cms/experience-builder/inventory")({
   head: () => ({
     meta: [{ title: "Inventario de Rutas · Experience Builder" }],
   }),

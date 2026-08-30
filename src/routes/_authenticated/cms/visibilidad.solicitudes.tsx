@@ -31,16 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-export const Route = createFileRoute(
-  "/_authenticated/cms/visibilidad/solicitudes",
-)({
+export const Route = createFileRoute("/_authenticated/cms/visibilidad/solicitudes")({
   head: () => ({
     meta: [
       { title: "Solicitudes de visibilidad · CMS Studio" },
@@ -50,7 +43,10 @@ export const Route = createFileRoute(
   component: SolicitudesPage,
 });
 
-const STATUS_META: Record<string, { label: string; tone: "default" | "secondary" | "outline" | "destructive" }> = {
+const STATUS_META: Record<
+  string,
+  { label: string; tone: "default" | "secondary" | "outline" | "destructive" }
+> = {
   pending: { label: "Pendiente", tone: "default" },
   active: { label: "Activa", tone: "secondary" },
   rejected: { label: "Rechazada", tone: "destructive" },
@@ -103,9 +99,7 @@ function SolicitudesPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Solicitudes de visibilidad
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Solicitudes de visibilidad</h1>
         <p className="text-sm text-muted-foreground">
           Aprueba, activa o rechaza las contrataciones manuales de paquetes.
         </p>
@@ -241,13 +235,7 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function ActivateDialog({
-  grant,
-  onClose,
-}: {
-  grant: AdminGrantRow | null;
-  onClose: () => void;
-}) {
+function ActivateDialog({ grant, onClose }: { grant: AdminGrantRow | null; onClose: () => void }) {
   const qc = useQueryClient();
   const activateFn = useServerFn(activateVisibilityGrant);
   const [cycle, setCycle] = useState<string>("");
@@ -327,9 +315,7 @@ function ActivateDialog({
             <div className="flex items-center justify-between rounded-md border p-3">
               <div>
                 <p className="text-sm font-medium">Auto-renovar</p>
-                <p className="text-xs text-muted-foreground">
-                  Requerirá un nuevo cobro al vencer.
-                </p>
+                <p className="text-xs text-muted-foreground">Requerirá un nuevo cobro al vencer.</p>
               </div>
               <Switch checked={autoRenew} onCheckedChange={setAutoRenew} />
             </div>
@@ -348,10 +334,7 @@ function ActivateDialog({
           <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button
-            onClick={() => mutation.mutate()}
-            disabled={mutation.isPending || !cycle}
-          >
+          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending || !cycle}>
             {mutation.isPending ? "Activando…" : "Confirmar y activar"}
           </Button>
         </DialogFooter>
