@@ -1,0 +1,91 @@
+{
+  "id": "g8-r1-f1j-deploy-record",
+  "wave": "G8-R1-F1J · Despliegue del piloto para revisión Founder",
+  "deployed_at_utc": "2026-08-30T02:47:00Z",
+  "deployed_at_merida": "2026-08-29T20:47:00-06:00",
+  "public_url": "https://quehacerenvalladolid.com",
+  "head_deployed": "00172de774a961a3bed91be27aa03ad06acf5422",
+  "head_message": "Ajustó autoridad de filtrado CMS",
+  "worktree": "clean",
+  "migrations_synced": 227,
+  "flag_omxds_visual_v1_contracts_enabled": false,
+  "pilot_entities": { "destination": 6, "place": 5, "business": 7, "product": 4, "total": 22 },
+  "predeploy_gates": {
+    "lint": "PASS (sin deuda nueva)",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "route_inventory": "PASS (220 rutas)",
+    "F1C-A": "PASS (46 tests)",
+    "G8-M1": "PASS (15 tests)",
+    "R1-D": "PASS (24 tests)",
+    "R1-E-R3": "PASS (16 tests)",
+    "F1G/F1H/F1I/F1I-R1": "PASS por verificación de invariantes en base y runtime (no existen suites de contrato dedicadas para estas olas)",
+    "sitemap": "PASS (0 URLs del piloto, 0 URLs en cuarentena)",
+    "alux": "PASS (catálogo canónico sin cuarentena, URLs vía buildCanonicalEntityUrl)",
+    "mi_viaje": "PASS (Guardar disponible en las 22 fichas)",
+    "gobernanza": "PASS (55 manifiestos, 0 cambios sensibles sin autorizar)",
+    "seguridad": "PASS (0 críticos; 4 avisos, 2 previamente ignorados por el usuario)"
+  },
+  "database_invariants": {
+    "published_businesses": 10,
+    "published_demo_businesses": 0,
+    "published_products": 4,
+    "published_demo_products": 0,
+    "published_demo_events": 0,
+    "owner_submitted_published_excluded_from_discovery": 3
+  },
+  "postdeploy_smoke": {
+    "viewports": [390, 430, 768, 1024, 1280, 1440],
+    "pilot_pages_checked": 22,
+    "pilot_issues": 0,
+    "structural_pages_checked": 9,
+    "structural_issues": 0,
+    "responsive_checks": 36,
+    "responsive_issues": 0,
+    "criteria": [
+      "HTTP 200",
+      "consola limpia",
+      "overflow 0",
+      "un H1",
+      "canonical presente",
+      "robots noindex,nofollow en el piloto",
+      "cero apariciones de fichas en cuarentena en descubrimiento",
+      "cero demos"
+    ],
+    "sitemap_prod_locs": 11,
+    "sitemap_prod_pilot_or_quarantine_urls": 0,
+    "quarantined_direct_access": "200 + noindex,nofollow (hacienda-san-servacio-boutique, cocina-del-frailes, ruta-cenotes-y-selva)"
+  },
+  "observations": [
+    {
+      "id": "OBS-F1J-001",
+      "level": "informativo",
+      "detail": "El sitemap de producción publica 11 URLs frente a 14 en el entorno de desarrollo: las tres páginas CMS /p/arma-tu-viaje, /p/alux y /p/marketplace no están presentes en la composición publicada. No afecta al piloto ni a los invariantes."
+    },
+    {
+      "id": "OBS-F1J-002",
+      "level": "informativo",
+      "detail": "/oriente-maya/valladolid permanece indexable y en sitemap por ser superficie territorial previa al piloto; no forma parte de las 22 entidades acreditadas."
+    }
+  ],
+  "rollback": {
+    "previous_version_sha": "33dbfa6a-previo (commit 33d3bfa6)",
+    "deployed_version_sha": "00172de774a961a3bed91be27aa03ad06acf5422",
+    "procedure": "Project settings → Publish → restaurar el despliegue anterior (o republicar el commit 33d3bfa6). No se tocan datos, contenido, estados editoriales, precios ni permisos.",
+    "estimated_time_minutes": 3,
+    "owner": "Founder / operador de plataforma",
+    "triggers": ["404", "fuga de demo", "error de permisos", "error de Alux", "navegación rota", "regresión visual"],
+    "invariants_on_rollback": ["conservar datos", "flag OFF", "documentar causa"]
+  },
+  "invariants_respected": [
+    "noindex del piloto intacto",
+    "sin indexación ni publicidad",
+    "flag global OFF",
+    "Reservaciones no iniciadas",
+    "Monitor/Estadísticas no iniciados",
+    "sin publicar entidades adicionales",
+    "sin demos",
+    "sin cambios de precios",
+    "sin ampliación de alcance"
+  ]
+}
