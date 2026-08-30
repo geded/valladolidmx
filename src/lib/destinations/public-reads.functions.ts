@@ -47,7 +47,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("destinations")
       .select(
-        "slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata )",
+        "slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum )",
       )
       .eq("slug", data.slug)
       .maybeSingle();
@@ -69,6 +69,11 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
           alt_text_ai?: string | null;
           alt_text_source?: string | null;
           review_state?: string | null;
+          status?: string | null;
+          deleted_at?: string | null;
+          is_demo_seed?: boolean | null;
+          pipeline_status?: string | null;
+          original_checksum?: string | null;
           title?: string | null;
           caption?: string | null;
           credit?: string | null;
@@ -76,7 +81,12 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
         } | null;
       }
     ).media_assets;
-    if (media?.storage_bucket && media?.storage_path) {
+    const { isAccreditedDestinationMedia } = await import("./public-media-policy");
+    if (
+      media?.storage_bucket &&
+      media?.storage_path &&
+      isAccreditedDestinationMedia(media)
+    ) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: signed, error: signErr } = await supabaseAdmin.storage
         .from(media.storage_bucket)
@@ -270,7 +280,7 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
     const { data: rows, error } = await sb
       .from("destination_media")
       .select(
-        "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata ), destinations!inner(slug)",
+         "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum ), destinations!inner(slug)",
       )
       .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
@@ -291,6 +301,11 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
             alt_text_ai: string | null;
             alt_text_source: string | null;
             review_state: string | null;
+            status: string | null;
+            deleted_at: string | null;
+            is_demo_seed: boolean | null;
+            pipeline_status: string | null;
+            original_checksum: string | null;
             title: string | null;
             caption: string | null;
             credit: string | null;
@@ -299,6 +314,8 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         };
         const m = row.media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
+        const { isAccreditedDestinationMedia } = await import("./public-media-policy");
+        if (!isAccreditedDestinationMedia(m)) return null;
         const { data: s } = await supabaseAdmin.storage
           .from(m.storage_bucket)
           .createSignedUrl(m.storage_path, 60 * 60);

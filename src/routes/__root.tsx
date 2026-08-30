@@ -218,7 +218,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html
       lang="es"
       suppressHydrationWarning
-      data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : "disabled"}
+      data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>
         <HeadContent />

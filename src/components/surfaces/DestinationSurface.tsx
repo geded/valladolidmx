@@ -57,6 +57,10 @@ import {
   type DestinationBlockInput,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { buildDestinationPremiumRuntime } from "@/components/destination-premium/destination-premium-runtime";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -181,6 +185,22 @@ export interface DestinationSurfaceContractBoundaryProps extends DestinationSurf
   legacy: ReactNode;
 }
 
+function PremiumRelatedCollection({ service, name }: { service: string; name: string }) {
+  const kind = service === "hoteles" ? "hotel" : service === "restaurantes" ? "restaurant" : service === "eventos" ? "event" : service === "experiencias" || service === "que-hacer" ? "experience" : "business";
+  return (
+    <ExperienceRelatedCollectionBlock config={{
+      source: "destination",
+      entityKind: kind,
+      variant: "grid",
+      columns: 3,
+      heading: `${service === "que-hacer" ? "Qué hacer" : service.charAt(0).toUpperCase() + service.slice(1)} en ${name}`,
+      emptyMessage: "Aún no hay opciones publicadas en esta categoría.",
+      groups: [{ id: service, entityKind: kind, categorySlug: service, maxItems: 6, variant: "grid" }],
+      capabilities: { showImage: true, showMeta: true, showBadges: true, showPrice: true, showDate: true, showKindBadge: true, dedupe: true },
+    }} />
+  );
+}
+
 export function DestinationSurfaceContractBoundary({
   enabled,
   legacy,
@@ -192,6 +212,26 @@ export function DestinationSurfaceContractBoundary({
   galleryMedia,
   premiumEnabled,
 }: DestinationSurfaceContractBoundaryProps) {
+  if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
+    const accreditedMedia = (galleryMedia ?? []).filter((item) => !hasForbiddenDestinationMedia(item));
+    const content = buildDestinationPremiumRuntime({
+      id: `destination:${destinationSlug}`,
+      destination: dbData,
+      media: accreditedMedia,
+      mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
+    });
+    return (
+      <div data-omxds-visual-foundations="enabled" data-destination-template="premium-g4" data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}>
+        <DestinationPremiumSurface
+          content={content}
+          heroVariant={premiumEnabled ? "cinematic" : "editorial"}
+          sections={{ gallery: accreditedMedia.length > 0 }}
+          heroAction={<AddToTravelPlanButton kind="destination" targetId={`destination:${destinationSlug}`} title={dbData.name} slug={destinationSlug} imageUrl={content.hero.cover.url || null} subtitle={dbData.tagline} variant="full" eligibilityMode="legacy" />}
+          renderServicePreview={(service) => <PremiumRelatedCollection service={service.key} name={dbData.name} />}
+        />
+      </div>
+    );
+  }
   if (!enabled || !destinationSlug) return legacy;
 
   const mock = DESTINOS_MOCK.find(

@@ -17,7 +17,7 @@
  *  - Pueblo Mágico sólo como estado editorial en texto.
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -59,6 +59,10 @@ export interface DestinationPremiumSurfaceProps {
   /** Servicio activo inicial (clave de categoría). */
   initialService?: string;
   className?: string;
+  /** Runtime productivo del CMS; sustituye las tarjetas ilustrativas G4. */
+  renderServicePreview?: (service: DestinationPremiumService) => ReactNode;
+  /** Acción canónica Guardar/Mi Viaje, inyectada sin duplicar su lógica. */
+  heroAction?: ReactNode;
 }
 
 const SERVICE_ICONS: Record<string, LucideIcon> = {
@@ -78,6 +82,8 @@ export function DestinationPremiumSurface({
   sections,
   initialService,
   className,
+  renderServicePreview,
+  heroAction,
 }: DestinationPremiumSurfaceProps) {
   const visible = (key: DestinationPremiumSectionKey) => sections?.[key] !== false;
   const [activeService, setActiveService] = useState<string>(
@@ -132,9 +138,9 @@ export function DestinationPremiumSurface({
             return (
               <Container key={key} className="mt-5">
                 {heroVariant === "cinematic" ? (
-                  <HeroCinematografico content={content} />
+                  <HeroCinematografico content={content} heroAction={heroAction} />
                 ) : (
-                  <HeroEditorial content={content} />
+                  <HeroEditorial content={content} heroAction={heroAction} />
                 )}
               </Container>
             );
@@ -163,7 +169,7 @@ export function DestinationPremiumSurface({
           case "servicePreview":
             return service ? (
               <Container key={key} className="mt-14">
-                <ServicioPreview content={content} service={service} />
+                {renderServicePreview ? renderServicePreview(service) : <ServicioPreview content={content} service={service} />}
               </Container>
             ) : null;
           case "map":
@@ -201,9 +207,11 @@ function EditorialStatus({ content }: { content: DestinationPremiumContent }) {
 function HeroCopy({
   content,
   compact = false,
+  heroAction,
 }: {
   content: DestinationPremiumContent;
   compact?: boolean;
+  heroAction?: ReactNode;
 }) {
   return (
     <div className={compact ? "" : "max-w-2xl"}>
@@ -231,23 +239,25 @@ function HeroCopy({
             {content.hero.secondaryCta.label}
           </a>
         </Button>
+        {heroAction}
       </div>
     </div>
   );
 }
 
-function HeroEditorial({ content }: { content: DestinationPremiumContent }) {
+function HeroEditorial({ content, heroAction }: { content: DestinationPremiumContent; heroAction?: ReactNode }) {
   const [a, b] = content.hero.supporting;
+  const hasCover = Boolean(content.hero.cover.url);
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <HeroCopy content={content} />
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <img
+      <HeroCopy content={content} heroAction={heroAction} />
+      <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"} className="grid grid-cols-2 gap-3 sm:gap-4">
+        {hasCover ? <img
           src={content.hero.cover.url}
           alt={content.hero.cover.alt}
           loading="eager"
           className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
-        />
+        /> : <div className="col-span-2 flex h-56 items-end rounded-3xl border border-border bg-muted p-6 shadow-soft sm:h-72"><p className="font-serif text-2xl text-foreground/80">{content.hero.title}</p></div>}
         {[a, b].filter(Boolean).map((m) => (
           <img
             key={(m as DestinationPremiumMedia).url}
@@ -262,7 +272,8 @@ function HeroEditorial({ content }: { content: DestinationPremiumContent }) {
   );
 }
 
-function HeroCinematografico({ content }: { content: DestinationPremiumContent }) {
+function HeroCinematografico({ content, heroAction }: { content: DestinationPremiumContent; heroAction?: ReactNode }) {
+  if (!content.hero.cover.url) return <HeroEditorial content={content} heroAction={heroAction} />;
   return (
     <section className="relative overflow-hidden rounded-3xl shadow-floating">
       <img
@@ -277,7 +288,7 @@ function HeroCinematografico({ content }: { content: DestinationPremiumContent }
       />
       <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
         <div className="rounded-3xl bg-background/85 p-6 backdrop-blur-md sm:max-w-xl sm:p-8">
-          <HeroCopy content={content} compact />
+          <HeroCopy content={content} compact heroAction={heroAction} />
         </div>
       </div>
     </section>
@@ -316,7 +327,7 @@ function ServiciosStrip({
 }
 
 function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
-  const [lead, ...rest] = content.descubre.media;
+  const [lead, ...rest] = content.descubre.media.filter((item) => Boolean(item.url));
   return (
     <section aria-labelledby="descubre-destino" className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
       <div>
@@ -363,6 +374,7 @@ function GaleriaEditorial({
   layout: DestinationGalleryLayout;
 }) {
   const items = content.gallery.items;
+  if (items.length === 0) return null;
   return (
     <section aria-labelledby="galeria-destino">
       <div className="flex items-end justify-between gap-4">
@@ -454,6 +466,7 @@ function ServicioPreview({
   service: DestinationPremiumService;
 }) {
   const Icon = SERVICE_ICONS[service.key] ?? Compass;
+  if (!service.media.url) return null;
   return (
     <section aria-live="polite">
       <div className="flex items-end justify-between gap-4">
@@ -502,6 +515,7 @@ function ServicioPreview({
 }
 
 function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
+  if (content.nearby.items.length === 0) return null;
   return (
     <section aria-labelledby="cerca-del-destino">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
