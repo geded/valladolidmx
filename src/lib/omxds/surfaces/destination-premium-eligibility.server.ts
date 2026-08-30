@@ -20,6 +20,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import type { Json } from "@/integrations/supabase/types";
+import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
 
 /** Bucket servido por el proxy público canónico `/api/public/studio-media/*`. */
 const STABLE_MEDIA_BUCKET = "studio-media";
@@ -76,6 +77,7 @@ interface DestinationMediaRow {
     pipeline_status: string;
     review_state: string;
     original_checksum: string | null;
+    credit: string | null;
     metadata: Json;
     is_demo_seed: boolean;
   } | null;
@@ -104,13 +106,7 @@ function toGovernedItem(row: DestinationMediaRow): DestinationPremiumMediaItem |
   if (row.role !== "cover" && row.role !== "gallery") return null;
   const ok =
     asset.kind === "image" &&
-    asset.status === "published" &&
-    asset.deleted_at === null &&
-    !asset.is_demo_seed &&
-    asset.pipeline_status === "ready" &&
-    asset.review_state === "approved" &&
-    nonEmpty(asset.alt_text) &&
-    nonEmpty(asset.original_checksum) &&
+    isAccreditedDestinationMedia(asset) &&
     positiveDimension(asset.width) &&
     positiveDimension(asset.height) &&
     hasDeclaredRights(asset.metadata);
@@ -160,7 +156,7 @@ export const getDestinationPremiumEligibility = createServerFn({ method: "GET" }
         supabaseAdmin
           .from("destination_media")
           .select(
-            "role, sort_order, media_assets:media_asset_id(id, kind, storage_bucket, storage_path, alt_text, width, height, status, deleted_at, pipeline_status, review_state, original_checksum, metadata, is_demo_seed)",
+             "role, sort_order, media_assets:media_asset_id(id, kind, storage_bucket, storage_path, alt_text, credit, width, height, status, deleted_at, pipeline_status, review_state, original_checksum, metadata, is_demo_seed)",
           )
           .eq("destination_id", destination.id)
           .in("role", ["cover", "gallery"])
