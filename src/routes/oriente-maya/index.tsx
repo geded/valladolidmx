@@ -19,6 +19,9 @@ import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { buildRegionPremiumRuntime } from "@/components/destination-premium/region-premium-runtime";
+
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import {
   ContextEngineProvider,
