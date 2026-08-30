@@ -107,6 +107,8 @@ export interface BusinessBindingInput {
   readonly override?: EntityTemplateOverride | null;
   /** Elegibilidad premium efectiva ya evaluada por la ruta. */
   readonly premiumEligible?: boolean;
+  /** G8-R1-F1L·P0 — Único interruptor que degrada a superficie estándar. */
+  readonly forceStandardSurface?: boolean;
 }
 
 /** `/oriente-maya/{destino}/{categoria}/{empresa}` → hotel · restaurante · casa de vacaciones. */
@@ -121,6 +123,7 @@ export function bindBusinessRoute(input: BusinessBindingInput): CanonicalEntityB
       categorySlug: input.categorySlug ?? null,
       override: input.override ?? null,
       premiumEligible: input.premiumEligible,
+      forceStandardSurface: input.forceStandardSurface,
     }),
   );
 }
@@ -130,6 +133,8 @@ export interface ProductBindingInput {
   readonly productType: string | null | undefined;
   readonly override?: EntityTemplateOverride | null;
   readonly premiumEligible?: boolean;
+  /** G8-R1-F1L·P0 — Único interruptor que degrada a superficie estándar. */
+  readonly forceStandardSurface?: boolean;
 }
 
 /** `/producto/{slug}` → experiencia · tour · producto genérico. */
@@ -144,6 +149,7 @@ export function bindProductRoute(input: ProductBindingInput): CanonicalEntityBin
       productType: input.productType ?? null,
       override: input.override ?? null,
       premiumEligible: input.premiumEligible,
+      forceStandardSurface: input.forceStandardSurface,
     }),
   );
 }
@@ -152,6 +158,8 @@ export interface EventBindingInput {
   readonly eventId: string;
   readonly override?: EntityTemplateOverride | null;
   readonly premiumEligible?: boolean;
+  /** G8-R1-F1L·P0 — Único interruptor que degrada a superficie estándar. */
+  readonly forceStandardSurface?: boolean;
 }
 
 /** `/eventos/{slug}` → evento. */
@@ -165,6 +173,7 @@ export function bindEventRoute(input: EventBindingInput): CanonicalEntityBinding
       entityType: "event",
       override: input.override ?? null,
       premiumEligible: input.premiumEligible,
+      forceStandardSurface: input.forceStandardSurface,
     }),
   );
 }
@@ -173,6 +182,8 @@ export interface PlaceBindingInput {
   readonly placeId: string;
   readonly placeType: string | null | undefined;
   readonly premiumEligible?: boolean;
+  /** G8-R1-F1L·P0 — Único interruptor que degrada a superficie estándar. */
+  readonly forceStandardSurface?: boolean;
 }
 
 /**
@@ -190,6 +201,7 @@ export function bindPlaceRoute(input: PlaceBindingInput): CanonicalEntityBinding
       entityType: "place",
       placeType: input.placeType ?? null,
       premiumEligible: input.premiumEligible,
+      forceStandardSurface: input.forceStandardSurface,
     }),
   );
 }

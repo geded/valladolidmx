@@ -156,6 +156,7 @@ export function resolveCanonicalEntityTemplate(
     productType: input.productType ?? null,
     override: input.override ?? null,
     premiumEligible: input.premiumEligible,
+    forceStandardSurface: input.forceStandardSurface,
   });
 
   if (base.family) {
