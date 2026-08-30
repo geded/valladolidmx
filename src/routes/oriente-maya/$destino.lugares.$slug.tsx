@@ -23,15 +23,22 @@ import {
 import { getPublicPlace, getPlacePreview } from "@/lib/places/place-public-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { bindPlaceRoute } from "@/lib/experience-builder/canonical-entity-binding";
+import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
+import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 
 const SITE = "https://quehacerenvalladolid.com";
 
 export const Route = createFileRoute("/oriente-maya/$destino/lugares/$slug")({
   loader: async ({ params }) => {
-    const place = await getPublicPlace({
-      data: { destinationSlug: params.destino, placeSlug: params.slug },
-    });
-    return { place: place ?? null };
+    const [place, evaluationLot] = await Promise.all([
+      getPublicPlace({ data: { destinationSlug: params.destino, placeSlug: params.slug } }),
+      // G8-R1-F1G/F1H · Lote interno de evaluación → noindex mientras dure.
+      getEvaluationLotSlugs().catch(() => null),
+    ]);
+    return {
+      place: place ?? null,
+      inEvaluationLot: isInEvaluationLot(evaluationLot, "place", params.slug),
+    };
   },
   head: ({ params, loaderData }) => {
     const place = loaderData?.place ?? null;
@@ -46,19 +53,24 @@ export const Route = createFileRoute("/oriente-maya/$destino/lugares/$slug")({
     }
     const title = `${place.name} · ${place.destination.name} · Oriente Maya`;
     const description = place.shortDescription ?? `${place.name} en ${place.destination.name}.`;
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: url },
+      { name: "twitter:card", content: "summary_large_image" },
+    ];
+    if (loaderData?.inEvaluationLot) {
+      meta.push({ name: "robots", content: "noindex, nofollow" });
+    }
     return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:type", content: "article" },
-        { property: "og:url", content: url },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
+      meta,
       links: [{ rel: "canonical", href: url }],
     };
   },
+
   component: PlaceRoute,
 });
 

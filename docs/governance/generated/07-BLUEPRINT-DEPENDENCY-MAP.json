@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.79",
     "state": "Approved",
-    "source_sha256": "eab5bb2748dff0e19cad5d9681b219f6a2983912c92cfd8dfbe51097793542f9",
+    "source_sha256": "55d36908e8cb5c42588e3c0318ba2e19f5dd32bc006e73cb7d4766737daf0061",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-29T00:00:00.000Z",
+  "generated_at": "2026-08-30T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -8829,6 +8829,67 @@
       "id": "ART:docs/governance/evidence/g8-r1-f1f-pilot-activation.json",
       "type": "artifact",
       "path": "docs/governance/evidence/g8-r1-f1f-pilot-activation.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/evaluation-lot.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/evaluation-lot.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/evaluation-lot.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/evaluation-lot.functions.ts"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/contenido-evaluacion.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/contenido-evaluacion.tsx"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-AD.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-AD.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-AD2.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-AD2.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/g8-r1-f1g-evaluation-lot-conversion.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/g8-r1-f1g-evaluation-lot-conversion.json"
+    },
+    {
+      "id": "ART:src/lib/omxds/pilot-allowlist.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/pilot-allowlist.ts"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-AE.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-AE.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/g8-r1-f1h-public-pilot.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/g8-r1-f1h-public-pilot.json"
     }
   ],
   "edges": [
@@ -23564,6 +23625,123 @@
       "evidence": "docs/blueprint/G8-R1-F1F-ACTIVACION-DEL-PILOTO-VISUAL-PREMIUM-NAVEGABLE-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1F-ACTIVACION-DEL-PILOTO-VISUAL-PREMIUM-NAVEGABLE-v1.0.md",
       "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/evaluation-lot.ts:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "origin": "ART:src/lib/omxds/evaluation-lot.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/evaluation-lot.functions.ts:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "origin": "ART:src/lib/omxds/evaluation-lot.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/_authenticated/cms/contenido-evaluacion.tsx:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/contenido-evaluacion.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-AD.json:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-AD.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-AD2.json:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-AD2.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/g8-r1-f1g-evaluation-lot-conversion.json:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/g8-r1-f1g-evaluation-lot-conversion.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1G-CONVERSION-Y-RETIRO-DEL-LOTE-DE-EVALUACION-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/pilot-allowlist.ts:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:src/lib/omxds/pilot-allowlist.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/canonical-catalog.server.ts:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:src/lib/alux/canonical-catalog.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/eb-sitemap.functions.ts:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/eb-sitemap.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.lugares.$slug.tsx:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/blocks/experience-subnav/ExperienceSubnav.tsx:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:src/components/experience-builder/blocks/experience-subnav/ExperienceSubnav.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-AE.json:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-AE.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/g8-r1-f1h-public-pilot.json:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "origin": "ART:docs/governance/evidence/g8-r1-f1h-public-pilot.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+      "verified_at": "2026-08-30"
     }
   ],
   "critical_chain_coverage": [
