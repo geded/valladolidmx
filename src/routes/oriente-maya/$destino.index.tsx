@@ -33,6 +33,8 @@ import {
   getDestinationMapPoints,
   getDestinationGalleryMedia,
 } from "@/lib/destinations/public-reads.functions";
+import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
+import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -84,6 +86,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       template,
       surfaceContractsEnabled,
       premiumEligibility,
+      evaluationLot,
     ] = await Promise.all([
       getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
@@ -93,6 +96,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
       getOmxdsSurfaceContractsFlag().catch(() => false),
       getDestinationPremiumEligibility({ data: { slug: params.destino } }).catch(() => null),
+      // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
+      getEvaluationLotSlugs().catch(() => null),
     ]);
     if (!mock && !db) throw notFound();
     const dest = {
@@ -132,11 +137,13 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       surfaceContractsEnabled,
       premiumEnabled,
       stableCoverUrl,
+      inEvaluationLot: isInEvaluationLot(evaluationLot, "destination", params.destino),
     };
   },
   head: ({ loaderData, params }) =>
     loaderData
       ? buildPublicHead({
+          noindex: loaderData.inEvaluationLot,
           title: `${loaderData.dest.name} — ${ORIENTE_MAYA.name} · ${SITE.name}`,
           description:
             loaderData.db?.description?.trim() ||
