@@ -1,0 +1,34 @@
+{
+  "wave": "G8-R1-F1G",
+  "recorded_at": "2026-08-30",
+  "lot_id": "G8-R1-F1G-EVALUATION-CONTENT",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "authorizations": ["PCA-2026-029-ADDENDUM-AD", "PCA-2026-029-ADDENDUM-AD2"],
+  "lot_state": {
+    "destinations": { "real_published": 6, "total": 6 },
+    "points_of_interest": { "real_published": 5, "total": 5 },
+    "businesses": { "real_published": 7, "demo_published": 8, "withdrawn_draft": 8, "total": 23 },
+    "products": { "real_published": 4, "demo_published": 1, "withdrawn_draft": 4, "total": 9 },
+    "events": { "archived": 10, "total": 10 },
+    "total": 53
+  },
+  "isolation_checks": {
+    "sitemap_loc_count": 23,
+    "sitemap_contains_lot_slugs": false,
+    "alux_canonical_catalog_excludes_lot": true,
+    "public_route_robots_taberna_de_los_frailes": "noindex, nofollow",
+    "public_route_robots_conato_1910": "noindex, nofollow"
+  },
+  "gates": {
+    "typecheck": "PASS",
+    "governance_check": "PASS",
+    "route_inventory_coverage": "PASS (220 rutas)",
+    "product_change_authorization_gate": "PASS (sensitive_changes=0)"
+  },
+  "invariants": {
+    "physical_deletes": 0,
+    "invented_data": 0,
+    "class_b_published": 0,
+    "reversible_withdrawals": true
+  }
+}
