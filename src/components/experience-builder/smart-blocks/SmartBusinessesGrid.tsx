@@ -8,6 +8,7 @@ export interface SmartBusinessItem {
   short_description?: string | null;
   cover_image_url?: string | null;
   logo_url?: string | null;
+  href?: string | null;
   [k: string]: unknown;
 }
 
@@ -29,7 +30,7 @@ export function SmartBusinessesGrid({
             title={String(b.name ?? "Empresa")}
             description={b.short_description ?? null}
             imageUrl={b.cover_image_url ?? b.logo_url ?? null}
-            href={b.slug ? `/empresa/${b.slug}` : null}
+            href={b.href ?? null}
             actions={
               b.id ? (
                 <AddToTravelPlanButton

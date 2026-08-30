@@ -7,6 +7,7 @@ export interface SmartDestinationItem {
   name?: string;
   short_description?: string | null;
   hero_image_url?: string | null;
+  href?: string | null;
   [k: string]: unknown;
 }
 
@@ -28,7 +29,7 @@ export function SmartDestinationsGrid({
             title={String(d.name ?? "Destino")}
             description={d.short_description ?? null}
             imageUrl={d.hero_image_url ?? null}
-            href={d.slug ? `/destino/${d.slug}` : null}
+            href={d.href ?? null}
             actions={
               d.id ? (
                 <AddToTravelPlanButton

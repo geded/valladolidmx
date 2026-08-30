@@ -9,6 +9,7 @@ export interface SmartEventItem {
   cover_image_url?: string | null;
   starts_at?: string | null;
   ends_at?: string | null;
+  href?: string | null;
   [k: string]: unknown;
 }
 
@@ -32,7 +33,7 @@ export function SmartEventsList({ items, title }: { items: SmartEventItem[]; tit
       {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
       <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
         {items.map((e, i) => {
-          const href = e.slug ? `/eventos/${e.slug}` : null;
+          const href = e.href ?? null;
           const Wrapper: any = href ? "a" : "div";
           const wrapperProps = href ? { href } : {};
           return (

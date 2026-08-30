@@ -9,6 +9,7 @@ export interface SmartProductItem {
   cover_image_url?: string | null;
   price?: number | null;
   currency?: string | null;
+  href?: string | null;
   [k: string]: unknown;
 }
 
@@ -37,7 +38,7 @@ export function SmartProductsGrid({ items, title }: { items: SmartProductItem[];
             title={String(p.name ?? "Producto")}
             description={p.short_description ?? null}
             imageUrl={p.cover_image_url ?? null}
-            href={p.slug ? `/producto/${p.slug}` : null}
+            href={p.href ?? null}
             badge={formatPrice(p.price ?? null, p.currency ?? null)}
             actions={
               p.id ? (
