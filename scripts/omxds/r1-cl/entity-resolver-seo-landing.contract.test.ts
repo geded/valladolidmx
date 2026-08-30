@@ -64,12 +64,25 @@ describe("C1 · resolutor canónico de 8 familias", () => {
     expect(r.presetId).toBeNull();
   });
 
-  test("lugar sin elegibilidad premium cae a superficie estándar", () => {
+  // G8-R1-F1L·P0 — familia ≠ medios.
+  test("lugar sin elegibilidad cinematográfica conserva su familia premium", () => {
     const r = resolveCanonicalEntityTemplate({
       entityId: "p3",
       entityType: "place",
       placeType: "cenote",
       premiumEligible: false,
+    });
+    expect(r.source).toBe("family");
+    expect(r.presetId).not.toBeNull();
+  });
+
+  test("sólo el contexto explícito degrada a superficie estándar", () => {
+    const r = resolveCanonicalEntityTemplate({
+      entityId: "p3",
+      entityType: "place",
+      placeType: "cenote",
+      premiumEligible: false,
+      forceStandardSurface: true,
     });
     expect(r.source).toBe("standard");
     expect(r.presetId).toBeNull();
