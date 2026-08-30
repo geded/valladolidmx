@@ -11,11 +11,9 @@
  * debe consumirlo en lugar de emitir `<img>` sin fallback.
  */
 import { cn } from "@/lib/utils";
+import { hasEditorialMedia, type EditorialMedia } from "./editorial-media";
 
-export interface EditorialMedia {
-  url: string;
-  alt: string;
-}
+export type { EditorialMedia };
 
 export interface EditorialMediaFrameProps {
   /** Medio acreditado. `null`, ausente o con `url` vacía ⇒ marcador neutral. */
@@ -28,11 +26,6 @@ export interface EditorialMediaFrameProps {
   markerClassName?: string;
   loading?: "eager" | "lazy";
   fetchPriority?: "high" | "low" | "auto";
-}
-
-/** `true` cuando existe un medio acreditado renderizable. */
-export function hasEditorialMedia(media?: EditorialMedia | null): boolean {
-  return typeof media?.url === "string" && media.url.trim().length > 0;
 }
 
 export function EditorialMediaFrame({

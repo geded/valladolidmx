@@ -204,7 +204,15 @@ function getPublicClient() {
   });
 }
 
-function applyFilter(builder: any, spec: TableSpec, f: SmartBlockFilter): any {
+/**
+ * Constructor de consulta estructural mínimo: evita `any` conservando el
+ * encadenamiento de PostgREST sin acoplarse a los genéricos del SDK.
+ */
+type QueryBuilder = {
+  [op: string]: (...args: unknown[]) => QueryBuilder;
+};
+
+function applyFilter(builder: QueryBuilder, spec: TableSpec, f: SmartBlockFilter): QueryBuilder {
   if (!ALLOWED_OPS.has(f.op)) return builder;
   if (!spec.filterable.includes(f.column)) return builder;
   if (f.op === "in") {
@@ -212,10 +220,11 @@ function applyFilter(builder: any, spec: TableSpec, f: SmartBlockFilter): any {
     return builder.in(f.column, f.value);
   }
   if (f.op === "ilike") return builder.ilike(f.column, String(f.value));
-  return (builder as any)[f.op](f.column, f.value);
+  const apply = builder[f.op];
+  return typeof apply === "function" ? apply.call(builder, f.column, f.value) : builder;
 }
 
-function applyOrder(builder: any, spec: TableSpec, o: SmartBlockOrderBy): any {
+function applyOrder(builder: QueryBuilder, spec: TableSpec, o: SmartBlockOrderBy): QueryBuilder {
   if (!spec.filterable.includes(o.column)) return builder;
   return builder.order(o.column, { ascending: (o.direction ?? "asc") === "asc" });
 }
@@ -242,12 +251,10 @@ async function signMedia(ids: string[]): Promise<Map<string, string>> {
       byBucket.set(bucket, list);
     }
     for (const [bucket, list] of byBucket) {
-      const { data: signed } = await supabaseAdmin.storage
-        .from(bucket)
-        .createSignedUrls(
-          list.map((l) => l.path),
-          60 * 60,
-        );
+      const { data: signed } = await supabaseAdmin.storage.from(bucket).createSignedUrls(
+        list.map((l) => l.path),
+        60 * 60,
+      );
       (signed ?? []).forEach((s, i) => {
         const entry = list[i];
         if (entry && s?.signedUrl) out.set(entry.id, s.signedUrl);
@@ -271,7 +278,7 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
     if (hit && Date.now() - hit.at < CACHE_TTL_MS) return { ...hit.value, cached: true };
 
     const client = getPublicClient();
-    let builder: any = client.from(q.table).select(spec.select);
+    let builder = client.from(q.table).select(spec.select) as unknown as QueryBuilder;
 
     // Elegibilidad pública fail-closed (no negociable por contrato).
     builder = builder.eq("status", "published").is("deleted_at", null);
@@ -297,7 +304,10 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
     // Se pide de más porque el adaptador descarta filas no elegibles.
     builder = builder.limit(Math.min(MAX_LIMIT, limit * 3));
 
-    const { data: rows, error } = await builder;
+    const { data: rows, error } = (await (builder as unknown as PromiseLike<{
+      data: Row[] | null;
+      error: { message: string } | null;
+    }>)) ?? { data: null, error: null };
     if (error) return { items: [], count: 0, cached: false, error: error.message };
 
     const adapted = ((rows ?? []) as Row[])

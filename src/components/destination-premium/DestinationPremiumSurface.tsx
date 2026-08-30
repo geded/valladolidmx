@@ -170,7 +170,11 @@ export function DestinationPremiumSurface({
           case "servicePreview":
             return service ? (
               <Container key={key} className="mt-14">
-                {renderServicePreview ? renderServicePreview(service) : <ServicioPreview content={content} service={service} />}
+                {renderServicePreview ? (
+                  renderServicePreview(service)
+                ) : (
+                  <ServicioPreview content={content} service={service} />
+                )}
               </Container>
             ) : null;
           case "map":
@@ -246,13 +250,22 @@ function HeroCopy({
   );
 }
 
-function HeroEditorial({ content, heroAction }: { content: DestinationPremiumContent; heroAction?: ReactNode }) {
+function HeroEditorial({
+  content,
+  heroAction,
+}: {
+  content: DestinationPremiumContent;
+  heroAction?: ReactNode;
+}) {
   const [a, b] = content.hero.supporting;
   const hasCover = Boolean(content.hero.cover.url);
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
       <HeroCopy content={content} heroAction={heroAction} />
-      <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"} className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div
+        data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}
+        className="grid grid-cols-2 gap-3 sm:gap-4"
+      >
         <EditorialMediaFrame
           media={content.hero.cover}
           label={content.hero.title}
@@ -272,7 +285,13 @@ function HeroEditorial({ content, heroAction }: { content: DestinationPremiumCon
   );
 }
 
-function HeroCinematografico({ content, heroAction }: { content: DestinationPremiumContent; heroAction?: ReactNode }) {
+function HeroCinematografico({
+  content,
+  heroAction,
+}: {
+  content: DestinationPremiumContent;
+  heroAction?: ReactNode;
+}) {
   if (!content.hero.cover.url) return <HeroEditorial content={content} heroAction={heroAction} />;
   return (
     <section className="relative overflow-hidden rounded-3xl shadow-floating">

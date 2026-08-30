@@ -187,22 +187,45 @@ export interface DestinationSurfaceContractBoundaryProps extends DestinationSurf
 }
 
 function PremiumRelatedCollection({ service, name }: { service: string; name: string }) {
-  const kind = service === "hoteles" ? "hotel" : service === "restaurantes" ? "restaurant" : service === "eventos" ? "event" : service === "experiencias" || service === "que-hacer" ? "experience" : "business";
+  const kind =
+    service === "hoteles"
+      ? "hotel"
+      : service === "restaurantes"
+        ? "restaurant"
+        : service === "eventos"
+          ? "event"
+          : service === "experiencias" || service === "que-hacer"
+            ? "experience"
+            : "business";
   return (
-    <ExperienceRelatedCollectionBlock config={{
-      source: "destination",
-      entityKind: kind,
-      variant: "grid",
-      columns: 3,
-      heading: `${service === "que-hacer" ? "Qué hacer" : service.charAt(0).toUpperCase() + service.slice(1)} en ${name}`,
-      emptyMessage: "Aún no hay opciones publicadas en esta categoría.",
-      groups: [{ id: service, entityKind: kind, categorySlug: service, maxItems: 6, variant: "grid" }],
-      capabilities: { showImage: true, showMeta: true, showBadges: true, showPrice: true, showDate: true, showKindBadge: true, dedupe: true },
-    }} />
+    <ExperienceRelatedCollectionBlock
+      config={{
+        source: "destination",
+        entityKind: kind,
+        variant: "grid",
+        columns: 3,
+        heading: `${service === "que-hacer" ? "Qué hacer" : service.charAt(0).toUpperCase() + service.slice(1)} en ${name}`,
+        emptyMessage: "Aún no hay opciones publicadas en esta categoría.",
+        groups: [
+          { id: service, entityKind: kind, categorySlug: service, maxItems: 6, variant: "grid" },
+        ],
+        capabilities: {
+          showImage: true,
+          showMeta: true,
+          showBadges: true,
+          showPrice: true,
+          showDate: true,
+          showKindBadge: true,
+          dedupe: true,
+        },
+      }}
+    />
   );
 }
 
-function withoutUnaccreditedRelatedMedia(related?: DestinationRelatedDTO): DestinationRelatedDTO | null {
+function withoutUnaccreditedRelatedMedia(
+  related?: DestinationRelatedDTO,
+): DestinationRelatedDTO | null {
   if (!related) return null;
   const stripBusiness = <T extends { cover_url?: string | null }>(item: T): T => ({
     ...item,
@@ -231,7 +254,9 @@ export function DestinationSurfaceContractBoundary({
   premiumEnabled,
 }: DestinationSurfaceContractBoundaryProps) {
   if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
-    const accreditedMedia = (galleryMedia ?? []).filter((item) => !hasForbiddenDestinationMedia(item));
+    const accreditedMedia = (galleryMedia ?? []).filter(
+      (item) => !hasForbiddenDestinationMedia(item),
+    );
     const safeRelated = withoutUnaccreditedRelatedMedia(related);
     const content = buildDestinationPremiumRuntime({
       id: `destination:${destinationSlug}`,
@@ -240,14 +265,40 @@ export function DestinationSurfaceContractBoundary({
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
     });
     return (
-      <div data-omxds-visual-foundations="enabled" data-destination-template="premium-g4" data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}>
-        <DestinationSurfaceProvider db={dbData} related={safeRelated} slug={destinationSlug} mapPoints={mapPoints} galleryUrls={accreditedMedia.map((item) => item.url)} galleryMedia={accreditedMedia}>
+      <div
+        data-omxds-visual-foundations="enabled"
+        data-destination-template="premium-g4"
+        data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}
+      >
+        <DestinationSurfaceProvider
+          db={dbData}
+          related={safeRelated}
+          slug={destinationSlug}
+          mapPoints={mapPoints}
+          galleryUrls={accreditedMedia.map((item) => item.url)}
+          galleryMedia={accreditedMedia}
+        >
           <DestinationPremiumSurface
             content={content}
             heroVariant={premiumEnabled ? "cinematic" : "editorial"}
             sections={{ gallery: accreditedMedia.length > 0 }}
-            heroAction={dbData.id ? <AddToTravelPlanButton kind="destination" targetId={dbData.id} title={dbData.name} slug={destinationSlug} imageUrl={content.hero.cover.url || null} subtitle={dbData.tagline} variant="full" eligibilityMode="legacy" /> : null}
-            renderServicePreview={(service) => <PremiumRelatedCollection service={service.key} name={dbData.name} />}
+            heroAction={
+              dbData.id ? (
+                <AddToTravelPlanButton
+                  kind="destination"
+                  targetId={dbData.id}
+                  title={dbData.name}
+                  slug={destinationSlug}
+                  imageUrl={content.hero.cover.url || null}
+                  subtitle={dbData.tagline}
+                  variant="full"
+                  eligibilityMode="legacy"
+                />
+              ) : null
+            }
+            renderServicePreview={(service) => (
+              <PremiumRelatedCollection service={service.key} name={dbData.name} />
+            )}
           />
         </DestinationSurfaceProvider>
       </div>
