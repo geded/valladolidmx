@@ -962,12 +962,12 @@ function EditorialSection({ content }: { content: HomePremiumContent }) {
             key={item.title}
             className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block"
           >
-            <img
-              src={item.media.url}
-              alt={item.media.alt}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={item.media}
+              label={item.title}
               className="h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto"
             />
+
             <div className="p-4">
               <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
               <h3 className="mt-1 font-display text-xl">{item.title}</h3>
