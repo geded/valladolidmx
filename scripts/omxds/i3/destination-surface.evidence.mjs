@@ -130,6 +130,12 @@ const acknowledgedRouteRevisions = [
     sha256: "757b76081ec68a96d5df0c204d0662907800275ea2b8b90d52c6d3fa0534244e",
     authorizations: ["PCA-2026-025", "PCA-2026-026", "PCA-2026-032"],
   },
+  {
+    // G8-R1-F1L · noindex gobernado del piloto en la ruta canónica de destino.
+    package: "g8-r1-f1l-destination-route-consolidation",
+    sha256: "86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0",
+    authorizations: ["PCA-2026-056"],
+  },
 ];
 
 const routeDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", routePath], {

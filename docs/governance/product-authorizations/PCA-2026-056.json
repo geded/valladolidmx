@@ -5,7 +5,7 @@
   "status": "Approved",
   "branch": "integration/lovable-valladolidmx",
   "blueprint": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-  "founder_authority": "Autorización Founder del 2026-08-30 limitada a corregir la trazabilidad del PR #58: admite exclusivamente el digest SHA-256 05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71 de src/components/surfaces/DestinationSurface.tsx, preservando el flag OFF y sin modificar componente, funcionalidad, datos, medios ni alcance.",
+  "founder_authority": "Autorizaciones Founder del 2026-08-30 limitadas a corregir la trazabilidad del PR #58: admiten exclusivamente el digest SHA-256 05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71 de src/components/surfaces/DestinationSurface.tsx y el digest SHA-256 86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0 de src/routes/oriente-maya/$destino.index.tsx, preservando el flag OFF y sin modificar componente, ruta, funcionalidad, datos, medios ni alcance.",
   "permissions": [
     {
       "operation": "modify",
@@ -14,6 +14,10 @@
     {
       "operation": "modify",
       "path": "scripts/omxds/i3/destination-surface.evidence.mjs"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx"
     }
   ],
   "acknowledged_revisions": [
@@ -21,6 +25,12 @@
       "operation": "modify",
       "path": "src/components/surfaces/DestinationSurface.tsx",
       "sha256": "05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx",
+      "sha256": "86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0",
       "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
     }
   ],
