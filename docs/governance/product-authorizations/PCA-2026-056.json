@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-056",
+  "title": "G8-R1-F1L · Admisión exacta de revisión DestinationSurface para consolidación pública",
+  "status": "Approved",
+  "branch": "integration/lovable-valladolidmx",
+  "blueprint": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-08-30 limitada a corregir la trazabilidad del PR #58: admite exclusivamente el digest SHA-256 05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71 de src/components/surfaces/DestinationSurface.tsx, preservando el flag OFF y sin modificar componente, funcionalidad, datos, medios ni alcance.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "scripts/omxds/i3/destination-surface.evidence.mjs"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "sha256": "05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run validate:i3:a",
+    "bun run governance:check"
+  ]
+}

@@ -97,6 +97,12 @@ const acknowledgedSurfaceRevisions = [
     sha256: "e0073c58b623b32c871f54f95c00becd39de5750b77f73c2423d72f6ce465b05",
     authorizations: ["PCA-2026-035"],
   },
+  {
+    // G8-R1-F1L · revisión exacta acreditada para consolidación pública gobernada.
+    package: "g8-r1-f1l-destination-surface-consolidation",
+    sha256: "05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71",
+    authorizations: ["PCA-2026-056"],
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
