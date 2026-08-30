@@ -448,9 +448,21 @@ export interface EntityTemplateResolutionInput {
   readonly productType?: string | null;
   /** Override editorial individual (opcional). */
   readonly override?: EntityTemplateOverride | null;
-  /** Elegibilidad premium de la entidad (por defecto `true`). */
+  /**
+   * G8-R1-F1L·P0 — DEPRECADO como criterio de familia.
+   *
+   * La elegibilidad premium (medios, portada, galería) NUNCA cambia la
+   * familia ni el preset: sólo decide el MODO (Editorial vs Cinematográfica).
+   * Este campo se conserva por compatibilidad y ya no degrada a estándar.
+   */
   readonly premiumEligible?: boolean;
+  /**
+   * Contexto que exige explícitamente superficie estándar (por ejemplo una
+   * vista previa interna de CMS). Único interruptor que degrada la familia.
+   */
+  readonly forceStandardSurface?: boolean;
 }
+
 
 export type EntityTemplateResolutionSource = "override" | "family" | "standard";
 
