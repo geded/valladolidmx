@@ -131,6 +131,9 @@ function OrienteMayaIndex() {
             content={premiumContent}
             heroVariant="editorial"
             sections={{
+              // La portada regional enumera destinos en `nearby`; no reutiliza
+              // el selector de categorías de una ficha de destino.
+              services: false,
               gallery: false,
               servicePreview: false,
               map: premiumContent.map.points.length > 0,

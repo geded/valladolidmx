@@ -556,7 +556,6 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       resolveTerritoryMapPointsQuery(),
     ]);
 
-
     const destinos = cardsFrom(destRes, () => "Destino");
     const businesses = cardsFrom(bizRes, (item) =>
       typeof item.category_slug === "string" ? item.category_slug : "",

@@ -18,6 +18,7 @@
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
 import { useMemo, useState, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CalendarDays,
@@ -108,7 +109,7 @@ export function DestinationPremiumSurface({
         lng: p.lng,
         title: p.title,
         subtitle: p.subtitle,
-        href: null,
+        href: p.href ?? null,
         thumbUrl: null,
         badge: p.badge,
         priceLabel: null,
@@ -544,33 +545,46 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{content.nearby.description}</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {content.nearby.items.map((d) => (
-          <article
-            key={d.slug}
-            className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
-          >
-            <div className="relative">
-              <EditorialMediaFrame
-                media={d.media}
-                label={d.name}
-                className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-              {isPuebloMagico(d.slug) ? (
-                <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
-                  Pueblo Mágico
-                </span>
-              ) : null}
-            </div>
-            <div className="p-4">
-              <h3 className="font-serif text-lg">{d.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
-              <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
-                <MapIcon className="size-3.5" aria-hidden />
-                {d.distance}
-              </p>
-            </div>
-          </article>
-        ))}
+        {content.nearby.items.map((d) => {
+          const card = (
+            <article
+              key={d.slug}
+              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+            >
+              <div className="relative">
+                <EditorialMediaFrame
+                  media={d.media}
+                  label={d.name}
+                  className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+                {isPuebloMagico(d.slug) ? (
+                  <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
+                    Pueblo Mágico
+                  </span>
+                ) : null}
+              </div>
+              <div className="p-4">
+                <h3 className="font-serif text-lg">{d.name}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
+                <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
+                  <MapIcon className="size-3.5" aria-hidden />
+                  {d.distance}
+                </p>
+              </div>
+            </article>
+          );
+          return d.href ? (
+            <Link
+              key={d.slug}
+              to={d.href}
+              className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {card}
+            </Link>
+          ) : (
+            card
+          );
+        })}
       </div>
     </section>
   );
