@@ -262,6 +262,8 @@ describe("elegibilidad premium determinista", () => {
    * Cinematográfico. El resto de requisitos sigue siendo bloqueante.
    */
   const mediaCases: [string, Partial<PremiumEligibilityFacts>, string][] = [
+    ["galería insuficiente", { approvedGalleryCount: 1 }, "gallery_minimum"],
+    ["sin portada", { cover: null }, "cover:cover_missing"],
   ];
 
   for (const [name, patch, missing] of mediaCases) {
@@ -278,11 +280,9 @@ describe("elegibilidad premium determinista", () => {
     ["sin clasificación", { canonicalClassification: null }, "canonical_classification"],
     ["sin ruta canónica", { canonicalPath: null }, "canonical_path"],
     ["con contenido demo", { isDemoSeed: true }, "demo_content_present"],
-    ["galería insuficiente", { approvedGalleryCount: 1 }, "gallery_minimum"],
     ["sin ubicación", { hasValidLocation: false }, "location"],
     ["sin relaciones", { hasRequiredRelations: false }, "required_relations"],
     ["sin bitácora", { hasAuditTrail: false }, "audit_trail"],
-    ["sin portada", { cover: null }, "cover:cover_missing"],
   ];
 
   for (const [name, patch, missing] of cases) {
