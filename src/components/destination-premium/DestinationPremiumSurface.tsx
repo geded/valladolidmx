@@ -489,10 +489,9 @@ function ServicioPreview({
             key={i}
             className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
           >
-            <img
-              src={service.media.url}
-              alt={service.media.alt}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={service.media}
+              label={service.title}
               className="h-44 w-full object-cover"
             />
             <div className="p-4">
@@ -532,10 +531,9 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
             className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
           >
             <div className="relative">
-              <img
-                src={d.media.url}
-                alt={d.media.alt}
-                loading="lazy"
+              <EditorialMediaFrame
+                media={d.media}
+                label={d.name}
                 className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
               {isPuebloMagico(d.slug) ? (
