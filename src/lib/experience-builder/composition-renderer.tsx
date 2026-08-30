@@ -146,8 +146,6 @@ import type {
   ExperienceMapPoint,
 } from "@/lib/experience-builder/blocks/experience-map/types";
 
-
-
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
  * forma controlada en ambos mapas (Studio + producción) SIN reemplazar
@@ -449,7 +447,6 @@ function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
   );
 }
 
-
 /**
  * G8-E · `vmx.destination.premium-g4` — render único (Studio, preview y
  * producción). Autoridad visual: `DestinationPremiumSurface`.
@@ -704,7 +701,6 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
           text_safe_zone: node.config.text_safe_zone as string | undefined,
           __typography:
             (node.config.__typography as Record<string, FieldTypography> | undefined) ?? undefined,
-
         }}
       />
     );
@@ -958,7 +954,6 @@ function readMapDto(config: Record<string, unknown>): ExperienceMapDTO | null {
   } as ExperienceMapDTO;
 }
 
-
 const ExperienceMapRender: BlockPreview = ({ node }) => {
   const dto = readMapDto(node.config);
   // G8-R1-F1J-HOME-PREMIUM-R2 · Sin puntos estáticos el bloque no se omite:
@@ -966,7 +961,6 @@ const ExperienceMapRender: BlockPreview = ({ node }) => {
   if (!dto) return <SmartTerritoryMap config={node.config} />;
   return <ExperienceMapBlock dto={dto} />;
 };
-
 
 PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -977,7 +971,6 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
 (STUDIO_PREVIEW_MAP as any)["vmx.alux.planner"] = ({ node }: { node: CompositionNode }) => (
   <AluxPlannerBlock config={node.config} />
 );
-
 
 /* ------------------------------------------------------------------ *
  * Bloque formulario configurable
