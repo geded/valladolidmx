@@ -265,30 +265,102 @@ const generatedPlatformArtifacts = new Map([
 // La ruta Y el digest deben coincidir. No se admiten prefijos, comodines ni
 // futuras migraciones por pertenecer al mismo directorio.
 const acknowledgedHistoricalMigrations = new Map([
-  ["supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql", "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9"],
-  ["supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql", "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9"],
-  ["supabase/migrations/20260828204226_4793613a-f45d-4635-a595-c53ee101cf58.sql", "6088b5b936439f34a20e7085765116f030095e3f0d24b1a1e206ecce89fec373"],
-  ["supabase/migrations/20260828220117_e2fcc5fa-be09-4350-9f74-2344a2c13c5b.sql", "ab5a719e0880f55239d5fe982d26f499ea7392c750457ec7f982dcc75ff18b21"],
-  ["supabase/migrations/20260829064842_283114c3-9498-491d-846f-1db486601eb6.sql", "1e6dbedbf4cac5a08613d8fdc7f4efcef8e517f411046524de6b19dfd426b0a8"],
-  ["supabase/migrations/20260829070641_959a44c6-4ddf-4810-aba3-7f80895563a1.sql", "99b81f982a95df01e894e30cfe1ed9a4a2c11f0b6562190b21b49af3fd2c079d"],
-  ["supabase/migrations/20260829074909_55bc2a54-6904-4c1e-88e3-6653cee1e03d.sql", "a3825853c690fba1739268a47295f69264d0c36b21b7946924da9150ce70bb85"],
-  ["supabase/migrations/20260830010427_7eabcc34-63e3-46a9-8a44-5fd07956065b.sql", "770b3b7cec5ea91f15c9b57c30a74252ec96a68a70f81ce9584bdb00e7d15216"],
-  ["supabase/migrations/20260830010547_4b12cc68-4b53-44ab-a63d-1111d2ea99e9.sql", "deb6546e1690f3bc4c1fc137b9ce84f03ebb99df982a0fa5dea527c1fdb9e67f"],
-  ["supabase/migrations/20260830012531_0ec3e62d-a748-4699-882b-c00c46e3d42b.sql", "3fc920f383e4f43d4e76476e1f9e93cffdeae2fc21ca9ff558225957b213d75a"],
-  ["supabase/migrations/20260830013318_5ba0c631-644e-440f-8736-b4a631837a3b.sql", "7fb1a8438ce8b3bfb10567bd4c852dcce535ad50a2c18fd408f2eb71e892e74d"],
-  ["supabase/migrations/20260830023112_3fa6c24e-b35f-40e4-9a11-40f101d8d4ee.sql", "765c5572598da4aad5c968c24fb4afe1aa17feefb861c853e545384a32cca13d"],
-  ["supabase/migrations/20260830031550_88a59552-8f9e-4575-acc9-7721b2015fe0.sql", "5fe1792a72d43b35af85f1916df6ae389dc1ada09fa6f8b01504e039ac713afe"],
-  ["supabase/migrations/20260830032801_a07b4165-db34-49c6-8ba3-fcef32be4975.sql", "ff786dd354683a94104454d9e9b54f5cf2f72546cc1393a96127a776e83550ac"],
-  ["supabase/migrations/20260830032821_2b64c84f-7d91-4f68-bd79-76f6423013b0.sql", "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4"],
-  ["supabase/migrations/20260830032831_c6039095-dd13-4846-b408-ee3ebbba271c.sql", "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4"],
-  ["supabase/migrations/20260830032850_7124625f-09a6-4e7b-9e26-ed9cf9335a4a.sql", "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4"],
-  ["supabase/migrations/20260830032901_6377dfbe-e823-4196-bbcc-f19aa032707b.sql", "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4"],
-  ["supabase/migrations/20260830032925_695e1257-6844-42b2-946f-8f4e5df36184.sql", "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4"],
-  ["supabase/migrations/20260830032934_956967e9-6362-448d-9082-2c792658ee5c.sql", "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4"],
-  ["supabase/migrations/20260830034311_63bb4c3a-49e6-46f2-9055-67ba6f42ccb5.sql", "41acc445b69a622b31af8d60bd520b9c4d954c364a3f37e2eaa560db6ae2aef6"],
-  ["supabase/migrations/20260830055802_b9ccf253-32dc-4d95-8a35-1e34926abd53.sql", "61a0754ced03d009753bd4a31cd46f7f40ef5e183cd3f108220d5ed0979a938d"],
-  ["supabase/migrations/20260830143421_d5d27075-8fd6-4b15-b115-a16b7ed7aa4b.sql", "3398df13e6a1637460642b9b5ace266113026a180b2cd2c3b93045435d0aeffa"],
-  ["supabase/migrations/20260830143533_2b67c92f-81d4-4199-bbb1-8a613b12352c.sql", "df9065196a7ccc91651e47849b7fd48c7b35cb34abe8ef44ed1ba2fbd5e49d67"],
+  [
+    "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql",
+    "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9",
+  ],
+  [
+    "supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql",
+    "ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9",
+  ],
+  [
+    "supabase/migrations/20260828204226_4793613a-f45d-4635-a595-c53ee101cf58.sql",
+    "6088b5b936439f34a20e7085765116f030095e3f0d24b1a1e206ecce89fec373",
+  ],
+  [
+    "supabase/migrations/20260828220117_e2fcc5fa-be09-4350-9f74-2344a2c13c5b.sql",
+    "ab5a719e0880f55239d5fe982d26f499ea7392c750457ec7f982dcc75ff18b21",
+  ],
+  [
+    "supabase/migrations/20260829064842_283114c3-9498-491d-846f-1db486601eb6.sql",
+    "1e6dbedbf4cac5a08613d8fdc7f4efcef8e517f411046524de6b19dfd426b0a8",
+  ],
+  [
+    "supabase/migrations/20260829070641_959a44c6-4ddf-4810-aba3-7f80895563a1.sql",
+    "99b81f982a95df01e894e30cfe1ed9a4a2c11f0b6562190b21b49af3fd2c079d",
+  ],
+  [
+    "supabase/migrations/20260829074909_55bc2a54-6904-4c1e-88e3-6653cee1e03d.sql",
+    "a3825853c690fba1739268a47295f69264d0c36b21b7946924da9150ce70bb85",
+  ],
+  [
+    "supabase/migrations/20260830010427_7eabcc34-63e3-46a9-8a44-5fd07956065b.sql",
+    "770b3b7cec5ea91f15c9b57c30a74252ec96a68a70f81ce9584bdb00e7d15216",
+  ],
+  [
+    "supabase/migrations/20260830010547_4b12cc68-4b53-44ab-a63d-1111d2ea99e9.sql",
+    "deb6546e1690f3bc4c1fc137b9ce84f03ebb99df982a0fa5dea527c1fdb9e67f",
+  ],
+  [
+    "supabase/migrations/20260830012531_0ec3e62d-a748-4699-882b-c00c46e3d42b.sql",
+    "3fc920f383e4f43d4e76476e1f9e93cffdeae2fc21ca9ff558225957b213d75a",
+  ],
+  [
+    "supabase/migrations/20260830013318_5ba0c631-644e-440f-8736-b4a631837a3b.sql",
+    "7fb1a8438ce8b3bfb10567bd4c852dcce535ad50a2c18fd408f2eb71e892e74d",
+  ],
+  [
+    "supabase/migrations/20260830023112_3fa6c24e-b35f-40e4-9a11-40f101d8d4ee.sql",
+    "765c5572598da4aad5c968c24fb4afe1aa17feefb861c853e545384a32cca13d",
+  ],
+  [
+    "supabase/migrations/20260830031550_88a59552-8f9e-4575-acc9-7721b2015fe0.sql",
+    "5fe1792a72d43b35af85f1916df6ae389dc1ada09fa6f8b01504e039ac713afe",
+  ],
+  [
+    "supabase/migrations/20260830032801_a07b4165-db34-49c6-8ba3-fcef32be4975.sql",
+    "ff786dd354683a94104454d9e9b54f5cf2f72546cc1393a96127a776e83550ac",
+  ],
+  [
+    "supabase/migrations/20260830032821_2b64c84f-7d91-4f68-bd79-76f6423013b0.sql",
+    "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+  ],
+  [
+    "supabase/migrations/20260830032831_c6039095-dd13-4846-b408-ee3ebbba271c.sql",
+    "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+  ],
+  [
+    "supabase/migrations/20260830032850_7124625f-09a6-4e7b-9e26-ed9cf9335a4a.sql",
+    "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+  ],
+  [
+    "supabase/migrations/20260830032901_6377dfbe-e823-4196-bbcc-f19aa032707b.sql",
+    "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+  ],
+  [
+    "supabase/migrations/20260830032925_695e1257-6844-42b2-946f-8f4e5df36184.sql",
+    "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+  ],
+  [
+    "supabase/migrations/20260830032934_956967e9-6362-448d-9082-2c792658ee5c.sql",
+    "354b7196c9ba5fb4b21cf615bb6ec4cd5c07503c34229feef033fc081a8c03f4",
+  ],
+  [
+    "supabase/migrations/20260830034311_63bb4c3a-49e6-46f2-9055-67ba6f42ccb5.sql",
+    "41acc445b69a622b31af8d60bd520b9c4d954c364a3f37e2eaa560db6ae2aef6",
+  ],
+  [
+    "supabase/migrations/20260830055802_b9ccf253-32dc-4d95-8a35-1e34926abd53.sql",
+    "61a0754ced03d009753bd4a31cd46f7f40ef5e183cd3f108220d5ed0979a938d",
+  ],
+  [
+    "supabase/migrations/20260830143421_d5d27075-8fd6-4b15-b115-a16b7ed7aa4b.sql",
+    "3398df13e6a1637460642b9b5ace266113026a180b2cd2c3b93045435d0aeffa",
+  ],
+  [
+    "supabase/migrations/20260830143533_2b67c92f-81d4-4199-bbb1-8a613b12352c.sql",
+    "df9065196a7ccc91651e47849b7fd48c7b35cb34abe8ef44ed1ba2fbd5e49d67",
+  ],
 ]);
 
 for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
