@@ -1,7 +1,7 @@
 import type {
   PublicDestinationDTO,
-  DestinationMapPointDTO,
 } from "@/lib/destinations/public-reads.functions";
+import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import type {
   DestinationPremiumContent,
@@ -16,7 +16,7 @@ export function buildDestinationPremiumRuntime(input: {
   id: string;
   destination: PublicDestinationDTO;
   media: PublicMediaAttribution[];
-  mapPoints: DestinationMapPointDTO[];
+  mapPoints: ExperienceMapPoint[];
 }): DestinationPremiumContent {
   const { destination, media, mapPoints } = input;
   const cover = media.find((item) => item.role === "cover") ?? null;

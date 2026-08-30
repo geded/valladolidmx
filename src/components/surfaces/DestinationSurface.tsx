@@ -57,6 +57,7 @@ import {
   type DestinationBlockInput,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
+import { hasForbiddenDestinationMedia } from "@/lib/destinations/public-media-policy";
 import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
 import { buildDestinationPremiumRuntime } from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
