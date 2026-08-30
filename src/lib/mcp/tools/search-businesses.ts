@@ -4,6 +4,7 @@ import { supabaseFor } from "../lib/ctx-supabase";
 import { withMcpGuardrails } from "../lib/wrap";
 import { sanitizeSearchQuery, SEARCH_RESULT_HARD_CAP } from "../lib/sanitize";
 import { LocaleSchema } from "../lib/contracts";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 const CONTRACT_VERSION = "1.1.0";
 
@@ -62,6 +63,8 @@ export default defineTool({
         .from("businesses")
         .select("id, slug, name, short_description, city, primary_category_id")
         .eq("status", "published")
+        // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
         .ilike("name", `%${clean.value}%`)
         .limit(cappedLimit);
       if (error) {

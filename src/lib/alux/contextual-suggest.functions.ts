@@ -30,7 +30,8 @@
  *    alineado con el contrato Explainable-by-Default (Política 06).
  */
 import { createServerFn } from "@tanstack/react-start";
-import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { z } from "zod";
 import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
@@ -273,6 +274,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     const destination = dest;
 
     // 2. Empresas publicadas del destino con su categoría primaria.
+    // G8-R1-F1I-R1 · DEF-F1I-001 — autoridad única de elegibilidad pública:
+    // sólo entran a Alux las empresas con revisión de fuente aprobada.
     const { data: biz, error: bErr } = await sb
       .from("businesses")
       .select(
@@ -281,6 +284,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       .eq("destination_id", dest.id)
       .eq("status", "published")
       .is("deleted_at", null)
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(60);
     if (bErr) return { ...EMPTY, reason: "No se pudieron cargar empresas del destino." };
@@ -294,20 +298,33 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       category_name: string;
     };
     const businesses: BizRow[] = (biz ?? [])
-      // G8-R1-F1H · empresas owner_submitted sin revisión no entran a Alux
-      // (ni ellas ni sus productos, que se resuelven por `bizIdsInDest`).
-      .filter((row) => !isQuarantinedBusiness(String(row.slug)))
       .map((row) => {
-      const cat = (row.business_categories as { slug?: unknown; name?: unknown } | null) ?? null;
-      return {
-        id: String(row.id),
-        slug: String(row.slug),
-        display_name: String(row.display_name),
-        tagline: (row.tagline as string | null) ?? null,
-        category_slug: typeof cat?.slug === "string" ? cat.slug : "",
-        category_name: typeof cat?.name === "string" ? cat.name : "",
-      };
-    });
+        const cat = (row.business_categories as { slug?: unknown; name?: unknown } | null) ?? null;
+        return {
+          id: String(row.id),
+          slug: String(row.slug),
+          display_name: String(row.display_name),
+          tagline: (row.tagline as string | null) ?? null,
+          category_slug: typeof cat?.slug === "string" ? cat.slug : "",
+          category_name: typeof cat?.name === "string" ? cat.name : "",
+        };
+      })
+      // G8-R1-F1I-R1 · DEF-F1I-002 — Alux nunca construye rutas a mano: si el
+      // resolutor canónico no puede emitir URL, la ficha no se sugiere.
+      .filter((row) => canonicalBusinessUrl(row) !== null);
+
+    /** URL canónica de una empresa vía autoridad de navegación (nunca manual). */
+    function canonicalBusinessUrl(row: {
+      slug: string;
+      category_slug: string;
+    }): string | null {
+      return buildCanonicalEntityUrl({
+        entityType: "business",
+        slug: row.slug,
+        destinationSlug: destination.slug,
+        categorySlug: row.category_slug,
+      });
+    }
 
     // 2b. Promociones activas de negocios del destino (A6).
     const bizIdsInDest = businesses.map((b) => b.id);
@@ -491,7 +508,9 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     }
 
     function buildSuggestion(row: BizRow, rationale: string): AluxContextualSuggestion {
-      const href = `/oriente-maya/${destination.slug}/${row.category_slug || "empresas"}/${row.slug}`;
+      // DEF-F1I-002 · URL emitida por el resolutor canónico; las filas sin
+      // URL resoluble ya quedaron fuera del conjunto de candidatas.
+      const href = canonicalBusinessUrl(row) ?? "";
       const clean = rationale.trim().replace(/\s+/g, " ");
       const safeRationale =
         clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);

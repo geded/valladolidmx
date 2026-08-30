@@ -11,6 +11,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface DiscoveryCategoryItem {
   /** Slug canónico de la categoría (business_categories.slug). */
@@ -129,6 +130,8 @@ export const getDiscoveryNavigator = createServerFn({ method: "GET" })
       .select("id, business_categories!businesses_primary_category_id_fkey ( slug, name )")
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .limit(2000);
 
     if (destinationId) {
