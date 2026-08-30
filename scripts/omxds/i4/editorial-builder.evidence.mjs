@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import {
@@ -170,6 +171,7 @@ const authorizedI4AConsumers = [
   "src/lib/experience-builder/block-registry.ts",
   "src/lib/experience-builder/block-library.ts",
   "src/components/experience-builder/VisualStudio.tsx",
+  "src/lib/experience-builder/premium-template-registry.ts",
   "src/lib/experience-builder/studio.functions.ts",
 ];
 const i4AConsumers = filesBelow("src")
@@ -189,6 +191,22 @@ if (i4AConsumers.length) {
   );
   assert.equal(i4AAuthorization.status, "Approved");
   assert.deepEqual(i4AConsumers, [...authorizedI4AConsumers].sort());
+  const premiumTemplateRegistryPath = "src/lib/experience-builder/premium-template-registry.ts";
+  const premiumTemplateRegistrySha256 =
+    "5f05a70a0ebb8e8ea8880e3b2531eb430251c87f565d7ea35ce38f910daadbb1";
+  assert.equal(
+    createHash("sha256").update(readFileSync(premiumTemplateRegistryPath)).digest("hex"),
+    premiumTemplateRegistrySha256,
+    "I4-0 premium template registry changed after exact acknowledgment",
+  );
+  assert.ok(
+    (i4AAuthorization.permissions ?? []).some(
+      (permission) =>
+        permission.operation === "create" && permission.path === premiumTemplateRegistryPath,
+    ),
+    "PCA-2026-013 does not authorize the exact premium template registry path",
+  );
+  assert.match(i4AAuthorization.founder_authority, new RegExp(premiumTemplateRegistrySha256));
 } else {
   assert.deepEqual(i4AConsumers, []);
 }

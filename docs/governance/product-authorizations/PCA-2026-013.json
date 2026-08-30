@@ -3,15 +3,19 @@
   "id": "PCA-2026-013",
   "title": "OMXDS V1 · I4-A Authoring Allowlist & Legacy Confinement",
   "status": "Approved",
-  "branch": "feature/omxds-i4-a-authoring-allowlist-legacy-confinement-v1",
+  "branch": "integration/lovable-valladolidmx",
   "blueprint": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
-  "founder_authority": "Founder Directive 2026-08-04 · Ejecutar de punta a punta exclusivamente I4-A sobre main@1fe83c8bfb8874468560c9c3c7d89ded0073a252, conforme a 18.47 y su addendum de alcance: exactamente 16 rutas, agregando únicamente scripts/omxds/i4/editorial-builder.evidence.mjs para reconocer cuatro consumidores cerrados cuando PCA-2026-013 esté Approved; flags OFF, fail-closed, un commit y PR borrador sólo con PASS total; sin merge, producción, datos reales ni I4-B/C/D, P0, P1, L1 o S1.",
+  "founder_authority": "Founder Directive 2026-08-04 · Ejecutar de punta a punta exclusivamente I4-A sobre main@1fe83c8bfb8874468560c9c3c7d89ded0073a252, conforme a 18.47 y su addendum de alcance: exactamente 16 rutas, agregando únicamente scripts/omxds/i4/editorial-builder.evidence.mjs para reconocer cuatro consumidores cerrados cuando PCA-2026-013 esté Approved; flags OFF, fail-closed, un commit y PR borrador sólo con PASS total; sin merge, producción, datos reales ni I4-B/C/D, P0, P1, L1 o S1. Addendum Founder 2026-08-30: reconocer exclusivamente src/lib/experience-builder/premium-template-registry.ts en su revisión SHA-256 exacta 5f05a70a0ebb8e8ea8880e3b2531eb430251c87f565d7ea35ce38f910daadbb1 mediante esta PCA y la evidencia I4-0, sin modificar el archivo funcional ni admitir comodines, excepciones genéricas o revisiones futuras; fusionar PR #58 sólo con Governance Integrity completo en PASS.",
   "permissions": [
     { "operation": "modify", "path": "src/lib/experience-builder/editorial-builder-policy.ts" },
     { "operation": "modify", "path": "src/lib/experience-builder/block-registry.ts" },
     { "operation": "modify", "path": "src/lib/experience-builder/block-library.ts" },
     { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
     { "operation": "modify", "path": "src/lib/experience-builder/studio.functions.ts" },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/premium-template-registry.ts"
+    },
     { "operation": "modify", "path": "package.json" }
   ],
   "public_routes": [],
