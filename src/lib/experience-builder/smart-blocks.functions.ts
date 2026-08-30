@@ -26,3 +26,9 @@ export const resolveTerritoryMapPoints = createServerFn({ method: "GET" }).handl
   const { resolveTerritoryMapPointsQuery } = await import("./smart-blocks.server");
   return resolveTerritoryMapPointsQuery();
 });
+
+/** Corpus real de la Home premium (`vmx.home.premium-g4`). Read-only. */
+export const resolveHomePremiumRealContent = createServerFn({ method: "GET" }).handler(async () => {
+  const { resolveHomePremiumRealContentQuery } = await import("./smart-blocks.server");
+  return resolveHomePremiumRealContentQuery();
+});

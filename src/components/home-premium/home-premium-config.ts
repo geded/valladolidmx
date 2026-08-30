@@ -39,12 +39,29 @@ const rows = (value: unknown): Cfg[] =>
     ? value.filter((item): item is Cfg => Boolean(item) && typeof item === "object")
     : [];
 
+const EMPTY_MEDIA: HomePremiumMedia = { url: "", alt: "" };
+
+/**
+ * G8-R1-F1L-R2 · Sólo se acepta una ruta interna canónica ("/..."). Cualquier
+ * otro valor —incluido "#"— se resuelve como `null` y la tarjeta se descarta.
+ */
+const hrefN = (value: unknown, fallback: string | null): string | null => {
+  if (typeof value !== "string") return fallback;
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("/") || trimmed === "#") return fallback;
+  return trimmed;
+};
+
+/** Descarta tarjetas sin URL canónica real (gate de promoción R2). */
+const linked = <T extends { href: string | null }>(items: T[]): T[] =>
+  items.filter((item) => typeof item.href === "string" && item.href.startsWith("/"));
+
 /**
  * G8-R1-F1L · Un `media_url` presente pero vacío es una decisión editorial
  * explícita (retiro de medio no acreditado) y NO debe caer al default.
  * La superficie renderiza entonces el marcador editorial neutral aprobado.
  */
-const media = (row: Cfg, fallback: HomePremiumMedia): HomePremiumMedia =>
+const media = (row: Cfg, fallback: HomePremiumMedia = EMPTY_MEDIA): HomePremiumMedia =>
   "media_url" in row
     ? {
         url: typeof row.media_url === "string" ? row.media_url.trim() : "",
@@ -57,11 +74,15 @@ function mapRows<T>(
   value: unknown,
   defaults: readonly T[],
   limit: number,
-  map: (row: Cfg, base: T) => T,
+  map: (row: Cfg, base: T | undefined) => T,
 ): T[] {
   const list = rows(value);
   if (list.length === 0) return defaults.slice(0, limit);
-  return list.slice(0, limit).map((row, index) => map(row, defaults[index % defaults.length] as T));
+  return list
+    .slice(0, limit)
+    .map((row, index) =>
+      map(row, defaults.length > 0 ? defaults[index % defaults.length] : undefined),
+    );
 }
 
 export interface HomePremiumG4Resolved {
@@ -93,8 +114,8 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
         to: str(config.hero_cta_secondary_href, base.hero.secondaryCta.to),
       },
       slides: mapRows(config.hero_slides, base.hero.slides, 6, (row, item) => ({
-        caption: str(row.caption, item.caption),
-        media: media(row, item.media),
+        caption: str(row.caption, item?.caption ?? ""),
+        media: media(row, item?.media),
       })),
     },
     categorias: {
@@ -104,12 +125,13 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
         base.categorias.items,
         num(config.categorias_max_items, 12),
         (row, item) => ({
-          slug: str(row.slug, item.slug),
-          label: str(row.label, item.label),
-          href: str(row.href, item.href),
+          slug: str(row.slug, item?.slug ?? ""),
+          label: str(row.label, item?.label ?? ""),
+          href: str(row.href, item?.href ?? "/"),
         }),
-      ),
+      ).filter((item) => item.slug.length > 0 && item.href.startsWith("/")),
     },
+
     alux: {
       eyebrow: str(config.alux_eyebrow, base.alux.eyebrow),
       heading: str(config.alux_heading, base.alux.heading),
@@ -127,17 +149,19 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       description: str(config.destinos_description, base.destinos.description),
       action: str(config.destinos_action, base.destinos.action),
       disclaimer: str(config.destinos_disclaimer, base.destinos.disclaimer),
-      items: mapRows(
-        config.destinos_items,
-        base.destinos.items,
-        num(config.destinos_max_items, 8),
-        (row, item) => ({
-          name: str(row.name, item.name),
-          note: str(row.note, item.note),
-          media: media(row, item.media),
-          puebloMagico: bool(row.pueblo_magico, item.puebloMagico),
-          demo: bool(row.demo, item.demo),
-        }),
+      items: linked(
+        mapRows(
+          config.destinos_items,
+          base.destinos.items,
+          num(config.destinos_max_items, 8),
+          (row, item) => ({
+            name: str(row.name, item?.name ?? ""),
+            note: str(row.note, item?.note ?? ""),
+            media: media(row, item?.media),
+            puebloMagico: bool(row.pueblo_magico, item?.puebloMagico ?? false),
+            href: hrefN(row.href, item?.href ?? null),
+          }),
+        ),
       ),
     },
     pueblosMagicos: {
@@ -161,35 +185,38 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
           const sequence = rows(row.sequence)
             .map((stop) => str(stop.label, ""))
             .filter((label) => label.length > 0);
-          const resolved = sequence.length > 0 ? sequence : item.sequence;
+          const resolved = sequence.length > 0 ? sequence : (item?.sequence ?? []);
           return {
-            id: str(row.id, item.id),
-            title: str(row.title, item.title),
-            duration: str(row.duration, item.duration),
-            stops: num(row.stops, resolved.length || item.stops),
-            vibe: str(row.vibe, item.vibe),
-            description: str(row.description, item.description),
+            id: str(row.id, item?.id ?? ""),
+            title: str(row.title, item?.title ?? ""),
+            duration: str(row.duration, item?.duration ?? ""),
+            stops: num(row.stops, resolved.length || (item?.stops ?? 0)),
+            vibe: str(row.vibe, item?.vibe ?? ""),
+            description: str(row.description, item?.description ?? ""),
             sequence: resolved,
-            media: media(row, item.media),
+            media: media(row, item?.media),
           };
         },
-      ),
+      ).filter((item) => item.id.length > 0 && item.sequence.length > 0),
     },
     experiencias: {
       kicker: str(config.experiencias_kicker, base.experiencias.kicker),
       title: str(config.experiencias_title, base.experiencias.title),
       description: str(config.experiencias_description, base.experiencias.description),
       action: str(config.experiencias_action, base.experiencias.action),
-      items: mapRows(
-        config.experiencias_items,
-        base.experiencias.items,
-        num(config.experiencias_max_items, 6),
-        (row, item) => ({
-          title: str(row.title, item.title),
-          category: str(row.category, item.category),
-          summary: str(row.summary, item.summary),
-          media: media(row, item.media),
-        }),
+      items: linked(
+        mapRows(
+          config.experiencias_items,
+          base.experiencias.items,
+          num(config.experiencias_max_items, 6),
+          (row, item) => ({
+            title: str(row.title, item?.title ?? ""),
+            category: str(row.category, item?.category ?? ""),
+            summary: str(row.summary, item?.summary ?? ""),
+            media: media(row, item?.media),
+            href: hrefN(row.href, item?.href ?? null),
+          }),
+        ),
       ),
     },
     servicios: {
@@ -198,29 +225,35 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       description: str(config.servicios_description, base.servicios.description),
       staysTitle: str(config.servicios_stays_title, base.servicios.staysTitle),
       foodTitle: str(config.servicios_food_title, base.servicios.foodTitle),
-      stays: mapRows(
-        config.servicios_stays,
-        base.servicios.stays,
-        num(config.servicios_max_items, 4),
-        (row, item) => ({
-          title: str(row.title, item.title),
-          destination: str(row.destination, item.destination),
-          category: str(row.category, item.category),
-          summary: str(row.summary, item.summary),
-          media: media(row, item.media),
-        }),
+      stays: linked(
+        mapRows(
+          config.servicios_stays,
+          base.servicios.stays,
+          num(config.servicios_max_items, 4),
+          (row, item) => ({
+            title: str(row.title, item?.title ?? ""),
+            destination: str(row.destination, item?.destination ?? ""),
+            category: str(row.category, item?.category ?? ""),
+            summary: str(row.summary, item?.summary ?? ""),
+            media: media(row, item?.media),
+            href: hrefN(row.href, item?.href ?? null),
+          }),
+        ),
       ),
-      food: mapRows(
-        config.servicios_food,
-        base.servicios.food,
-        num(config.servicios_max_items, 4),
-        (row, item) => ({
-          title: str(row.title, item.title),
-          destination: str(row.destination, item.destination),
-          category: str(row.category, item.category),
-          summary: str(row.summary, item.summary),
-          media: media(row, item.media),
-        }),
+      food: linked(
+        mapRows(
+          config.servicios_food,
+          base.servicios.food,
+          num(config.servicios_max_items, 4),
+          (row, item) => ({
+            title: str(row.title, item?.title ?? ""),
+            destination: str(row.destination, item?.destination ?? ""),
+            category: str(row.category, item?.category ?? ""),
+            summary: str(row.summary, item?.summary ?? ""),
+            media: media(row, item?.media),
+            href: hrefN(row.href, item?.href ?? null),
+          }),
+        ),
       ),
     },
     eventos: {
@@ -236,16 +269,19 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
             : base.eventos.media.url,
         alt: str(config.eventos_media_alt, base.eventos.media.alt),
       },
-      items: mapRows(
-        config.eventos_items,
-        base.eventos.items,
-        num(config.eventos_max_items, 6),
-        (row, item) => ({
-          day: str(row.day, item.day),
-          title: str(row.title, item.title),
-          type: str(row.type, item.type),
-          detail: str(row.detail, item.detail),
-        }),
+      items: linked(
+        mapRows(
+          config.eventos_items,
+          base.eventos.items,
+          num(config.eventos_max_items, 6),
+          (row, item) => ({
+            day: str(row.day, item?.day ?? ""),
+            title: str(row.title, item?.title ?? ""),
+            type: str(row.type, item?.type ?? ""),
+            detail: str(row.detail, item?.detail ?? ""),
+            href: hrefN(row.href, item?.href ?? null),
+          }),
+        ),
       ),
     },
     queHacer: {
@@ -253,18 +289,22 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.que_hacer_title, base.queHacer.title),
       description: str(config.que_hacer_description, base.queHacer.description),
       action: str(config.que_hacer_action, base.queHacer.action),
-      items: mapRows(
-        config.que_hacer_items,
-        base.queHacer.items,
-        num(config.que_hacer_max_items, 6),
-        (row, item) => ({
-          kicker: str(row.kicker, item.kicker),
-          title: str(row.title, item.title),
-          body: str(row.body, item.body),
-          media: media(row, item.media),
-        }),
+      items: linked(
+        mapRows(
+          config.que_hacer_items,
+          base.queHacer.items,
+          num(config.que_hacer_max_items, 6),
+          (row, item) => ({
+            kicker: str(row.kicker, item?.kicker ?? ""),
+            title: str(row.title, item?.title ?? ""),
+            body: str(row.body, item?.body ?? ""),
+            media: media(row, item?.media),
+            href: hrefN(row.href, item?.href ?? null),
+          }),
+        ),
       ),
     },
+
     mapa: {
       kicker: str(config.mapa_kicker, base.mapa.kicker),
       title: str(config.mapa_title, base.mapa.title),
@@ -330,7 +370,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
       name: d.name,
       note: d.note,
       pueblo_magico: d.puebloMagico,
-      demo: d.demo,
+      href: d.href,
       ...mediaRow(d.media),
     })),
     pueblos_kicker: c.pueblosMagicos.kicker,
@@ -363,6 +403,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
       title: e.title,
       category: e.category,
       summary: e.summary,
+      href: e.href,
       ...mediaRow(e.media),
     })),
     servicios_kicker: c.servicios.kicker,
@@ -376,6 +417,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
       destination: s.destination,
       category: s.category,
       summary: s.summary,
+      href: s.href,
       ...mediaRow(s.media),
     })),
     servicios_food: c.servicios.food.map((s) => ({
@@ -383,6 +425,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
       destination: s.destination,
       category: s.category,
       summary: s.summary,
+      href: s.href,
       ...mediaRow(s.media),
     })),
     eventos_kicker: c.eventos.kicker,
@@ -401,8 +444,10 @@ export function homePremiumG4DefaultConfig(): Cfg {
       kicker: i.kicker,
       title: i.title,
       body: i.body,
+      href: i.href,
       ...mediaRow(i.media),
     })),
+
     mapa_kicker: c.mapa.kicker,
     mapa_title: c.mapa.title,
     mapa_description: c.mapa.description,

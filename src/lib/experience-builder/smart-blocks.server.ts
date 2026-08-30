@@ -110,6 +110,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         slug,
         name,
         short_description: str(row.tagline),
+        category_slug: categorySlug,
         cover_image_url: null,
         logo_url: null,
         href: buildCanonicalEntityUrl({
@@ -409,5 +410,187 @@ export async function resolveTerritoryMapPointsQuery(limit = 60): Promise<Territ
     return points;
   } catch {
     return [];
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * G8-R1-F1L-R2 · Corpus real de la Home premium (`vmx.home.premium-g4`)
+ *
+ * El fixture editorial no declara tarjetas: destinos, experiencias,
+ * hospedaje, gastronomía, eventos y rutas provienen EXCLUSIVAMENTE del
+ * corpus publicado y acreditado, con la misma autoridad de elegibilidad
+ * y de URL canónica que el resto de Smart Blocks. Sin fotografía
+ * acreditada, `media.url` queda vacío y la superficie renderiza el
+ * marcador editorial neutral. Nunca se inventan datos ni rutas.
+ * ------------------------------------------------------------------ */
+
+export interface HomeRealCard {
+  title: string;
+  subtitle: string;
+  category: string;
+  href: string;
+  mediaUrl: string;
+  puebloMagico: boolean;
+}
+
+export interface HomeRealRoute {
+  id: string;
+  title: string;
+  duration: string;
+  stops: number;
+  vibe: string;
+  description: string;
+  sequence: string[];
+}
+
+export interface HomeRealContent {
+  destinos: HomeRealCard[];
+  experiencias: HomeRealCard[];
+  stays: HomeRealCard[];
+  food: HomeRealCard[];
+  eventos: Array<HomeRealCard & { day: string }>;
+  rutas: HomeRealRoute[];
+  mapPoints: TerritoryMapPoint[];
+}
+
+/** Pueblos Mágicos del Oriente Maya (registro configurable, G8/H-03). */
+const PUEBLOS_MAGICOS = new Set(["valladolid", "izamal", "espita"]);
+
+const HOME_CACHE_TTL_MS = 60_000;
+let homeCache: { at: number; value: HomeRealContent } | null = null;
+
+const EMPTY_HOME: HomeRealContent = {
+  destinos: [],
+  experiencias: [],
+  stays: [],
+  food: [],
+  eventos: [],
+  rutas: [],
+  mapPoints: [],
+};
+
+function cardsFrom(
+  result: SmartBlockResolveResult,
+  category: (item: Record<string, SmartBlockJsonValue>) => string,
+): HomeRealCard[] {
+  const out: HomeRealCard[] = [];
+  for (const item of result.items) {
+    const title = typeof item.name === "string" ? item.name : "";
+    const href = typeof item.href === "string" ? item.href : "";
+    if (!title || !href.startsWith("/")) continue;
+    const media =
+      (typeof item.hero_image_url === "string" ? item.hero_image_url : null) ??
+      (typeof item.cover_image_url === "string" ? item.cover_image_url : null) ??
+      "";
+    out.push({
+      title,
+      subtitle: typeof item.short_description === "string" ? item.short_description : "",
+      category: category(item),
+      href,
+      mediaUrl: media,
+      puebloMagico:
+        typeof item.slug === "string" ? PUEBLOS_MAGICOS.has(item.slug.toLowerCase()) : false,
+    });
+  }
+  return out;
+}
+
+/** Construye rutas sobre destinos reales publicados; sin tiempos inventados. */
+function routesFrom(destinos: HomeRealCard[]): HomeRealRoute[] {
+  if (destinos.length < 2) return [];
+  const magicos = destinos.filter((d) => d.puebloMagico).map((d) => d.title);
+  const routes: HomeRealRoute[] = [];
+  if (magicos.length >= 2) {
+    routes.push({
+      id: "pueblos-magicos",
+      title: "Pueblos Mágicos del Oriente Maya",
+      duration: `${magicos.length} destinos`,
+      stops: magicos.length,
+      vibe: "Patrimonio y cultura viva",
+      description:
+        "Recorre los Pueblos Mágicos publicados del oriente de Yucatán en un orden comprensible, iniciando por la capital turística.",
+      sequence: magicos,
+    });
+  }
+  const territorio = destinos.slice(0, 4).map((d) => d.title);
+  if (territorio.length >= 2) {
+    routes.push({
+      id: "territorio-completo",
+      title: "Panorámica del territorio",
+      duration: `${territorio.length} destinos`,
+      stops: territorio.length,
+      vibe: "Primera aproximación",
+      description:
+        "Una secuencia amplia sobre los destinos publicados para reconocer el territorio antes de profundizar.",
+      sequence: territorio,
+    });
+  }
+  return routes;
+}
+
+/** Corpus real que alimenta la Home premium. Read-only, fail-closed. */
+export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealContent> {
+  if (homeCache && Date.now() - homeCache.at < HOME_CACHE_TTL_MS) return homeCache.value;
+  try {
+    const [destRes, bizRes, prodRes, eventRes, mapPoints] = await Promise.all([
+      resolveSmartBlockQuery({
+        select: ["slug", "name", "short_description", "hero_image_url", "href"],
+        table: "destinations",
+        limit: 8,
+      }),
+      resolveSmartBlockQuery({
+        select: ["slug", "name", "short_description", "cover_image_url", "category_slug", "href"],
+        table: "businesses",
+        limit: 40,
+      }),
+      resolveSmartBlockQuery({
+        select: ["slug", "name", "short_description", "cover_image_url", "href"],
+        table: "products",
+        limit: 6,
+      }),
+      resolveSmartBlockQuery({
+        select: ["slug", "name", "short_description", "cover_image_url", "starts_at", "href"],
+        table: "events",
+        limit: 6,
+      }),
+      resolveTerritoryMapPointsQuery(),
+    ]);
+
+
+    const destinos = cardsFrom(destRes, () => "Destino");
+    const businesses = cardsFrom(bizRes, (item) =>
+      typeof item.category_slug === "string" ? item.category_slug : "",
+    );
+    const byCategory = (slug: string) => businesses.filter((b) => b.category === slug);
+    const stays = byCategory("hoteles")
+      .slice(0, 4)
+      .map((b) => ({ ...b, category: "Hospedaje" }));
+    const food = byCategory("restaurantes")
+      .slice(0, 4)
+      .map((b) => ({ ...b, category: "Gastronomía" }));
+    const experiencias = [
+      ...cardsFrom(prodRes, () => "Experiencia"),
+      ...byCategory("experiencias").map((b) => ({ ...b, category: "Experiencias" })),
+      ...byCategory("cenotes").map((b) => ({ ...b, category: "Cenotes" })),
+    ].slice(0, 6);
+
+    const eventos = cardsFrom(eventRes, () => "Evento").map((card, index) => ({
+      ...card,
+      day: String(index + 1).padStart(2, "0"),
+    }));
+
+    const value: HomeRealContent = {
+      destinos,
+      experiencias,
+      stays,
+      food,
+      eventos,
+      rutas: routesFrom(destinos),
+      mapPoints,
+    };
+    homeCache = { at: Date.now(), value };
+    return value;
+  } catch {
+    return EMPTY_HOME;
   }
 }
