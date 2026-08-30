@@ -1,0 +1,62 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AG",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AG · G8-R1-F1I-R1 · Autoridad única de elegibilidad pública (DEF-F1I-001) y URL canónica en Alux (DEF-F1I-002)",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/governance/audit/2026-08-30-G8-R1-F1I-CMS-PLANTILLAS-ALUX-CONTROL-FINAL-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorizacion Founder G8-R1-F1I-R1 (2026-08-30) · remediacion puntual exclusiva de DEF-F1I-001 (fichas en cuarentena visibles en listados y relacionados) y DEF-F1I-002 (URL manual en Alux). Sin retirar noindex del piloto, sin activar flag, sin publicar y sin iniciar Reservaciones o Monitor.",
+  "permissions": [
+    { "operation": "create", "path": "src/lib/omxds/public-eligibility.ts" },
+    { "operation": "create", "path": "src/lib/omxds/public-eligibility.functions.ts" },
+    { "operation": "delete", "path": "src/lib/omxds/unreviewed-quarantine.ts" },
+    { "operation": "modify", "path": "src/lib/alux/contextual-suggest.functions.ts" },
+    { "operation": "modify", "path": "src/routes/sitemap[.]xml.ts" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx" },
+    { "operation": "modify", "path": "src/lib/catalog/marketplace-reads.functions.ts" },
+    { "operation": "modify", "path": "src/lib/catalog/business-related.functions.ts" },
+    { "operation": "modify", "path": "src/lib/catalog/category-related.functions.ts" },
+    { "operation": "modify", "path": "src/lib/discovery/discovery-navigator.functions.ts" },
+    { "operation": "modify", "path": "src/lib/discovery/inline-explorer.functions.ts" },
+    { "operation": "modify", "path": "src/lib/destinations/public-reads.functions.ts" },
+    { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts" },
+    { "operation": "modify", "path": "src/lib/mcp/tools/search-businesses.ts" },
+    { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts" },
+    { "operation": "create", "path": "docs/governance/evidence/g8-r1-f1i-r1-public-eligibility.json" }
+  ],
+  "database_changes": [
+    "CREATE OR REPLACE FUNCTION public.search_marketplace(...) — añade b.source_review_state = 'approved'. Sin cambios de datos, sin DDL de tablas, sin cambios de grants."
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": ["bun run typecheck", "bun run governance:check"],
+  "supersedes": "PCA-2026-029-ADDENDUM-AF",
+  "supersedes_reason": "La cuarentena por lista de slugs (G8-R1-F1H) se sustituye por una autoridad única derivada del dato (businesses.source_review_state). Mismo efecto para las tres fichas, sin mantenimiento manual y con reversión automática al aprobarse la revisión editorial.",
+  "file_hashes": {
+    "src/lib/omxds/public-eligibility.ts": "ef06de78650d442e0daafd0012bff38e7ded17c8289299db5fa3fbd6d84c620d",
+    "src/lib/omxds/public-eligibility.functions.ts": "5b40e7958c3ece0a70c8f6454050a275877659377fe1921580ef95470da48ef1",
+    "src/lib/alux/contextual-suggest.functions.ts": "dad9234bb151bc71bf4a46982bdfe581bf9ceea83e25e58d7f59e98f24c40fca",
+    "src/routes/sitemap[.]xml.ts": "c0316fa784af539b321fee9a251ae6f76d29da55559dcb5c92f7335f3e15a03a",
+    "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx": "b3e13f4b0669dda2f422980acf0a07c11ed2c870b74e591bc6b17baaae2369a7",
+    "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx": "bce561c2214a411f4bb6f968fe86301132d85aed829201fe9608c76992114624",
+    "src/lib/catalog/marketplace-reads.functions.ts": "377a1454f6c01de9b1ec48a98133509521956527e940b3f3f7dc8904e29b314d",
+    "src/lib/catalog/business-related.functions.ts": "4067e5973eee77a9c21c63da271a82aaa0494abec187da1805d1d6b34422df2e",
+    "src/lib/catalog/category-related.functions.ts": "10531eb1d432698d78d985ec0435125fd2b584f016e7ad78f4d5900fdbf203cc",
+    "src/lib/discovery/discovery-navigator.functions.ts": "7d1c39e1d054bfca76256aee076fa4ebbd5b1636c874796b08fe55fcbf228903",
+    "src/lib/discovery/inline-explorer.functions.ts": "09d71cf1c5e501d67bfa2b741483842b8ad3f6e72da71c7bac6de3437396e550",
+    "src/lib/destinations/public-reads.functions.ts": "375dd5412c916fd7cc040fdea8fa03b61cb1dde5c2f4acdf4b2d7314a2c8f8f6",
+    "src/lib/cms/public-reads.functions.ts": "af666fd4daea8a2510680a331f45b773ce442cda59baee021425f2e8c8c973a1",
+    "src/lib/mcp/tools/search-businesses.ts": "875d3d3bc733fa102e288c566d0d2262c4c6ce1267f9cf3cd092fff87aa0da20",
+    "src/routes/api/public/alux/chat.ts": "f69bfa73187c4351b418f5158bb4b12ee2a3cde6996b7e30d5bed2972e80ff90"
+  },
+  "rollback": [
+    "Revertir los archivos listados a la revisión previa (la lista de slugs de ADDENDUM-AF queda superada).",
+    "SQL: reaplicar la definición previa de public.search_marketplace sin la condición b.source_review_state = 'approved' (migración 20260629235241)."
+  ]
+}
