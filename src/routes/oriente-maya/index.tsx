@@ -130,7 +130,11 @@ function OrienteMayaIndex() {
           <DestinationPremiumSurface
             content={premiumContent}
             heroVariant="editorial"
-            sections={{ gallery: false, servicePreview: false }}
+            sections={{
+              gallery: false,
+              servicePreview: false,
+              map: premiumContent.map.points.length > 0,
+            }}
           />
         </div>
       ) : (
@@ -139,4 +143,3 @@ function OrienteMayaIndex() {
     </ContextEngineProvider>
   );
 }
-

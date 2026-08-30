@@ -33,7 +33,7 @@ export function buildRegionPremiumRuntime(input: {
       regionBadge: "Región",
       title: ORIENTE_MAYA.name,
       subtitle: ORIENTE_MAYA.short_description,
-      description: ORIENTE_MAYA.short_description,
+      description: "",
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Ver destinos", href: "#servicios-destino" },
       cover: { url: "", alt: "" },
