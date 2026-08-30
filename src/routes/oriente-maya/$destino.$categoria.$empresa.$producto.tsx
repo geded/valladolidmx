@@ -6,6 +6,8 @@
  * cambia URL + breadcrumbs territoriales + canonical self-referencial.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
+import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { PublicShell } from "@/components/discovery";
 import {
   buildPublicHead,
@@ -41,11 +43,13 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       },
     });
     if (resolution.reason !== "ok" || !resolution.product) throw notFound();
-    const [product, surfaceContractsEnabled] = await Promise.all([
+    const [product, surfaceContractsEnabled, evaluationLot] = await Promise.all([
       getMarketplaceProductBySlug({
         data: { slug: params.producto },
       }),
       getOmxdsSurfaceContractsFlag().catch(() => false),
+      // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
+      getEvaluationLotSlugs().catch(() => null),
     ]);
     if (!product) throw notFound();
     // E2 · US-E2.2 — Related Collection contextual del producto.
@@ -63,7 +67,13 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
     } catch {
       related = null;
     }
-    return { resolution, product, related, surfaceContractsEnabled };
+    return {
+      resolution,
+      product,
+      related,
+      surfaceContractsEnabled,
+      inEvaluationLot: isInEvaluationLot(evaluationLot, "product", params.producto),
+    };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -123,6 +133,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       );
     }
     return buildPublicHead({
+      noindex: loaderData.inEvaluationLot,
       title: `${p.name} · ${p.business.display_name} — ${SITE.name}`,
       description,
       path,

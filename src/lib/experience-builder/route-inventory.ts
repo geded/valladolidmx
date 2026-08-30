@@ -319,6 +319,16 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
       "G8-R1-F1B-B3 · Preview interno staff de borradores empresariales. " +
       "Reutiliza BusinessSurface productiva. noindex,nofollow. Sin publicación.",
   },
+  "src/routes/_authenticated/cms/contenido-evaluacion.tsx": {
+    category: "studio",
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+    functionalOwner: "Editorial",
+    notes:
+      "G8-R1-F1G · Herramienta interna del lote de contenido de evaluación. " +
+      "Retiro y restauración reversibles. noindex,nofollow. Sólo admin.",
+  },
   "src/routes/arma-tu-viaje.tsx": {
     category: "studio",
     businessPriority: "critical",
@@ -358,6 +368,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/alux.feedback.tsx",
   "src/routes/_authenticated/cms/alux.tsx",
   "src/routes/_authenticated/cms/alertas.tsx",
+  "src/routes/_authenticated/cms/contenido-evaluacion.tsx",
   "src/routes/_authenticated/cms/categorias.$id.editar.tsx",
   "src/routes/_authenticated/cms/categorias.index.tsx",
   "src/routes/_authenticated/cms/categorias.nueva.tsx",

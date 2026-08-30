@@ -10,6 +10,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitemap.functions";
 import { createClient } from "@supabase/supabase-js";
+import { EVALUATION_LOT_ID } from "@/lib/omxds/evaluation-lot";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { absoluteUrl } from "@/config/site";
@@ -179,12 +180,14 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
   const sb = createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
+  // G8-R1-F1G · El lote interno de evaluación jamás entra al sitemap.
   const [d, b, p, e] = await Promise.all([
     sb
       .from("destinations")
       .select("slug, updated_at")
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .limit(500),
     sb
       .from("businesses")
@@ -193,6 +196,7 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .limit(1000),
     sb
       .from("products")
@@ -201,12 +205,14 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .limit(2000),
     sb
       .from("events")
       .select("slug, updated_at")
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .limit(1000),
   ]);
   const norm = (rows: { slug: string; updated_at: string | null }[] | null) =>
