@@ -380,6 +380,8 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .eq("destination_id", dest.id)
         .eq("status", "published")
         .is("deleted_at", null)
+        // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
         .order("display_name", { ascending: true })
         .limit(60),
       sb
@@ -387,9 +389,8 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
         .eq("status", "published")
         .is("deleted_at", null)
-        // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
-        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
         .eq("destination_id", dest.id)
+
         .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
         .limit(6),
