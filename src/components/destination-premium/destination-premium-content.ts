@@ -11,7 +11,8 @@
  */
 
 export interface DestinationPremiumMedia {
-  url: string;
+  /** `null` representa el marcador Editorial neutral, nunca una imagen sustituta. */
+  url: string | null;
   alt: string;
 }
 

@@ -13,6 +13,21 @@
 
 export const PILOT_ID = "G8-R1-F1H-PUBLIC-PILOT" as const;
 
+/** Destinos bajo revisión visual F1K. Valladolid se suma al lote territorial F1H. */
+export const F1K_DESTINATION_SLUGS = [
+  "valladolid",
+  "izamal",
+  "espita",
+  "ek-balam",
+  "rio-lagartos",
+  "las-coloradas",
+  "uayma",
+] as const;
+
+export function isF1kDestination(slug: string): boolean {
+  return (F1K_DESTINATION_SLUGS as readonly string[]).includes(slug);
+}
+
 /**
  * Filtro PostgREST canónico para excluir corpus demo de cualquier lectura
  * pública del piloto (listados, catálogo de Alux, recomendaciones).
