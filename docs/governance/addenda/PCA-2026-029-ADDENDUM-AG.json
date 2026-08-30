@@ -99,7 +99,7 @@
     "src/lib/omxds/public-eligibility.functions.ts": "5b40e7958c3ece0a70c8f6454050a275877659377fe1921580ef95470da48ef1",
     "src/lib/alux/contextual-suggest.functions.ts": "dad9234bb151bc71bf4a46982bdfe581bf9ceea83e25e58d7f59e98f24c40fca",
     "src/routes/sitemap[.]xml.ts": "c0316fa784af539b321fee9a251ae6f76d29da55559dcb5c92f7335f3e15a03a",
-    "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx": "b3e13f4b0669dda2f422980acf0a07c11ed2c870b74e591bc6b17baaae2369a7",
+    "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx": "517fb6f0479f46fbd712d0bd2030ca53ef4d0c6ce8bf792734619a4ac35994be",
     "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx": "bce561c2214a411f4bb6f968fe86301132d85aed829201fe9608c76992114624",
     "src/lib/catalog/marketplace-reads.functions.ts": "377a1454f6c01de9b1ec48a98133509521956527e940b3f3f7dc8904e29b314d",
     "src/lib/catalog/business-related.functions.ts": "4067e5973eee77a9c21c63da271a82aaa0494abec187da1805d1d6b34422df2e",
@@ -119,7 +119,7 @@
     "operation": "modify",
     "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
     "previous_sha256": "e55c46ac0792803e3c9e7c28d673ce2a142ce3df4a4aa7b6998efcb63912fb7a",
-    "current_sha256": "b3e13f4b0669dda2f422980acf0a07c11ed2c870b74e591bc6b17baaae2369a7",
+    "current_sha256": "517fb6f0479f46fbd712d0bd2030ca53ef4d0c6ce8bf792734619a4ac35994be",
     "semantic_change": "El loader sustituye la lista de slugs en cuarentena por la lectura server-side de empresas publicadas sin revisión de fuente aprobada para calcular `noindex`. Sin cambios de render, datos ni estado.",
     "authority": "Autorización Founder G8-R1-F1I-R1 · remediación puntual (2026-08-30)"
   }
