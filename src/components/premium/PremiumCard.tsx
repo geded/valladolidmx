@@ -1,18 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import type { PremiumCardVM } from "./types";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export function PremiumCard({ card }: { card: PremiumCardVM }) {
   const body = (
     <article className="group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
       <div className="aspect-[4/3] overflow-hidden bg-muted">
-        {card.media ? (
-          <img
-            src={card.media.url}
-            alt={card.media.alt ?? ""}
-            className="size-full object-cover transition duration-500 group-hover:scale-[1.03]"
-          />
-        ) : null}
+        <EditorialMediaFrame
+          media={card.media ? { url: card.media.url, alt: card.media.alt ?? "" } : null}
+          label={card.title}
+          className="size-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          markerClassName="border-0"
+        />
       </div>
       <div className="p-5 sm:p-6">
         {card.eyebrow ? (
