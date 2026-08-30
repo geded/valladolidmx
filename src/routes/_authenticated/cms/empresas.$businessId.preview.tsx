@@ -93,7 +93,7 @@ function BusinessDraftPreviewRoute() {
   const binding = bindBusinessRoute({
     businessId: business.id,
     categorySlug: business.category_slug,
-    premiumEligible: false,
+    forceStandardSurface: true,
   });
 
   return (
