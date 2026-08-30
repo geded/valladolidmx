@@ -44,6 +44,9 @@ export interface SmartBlockResolveResult {
 
 type Row = Record<string, unknown>;
 
+/** DTO adaptado que consumen los renderers (más el id de medio interno). */
+type AdaptedItem = { [k: string]: SmartBlockJsonValue | string | undefined; _media?: string };
+
 interface TableSpec {
   /** Proyección física real (incluye relaciones necesarias para la URL). */
   readonly select: string;
@@ -52,7 +55,7 @@ interface TableSpec {
   /** Orden por defecto cuando el contrato no declara uno válido. */
   readonly defaultOrder?: { column: string; ascending: boolean };
   /** Adaptador fila física → DTO consumido por los renderers. */
-  readonly adapt: (row: Row) => (Record<string, SmartBlockJsonValue> & { _media?: string }) | null;
+  readonly adapt: (row: Row) => AdaptedItem | null;
 }
 
 function str(v: unknown): string | null {
@@ -281,11 +284,10 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
       if (f.column === "status" || f.column === "deleted_at") continue;
       builder = applyFilter(builder, spec, f);
     }
-    let ordered = false;
+    let ordered: boolean = false;
     for (const o of q.order_by ?? []) {
-      const before = ordered;
       builder = applyOrder(builder, spec, o);
-      ordered = before || spec.filterable.includes(o.column);
+      if (spec.filterable.includes(o.column)) ordered = true;
     }
     if (!ordered && spec.defaultOrder) {
       builder = builder.order(spec.defaultOrder.column, {
@@ -300,7 +302,7 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
 
     const adapted = ((rows ?? []) as Row[])
       .map((r) => spec.adapt(r))
-      .filter((r): r is Record<string, SmartBlockJsonValue> & { _media?: string } => r !== null);
+      .filter((r): r is AdaptedItem => r !== null);
 
     // "Destacado" es ranking, no filtro duro: nunca deja una sección vacía.
     adapted.sort((a, b) => Number(b.featured === true) - Number(a.featured === true));
