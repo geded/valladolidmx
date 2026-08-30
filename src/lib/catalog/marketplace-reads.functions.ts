@@ -286,8 +286,9 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .eq("id", businessId)
         .eq("status", "published")
         .is("deleted_at", null)
-        // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
-        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
+        // G8-R1-F1I-R1 · lectura de FICHA DIRECTA: no se aplica elegibilidad
+        // pública (la ruta sigue respondiendo 200 con `noindex, nofollow`).
+        // La elegibilidad sólo gobierna superficies de descubrimiento.
         .maybeSingle(),
       supabase
         .from("product_media")
