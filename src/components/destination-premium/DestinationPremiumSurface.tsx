@@ -491,7 +491,7 @@ function ServicioPreview({
           >
             <EditorialMediaFrame
               media={service.media}
-              label={service.title}
+              label={service.label}
               className="h-44 w-full object-cover"
             />
             <div className="p-4">
