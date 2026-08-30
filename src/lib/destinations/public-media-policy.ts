@@ -13,7 +13,7 @@ export interface DestinationMediaFacts {
   original_checksum?: string | null;
   alt_text?: string | null;
   credit?: string | null;
-  metadata?: Record<string, unknown> | null;
+  metadata?: unknown;
 }
 
 function nonEmpty(value: unknown): value is string {
@@ -26,7 +26,10 @@ function nonEmpty(value: unknown): value is string {
  */
 export function isAccreditedDestinationMedia(media: DestinationMediaFacts | null): boolean {
   if (!media) return false;
-  const metadata = media.metadata ?? {};
+  const metadata =
+    typeof media.metadata === "object" && media.metadata !== null && !Array.isArray(media.metadata)
+      ? (media.metadata as Record<string, unknown>)
+      : {};
   const rightsDeclared =
     metadata.rights_status === "declared" &&
     nonEmpty(metadata.rights_holder) &&

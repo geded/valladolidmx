@@ -1,8 +1,8 @@
 /**
  * Public reads for /oriente-maya/{slug} destination page.
- * Reads destinations enriched in DB (Fase 4.1b) and signs the hero image
- * from the private `demo-media` bucket. Falls back to null on miss so the
- * caller can use the static mock.
+ * Reads destinations enriched in DB (Fase 4.1b). Media is exposed only
+ * after passing the G8-M1 public accreditation policy; otherwise the
+ * caller receives no image and renders the neutral Editorial marker.
  */
 import { createServerFn } from "@tanstack/react-start";
 import type {
@@ -14,6 +14,8 @@ import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface PublicDestinationDTO {
+  /** UUID canónico. Siempre presente en lecturas productivas; opcional en previews históricos. */
+  id?: string;
   slug: string;
   name: string;
   tagline: string | null;
@@ -47,7 +49,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("destinations")
       .select(
-        "slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum )",
+        "id, slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum )",
       )
       .eq("slug", data.slug)
       .maybeSingle();
@@ -114,6 +116,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     }
 
     return {
+      id: row.id,
       slug: row.slug,
       name: row.name,
       tagline: row.tagline ?? null,
