@@ -88,14 +88,17 @@ export function SmartBlockRuntime({ node }: { node: CompositionNode }) {
   }
 }
 
+/**
+ * G8-R1-F1J-HOME-PREMIUM-R2 — `is_featured` no existe en el esquema real.
+ * "Destacado" se resuelve como RANKING dentro del resolver (metadata
+ * `featured`), nunca como filtro duro: una sección destacada jamás queda
+ * vacía por falta de marcado editorial.
+ */
 function mergeFeaturedFilter(
   filters: SmartBlockFilter[] | undefined,
-  type: string,
-  onlyFeatured: boolean,
+  _type: string,
+  _onlyFeatured: boolean,
 ): SmartBlockFilter[] | undefined {
-  if (!onlyFeatured) return filters;
-  // events publican estado; is_featured aplica a destinos, empresas y productos.
-  if (type === "vmx.smart.events-list") return filters;
-  const extra: SmartBlockFilter = { column: "is_featured", op: "eq", value: true };
-  return [...(filters ?? []), extra];
+  return filters;
 }
+
