@@ -7,6 +7,8 @@
  * Nada de UX profunda ni composición nueva: eso llega en N2.2.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
+import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -40,7 +42,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       },
     });
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
-    const [business, specific, template, surfaceContractsEnabled] = await Promise.all([
+    const [business, specific, template, surfaceContractsEnabled, evaluationLot] =
+      await Promise.all([
       getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
       // SEO.A3.M1 · Authority Business Landing — composition-first.
       // Se resuelve primero una composición específica por slug
@@ -55,6 +58,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
         data: { slug: "__tpl_business__" },
       }).catch(() => null),
       getOmxdsSurfaceContractsFlag().catch(() => false),
+      // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
+      getEvaluationLotSlugs().catch(() => null),
     ]);
     if (!business) throw notFound();
     // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
@@ -97,6 +102,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       surfaceContractsEnabled,
       premiumEligibility,
       canonicalBinding,
+      inEvaluationLot: isInEvaluationLot(evaluationLot, "business", params.empresa),
     };
   },
   head: ({ loaderData, params }) => {
@@ -111,6 +117,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       b.description.slice(0, 300) ||
       `${b.display_name} en ${destName}, Oriente Maya de Yucatán.`;
     return buildPublicHead({
+      noindex: loaderData.inEvaluationLot,
       title: `${b.display_name} · ${destName} — ${SITE.name}`,
       description,
       path,
