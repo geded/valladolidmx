@@ -10,6 +10,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitemap.functions";
 import { createClient } from "@supabase/supabase-js";
+import { EVALUATION_LOT_ID } from "@/lib/omxds/evaluation-lot";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { absoluteUrl } from "@/config/site";
