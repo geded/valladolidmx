@@ -51,6 +51,21 @@ for (const file of originalI3CFiles)
 for (const file of allowed)
   assert.ok(originalI3CFiles.includes(file), `historical I3-C file missing: ${file}`);
 
+const reconciliationAuthorization = JSON.parse(
+  readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
+);
+assert.equal(reconciliationAuthorization.status, "Approved");
+assert.ok(
+  (reconciliationAuthorization.required_feature_flags ?? []).includes(
+    "omxds_visual_v1_contracts_enabled=false",
+  ),
+);
+const acknowledgedConsumerRevisions = new Map([
+  [productRoutePath, "f414f6107ee1f7696ad211e2a0700d3d23e7f3834e9313f5c17784276d494261"],
+  [territorialProductRoutePath, "bce561c2214a411f4bb6f968fe86301132d85aed829201fe9608c76992114624"],
+  [eventRoutePath, "1ce68f037ab27c43d79b4abba1ac7d1c3f4927378595268e8fd1feae6efdd4f0"],
+]);
+
 for (const file of [
   productRoutePath,
   territorialProductRoutePath,
@@ -59,14 +74,25 @@ for (const file of [
   "src/lib/omxds/surfaces/experience-surface.adapter.ts",
   "src/lib/omxds/surfaces/event-surface.contract.ts",
   "scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts",
-])
+]) {
+  const changed = execFileSync("git", ["diff", "--name-only", i3CHead, "--", file], {
+    encoding: "utf8",
+  });
+  if (changed === "") continue;
+  const expectedDigest = acknowledgedConsumerRevisions.get(file);
+  assert.ok(expectedDigest, `I3-C regression: ${file}`);
   assert.equal(
-    execFileSync("git", ["diff", "--name-only", i3CHead, "--", file], {
-      encoding: "utf8",
-    }),
-    "",
-    `I3-C regression: ${file}`,
+    createHash("sha256").update(readFileSync(file)).digest("hex"),
+    expectedDigest,
+    `I3-C consumer changed after exact acknowledgment: ${file}`,
   );
+  assert.ok(
+    (reconciliationAuthorization.acknowledged_revisions ?? []).some(
+      (entry) => entry.path === file && entry.sha256 === expectedDigest,
+    ),
+    `PCA-2026-056 does not acknowledge the exact I3-C consumer revision: ${file}`,
+  );
+}
 
 const acknowledgedSurfaceRevisions = new Map([
   [
@@ -228,19 +254,42 @@ for (const pcaGovernedPath of [
     );
 }
 
-for (const forbiddenPath of [
-  "src/lib/discovery/seo.ts",
-  "src/lib/experience-builder/page-kind-registry.ts",
-  "src/lib/experience-builder/composition-renderer.tsx",
-  "src/lib/catalog/product-related.functions.ts",
-  "src/lib/events/public-reads.functions.ts",
-])
+const acknowledgedProtectedRevisions = new Map([
+  ["src/lib/discovery/seo.ts", "53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05"],
+  [
+    "src/lib/experience-builder/page-kind-registry.ts",
+    "3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c",
+  ],
+  [
+    "src/lib/experience-builder/composition-renderer.tsx",
+    "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+  ],
+  [
+    "src/lib/catalog/product-related.functions.ts",
+    "d4f4d4f9aef25bb08228a5f50d1de6a42fb9f572f7946e8c039761c869b802fc",
+  ],
+  [
+    "src/lib/events/public-reads.functions.ts",
+    "c40ae17d1aa9697de5ad8c1c492b43472454ffe695339fa3d7e8689ab2fef7a6",
+  ],
+]);
+for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
+  const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
+    encoding: "utf8",
+  });
+  if (changed === "") continue;
   assert.equal(
-    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenPath], {
-      encoding: "utf8",
-    }),
-    "",
+    createHash("sha256").update(readFileSync(protectedPath)).digest("hex"),
+    expectedDigest,
+    `I3-C protected artifact changed after exact acknowledgment: ${protectedPath}`,
   );
+  assert.ok(
+    (reconciliationAuthorization.acknowledged_revisions ?? []).some(
+      (entry) => entry.path === protectedPath && entry.sha256 === expectedDigest,
+    ),
+    `PCA-2026-056 does not acknowledge the exact I3-C revision: ${protectedPath}`,
+  );
+}
 // 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
 // la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin
 // secretos embebidos y no editables por el proyecto. Sólo estas dos rutas exactas

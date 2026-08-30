@@ -33,6 +33,30 @@
     },
     {
       "operation": "modify",
+      "path": "src/lib/catalog/product-related.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/events/public-reads.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    {
+      "operation": "modify",
       "path": "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql"
     },
     {
@@ -157,6 +181,42 @@
       "operation": "modify",
       "path": "src/lib/discovery/seo.ts",
       "sha256": "53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/catalog/product-related.functions.ts",
+      "sha256": "d4f4d4f9aef25bb08228a5f50d1de6a42fb9f572f7946e8c039761c869b802fc",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/events/public-reads.functions.ts",
+      "sha256": "c40ae17d1aa9697de5ad8c1c492b43472454ffe695339fa3d7e8689ab2fef7a6",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx",
+      "sha256": "f414f6107ee1f7696ad211e2a0700d3d23e7f3834e9313f5c17784276d494261",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "sha256": "bce561c2214a411f4bb6f968fe86301132d85aed829201fe9608c76992114624",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.$slug.tsx",
+      "sha256": "1ce68f037ab27c43d79b4abba1ac7d1c3f4927378595268e8fd1feae6efdd4f0",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "sha256": "517fb6f0479f46fbd712d0bd2030ca53ef4d0c6ce8bf792734619a4ac35994be",
       "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
     },
     {

@@ -195,17 +195,43 @@ if (pcaGovernedChange)
     `post-I3-B change lacks Approved PCA: ${pcaGovernedPath}`,
   );
 
-for (const forbiddenPath of [
-  "src/lib/discovery/seo.ts",
-  "src/lib/experience-builder/page-kind-registry.ts",
-  "src/lib/experience-builder/composition-renderer.tsx",
-])
+const acknowledgedProtectedRevisions = new Map([
+  ["src/lib/discovery/seo.ts", "53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05"],
+  [
+    "src/lib/experience-builder/page-kind-registry.ts",
+    "3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c",
+  ],
+  [
+    "src/lib/experience-builder/composition-renderer.tsx",
+    "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+  ],
+]);
+const reconciliationAuthorization = JSON.parse(
+  readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
+);
+assert.equal(reconciliationAuthorization.status, "Approved");
+assert.ok(
+  (reconciliationAuthorization.required_feature_flags ?? []).includes(
+    "omxds_visual_v1_contracts_enabled=false",
+  ),
+);
+for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
+  const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
+    encoding: "utf8",
+  });
+  if (changed === "") continue;
   assert.equal(
-    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenPath], {
-      encoding: "utf8",
-    }),
-    "",
+    createHash("sha256").update(readFileSync(protectedPath)).digest("hex"),
+    expectedDigest,
+    `I3-B protected artifact changed after exact acknowledgment: ${protectedPath}`,
   );
+  assert.ok(
+    (reconciliationAuthorization.acknowledged_revisions ?? []).some(
+      (entry) => entry.path === protectedPath && entry.sha256 === expectedDigest,
+    ),
+    `PCA-2026-056 does not acknowledge the exact I3-B revision: ${protectedPath}`,
+  );
+}
 
 for (const file of execFileSync(
   "git",

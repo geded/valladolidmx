@@ -59,8 +59,8 @@ const acknowledgedRevisions = new Map([
   [
     routePath,
     {
-      sha256: "a615c0a480b5d9881e47629b895f20413531561ab9b7c92332cb82dbdb1d5549",
-      authorizations: ["PCA-2026-023", "PCA-2026-026"],
+      sha256: "517fb6f0479f46fbd712d0bd2030ca53ef4d0c6ce8bf792734619a4ac35994be",
+      authorizations: ["PCA-2026-056"],
     },
   ],
   [
@@ -179,7 +179,7 @@ assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
 // el flag global OFF continúa gobernando los demás contratos de superficie.
 assert.match(route, /const premiumEligibility = await getBusinessPremiumEligibility\(\{/);
 assert.match(route, /\}\)\.catch\(\(\) => null\)/);
-assert.match(route, /const premiumEnabled = premiumEligibility\?\.eligible === true/);
+assert.match(route, /const premiumEnabled = canonicalBinding\.surface === "premium"/);
 assert.match(route, /enabled=\{surfaceContractsEnabled \|\| premiumEnabled\}/);
 assert.match(route, /premiumEligibility=\{premiumEnabled \? premiumEligibility : null\}/);
 assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
@@ -306,9 +306,44 @@ for (const pcaGovernedPath of [
     );
 }
 
+const acknowledgedProtectedRevisions = new Map([
+  [
+    "src/lib/experience-builder/composition-renderer.tsx",
+    "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+  ],
+  [
+    "src/lib/experience-builder/page-kind-registry.ts",
+    "3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c",
+  ],
+]);
+const reconciliationAuthorization = JSON.parse(
+  readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
+);
+assert.equal(reconciliationAuthorization.status, "Approved");
+assert.ok(
+  (reconciliationAuthorization.required_feature_flags ?? []).includes(
+    "omxds_visual_v1_contracts_enabled=false",
+  ),
+);
+for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
+  const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
+    encoding: "utf8",
+  });
+  if (changed === "") continue;
+  assert.equal(
+    createHash("sha256").update(readFileSync(protectedPath)).digest("hex"),
+    expectedDigest,
+    `I3-D protected artifact changed after exact acknowledgment: ${protectedPath}`,
+  );
+  assert.ok(
+    (reconciliationAuthorization.acknowledged_revisions ?? []).some(
+      (entry) => entry.path === protectedPath && entry.sha256 === expectedDigest,
+    ),
+    `PCA-2026-056 does not acknowledge the exact I3-D revision: ${protectedPath}`,
+  );
+}
+
 for (const forbiddenPath of [
-  "src/lib/experience-builder/composition-renderer.tsx",
-  "src/lib/experience-builder/page-kind-registry.ts",
   "src/lib/omxds/surfaces/surface-actions.ts",
   "src/lib/omxds/surfaces/surface-contract.ts",
   "src/lib/omxds/surfaces/surface-contracts-flag.server.ts",
