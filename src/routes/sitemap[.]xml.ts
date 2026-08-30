@@ -11,6 +11,7 @@ import type {} from "@tanstack/react-start";
 import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitemap.functions";
 import { createClient } from "@supabase/supabase-js";
 import { EVALUATION_LOT_ID } from "@/lib/omxds/evaluation-lot";
+import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { absoluteUrl } from "@/config/site";
@@ -221,8 +222,11 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
     const s = (rel as { slug?: unknown } | null)?.slug;
     return typeof s === "string" && s.length > 0 ? s : null;
   };
+  // G8-R1-F1H · empresas owner_submitted sin revisión editorial fuera del sitemap.
   const empresas: BusinessRow[] = ((b.data as any[]) ?? [])
-    .filter((r) => typeof r?.slug === "string" && r.slug.length > 0)
+    .filter(
+      (r) => typeof r?.slug === "string" && r.slug.length > 0 && !isQuarantinedBusiness(r.slug),
+    )
     .map((r) => ({
       slug: r.slug as string,
       updated_at: (r.updated_at as string | null) ?? null,
@@ -230,7 +234,12 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
       category_slug: pickSlug(r.business_categories),
     }));
   const productos: ProductRow[] = ((p.data as any[]) ?? [])
-    .filter((r) => typeof r?.slug === "string" && r.slug.length > 0)
+    .filter(
+      (r) =>
+        typeof r?.slug === "string" &&
+        r.slug.length > 0 &&
+        !isQuarantinedBusiness((r.businesses as { slug?: string } | null)?.slug),
+    )
     .map((r) => {
       const biz = r.businesses as any;
       return {

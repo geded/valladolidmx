@@ -8,6 +8,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
+import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
 import { PublicShell } from "@/components/discovery";
 import {
   buildPublicHead,
@@ -72,7 +73,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       product,
       related,
       surfaceContractsEnabled,
-      inEvaluationLot: isInEvaluationLot(evaluationLot, "product", params.producto),
+      inEvaluationLot:
+        isInEvaluationLot(evaluationLot, "product", params.producto) ||
+        // G8-R1-F1H · producto de empresa en cuarentena editorial.
+        isQuarantinedBusiness(params.empresa),
     };
   },
   head: ({ loaderData, params }) => {

@@ -9,6 +9,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
+import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -102,7 +103,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       surfaceContractsEnabled,
       premiumEligibility,
       canonicalBinding,
-      inEvaluationLot: isInEvaluationLot(evaluationLot, "business", params.empresa),
+      inEvaluationLot:
+        isInEvaluationLot(evaluationLot, "business", params.empresa) ||
+        // G8-R1-F1H · empresa owner_submitted sin revisión editorial.
+        isQuarantinedBusiness(params.empresa),
     };
   },
   head: ({ loaderData, params }) => {

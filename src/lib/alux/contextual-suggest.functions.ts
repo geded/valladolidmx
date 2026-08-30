@@ -30,6 +30,7 @@
  *    alineado con el contrato Explainable-by-Default (Política 06).
  */
 import { createServerFn } from "@tanstack/react-start";
+import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
 import { z } from "zod";
 import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
@@ -292,7 +293,11 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       category_slug: string;
       category_name: string;
     };
-    const businesses: BizRow[] = (biz ?? []).map((row) => {
+    const businesses: BizRow[] = (biz ?? [])
+      // G8-R1-F1H · empresas owner_submitted sin revisión no entran a Alux
+      // (ni ellas ni sus productos, que se resuelven por `bizIdsInDest`).
+      .filter((row) => !isQuarantinedBusiness(String(row.slug)))
+      .map((row) => {
       const cat = (row.business_categories as { slug?: unknown; name?: unknown } | null) ?? null;
       return {
         id: String(row.id),
