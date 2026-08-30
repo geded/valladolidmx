@@ -35,6 +35,8 @@ import {
 } from "@/lib/destinations/public-reads.functions";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
+import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
+
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -137,7 +139,12 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       surfaceContractsEnabled,
       premiumEnabled,
       stableCoverUrl,
-      inEvaluationLot: isInEvaluationLot(evaluationLot, "destination", params.destino),
+      // G8-R1-F1L · Los 7 destinos bajo revisión visual F1K permanecen
+      // `noindex, nofollow` hasta la autorización expresa del Founder.
+      inEvaluationLot:
+        isInEvaluationLot(evaluationLot, "destination", params.destino) ||
+        isF1kDestination(params.destino),
+
     };
   },
   head: ({ loaderData, params }) =>
