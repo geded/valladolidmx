@@ -35,6 +35,8 @@ import {
 } from "@/lib/destinations/public-reads.functions";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
+import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
+
 import {
   ContextEngineProvider,
   defineRouteContext,
