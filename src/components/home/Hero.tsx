@@ -109,6 +109,15 @@ export function Hero({ config }: HeroProps = {}) {
   const legacyBg = config?.background_image?.trim();
   const slides: readonly string[] =
     configSlides && configSlides.length > 0 ? configSlides : legacyBg ? [legacyBg] : DEFAULT_SLIDES;
+  /**
+   * G8-R1-F1J-HOME-PREMIUM · Marcador neutral piedra/caliza.
+   * Cuando el editor declara explícitamente `background_images: []` (sin
+   * portada real acreditada G8-M1), la variante editorial NO cae a las
+   * imágenes por defecto: renderiza un panel neutral de piedra/caliza con
+   * tokens del Design System. Cero fixtures, cero medios ajenos.
+   */
+  const useNeutralStoneMarker = Boolean(configSlides && configSlides.length === 0 && !legacyBg);
+
 
   const intervalMs = Math.max(
     2000,
