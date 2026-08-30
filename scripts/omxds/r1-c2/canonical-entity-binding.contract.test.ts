@@ -71,11 +71,24 @@ describe("C2 · empresa", () => {
     expect(b.presetId).toBeNull();
   });
 
-  it("entidad sin elegibilidad premium cae a superficie estándar", () => {
+  // G8-R1-F1L·P0 — familia ≠ medios: la carencia de fotografía acreditada ya
+  // no expulsa a la entidad de su familia premium; sólo el contexto explícito
+  // (`forceStandardSurface`) degrada a superficie estándar.
+  it("entidad sin elegibilidad cinematográfica conserva su familia premium", () => {
     const b = bindBusinessRoute({
       businessId: "b4",
       categorySlug: "hoteles",
       premiumEligible: false,
+    });
+    expect(b.surface).toBe("premium");
+  });
+
+  it("sólo el contexto explícito degrada a superficie estándar", () => {
+    const b = bindBusinessRoute({
+      businessId: "b4",
+      categorySlug: "hoteles",
+      premiumEligible: false,
+      forceStandardSurface: true,
     });
     expect(b.surface).toBe("standard");
   });

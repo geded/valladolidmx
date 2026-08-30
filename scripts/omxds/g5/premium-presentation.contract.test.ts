@@ -42,7 +42,10 @@ for (const preview of previews) {
 
 for (const preview of previews.filter((name) => name !== "g4-home-premium-preview.tsx")) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
-  assert.match(source, /PremiumTerritorialBreadcrumb/);
+  // G8-E · una preview puede delegar todo su JSX en la autoridad visual
+  // compartida; en ese caso el breadcrumb territorial vive en el componente
+  // compartido y no en la preview.
+  assert.match(source, /PremiumTerritorialBreadcrumb|PremiumSurface/);
   assert.doesNotMatch(source, /aria-label="Ruta territorial"/);
 }
 

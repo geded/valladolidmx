@@ -39,10 +39,18 @@ const rows = (value: unknown): Cfg[] =>
     ? value.filter((item): item is Cfg => Boolean(item) && typeof item === "object")
     : [];
 
-const media = (row: Cfg, fallback: HomePremiumMedia): HomePremiumMedia => ({
-  url: str(row.media_url, fallback.url),
-  alt: str(row.media_alt, fallback.alt),
-});
+/**
+ * G8-R1-F1L · Un `media_url` presente pero vacío es una decisión editorial
+ * explícita (retiro de medio no acreditado) y NO debe caer al default.
+ * La superficie renderiza entonces el marcador editorial neutral aprobado.
+ */
+const media = (row: Cfg, fallback: HomePremiumMedia): HomePremiumMedia =>
+  "media_url" in row
+    ? {
+        url: typeof row.media_url === "string" ? row.media_url.trim() : "",
+        alt: typeof row.media_alt === "string" ? row.media_alt.trim() : fallback.alt,
+      }
+    : { url: fallback.url, alt: str(row.media_alt, fallback.alt) };
 
 /** Mapea filas editables sobre los defaults aprobados, preservando paridad. */
 function mapRows<T>(
@@ -220,7 +228,12 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.eventos_title, base.eventos.title),
       description: str(config.eventos_description, base.eventos.description),
       media: {
-        url: str(config.eventos_media_url, base.eventos.media.url),
+        url:
+          "eventos_media_url" in config
+            ? typeof config.eventos_media_url === "string"
+              ? config.eventos_media_url.trim()
+              : ""
+            : base.eventos.media.url,
         alt: str(config.eventos_media_alt, base.eventos.media.alt),
       },
       items: mapRows(

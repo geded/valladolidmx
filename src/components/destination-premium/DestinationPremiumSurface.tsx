@@ -37,6 +37,7 @@ import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
 import {
   DESTINATION_PREMIUM_G4_CONTENT,
@@ -252,18 +253,17 @@ function HeroEditorial({ content, heroAction }: { content: DestinationPremiumCon
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
       <HeroCopy content={content} heroAction={heroAction} />
       <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"} className="grid grid-cols-2 gap-3 sm:gap-4">
-        {hasCover ? <img
-          src={content.hero.cover.url}
-          alt={content.hero.cover.alt}
+        <EditorialMediaFrame
+          media={content.hero.cover}
+          label={content.hero.title}
           loading="eager"
           className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
-        /> : <div className="col-span-2 flex h-56 items-end rounded-3xl border border-border bg-muted p-6 shadow-soft sm:h-72"><p className="font-serif text-2xl text-foreground/80">{content.hero.title}</p></div>}
-        {[a, b].filter(Boolean).map((m) => (
-          <img
-            key={(m as DestinationPremiumMedia).url}
-            src={(m as DestinationPremiumMedia).url}
-            alt={(m as DestinationPremiumMedia).alt}
-            loading="lazy"
+          markerClassName="shadow-soft"
+        />
+        {[a, b].filter(Boolean).map((m, index) => (
+          <EditorialMediaFrame
+            key={(m as DestinationPremiumMedia).url || `neutral-${index}`}
+            media={m as DestinationPremiumMedia}
             className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
           />
         ))}
@@ -489,10 +489,9 @@ function ServicioPreview({
             key={i}
             className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
           >
-            <img
-              src={service.media.url}
-              alt={service.media.alt}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={service.media}
+              label={service.label}
               className="h-44 w-full object-cover"
             />
             <div className="p-4">
@@ -532,10 +531,9 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
             className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
           >
             <div className="relative">
-              <img
-                src={d.media.url}
-                alt={d.media.alt}
-                loading="lazy"
+              <EditorialMediaFrame
+                media={d.media}
+                label={d.name}
                 className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
               {isPuebloMagico(d.slug) ? (

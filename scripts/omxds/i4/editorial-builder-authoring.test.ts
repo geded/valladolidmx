@@ -42,6 +42,7 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
       "vmx.section.rutas",
       "vmx.section.arma-tu-viaje",
       "vmx.experience.map",
+      "vmx.place.premium-q2d",
       "vmx.destination.premium-g4",
       "vmx.listing.premium-g5",
       "vmx.custom.html",

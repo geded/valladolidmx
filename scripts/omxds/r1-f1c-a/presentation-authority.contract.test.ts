@@ -256,16 +256,33 @@ describe("elegibilidad premium determinista", () => {
     expect(r.activatesFlag).toBe(false);
   });
 
+  /**
+   * G8-R1-F1L · P0 — familia ≠ medios. Los déficits de fotografía ya no
+   * expulsan a la entidad de su familia premium: sólo bloquean el modo
+   * Cinematográfico. El resto de requisitos sigue siendo bloqueante.
+   */
+  const mediaCases: [string, Partial<PremiumEligibilityFacts>, string][] = [
+    ["galería insuficiente", { approvedGalleryCount: 1 }, "gallery_minimum"],
+    ["sin portada", { cover: null }, "cover:cover_missing"],
+  ];
+
+  for (const [name, patch, missing] of mediaCases) {
+    it(`mantiene familia premium en modo editorial: ${name}`, () => {
+      const r = evaluatePremiumEligibility({ ...base, ...patch });
+      expect(r.familyEligible).toBe(true);
+      expect(r.cinematicEligible).toBe(false);
+      expect(r.cinematicMissing).toContain(missing);
+    });
+  }
+
   const cases: [string, Partial<PremiumEligibilityFacts>, string][] = [
     ["sin estado editorial", { editorialState: "draft" }, "editorial_state"],
     ["sin clasificación", { canonicalClassification: null }, "canonical_classification"],
     ["sin ruta canónica", { canonicalPath: null }, "canonical_path"],
     ["con contenido demo", { isDemoSeed: true }, "demo_content_present"],
-    ["galería insuficiente", { approvedGalleryCount: 1 }, "gallery_minimum"],
     ["sin ubicación", { hasValidLocation: false }, "location"],
     ["sin relaciones", { hasRequiredRelations: false }, "required_relations"],
     ["sin bitácora", { hasAuditTrail: false }, "audit_trail"],
-    ["sin portada", { cover: null }, "cover:cover_missing"],
   ];
 
   for (const [name, patch, missing] of cases) {
