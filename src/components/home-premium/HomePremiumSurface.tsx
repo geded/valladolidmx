@@ -25,6 +25,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
 import {
