@@ -242,12 +242,10 @@ async function signMedia(ids: string[]): Promise<Map<string, string>> {
       byBucket.set(bucket, list);
     }
     for (const [bucket, list] of byBucket) {
-      const { data: signed } = await supabaseAdmin.storage
-        .from(bucket)
-        .createSignedUrls(
-          list.map((l) => l.path),
-          60 * 60,
-        );
+      const { data: signed } = await supabaseAdmin.storage.from(bucket).createSignedUrls(
+        list.map((l) => l.path),
+        60 * 60,
+      );
       (signed ?? []).forEach((s, i) => {
         const entry = list[i];
         if (entry && s?.signedUrl) out.set(entry.id, s.signedUrl);
