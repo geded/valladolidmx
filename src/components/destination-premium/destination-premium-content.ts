@@ -29,6 +29,8 @@ export interface DestinationPremiumNearby {
   distance: string;
   tagline: string;
   media: DestinationPremiumMedia;
+  /** Ruta canónica del destino. Ausente sólo en fixtures históricos. */
+  href?: string | null;
 }
 
 export interface DestinationPremiumMapPoint {
@@ -39,6 +41,8 @@ export interface DestinationPremiumMapPoint {
   title: string;
   subtitle: string | null;
   badge: string | null;
+  /** Ruta canónica del punto cuando existe una ficha pública resoluble. */
+  href?: string | null;
 }
 
 export interface DestinationPremiumContent {
