@@ -533,9 +533,12 @@ export function resolveEntityTemplate(
       `[G8-P2] familia no reconocida para ${input.entityId} (${input.entityType}/${input.categorySlug ?? "-"}/${input.productType ?? "-"})`,
     );
   }
-  if (input.premiumEligible === false) {
-    return STANDARD("entidad sin elegibilidad premium");
+  // G8-R1-F1L·P0 — La falta de medios NO expulsa a la entidad de su familia.
+  // Sólo un contexto que pide explícitamente superficie estándar degrada.
+  if (input.forceStandardSurface === true) {
+    return STANDARD("superficie estándar solicitada explícitamente por el contexto");
   }
+
   if (!familyPreset.autoAssign) {
     return STANDARD(`preset ${familyPreset.id} pendiente de aceptación visual Founder`);
   }
