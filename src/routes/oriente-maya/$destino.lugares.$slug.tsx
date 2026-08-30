@@ -23,6 +23,8 @@ import {
 import { getPublicPlace, getPlacePreview } from "@/lib/places/place-public-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { bindPlaceRoute } from "@/lib/experience-builder/canonical-entity-binding";
+import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
+import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 
 const SITE = "https://quehacerenvalladolid.com";
 
