@@ -148,7 +148,11 @@ export const setEvaluationLotStatus = createServerFn({ method: "POST" })
           .eq("business_id", data.id)
           .eq("status", "active")
           .limit(1),
-        sb.from("business_claim_snapshots").select("business_id").eq("business_id", data.id).limit(1),
+        sb
+          .from("business_claim_snapshots")
+          .select("business_id")
+          .eq("business_id", data.id)
+          .limit(1),
         sb.from("concierge_order_items").select("business_id").eq("business_id", data.id).limit(1),
       ]);
       const guarded = [owners, claims, items].some((res) => (res.data ?? []).length > 0);

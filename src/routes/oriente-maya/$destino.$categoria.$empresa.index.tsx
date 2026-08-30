@@ -44,23 +44,23 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
     const [business, specific, template, surfaceContractsEnabled, evaluationLot] =
       await Promise.all([
-      getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
-      // SEO.A3.M1 · Authority Business Landing — composition-first.
-      // Se resuelve primero una composición específica por slug
-      // (`biz-<slug>`) que permite landings editoriales premium; en su
-      // ausencia la ruta cae a la plantilla oficial de negocio y, en
-      // último término, al render directo de `BusinessSurface`. Misma
-      // arquitectura que Región y Destino — cero excepciones por empresa.
-      getPublishedCompositionBySlug({
-        data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
-      }).catch(() => null),
-      getPublishedCompositionBySlug({
-        data: { slug: "__tpl_business__" },
-      }).catch(() => null),
-      getOmxdsSurfaceContractsFlag().catch(() => false),
-      // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
-      getEvaluationLotSlugs().catch(() => null),
-    ]);
+        getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
+        // SEO.A3.M1 · Authority Business Landing — composition-first.
+        // Se resuelve primero una composición específica por slug
+        // (`biz-<slug>`) que permite landings editoriales premium; en su
+        // ausencia la ruta cae a la plantilla oficial de negocio y, en
+        // último término, al render directo de `BusinessSurface`. Misma
+        // arquitectura que Región y Destino — cero excepciones por empresa.
+        getPublishedCompositionBySlug({
+          data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
+        }).catch(() => null),
+        getPublishedCompositionBySlug({
+          data: { slug: "__tpl_business__" },
+        }).catch(() => null),
+        getOmxdsSurfaceContractsFlag().catch(() => false),
+        // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
+        getEvaluationLotSlugs().catch(() => null),
+      ]);
     if (!business) throw notFound();
     // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
     // (fail-closed dentro del evaluador: published, is_demo_seed=false, grant

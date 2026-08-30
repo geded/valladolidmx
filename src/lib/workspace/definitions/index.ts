@@ -837,6 +837,16 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.contenido-evaluacion",
+      workspaceId: "cms",
+      label: "Contenido de evaluación",
+      icon: Activity,
+      to: "/cms/contenido-evaluacion",
+      group: "operacion",
+      order: 14,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.eb",
       workspaceId: "cms",
       label: "Editor de páginas",

@@ -8,11 +8,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import {
-  EMPTY_EVALUATION_LOT,
-  EVALUATION_LOT_ID,
-  type EvaluationLotSlugs,
-} from "./evaluation-lot";
+import { EMPTY_EVALUATION_LOT, EVALUATION_LOT_ID, type EvaluationLotSlugs } from "./evaluation-lot";
 
 const TTL_MS = 60_000;
 let cache: { at: number; value: EvaluationLotSlugs } | null = null;
