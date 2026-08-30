@@ -91,17 +91,19 @@ function resolvePlace(input: CanonicalEntityResolutionInput): CanonicalEntityRes
   const slug = normalize(input.placeType ?? input.categorySlug);
   const variant = PLACE_PREMIUM_VARIANTS.find((v) => v.slug === slug) ?? null;
 
-  if (input.premiumEligible === false) {
+  // G8-R1-F1L·P0 — La ausencia de medios nunca expulsa a un lugar de su familia.
+  if (input.forceStandardSurface === true) {
     return {
       source: "standard",
       presetId: null,
       family: null,
       canonicalFamily: "place",
       variant: variant?.slug ?? null,
-      reason: "entidad sin elegibilidad premium",
+      reason: "superficie estándar solicitada explícitamente por el contexto",
       devWarning: null,
     };
   }
+
 
   if (!variant) {
     return {
