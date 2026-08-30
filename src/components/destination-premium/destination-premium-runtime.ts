@@ -43,8 +43,8 @@ export function buildDestinationPremiumRuntime(input: {
       lat: point.lat,
       lng: point.lng,
       title: point.title,
-      subtitle: point.subtitle,
-      badge: point.badge,
+      subtitle: point.subtitle ?? null,
+      badge: point.badge ?? null,
     })),
   ];
 
