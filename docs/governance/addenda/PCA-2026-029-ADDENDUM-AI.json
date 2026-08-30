@@ -1,0 +1,48 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AI",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AI · G8-R1-F1L · P0 Familia ≠ medios en la elegibilidad premium de destinos",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/governance/audit/2026-08-30-G8-R1-F1L-VISUAL-AUTHORITY-RECONCILIATION-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorizacion encadenada Founder G8-R1-F1L (2026-08-30) · P0 establece que tipo/categoria determina familia y preset; la ausencia de medios acreditados G8-M1 bloquea unicamente el modo Cinematografico y nunca degrada la familia premium a superficie legacy.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/omxds/editorial-media.ts"
+    }
+  ],
+  "database_changes": [],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run lint",
+    "bun run governance:check"
+  ],
+  "file_hashes": {
+    "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts": "6abd483fcecb72def21812a6d512accb7b32f1bbbb26ee4f9c1f2b1b95ff25f3"
+  },
+  "rollback": [
+    "Revertir src/lib/omxds/surfaces/destination-premium-eligibility.server.ts a la revisión 2c72175df4d8c1c2905791f25661ea56b1d4c2665370ebdf151f7c9c9ddc4524."
+  ],
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts",
+    "previous_sha256": "2c72175df4d8c1c2905791f25661ea56b1d4c2665370ebdf151f7c9c9ddc4524",
+    "current_sha256": "6abd483fcecb72def21812a6d512accb7b32f1bbbb26ee4f9c1f2b1b95ff25f3",
+    "semantic_change": "La elegibilidad deja de expulsar destinos sin portada acreditada de la familia premium: sólo declara `cinematicMissing` y mantiene el modo Editorial con marcador neutral. Sin cambios de datos ni de indexación.",
+    "authority": "Autorización Founder G8-R1-F1L · promoción controlada (2026-08-30)"
+  }
+}
