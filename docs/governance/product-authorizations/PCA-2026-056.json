@@ -5,7 +5,7 @@
   "status": "Approved",
   "branch": "integration/lovable-valladolidmx",
   "blueprint": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-  "founder_authority": "Autorizaciones Founder del 2026-08-30 limitadas a corregir la trazabilidad del PR #58: admiten exclusivamente el digest SHA-256 05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71 de src/components/surfaces/DestinationSurface.tsx y el digest SHA-256 86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0 de src/routes/oriente-maya/$destino.index.tsx, preservando el flag OFF y sin modificar componente, ruta, funcionalidad, datos, medios ni alcance.",
+  "founder_authority": "Autorizaciones Founder del 2026-08-30 limitadas a corregir la trazabilidad del PR #58: admiten exclusivamente los digests SHA-256 05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71 de src/components/surfaces/DestinationSurface.tsx, 86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0 de src/routes/oriente-maya/$destino.index.tsx, 3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c de src/lib/experience-builder/page-kind-registry.ts, 17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90 de src/lib/experience-builder/composition-renderer.tsx y 53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05 de src/lib/discovery/seo.ts, preservando el flag OFF y sin modificar archivos funcionales, funcionalidad, datos, medios ni alcance.",
   "permissions": [
     {
       "operation": "modify",
@@ -18,6 +18,18 @@
     {
       "operation": "modify",
       "path": "src/routes/oriente-maya/$destino.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/page-kind-registry.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/composition-renderer.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/discovery/seo.ts"
     }
   ],
   "acknowledged_revisions": [
@@ -31,6 +43,24 @@
       "operation": "modify",
       "path": "src/routes/oriente-maya/$destino.index.tsx",
       "sha256": "86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/page-kind-registry.ts",
+      "sha256": "3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/composition-renderer.tsx",
+      "sha256": "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+      "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/discovery/seo.ts",
+      "sha256": "53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05",
       "authority": "Founder G8-R1-F1L PR #58 governance reconciliation"
     }
   ],

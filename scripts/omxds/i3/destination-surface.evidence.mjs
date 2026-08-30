@@ -188,31 +188,63 @@ const authorizedChangedPaths = new Set(
     .map((permission) => permission.path),
 );
 
-for (const forbiddenPath of [
+const acknowledgedProtectedRevisions = new Map([
+  [
+    "src/lib/experience-builder/page-kind-registry.ts",
+    {
+      sha256: "3948b56730bbee1ec6e6c7fa689fbba19fb6e7224b1b9947867620466733917c",
+      authorizations: ["PCA-2026-056"],
+    },
+  ],
+  [
+    "src/lib/experience-builder/composition-renderer.tsx",
+    {
+      sha256: "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+      authorizations: ["PCA-2026-056"],
+    },
+  ],
+  [
+    "src/lib/discovery/seo.ts",
+    {
+      sha256: "53a3e3499de8e64c5d238f31769e5fa6bb62af98046c1941756c100bdff19a05",
+      authorizations: ["PCA-2026-056"],
+    },
+  ],
+]);
+
+for (const protectedPath of [
   "src/lib/experience-builder/page-kind-registry.ts",
   "src/lib/experience-builder/preview-registry.tsx",
   "src/lib/experience-builder/composition-renderer.tsx",
+  "src/lib/discovery/seo.ts",
 ]) {
-  const changed = execFileSync("git", ["diff", "--name-only", base, "--", forbiddenPath], {
+  const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
     encoding: "utf8",
   });
-  if (forbiddenPath === "src/lib/experience-builder/preview-registry.tsx" && changed !== "") {
+  if (protectedPath === "src/lib/experience-builder/preview-registry.tsx" && changed !== "") {
     assert.ok(
-      authorizedChangedPaths.has(forbiddenPath),
-      `post-I3-A preview registry change lacks Approved PCA: ${forbiddenPath}`,
+      authorizedChangedPaths.has(protectedPath),
+      `post-I3-A preview registry change lacks Approved PCA: ${protectedPath}`,
     );
     continue;
   }
-  assert.equal(changed, "");
-}
+  if (changed === "") continue;
 
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "src/lib/discovery/seo.ts"], {
-    encoding: "utf8",
-  }),
-  "",
-  "SEO helper must remain untouched because no reproducible gap was found",
-);
+  const acknowledged = acknowledgedProtectedRevisions.get(protectedPath);
+  assert.ok(
+    acknowledged,
+    `I3-A regression: ${protectedPath} changed without an exact acknowledged revision`,
+  );
+  const digest = createHash("sha256").update(readFileSync(protectedPath)).digest("hex");
+  assert.equal(
+    digest,
+    acknowledged.sha256,
+    `I3-A regression: ${protectedPath} digest ${digest} is not the exact acknowledged revision`,
+  );
+  for (const authorizationId of acknowledged.authorizations) {
+    assertApprovedExactModification(authorizationId, protectedPath);
+  }
+}
 // 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
 // la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin
 // secretos embebidos y no editables por el proyecto. Sólo estas dos rutas exactas
