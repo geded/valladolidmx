@@ -39,6 +39,8 @@ export const listPublishedPagesForSitemap = createServerFn({ method: "GET" }).ha
       if (error || !data) return [];
       return data
         .filter((row) => {
+          // Plantillas internas (`__tpl_*`) nunca son URLs públicas.
+          if (String(row.slug ?? "").startsWith("__tpl")) return false;
           const directive = String(
             (row as { robots_directive?: unknown }).robots_directive ?? "",
           ).toLowerCase();
