@@ -131,6 +131,8 @@ import {
   InstitutionalBadgesPreview,
 } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import { SmartTerritoryMap } from "@/components/experience-builder/smart-blocks/SmartTerritoryMap";
+
 import type {
   ExperienceMapDTO,
   ExperienceMapPoint,
