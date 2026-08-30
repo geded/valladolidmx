@@ -156,7 +156,7 @@ export const getDestinationPremiumEligibility = createServerFn({ method: "GET" }
         supabaseAdmin
           .from("destination_media")
           .select(
-             "role, sort_order, media_assets:media_asset_id(id, kind, storage_bucket, storage_path, alt_text, credit, width, height, status, deleted_at, pipeline_status, review_state, original_checksum, metadata, is_demo_seed)",
+            "role, sort_order, media_assets:media_asset_id(id, kind, storage_bucket, storage_path, alt_text, credit, width, height, status, deleted_at, pipeline_status, review_state, original_checksum, metadata, is_demo_seed)",
           )
           .eq("destination_id", destination.id)
           .in("role", ["cover", "gallery"])
