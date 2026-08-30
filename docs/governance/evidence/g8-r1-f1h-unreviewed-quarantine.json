@@ -1,0 +1,71 @@
+{
+  "id": "G8-R1-F1H-UNREVIEWED-QUARANTINE",
+  "recorded_at": "2026-08-30",
+  "authorization": "PCA-2026-029-ADDENDUM-AF",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "scope": "Remediación puntual · fichas owner_submitted publicadas sin revisión editorial",
+  "entities": [
+    {
+      "family": "business",
+      "id": "7d1d0001-1111-4111-8111-000000000001",
+      "slug": "hacienda-san-servacio-boutique",
+      "status": "published (sin cambios)",
+      "is_demo_seed": false,
+      "public_path": "/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+      "http": 200,
+      "robots": "noindex, nofollow",
+      "in_sitemap": false,
+      "in_alux_catalog": false
+    },
+    {
+      "family": "business",
+      "id": "7d1d0002-1111-4111-8111-000000000002",
+      "slug": "cocina-del-frailes",
+      "status": "published (sin cambios)",
+      "is_demo_seed": false,
+      "public_path": "/oriente-maya/valladolid/restaurantes/cocina-del-frailes",
+      "http": 200,
+      "robots": "noindex, nofollow",
+      "in_sitemap": false,
+      "in_alux_catalog": false
+    },
+    {
+      "family": "business",
+      "id": "7d1d0003-1111-4111-8111-000000000003",
+      "slug": "ruta-cenotes-y-selva",
+      "status": "published (sin cambios)",
+      "is_demo_seed": false,
+      "public_path": "/oriente-maya/valladolid/experiencias/ruta-cenotes-y-selva",
+      "http": 200,
+      "robots": "noindex, nofollow",
+      "in_sitemap": false,
+      "in_alux_catalog": false
+    }
+  ],
+  "implementation": {
+    "authority": "src/lib/omxds/unreviewed-quarantine.ts (QUARANTINED_BUSINESS_SLUGS)",
+    "surfaces": [
+      "ficha de empresa · noindex,nofollow vía buildPublicHead",
+      "fichas de producto de esas empresas · noindex,nofollow",
+      "sitemap.xml · empresas y productos filtrados",
+      "Alux · exclusión en contextual-suggest antes del índice de empresas (arrastra productos)"
+    ]
+  },
+  "invariants": {
+    "sin_borrado_fisico": true,
+    "sin_cambio_de_contenido": true,
+    "sin_cambio_de_estado": true,
+    "sin_migracion_sql": true,
+    "flag_visual_global": "OFF"
+  },
+  "rollback": {
+    "procedure": "Vaciar el arreglo QUARANTINED_BUSINESS_SLUGS en src/lib/omxds/unreviewed-quarantine.ts (o eliminar el slug correspondiente al aprobar su revisión editorial).",
+    "impact": "Restablece indexación, presencia en sitemap y elegibilidad en Alux de inmediato. No requiere migración ni cambio de datos.",
+    "reversible": true
+  },
+  "verification": [
+    "curl 200 + noindex confirmado en las tres rutas públicas",
+    "grep de los tres slugs en /sitemap.xml = 0 coincidencias",
+    "typecheck en PASS"
+  ]
+}

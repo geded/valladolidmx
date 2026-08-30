@@ -1,0 +1,63 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AF",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AF · G8-R1-F1H · Cuarentena editorial de fichas owner_submitted sin revisión",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1H-PILOTO-PUBLICO-NAVEGABLE-CON-CORPUS-REAL-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorizacion Founder G8-R1-F1H (2026-08-30) · remediacion puntual. Coloca hacienda-san-servacio-boutique, cocina-del-frailes y ruta-cenotes-y-selva en noindex,nofollow, fuera del sitemap y fuera del catalogo canonico de Alux mientras permanezcan owner_submitted sin revision. Sin borrado, sin cambio de contenido y sin cambio de estado.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/unreviewed-quarantine.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/contextual-suggest.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/sitemap[.]xml.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "docs/governance/evidence/g8-r1-f1h-unreviewed-quarantine.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run governance:check"
+  ],
+  "file_hashes": {
+    "src/lib/omxds/unreviewed-quarantine.ts": "b67a8c73298648375ad839a1764a3915ca08dcdf6cf60a556c37f8d43cb77d29",
+    "src/lib/alux/contextual-suggest.functions.ts": "04401789aad93b8df707474ffe40c7a7f6789915044d59dfd0adb419b1756162",
+    "src/routes/sitemap[.]xml.ts": "1911dfaca9dcac26d08ab2c634f08535ed6acb7de9096f76d039484d3b104df3",
+    "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx": "e55c46ac0792803e3c9e7c28d673ce2a142ce3df4a4aa7b6998efcb63912fb7a",
+    "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx": "8986b470d4fca926aeae067b40b0b2e8ebbb32c0fd1986939db3af1901260aa3"
+  },
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+    "previous_sha256": "087a3a81f02dc907db9a66f9bfee5219464d0446b3a727f1a08ef04b4246089d",
+    "current_sha256": "e55c46ac0792803e3c9e7c28d673ce2a142ce3df4a4aa7b6998efcb63912fb7a",
+    "semantic_change": "El loader añade la cuarentena editorial de empresas owner_submitted sin revisión al cálculo de noindex. Sin cambios de render, datos ni estado.",
+    "authority": "Autorización Founder G8-R1-F1H · remediación puntual (2026-08-30)"
+  }
+}
