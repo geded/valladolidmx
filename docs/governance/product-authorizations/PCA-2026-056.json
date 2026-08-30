@@ -13,10 +13,6 @@
     },
     {
       "operation": "modify",
-      "path": "scripts/omxds/i3/destination-surface.evidence.mjs"
-    },
-    {
-      "operation": "modify",
       "path": "src/routes/oriente-maya/$destino.index.tsx"
     },
     {

@@ -23,12 +23,13 @@ export function normalizeRepositoryPath(value) {
 
 export function isExactPath(value) {
   const normalized = normalizeRepositoryPath(value);
+  const withoutLiteralDots = normalized.replaceAll("[.]", ".");
   return (
     Boolean(normalized) &&
     !normalized.startsWith("/") &&
     !normalized.endsWith("/") &&
     !normalized.includes("..") &&
-    !/[?*\[\]{}!]/.test(normalized)
+    !/[?*\[\]{}!]/.test(withoutLiteralDots)
   );
 }
 

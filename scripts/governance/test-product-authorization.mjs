@@ -15,7 +15,14 @@ const approved = [
 ];
 
 assert.equal(isExactPath("src/routes/example.tsx"), true);
+assert.equal(isExactPath("src/routes/robots[.]txt.ts"), true);
+assert.equal(isExactPath("src/routes/[.]lovable.oauth.consent.tsx"), true);
 assert.equal(isExactPath("src/routes/**"), false);
+assert.equal(isExactPath("src/routes/[ab].tsx"), false);
+assert.equal(isExactPath("src/routes/file[?].tsx"), false);
+assert.equal(isExactPath("src/routes/file[].tsx"), false);
+assert.equal(isExactPath("src/routes/file[.].tsx"), true);
+assert.equal(isExactPath("src/routes/file[.][x].tsx"), false);
 assert.deepEqual(
   parseNameStatus(
     "A\tsrc/routes/example.tsx\nM\tsrc/components/cards/Example.tsx\nR100\tsrc/lib/old.ts\tsrc/lib/new.ts\n",
@@ -84,4 +91,4 @@ assert.match(
   /UNAUTHORIZED rename/,
 );
 
-console.log(JSON.stringify({ result: "PASS", cases: 10 }, null, 2));
+console.log(JSON.stringify({ result: "PASS", cases: 17 }, null, 2));
