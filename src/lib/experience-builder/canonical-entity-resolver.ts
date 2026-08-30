@@ -60,7 +60,13 @@ export interface CanonicalEntityResolutionInput {
   /** Slug de `place_types` cuando `entityType === "place"`. */
   readonly placeType?: string | null;
   readonly override?: EntityTemplateOverride | null;
+  /**
+   * G8-R1-F1L·P0 — Sólo informativo. La elegibilidad por medios jamás cambia
+   * la familia; decide únicamente el modo (Editorial / Cinematográfica).
+   */
   readonly premiumEligible?: boolean;
+  /** Único interruptor que degrada a superficie estándar (contexto interno). */
+  readonly forceStandardSurface?: boolean;
 }
 
 export interface CanonicalEntityResolution extends EntityTemplateResolution {
@@ -84,14 +90,15 @@ function resolvePlace(input: CanonicalEntityResolutionInput): CanonicalEntityRes
   const slug = normalize(input.placeType ?? input.categorySlug);
   const variant = PLACE_PREMIUM_VARIANTS.find((v) => v.slug === slug) ?? null;
 
-  if (input.premiumEligible === false) {
+  // G8-R1-F1L·P0 — La ausencia de medios nunca expulsa a un lugar de su familia.
+  if (input.forceStandardSurface === true) {
     return {
       source: "standard",
       presetId: null,
       family: null,
       canonicalFamily: "place",
       variant: variant?.slug ?? null,
-      reason: "entidad sin elegibilidad premium",
+      reason: "superficie estándar solicitada explícitamente por el contexto",
       devWarning: null,
     };
   }
@@ -147,6 +154,7 @@ export function resolveCanonicalEntityTemplate(
     productType: input.productType ?? null,
     override: input.override ?? null,
     premiumEligible: input.premiumEligible,
+    forceStandardSurface: input.forceStandardSurface,
   });
 
   if (base.family) {

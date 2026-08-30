@@ -57,8 +57,21 @@ const REQUIRES_LOCATION: Record<PremiumEligibilityKind, boolean> = {
 const ACCEPTED_EDITORIAL_STATES = new Set(["approved", "published"]);
 
 export interface PremiumEligibilityResult {
+  /**
+   * G8-R1-F1L·P0 — Pertenencia a la FAMILIA premium (modo Editorial base).
+   * NO depende de portada ni de galería: los medios nunca expulsan.
+   */
+  readonly familyEligible: boolean;
+  /** Requisitos de medios G8-M1 para el modo Cinematográfico. */
+  readonly cinematicEligible: boolean;
+  /**
+   * Compatibilidad histórica: equivale a `familyEligible`. Ningún consumidor
+   * puede usarlo para decidir la familia a partir de medios.
+   */
   readonly eligible: boolean;
   readonly missing: readonly string[];
+  /** Faltantes que sólo bloquean Cinematográfica. */
+  readonly cinematicMissing: readonly string[];
   /** La elegibilidad NUNCA implica publicación ni activación de flag. */
   readonly publishes: false;
   readonly activatesFlag: false;
@@ -74,18 +87,25 @@ export function evaluatePremiumEligibility(
   if (!facts.canonicalPath) missing.push("canonical_path");
   if (!facts.hasRealContent) missing.push("real_content");
   if (facts.isDemoSeed) missing.push("demo_content_present");
-
-  const cover = evaluateGovernedCover(facts.cover);
-  if (!cover.eligible) missing.push(...cover.failures.map((f) => `cover:${f}`));
-
-  if (facts.approvedGalleryCount < MIN_GALLERY[facts.kind]) missing.push("gallery_minimum");
   if (REQUIRES_LOCATION[facts.kind] && !facts.hasValidLocation) missing.push("location");
   if (!facts.hasRequiredRelations) missing.push("required_relations");
   if (!facts.hasAuditTrail) missing.push("audit_trail");
 
+  // Requisitos EXCLUSIVOS del modo Cinematográfico (medios).
+  const cinematicMissing: string[] = [];
+  const cover = evaluateGovernedCover(facts.cover);
+  if (!cover.eligible) cinematicMissing.push(...cover.failures.map((f) => `cover:${f}`));
+  if (facts.approvedGalleryCount < MIN_GALLERY[facts.kind])
+    cinematicMissing.push("gallery_minimum");
+
+  const familyEligible = missing.length === 0;
+
   return {
-    eligible: missing.length === 0,
+    familyEligible,
+    cinematicEligible: familyEligible && cinematicMissing.length === 0,
+    eligible: familyEligible,
     missing,
+    cinematicMissing,
     publishes: false,
     activatesFlag: false,
   };

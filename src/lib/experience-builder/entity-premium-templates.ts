@@ -448,8 +448,19 @@ export interface EntityTemplateResolutionInput {
   readonly productType?: string | null;
   /** Override editorial individual (opcional). */
   readonly override?: EntityTemplateOverride | null;
-  /** Elegibilidad premium de la entidad (por defecto `true`). */
+  /**
+   * G8-R1-F1L·P0 — DEPRECADO como criterio de familia.
+   *
+   * La elegibilidad premium (medios, portada, galería) NUNCA cambia la
+   * familia ni el preset: sólo decide el MODO (Editorial vs Cinematográfica).
+   * Este campo se conserva por compatibilidad y ya no degrada a estándar.
+   */
   readonly premiumEligible?: boolean;
+  /**
+   * Contexto que exige explícitamente superficie estándar (por ejemplo una
+   * vista previa interna de CMS). Único interruptor que degrada la familia.
+   */
+  readonly forceStandardSurface?: boolean;
 }
 
 export type EntityTemplateResolutionSource = "override" | "family" | "standard";
@@ -521,9 +532,12 @@ export function resolveEntityTemplate(
       `[G8-P2] familia no reconocida para ${input.entityId} (${input.entityType}/${input.categorySlug ?? "-"}/${input.productType ?? "-"})`,
     );
   }
-  if (input.premiumEligible === false) {
-    return STANDARD("entidad sin elegibilidad premium");
+  // G8-R1-F1L·P0 — La falta de medios NO expulsa a la entidad de su familia.
+  // Sólo un contexto que pide explícitamente superficie estándar degrada.
+  if (input.forceStandardSurface === true) {
+    return STANDARD("superficie estándar solicitada explícitamente por el contexto");
   }
+
   if (!familyPreset.autoAssign) {
     return STANDARD(`preset ${familyPreset.id} pendiente de aceptación visual Founder`);
   }
