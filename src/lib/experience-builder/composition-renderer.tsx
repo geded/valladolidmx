@@ -940,9 +940,12 @@ function readMapDto(config: Record<string, unknown>): ExperienceMapDTO | null {
 
 const ExperienceMapRender: BlockPreview = ({ node }) => {
   const dto = readMapDto(node.config);
-  if (!dto) return null;
+  // G8-R1-F1J-HOME-PREMIUM-R2 · Sin puntos estáticos el bloque no se omite:
+  // resuelve el corpus real publicado con la autoridad de elegibilidad única.
+  if (!dto) return <SmartTerritoryMap config={node.config} />;
   return <ExperienceMapBlock dto={dto} />;
 };
+
 
 PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
