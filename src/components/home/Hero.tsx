@@ -109,6 +109,15 @@ export function Hero({ config }: HeroProps = {}) {
   const legacyBg = config?.background_image?.trim();
   const slides: readonly string[] =
     configSlides && configSlides.length > 0 ? configSlides : legacyBg ? [legacyBg] : DEFAULT_SLIDES;
+  /**
+   * G8-R1-F1J-HOME-PREMIUM · Marcador neutral piedra/caliza.
+   * Cuando el editor declara explícitamente `background_images: []` (sin
+   * portada real acreditada G8-M1), la variante editorial NO cae a las
+   * imágenes por defecto: renderiza un panel neutral de piedra/caliza con
+   * tokens del Design System. Cero fixtures, cero medios ajenos.
+   */
+  const useNeutralStoneMarker = Boolean(configSlides && configSlides.length === 0 && !legacyBg);
+
 
   const intervalMs = Math.max(
     2000,
@@ -237,23 +246,39 @@ export function Hero({ config }: HeroProps = {}) {
         >
           <div
             data-hero-media
-            className={`relative min-h-[42svh] w-full overflow-hidden bg-foreground @3xl:min-h-[70svh] ${mediaRight ? "@3xl:order-2" : "@3xl:order-1"}`}
+            data-hero-media-mode={useNeutralStoneMarker ? "stone-marker" : "photo"}
+            className={`relative min-h-[42svh] w-full overflow-hidden @3xl:min-h-[70svh] ${
+              useNeutralStoneMarker ? "bg-muted" : "bg-foreground"
+            } ${mediaRight ? "@3xl:order-2" : "@3xl:order-1"}`}
           >
-            {slides.map((src, i) => (
-              <img
-                key={`${src}-${i}`}
-                src={src}
-                alt=""
+            {useNeutralStoneMarker ? (
+              <div
                 aria-hidden
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
-                  slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0"
-                }`}
-                style={{ objectPosition: backgroundPosition }}
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
-            ))}
+                className="absolute inset-0 bg-gradient-to-br from-muted via-secondary/40 to-muted"
+              >
+                <div className="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle_at_18%_22%,color-mix(in_oklab,var(--color-foreground)_9%,transparent)_0,transparent_38%),radial-gradient(circle_at_74%_68%,color-mix(in_oklab,var(--color-foreground)_7%,transparent)_0,transparent_42%)]" />
+                <div className="absolute inset-x-6 bottom-6 text-xs uppercase tracking-[0.28em] text-muted-foreground @3xl:inset-x-10">
+                  Oriente Maya
+                </div>
+              </div>
+            ) : (
+              slides.map((src, i) => (
+                <img
+                  key={`${src}-${i}`}
+                  src={src}
+                  alt=""
+                  aria-hidden
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+                    slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ objectPosition: backgroundPosition }}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              ))
+            )}
           </div>
+
           <div
             data-hero-safe-zone={safeZone}
             className={`flex w-full min-w-0 flex-col justify-center gap-4 ${safeZoneClass} ${mediaRight ? "@3xl:order-1" : "@3xl:order-2"} ${textAlignClass}`}

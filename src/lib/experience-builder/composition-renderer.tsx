@@ -675,8 +675,15 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
           search_max_width: node.config.search_max_width as string | undefined,
           text_alignment: node.config.text_alignment as string | undefined,
           search_alignment: node.config.search_alignment as string | undefined,
+          // G8-R1-F1J-HOME-PREMIUM · La variante editorial y sus controles de
+          // composición deben viajar del DTO del CMS al bloque oficial.
+          variant: node.config.variant as string | undefined,
+          media_side: node.config.media_side as string | undefined,
+          mobile_order: node.config.mobile_order as string | undefined,
+          text_safe_zone: node.config.text_safe_zone as string | undefined,
           __typography:
             (node.config.__typography as Record<string, FieldTypography> | undefined) ?? undefined,
+
         }}
       />
     );
