@@ -229,7 +229,6 @@ function applyOrder(builder: QueryBuilder, spec: TableSpec, o: SmartBlockOrderBy
   return builder.order(o.column, { ascending: (o.direction ?? "asc") === "asc" });
 }
 
-
 /** Firma en lote las imágenes de portada (buckets privados). */
 async function signMedia(ids: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
@@ -310,7 +309,6 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
       error: { message: string } | null;
     }>)) ?? { data: null, error: null };
     if (error) return { items: [], count: 0, cached: false, error: error.message };
-
 
     const adapted = ((rows ?? []) as Row[])
       .map((r) => spec.adapt(r))
