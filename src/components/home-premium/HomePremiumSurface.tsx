@@ -312,9 +312,9 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
           </div>
         </div>
         <figure className="relative min-h-[22rem] overflow-hidden lg:min-h-[38rem]">
-          <img
-            src={slide.media.url}
-            alt={slide.media.alt}
+          <EditorialMediaFrame
+            media={slide.media}
+            label={content.hero.title}
             loading="eager"
             className="absolute inset-0 size-full object-cover"
           />
@@ -333,9 +333,9 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
       <div className="relative min-h-[28rem] sm:min-h-[36rem]">
-        <img
-          src={slide.media.url}
-          alt={slide.media.alt}
+        <EditorialMediaFrame
+          media={slide.media}
+          label={content.hero.title}
           loading="eager"
           className="absolute inset-0 size-full object-cover"
         />
@@ -542,10 +542,9 @@ function RoutesSection({
               )}
             >
               <div className="grid grid-cols-[7rem_1fr] border-b border-border">
-                <img
-                  src={route.media.url}
-                  alt={route.media.alt}
-                  loading="lazy"
+                <EditorialMediaFrame
+                  media={route.media}
+                  label={route.title}
                   className="h-full min-h-32 w-full object-cover"
                 />
                 <div className="p-4">
@@ -648,10 +647,9 @@ function DestinationsSection({
               )}
             >
               <div className="relative">
-                <img
-                  src={destination.media.url}
-                  alt={destination.media.alt}
-                  loading="lazy"
+                <EditorialMediaFrame
+                  media={destination.media}
+                  label={destination.name}
                   className={cn(
                     "w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]",
                     wide ? "aspect-[16/9]" : "aspect-[4/3]",
@@ -720,10 +718,8 @@ function PueblosMagicosSection({
             key={pueblo.name}
             className="flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3"
           >
-            <img
-              src={pueblo.media.url}
-              alt={pueblo.media.alt}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={pueblo.media}
               className="size-20 shrink-0 rounded-xl object-cover"
             />
             <div className="min-w-0">
@@ -778,10 +774,9 @@ function ExperiencesSection({
         )}
       >
         <article className="overflow-hidden rounded-2xl border border-border bg-card">
-          <img
-            src={featured.media.url}
-            alt={featured.media.alt}
-            loading="lazy"
+          <EditorialMediaFrame
+            media={featured.media}
+            label={featured.title}
             className="aspect-[16/9] w-full object-cover"
           />
           <div className="p-5">
@@ -813,10 +808,9 @@ function CompactMediaRow({
 }) {
   return (
     <article className="grid min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr]">
-      <img
-        src={item.media.url}
-        alt={item.media.alt}
-        loading="lazy"
+      <EditorialMediaFrame
+        media={item.media}
+        label={item.title}
         className="h-full w-full object-cover"
       />
       <div className="flex min-w-0 flex-col justify-center p-4">
@@ -878,10 +872,9 @@ function ServiceColumn({
             key={item.title}
             className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[11rem_1fr]"
           >
-            <img
-              src={item.media.url}
-              alt={item.media.alt}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={item.media}
+              label={item.title}
               className="h-full min-h-40 w-full object-cover"
             />
             <div className="min-w-0 p-4">
@@ -916,10 +909,9 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             {content.eventos.description}
           </p>
-          <img
-            src={content.eventos.media.url}
-            alt={content.eventos.media.alt}
-            loading="lazy"
+          <EditorialMediaFrame
+            media={content.eventos.media}
+            label={content.eventos.title}
             className="mt-5 aspect-[16/10] w-full rounded-2xl object-cover"
           />
         </div>
