@@ -14,7 +14,8 @@ import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface PublicDestinationDTO {
-  id: string;
+  /** UUID canónico. Siempre presente en lecturas productivas; opcional en previews históricos. */
+  id?: string;
   slug: string;
   name: string;
   tagline: string | null;

@@ -246,7 +246,7 @@ export function DestinationSurfaceContractBoundary({
             content={content}
             heroVariant={premiumEnabled ? "cinematic" : "editorial"}
             sections={{ gallery: accreditedMedia.length > 0 }}
-            heroAction={<AddToTravelPlanButton kind="destination" targetId={dbData.id} title={dbData.name} slug={destinationSlug} imageUrl={content.hero.cover.url || null} subtitle={dbData.tagline} variant="full" eligibilityMode="legacy" />}
+            heroAction={dbData.id ? <AddToTravelPlanButton kind="destination" targetId={dbData.id} title={dbData.name} slug={destinationSlug} imageUrl={content.hero.cover.url || null} subtitle={dbData.tagline} variant="full" eligibilityMode="legacy" /> : null}
             renderServicePreview={(service) => <PremiumRelatedCollection service={service.key} name={dbData.name} />}
           />
         </DestinationSurfaceProvider>
