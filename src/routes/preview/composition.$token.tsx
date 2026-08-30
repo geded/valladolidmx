@@ -67,7 +67,6 @@ function PreviewCompositionView() {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "America/Merida",
-    timeZoneName: "short",
   }).format(new Date(payload.expires_at));
 
   // 18.51 · La identidad y los valores gobernados los resuelve el
