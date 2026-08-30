@@ -1,0 +1,728 @@
+{
+  "id": "g8-r1-f1h-public-pilot",
+  "wave": "G8-R1-F1H",
+  "recorded_at": "2026-08-30",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "reconciliation_23_to_22": {
+    "entity": "taberna-de-los-frailes",
+    "family": "business",
+    "reason": "Verificacion documental NO_ENCONTRADO en G8-R1-F1G; sin procedencia acreditable. Permanece como demo en el lote, fuera del piloto."
+  },
+  "allowlist": {
+    "source": "src/lib/omxds/pilot-allowlist.ts",
+    "total": 22,
+    "paths": [
+      "/oriente-maya/izamal",
+      "/oriente-maya/espita",
+      "/oriente-maya/ek-balam",
+      "/oriente-maya/rio-lagartos",
+      "/oriente-maya/las-coloradas",
+      "/oriente-maya/uayma",
+      "/oriente-maya/valladolid/lugares/convento-san-bernardino",
+      "/oriente-maya/valladolid/lugares/calzada-de-los-frailes",
+      "/oriente-maya/valladolid/lugares/cenote-zaci",
+      "/oriente-maya/valladolid/lugares/cenote-suytun",
+      "/oriente-maya/tinum/lugares/cenote-ik-kil",
+      "/oriente-maya/valladolid/restaurantes/conato-1910",
+      "/oriente-maya/valladolid/restaurantes/yerbabuena-del-sisal",
+      "/oriente-maya/valladolid/hoteles/hotel-casa-tia-micha",
+      "/oriente-maya/valladolid/experiencias/coqui-coqui-valladolid",
+      "/oriente-maya/valladolid/cenotes/zazil-tunich",
+      "/oriente-maya/izamal/restaurantes/kinich-restaurante",
+      "/oriente-maya/izamal/hoteles/macan-che-bed-breakfast",
+      "/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+      "/oriente-maya/valladolid/cenotes/zazil-tunich/recorrido-cenote-museo",
+      "/oriente-maya/valladolid/cenotes/zazil-tunich/ceremonia-maya",
+      "/oriente-maya/valladolid/cenotes/zazil-tunich/cena-romantica-en-cenote"
+    ]
+  },
+  "withdrawn_class_b": {
+    "count": 9,
+    "action": "content_audit_log:g8_r1_f1h_withdraw_class_b",
+    "reversible": true
+  },
+  "sitemap": {
+    "urls": 17,
+    "pilot_entities_present": 0,
+    "templates_present": 0
+  },
+  "presentation": {
+    "editorial": 22,
+    "cinematografica": 0,
+    "reason": "Cero portadas G8-M1 aprobadas"
+  },
+  "qa": {
+    "checks": 81,
+    "widths": [
+      390,
+      768,
+      1440
+    ],
+    "http_200": 81,
+    "overflow_failures": 0,
+    "console_errors": 0,
+    "demo_leaks": 0,
+    "results": [
+      {
+        "w": 390,
+        "path": "/",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/restaurantes",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/alux",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/izamal",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/espita",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/ek-balam",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/rio-lagartos",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/las-coloradas",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/uayma",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/lugares/convento-san-bernardino",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/lugares/calzada-de-los-frailes",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/lugares/cenote-zaci",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/lugares/cenote-suytun",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/tinum/lugares/cenote-ik-kil",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/restaurantes/conato-1910",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/restaurantes/yerbabuena-del-sisal",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/hoteles/hotel-casa-tia-micha",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/experiencias/coqui-coqui-valladolid",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/izamal/restaurantes/kinich-restaurante",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/izamal/hoteles/macan-che-bed-breakfast",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/recorrido-cenote-museo",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/ceremonia-maya",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 390,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/cena-romantica-en-cenote",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/restaurantes",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/alux",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/izamal",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/espita",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/ek-balam",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/rio-lagartos",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/las-coloradas",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/uayma",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/lugares/convento-san-bernardino",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/lugares/calzada-de-los-frailes",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/lugares/cenote-zaci",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/lugares/cenote-suytun",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/tinum/lugares/cenote-ik-kil",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/restaurantes/conato-1910",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/restaurantes/yerbabuena-del-sisal",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/hoteles/hotel-casa-tia-micha",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/experiencias/coqui-coqui-valladolid",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/izamal/restaurantes/kinich-restaurante",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/izamal/hoteles/macan-che-bed-breakfast",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/recorrido-cenote-museo",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/ceremonia-maya",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 768,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/cena-romantica-en-cenote",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/restaurantes",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/alux",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/izamal",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/espita",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/ek-balam",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/rio-lagartos",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/las-coloradas",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/uayma",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/lugares/convento-san-bernardino",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/lugares/calzada-de-los-frailes",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/lugares/cenote-zaci",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/lugares/cenote-suytun",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/tinum/lugares/cenote-ik-kil",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/restaurantes/conato-1910",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/restaurantes/yerbabuena-del-sisal",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/hoteles/hotel-casa-tia-micha",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/experiencias/coqui-coqui-valladolid",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/izamal/restaurantes/kinich-restaurante",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/izamal/hoteles/macan-che-bed-breakfast",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/recorrido-cenote-museo",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/ceremonia-maya",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      },
+      {
+        "w": 1440,
+        "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/cena-romantica-en-cenote",
+        "status": 200,
+        "overflow": 0,
+        "console_errors": [],
+        "demo_leak": []
+      }
+    ]
+  },
+  "out_of_scope_pending_founder": [
+    "hacienda-san-servacio-boutique",
+    "cocina-del-frailes",
+    "ruta-cenotes-y-selva"
+  ],
+  "file_hashes": {
+    "src/lib/omxds/pilot-allowlist.ts": "a5a161af73ba9ea79f6d1edab23c49fe4d015821cabdd678e9b0f6701ee76acd",
+    "src/lib/alux/canonical-catalog.server.ts": "d99a2b0f6c1e476c12845df2ec4bfd4ae81710b1235cf25647cba075749914c9",
+    "src/lib/experience-builder/eb-sitemap.functions.ts": "9c61f5359926a5f0ab19e960f25b4563a9ef172fc76d181f5dd36b4781db0a9c",
+    "src/routes/oriente-maya/$destino.lugares.$slug.tsx": "d47a07d0072cb1382204a07c5f7a91cb70dbe0c3bfdaa1739be2d4e5f917ac6a",
+    "src/components/experience-builder/blocks/experience-subnav/ExperienceSubnav.tsx": "19f9cf861d7702370d96d10f5cdad62b6479898e04b55f0470257930e81ecfe8"
+  }
+}
