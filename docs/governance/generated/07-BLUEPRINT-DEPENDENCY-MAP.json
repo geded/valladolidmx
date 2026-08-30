@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.82",
+    "version": "0.83",
     "state": "Approved",
-    "source_sha256": "5447340185cace7c26bfd833c7b113d4238cf385b379a95c2208b8388efaa60e",
+    "source_sha256": "db3e5e3275ab6bc92c4badddb551aa294d450fa910b7dab8e7129dd4a046ae21",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -9798,6 +9798,21 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-057.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-057.json"
+    },
+    {
+      "id": "ART:supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-058.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-058.json"
     }
   ],
   "edges": [
@@ -26265,6 +26280,33 @@
     {
       "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-057.json:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
       "origin": "ART:docs/governance/product-authorizations/PCA-2026-057.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-058.json:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-058.json",
       "relation": "implements",
       "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-F1L-PR58-GOVERNANCE-RECONCILIATION-MANIFEST-v1.0.md § Implementación",

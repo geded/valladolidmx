@@ -8,8 +8,8 @@
 ## 1. Resultado de adjudicación
 
 - Universo del control #284: **181** artefactos.
-- Con autoridad documental Approved inequívoca: **179**.
-- Bloqueados por ausencia de blueprint Approved correspondiente: **2**.
+- Con autoridad documental Approved inequívoca tras el addendum Founder del control #287: **181**.
+- Bloqueados: **0**.
 - Código, datos, medios, migraciones, flags y comportamiento modificados por esta reconciliación: **0**.
 
 ## 2. Resumen por autoridad aprobada
@@ -221,14 +221,14 @@
 | 178 | `supabase/migrations/20260830143421_d5d27075-8fd6-4b15-b115-a16b7ed7aa4b.sql` | `3398df13e6a1637460642b9b5ace266113026a180b2cd2c3b93045435d0aeffa` | `docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md` |
 | 179 | `supabase/migrations/20260830143533_2b67c92f-81d4-4199-bbb1-8a613b12352c.sql` | `df9065196a7ccc91651e47849b7fd48c7b35cb34abe8ef44ed1ba2fbd5e49d67` | `docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md` |
 
-## 4. Artefactos bloqueados
+## 4. Addendum Founder · control #287
 
-Estos artefactos **no** se incorporan a la columna de implementación del Índice Maestro ni a las proyecciones 07/08. El documento temático existente para Customer Case File permanece `Draft`, por lo que no satisface la condición Founder de blueprint aprobado.
+La autorización Founder del 2026-08-30 admite exclusivamente las siguientes dos revisiones históricas por su pareja exacta ruta + SHA-256, bajo la autoridad Approved de este manifiesto de consolidación. No aprueba ni modifica el blueprint temático `14.60.2`, que permanece `Draft`; tampoco autoriza futuros digests, prefijos ni cobertura genérica.
 
-| Ruta exacta | SHA-256 actual | Motivo de bloqueo |
+| Ruta exacta | SHA-256 actual | Autoridad exacta |
 | --- | --- | --- |
-| `supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql` | `ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9` | Sólo existe autoridad temática `docs/blueprint/14.60.2-ADENDA-CUSTOMER-CASE-FILE-v1.0.md` en estado `Draft`; no se admite automáticamente. |
-| `supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql` | `ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9` | Sólo existe autoridad temática `docs/blueprint/14.60.2-ADENDA-CUSTOMER-CASE-FILE-v1.0.md` en estado `Draft`; no se admite automáticamente. |
+| `supabase/migrations/20260827214117_63152f35-7ee6-49e5-af4f-f2fec5ec6b34.sql` | `ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9` | Addendum Founder del control #287 + este manifiesto Approved. |
+| `supabase/migrations/20260827214359_604c0109-bd38-4ffb-9ea0-97a00ecaa519.sql` | `ce656e33fa2a236b64f8519425227caca3c62ab0d9ea0bdca4324fc9a42424f9` | Addendum Founder del control #287 + este manifiesto Approved. |
 
 ## 5. Invariantes
 
