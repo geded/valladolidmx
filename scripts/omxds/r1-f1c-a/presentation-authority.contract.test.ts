@@ -271,7 +271,7 @@ describe("elegibilidad premium determinista", () => {
       const r = evaluatePremiumEligibility({ ...base, ...patch });
       expect(r.familyEligible).toBe(true);
       expect(r.cinematicEligible).toBe(false);
-      expect(r.missing).toContain(missing);
+      expect(r.cinematicMissing).toContain(missing);
     });
   }
 
