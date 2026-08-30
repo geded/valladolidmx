@@ -18,7 +18,16 @@ export function SmartDestinationsGrid({
   items: SmartDestinationItem[];
   title?: string;
 }) {
-  if (!items?.length) return <SmartEmpty message="Aún no hay destinos para mostrar." />;
+  // La sección conserva su título aunque no haya resultados: la ausencia
+  // de datos es un estado editorial legible, no un bloque desaparecido.
+  if (!items?.length) {
+    return (
+      <section className="space-y-4">
+        {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
+        <SmartEmpty message="Aún no hay destinos para mostrar." />
+      </section>
+    );
+  }
   return (
     <section className="space-y-4">
       {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}

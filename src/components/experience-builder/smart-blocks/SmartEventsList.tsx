@@ -27,7 +27,16 @@ function formatDate(iso?: string | null): string {
 }
 
 export function SmartEventsList({ items, title }: { items: SmartEventItem[]; title?: string }) {
-  if (!items?.length) return <SmartEmpty message="No hay eventos programados." />;
+  // La sección conserva su título aunque no haya resultados: la ausencia
+  // de datos es un estado editorial legible, no un bloque desaparecido.
+  if (!items?.length) {
+    return (
+      <section className="space-y-4">
+        {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
+        <SmartEmpty message="No hay eventos programados." />
+      </section>
+    );
+  }
   return (
     <section className="space-y-4">
       {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
