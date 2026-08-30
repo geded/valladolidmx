@@ -43,6 +43,7 @@ import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as ViajeroHandleRouteImport } from './routes/viajero.$handle'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
+import { Route as PreviewF1kDestinationsRouteImport } from './routes/preview/f1k-destinations'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
@@ -396,6 +397,11 @@ const ViajeCompartidoTokenRoute = ViajeCompartidoTokenRouteImport.update({
 const ProductoSlugRoute = ProductoSlugRouteImport.update({
   id: '/producto/$slug',
   path: '/producto/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewF1kDestinationsRoute = PreviewF1kDestinationsRouteImport.update({
+  id: '/preview/f1k-destinations',
+  path: '/preview/f1k-destinations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PreviewTokenRoute = PreviewTokenRouteImport.update({
@@ -1556,6 +1562,7 @@ export interface FileRoutesByFullPath {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
+  '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
@@ -1769,6 +1776,7 @@ export interface FileRoutesByTo {
   '/marketplace/$': typeof MarketplaceSplatRoute
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
+  '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
@@ -1988,6 +1996,7 @@ export interface FileRoutesById {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
+  '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
@@ -2210,6 +2219,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
+    | '/preview/f1k-destinations'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
@@ -2423,6 +2433,7 @@ export interface FileRouteTypes {
     | '/marketplace/$'
     | '/p/$slug'
     | '/preview/$token'
+    | '/preview/f1k-destinations'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
@@ -2641,6 +2652,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
+    | '/preview/f1k-destinations'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
@@ -2853,6 +2865,7 @@ export interface RootRouteChildren {
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
+  PreviewF1kDestinationsRoute: typeof PreviewF1kDestinationsRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
@@ -3120,6 +3133,13 @@ declare module '@tanstack/react-router' {
       path: '/producto/$slug'
       fullPath: '/producto/$slug'
       preLoaderRoute: typeof ProductoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview/f1k-destinations': {
+      id: '/preview/f1k-destinations'
+      path: '/preview/f1k-destinations'
+      fullPath: '/preview/f1k-destinations'
+      preLoaderRoute: typeof PreviewF1kDestinationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/preview/$token': {
@@ -4995,6 +5015,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
+  PreviewF1kDestinationsRoute: PreviewF1kDestinationsRoute,
   ProductoSlugRoute: ProductoSlugRoute,
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,

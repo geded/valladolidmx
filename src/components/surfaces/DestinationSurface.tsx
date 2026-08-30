@@ -202,6 +202,23 @@ function PremiumRelatedCollection({ service, name }: { service: string; name: st
   );
 }
 
+function withoutUnaccreditedRelatedMedia(related?: DestinationRelatedDTO): DestinationRelatedDTO | null {
+  if (!related) return null;
+  const stripBusiness = <T extends { cover_url?: string | null }>(item: T): T => ({
+    ...item,
+    cover_url: null,
+  });
+  return {
+    ...related,
+    hoteles: related.hoteles.map(stripBusiness),
+    restaurantes: related.restaurantes.map(stripBusiness),
+    experiencias: related.experiencias.map(stripBusiness),
+    otras: related.otras.map(stripBusiness),
+    productos: related.productos.map(stripBusiness),
+    eventos: related.eventos?.map((event) => ({ ...event, cover_url: null })) ?? [],
+  };
+}
+
 export function DestinationSurfaceContractBoundary({
   enabled,
   legacy,
@@ -215,6 +232,7 @@ export function DestinationSurfaceContractBoundary({
 }: DestinationSurfaceContractBoundaryProps) {
   if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
     const accreditedMedia = (galleryMedia ?? []).filter((item) => !hasForbiddenDestinationMedia(item));
+    const safeRelated = withoutUnaccreditedRelatedMedia(related);
     const content = buildDestinationPremiumRuntime({
       id: `destination:${destinationSlug}`,
       destination: dbData,
@@ -223,13 +241,15 @@ export function DestinationSurfaceContractBoundary({
     });
     return (
       <div data-omxds-visual-foundations="enabled" data-destination-template="premium-g4" data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}>
-        <DestinationPremiumSurface
-          content={content}
-          heroVariant={premiumEnabled ? "cinematic" : "editorial"}
-          sections={{ gallery: accreditedMedia.length > 0 }}
-          heroAction={<AddToTravelPlanButton kind="destination" targetId={`destination:${destinationSlug}`} title={dbData.name} slug={destinationSlug} imageUrl={content.hero.cover.url || null} subtitle={dbData.tagline} variant="full" eligibilityMode="legacy" />}
-          renderServicePreview={(service) => <PremiumRelatedCollection service={service.key} name={dbData.name} />}
-        />
+        <DestinationSurfaceProvider db={dbData} related={safeRelated} slug={destinationSlug} mapPoints={mapPoints} galleryUrls={accreditedMedia.map((item) => item.url)} galleryMedia={accreditedMedia}>
+          <DestinationPremiumSurface
+            content={content}
+            heroVariant={premiumEnabled ? "cinematic" : "editorial"}
+            sections={{ gallery: accreditedMedia.length > 0 }}
+            heroAction={<AddToTravelPlanButton kind="destination" targetId={`destination:${destinationSlug}`} title={dbData.name} slug={destinationSlug} imageUrl={content.hero.cover.url || null} subtitle={dbData.tagline} variant="full" eligibilityMode="legacy" />}
+            renderServicePreview={(service) => <PremiumRelatedCollection service={service.key} name={dbData.name} />}
+          />
+        </DestinationSurfaceProvider>
       </div>
     );
   }
