@@ -110,15 +110,23 @@ export const Route = createFileRoute("/oriente-maya/")({
 function OrienteMayaIndex() {
   const { composition, destinations } = Route.useLoaderData();
   const declaration = buildRegionContext();
-  // Provider a nivel de ruta — igual patrón que I3 en `/oriente-maya/$destino`.
-  // Cubre las dos ramas de render (EB y fallback) sin tocar sus shells.
+  // G8-R1-F1L-R2 — sin composición premium publicada, la portada regional
+  // usa la autoridad premium aprobada en modo Editorial (nunca legacy).
+  const premiumContent = buildRegionPremiumRuntime({ destinations });
   return (
     <ContextEngineProvider declaration={declaration}>
       {composition ? (
         <CompositionRenderer tree={composition.snapshot} />
       ) : (
-        <RegionSurface destinations={destinations} />
+        <div data-destination-template="premium-g4" data-destination-presentation="editorial">
+          <DestinationPremiumSurface
+            content={premiumContent}
+            heroVariant="editorial"
+            sections={{ gallery: false, servicePreview: false }}
+          />
+        </div>
       )}
     </ContextEngineProvider>
   );
 }
+
