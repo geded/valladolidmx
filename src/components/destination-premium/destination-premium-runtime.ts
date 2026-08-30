@@ -39,7 +39,7 @@ export function buildDestinationPremiumRuntime(input: {
       : []),
     ...mapPoints.map((point) => ({
       id: point.id,
-      kind: point.kind,
+      kind: "business" as const,
       lat: point.lat,
       lng: point.lng,
       title: point.title,
