@@ -1,6 +1,4 @@
-import type {
-  PublicDestinationDTO,
-} from "@/lib/destinations/public-reads.functions";
+import type { PublicDestinationDTO } from "@/lib/destinations/public-reads.functions";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import type {
@@ -72,10 +70,25 @@ export function buildDestinationPremiumRuntime(input: {
     },
     services: [
       { key: "hoteles", label: "Hoteles", hint: "Dónde dormir", media: { url: "", alt: "" } },
-      { key: "restaurantes", label: "Restaurantes", hint: "Dónde comer", media: { url: "", alt: "" } },
+      {
+        key: "restaurantes",
+        label: "Restaurantes",
+        hint: "Dónde comer",
+        media: { url: "", alt: "" },
+      },
       { key: "que-hacer", label: "Qué hacer", hint: "Planes del día", media: { url: "", alt: "" } },
-      { key: "casas-de-vacaciones", label: "Casas de vacaciones", hint: "Estancias completas", media: { url: "", alt: "" } },
-      { key: "experiencias", label: "Experiencias", hint: "Cenotes y cultura viva", media: { url: "", alt: "" } },
+      {
+        key: "casas-de-vacaciones",
+        label: "Casas de vacaciones",
+        hint: "Estancias completas",
+        media: { url: "", alt: "" },
+      },
+      {
+        key: "experiencias",
+        label: "Experiencias",
+        hint: "Cenotes y cultura viva",
+        media: { url: "", alt: "" },
+      },
       { key: "eventos", label: "Eventos", hint: "Agenda del destino", media: { url: "", alt: "" } },
     ],
     servicesNote: "Selecciona una categoría para descubrir opciones publicadas en este destino.",
