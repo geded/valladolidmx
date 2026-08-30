@@ -46,6 +46,7 @@ import {
   resolveCanonicalEntityTemplate,
   type CanonicalEntityFamily,
 } from "@/lib/experience-builder/canonical-entity-resolver";
+import { EVALUATION_LOT_ID } from "@/lib/omxds/evaluation-lot";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
 
@@ -170,6 +171,7 @@ export async function loadAluxCanonicalCandidates(
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .order("name", { ascending: true })
       .limit(limit);
 
@@ -251,6 +253,7 @@ export async function loadAluxCanonicalCandidates(
       .in("business_id", input.publishedBusinessIds as string[])
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .order("name", { ascending: true })
       .limit(limit * 2);
 
@@ -350,6 +353,7 @@ export async function loadAluxCanonicalCandidates(
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .order("starts_at", { ascending: true })
       .limit(limit);
 
@@ -411,6 +415,7 @@ export async function loadAluxCanonicalCandidates(
       .select("id, slug, name")
       .eq("status", "published")
       .is("deleted_at", null)
+      .or(`demo_seed_batch.is.null,demo_seed_batch.neq.${EVALUATION_LOT_ID}`)
       .neq("id", input.destinationId)
       .order("name", { ascending: true })
       .limit(limit);
