@@ -1,0 +1,73 @@
+{
+  "id": "g8-r1-f1i-r1-public-eligibility",
+  "authorization": "PCA-2026-029-ADDENDUM-AG",
+  "date": "2026-08-30",
+  "defects_remediated": ["DEF-F1I-001", "DEF-F1I-002"],
+  "authority": {
+    "module": "src/lib/omxds/public-eligibility.ts",
+    "rule": "businesses.source_review_state = 'approved' (fail-closed)",
+    "replaces": "src/lib/omxds/unreviewed-quarantine.ts (lista de slugs, eliminada)",
+    "self_healing": "Al aprobar editorialmente la revisión de fuente, la ficha vuelve a descubrimiento sin cambios de código."
+  },
+  "surfaces_covered": [
+    "sitemap.xml (empresas y productos)",
+    "listados públicos (6 familias vía marketplace-reads)",
+    "buscador (RPC public.search_marketplace)",
+    "home · empresas destacadas (cms/public-reads)",
+    "destino · mapa y relacionados (destinations/public-reads)",
+    "relacionados de empresa y de categoría",
+    "discovery navigator e inline explorer",
+    "catálogo de Alux (contextual-suggest) y API pública de Alux",
+    "herramienta MCP search-businesses"
+  ],
+  "not_covered_by_design": [
+    "getMarketplaceBusinessBySlug y getMarketplaceProductBySlug (fichas directas): siguen respondiendo 200 con noindex,nofollow. No se borra, no se despublica y no se altera contenido."
+  ],
+  "data_state": {
+    "published_businesses": 10,
+    "approved_editorial": [
+      "conato-1910",
+      "coqui-coqui-valladolid",
+      "hotel-casa-tia-micha",
+      "kinich-restaurante",
+      "macan-che-bed-breakfast",
+      "yerbabuena-del-sisal",
+      "zazil-tunich"
+    ],
+    "owner_submitted_unreviewed": [
+      "hacienda-san-servacio-boutique",
+      "cocina-del-frailes",
+      "ruta-cenotes-y-selva"
+    ]
+  },
+  "runtime_qa": {
+    "method": "SSR HTML fetch sobre el servidor de desarrollo",
+    "checks": [
+      { "url": "/", "unreviewed_occurrences": 0 },
+      { "url": "/hoteles", "unreviewed_occurrences": 0, "pilot_present": true },
+      { "url": "/restaurantes", "unreviewed_occurrences": 0, "pilot_present": true },
+      { "url": "/experiencias", "unreviewed_occurrences": 0 },
+      { "url": "/marketplace", "unreviewed_occurrences": 0 },
+      { "url": "/buscar", "unreviewed_occurrences": 0 },
+      { "url": "/oriente-maya", "unreviewed_occurrences": 0 },
+      { "url": "/oriente-maya/valladolid", "unreviewed_occurrences": 0, "pilot_present": true },
+      { "url": "/sitemap.xml", "unreviewed_occurrences": 0, "loc_count": 14 },
+      {
+        "url": "/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+        "http_status": 200,
+        "noindex": true
+      }
+    ]
+  },
+  "def_f1i_002": {
+    "before": "href construido a mano: `/oriente-maya/${destination.slug}/${row.category_slug || 'empresas'}/${row.slug}`",
+    "after": "buildCanonicalEntityUrl({ entityType: 'business', ... }) vía resolveCanonicalPath; las filas sin URL resoluble se excluyen de las candidatas (cero enlaces rotos, cero categoría inventada 'empresas')."
+  },
+  "gates": {
+    "typecheck": "PASS",
+    "runtime_ssr_qa": "PASS",
+    "flag_omxds_visual_v1_contracts_enabled": false,
+    "noindex_piloto": "intacto",
+    "content_or_status_changes": "ninguno"
+  }
+}
