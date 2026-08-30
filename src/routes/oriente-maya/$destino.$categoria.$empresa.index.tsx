@@ -43,14 +43,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       },
     });
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
-    const [
-      business,
-      specific,
-      template,
-      surfaceContractsEnabled,
-      evaluationLot,
-      nonDiscoverable,
-    ] = await Promise.all([
+    const [business, specific, template, surfaceContractsEnabled, evaluationLot, nonDiscoverable] =
+      await Promise.all([
         getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
         // SEO.A3.M1 · Authority Business Landing — composition-first.
         // Se resuelve primero una composición específica por slug
