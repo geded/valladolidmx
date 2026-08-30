@@ -256,6 +256,23 @@ describe("elegibilidad premium determinista", () => {
     expect(r.activatesFlag).toBe(false);
   });
 
+  /**
+   * G8-R1-F1L · P0 — familia ≠ medios. Los déficits de fotografía ya no
+   * expulsan a la entidad de su familia premium: sólo bloquean el modo
+   * Cinematográfico. El resto de requisitos sigue siendo bloqueante.
+   */
+  const mediaCases: [string, Partial<PremiumEligibilityFacts>, string][] = [
+  ];
+
+  for (const [name, patch, missing] of mediaCases) {
+    it(`mantiene familia premium en modo editorial: ${name}`, () => {
+      const r = evaluatePremiumEligibility({ ...base, ...patch });
+      expect(r.familyEligible).toBe(true);
+      expect(r.cinematicEligible).toBe(false);
+      expect(r.missing).toContain(missing);
+    });
+  }
+
   const cases: [string, Partial<PremiumEligibilityFacts>, string][] = [
     ["sin estado editorial", { editorialState: "draft" }, "editorial_state"],
     ["sin clasificación", { canonicalClassification: null }, "canonical_classification"],
