@@ -683,7 +683,7 @@ function G7IntegratedFixture() {
           mobile_order: "media-first",
           text_safe_zone: "lg",
           eyebrow: "Despierta en Valladolid",
-          title: "El Oriente Maya, contado como una historia editorial.",
+          title: "El Oriente Maya de Yucatán, contado como una historia editorial.",
           subtitle:
             "Cenotes, haciendas y cocina de humo a media hora del centro histórico de Valladolid.",
           background_images: [MEDIA.centro.url, MEDIA.calle.url],

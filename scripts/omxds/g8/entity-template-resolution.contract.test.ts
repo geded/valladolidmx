@@ -122,13 +122,24 @@ const overrideNotApproved = resolveEntityTemplate({
 });
 assert.equal(overrideNotApproved.source, "family", "un override sin aprobación nunca aplica");
 
-// 12 · entidad sin elegibilidad premium
+// 12 · G8-R1-F1L·P0 — familia ≠ medios: sin acreditación cinematográfica la
+// entidad conserva su familia premium; sólo el contexto explícito degrada.
 assert.equal(
   resolveEntityTemplate({
     entityId: "b-6",
     entityType: "business",
     categorySlug: "hoteles",
     premiumEligible: false,
+  }).source,
+  "family",
+);
+assert.equal(
+  resolveEntityTemplate({
+    entityId: "b-6",
+    entityType: "business",
+    categorySlug: "hoteles",
+    premiumEligible: false,
+    forceStandardSurface: true,
   }).source,
   "standard",
 );
