@@ -144,6 +144,7 @@ import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_au
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
 import { Route as AuthenticatedCmsDemoPackRouteImport } from './routes/_authenticated/cms/demo-pack'
+import { Route as AuthenticatedCmsContenidoEvaluacionRouteImport } from './routes/_authenticated/cms/contenido-evaluacion'
 import { Route as AuthenticatedCmsAluxRouteImport } from './routes/_authenticated/cms/alux'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
@@ -980,6 +981,12 @@ const AuthenticatedCmsDemoPackRoute =
     path: '/demo-pack',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsContenidoEvaluacionRoute =
+  AuthenticatedCmsContenidoEvaluacionRouteImport.update({
+    id: '/contenido-evaluacion',
+    path: '/contenido-evaluacion',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsAluxRoute = AuthenticatedCmsAluxRouteImport.update({
   id: '/alux',
   path: '/alux',
@@ -1566,6 +1573,7 @@ export interface FileRoutesByFullPath {
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
+  '/cms/contenido-evaluacion': typeof AuthenticatedCmsContenidoEvaluacionRoute
   '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
@@ -1777,6 +1785,7 @@ export interface FileRoutesByTo {
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
+  '/cms/contenido-evaluacion': typeof AuthenticatedCmsContenidoEvaluacionRoute
   '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
@@ -1996,6 +2005,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
+  '/_authenticated/cms/contenido-evaluacion': typeof AuthenticatedCmsContenidoEvaluacionRoute
   '/_authenticated/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
@@ -2217,6 +2227,7 @@ export interface FileRouteTypes {
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/alux'
+    | '/cms/contenido-evaluacion'
     | '/cms/demo-pack'
     | '/cms/experience-builder'
     | '/cms/media'
@@ -2428,6 +2439,7 @@ export interface FileRouteTypes {
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/alux'
+    | '/cms/contenido-evaluacion'
     | '/cms/demo-pack'
     | '/cms/experience-builder'
     | '/cms/media'
@@ -2646,6 +2658,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
     | '/_authenticated/cms/alux'
+    | '/_authenticated/cms/contenido-evaluacion'
     | '/_authenticated/cms/demo-pack'
     | '/_authenticated/cms/experience-builder'
     | '/_authenticated/cms/media'
@@ -3816,6 +3829,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsDemoPackRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/contenido-evaluacion': {
+      id: '/_authenticated/cms/contenido-evaluacion'
+      path: '/contenido-evaluacion'
+      fullPath: '/cms/contenido-evaluacion'
+      preLoaderRoute: typeof AuthenticatedCmsContenidoEvaluacionRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/alux': {
       id: '/_authenticated/cms/alux'
       path: '/alux'
@@ -4677,6 +4697,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
   AuthenticatedCmsAluxRoute: typeof AuthenticatedCmsAluxRouteWithChildren
+  AuthenticatedCmsContenidoEvaluacionRoute: typeof AuthenticatedCmsContenidoEvaluacionRoute
   AuthenticatedCmsDemoPackRoute: typeof AuthenticatedCmsDemoPackRoute
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
@@ -4721,6 +4742,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsActividadRoute: AuthenticatedCmsActividadRoute,
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
   AuthenticatedCmsAluxRoute: AuthenticatedCmsAluxRouteWithChildren,
+  AuthenticatedCmsContenidoEvaluacionRoute:
+    AuthenticatedCmsContenidoEvaluacionRoute,
   AuthenticatedCmsDemoPackRoute: AuthenticatedCmsDemoPackRoute,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
