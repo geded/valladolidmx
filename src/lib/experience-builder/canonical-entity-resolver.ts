@@ -60,8 +60,15 @@ export interface CanonicalEntityResolutionInput {
   /** Slug de `place_types` cuando `entityType === "place"`. */
   readonly placeType?: string | null;
   readonly override?: EntityTemplateOverride | null;
+  /**
+   * G8-R1-F1L·P0 — Sólo informativo. La elegibilidad por medios jamás cambia
+   * la familia; decide únicamente el modo (Editorial / Cinematográfica).
+   */
   readonly premiumEligible?: boolean;
+  /** Único interruptor que degrada a superficie estándar (contexto interno). */
+  readonly forceStandardSurface?: boolean;
 }
+
 
 export interface CanonicalEntityResolution extends EntityTemplateResolution {
   readonly canonicalFamily: CanonicalEntityFamily | null;
