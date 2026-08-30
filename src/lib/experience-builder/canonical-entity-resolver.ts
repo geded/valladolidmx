@@ -69,7 +69,6 @@ export interface CanonicalEntityResolutionInput {
   readonly forceStandardSurface?: boolean;
 }
 
-
 export interface CanonicalEntityResolution extends EntityTemplateResolution {
   readonly canonicalFamily: CanonicalEntityFamily | null;
   /** Variante cerrada dentro de la familia (sólo `place` hoy). */
@@ -103,7 +102,6 @@ function resolvePlace(input: CanonicalEntityResolutionInput): CanonicalEntityRes
       devWarning: null,
     };
   }
-
 
   if (!variant) {
     return {

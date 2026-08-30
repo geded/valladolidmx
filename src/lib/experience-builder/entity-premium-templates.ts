@@ -463,7 +463,6 @@ export interface EntityTemplateResolutionInput {
   readonly forceStandardSurface?: boolean;
 }
 
-
 export type EntityTemplateResolutionSource = "override" | "family" | "standard";
 
 export interface EntityTemplateResolution {
