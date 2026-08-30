@@ -27,14 +27,24 @@ export const listPublishedPagesForSitemap = createServerFn({ method: "GET" }).ha
       const { data, error } = await supabaseAdmin
         .from("page_compositions")
         .select(
-          "slug, page_type, published_at, updated_at, active_revision_id, page_revisions:active_revision_id(snapshot)",
+          "slug, page_type, published_at, updated_at, is_template, robots_directive, active_revision_id, page_revisions:active_revision_id(snapshot)",
         )
         .eq("status", "published")
         .neq("page_type", "home")
+        // G8-R1-F1H · plantillas internas y páginas marcadas noindex nunca
+        // entran al sitemap público.
+        .neq("is_template", true)
         .order("published_at", { ascending: false })
         .limit(500);
       if (error || !data) return [];
-      return data.map((row) => {
+      return data
+        .filter((row) => {
+          const directive = String(
+            (row as { robots_directive?: unknown }).robots_directive ?? "",
+          ).toLowerCase();
+          return !directive.includes("noindex");
+        })
+        .map((row) => {
         const snapshot = (row as { page_revisions?: { snapshot?: unknown } }).page_revisions
           ?.snapshot;
         const seo = extractSeo(snapshot);
