@@ -305,8 +305,12 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
     // Se pide de más porque el adaptador descarta filas no elegibles.
     builder = builder.limit(Math.min(MAX_LIMIT, limit * 3));
 
-    const { data: rows, error } = await builder;
+    const { data: rows, error } = (await (builder as unknown as PromiseLike<{
+      data: Row[] | null;
+      error: { message: string } | null;
+    }>)) ?? { data: null, error: null };
     if (error) return { items: [], count: 0, cached: false, error: error.message };
+
 
     const adapted = ((rows ?? []) as Row[])
       .map((r) => spec.adapt(r))
