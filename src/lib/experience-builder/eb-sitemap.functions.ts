@@ -45,18 +45,18 @@ export const listPublishedPagesForSitemap = createServerFn({ method: "GET" }).ha
           return !directive.includes("noindex");
         })
         .map((row) => {
-        const snapshot = (row as { page_revisions?: { snapshot?: unknown } }).page_revisions
-          ?.snapshot;
-        const seo = extractSeo(snapshot);
-        return {
-          slug: row.slug as string,
-          page_type: (row.page_type ?? "generic") as string,
-          published_at: (row.published_at ?? null) as string | null,
-          updated_at: (row.updated_at ?? null) as string | null,
-          priority: typeof seo?.priority === "number" ? seo.priority : undefined,
-          featured: seo?.featured === true ? true : undefined,
-        };
-      });
+          const snapshot = (row as { page_revisions?: { snapshot?: unknown } }).page_revisions
+            ?.snapshot;
+          const seo = extractSeo(snapshot);
+          return {
+            slug: row.slug as string,
+            page_type: (row.page_type ?? "generic") as string,
+            published_at: (row.published_at ?? null) as string | null,
+            updated_at: (row.updated_at ?? null) as string | null,
+            priority: typeof seo?.priority === "number" ? seo.priority : undefined,
+            featured: seo?.featured === true ? true : undefined,
+          };
+        });
     } catch {
       return [];
     }
