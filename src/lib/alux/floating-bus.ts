@@ -7,11 +7,27 @@
  * cards que quieran invocar a Alux con contexto pre-cargado.
  */
 
-export type AluxOpenReason = "nearby-suggestion" | "context-chip" | "manual";
+export type AluxOpenReason =
+  | "nearby-suggestion"
+  | "context-chip"
+  | "manual"
+  | "home-premium-route";
 
 export interface AluxOpenPayload {
   reason: AluxOpenReason;
   hint?: string;
+  route?: {
+    id: string;
+    title: string;
+    duration: string;
+    stops: number;
+    sequence: string[];
+  };
+  destination?: {
+    slug: string;
+    label: string;
+    href?: string;
+  };
 }
 
 const EVENT = "alux:open";

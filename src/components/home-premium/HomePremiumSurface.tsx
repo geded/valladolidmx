@@ -6,14 +6,12 @@
  * consumen la preview G4, el fixture de validación, el canvas de Studio y el
  * renderer público. Prohibido mantener una copia aproximada por superficie.
  */
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  Check,
   ChevronRight,
   Clock3,
-  Compass,
   Hotel,
   Landmark,
   MapPin,
@@ -29,6 +27,8 @@ import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { AddHomeRouteToTravelPlanButton } from "./AddHomeRouteToTravelPlanButton";
 import {
   HOME_PREMIUM_DEFAULT_ORDER,
   HOME_PREMIUM_G4_CONTENT,
@@ -62,10 +62,37 @@ export function HomePremiumSurface({
   const routes = content.rutas.items;
   const [selectedRoute, setSelectedRoute] = useState<string>(routes[0]?.id ?? "");
   const [selectedPrompt, setSelectedPrompt] = useState(content.alux.prompts[0] ?? "");
-  const [added, setAdded] = useState(false);
   const [openedMicrosite, setOpenedMicrosite] = useState<string | null>(null);
 
   const enabled = (key: HomePremiumSectionKey) => sections?.[key] !== false;
+
+  const openRouteInAlux = useCallback(
+    (route: HomePremiumRoute | undefined, prompt = selectedPrompt) => {
+      if (!route) return;
+      const firstStop = route.sequence[0] ?? "";
+      const destination = content.destinos.items.find(
+        (item) => item.name.trim().toLowerCase() === firstStop.trim().toLowerCase(),
+      );
+      const destinationSlug =
+        destination?.href?.match(/^\/oriente-maya\/([^/?#]+)/)?.[1] ?? undefined;
+      openAluxFloating({
+        reason: "home-premium-route",
+        hint: prompt,
+        route: {
+          id: route.id,
+          title: route.title,
+          duration: route.duration,
+          stops: route.stops,
+          sequence: route.sequence,
+        },
+        destination:
+          destinationSlug && destination
+            ? { slug: destinationSlug, label: destination.name, href: destination.href ?? undefined }
+            : undefined,
+      });
+    },
+    [content.destinos.items, selectedPrompt],
+  );
 
   const renderSection = (key: HomePremiumSectionKey) => {
     if (key === "destinos")
@@ -90,7 +117,7 @@ export function HomePremiumSurface({
           content={content}
           selectedRoute={selectedRoute}
           onSelectRoute={setSelectedRoute}
-          onAdd={() => setAdded(true)}
+          onPersonalize={(route) => openRouteInAlux(route)}
         />
       );
     if (key === "experiencias") return <ExperiencesSection content={content} layout={layout} />;
@@ -134,9 +161,7 @@ export function HomePremiumSurface({
             selectedPrompt={selectedPrompt}
             onSelectPrompt={setSelectedPrompt}
             selectedRoute={selectedRoute}
-            onSelectRoute={setSelectedRoute}
-            added={added}
-            onAdd={() => setAdded(true)}
+            onPersonalize={openRouteInAlux}
           />
         </Container>
 
@@ -152,8 +177,7 @@ export function HomePremiumSurface({
           <TravelPlanClose
             content={content}
             selectedRoute={selectedRoute}
-            added={added}
-            onAdd={() => setAdded(true)}
+            onPersonalize={openRouteInAlux}
           />
         </Container>
       </main>
@@ -411,17 +435,13 @@ function AluxPlanner({
   selectedPrompt,
   onSelectPrompt,
   selectedRoute,
-  onSelectRoute,
-  added,
-  onAdd,
+  onPersonalize,
 }: {
   content: HomePremiumContent;
   selectedPrompt: string;
   onSelectPrompt: (value: string) => void;
   selectedRoute: string;
-  onSelectRoute: (value: string) => void;
-  added: boolean;
-  onAdd: () => void;
+  onPersonalize: (route: HomePremiumRoute | undefined, prompt?: string) => void;
 }) {
   const routes = content.rutas.items;
   const suggested = routes.find((route) => route.id === selectedRoute) ?? routes[0];
@@ -480,25 +500,15 @@ function AluxPlanner({
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button
               type="button"
-              onClick={() => suggested && onSelectRoute(suggested.id)}
+              onClick={() => onPersonalize(suggested, selectedPrompt)}
               className="min-h-11 rounded-pill"
             >
               <MessageCircle className="mr-2 size-4" aria-hidden />
               Personalizar con Alux
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onAdd}
-              className="min-h-11 rounded-pill"
-            >
-              {added ? (
-                <Check className="mr-2 size-4" aria-hidden />
-              ) : (
-                <Compass className="mr-2 size-4" aria-hidden />
-              )}
-              {added ? "Ruta agregada" : "Agregar ruta a mi viaje"}
-            </Button>
+            {suggested ? (
+              <AddHomeRouteToTravelPlanButton route={suggested} variant="outline" />
+            ) : null}
           </div>
         </div>
       </div>
@@ -510,12 +520,12 @@ function RoutesSection({
   content,
   selectedRoute,
   onSelectRoute,
-  onAdd,
+  onPersonalize,
 }: {
   content: HomePremiumContent;
   selectedRoute: string;
   onSelectRoute: (value: string) => void;
-  onAdd: () => void;
+  onPersonalize: (route: HomePremiumRoute) => void;
 }) {
   return (
     <section id="rutas" aria-labelledby="routes-title">
@@ -585,7 +595,7 @@ function RoutesSection({
                     variant="ghost"
                     onClick={() => {
                       onSelectRoute(route.id);
-                      onAdd();
+                      onPersonalize(route);
                     }}
                     className="min-h-11 rounded-pill whitespace-normal"
                   >
@@ -1030,13 +1040,11 @@ function MapSection({
 function TravelPlanClose({
   content,
   selectedRoute,
-  added,
-  onAdd,
+  onPersonalize,
 }: {
   content: HomePremiumContent;
   selectedRoute: string;
-  added: boolean;
-  onAdd: () => void;
+  onPersonalize: (route: HomePremiumRoute | undefined) => void;
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
@@ -1055,16 +1063,22 @@ function TravelPlanClose({
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-          <Button type="button" size="lg" onClick={onAdd} className="min-h-12 rounded-pill">
-            {added ? (
-              <Check className="mr-2 size-4" aria-hidden />
-            ) : (
-              <Compass className="mr-2 size-4" aria-hidden />
-            )}
-            {added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel}
-          </Button>
-          <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
-            <Link to="/alux">{content.travelPlan.ctaAluxLabel}</Link>
+          {route ? (
+            <AddHomeRouteToTravelPlanButton
+              route={route}
+              variant="primary"
+              addLabel={content.travelPlan.ctaAddLabel}
+              addedLabel={content.travelPlan.ctaAddedLabel}
+            />
+          ) : null}
+          <Button
+            type="button"
+            size="lg"
+            variant="secondary"
+            className="min-h-12 rounded-pill"
+            onClick={() => onPersonalize(route)}
+          >
+            {content.travelPlan.ctaAluxLabel}
           </Button>
         </div>
       </div>

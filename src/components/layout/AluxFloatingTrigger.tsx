@@ -50,7 +50,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
-import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
+import {
+  onAluxFloatingOpen,
+  type AluxOpenPayload,
+} from "@/lib/alux/floating-bus";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
 import {
@@ -114,6 +117,7 @@ export function AluxFloatingTrigger() {
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const queryClient = useQueryClient();
+  const [launch, setLaunch] = useState<AluxOpenPayload | null>(null);
   // Sólo confiamos en el contexto territorial cuando la ruta actual
   // pertenece al árbol `/oriente-maya/*`. En cualquier otra superficie
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
@@ -121,7 +125,20 @@ export function AluxFloatingTrigger() {
   const contextIsRelevant = pathname.startsWith("/oriente-maya/");
   const ctx: AluxContext = useMemo(
     () =>
-      contextIsRelevant
+      launch?.destination
+        ? {
+            hasContext: true,
+            related: [],
+            reason: launch.hint ?? rawCtx.reason,
+            origin: "live",
+            region: { slug: "oriente-maya", label: "Oriente Maya", href: "/oriente-maya" },
+            destination: launch.destination,
+            category: undefined,
+            business: undefined,
+            product: undefined,
+            canonical: launch.destination.href,
+          }
+        : contextIsRelevant
         ? rawCtx
         : {
             hasContext: false,
@@ -135,14 +152,17 @@ export function AluxFloatingTrigger() {
             product: undefined,
             canonical: undefined,
           },
-    [contextIsRelevant, rawCtx],
+    [contextIsRelevant, launch, rawCtx],
   );
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
 
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
   useEffect(() => {
-    return onAluxFloatingOpen(() => setOpen(true));
+    return onAluxFloatingOpen((payload) => {
+      setLaunch(payload);
+      setOpen(true);
+    });
   }, []);
 
   const geo = useVisitorGeolocation();
@@ -544,7 +564,13 @@ export function AluxFloatingTrigger() {
         )}
       </div>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next) setLaunch(null);
+        }}
+      >
         <SheetContent side="right" className="flex w-full max-w-md flex-col gap-6 overflow-y-auto">
           <SheetHeader className="text-left">
             <div className="flex items-center gap-2">
@@ -559,6 +585,27 @@ export function AluxFloatingTrigger() {
               </div>
             </div>
           </SheetHeader>
+
+          {launch?.reason === "home-premium-route" && launch.route ? (
+            <section
+              aria-label="Selección enviada desde la Home"
+              className="rounded-2xl border border-primary/25 bg-primary/5 p-4"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                Personalizando tu selección
+              </p>
+              <h3 className="mt-1 font-serif text-lg">{launch.route.title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {launch.route.duration} · {launch.route.stops} paradas
+              </p>
+              {launch.hint ? (
+                <p className="mt-3 rounded-xl bg-background px-3 py-2 text-sm">“{launch.hint}”</p>
+              ) : null}
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                {launch.route.sequence.join(" → ")}
+              </p>
+            </section>
+          ) : null}
 
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
           {territory?.is_returning &&

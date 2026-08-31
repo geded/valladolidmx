@@ -1,0 +1,67 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-061",
+  "title": "G8-R1-F1L-R3 · Cableado canónico Home Premium con Alux y Travel Plan",
+  "status": "Approved",
+  "branch": "codex/home-premium-alux-canonical-wiring",
+  "blueprint": "docs/blueprint/G8-R1-F1L-R3-HOME-ALUX-CANONICAL-WIRING-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-08-31 limitada a cablear la Home Premium existente con el dock global Alux y la acción canónica de Travel Plan; sin reconstruir ni modificar motor, perfil, memoria anónima, continuidad, catálogo, ranking, Context Engine, ubicación, logo, datos, medios, migraciones, dependencias, flags, otras plantillas, PR, merge o despliegue.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/home-premium/AddHomeRouteToTravelPlanButton.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/AluxFloatingTrigger.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/floating-bus.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "8921e316b5ffc91c65864e83582f865a23f395af5d91b99de5671706876548c5",
+      "authority": "G8-R1-F1L-R3 Home Alux Canonical Wiring v1.0"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/home-premium/AddHomeRouteToTravelPlanButton.tsx",
+      "sha256": "b94dedb7f2fb687956be1204f495f153bee3fe23d3cb95c48dfd4850e2e54bcf",
+      "authority": "G8-R1-F1L-R3 Home Alux Canonical Wiring v1.0"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/AluxFloatingTrigger.tsx",
+      "sha256": "2a0966b31ced6a44e3be6e2c8bdd519ad6826ee11e274ae93f5edfec663a38d7",
+      "authority": "G8-R1-F1L-R3 Home Alux Canonical Wiring v1.0"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/floating-bus.ts",
+      "sha256": "37144d69f4bb281d13a20b06de249580dc72c69e1d98cf1116ac62a9778527fe",
+      "authority": "G8-R1-F1L-R3 Home Alux Canonical Wiring v1.0"
+    }
+  ],
+  "public_routes": [
+    "/"
+  ],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun test scripts/omxds/r1-f1l-r3/home-alux-wiring.contract.test.ts",
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}
