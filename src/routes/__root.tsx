@@ -249,6 +249,7 @@ function RootComponent() {
     pathname.startsWith("/concierge") ||
     pathname.startsWith("/empresa") ||
     pathname.startsWith("/lovable/founder-");
+  const showPublicAlux = !isAppShellRoute || pathname === "/lovable/founder-home-premium-preview";
 
   // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
   // este punto se cambia por registro real con vite-plugin-pwa.
@@ -303,7 +304,7 @@ function RootComponent() {
           {!isAppShellRoute ? (
             <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />
           ) : null}
-          {!isAppShellRoute ? (
+          {showPublicAlux ? (
             <React.Suspense fallback={null}>
               <AluxFloatingTrigger />
             </React.Suspense>

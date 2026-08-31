@@ -31,6 +31,7 @@ export interface UseAnonymousTripResult {
     kind: AnonymousPlannedItem["kind"],
     targetId: string | null,
   ) => Promise<boolean>;
+  setTravelerCount: (count: { adults: number; children?: number }) => Promise<boolean>;
   reset: () => Promise<void>;
   acknowledgeReturn: () => void;
 }
@@ -148,6 +149,20 @@ export function useAnonymousTrip(): UseAnonymousTripResult {
     [mutate],
   );
 
+  const setTravelerCount: UseAnonymousTripResult["setTravelerCount"] = useCallback(
+    async (count) =>
+      Boolean(
+        await mutate((current) => ({
+          ...current,
+          travelerCount: {
+            adults: Math.max(1, Math.min(20, Math.floor(count.adults))),
+            children: Math.max(0, Math.min(20, Math.floor(count.children ?? 0))),
+          },
+        })),
+      ),
+    [mutate],
+  );
+
   const reset = useCallback(async () => {
     await clearAnonymousTrip();
     setHasReturningTrip(false);
@@ -165,6 +180,7 @@ export function useAnonymousTrip(): UseAnonymousTripResult {
     removeFavorite,
     addPlannedItem,
     removePlannedItem,
+    setTravelerCount,
     reset,
     acknowledgeReturn,
   };

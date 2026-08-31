@@ -33,6 +33,13 @@ import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { recordAluxSignal } from "@/lib/alux/memory-store";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
+import {
+  PARTY_OPTIONS,
+  compositionFromPartySize,
+  type PartyComposition,
+} from "@/lib/traveler/party-composition";
 import {
   HOME_PREMIUM_DEFAULT_ORDER,
   HOME_PREMIUM_G4_CONTENT,
@@ -67,8 +74,45 @@ export function HomePremiumSurface({
   const routes = content.rutas.items;
   const [selectedRoute, setSelectedRoute] = useState<string>(routes[0]?.id ?? "");
   const [selectedPrompt, setSelectedPrompt] = useState(content.alux.prompts[0] ?? "");
+  const anonymousTrip = useAnonymousTrip();
+  const [selectedParty, setSelectedParty] = useState<PartyComposition | null>(null);
   const [added, setAdded] = useState(false);
   const [openedMicrosite, setOpenedMicrosite] = useState<string | null>(null);
+
+  useEffect(() => {
+    const count = anonymousTrip.trip?.travelerCount;
+    if (!count || selectedParty) return;
+    setSelectedParty(
+      (count.children ?? 0) > 0
+        ? "familiar"
+        : compositionFromPartySize(count.adults + (count.children ?? 0)),
+    );
+  }, [anonymousTrip.trip?.travelerCount, selectedParty]);
+
+  const selectParty = (party: PartyComposition) => {
+    const option = PARTY_OPTIONS.find((item) => item.value === party);
+    if (!option) return;
+    setSelectedParty(party);
+    void anonymousTrip.setTravelerCount(
+      party === "familiar" ? { adults: 2, children: 2 } : { adults: option.partySize, children: 0 },
+    );
+  };
+
+  const selectPrompt = (prompt: string) => {
+    setSelectedPrompt(prompt);
+    const keyByPrompt: Record<string, string> = {
+      "Tengo medio día": "medio-dia",
+      "Quiero cenotes y gastronomía": "cenotes-gastronomia",
+      "Busco cultura viva": "cultura-viva",
+      "Viajo en pareja": "romantico",
+    };
+    recordAluxSignal({
+      kind: "category_explored",
+      key: keyByPrompt[prompt] ?? prompt.toLocaleLowerCase("es-MX").replace(/\s+/g, "-"),
+      at: Date.now(),
+      purpose: "personalization",
+    });
+  };
 
   const enabled = (key: HomePremiumSectionKey) => sections?.[key] !== false;
   const presentationOrder: HomePremiumSectionKey[] = cinematic
@@ -151,7 +195,9 @@ export function HomePremiumSurface({
           <AluxPlanner
             content={content}
             selectedPrompt={selectedPrompt}
-            onSelectPrompt={setSelectedPrompt}
+            onSelectPrompt={selectPrompt}
+            selectedParty={selectedParty}
+            onSelectParty={selectParty}
             selectedRoute={selectedRoute}
             onSelectRoute={setSelectedRoute}
             added={added}
@@ -346,6 +392,8 @@ function AluxPlanner({
   content,
   selectedPrompt,
   onSelectPrompt,
+  selectedParty,
+  onSelectParty,
   selectedRoute,
   onSelectRoute,
   added,
@@ -354,6 +402,8 @@ function AluxPlanner({
   content: HomePremiumContent;
   selectedPrompt: string;
   onSelectPrompt: (value: string) => void;
+  selectedParty: PartyComposition | null;
+  onSelectParty: (value: PartyComposition) => void;
   selectedRoute: string;
   onSelectRoute: (value: string) => void;
   added: boolean;
@@ -366,7 +416,11 @@ function AluxPlanner({
     onSelectRoute(suggested.id);
     openAluxFloating({
       reason: "manual",
-      hint: `${selectedPrompt}. Ruta sugerida: ${suggested.title}. ${suggested.description}`,
+      hint: `${selectedPrompt}. ${
+        selectedParty
+          ? `Composición del viaje: ${PARTY_OPTIONS.find((item) => item.value === selectedParty)?.label}. `
+          : ""
+      }Ruta sugerida: ${suggested.title}. ${suggested.description}`,
     });
   };
   return (
@@ -397,6 +451,28 @@ function AluxPlanner({
                 className="min-h-11 rounded-pill whitespace-normal text-left"
               >
                 {prompt}
+              </Button>
+            ))}
+          </div>
+          <p className="mt-6 text-xs font-semibold uppercase text-selva-foreground/80">
+            ¿Con quién viajas?
+          </p>
+          <div
+            className="mt-2 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Composición del viaje"
+          >
+            {PARTY_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                type="button"
+                size="sm"
+                variant={selectedParty === option.value ? "default" : "secondary"}
+                aria-pressed={selectedParty === option.value}
+                onClick={() => onSelectParty(option.value)}
+                className="min-h-11 rounded-pill"
+              >
+                {option.label}
               </Button>
             ))}
           </div>
