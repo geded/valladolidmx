@@ -8,7 +8,8 @@
  *  - Sólo se monta cuando el usuario lo pide (toggle) para no pagar
  *    Maps JS en cada visita.
  *
- * Cada marker se renderiza como un círculo con la letra asignada (A, B, C…)
+ * El lienzo usa la cartografía territorial Valladolid.mx y cada marker se
+ * renderiza como un pin de marca con la letra asignada (A, B, C…)
  * para que el visitante pueda detectar y correlacionar los servicios del
  * listado con su ubicación en el mapa.
  *
@@ -63,6 +64,60 @@ declare global {
 
 const SCRIPT_ID = "vmx-google-maps-js";
 
+/**
+ * Cartografía territorial Valladolid.mx.
+ * Conserva calles y referencias geográficas útiles, reduce ruido comercial
+ * y traslada la paleta crema / selva / oro al lienzo de Google Maps.
+ */
+const VALLADOLID_MAP_STYLES = [
+  { elementType: "geometry", stylers: [{ color: "#eee8d8" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#23483a" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#f7f3e9" }] },
+  {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#b7aa86" }],
+  },
+  {
+    featureType: "administrative.country",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#123e2f" }],
+  },
+  {
+    featureType: "landscape.natural",
+    elementType: "geometry",
+    stylers: [{ color: "#dfe5cf" }],
+  },
+  {
+    featureType: "landscape.man_made",
+    elementType: "geometry",
+    stylers: [{ color: "#f3eddf" }],
+  },
+  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#d7dfc8" }] },
+  { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#c7d6b6" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#fffaf0" }] },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#d5c9aa" }],
+  },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#d7a641" }] },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#b47b13" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#173f31" }],
+  },
+  { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#8cbfc0" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#285e60" }] },
+] as const;
+
 function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
   return new Promise((resolve, reject) => {
     if (typeof window === "undefined") {
@@ -115,19 +170,20 @@ function labelForIndex(i: number) {
 
 function getMarkerColors(): { bg: string; fg: string; stroke: string } {
   if (typeof document === "undefined") {
-    return { bg: "#EAA840", fg: "#1C1D14", stroke: "#ffffff" };
+    return { bg: "#c88a17", fg: "#fffaf0", stroke: "#123e2f" };
   }
   const root = getComputedStyle(document.documentElement);
   const bg = root.getPropertyValue("--primary").trim() || "#EAA840";
-  const fg = root.getPropertyValue("--primary-foreground").trim() || "#1C1D14";
-  return { bg, fg, stroke: "#ffffff" };
+  const fg = root.getPropertyValue("--primary-foreground").trim() || "#fffaf0";
+  return { bg, fg, stroke: "#123e2f" };
 }
 
 function markerIconDataUri(letter: string): string {
   const { bg, fg, stroke } = getMarkerColors();
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-    <circle cx="16" cy="16" r="13" fill="${bg}" stroke="${stroke}" stroke-width="2.5"/>
-    <text x="16" y="20.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="${fg}">${letter}</text>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48">
+    <path d="M20 2C10.6 2 3 9.6 3 19c0 12.4 17 27 17 27s17-14.6 17-27C37 9.6 29.4 2 20 2Z" fill="${bg}" stroke="${stroke}" stroke-width="2.5"/>
+    <circle cx="20" cy="19" r="10" fill="${stroke}" opacity=".92"/>
+    <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${fg}">${letter}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
@@ -157,7 +213,10 @@ export function InteractiveMap({
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
           zoom,
-          disableDefaultUI: false,
+          styles: VALLADOLID_MAP_STYLES,
+          backgroundColor: "#eee8d8",
+          disableDefaultUI: true,
+          zoomControl: true,
           streetViewControl: false,
           mapTypeControl: false,
           fullscreenControl: true,
@@ -173,8 +232,8 @@ export function InteractiveMap({
             title: `${letter} · ${m.title ?? markerTitle ?? "Ubicación"}`,
             icon: {
               url: markerIconDataUri(letter),
-              scaledSize: new google.maps.Size(32, 32),
-              anchor: new google.maps.Point(16, 32),
+              scaledSize: new google.maps.Size(40, 48),
+              anchor: new google.maps.Point(20, 48),
             },
           });
           bounds.extend({ lat: m.lat, lng: m.lng });
