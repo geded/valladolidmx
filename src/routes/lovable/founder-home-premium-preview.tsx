@@ -73,9 +73,7 @@ function FounderHomePremiumPreview() {
         layout="asimetrica"
       />
 
-      <Container className="mt-8">
-        <HomePremiumFooter />
-      </Container>
+      <HomePremiumFooter />
     </div>
   );
 }

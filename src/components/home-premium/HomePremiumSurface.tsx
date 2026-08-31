@@ -6,7 +6,7 @@
  * consumen la preview G4, el fixture de validación, el canvas de Studio y el
  * renderer público. Prohibido mantener una copia aproximada por superficie.
  */
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -26,7 +26,9 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
-import { BrandLogo } from "@/components/brand/BrandLogo";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
@@ -203,62 +205,11 @@ export function HomePremiumRibbon({ label }: { label?: string }) {
 }
 
 export function HomePremiumHeader() {
-  return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-      <Container className="flex min-h-16 items-center justify-between gap-4 py-2">
-        <Link
-          to="/"
-          className="flex min-w-0 items-center"
-          aria-label="Ir al inicio de Valladolid.mx"
-        >
-          <BrandLogo size="md" />
-        </Link>
-        <nav
-          aria-label="Navegación de la vista previa"
-          className="hidden items-center gap-1 lg:flex"
-        >
-          {[
-            ["#rutas", "Rutas"],
-            ["#destinos", "Destinos"],
-            ["#experiencias", "Experiencias"],
-            ["#mapa", "Mapa"],
-          ].map(([href, label]) => (
-            <a
-              key={href}
-              href={href}
-              className="rounded-pill px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-        <Button asChild size="sm" className="rounded-pill">
-          <Link to="/arma-tu-viaje">Arma tu viaje</Link>
-        </Button>
-      </Container>
-    </header>
-  );
+  return <SiteHeader variant="solid" />;
 }
 
 export function HomePremiumFooter() {
-  return (
-    <footer className="border-t border-border py-7">
-      <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
-        <div>
-          <p className="font-display text-xl">Valladolid.mx</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Continuidad territorial: Valladolid · Espita · Izamal · Oriente Maya de Yucatán.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-          <Link to="/oriente-maya">Territorio</Link>
-          <Link to="/experiencias">Experiencias</Link>
-          <Link to="/arma-tu-viaje">Travel Plan</Link>
-          <Link to="/alux">Alux</Link>
-        </div>
-      </div>
-    </footer>
-  );
+  return <SiteFooter />;
 }
 
 /* ------------------------------------------------------------------ *
@@ -306,23 +257,33 @@ function HeroSlideControl({
   );
 }
 
-function HeroActions({ content }: { content: HomePremiumContent }) {
+function HeroSearch() {
   return (
-    <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
-      <Button asChild className="min-h-11 rounded-pill px-5">
-        <Link to={content.hero.primaryCta.to}>
-          {content.hero.primaryCta.label} <ArrowRight className="ml-2 size-4" aria-hidden />
-        </Link>
-      </Button>
-      <Button asChild variant="outline" className="min-h-11 rounded-pill px-5">
-        <Link to={content.hero.secondaryCta.to}>{content.hero.secondaryCta.label}</Link>
-      </Button>
-    </div>
+    <HeroSearchPill
+      destinoLabel="Destino"
+      destinoPlaceholder="¿A dónde quieres ir?"
+      categoriaLabel="Categoría"
+      categoriaPlaceholder="¿Qué quieres descubrir?"
+      submitLabel="Buscar"
+      maxWidth="full"
+    />
   );
+}
+
+function useHeroAutoplay(slides: number, setIndex: Dispatch<SetStateAction<number>>) {
+  useEffect(() => {
+    if (slides < 2 || typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setIndex((current: number) => (current + 1) % slides);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [setIndex, slides]);
 }
 
 function HeroEditorial({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
+  useHeroAutoplay(content.hero.slides.length, setIndex);
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
@@ -336,7 +297,7 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
             {content.hero.subtitle}
           </p>
           <div className="mt-5">
-            <HeroActions content={content} />
+            <HeroSearch />
           </div>
           <div className="mt-5 border-t border-border pt-4">
             <HeroSlideControl content={content} index={index} onChange={setIndex} />
@@ -360,6 +321,7 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
 
 function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
+  useHeroAutoplay(content.hero.slides.length, setIndex);
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
@@ -388,7 +350,7 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
         <p className="max-w-2xl text-[0.95rem] leading-6 text-muted-foreground">
           {content.hero.subtitle}
         </p>
-        <HeroActions content={content} />
+        <HeroSearch />
       </div>
     </section>
   );

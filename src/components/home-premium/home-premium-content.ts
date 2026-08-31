@@ -262,7 +262,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
       { slug: "promociones", label: "Promociones", href: "/promociones" },
       { slug: "rutas", label: "Arma tu viaje", href: "/arma-tu-viaje" },
       { slug: "blog", label: "Blog", href: "/blog" },
-      { slug: "mapas", label: "Mapa", href: "/mapa" },
+      { slug: "mapas", label: "Mapa", href: "#mapa" },
     ],
   },
   alux: {
