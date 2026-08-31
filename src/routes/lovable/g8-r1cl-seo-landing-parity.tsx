@@ -17,7 +17,11 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { PremiumHero } from "@/components/premium";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import type { CompositionNode } from "@/lib/experience-builder/composition-tree";
+import {
+  mapTree,
+  type CompositionNode,
+  type CompositionTree,
+} from "@/lib/experience-builder/composition-tree";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import {
   SEO_LANDING_AUTHORITY,
@@ -98,6 +102,31 @@ type ViewKey = "a" | "b" | "ab" | ProbeKey;
 
 const WIDTHS = [390, 430, 768, 1024, 1280, 1440] as const;
 type WidthKey = (typeof WIDTHS)[number] | "full";
+
+const ZAZIL_PREVIEW_MEDIA = "/media/preview-generated/zazil-tunich-hero-preview.webp";
+
+function withZazilPreviewMedia(tree: CompositionTree): CompositionTree {
+  return mapTree(tree, (node) =>
+    node.type === "vmx.experience.hero"
+      ? {
+          ...node,
+          config: {
+            ...node.config,
+            mediaUrl: ZAZIL_PREVIEW_MEDIA,
+            mediaAlt:
+              "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
+            mediaSlides: [
+              {
+                url: ZAZIL_PREVIEW_MEDIA,
+                alt: "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
+                nature: "conceptual",
+              },
+            ],
+          },
+        }
+      : node,
+  );
+}
 
 const VIEWS: { key: ViewKey; label: string }[] = [
   { key: "a", label: "Caso A · Autoridad Zazil Tunich" },
@@ -217,9 +246,10 @@ function ProbePanel({ probeKey }: { probeKey: ProbeKey }) {
 function SeoLandingParityPreview() {
   const authority = useQuery(authorityQuery);
   const tree = authority.data?.snapshot ?? null;
+  const previewTree = useMemo(() => (tree ? withZazilPreviewMedia(tree) : null), [tree]);
   const [view, setView] = useState<ViewKey>("ab");
   const [width, setWidth] = useState<WidthKey>("full");
-  const [showNumbers, setShowNumbers] = useState(true);
+  const [showNumbers, setShowNumbers] = useState(false);
 
   const isProbe = view.startsWith("probe-");
 
@@ -329,11 +359,11 @@ function SeoLandingParityPreview() {
           <Container className="pt-10">
             <h2 className="font-serif text-xl">Caso A · Autoridad acreditada (solo lectura)</h2>
           </Container>
-          {tree ? (
+          {previewTree ? (
             <WidthFrame width={width}>
               <NumberedCase
                 caseId="authority"
-                tree={tree}
+                tree={previewTree}
                 pageType={authority.data?.page_type}
                 showNumbers={showNumbers}
               />
