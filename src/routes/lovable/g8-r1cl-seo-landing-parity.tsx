@@ -13,10 +13,16 @@
  */
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
-import { SeoLandingPremiumSurface } from "@/components/seo-landing-premium/SeoLandingPremiumSurface";
+import { PremiumHero } from "@/components/premium";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import type { CompositionNode } from "@/lib/experience-builder/composition-tree";
+import {
+  mapTree,
+  type CompositionNode,
+  type CompositionTree,
+} from "@/lib/experience-builder/composition-tree";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import {
   SEO_LANDING_AUTHORITY,
   SEO_LANDING_SLOTS,
@@ -25,6 +31,23 @@ import {
   buildSeoLandingComposition,
 } from "@/lib/experience-builder/seo-landing/seo-landing-template";
 import { resolveCanonicalEntityTemplate } from "@/lib/experience-builder/canonical-entity-resolver";
+
+const authorityQuery = queryOptions({
+  queryKey: [
+    "eb",
+    "published-composition",
+    SEO_LANDING_AUTHORITY.compositionSlug,
+    SEO_LANDING_AUTHORITY.variantKey,
+  ],
+  queryFn: () =>
+    getPublishedCompositionBySlug({
+      data: {
+        slug: SEO_LANDING_AUTHORITY.compositionSlug,
+        variant_key: SEO_LANDING_AUTHORITY.variantKey,
+      },
+    }),
+  staleTime: 60_000,
+});
 
 export const Route = createFileRoute("/lovable/g8-r1cl-seo-landing-parity")({
   head: () => ({
@@ -79,6 +102,31 @@ type ViewKey = "a" | "b" | "ab" | ProbeKey;
 
 const WIDTHS = [390, 430, 768, 1024, 1280, 1440] as const;
 type WidthKey = (typeof WIDTHS)[number] | "full";
+
+const ZAZIL_PREVIEW_MEDIA = "/media/preview-generated/zazil-tunich-hero-preview.webp";
+
+function withZazilPreviewMedia(tree: CompositionTree): CompositionTree {
+  return mapTree(tree, (node) =>
+    node.type === "vmx.experience.hero"
+      ? {
+          ...node,
+          config: {
+            ...node.config,
+            mediaUrl: ZAZIL_PREVIEW_MEDIA,
+            mediaAlt:
+              "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
+            mediaSlides: [
+              {
+                url: ZAZIL_PREVIEW_MEDIA,
+                alt: "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
+                nature: "conceptual",
+              },
+            ],
+          },
+        }
+      : node,
+  );
+}
 
 const VIEWS: { key: ViewKey; label: string }[] = [
   { key: "a", label: "Caso A · Autoridad Zazil Tunich" },
@@ -196,10 +244,12 @@ function ProbePanel({ probeKey }: { probeKey: ProbeKey }) {
 }
 
 function SeoLandingParityPreview() {
-  const [view, setView] = useState<ViewKey>("a");
+  const authority = useQuery(authorityQuery);
+  const tree = authority.data?.snapshot ?? null;
+  const previewTree = useMemo(() => (tree ? withZazilPreviewMedia(tree) : null), [tree]);
+  const [view, setView] = useState<ViewKey>("ab");
   const [width, setWidth] = useState<WidthKey>("full");
   const [showNumbers, setShowNumbers] = useState(false);
-  const [authorityTheme, setAuthorityTheme] = useState<"sol" | "luna">("sol");
 
   const isProbe = view.startsWith("probe-");
 
@@ -307,40 +357,52 @@ function SeoLandingParityPreview() {
       {view === "a" || view === "ab" ? (
         <>
           <Container className="pt-10">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-serif text-xl">Caso A · Dirección Founder Sol/Luna</h2>
-              <div className="flex gap-2" aria-label="Dirección visual">
-                {(["sol", "luna"] as const).map((theme) => (
-                  <button
-                    key={theme}
-                    type="button"
-                    onClick={() => setAuthorityTheme(theme)}
-                    aria-pressed={authorityTheme === theme}
-                    className={`min-h-10 rounded-pill border px-4 text-sm capitalize ${
-                      authorityTheme === theme
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-card"
-                    }`}
-                  >
-                    {theme}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <h2 className="font-serif text-xl">Caso A · Autoridad acreditada (solo lectura)</h2>
           </Container>
-          <WidthFrame width={width}>
-            <SeoLandingPremiumSurface
-              theme={authorityTheme}
-              eyebrow="Cenote-Museo · Valladolid, Yucatán"
-              title="Zazil Tunich"
-              category="Cenote-Museo"
-              destination="Valladolid, Yucatán"
-              claim="Un viaje al Inframundo Maya"
-              description="Naturaleza, memoria y cultura viva bajo la tierra."
-              heroUrl="/media/preview-generated/zazil-tunich-hero-preview.webp"
-              heroAlt="Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado"
-            />
-          </WidthFrame>
+          {previewTree ? (
+            <WidthFrame width={width}>
+              <NumberedCase
+                caseId="authority"
+                tree={previewTree}
+                pageType={authority.data?.page_type}
+                showNumbers={showNumbers}
+              />
+            </WidthFrame>
+          ) : (
+            <WidthFrame width={width}>
+              <div data-parity-case="authority-preview-generated">
+                <PremiumHero
+                  vm={{
+                    presentation: "editorial",
+                    crumbs: [
+                      { label: "Inicio" },
+                      { label: "Oriente Maya" },
+                      { label: "Valladolid" },
+                      { label: "Zazil Tunich" },
+                    ],
+                    eyebrow: "Cenote-Museo · Valladolid, Yucatán",
+                    title: "Zazil Tunich",
+                    description:
+                      "Un viaje al Inframundo Maya. Naturaleza, memoria y cultura viva bajo la tierra.",
+                    media: {
+                      url: "/media/preview-generated/zazil-tunich-hero-preview.webp",
+                      alt: "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
+                      caption: "Medio generado para visualización · reemplazo requerido",
+                    },
+                    primaryAction: { label: "Ver experiencias", href: "#experiencias" },
+                    secondaryAction: { label: "Agregar a Mi Viaje", href: "#mi-viaje" },
+                  }}
+                />
+                <Container className="py-4">
+                  <p className="rounded-2xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-950">
+                    La composición acreditada no estuvo disponible en esta sesión. Este fallback
+                    conserva la dirección visual Sol/Luna aprobada y utiliza un medio temporal
+                    generado; no es publicable ni sustituye la composición o la fotografía real.
+                  </p>
+                </Container>
+              </div>
+            </WidthFrame>
+          )}
         </>
       ) : null}
 
