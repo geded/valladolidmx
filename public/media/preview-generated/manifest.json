@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "productionEligible": false,
+  "assets": [
+    {
+      "id": "preview-zazil-tunich-hero-v1",
+      "path": "/media/preview-generated/zazil-tunich-hero-preview.webp",
+      "entity": "Zazil Tunich",
+      "role": "hero",
+      "status": "preview-generado",
+      "replacement": "reemplazo-requerido",
+      "reference": "Founder-approved Zazil Tunich Sol/Luna screenshots supplied 2026-08-31",
+      "sha256": "8a9725666ecd3e6367e3130e76cc4201e5c8a5993ce854a7e80f0cf695e17c87"
+    },
+    {
+      "id": "preview-valladolid-san-servacio-hero-v1",
+      "path": "/media/preview-generated/valladolid-san-servacio-hero-preview.webp",
+      "entity": "Valladolid",
+      "role": "hero",
+      "status": "preview-generado",
+      "replacement": "reemplazo-requerido",
+      "reference": "Founder-approved Valladolid microsite screenshot plus public visual references supplied 2026-08-31",
+      "sha256": "c3325a87390575d8b750b45a83d9be026feb699606672baa98d106d6675ba202"
+    }
+  ]
+}

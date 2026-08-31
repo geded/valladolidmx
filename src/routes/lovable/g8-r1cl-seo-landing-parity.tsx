@@ -15,6 +15,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
+import { PremiumHero } from "@/components/premium";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import type { CompositionNode } from "@/lib/experience-builder/composition-tree";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
@@ -338,12 +339,39 @@ function SeoLandingParityPreview() {
               />
             </WidthFrame>
           ) : (
-            <Container className="pt-3">
-              <p className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                La composición de autoridad no está disponible en esta sesión (no publicada o sin
-                acceso). La paridad se evalúa contra el mapa de slots y el SHA-256 acreditado.
-              </p>
-            </Container>
+            <WidthFrame width={width}>
+              <div data-parity-case="authority-preview-generated">
+                <PremiumHero
+                  vm={{
+                    presentation: "editorial",
+                    crumbs: [
+                      { label: "Inicio" },
+                      { label: "Oriente Maya" },
+                      { label: "Valladolid" },
+                      { label: "Zazil Tunich" },
+                    ],
+                    eyebrow: "Cenote-Museo · Valladolid, Yucatán",
+                    title: "Zazil Tunich",
+                    description:
+                      "Un viaje al Inframundo Maya. Naturaleza, memoria y cultura viva bajo la tierra.",
+                    media: {
+                      url: "/media/preview-generated/zazil-tunich-hero-preview.webp",
+                      alt: "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
+                      caption: "Medio generado para visualización · reemplazo requerido",
+                    },
+                    primaryAction: { label: "Ver experiencias", href: "#experiencias" },
+                    secondaryAction: { label: "Agregar a Mi Viaje", href: "#mi-viaje" },
+                  }}
+                />
+                <Container className="py-4">
+                  <p className="rounded-2xl border border-amber-300/60 bg-amber-50 p-4 text-sm text-amber-950">
+                    La composición acreditada no estuvo disponible en esta sesión. Este fallback
+                    conserva la dirección visual Sol/Luna aprobada y utiliza un medio temporal
+                    generado; no es publicable ni sustituye la composición o la fotografía real.
+                  </p>
+                </Container>
+              </div>
+            </WidthFrame>
           )}
         </>
       ) : null}

@@ -26,6 +26,7 @@ import {
   DestinationPremiumSurface,
   type DestinationGalleryLayout,
 } from "@/components/destination-premium/DestinationPremiumSurface";
+import { DESTINATION_PREMIUM_G4_CONTENT } from "@/components/destination-premium/destination-premium-content";
 
 export const Route = createFileRoute("/lovable/g4-destination-microsite-preview")({
   head: () => ({
@@ -54,6 +55,17 @@ interface TuningState {
   role: RoleView;
 }
 
+const PREVIEW_CONTENT = {
+  ...DESTINATION_PREMIUM_G4_CONTENT,
+  hero: {
+    ...DESTINATION_PREMIUM_G4_CONTENT.hero,
+    cover: {
+      url: "/media/preview-generated/valladolid-san-servacio-hero-preview.webp",
+      alt: "Vista editorial generada para preview de la catedral de San Servacio y la plaza de Valladolid al atardecer",
+    },
+  },
+};
+
 function G4DestinationMicrositePreview() {
   const [tuning, setTuning] = useState<TuningState>({
     direction: "editorial",
@@ -76,6 +88,7 @@ function G4DestinationMicrositePreview() {
       ) : null}
 
       <DestinationPremiumSurface
+        content={PREVIEW_CONTENT}
         heroVariant={tuning.direction === "cinematic" ? "cinematic" : "editorial"}
         galleryLayout={tuning.gallery}
         sections={{
@@ -94,8 +107,9 @@ function G4DestinationMicrositePreview() {
 function PreviewRibbon() {
   return (
     <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
-      Vista previa interna G4-A · Micrositio de destino (Valladolid) — no indexable, sin
-      persistencia. No modifica páginas públicas ni el CMS.
+      Vista previa interna G4-A · Micrositio de destino (Valladolid) · medio hero generado para
+      visualización, reemplazo requerido — no indexable, sin persistencia. No modifica páginas
+      públicas ni el CMS.
     </div>
   );
 }
