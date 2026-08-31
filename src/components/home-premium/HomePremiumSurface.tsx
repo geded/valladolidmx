@@ -216,47 +216,6 @@ export function HomePremiumFooter() {
  * Piezas compartidas
  * ------------------------------------------------------------------ */
 
-function HeroSlideControl({
-  content,
-  index,
-  onChange,
-  inverted = false,
-}: {
-  content: HomePremiumContent;
-  index: number;
-  onChange: (value: number) => void;
-  inverted?: boolean;
-}) {
-  const slides = content.hero.slides;
-  return (
-    <div className="flex flex-wrap items-center gap-2" aria-label="Seleccionar imagen del hero">
-      {slides.map((slide, itemIndex) => (
-        <Button
-          key={slide.caption}
-          type="button"
-          size="sm"
-          variant={itemIndex === index ? "default" : "outline"}
-          onClick={() => onChange(itemIndex)}
-          aria-pressed={itemIndex === index}
-          className={cn(
-            "min-h-11 rounded-pill px-4",
-            inverted &&
-              itemIndex !== index &&
-              "border-primary-foreground/50 bg-foreground/40 text-primary-foreground hover:bg-foreground/60",
-          )}
-        >
-          {itemIndex + 1} de {slides.length}
-        </Button>
-      ))}
-      <span
-        className={cn("text-xs", inverted ? "text-primary-foreground/85" : "text-muted-foreground")}
-      >
-        {slides[index]?.caption}
-      </span>
-    </div>
-  );
-}
-
 function HeroSearch() {
   return (
     <HeroSearchPill
@@ -299,9 +258,6 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
           <div className="mt-5">
             <HeroSearch />
           </div>
-          <div className="mt-5 border-t border-border pt-4">
-            <HeroSlideControl content={content} index={index} onChange={setIndex} />
-          </div>
         </div>
         <figure className="relative min-h-[21rem] overflow-hidden lg:min-h-[32rem]">
           <EditorialMediaFrame
@@ -336,14 +292,14 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
           aria-hidden
         />
+        <span className="absolute right-4 top-4 rounded-md bg-foreground/70 px-3 py-1.5 text-xs text-primary-foreground backdrop-blur-sm">
+          {slide.caption}
+        </span>
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">Oriente Maya de Yucatán</p>
           <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-primary-foreground sm:text-[3.35rem]">
             {content.hero.title}
           </h1>
-          <div className="mt-5">
-            <HeroSlideControl content={content} index={index} onChange={setIndex} inverted />
-          </div>
         </div>
       </div>
       <div className="grid gap-4 bg-card p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
