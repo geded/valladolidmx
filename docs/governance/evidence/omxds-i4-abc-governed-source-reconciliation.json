@@ -12,7 +12,9 @@
   "rollback_rule": "geography.location revalidated before eb_restore_revision; rollback stays a draft",
   "release_rule": "publish and schedule require a clean local tree, approved workflow_state and draft_hash === approved_snapshot_hash",
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "exact_route_count": 22,
   "exact_routes": [
     "src/lib/catalog/marketplace-reads.functions.ts",
@@ -41,43 +43,43 @@
   "artifacts": [
     {
       "path": "src/lib/catalog/marketplace-reads.functions.ts",
-      "sha256": "a0f1162aa5a41daab7a67d8dc98d9c1a76652b2ac466a86b35c061176aa7e581"
+      "sha256": "377a1454f6c01de9b1ec48a98133509521956527e940b3f3f7dc8904e29b314d"
     },
     {
       "path": "src/lib/experience-builder/preview-registry.tsx",
-      "sha256": "6fe7c48828b0eb7ee25e085a0054fff3810a2ef38834d45b8e346d7f716adcf5"
+      "sha256": "549419739775d1ae4aab6f2aa9cf01a34c9f2e9046c54026cca6a76f2e7e2d4d"
     },
     {
       "path": "src/lib/experience-builder/editorial-builder-policy.ts",
-      "sha256": "5ad4f6981c4f5bc8c8954ef45de77811b3b6abb286e8968e1d33cf1e03fdb23f"
+      "sha256": "1690cdf28c7ef73f52f8230a06e065889c53062bc496f580a3076f2cf567a68d"
     },
     {
       "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
-      "sha256": "bc0ab4256af88db07bd86712a82e9ed91b54673cce715e37bf2a65cb9bacb2c3"
+      "sha256": "ac8c465978537ecaa78df6d8a201c72970bc932b8d1b1f3359b949712b3aba46"
     },
     {
       "path": "src/lib/experience-builder/block-library.ts",
-      "sha256": "1f0aecc624b5054dad17a8b7f0cf0449d662b5067d2ea4071c4667ea2657015d"
+      "sha256": "752666bca99dfc275a8b5a913c7cc55596de2fff4cb2f83ac9ece10f388ad4f8"
     },
     {
       "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
-      "sha256": "4171a6b1817bab1b97e6aa2062a2b467ffe48ef6b7a619dc7709d8862f525d7f"
+      "sha256": "a5e7dbeea7d15d88ff0d3600159251faaa7deb300fba61691e8bb6c4811188af"
     },
     {
       "path": "src/lib/experience-builder/studio.functions.ts",
-      "sha256": "501f327ad9a8560931102ddc805e14cfa57c104353a2bc822f08ee5370acdbff"
+      "sha256": "3d9439fd9a176cbdb41b398b803126d466e11bfe5092cd249e1d0e3c619bd4a0"
     },
     {
       "path": "src/routes/preview/composition.$token.tsx",
-      "sha256": "4c771dc279fc63abc6e79956f25989bbf9e87eff54134e70a89ec8f9558246ef"
+      "sha256": "ef403105d7e406c60e9de4996bdbf082c0b4c9916a4392ced1c80c9a6dd2364e"
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "37624843649eb06f90c8e3fb1fe350b5592d9b15286b45ec42352bc8bb4c840b"
+      "sha256": "8ccb9ff54d72b083e6bdc999fa6d4f13e3a63c19edb5edd198e1504560eee25c"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-authoring.test.ts",
-      "sha256": "b0a249d884ccbe3736b88e34389455b65fa30f95b03e7e14f6fbecda2b4ff536"
+      "sha256": "75290dfdd44d9c4db3498c1a1f8de1e333355d68407b6c68424a14b086a68de6"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
@@ -89,7 +91,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "6264044a656345994ea90627cff98c047d3bb5bf18dd5adf7b8156672c3a2357"
+      "sha256": "8c8118cce3b587f87d2c8fde60c0a717cc1b11c7b3c9927a9e5ba455bca98c7a"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
@@ -105,23 +107,23 @@
     },
     {
       "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
-      "sha256": "0e9ef2466dc5779878f02f8cb777559bf33b0ad3c74639a0b9909b82edd57bbf"
+      "sha256": "e3ff71fe5df39a5e1007aa8b73041d548245f3b8c32863683fa6b829e242c7ae"
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "f7da2f46f7e269cf85ac14e8b42bd1f3af8c49385f68fa5e17f0232e90c64636"
+      "sha256": "185059f00c5cc781152847fa953eb499718e57204c7ac30f1196b898f49b25ca"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "b355e8947b94a0e696eee4417c22c972dc48486c7c7032b8e04462345f746842"
+      "sha256": "b71a9a158aeee017c124a5f6963a35c649e3f798f9a7e346a4edbe709a52dc81"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "f8effdb808cdf92ba9cec9e9f4b7b02d10250ed013647bcf5d2aace0e68fe61e"
+      "sha256": "97899ed2f19c25d1eee7fb995a1526736992753d86a13f9f69aba2d125c6c516"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "3b5d16ee3749107e7228ecc1fd1b8430ce65ce31acbc132ce75955c4ecdf419f"
+      "sha256": "6b2b6566e5de99117e19295d4383d9dd361c7ec32cf7db0365b66b606b65b6f0"
     }
   ]
 }

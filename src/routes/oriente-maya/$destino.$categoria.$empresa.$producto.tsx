@@ -32,6 +32,7 @@ import {
   ProductSurfaceProvider,
 } from "@/components/surfaces/ProductSurface";
 import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
+import { bindProductRoute } from "@/lib/experience-builder/canonical-entity-binding";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/$producto")({
   loader: async ({ params }) => {
@@ -56,6 +57,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
     ]);
 
     if (!product) throw notFound();
+    const canonicalBinding = bindProductRoute({
+      productId: product.id,
+      productType: product.product_type,
+    });
     // E2 · US-E2.2 — Related Collection contextual del producto.
     // Fallback silencioso: no debe romper el render de la ficha.
     let related = null as Awaited<ReturnType<typeof getProductRelated>> | null;
@@ -76,6 +81,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       product,
       related,
       surfaceContractsEnabled,
+      canonicalBinding,
       inEvaluationLot:
         isInEvaluationLot(evaluationLot, "product", params.producto) ||
         // G8-R1-F1I-R1 · producto de empresa sin revisión de fuente aprobada.
@@ -171,7 +177,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
 });
 
 function ProductoTerritorialPage() {
-  const { resolution, product, related, surfaceContractsEnabled } = Route.useLoaderData();
+  const { resolution, product, related, surfaceContractsEnabled, canonicalBinding } =
+    Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -186,7 +193,7 @@ function ProductoTerritorialPage() {
     <ContextEngineProvider declaration={declaration}>
       <ProductSurfaceProvider product={product} related={related}>
         <ProductSurfaceContractBoundary
-          enabled={surfaceContractsEnabled}
+          enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}
           product={product}
           related={related}
           legacy={<ProductSurface />}

@@ -241,7 +241,7 @@ function MarketplaceProductPage() {
     <ContextEngineProvider declaration={declaration}>
       <ProductSurfaceProvider product={product}>
         <ProductSurfaceContractBoundary
-          enabled={surfaceContractsEnabled && canonicalBinding.surface === "premium"}
+          enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}
           product={product}
           legacy={
             composition ? <CompositionRenderer tree={composition.snapshot} /> : <ProductSurface />

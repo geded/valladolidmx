@@ -462,8 +462,8 @@
     {
       "operation": "create",
       "path": "src/components/home-premium/home-premium-real.ts",
-      "sha256": "58ef94cb088f6c8736d23c0bdef514fe66c42150c13d757af1143e86e18630c4",
-      "authority": "Founder G8-R1-F1L control #284 · trazabilidad exacta hacia docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md"
+      "sha256": "58260b92f01721808399537cfc401dd92b410273581cd0a1dc7f56629690f7f6",
+      "authority": "Founder G8-R1-F1L Public Premium Runtime Integration · PCA-2026-060"
     },
     {
       "operation": "create",
@@ -672,8 +672,8 @@
     {
       "operation": "create",
       "path": "src/lib/experience-builder/smart-blocks.server.ts",
-      "sha256": "9913850b19d92c009a38df21845ba651aea536e786ad9095f1bba61ec72378cf",
-      "authority": "Founder G8-R1-F1L control #284 · trazabilidad exacta hacia docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md"
+      "sha256": "3f7cf05ceb5578859b741e29117f85a79341d1e0a848d08ab8a81134191f59dc",
+      "authority": "Founder G8-R1-F1L Public Premium Runtime Integration · PCA-2026-060"
     },
     {
       "operation": "create",

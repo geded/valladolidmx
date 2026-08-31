@@ -25,8 +25,20 @@ export function mergeHomeRealContent(
 ): HomePremiumContent {
   if (!real) return content;
 
+  const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
+  const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
+  const firstEventWithMedia = real.eventos.find((card) => card.mediaUrl.length > 0);
+  const realHeroSlides = destinationsWithMedia.slice(0, 3).map((card) => ({
+    media: mediaOf(card),
+    caption: card.title,
+  }));
+
   return {
     ...content,
+    hero: {
+      ...content.hero,
+      slides: realHeroSlides.length > 0 ? realHeroSlides : content.hero.slides,
+    },
     destinos: {
       ...content.destinos,
       items: real.destinos.map((card) => ({
@@ -39,10 +51,15 @@ export function mergeHomeRealContent(
     },
     rutas: {
       ...content.rutas,
-      items: real.rutas.map((route) => ({
-        ...route,
-        media: { url: "", alt: route.title },
-      })),
+      items: real.rutas.map((route) => {
+        const cover = route.sequence
+          .map((title) => destinationByTitle.get(title))
+          .find((card): card is Card => Boolean(card?.mediaUrl));
+        return {
+          ...route,
+          media: cover ? mediaOf(cover) : { url: "", alt: route.title },
+        };
+      }),
     },
     experiencias: {
       ...content.experiencias,
@@ -75,7 +92,9 @@ export function mergeHomeRealContent(
     },
     eventos: {
       ...content.eventos,
-      media: { url: "", alt: content.eventos.media.alt },
+      media: firstEventWithMedia
+        ? mediaOf(firstEventWithMedia)
+        : { url: "", alt: content.eventos.media.alt },
       items: real.eventos.map((card) => ({
         day: card.day,
         title: card.title,

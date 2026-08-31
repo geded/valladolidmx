@@ -26,6 +26,8 @@ import type { SmartBlockFilter, SmartBlockOrderBy, SmartBlockQuery } from "./blo
 import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { PUBLIC_APPROVED_REVIEW_STATE } from "@/lib/omxds/public-eligibility";
 import { buildCanonicalEntityUrl } from "./canonical-entity-binding";
+import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
+import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 
 export type SmartBlockJsonValue =
   | string
@@ -230,39 +232,48 @@ function applyOrder(builder: QueryBuilder, spec: TableSpec, o: SmartBlockOrderBy
   return builder.order(o.column, { ascending: (o.direction ?? "asc") === "asc" });
 }
 
-/** Firma en lote las imágenes de portada (buckets privados). */
-async function signMedia(ids: string[]): Promise<Map<string, string>> {
+/**
+ * Resuelve en lote las portadas acreditadas a la URL pública estable canónica.
+ *
+ * El proxy `/api/public/studio-media/*` firma el objeto al momento de servirlo;
+ * el resolutor de la Home no necesita ni debe depender de la service role. Así
+ * Lovable preview y producción consumen exactamente el mismo contrato público.
+ */
+async function resolveStableMedia(ids: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   if (ids.length === 0) return out;
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getPublicClient()
       .from("media_assets")
-      .select("id, storage_bucket, storage_path")
+      .select(
+        "id, storage_bucket, storage_path, status, deleted_at, is_demo_seed, review_state, pipeline_status, original_checksum, alt_text, credit, metadata",
+      )
       .in("id", ids);
     if (error || !data) return out;
-    const byBucket = new Map<string, Array<{ id: string; path: string }>>();
     for (const m of data as Array<Row>) {
+      const id = str(m.id);
       const bucket = str(m.storage_bucket);
       const path = str(m.storage_path);
-      const id = str(m.id);
-      if (!bucket || !path || !id) continue;
-      const list = byBucket.get(bucket) ?? [];
-      list.push({ id, path });
-      byBucket.set(bucket, list);
-    }
-    for (const [bucket, list] of byBucket) {
-      const { data: signed } = await supabaseAdmin.storage.from(bucket).createSignedUrls(
-        list.map((l) => l.path),
-        60 * 60,
-      );
-      (signed ?? []).forEach((s, i) => {
-        const entry = list[i];
-        if (entry && s?.signedUrl) out.set(entry.id, s.signedUrl);
+      if (!id || !bucket || !path) continue;
+      const accredited = isAccreditedDestinationMedia({
+        storage_bucket: bucket,
+        storage_path: path,
+        status: str(m.status),
+        deleted_at: str(m.deleted_at),
+        is_demo_seed: m.is_demo_seed === true,
+        review_state: str(m.review_state),
+        pipeline_status: str(m.pipeline_status),
+        original_checksum: str(m.original_checksum),
+        alt_text: str(m.alt_text),
+        credit: str(m.credit),
+        metadata: m.metadata,
       });
+      if (!accredited) continue;
+      const stableUrl = toStablePublicMediaUrl(bucket, path);
+      if (stableUrl) out.set(id, stableUrl);
     }
   } catch {
-    /* fail-open sobre imagen: la tarjeta se muestra sin fotografía. */
+    /* Fail-closed sobre imagen: la tarjeta conserva su contenido sin medio. */
   }
   return out;
 }
@@ -319,7 +330,7 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
     adapted.sort((a, b) => Number(b.featured === true) - Number(a.featured === true));
     const page = adapted.slice(0, limit);
 
-    const media = await signMedia(
+    const media = await resolveStableMedia(
       Array.from(new Set(page.map((i) => i._media).filter((v): v is string => !!v))),
     );
 
