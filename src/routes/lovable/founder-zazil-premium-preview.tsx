@@ -56,14 +56,14 @@ function FounderZazilPremiumPreview() {
                   <h1 className="font-serif text-6xl leading-[0.92] sm:text-7xl">Zazil Tunich</h1>
                   <p className="mt-3 font-serif text-2xl text-[#b97b00] sm:text-3xl">Cenote-Museo · Valladolid, Yucatán</p>
                 </div>
-                <button type="button" className="hidden size-12 shrink-0 items-center justify-center rounded-full border border-current/40 lg:flex" aria-label="Guardar Zazil Tunich"><Heart /></button>
+                <Link to="/auth" className="hidden size-12 shrink-0 items-center justify-center rounded-full border border-current/40 lg:flex" aria-label="Iniciar sesión para guardar Zazil Tunich"><Heart /></Link>
               </div>
               <div className="mt-5 h-0.5 w-14 bg-[#c78a14]" />
               <h2 className="mt-5 font-serif text-3xl sm:text-4xl">Un viaje al Inframundo Maya</h2>
               <p className="mt-2 text-lg opacity-85">Naturaleza, memoria y cultura viva bajo la tierra.</p>
               <div className="mt-7 flex flex-wrap gap-4">
                 <a href="#experiencias" className="inline-flex min-h-14 items-center gap-5 rounded-md bg-[#004d32] px-8 font-semibold uppercase tracking-wide text-white">Ver experiencias <span>→</span></a>
-                <button type="button" className="inline-flex min-h-14 items-center gap-3 rounded-md border border-current px-7 font-medium uppercase tracking-wide">Agregar a Mi Viaje <Plus className="size-5" /></button>
+                <Link to="/arma-tu-viaje" className="inline-flex min-h-14 items-center gap-3 rounded-md border border-current px-7 font-medium uppercase tracking-wide">Agregar a Mi Viaje <Plus className="size-5" /></Link>
               </div>
             </div>
           </div>
@@ -115,12 +115,12 @@ function FounderHeader({ theme, onTheme }: { theme: "sol" | "luna"; onTheme: (th
 
 function ProofStrip() {
   const facts = [
-    [<Award key="award" />, "Premio Nacional a la Innovación Turística 2023"],
-    [<Sparkles key="sparkles" />, "Reconocimiento institucional"],
-    [<MapPin key="pin" />, "A 6 km de Valladolid"],
-    [<Heart key="heart" />, "Cenote-Museo del Oriente Maya"],
+    [<Award key="award" />, "Premio Nacional a la Innovación Turística 2023", null],
+    [<Sparkles key="sparkles" />, "Reconocimiento institucional · denominación por verificar", null],
+    [<img key="google" src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" className="size-7 object-contain" />, "Calificación y reseñas · sincronización pendiente", "https://www.google.com/search?q=Zazil+Tunich"],
+    [<MapPin key="pin" />, "A 6 km de Valladolid", "https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan"],
   ] as const;
-  return <div className="border-b border-current/15"><ul className="mx-auto grid max-w-[1500px] sm:grid-cols-2 lg:grid-cols-4">{facts.map(([icon, label], index) => <li key={label} className={`flex min-h-20 items-center gap-4 px-6 py-4 ${index ? "border-t border-current/15 sm:border-l sm:border-t-0" : ""}`}><span className="text-[#c78a14]">{icon}</span><span className="text-sm">{label}</span></li>)}</ul></div>;
+  return <div className="border-b border-current/15"><ul className="mx-auto grid max-w-[1500px] sm:grid-cols-2 lg:grid-cols-4">{facts.map(([icon, label, href], index) => <li key={label} className={`${index ? "border-t border-current/15 sm:border-l sm:border-t-0" : ""}`}>{href ? <a href={href} target="_blank" rel="noreferrer" className="flex min-h-20 items-center gap-4 px-6 py-4 transition hover:bg-current/5"><span className="shrink-0 text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></a> : <div className="flex min-h-20 items-center gap-4 px-6 py-4"><span className="shrink-0 text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></div>}</li>)}</ul></div>;
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -128,11 +128,11 @@ function SectionTitle({ children }: { children: ReactNode }) {
 }
 
 function Story() {
-  return <section><SectionTitle>Por qué es extraordinario</SectionTitle><p className="mt-5 text-sm leading-6 opacity-80">Zazil Tunich es un cenote-museo que revela la profundidad del vínculo maya con el agua y el inframundo. Formaciones milenarias, luz que esculpe la piedra y relatos ancestrales se entretejen en una experiencia que inspira respeto y asombro.</p><div className="mt-5 grid grid-cols-2 gap-2"><MiniFact icon={<Sparkles />} text="Recorridos guiados" /><MiniFact icon={<UtensilsCrossed />} text="Cocina regional" /><MiniFact icon={<Leaf />} text="Nado en cenote" /><MiniFact icon={<Accessibility />} text="Accesibilidad" /></div></section>;
+  return <section><SectionTitle>Por qué es extraordinario</SectionTitle><p className="mt-5 text-sm leading-6 opacity-80">Zazil Tunich es un cenote-museo que revela la profundidad del vínculo maya con el agua y el inframundo. Formaciones milenarias, luz que esculpe la piedra y relatos ancestrales se entretejen en una experiencia que inspira respeto y asombro.</p><div className="mt-5 grid grid-cols-2 gap-2"><MiniFact icon={<Sparkles />} text="Recorridos guiados por intérpretes locales" /><MiniFact icon={<UtensilsCrossed />} text="Cocina de la región con identidad maya" /><MiniFact icon={<Leaf />} text="Nado en cenote permitido" /><MiniFact icon={<Accessibility />} text="Información sobre accesibilidad" /></div></section>;
 }
 
 function MiniFact({ icon, text }: { icon: ReactNode; text: string }) {
-  return <div className="flex min-h-16 min-w-0 items-center gap-2 rounded-lg border border-current/15 bg-transparent p-2.5"><span className="shrink-0 text-[#c78a14] [&>svg]:size-5">{icon}</span><span className="min-w-0 text-[11px] font-medium leading-tight xl:text-xs">{text}</span></div>;
+  return <div className="flex min-h-20 min-w-0 items-center gap-2 rounded-lg border border-current/15 bg-transparent p-2.5"><span className="shrink-0 text-[#c78a14] [&>svg]:size-5">{icon}</span><span className="min-w-0 text-[10px] font-medium leading-[1.25] xl:text-[11px]">{text}</span></div>;
 }
 
 function FeaturedExperience() {
@@ -148,7 +148,7 @@ function InfoRow({ icon, title, children }: { icon: ReactNode; title: string; ch
 }
 
 function TerritorialContext() {
-  return <section><SectionTitle>Contexto territorial</SectionTitle><div className="mt-5 rounded-2xl border border-[#c78a14]/50 bg-[#143c2e] p-5 text-white"><p className="text-xs uppercase tracking-[0.2em] text-white/75">Valladolid</p><div className="mt-4 border-l border-dashed border-amber-300 py-2 pl-5"><span className="rounded bg-black/35 px-2 py-1 text-xs">6 km</span><p className="mt-8 font-medium">Zazil Tunich</p><p className="text-xs text-white/70">Cenote-Museo</p></div></div><p className="mt-4 text-sm leading-6 opacity-75">Ubicado en el Oriente Maya de Yucatán, donde la naturaleza, la historia y las tradiciones vivas invitan a explorar más.</p></section>;
+  return <section><SectionTitle>Contexto territorial</SectionTitle><a href="https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan" target="_blank" rel="noreferrer" className="mt-5 block rounded-2xl border border-[#c78a14]/50 bg-[#143c2e] p-5 text-white transition hover:-translate-y-0.5 hover:shadow-lg"><p className="text-xs uppercase tracking-[0.2em] text-white/75">Valladolid</p><div className="mt-4 border-l border-dashed border-amber-300 py-2 pl-5"><span className="rounded bg-black/35 px-2 py-1 text-xs">6 km</span><p className="mt-8 font-medium">Zazil Tunich</p><p className="text-xs text-white/70">Cenote-Museo</p></div></a><p className="mt-4 text-sm leading-6 opacity-75">Ubicado en el Oriente Maya de Yucatán, donde la naturaleza, la historia y las tradiciones vivas invitan a explorar más.</p></section>;
 }
 
 function AluxBand() {
