@@ -46,10 +46,10 @@ function FounderZazilPremiumPreview() {
       <FounderHeader theme={theme} onTheme={setTheme} />
 
       <main>
-        <section className="relative isolate min-h-[39rem] overflow-hidden border-b border-current/15 sm:min-h-[43rem] lg:min-h-[31rem]">
+        <section className="relative isolate min-h-[40rem] overflow-hidden border-b border-current/15 sm:min-h-[42rem] lg:min-h-[28.5rem]">
           <img src={HERO} alt="Caverna de piedra caliza con agua turquesa y sendero iluminado" className="absolute inset-0 -z-30 size-full object-cover" />
           <div className={luna ? "absolute inset-0 -z-20 bg-gradient-to-r from-[#050e12] via-[#050e12]/90 to-black/5" : "absolute inset-0 -z-20 bg-gradient-to-r from-[#f7f3ea] via-[#f7f3ea]/90 to-transparent"} />
-          <div className="mx-auto grid min-h-[inherit] max-w-[1500px] items-center px-6 py-12 sm:px-10 lg:px-16">
+          <div className="mx-auto grid min-h-[inherit] max-w-[1500px] items-center px-6 pb-10 pt-28 sm:px-10 lg:px-16 lg:pb-8 lg:pt-24">
             <div className="max-w-2xl">
               <h1 className="font-serif text-6xl leading-[0.92] sm:text-7xl">Zazil Tunich</h1>
               <p className="mt-3 font-serif text-2xl text-[#b97b00] sm:text-3xl">Cenote-Museo · Valladolid, Yucatán</p>
@@ -62,12 +62,12 @@ function FounderZazilPremiumPreview() {
               </div>
             </div>
           </div>
-          <Link to="/auth" className="absolute right-6 top-8 z-10 hidden min-h-12 items-center gap-3 rounded-full border border-white/60 bg-black/15 px-4 text-white backdrop-blur-sm lg:inline-flex xl:right-16" aria-label="Iniciar sesión para guardar Zazil Tunich"><span className="grid size-9 place-items-center rounded-full border border-white/70"><Heart className="size-5" /></span><span className="text-sm">Guardar</span></Link>
+          <Link to="/auth" className="absolute right-6 top-28 z-10 hidden min-h-11 items-center gap-3 rounded-full border border-white/60 bg-black/15 px-4 text-white backdrop-blur-sm lg:inline-flex xl:right-16" aria-label="Iniciar sesión para guardar Zazil Tunich"><span className="grid size-9 place-items-center rounded-full border border-white/70"><Heart className="size-5" /></span><span className="text-sm">Guardar</span></Link>
         </section>
 
         <ProofStrip luna={luna} />
 
-        <div className="mx-auto grid max-w-[1500px] items-start gap-8 px-6 py-10 sm:px-10 lg:grid-cols-[0.92fr_1.28fr_0.9fr_0.9fr] lg:px-16 xl:gap-10">
+        <div className="mx-auto grid max-w-[1500px] items-start gap-8 px-6 py-7 sm:px-10 lg:grid-cols-[0.92fr_1.28fr_0.9fr_0.9fr] lg:px-16 xl:gap-10">
           <Story />
           <FeaturedExperience />
           <VisitInfo />
@@ -83,10 +83,10 @@ function FounderZazilPremiumPreview() {
 function FounderHeader({ theme, onTheme }: { theme: "sol" | "luna"; onTheme: (theme: "sol" | "luna") => void }) {
   const luna = theme === "luna";
   return (
-    <header className={luna ? "border-b border-white/15 bg-[#050e12]" : "border-b border-[#0b3827]/15 bg-[#f7f3ea]"}>
+    <header className={`absolute inset-x-0 top-0 z-30 ${luna ? "text-white" : "text-[#172319]"}`}>
       <div className="mx-auto flex min-h-24 max-w-[1500px] items-center justify-between gap-5 px-6 sm:px-10 lg:px-16">
         <Link to="/" className="shrink-0">
-          <span className="block font-serif text-3xl leading-none">Valladolid<span className="text-[#b97b00]">.mx</span></span>
+          <span className="block font-serif text-3xl leading-none">Valladolid<span className="text-[#d99a21]">.mx</span></span>
           <span className="mt-1 block text-[9px] uppercase tracking-[0.28em] opacity-70">Oriente Maya de Yucatán</span>
         </Link>
         <nav className="hidden items-center gap-9 text-sm uppercase tracking-wide lg:flex" aria-label="Navegación principal">
@@ -97,12 +97,12 @@ function FounderHeader({ theme, onTheme }: { theme: "sol" | "luna"; onTheme: (th
           <Link to="/alux">Alux <span className="text-[#b97b00]">✦</span></Link>
         </nav>
         <div className="flex items-center gap-3">
-          <div className="flex rounded-full border border-current/25 p-1" aria-label="Tema Sol o Luna">
+          <div className={`flex rounded-full border p-1 backdrop-blur-sm ${luna ? "border-white/35 bg-black/20" : "border-[#172319]/30 bg-white/35"}`} aria-label="Tema Sol o Luna">
             <button type="button" onClick={() => onTheme("sol")} aria-pressed={theme === "sol"} aria-label="Vista Sol" className={`grid size-9 place-items-center rounded-full ${theme === "sol" ? "bg-white text-[#0b3827] shadow" : "opacity-55"}`}><Sun className="size-5" /></button>
             <button type="button" onClick={() => onTheme("luna")} aria-pressed={theme === "luna"} aria-label="Vista Luna" className={`grid size-9 place-items-center rounded-full ${theme === "luna" ? "bg-[#253139] text-amber-300 shadow" : "opacity-55"}`}><Moon className="size-5" /></button>
           </div>
           <Link to="/arma-tu-viaje" className="hidden min-h-12 items-center rounded-full border border-[#b97b00] px-6 text-sm font-medium uppercase tracking-wide text-[#b97b00] sm:inline-flex">Arma tu viaje</Link>
-          <button type="button" className="grid size-11 place-items-center rounded-full border border-current/25 lg:hidden" aria-label="Abrir menú"><Menu /></button>
+          <button type="button" className={`grid size-11 place-items-center rounded-full border lg:hidden ${luna ? "border-white/35" : "border-[#172319]/30"}`} aria-label="Abrir menú"><Menu /></button>
         </div>
       </div>
     </header>
@@ -116,7 +116,7 @@ function ProofStrip({ luna }: { luna: boolean }) {
     [<GoogleG key="google" luna={luna} />, "Calificación y reseñas · sincronización pendiente", "https://www.google.com/search?q=Zazil+Tunich"],
     [<MapPin key="pin" />, "A 6 km de Valladolid", "https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan"],
   ] as const;
-  return <div className="border-b border-current/15"><ul className="mx-auto grid max-w-[1500px] sm:grid-cols-2 lg:grid-cols-4">{facts.map(([icon, label, href], index) => <li key={label} className={`${index ? "border-t border-current/15 sm:border-l sm:border-t-0" : ""}`}>{href ? <a href={href} target="_blank" rel="noreferrer" className="flex min-h-20 items-center gap-4 px-6 py-4 transition hover:bg-current/5"><span className="grid size-9 shrink-0 place-items-center text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></a> : <div className="flex min-h-20 items-center gap-4 px-6 py-4"><span className="grid size-9 shrink-0 place-items-center text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></div>}</li>)}</ul></div>;
+  return <div className="border-b border-current/15"><ul className="mx-auto grid max-w-[1500px] sm:grid-cols-2 lg:grid-cols-4">{facts.map(([icon, label, href], index) => <li key={label} className={`${index ? "border-t border-current/15 sm:border-l sm:border-t-0" : ""}`}>{href ? <a href={href} target="_blank" rel="noreferrer" className="flex min-h-[4.25rem] items-center gap-4 px-6 py-3 transition hover:bg-current/5"><span className="grid size-9 shrink-0 place-items-center text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></a> : <div className="flex min-h-[4.25rem] items-center gap-4 px-6 py-3"><span className="grid size-9 shrink-0 place-items-center text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></div>}</li>)}</ul></div>;
 }
 
 function GoogleG({ luna }: { luna: boolean }) {
@@ -153,7 +153,7 @@ function InfoRow({ icon, title, children }: { icon: ReactNode; title: string; ch
 }
 
 function TerritorialContext() {
-  return <section><SectionTitle>Contexto territorial</SectionTitle><a href="https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan" target="_blank" rel="noreferrer" className="mt-5 block rounded-2xl border border-[#c78a14]/50 bg-[#143c2e] p-5 text-white transition hover:-translate-y-0.5 hover:shadow-lg"><p className="text-xs uppercase tracking-[0.2em] text-white/75">Valladolid</p><div className="mt-4 border-l border-dashed border-amber-300 py-2 pl-5"><span className="rounded bg-black/35 px-2 py-1 text-xs">6 km</span><p className="mt-8 font-medium">Zazil Tunich</p><p className="text-xs text-white/70">Cenote-Museo</p></div></a><p className="mt-4 text-sm leading-6 opacity-75">Ubicado en el Oriente Maya de Yucatán, donde la naturaleza, la historia y las tradiciones vivas invitan a explorar más.</p></section>;
+  return <section><SectionTitle>Contexto territorial</SectionTitle><div className="mt-5 aspect-[4/3] overflow-hidden rounded-2xl border border-[#c78a14]/50 bg-[#143c2e]"><iframe title="Mapa de Zazil Tunich cerca de Valladolid" src="https://www.google.com/maps?q=Zazil%20Tunich%20Yucatan&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="size-full border-0" /></div><p className="mt-4 text-sm leading-6 opacity-75">Ubicado en el Oriente Maya de Yucatán, donde la naturaleza, la historia y las tradiciones vivas invitan a explorar más.</p><a href="https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan" target="_blank" rel="noreferrer" className="mt-3 inline-flex text-sm font-medium text-[#c78a14]">Abrir ubicación en Google Maps →</a></section>;
 }
 
 function AluxBand() {
