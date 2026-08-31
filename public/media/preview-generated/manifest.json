@@ -21,6 +21,46 @@
       "replacement": "reemplazo-requerido",
       "reference": "Founder-approved Valladolid microsite screenshot plus public visual references supplied 2026-08-31",
       "sha256": "c3325a87390575d8b750b45a83d9be026feb699606672baa98d106d6675ba202"
+    },
+    {
+      "id": "preview-home-valladolid-editorial-v1",
+      "path": "/media/preview-generated/home-valladolid-editorial-preview.webp",
+      "entity": "Valladolid",
+      "role": "home-destination-cover",
+      "status": "preview-generado",
+      "replacement": "reemplazo-requerido",
+      "reference": "Public visual references for San Servacio and Valladolid historic center, reviewed 2026-08-31",
+      "sha256": "87ea72f20b692fc5c87590a62c3a6e33a094e3478899e1c38740a1ba6c01e56a"
+    },
+    {
+      "id": "preview-home-izamal-editorial-v1",
+      "path": "/media/preview-generated/home-izamal-editorial-preview.webp",
+      "entity": "Izamal",
+      "role": "home-destination-cover",
+      "status": "preview-generado",
+      "replacement": "reemplazo-requerido",
+      "reference": "Public visual references for the Convent of San Antonio de Padua and Izamal arcades, reviewed 2026-08-31",
+      "sha256": "04e18ebd22ae0e8f82e7f658d610e4337b65bba78d72662e70d41aa0a2f962e6"
+    },
+    {
+      "id": "preview-home-espita-editorial-v1",
+      "path": "/media/preview-generated/home-espita-editorial-preview.webp",
+      "entity": "Espita",
+      "role": "home-destination-cover",
+      "status": "preview-generado",
+      "replacement": "reemplazo-requerido",
+      "reference": "Public visual references for Espita church and central plaza, reviewed 2026-08-31",
+      "sha256": "6a423de306b4fc942966b9a76da108239fa09118cf2c708ff050a09bd42f97e6"
+    },
+    {
+      "id": "preview-home-temozon-editorial-v1",
+      "path": "/media/preview-generated/home-temozon-editorial-preview.webp",
+      "entity": "Temozón",
+      "role": "home-destination-cover",
+      "status": "preview-generado",
+      "replacement": "reemplazo-requerido",
+      "reference": "Public visual references for Temozón gastronomy and artisan identity, reviewed 2026-08-31",
+      "sha256": "e656a19b958eaea0316801753903a771ed1665f8e0666f4c1f16bd1f1f7999bd"
     }
   ]
 }

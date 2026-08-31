@@ -252,6 +252,11 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
       { slug: "restaurantes", label: "Restaurantes", href: "/restaurantes" },
       { slug: "experiencias", label: "Experiencias", href: "/experiencias" },
       { slug: "casas-de-vacaciones", label: "Casas de vacaciones", href: "/casas-de-vacaciones" },
+      {
+        slug: "lugares",
+        label: "Lugares y sitios de interés",
+        href: "/oriente-maya/valladolid/lugares",
+      },
       { slug: "que-hacer", label: "Qué hacer", href: "/que-hacer" },
       { slug: "eventos", label: "Eventos", href: "/eventos" },
       { slug: "promociones", label: "Promociones", href: "/promociones" },

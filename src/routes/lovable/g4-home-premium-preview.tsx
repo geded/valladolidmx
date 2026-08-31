@@ -32,6 +32,10 @@ import {
   HomePremiumRibbon,
   HomePremiumSurface,
 } from "@/components/home-premium/HomePremiumSurface";
+import {
+  HOME_PREMIUM_G4_CONTENT,
+  type HomePremiumContent,
+} from "@/components/home-premium/home-premium-content";
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PremiumPresentationControl } from "@/components/premium";
@@ -88,6 +92,25 @@ const MEDIA = {
   cenote: {
     url: `${GOVERNED}/experience-cover.jpg`,
     alt: "Cenote de aguas turquesa dentro de una caverna de piedra caliza",
+  },
+} as const;
+
+const HOME_DESTINATION_MEDIA = {
+  valladolid: {
+    url: "/media/preview-generated/home-valladolid-editorial-preview.webp",
+    alt: "Templo de San Servacio y centro histórico de Valladolid al atardecer",
+  },
+  izamal: {
+    url: "/media/preview-generated/home-izamal-editorial-preview.webp",
+    alt: "Arquerías y convento amarillo de Izamal",
+  },
+  espita: {
+    url: "/media/preview-generated/home-espita-editorial-preview.webp",
+    alt: "Iglesia histórica y plaza arbolada de Espita",
+  },
+  temozon: {
+    url: "/media/preview-generated/home-temozon-editorial-preview.webp",
+    alt: "Cocina tradicional y artesanía de Temozón",
   },
 } as const;
 
@@ -339,6 +362,52 @@ const MAP_DTO: ExperienceMapDTO = {
   emptyMessage: null,
 };
 
+export const HOME_PREMIUM_PREVIEW_CONTENT: HomePremiumContent = {
+  ...HOME_PREMIUM_G4_CONTENT,
+  hero: {
+    ...HOME_PREMIUM_G4_CONTENT.hero,
+    slides: [
+      { media: HOME_DESTINATION_MEDIA.valladolid, caption: "Centro histórico de Valladolid" },
+      { media: MEDIA.cenote, caption: "Cenotes del Oriente Maya de Yucatán" },
+    ],
+  },
+  destinos: {
+    ...HOME_PREMIUM_G4_CONTENT.destinos,
+    items: [
+      { name: "Valladolid", note: "Capital turística · punto de partida", media: HOME_DESTINATION_MEDIA.valladolid, puebloMagico: true, href: "/oriente-maya/valladolid" },
+      { name: "Izamal", note: "Ciudad amarilla · patrimonio vivo", media: HOME_DESTINATION_MEDIA.izamal, puebloMagico: true, href: "/oriente-maya/izamal" },
+      { name: "Espita", note: "Arquitectura y ritmo de pueblo", media: HOME_DESTINATION_MEDIA.espita, puebloMagico: true, href: "/oriente-maya/espita" },
+      { name: "Temozón", note: "Gastronomía, artesanía y comunidad", media: HOME_DESTINATION_MEDIA.temozon, puebloMagico: false, href: "/oriente-maya/temozon" },
+    ],
+  },
+  rutas: {
+    ...HOME_PREMIUM_G4_CONTENT.rutas,
+    items: ROUTES.map((route) => ({ ...route, sequence: [...route.sequence] })),
+  },
+  experiencias: {
+    ...HOME_PREMIUM_G4_CONTENT.experiencias,
+    items: EXPERIENCES.map((item, index) => ({
+      ...item,
+      href: index === 0 ? "/experiencias" : "/que-hacer",
+    })),
+  },
+  servicios: {
+    ...HOME_PREMIUM_G4_CONTENT.servicios,
+    stays: STAYS.map((item) => ({ ...item, href: "/hoteles" })),
+    food: FOOD.map((item) => ({ ...item, href: "/restaurantes" })),
+  },
+  eventos: {
+    ...HOME_PREMIUM_G4_CONTENT.eventos,
+    media: MEDIA.plaza,
+    items: EVENTS.map((item) => ({ ...item, href: "/eventos" })),
+  },
+  queHacer: {
+    ...HOME_PREMIUM_G4_CONTENT.queHacer,
+    items: EDITORIAL.map((item) => ({ ...item, href: "/que-hacer" })),
+  },
+  mapa: { ...HOME_PREMIUM_G4_CONTENT.mapa, dto: MAP_DTO },
+};
+
 const SECTION_LABELS: Record<SectionKey, string> = {
   destinos: "Destinos del Oriente Maya de Yucatán",
   pueblosMagicos: "Pueblos Mágicos",
@@ -395,13 +464,17 @@ function G4HomePremiumPreview() {
   });
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background pb-20">
+    <div
+      className="min-h-screen overflow-x-clip bg-background pb-20"
+      data-premium-direction={tuning.direction}
+    >
       <HomePremiumRibbon />
       <HomePremiumHeader />
       <G7IntegratedFixture />
       {/* G8-D · autoridad visual única: la preview consume la misma superficie
           que el renderer del Experience Builder. */}
       <HomePremiumSurface
+        content={HOME_PREMIUM_PREVIEW_CONTENT}
         heroVariant={tuning.heroVariant}
         layout={tuning.layout}
         sections={tuning.sections}
@@ -458,7 +531,9 @@ function TuningPanel({
           <div className="mt-4 space-y-4">
             <PremiumPresentationControl
               value={value.direction}
-              onChange={(next) => set("direction", next)}
+              onChange={(next) =>
+                onChange({ ...value, direction: next, heroVariant: next })
+              }
             />
             <OptionGroup
               title="Hero"

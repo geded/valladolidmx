@@ -26,9 +26,11 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
 import {
   HOME_PREMIUM_DEFAULT_ORDER,
   HOME_PREMIUM_G4_CONTENT,
@@ -178,11 +180,8 @@ export function HomePremiumHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
       <Container className="flex min-h-16 items-center justify-between gap-4 py-2">
-        <Link to="/" className="flex min-w-0 items-center gap-2">
-          <span className="truncate font-display text-lg font-semibold">Valladolid.mx</span>
-          <span className="hidden text-[10px] uppercase text-muted-foreground sm:inline">
-            Oriente Maya de Yucatán
-          </span>
+        <Link to="/" className="flex min-w-0 items-center" aria-label="Ir al inicio de Valladolid.mx">
+          <BrandLogo size="md" />
         </Link>
         <nav
           aria-label="Navegación de la vista previa"
@@ -279,13 +278,13 @@ function HeroSlideControl({
 
 function HeroActions({ content }: { content: HomePremiumContent }) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <Button asChild size="lg" className="min-h-12 rounded-pill">
+    <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+      <Button asChild className="min-h-11 rounded-pill px-5">
         <Link to={content.hero.primaryCta.to}>
           {content.hero.primaryCta.label} <ArrowRight className="ml-2 size-4" aria-hidden />
         </Link>
       </Button>
-      <Button asChild size="lg" variant="outline" className="min-h-12 rounded-pill">
+      <Button asChild variant="outline" className="min-h-11 rounded-pill px-5">
         <Link to={content.hero.secondaryCta.to}>{content.hero.secondaryCta.label}</Link>
       </Button>
     </div>
@@ -297,23 +296,23 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
-        <div className="flex flex-col justify-center bg-card p-6 sm:p-9 lg:p-12">
+      <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
+        <div className="flex flex-col justify-center bg-card p-6 sm:p-8 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">{content.hero.eyebrow}</p>
-          <h1 className="mt-3 text-balance font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
+          <h1 className="mt-2.5 text-balance font-display text-4xl leading-[1.02] sm:text-5xl lg:text-[3.35rem]">
             {content.hero.title}
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
+          <p className="mt-4 max-w-xl text-[0.95rem] leading-6 text-muted-foreground">
             {content.hero.subtitle}
           </p>
-          <div className="mt-7">
+          <div className="mt-5">
             <HeroActions content={content} />
           </div>
-          <div className="mt-7 border-t border-border pt-5">
+          <div className="mt-5 border-t border-border pt-4">
             <HeroSlideControl content={content} index={index} onChange={setIndex} />
           </div>
         </div>
-        <figure className="relative min-h-[22rem] overflow-hidden lg:min-h-[38rem]">
+        <figure className="relative min-h-[21rem] overflow-hidden lg:min-h-[32rem]">
           <EditorialMediaFrame
             media={slide.media}
             label={content.hero.title}
@@ -334,7 +333,7 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="relative min-h-[28rem] sm:min-h-[36rem]">
+      <div className="relative min-h-[27rem] sm:min-h-[32rem]">
         <EditorialMediaFrame
           media={slide.media}
           label={content.hero.title}
@@ -345,9 +344,9 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
           aria-hidden
         />
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">Oriente Maya de Yucatán</p>
-          <h1 className="mt-3 max-w-4xl text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-6xl">
+          <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-primary-foreground sm:text-[3.35rem]">
             {content.hero.title}
           </h1>
           <div className="mt-5">
@@ -355,8 +354,8 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           </div>
         </div>
       </div>
-      <div className="grid gap-5 bg-card p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+      <div className="grid gap-4 bg-card p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+        <p className="max-w-2xl text-[0.95rem] leading-6 text-muted-foreground">
           {content.hero.subtitle}
         </p>
         <HeroActions content={content} />
@@ -425,6 +424,14 @@ function AluxPlanner({
 }) {
   const routes = content.rutas.items;
   const suggested = routes.find((route) => route.id === selectedRoute) ?? routes[0];
+  const openAlux = () => {
+    if (!suggested) return;
+    onSelectRoute(suggested.id);
+    openAluxFloating({
+      reason: "manual",
+      hint: `${selectedPrompt}. Ruta sugerida: ${suggested.title}. ${suggested.description}`,
+    });
+  };
   return (
     <section
       aria-labelledby="alux-title"
@@ -480,7 +487,7 @@ function AluxPlanner({
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button
               type="button"
-              onClick={() => suggested && onSelectRoute(suggested.id)}
+              onClick={openAlux}
               className="min-h-11 rounded-pill"
             >
               <MessageCircle className="mr-2 size-4" aria-hidden />
