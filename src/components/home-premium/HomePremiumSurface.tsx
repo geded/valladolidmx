@@ -569,32 +569,17 @@ function DestinationsSection({
             ? "sm:grid-cols-2"
             : layout === "carrusel"
               ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[32%]"
-              : "sm:grid-cols-6",
+              : "sm:grid-cols-2 xl:grid-cols-4",
         )}
       >
-        {content.destinos.items.map((destination, index) => {
-          const wide = layout === "asimetrica" && index === 0;
-          const asymmetricSpan =
-            layout !== "asimetrica"
-              ? ""
-              : content.destinos.items.length === 1
-                ? "sm:col-span-6"
-                : index === 0
-                  ? "sm:col-span-4"
-                  : index === 1
-                    ? "sm:col-span-2"
-                    : index === content.destinos.items.length - 1 &&
-                        (content.destinos.items.length - 2) % 2 === 1
-                      ? "sm:col-span-6"
-                      : "sm:col-span-3";
+        {content.destinos.items.map((destination) => {
           return (
             <article
               key={destination.name}
               className={cn(
                 "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
-                asymmetricSpan,
                 cinematic &&
-                  "relative min-h-[22rem] justify-end border-0 bg-[#071814] text-[#f7f3ea] shadow-elevated sm:min-h-[26rem]",
+                  "relative min-h-[20rem] justify-end border-0 bg-[#071814] text-[#f7f3ea] shadow-elevated sm:min-h-[22rem]",
               )}
             >
               <div className={cn("relative", cinematic && "absolute inset-0")}>
@@ -603,7 +588,7 @@ function DestinationsSection({
                   label={destination.name}
                   className={cn(
                     "w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]",
-                    cinematic ? "h-full" : wide ? "aspect-[16/9]" : "aspect-[4/3]",
+                    cinematic ? "h-full" : "aspect-[4/3]",
                   )}
                 />
                 {cinematic ? (
