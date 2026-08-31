@@ -51,6 +51,8 @@ export interface ExperienceMapBlockProps {
   interactiveOnly?: boolean;
   /** Presentación territorial amplia para superficies Premium. */
   immersive?: boolean;
+  /** Dibuja el recorrido por carretera siguiendo el orden de los puntos. */
+  connectByRoad?: boolean;
 }
 
 export function ExperienceMapBlock({
@@ -58,6 +60,7 @@ export function ExperienceMapBlock({
   className,
   interactiveOnly = false,
   immersive = false,
+  connectByRoad = false,
 }: ExperienceMapBlockProps) {
   // C2.F1 · Piloto Render-Only. Normalizamos vía defaults render-only
   // (equivalente runtime a `schema.parse` para inputs válidos, ver
@@ -115,6 +118,7 @@ export function ExperienceMapBlock({
                 lng={center.lng}
                 zoom={center.zoom ?? 14}
                 markerTitle={primary.title}
+                connectByRoad={connectByRoad}
                 markers={dto.points.map((p) => ({
                   lat: p.lat,
                   lng: p.lng,

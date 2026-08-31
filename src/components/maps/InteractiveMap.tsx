@@ -22,8 +22,12 @@ import { useEffect, useRef, useState } from "react";
 // Tipos mínimos locales para evitar depender de @types/google.maps.
 type LatLng = { lat: number; lng: number };
 interface GMap {
-  new (el: HTMLElement, opts: Record<string, unknown>): {
+  new (
+    el: HTMLElement,
+    opts: Record<string, unknown>,
+  ): {
     fitBounds: (bounds: unknown, padding?: number) => void;
+    setZoom: (zoom: number) => void;
   };
 }
 interface GMarker {
@@ -44,6 +48,17 @@ interface GPoint {
 interface GLatLngBounds {
   new (): { extend: (position: LatLng) => void };
 }
+interface GDirectionsService {
+  new (): {
+    route: (
+      request: Record<string, unknown>,
+      callback: (result: unknown, status: string) => void,
+    ) => void;
+  };
+}
+interface GDirectionsRenderer {
+  new (opts: Record<string, unknown>): { setDirections: (result: unknown) => void };
+}
 interface GoogleMapsNamespace {
   maps: {
     Map: GMap;
@@ -51,6 +66,10 @@ interface GoogleMapsNamespace {
     Size: GSize;
     Point: GPoint;
     LatLngBounds: GLatLngBounds;
+    DirectionsService: GDirectionsService;
+    DirectionsRenderer: GDirectionsRenderer;
+    TravelMode: { DRIVING: string };
+    DirectionsStatus: { OK: string };
   };
 }
 
@@ -162,6 +181,8 @@ export interface InteractiveMapProps {
   className?: string;
   /** Pines adicionales para renderizar (visitas territoriales). */
   markers?: Array<{ lat: number; lng: number; title?: string; href?: string | null }>;
+  /** Conecta los pines, en su orden, siguiendo carreteras reales. */
+  connectByRoad?: boolean;
 }
 
 function labelForIndex(i: number) {
@@ -195,6 +216,7 @@ export function InteractiveMap({
   markerTitle,
   className,
   markers,
+  connectByRoad = false,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -238,7 +260,39 @@ export function InteractiveMap({
           });
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
-        if (list.length > 1) map.fitBounds(bounds, 56);
+        if (list.length > 1) map.fitBounds(bounds, 88);
+        if (connectByRoad && list.length > 1) {
+          const directions = new google.maps.DirectionsService();
+          const renderer = new google.maps.DirectionsRenderer({
+            map,
+            suppressMarkers: true,
+            preserveViewport: false,
+            polylineOptions: {
+              strokeColor: "#c88a17",
+              strokeOpacity: 0.95,
+              strokeWeight: 5,
+            },
+          });
+          directions.route(
+            {
+              origin: { lat: list[0].lat, lng: list[0].lng },
+              destination: { lat: list[list.length - 1].lat, lng: list[list.length - 1].lng },
+              waypoints: list.slice(1, -1).map((point) => ({
+                location: { lat: point.lat, lng: point.lng },
+                stopover: true,
+              })),
+              travelMode: google.maps.TravelMode.DRIVING,
+              optimizeWaypoints: false,
+            },
+            (result, status) => {
+              if (status === google.maps.DirectionsStatus.OK && result) {
+                renderer.setDirections(result);
+              } else {
+                map.fitBounds(bounds, 88);
+              }
+            },
+          );
+        }
         setReady(true);
       })
       .catch((e) => {
@@ -247,7 +301,7 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, zoom, markerTitle, markers]);
+  }, [lat, lng, zoom, markerTitle, markers, connectByRoad]);
 
   if (error) {
     return (

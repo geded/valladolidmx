@@ -166,7 +166,8 @@ export function HomePremiumSurface({
               key={key}
               className={cn(
                 "mt-10 sm:mt-12",
-                cinematic && index % 2 === 0 &&
+                cinematic &&
+                  index % 2 === 0 &&
                   "rounded-[2rem] bg-[#071814] p-5 text-[#f7f3ea] shadow-elevated sm:p-7 [&_.border-border]:border-white/15 [&_.bg-card]:bg-white/[0.06] [&_.bg-muted]:bg-white/10 [&_.text-muted-foreground]:text-[#f7f3ea]/70",
               )}
             >
@@ -205,7 +206,11 @@ export function HomePremiumHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
       <Container className="flex min-h-16 items-center justify-between gap-4 py-2">
-        <Link to="/" className="flex min-w-0 items-center" aria-label="Ir al inicio de Valladolid.mx">
+        <Link
+          to="/"
+          className="flex min-w-0 items-center"
+          aria-label="Ir al inicio de Valladolid.mx"
+        >
           <BrandLogo size="md" />
         </Link>
         <nav
@@ -510,11 +515,7 @@ function AluxPlanner({
             datos acreditados.
           </p>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Button
-              type="button"
-              onClick={openAlux}
-              className="min-h-11 rounded-pill"
-            >
+            <Button type="button" onClick={openAlux} className="min-h-11 rounded-pill">
               <MessageCircle className="mr-2 size-4" aria-hidden />
               Personalizar con Alux
             </Button>
@@ -1030,6 +1031,25 @@ function MapSection({
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
+  const normalizeLabel = (value: string) =>
+    value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLocaleLowerCase("es-MX");
+  const pointByTitle = new Map(
+    content.mapa.dto.points
+      .filter((point) => point.kind === "destination")
+      .map((point) => [normalizeLabel(point.title), point]),
+  );
+  const routePoints = (route?.sequence ?? [])
+    .map((title) => pointByTitle.get(normalizeLabel(title)))
+    .filter((point): point is NonNullable<typeof point> => Boolean(point));
+  const mapDto = {
+    ...content.mapa.dto,
+    center: null,
+    points: routePoints.length >= 2 ? routePoints : content.mapa.dto.points,
+  };
   return (
     <section
       id="mapa"
@@ -1054,7 +1074,12 @@ function MapSection({
           </p>
         </div>
       </div>
-      <ExperienceMapBlock dto={content.mapa.dto} interactiveOnly immersive />
+      <ExperienceMapBlock
+        dto={mapDto}
+        interactiveOnly
+        immersive
+        connectByRoad={routePoints.length >= 2}
+      />
     </section>
   );
 }

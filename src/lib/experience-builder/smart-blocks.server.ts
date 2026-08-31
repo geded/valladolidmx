@@ -30,12 +30,7 @@ import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-po
 import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 
 export type SmartBlockJsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | SmartBlockJsonValue[]
-  | { [k: string]: SmartBlockJsonValue };
+  string | number | boolean | null | SmartBlockJsonValue[] | { [k: string]: SmartBlockJsonValue };
 
 export interface SmartBlockResolveResult {
   items: Array<Record<string, SmartBlockJsonValue>>;
@@ -377,25 +372,49 @@ export interface TerritoryMapPoint {
 const MAP_CACHE_TTL_MS = 60_000;
 let mapCache: { at: number; value: TerritoryMapPoint[] } | null = null;
 
-/** Puntos reales del territorio: empresas acreditadas con coordenadas. */
+/** Puntos reales del territorio: destinos y empresas acreditadas con coordenadas. */
 export async function resolveTerritoryMapPointsQuery(limit = 60): Promise<TerritoryMapPoint[]> {
   if (mapCache && Date.now() - mapCache.at < MAP_CACHE_TTL_MS) return mapCache.value;
   try {
     const client = getPublicClient();
-    const { data, error } = await client
-      .from("businesses")
-      .select(
-        "id, slug, display_name, tagline, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ), business_locations ( latitude, longitude )",
-      )
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .eq("source_review_state", PUBLIC_APPROVED_REVIEW_STATE)
-      .or(PILOT_NON_DEMO_FILTER)
-      .limit(Math.min(200, Math.max(1, limit)));
-    if (error || !data) return [];
+    const [destinationsResult, businessesResult] = await Promise.all([
+      client
+        .from("destinations")
+        .select("id, slug, name, tagline, latitude, longitude")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .limit(Math.min(50, Math.max(1, limit))),
+      client
+        .from("businesses")
+        .select(
+          "id, slug, display_name, tagline, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ), business_locations ( latitude, longitude )",
+        )
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .eq("source_review_state", PUBLIC_APPROVED_REVIEW_STATE)
+        .or(PILOT_NON_DEMO_FILTER)
+        .limit(Math.min(200, Math.max(1, limit))),
+    ]);
+    if (destinationsResult.error || businessesResult.error) return [];
 
     const points: TerritoryMapPoint[] = [];
-    for (const row of data as Row[]) {
+    for (const row of (destinationsResult.data ?? []) as Row[]) {
+      const slug = str(row.slug);
+      const title = str(row.name);
+      const lat = Number(row.latitude);
+      const lng = Number(row.longitude);
+      if (!slug || !title || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      points.push({
+        id: str(row.id) ?? slug,
+        kind: "destination",
+        lat,
+        lng,
+        title,
+        subtitle: str(row.tagline),
+        href: `/oriente-maya/${slug}`,
+      });
+    }
+    for (const row of (businessesResult.data ?? []) as Row[]) {
       const slug = str(row.slug);
       const title = str(row.display_name);
       const loc = rel(row, "business_locations");
