@@ -51,13 +51,8 @@ function FounderZazilPremiumPreview() {
           <div className={luna ? "absolute inset-0 -z-20 bg-gradient-to-r from-[#050e12] via-[#050e12]/90 to-black/5" : "absolute inset-0 -z-20 bg-gradient-to-r from-[#f7f3ea] via-[#f7f3ea]/90 to-transparent"} />
           <div className="mx-auto grid min-h-[inherit] max-w-[1500px] items-center px-6 py-12 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="font-serif text-6xl leading-[0.92] sm:text-7xl">Zazil Tunich</h1>
-                  <p className="mt-3 font-serif text-2xl text-[#b97b00] sm:text-3xl">Cenote-Museo · Valladolid, Yucatán</p>
-                </div>
-                <Link to="/auth" className="hidden size-12 shrink-0 items-center justify-center rounded-full border border-current/40 lg:flex" aria-label="Iniciar sesión para guardar Zazil Tunich"><Heart /></Link>
-              </div>
+              <h1 className="font-serif text-6xl leading-[0.92] sm:text-7xl">Zazil Tunich</h1>
+              <p className="mt-3 font-serif text-2xl text-[#b97b00] sm:text-3xl">Cenote-Museo · Valladolid, Yucatán</p>
               <div className="mt-5 h-0.5 w-14 bg-[#c78a14]" />
               <h2 className="mt-5 font-serif text-3xl sm:text-4xl">Un viaje al Inframundo Maya</h2>
               <p className="mt-2 text-lg opacity-85">Naturaleza, memoria y cultura viva bajo la tierra.</p>
@@ -67,11 +62,12 @@ function FounderZazilPremiumPreview() {
               </div>
             </div>
           </div>
+          <Link to="/auth" className="absolute right-6 top-8 z-10 hidden min-h-12 items-center gap-3 rounded-full border border-white/60 bg-black/15 px-4 text-white backdrop-blur-sm lg:inline-flex xl:right-16" aria-label="Iniciar sesión para guardar Zazil Tunich"><span className="grid size-9 place-items-center rounded-full border border-white/70"><Heart className="size-5" /></span><span className="text-sm">Guardar</span></Link>
         </section>
 
-        <ProofStrip />
+        <ProofStrip luna={luna} />
 
-        <div className="mx-auto grid max-w-[1500px] items-start gap-8 px-6 py-10 sm:px-10 lg:grid-cols-[1.05fr_1.3fr_1fr_0.95fr] lg:px-16">
+        <div className="mx-auto grid max-w-[1500px] items-start gap-8 px-6 py-10 sm:px-10 lg:grid-cols-[0.92fr_1.28fr_0.9fr_0.9fr] lg:px-16 xl:gap-10">
           <Story />
           <FeaturedExperience />
           <VisitInfo />
@@ -113,14 +109,23 @@ function FounderHeader({ theme, onTheme }: { theme: "sol" | "luna"; onTheme: (th
   );
 }
 
-function ProofStrip() {
+function ProofStrip({ luna }: { luna: boolean }) {
   const facts = [
     [<Award key="award" />, "Premio Nacional a la Innovación Turística 2023", null],
     [<Sparkles key="sparkles" />, "Reconocimiento institucional · denominación por verificar", null],
-    [<img key="google" src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" className="size-7 object-contain" />, "Calificación y reseñas · sincronización pendiente", "https://www.google.com/search?q=Zazil+Tunich"],
+    [<GoogleG key="google" luna={luna} />, "Calificación y reseñas · sincronización pendiente", "https://www.google.com/search?q=Zazil+Tunich"],
     [<MapPin key="pin" />, "A 6 km de Valladolid", "https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan"],
   ] as const;
-  return <div className="border-b border-current/15"><ul className="mx-auto grid max-w-[1500px] sm:grid-cols-2 lg:grid-cols-4">{facts.map(([icon, label, href], index) => <li key={label} className={`${index ? "border-t border-current/15 sm:border-l sm:border-t-0" : ""}`}>{href ? <a href={href} target="_blank" rel="noreferrer" className="flex min-h-20 items-center gap-4 px-6 py-4 transition hover:bg-current/5"><span className="shrink-0 text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></a> : <div className="flex min-h-20 items-center gap-4 px-6 py-4"><span className="shrink-0 text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></div>}</li>)}</ul></div>;
+  return <div className="border-b border-current/15"><ul className="mx-auto grid max-w-[1500px] sm:grid-cols-2 lg:grid-cols-4">{facts.map(([icon, label, href], index) => <li key={label} className={`${index ? "border-t border-current/15 sm:border-l sm:border-t-0" : ""}`}>{href ? <a href={href} target="_blank" rel="noreferrer" className="flex min-h-20 items-center gap-4 px-6 py-4 transition hover:bg-current/5"><span className="grid size-9 shrink-0 place-items-center text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></a> : <div className="flex min-h-20 items-center gap-4 px-6 py-4"><span className="grid size-9 shrink-0 place-items-center text-[#c78a14]">{icon}</span><span className="text-sm leading-5">{label}</span></div>}</li>)}</ul></div>;
+}
+
+function GoogleG({ luna }: { luna: boolean }) {
+  return (
+    <span aria-label="Google" role="img" className="relative block size-7 rounded-full bg-[conic-gradient(from_-35deg,#4285f4_0_25%,#34a853_25%_45%,#fbbc05_45%_65%,#ea4335_65%_82%,#4285f4_82%_100%)]">
+      <span className={`absolute inset-[5px] rounded-full ${luna ? "bg-[#050e12]" : "bg-[#f7f3ea]"}`} />
+      <span className="absolute right-0 top-[11px] h-[5px] w-[13px] bg-[#4285f4]" />
+    </span>
+  );
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
