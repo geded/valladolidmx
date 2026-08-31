@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.84",
     "state": "Approved",
-    "source_sha256": "ffff5409d0ab27706af410d453be6d180890025f65d9793cc166b3134eece4a4",
+    "source_sha256": "185059f00c5cc781152847fa953eb499718e57204c7ac30f1196b898f49b25ca",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-30T00:00:00.000Z",
+  "generated_at": "2026-08-31T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -11426,6 +11426,19 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-059.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-059.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-060.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-060.json"
     }
   ],
   "edges": [
@@ -35215,6 +35228,69 @@
       "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
       "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/home-premium/home-premium-real.ts:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:src/components/home-premium/home-premium-real.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/smart-blocks.server.ts:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/smart-blocks.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/producto.$slug.tsx:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:src/routes/producto.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-060.json:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-060.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-08-31"
     }
   ],
   "critical_chain_coverage": [

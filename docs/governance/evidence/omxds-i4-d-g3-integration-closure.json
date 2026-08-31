@@ -14,7 +14,12 @@
     "preview_route": "/preview/composition/$token",
     "public_routes_added": []
   },
-  "inherited_closure": ["I4-A", "I4-B", "I4-C", "I4-R"],
+  "inherited_closure": [
+    "I4-A",
+    "I4-B",
+    "I4-C",
+    "I4-R"
+  ],
   "human_scenarios": [
     "G3-H01",
     "G3-H02",
@@ -30,10 +35,16 @@
     "G3-H12"
   ],
   "operational_model": "single-actor",
-  "deferred_non_blocking": ["G3-H07", "G3-H11", "G3-H12"],
+  "deferred_non_blocking": [
+    "G3-H07",
+    "G3-H11",
+    "G3-H12"
+  ],
   "open_p0": 0,
   "open_p1": 0,
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "exact_route_count": 12,
   "exact_routes": [
     "scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
@@ -60,7 +71,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "6264044a656345994ea90627cff98c047d3bb5bf18dd5adf7b8156672c3a2357"
+      "sha256": "8c8118cce3b587f87d2c8fde60c0a717cc1b11c7b3c9927a9e5ba455bca98c7a"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
@@ -80,19 +91,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "f7da2f46f7e269cf85ac14e8b42bd1f3af8c49385f68fa5e17f0232e90c64636"
+      "sha256": "185059f00c5cc781152847fa953eb499718e57204c7ac30f1196b898f49b25ca"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "b355e8947b94a0e696eee4417c22c972dc48486c7c7032b8e04462345f746842"
+      "sha256": "b71a9a158aeee017c124a5f6963a35c649e3f798f9a7e346a4edbe709a52dc81"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "f8effdb808cdf92ba9cec9e9f4b7b02d10250ed013647bcf5d2aace0e68fe61e"
+      "sha256": "97899ed2f19c25d1eee7fb995a1526736992753d86a13f9f69aba2d125c6c516"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "3b5d16ee3749107e7228ecc1fd1b8430ce65ce31acbc132ce75955c4ecdf419f"
+      "sha256": "6b2b6566e5de99117e19295d4383d9dd361c7ec32cf7db0365b66b606b65b6f0"
     }
   ]
 }

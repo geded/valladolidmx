@@ -61,8 +61,8 @@ assert.ok(
   ),
 );
 const acknowledgedConsumerRevisions = new Map([
-  [productRoutePath, "f414f6107ee1f7696ad211e2a0700d3d23e7f3834e9313f5c17784276d494261"],
-  [territorialProductRoutePath, "bce561c2214a411f4bb6f968fe86301132d85aed829201fe9608c76992114624"],
+  [productRoutePath, "b9c1ba9a015ec4d0974a1a57dd6ac03905d162d998073c9fee197420d8044b3f"],
+  [territorialProductRoutePath, "2dd89fb8ab9a6e6ba42307ba0a45dfe3f424c1d436d96b91182e5255ac008dbb"],
   [eventRoutePath, "1ce68f037ab27c43d79b4abba1ac7d1c3f4927378595268e8fd1feae6efdd4f0"],
 ]);
 

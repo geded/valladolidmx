@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { buildRegionPremiumRuntime } from "../../../src/components/destination-premium/region-premium-runtime";
+import { HOME_PREMIUM_G4_CONTENT } from "../../../src/components/home-premium/home-premium-content";
+import { mergeHomeRealContent } from "../../../src/components/home-premium/home-premium-real";
 
 const root = process.cwd();
 const read = (path: string) => readFileSync(resolve(root, path), "utf8");
@@ -70,5 +72,69 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(script).toContain("is_demo_seed: false");
     expect(script).toContain('action: "media.link"');
     expect(script).not.toContain('storage_bucket: "demo-media"');
+  });
+
+  test("la Home pública conecta el hero y las rutas con medios reales ya acreditados", () => {
+    const mediaUrl = "/api/public/studio-media/open-destination-media/valladolid.jpg";
+    const merged = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
+      destinos: [
+        {
+          title: "Valladolid",
+          subtitle: "Capital turística",
+          category: "Destino",
+          href: "/oriente-maya/valladolid",
+          mediaUrl,
+          puebloMagico: true,
+        },
+        {
+          title: "Izamal",
+          subtitle: "Ciudad amarilla",
+          category: "Destino",
+          href: "/oriente-maya/izamal",
+          mediaUrl: "/api/public/studio-media/open-destination-media/izamal.jpg",
+          puebloMagico: true,
+        },
+      ],
+      experiencias: [],
+      stays: [],
+      food: [],
+      eventos: [],
+      rutas: [
+        {
+          id: "pueblos-magicos",
+          title: "Pueblos Mágicos",
+          duration: "2 destinos",
+          stops: 2,
+          vibe: "Patrimonio",
+          description: "Recorrido territorial",
+          sequence: ["Valladolid", "Izamal"],
+        },
+      ],
+      mapPoints: [],
+    });
+
+    expect(merged.hero.slides[0]?.media.url).toBe(mediaUrl);
+    expect(merged.rutas.items[0]?.media.url).toBe(mediaUrl);
+    expect(merged.destinos.items[0]?.media.url).toBe(mediaUrl);
+  });
+
+  test("los medios de Home usan el proxy estable y no dependen de service role", () => {
+    const resolver = read("src/lib/experience-builder/smart-blocks.server.ts");
+    expect(resolver).toContain("toStablePublicMediaUrl");
+    expect(resolver).toContain("isAccreditedDestinationMedia");
+    expect(resolver).not.toContain("async function signMedia");
+    expect(resolver).not.toContain("createSignedUrls(");
+  });
+
+  test("experiencias y tours resuelven Premium en ambas rutas canónicas con el flag global OFF", () => {
+    const marketplace = read("src/routes/producto.$slug.tsx");
+    const territorial = read("src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx");
+    expect(marketplace).toContain(
+      'enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}',
+    );
+    expect(territorial).toContain("bindProductRoute");
+    expect(territorial).toContain(
+      'enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}',
+    );
   });
 });
