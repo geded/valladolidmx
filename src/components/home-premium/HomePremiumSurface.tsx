@@ -90,6 +90,7 @@ export function HomePremiumSurface({
         <DestinationsSection
           content={content}
           layout={layout}
+          cinematic={cinematic}
           opened={openedMicrosite}
           onOpen={setOpenedMicrosite}
         />
@@ -110,10 +111,11 @@ export function HomePremiumSurface({
           onAdd={() => setAdded(true)}
         />
       );
-    if (key === "experiencias") return <ExperiencesSection content={content} layout={layout} />;
+    if (key === "experiencias")
+      return <ExperiencesSection content={content} layout={layout} cinematic={cinematic} />;
     if (key === "servicios") return <ServicesSection content={content} />;
     if (key === "eventos") return <EventsSection content={content} />;
-    if (key === "queHacer") return <EditorialSection content={content} />;
+    if (key === "queHacer") return <EditorialSection content={content} cinematic={cinematic} />;
     return <MapSection content={content} selectedRoute={selectedRoute} />;
   };
 
@@ -542,11 +544,13 @@ function RoutesSection({
 function DestinationsSection({
   content,
   layout,
+  cinematic,
   opened,
   onOpen,
 }: {
   content: HomePremiumContent;
   layout: HomePremiumLayout;
+  cinematic: boolean;
   opened: string | null;
   onOpen: (value: string) => void;
 }) {
@@ -589,35 +593,77 @@ function DestinationsSection({
               className={cn(
                 "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
                 asymmetricSpan,
+                cinematic &&
+                  "relative min-h-[22rem] justify-end border-0 bg-[#071814] text-[#f7f3ea] shadow-elevated sm:min-h-[26rem]",
               )}
             >
-              <div className="relative">
+              <div className={cn("relative", cinematic && "absolute inset-0")}>
                 <EditorialMediaFrame
                   media={destination.media}
                   label={destination.name}
                   className={cn(
                     "w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]",
-                    wide ? "aspect-[16/9]" : "aspect-[4/3]",
+                    cinematic ? "h-full" : wide ? "aspect-[16/9]" : "aspect-[4/3]",
                   )}
                 />
-                <span className="absolute left-3 top-3 rounded-pill bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-card-foreground shadow-soft">
+                {cinematic ? (
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent"
+                    aria-hidden
+                  />
+                ) : null}
+                <span
+                  className={cn(
+                    "absolute left-3 top-3 rounded-pill px-2.5 py-1 text-[10px] font-semibold uppercase shadow-soft",
+                    cinematic
+                      ? "border border-white/25 bg-black/35 text-white backdrop-blur-sm"
+                      : "bg-card text-card-foreground",
+                  )}
+                >
                   {destination.puebloMagico ? "Pueblo Mágico" : "Destino"}
                 </span>
               </div>
-              <div className="flex flex-1 flex-col p-4">
+              <div
+                className={cn(
+                  "flex flex-1 flex-col p-4",
+                  cinematic && "relative z-10 justify-end p-5",
+                )}
+              >
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-display text-2xl">{destination.name}</h3>
+                  <h3 className={cn("font-display text-2xl", cinematic && "text-3xl text-white")}>
+                    {destination.name}
+                  </h3>
                   {destination.puebloMagico ? (
-                    <span className="rounded-pill border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                    <span
+                      className={cn(
+                        "rounded-pill border px-2 py-0.5 text-[10px] font-semibold uppercase",
+                        cinematic
+                          ? "border-white/25 bg-white/10 text-white/85"
+                          : "border-border bg-muted text-muted-foreground",
+                      )}
+                    >
                       Pueblo Mágico
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                <p
+                  className={cn(
+                    "mt-1 text-sm leading-relaxed text-muted-foreground",
+                    cinematic && "text-white/80",
+                  )}
+                >
                   {destination.note}
                 </p>
                 {destination.href ? (
-                  <Button asChild variant="outline" className="mt-4 min-h-11 rounded-pill">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className={cn(
+                      "mt-4 min-h-11 rounded-pill",
+                      cinematic &&
+                        "border-white/45 bg-black/25 text-white hover:bg-white hover:text-[#071814]",
+                    )}
+                  >
                     <Link to={destination.href} onClick={() => onOpen(destination.name)}>
                       <Landmark className="mr-2 size-4" aria-hidden />
                       Ver micrositio
@@ -690,9 +736,11 @@ function PueblosMagicosSection({
 function ExperiencesSection({
   content,
   layout,
+  cinematic,
 }: {
   content: HomePremiumContent;
   layout: HomePremiumLayout;
+  cinematic: boolean;
 }) {
   const items = content.experiencias.items;
   const featured = items[0];
@@ -713,20 +761,51 @@ function ExperiencesSection({
             : "lg:grid-cols-[1.2fr_1fr]",
         )}
       >
-        <article className="overflow-hidden rounded-2xl border border-border bg-card">
+        <article
+          className={cn(
+            "overflow-hidden rounded-2xl border border-border bg-card",
+            cinematic && "relative min-h-[30rem] border-0 bg-[#071814] text-white shadow-elevated",
+          )}
+        >
           <EditorialMediaFrame
             media={featured.media}
             label={featured.title}
-            className="aspect-[16/9] w-full object-cover"
+            className={cn(
+              "aspect-[16/9] w-full object-cover",
+              cinematic && "absolute inset-0 h-full",
+            )}
           />
-          <div className="p-5">
+          {cinematic ? (
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
+              aria-hidden
+            />
+          ) : null}
+          <div className={cn("p-5", cinematic && "absolute inset-x-0 bottom-0 z-10")}>
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-muted-foreground">{featured.category}</span>
+              <span className={cn("text-xs text-muted-foreground", cinematic && "text-white/75")}>
+                {featured.category}
+              </span>
             </div>
             <h3 className="mt-3 font-display text-3xl">{featured.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{featured.summary}</p>
+            <p
+              className={cn(
+                "mt-2 text-sm leading-relaxed text-muted-foreground",
+                cinematic && "text-white/80",
+              )}
+            >
+              {featured.summary}
+            </p>
             {featured.href ? (
-              <Button asChild variant="outline" className="mt-4 min-h-11 rounded-pill">
+              <Button
+                asChild
+                variant="outline"
+                className={cn(
+                  "mt-4 min-h-11 rounded-pill",
+                  cinematic &&
+                    "border-white/45 bg-black/25 text-white hover:bg-white hover:text-[#071814]",
+                )}
+              >
                 <Link to={featured.href}>Explorar experiencia</Link>
               </Button>
             ) : null}
@@ -904,7 +983,13 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
   );
 }
 
-function EditorialSection({ content }: { content: HomePremiumContent }) {
+function EditorialSection({
+  content,
+  cinematic,
+}: {
+  content: HomePremiumContent;
+  cinematic: boolean;
+}) {
   return (
     <section aria-labelledby="editorial-title">
       <SectionHead
@@ -919,18 +1004,42 @@ function EditorialSection({ content }: { content: HomePremiumContent }) {
             <Link
               key={item.title}
               to={item.href}
-              className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block"
+              className={cn(
+                "grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block",
+                cinematic &&
+                  "relative min-h-[24rem] border-0 bg-[#071814] text-white shadow-elevated",
+              )}
             >
               <EditorialMediaFrame
                 media={item.media}
                 label={item.title}
-                className="h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto"
+                className={cn(
+                  "h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto",
+                  cinematic && "absolute inset-0 h-full min-h-0 md:h-full",
+                )}
               />
-
-              <div className="p-4">
+              {cinematic ? (
+                <div
+                  className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
+                  aria-hidden
+                />
+              ) : null}
+              <div
+                className={cn(
+                  "p-4",
+                  cinematic && "relative z-10 flex h-full flex-col justify-end self-end",
+                )}
+              >
                 <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
                 <h3 className="mt-1 font-display text-xl">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+                <p
+                  className={cn(
+                    "mt-2 text-sm leading-relaxed text-muted-foreground",
+                    cinematic && "text-white/80",
+                  )}
+                >
+                  {item.body}
+                </p>
               </div>
             </Link>
           ) : null,
