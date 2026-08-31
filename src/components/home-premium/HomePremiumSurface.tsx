@@ -565,17 +565,30 @@ function DestinationsSection({
             ? "sm:grid-cols-2"
             : layout === "carrusel"
               ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[32%]"
-              : "sm:grid-cols-2 lg:grid-cols-4",
+              : "sm:grid-cols-6",
         )}
       >
         {content.destinos.items.map((destination, index) => {
           const wide = layout === "asimetrica" && index === 0;
+          const asymmetricSpan =
+            layout !== "asimetrica"
+              ? ""
+              : content.destinos.items.length === 1
+                ? "sm:col-span-6"
+                : index === 0
+                  ? "sm:col-span-4"
+                  : index === 1
+                    ? "sm:col-span-2"
+                    : index === content.destinos.items.length - 1 &&
+                        (content.destinos.items.length - 2) % 2 === 1
+                      ? "sm:col-span-6"
+                      : "sm:col-span-3";
           return (
             <article
               key={destination.name}
               className={cn(
                 "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
-                wide && "sm:col-span-2 lg:col-span-2",
+                asymmetricSpan,
               )}
             >
               <div className="relative">
