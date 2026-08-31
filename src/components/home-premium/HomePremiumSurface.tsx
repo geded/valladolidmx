@@ -132,12 +132,7 @@ export function HomePremiumSurface({
           {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
           <section
             aria-label={content.categorias.heading}
-            className={cn(
-              "rounded-2xl border p-4 sm:p-5",
-              cinematic
-                ? "border-white/15 bg-[#071814] text-[#f7f3ea] shadow-elevated [&_.text-muted-foreground]:text-[#f7f3ea]/70"
-                : "border-border bg-card",
-            )}
+            className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
           >
             <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
             <CategoryNavGrid
@@ -162,17 +157,9 @@ export function HomePremiumSurface({
           />
         </Container>
 
-        {presentationOrder.map((key, index) =>
+        {presentationOrder.map((key) =>
           enabled(key) ? (
-            <Container
-              key={key}
-              className={cn(
-                "mt-10 sm:mt-12",
-                cinematic &&
-                  index % 2 === 0 &&
-                  "rounded-[2rem] bg-[#071814] p-5 text-[#f7f3ea] shadow-elevated sm:p-7 [&_.border-border]:border-white/15 [&_.bg-card]:bg-white/[0.06] [&_.bg-muted]:bg-white/10 [&_.text-muted-foreground]:text-[#f7f3ea]/70",
-              )}
-            >
+            <Container key={key} className="mt-10 sm:mt-12">
               <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
             </Container>
           ) : null,
@@ -292,12 +279,12 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
           aria-hidden
         />
-        <span className="absolute right-4 top-4 rounded-md bg-foreground/70 px-3 py-1.5 text-xs text-primary-foreground backdrop-blur-sm">
+        <span className="absolute right-4 top-4 rounded-md bg-black/65 px-3 py-1.5 text-xs text-[#f7f3ea] backdrop-blur-sm">
           {slide.caption}
         </span>
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">Oriente Maya de Yucatán</p>
-          <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-primary-foreground sm:text-[3.35rem]">
+          <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-[#f7f3ea] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-[3.35rem]">
             {content.hero.title}
           </h1>
         </div>
