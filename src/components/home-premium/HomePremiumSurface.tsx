@@ -1054,7 +1054,7 @@ function MapSection({
           </p>
         </div>
       </div>
-      <ExperienceMapBlock dto={content.mapa.dto} />
+      <ExperienceMapBlock dto={content.mapa.dto} interactiveOnly immersive />
     </section>
   );
 }

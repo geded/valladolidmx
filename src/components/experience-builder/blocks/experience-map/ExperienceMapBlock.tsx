@@ -47,14 +47,23 @@ function computeCenter(points: ExperienceMapPoint[]) {
 export interface ExperienceMapBlockProps {
   dto: ExperienceMapDTO;
   className?: string;
+  /** Abre Google Maps directamente y elimina el regreso al mapa estático. */
+  interactiveOnly?: boolean;
+  /** Presentación territorial amplia para superficies Premium. */
+  immersive?: boolean;
 }
 
-export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBlockProps) {
+export function ExperienceMapBlock({
+  dto: rawDto,
+  className,
+  interactiveOnly = false,
+  immersive = false,
+}: ExperienceMapBlockProps) {
   // C2.F1 · Piloto Render-Only. Normalizamos vía defaults render-only
   // (equivalente runtime a `schema.parse` para inputs válidos, ver
   // `scripts/experience-map-defaults.test.ts`). Sin Zod en el árbol público.
   const dto = useMemo(() => applyExperienceMapDefaults(rawDto), [rawDto]);
-  const [interactive, setInteractive] = useState(false);
+  const [interactive, setInteractive] = useState(interactiveOnly);
   const [activeId, setActiveId] = useState<string | null>(dto.points[0]?.id ?? null);
 
   const center = useMemo(() => {
@@ -81,7 +90,7 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
   const labelOf = (idx: number) => String.fromCharCode(65 + (idx % 26));
 
   return (
-    <section className={cn("space-y-4", className)}>
+    <section className={cn("space-y-4", immersive && "space-y-5", className)}>
       {dto.heading ? (
         <h2 className="text-xl font-semibold text-foreground">{dto.heading}</h2>
       ) : null}
@@ -89,11 +98,15 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
       <div
         className={cn(
           "grid gap-6",
-          isMulti ? "md:grid-cols-[minmax(0,1fr)_320px]" : "md:grid-cols-[minmax(0,1fr)_320px]",
+          immersive
+            ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-stretch"
+            : isMulti
+              ? "md:grid-cols-[minmax(0,1fr)_320px]"
+              : "md:grid-cols-[minmax(0,1fr)_320px]",
         )}
       >
         <div className="min-w-0 space-y-3">
-          {interactive && dto.capabilities.allowInteractiveToggle ? (
+          {interactive && (dto.capabilities.allowInteractiveToggle || interactiveOnly) ? (
             <Suspense
               fallback={<div className="h-[420px] w-full animate-pulse rounded-2xl bg-muted" />}
             >
@@ -108,7 +121,10 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
                   title: p.title,
                   href: p.href ?? null,
                 }))}
-                className="h-[420px] w-full rounded-2xl border border-border"
+                className={cn(
+                  "w-full rounded-2xl border border-border",
+                  immersive ? "h-[32rem] shadow-elevated sm:h-[38rem]" : "h-[420px]",
+                )}
               />
             </Suspense>
           ) : (
@@ -128,7 +144,7 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
             />
           )}
 
-          {dto.capabilities.allowInteractiveToggle ? (
+          {dto.capabilities.allowInteractiveToggle && !interactiveOnly ? (
             <Button
               type="button"
               variant="outline"
@@ -141,9 +157,21 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
           ) : null}
         </div>
 
-        <aside className="space-y-4">
+        <aside
+          className={cn(
+            "space-y-4",
+            immersive && "rounded-2xl border border-border bg-background/70 p-3 backdrop-blur",
+          )}
+        >
           <ul
-            className={cn("space-y-3", isMulti ? "max-h-[560px] overflow-y-auto pr-1" : undefined)}
+            className={cn(
+              "space-y-3",
+              isMulti
+                ? immersive
+                  ? "max-h-[36rem] overflow-y-auto pr-1"
+                  : "max-h-[560px] overflow-y-auto pr-1"
+                : undefined,
+            )}
             aria-label="Puntos en el mapa"
           >
             {dto.points.map((p, i) => {

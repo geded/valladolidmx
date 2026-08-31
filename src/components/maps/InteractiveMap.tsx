@@ -21,7 +21,9 @@ import { useEffect, useRef, useState } from "react";
 // Tipos mínimos locales para evitar depender de @types/google.maps.
 type LatLng = { lat: number; lng: number };
 interface GMap {
-  new (el: HTMLElement, opts: Record<string, unknown>): unknown;
+  new (el: HTMLElement, opts: Record<string, unknown>): {
+    fitBounds: (bounds: unknown, padding?: number) => void;
+  };
 }
 interface GMarker {
   new (opts: {
@@ -38,8 +40,17 @@ interface GSize {
 interface GPoint {
   new (x: number, y: number): unknown;
 }
+interface GLatLngBounds {
+  new (): { extend: (position: LatLng) => void };
+}
 interface GoogleMapsNamespace {
-  maps: { Map: GMap; Marker: GMarker; Size: GSize; Point: GPoint };
+  maps: {
+    Map: GMap;
+    Marker: GMarker;
+    Size: GSize;
+    Point: GPoint;
+    LatLngBounds: GLatLngBounds;
+  };
 }
 
 declare global {
@@ -153,6 +164,7 @@ export function InteractiveMap({
           gestureHandling: "cooperative",
         });
         const list = markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
+        const bounds = new google.maps.LatLngBounds();
         list.forEach((m, i) => {
           const letter = labelForIndex(i);
           new google.maps.Marker({
@@ -165,7 +177,9 @@ export function InteractiveMap({
               anchor: new google.maps.Point(16, 32),
             },
           });
+          bounds.extend({ lat: m.lat, lng: m.lng });
         });
+        if (list.length > 1) map.fitBounds(bounds, 56);
         setReady(true);
       })
       .catch((e) => {
