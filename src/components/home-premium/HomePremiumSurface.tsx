@@ -61,6 +61,7 @@ export function HomePremiumSurface({
   sections,
   order = HOME_PREMIUM_DEFAULT_ORDER,
 }: HomePremiumSurfaceProps) {
+  const cinematic = heroVariant === "cinematic";
   const routes = content.rutas.items;
   const [selectedRoute, setSelectedRoute] = useState<string>(routes[0]?.id ?? "");
   const [selectedPrompt, setSelectedPrompt] = useState(content.alux.prompts[0] ?? "");
@@ -68,6 +69,18 @@ export function HomePremiumSurface({
   const [openedMicrosite, setOpenedMicrosite] = useState<string | null>(null);
 
   const enabled = (key: HomePremiumSectionKey) => sections?.[key] !== false;
+  const presentationOrder: HomePremiumSectionKey[] = cinematic
+    ? [
+        "destinos",
+        "experiencias",
+        "rutas",
+        "pueblosMagicos",
+        "eventos",
+        "servicios",
+        "mapa",
+        "queHacer",
+      ]
+    : order;
 
   const renderSection = (key: HomePremiumSectionKey) => {
     if (key === "destinos")
@@ -104,7 +117,7 @@ export function HomePremiumSurface({
 
   return (
     <>
-      <main>
+      <main data-home-presentation={heroVariant}>
         <Container className="pt-4 sm:pt-6">
           {heroVariant === "editorial" ? (
             <HeroEditorial content={content} />
@@ -117,7 +130,12 @@ export function HomePremiumSurface({
           {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
           <section
             aria-label={content.categorias.heading}
-            className="rounded-2xl border border-border bg-card p-4 sm:p-5"
+            className={cn(
+              "rounded-2xl border p-4 sm:p-5",
+              cinematic
+                ? "border-white/15 bg-[#071814] text-[#f7f3ea] shadow-elevated [&_.text-muted-foreground]:text-[#f7f3ea]/70"
+                : "border-border bg-card",
+            )}
           >
             <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
             <CategoryNavGrid
@@ -142,10 +160,17 @@ export function HomePremiumSurface({
           />
         </Container>
 
-        {order.map((key) =>
+        {presentationOrder.map((key, index) =>
           enabled(key) ? (
-            <Container key={key} className="mt-10 sm:mt-12">
-              {renderSection(key)}
+            <Container
+              key={key}
+              className={cn(
+                "mt-10 sm:mt-12",
+                cinematic && index % 2 === 0 &&
+                  "rounded-[2rem] bg-[#071814] p-5 text-[#f7f3ea] shadow-elevated sm:p-7 [&_.border-border]:border-white/15 [&_.bg-card]:bg-white/[0.06] [&_.bg-muted]:bg-white/10 [&_.text-muted-foreground]:text-[#f7f3ea]/70",
+              )}
+            >
+              <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
             </Container>
           ) : null,
         )}

@@ -44,7 +44,8 @@ function FounderHomePremiumPreview() {
               Vista de aprobación
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              El contenido, navegación y componentes permanecen iguales; cambia la dirección del hero.
+              Mismo contenido y navegación; cambian el orden, la densidad y el protagonismo
+              fotográfico de toda la composición.
             </p>
           </div>
           <div className="grid grid-cols-2 rounded-pill border border-border bg-muted p-1">
