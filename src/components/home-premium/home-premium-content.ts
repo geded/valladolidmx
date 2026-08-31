@@ -260,7 +260,6 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
       { slug: "que-hacer", label: "Qué hacer", href: "/que-hacer" },
       { slug: "eventos", label: "Eventos", href: "/eventos" },
       { slug: "promociones", label: "Promociones", href: "/promociones" },
-      { slug: "empresas", label: "Empresas", href: "/empresas" },
       { slug: "rutas", label: "Arma tu viaje", href: "/arma-tu-viaje" },
       { slug: "blog", label: "Blog", href: "/blog" },
       { slug: "mapas", label: "Mapa", href: "/mapa" },
