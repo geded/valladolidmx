@@ -16,6 +16,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 export const Route = createFileRoute("/lovable/founder-zazil-premium-preview")({
   head: () => ({
@@ -67,9 +68,9 @@ function FounderZazilPremiumPreview() {
 
         <ProofStrip luna={luna} />
 
-        <div className="mx-auto grid max-w-[1500px] items-start gap-8 px-6 py-7 sm:px-10 lg:grid-cols-[0.92fr_1.28fr_0.9fr_0.9fr] lg:px-16 xl:gap-10">
+        <div className="mx-auto grid max-w-[1500px] items-start gap-7 px-6 py-6 sm:px-10 lg:grid-cols-[0.92fr_1.28fr_0.9fr_0.9fr] lg:px-16 xl:gap-8">
           <Story />
-          <FeaturedExperience />
+          <FeaturedExperience luna={luna} />
           <VisitInfo />
           <TerritorialContext />
         </div>
@@ -83,13 +84,12 @@ function FounderZazilPremiumPreview() {
 function FounderHeader({ theme, onTheme }: { theme: "sol" | "luna"; onTheme: (theme: "sol" | "luna") => void }) {
   const luna = theme === "luna";
   return (
-    <header className={`absolute inset-x-0 top-0 z-30 ${luna ? "text-white" : "text-[#172319]"}`}>
+    <header className={`absolute inset-x-0 top-0 z-30 border-b backdrop-blur-[6px] ${luna ? "border-white/10 bg-[#050e12]/35 text-white" : "border-[#0b3827]/15 bg-[#f7f3ea]/82 text-[#0b3827] shadow-[0_1px_0_rgba(11,56,39,0.08)]"}`}>
       <div className="mx-auto flex min-h-24 max-w-[1500px] items-center justify-between gap-5 px-6 sm:px-10 lg:px-16">
         <Link to="/" className="shrink-0">
-          <span className="block font-serif text-3xl leading-none">Valladolid<span className="text-[#d99a21]">.mx</span></span>
-          <span className="mt-1 block text-[9px] uppercase tracking-[0.28em] opacity-70">Oriente Maya de Yucatán</span>
+          <BrandLogo tone={luna ? "light" : "dark"} size="lg" className="h-12 sm:h-14" />
         </Link>
-        <nav className="hidden items-center gap-9 text-sm uppercase tracking-wide lg:flex" aria-label="Navegación principal">
+        <nav className={`hidden items-center gap-9 text-sm font-medium uppercase tracking-wide lg:flex ${luna ? "drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "[&_a:hover]:text-[#a96f00]"}`} aria-label="Navegación principal">
           <Link to="/oriente-maya/valladolid">Valladolid</Link>
           <Link to="/oriente-maya">Oriente Maya</Link>
           <Link to="/experiencias">Experiencias</Link>
@@ -129,31 +129,31 @@ function GoogleG({ luna }: { luna: boolean }) {
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
-  return <><h2 className="text-balance font-serif text-2xl leading-tight xl:text-3xl">{children}</h2><div className="mt-3 h-px w-10 bg-[#c78a14]" /></>;
+  return <><h2 className="text-balance font-serif text-xl leading-[1.08] xl:text-2xl">{children}</h2><div className="mt-2.5 h-px w-9 bg-[#c78a14]" /></>;
 }
 
 function Story() {
-  return <section><SectionTitle>Por qué es extraordinario</SectionTitle><p className="mt-5 text-sm leading-6 opacity-80">Zazil Tunich es un cenote-museo que revela la profundidad del vínculo maya con el agua y el inframundo. Formaciones milenarias, luz que esculpe la piedra y relatos ancestrales se entretejen en una experiencia que inspira respeto y asombro.</p><div className="mt-5 grid grid-cols-2 gap-2"><MiniFact icon={<Sparkles />} text="Recorridos guiados por intérpretes locales" /><MiniFact icon={<UtensilsCrossed />} text="Cocina de la región con identidad maya" /><MiniFact icon={<Leaf />} text="Nado en cenote permitido" /><MiniFact icon={<Accessibility />} text="Información sobre accesibilidad" /></div></section>;
+  return <section><SectionTitle>Por qué es extraordinario</SectionTitle><p className="mt-4 text-[13px] leading-[1.48] opacity-80">Zazil Tunich es un cenote-museo que revela la profundidad del vínculo maya con el agua y el inframundo. Formaciones milenarias, luz que esculpe la piedra y relatos ancestrales se entretejen en una experiencia que inspira respeto y asombro.</p><div className="mt-4 grid grid-cols-2 gap-1.5"><MiniFact icon={<Sparkles />} text="Recorridos guiados por intérpretes locales" /><MiniFact icon={<UtensilsCrossed />} text="Cocina de la región con identidad maya" /><MiniFact icon={<Leaf />} text="Nado en cenote permitido" /><MiniFact icon={<Accessibility />} text="Información sobre accesibilidad" /></div></section>;
 }
 
 function MiniFact({ icon, text }: { icon: ReactNode; text: string }) {
-  return <div className="flex min-h-20 min-w-0 items-center gap-2 rounded-lg border border-current/15 bg-transparent p-2.5"><span className="shrink-0 text-[#c78a14] [&>svg]:size-5">{icon}</span><span className="min-w-0 text-[10px] font-medium leading-[1.25] xl:text-[11px]">{text}</span></div>;
+  return <div className="flex min-h-16 min-w-0 items-center gap-2 rounded-lg border border-current/15 bg-transparent p-2"><span className="shrink-0 text-[#c78a14] [&>svg]:size-5">{icon}</span><span className="min-w-0 text-[10px] font-medium leading-[1.18]">{text}</span></div>;
 }
 
-function FeaturedExperience() {
-  return <section id="experiencias"><SectionTitle>Experiencias destacadas</SectionTitle><div className="relative mt-5 aspect-[4/3] overflow-hidden rounded-2xl border border-[#c78a14]/50"><img src={HERO} alt="Ambiente subterráneo de Zazil Tunich" className="size-full object-cover" /><div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent p-5 text-white"><h3 className="max-w-sm font-serif text-2xl leading-tight xl:text-3xl">Cena romántica subterránea</h3><p className="mt-2 max-w-sm text-sm leading-5 text-white/80">Una velada íntima en un entorno natural único, con sabores locales y atmósfera ancestral.</p><div className="mt-3 flex flex-wrap gap-2 text-[11px]"><span className="rounded-full bg-white/15 px-3 py-1">Cena</span><span className="rounded-full bg-white/15 px-3 py-1">Ambiente íntimo</span><span className="rounded-full bg-white/15 px-3 py-1">Entorno natural</span></div></div></div></section>;
+function FeaturedExperience({ luna }: { luna: boolean }) {
+  return <section id="experiencias"><SectionTitle>Experiencias destacadas</SectionTitle><div className={`relative mt-4 aspect-[4/3] overflow-hidden rounded-xl border border-[#c78a14]/50 ${luna ? "bg-black" : "bg-[#eee7d9] shadow-[0_10px_26px_rgba(28,54,42,0.08)]"}`}><img src={HERO} alt="Ambiente subterráneo de Zazil Tunich" className={`size-full object-cover ${luna ? "" : "brightness-110 saturate-90"}`} /><div className={luna ? "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent p-4 text-white" : "absolute inset-x-0 bottom-0 border-t border-[#c78a14]/25 bg-[#f7f3ea]/95 p-4 text-[#0b3827] backdrop-blur-md"}><h3 className="max-w-sm font-serif text-xl leading-[1.08] xl:text-2xl">Cena romántica subterránea</h3><p className={`mt-1.5 max-w-sm text-xs leading-[1.4] ${luna ? "text-white/80" : "text-[#315c4b]"}`}>Una velada íntima en un entorno natural único, con sabores locales y atmósfera ancestral.</p><div className="mt-2 flex flex-wrap gap-1.5 text-[10px]"><span className={luna ? "rounded-full bg-white/15 px-2.5 py-1" : "rounded-full border border-[#0b3827]/15 bg-white/55 px-2.5 py-1"}>Cena</span><span className={luna ? "rounded-full bg-white/15 px-2.5 py-1" : "rounded-full border border-[#0b3827]/15 bg-white/55 px-2.5 py-1"}>Ambiente íntimo</span><span className={luna ? "rounded-full bg-white/15 px-2.5 py-1" : "rounded-full border border-[#0b3827]/15 bg-white/55 px-2.5 py-1"}>Entorno natural</span></div></div></div></section>;
 }
 
 function VisitInfo() {
-  return <section><SectionTitle>Información para tu visita</SectionTitle><div className="mt-3"><InfoRow icon={<Clock3 />} title="Duración">Consultar duración</InfoRow><InfoRow icon={<Clock3 />} title="Horarios">Consultar horarios</InfoRow><InfoRow icon={<Shirt />} title="Qué llevar">Traje de baño, toalla y calzado antiderrapante</InfoRow><InfoRow icon={<Leaf />} title="Sustentabilidad">Respeta este espacio sagrado</InfoRow></div></section>;
+  return <section><SectionTitle>Información para tu visita</SectionTitle><div className="mt-2"><InfoRow icon={<Clock3 />} title="Duración">Consultar duración</InfoRow><InfoRow icon={<Clock3 />} title="Horarios">Consultar horarios</InfoRow><InfoRow icon={<Shirt />} title="Qué llevar">Traje de baño, toalla y calzado antiderrapante</InfoRow><InfoRow icon={<Leaf />} title="Sustentabilidad">Respeta este espacio sagrado</InfoRow></div></section>;
 }
 
 function InfoRow({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
-  return <div className="flex gap-3 border-b border-current/15 py-3"><span className="text-[#c78a14] [&>svg]:size-5">{icon}</span><div><strong className="block text-sm">{title}</strong><span className="text-xs opacity-70">{children}</span></div></div>;
+  return <div className="flex gap-2.5 border-b border-current/15 py-2.5"><span className="text-[#c78a14] [&>svg]:size-5">{icon}</span><div><strong className="block text-[13px] leading-4">{title}</strong><span className="text-[11px] leading-4 opacity-70">{children}</span></div></div>;
 }
 
 function TerritorialContext() {
-  return <section><SectionTitle>Contexto territorial</SectionTitle><div className="mt-5 aspect-[4/3] overflow-hidden rounded-2xl border border-[#c78a14]/50 bg-[#143c2e]"><iframe title="Mapa de Zazil Tunich cerca de Valladolid" src="https://www.google.com/maps?q=Zazil%20Tunich%20Yucatan&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="size-full border-0" /></div><p className="mt-4 text-sm leading-6 opacity-75">Ubicado en el Oriente Maya de Yucatán, donde la naturaleza, la historia y las tradiciones vivas invitan a explorar más.</p><a href="https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan" target="_blank" rel="noreferrer" className="mt-3 inline-flex text-sm font-medium text-[#c78a14]">Abrir ubicación en Google Maps →</a></section>;
+  return <section><SectionTitle>Contexto territorial</SectionTitle><div className="mt-4 aspect-[4/3] overflow-hidden rounded-xl border border-[#c78a14]/50 bg-[#143c2e]"><iframe title="Mapa de Zazil Tunich cerca de Valladolid" src="https://www.google.com/maps?q=Zazil%20Tunich%20Yucatan&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="size-full border-0" /></div><p className="mt-3 text-[13px] leading-[1.45] opacity-75">Ubicado en el Oriente Maya de Yucatán, donde la naturaleza, la historia y las tradiciones vivas invitan a explorar más.</p><a href="https://www.google.com/maps/search/?api=1&query=Zazil+Tunich+Yucatan" target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-medium text-[#c78a14]">Abrir ubicación en Google Maps →</a></section>;
 }
 
 function AluxBand() {
