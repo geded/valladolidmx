@@ -103,7 +103,8 @@ type ViewKey = "a" | "b" | "ab" | ProbeKey;
 const WIDTHS = [390, 430, 768, 1024, 1280, 1440] as const;
 type WidthKey = (typeof WIDTHS)[number] | "full";
 
-const ZAZIL_PREVIEW_MEDIA = "/media/preview-generated/zazil-tunich-hero-preview.webp";
+const ZAZIL_PREVIEW_MEDIA =
+  "/api/public/studio-media/conceptual-preview/2026-09-01/zazil-tunich-hero-preview.webp";
 
 function withZazilPreviewMedia(tree: CompositionTree): CompositionTree {
   return mapTree(tree, (node) =>
@@ -385,7 +386,7 @@ function SeoLandingParityPreview() {
                     description:
                       "Un viaje al Inframundo Maya. Naturaleza, memoria y cultura viva bajo la tierra.",
                     media: {
-                      url: "/media/preview-generated/zazil-tunich-hero-preview.webp",
+                      url: ZAZIL_PREVIEW_MEDIA,
                       alt: "Vista editorial generada para preview de una caverna de piedra caliza con agua turquesa y sendero iluminado",
                       caption: "Medio generado para visualización · reemplazo requerido",
                     },

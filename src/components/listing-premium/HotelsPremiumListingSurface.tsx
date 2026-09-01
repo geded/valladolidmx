@@ -28,17 +28,17 @@ const ALL = "__all__";
 
 const CONCEPT_HERO_SLIDES = [
   {
-    src: "/media/preview-generated/hoteles-hero-colonial-v1.webp",
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-colonial-v1.webp",
     alt: "Visualización conceptual de un hotel colonial del Oriente Maya",
     label: "Ciudad colonial",
   },
   {
-    src: "/media/preview-generated/hoteles-hero-campo-v1.webp",
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-campo-v1.webp",
     alt: "Visualización conceptual de hospedaje rural entre milpa y campo yucateco",
     label: "Campo y siembra",
   },
   {
-    src: "/media/preview-generated/hoteles-hero-costa-v1.webp",
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-costa-v1.webp",
     alt: "Visualización conceptual de hospedaje frente a la costa del Oriente Maya",
     label: "Costa y playa",
   },

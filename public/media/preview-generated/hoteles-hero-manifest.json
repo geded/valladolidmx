@@ -11,15 +11,15 @@
   },
   "assets": [
     {
-      "path": "/media/preview-generated/hoteles-hero-colonial-v1.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-colonial-v1.webp",
       "theme": "hotel-colonial"
     },
     {
-      "path": "/media/preview-generated/hoteles-hero-campo-v1.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-campo-v1.webp",
       "theme": "campo-y-siembra"
     },
     {
-      "path": "/media/preview-generated/hoteles-hero-costa-v1.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-costa-v1.webp",
       "theme": "costa-y-playa"
     }
   ]

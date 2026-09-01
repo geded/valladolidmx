@@ -18,17 +18,17 @@ const PUEBLOS_MAGICOS = new Set(["valladolid", "izamal", "espita"]);
 const COASTAL = new Set(["el-cuyo", "las-coloradas", "rio-lagartos", "san-felipe"]);
 const HERO_SLIDES = [
   {
-    src: "/media/preview-generated/oriente-maya-hero-territorio-v1.webp",
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-territorio-v1.webp",
     alt: "Vista conceptual de Valladolid y el territorio verde del Oriente Maya al amanecer",
     label: "Valladolid · punto de partida",
   },
   {
-    src: "/media/preview-generated/oriente-maya-hero-naturaleza-v1.webp",
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-naturaleza-v1.webp",
     alt: "Escena conceptual de exploración en un cenote del Oriente Maya",
     label: "Naturaleza · cenotes y aventura",
   },
   {
-    src: "/media/preview-generated/oriente-maya-hero-cultura-v1.webp",
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-cultura-v1.webp",
     alt: "Escena conceptual de bordado artesanal y cultura maya viva",
     label: "Cultura maya · comunidad viva",
   },

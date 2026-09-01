@@ -97,19 +97,19 @@ const MEDIA = {
 
 const HOME_DESTINATION_MEDIA = {
   valladolid: {
-    url: "/media/preview-generated/home-valladolid-editorial-preview.webp",
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-valladolid-editorial-preview.webp",
     alt: "Templo de San Servacio y centro histórico de Valladolid al atardecer",
   },
   izamal: {
-    url: "/media/preview-generated/home-izamal-editorial-preview.webp",
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-izamal-editorial-preview.webp",
     alt: "Arquerías y convento amarillo de Izamal",
   },
   espita: {
-    url: "/media/preview-generated/home-espita-editorial-preview.webp",
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-espita-editorial-preview.webp",
     alt: "Iglesia histórica y plaza arbolada de Espita",
   },
   temozon: {
-    url: "/media/preview-generated/home-temozon-editorial-preview.webp",
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-temozon-editorial-preview.webp",
     alt: "Cocina tradicional y artesanía de Temozón",
   },
 } as const;

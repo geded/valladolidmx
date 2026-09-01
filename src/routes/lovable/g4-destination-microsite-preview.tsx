@@ -61,7 +61,7 @@ const PREVIEW_CONTENT = {
   hero: {
     ...DESTINATION_PREMIUM_G4_CONTENT.hero,
     cover: {
-      url: "/media/preview-generated/valladolid-san-servacio-hero-preview.webp",
+      url: "/api/public/studio-media/conceptual-preview/2026-09-01/valladolid-san-servacio-hero-preview.webp",
       alt: "Vista editorial generada para preview de la catedral de San Servacio y la plaza de Valladolid al atardecer",
     },
   },

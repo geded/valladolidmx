@@ -32,7 +32,8 @@ export const Route = createFileRoute("/lovable/founder-zazil-premium-preview")({
   component: FounderZazilPremiumPreview,
 });
 
-const HERO = "/media/preview-generated/zazil-tunich-hero-preview.webp";
+const HERO =
+  "/api/public/studio-media/conceptual-preview/2026-09-01/zazil-tunich-hero-preview.webp";
 
 function FounderZazilPremiumPreview() {
   const [theme, setTheme] = useState<"sol" | "luna">("sol");

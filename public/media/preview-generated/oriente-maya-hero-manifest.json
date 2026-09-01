@@ -11,15 +11,15 @@
   },
   "items": [
     {
-      "path": "oriente-maya-hero-territorio-v1.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-territorio-v1.webp",
       "subject": "Valladolid and the Oriente Maya territory"
     },
     {
-      "path": "oriente-maya-hero-naturaleza-v1.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-naturaleza-v1.webp",
       "subject": "Cenote nature and active exploration"
     },
     {
-      "path": "oriente-maya-hero-cultura-v1.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-cultura-v1.webp",
       "subject": "Living Maya culture and embroidery"
     }
   ]

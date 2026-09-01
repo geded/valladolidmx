@@ -4,7 +4,7 @@
   "assets": [
     {
       "id": "preview-zazil-tunich-hero-v1",
-      "path": "/media/preview-generated/zazil-tunich-hero-preview.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/zazil-tunich-hero-preview.webp",
       "entity": "Zazil Tunich",
       "role": "hero",
       "status": "preview-generado",
@@ -14,7 +14,7 @@
     },
     {
       "id": "preview-valladolid-san-servacio-hero-v1",
-      "path": "/media/preview-generated/valladolid-san-servacio-hero-preview.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/valladolid-san-servacio-hero-preview.webp",
       "entity": "Valladolid",
       "role": "hero",
       "status": "preview-generado",
@@ -24,7 +24,7 @@
     },
     {
       "id": "preview-home-valladolid-editorial-v1",
-      "path": "/media/preview-generated/home-valladolid-editorial-preview.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/home-valladolid-editorial-preview.webp",
       "entity": "Valladolid",
       "role": "home-destination-cover",
       "status": "preview-generado",
@@ -34,7 +34,7 @@
     },
     {
       "id": "preview-home-izamal-editorial-v1",
-      "path": "/media/preview-generated/home-izamal-editorial-preview.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/home-izamal-editorial-preview.webp",
       "entity": "Izamal",
       "role": "home-destination-cover",
       "status": "preview-generado",
@@ -44,7 +44,7 @@
     },
     {
       "id": "preview-home-espita-editorial-v1",
-      "path": "/media/preview-generated/home-espita-editorial-preview.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/home-espita-editorial-preview.webp",
       "entity": "Espita",
       "role": "home-destination-cover",
       "status": "preview-generado",
@@ -54,7 +54,7 @@
     },
     {
       "id": "preview-home-temozon-editorial-v1",
-      "path": "/media/preview-generated/home-temozon-editorial-preview.webp",
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/home-temozon-editorial-preview.webp",
       "entity": "Temozón",
       "role": "home-destination-cover",
       "status": "preview-generado",
