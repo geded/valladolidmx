@@ -87,11 +87,20 @@ function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram }
 
   const inner = (
     <>
-      <Icon
-        style={{ width: iconSizePx, height: iconSizePx }}
-        strokeWidth={1.5}
-        aria-hidden="true"
-      />
+      {entry.markSrc ? (
+        <img
+          src={entry.markSrc}
+          alt={entry.markAlt ?? ""}
+          className="size-7 shrink-0 rounded-md object-contain"
+          loading="eager"
+        />
+      ) : (
+        <Icon
+          style={{ width: iconSizePx, height: iconSizePx }}
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
+      )}
       {showText ? (
         <span className="font-medium tracking-tight whitespace-nowrap">{label}</span>
       ) : null}

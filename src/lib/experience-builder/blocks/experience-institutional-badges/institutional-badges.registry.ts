@@ -42,6 +42,9 @@ export interface BadgeRegistryEntry {
   label: string;
   shortLabel: string;
   icon: LucideIcon;
+  /** Marca institucional acreditada. Cuando existe, sustituye al glifo genérico. */
+  markSrc?: string;
+  markAlt?: string;
   /** Nombre del token semántico (sin el prefijo `--color-`). */
   colorToken: string;
   /** Prioridad institucional — orden fijo, no configurable. */
@@ -68,6 +71,8 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     label: "Pueblo Mágico",
     shortLabel: "P. Mágico",
     icon: Sparkles,
+    markSrc: "/brand/institutional/pueblos-magicos-oficial.webp",
+    markAlt: "Pueblos Mágicos de México",
     colorToken: "badge-pueblo-magico",
     priority: 10,
     group: "identity",

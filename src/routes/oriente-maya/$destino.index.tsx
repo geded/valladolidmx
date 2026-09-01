@@ -36,6 +36,7 @@ import {
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 
 import {
   ContextEngineProvider,
@@ -89,6 +90,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       surfaceContractsEnabled,
       premiumEligibility,
       evaluationLot,
+      homeRealContent,
     ] = await Promise.all([
       getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
@@ -100,6 +102,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       getDestinationPremiumEligibility({ data: { slug: params.destino } }).catch(() => null),
       // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
       getEvaluationLotSlugs().catch(() => null),
+      resolveHomePremiumRealContent().catch(() => null),
     ]);
     if (!mock && !db) throw notFound();
     const dest = {
@@ -144,6 +147,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       inEvaluationLot:
         isInEvaluationLot(evaluationLot, "destination", params.destino) ||
         isF1kDestination(params.destino),
+      nearbyDestinations: homeRealContent?.destinos ?? [],
     };
   },
   head: ({ loaderData, params }) =>
@@ -198,6 +202,7 @@ function DestinoPage() {
     composition,
     surfaceContractsEnabled,
     premiumEnabled,
+    nearbyDestinations,
   } = Route.useLoaderData();
   const declaration = buildDestinationContext(dest.slug, dest.name);
   // SEO.A2.M1 — La ruta hidrata `DestinationSurfaceProvider` con los
@@ -226,6 +231,7 @@ function DestinoPage() {
           galleryUrls={galleryUrls ?? []}
           galleryMedia={galleryMedia ?? []}
           premiumEnabled={premiumEnabled}
+          nearbyDestinations={nearbyDestinations}
           legacy={
             composition ? (
               <CompositionRenderer tree={composition.snapshot} />

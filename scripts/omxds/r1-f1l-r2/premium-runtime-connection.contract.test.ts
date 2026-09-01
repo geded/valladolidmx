@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { buildRegionPremiumRuntime } from "../../../src/components/destination-premium/region-premium-runtime";
+import { buildDestinationPremiumRuntime } from "../../../src/components/destination-premium/destination-premium-runtime";
 import { HOME_PREMIUM_G4_CONTENT } from "../../../src/components/home-premium/home-premium-content";
 import { mergeHomeRealContent } from "../../../src/components/home-premium/home-premium-real";
 
@@ -39,6 +40,52 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(surface).toContain("href: p.href ?? null");
     expect(surface).toContain("d.href ? (");
     expect(surface).toContain("to={d.href}");
+  });
+
+  test("el destino Premium consume continuidad territorial real y excluye su propia ruta", () => {
+    const content = buildDestinationPremiumRuntime({
+      id: "destination:valladolid",
+      destination: {
+        slug: "valladolid",
+        name: "Valladolid",
+        tagline: "Capital turística",
+        description: "Punto de partida del Oriente Maya.",
+        highlights: [],
+        hero_palette: "territorio",
+        hero_url: null,
+        latitude: 20.6896,
+        longitude: -88.2011,
+      },
+      media: [],
+      mapPoints: [],
+      nearbyDestinations: [
+        {
+          title: "Valladolid",
+          subtitle: "Capital turística",
+          href: "/oriente-maya/valladolid",
+          mediaUrl: "",
+        },
+        {
+          title: "Izamal",
+          subtitle: "Ciudad amarilla",
+          href: "/oriente-maya/izamal",
+          mediaUrl: "/media/izamal.webp",
+        },
+      ],
+    });
+
+    expect(content.nearby.items.map((item) => item.href)).toEqual(["/oriente-maya/izamal"]);
+    expect(content.nearby.items[0]?.media.url).toBe("/media/izamal.webp");
+  });
+
+  test("Pueblo Mágico usa la marca institucional acreditada", () => {
+    const registry = read(
+      "src/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry.ts",
+    );
+    expect(registry).toContain('markSrc: "/brand/institutional/pueblos-magicos-oficial.webp"');
+    expect(read("public/brand/institutional/manifest.json")).toContain(
+      "Secretaría de Cultura y Turismo del Estado de México",
+    );
   });
 
   test("la siembra de medios es acreditada, reversible y nunca se ejecuta implícitamente", () => {

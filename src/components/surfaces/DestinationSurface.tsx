@@ -59,7 +59,10 @@ import {
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { hasForbiddenDestinationMedia } from "@/lib/destinations/public-media-policy";
 import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
-import { buildDestinationPremiumRuntime } from "@/components/destination-premium/destination-premium-runtime";
+import {
+  buildDestinationPremiumRuntime,
+  type DestinationPremiumNearbySource,
+} from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import {
@@ -83,6 +86,8 @@ export interface DestinationSurfaceContextValue {
   galleryUrls?: string[];
   /** G8-F1D — atribución acreditada por medio (ALT, caption, crédito). */
   galleryMedia?: PublicMediaAttribution[];
+  /** Destinos publicados del corpus real para continuidad territorial. */
+  nearbyDestinations?: DestinationPremiumNearbySource[];
 }
 
 export const DestinationSurfaceContext = createContext<DestinationSurfaceContextValue | null>(null);
@@ -94,11 +99,12 @@ export function DestinationSurfaceProvider({
   mapPoints,
   galleryUrls,
   galleryMedia,
+  nearbyDestinations,
   children,
 }: DestinationSurfaceContextValue & { children: React.ReactNode }) {
   return (
     <DestinationSurfaceContext.Provider
-      value={{ db, related, slug, mapPoints, galleryUrls, galleryMedia }}
+      value={{ db, related, slug, mapPoints, galleryUrls, galleryMedia, nearbyDestinations }}
     >
       {children}
     </DestinationSurfaceContext.Provider>
@@ -122,6 +128,8 @@ export interface DestinationSurfaceProps {
   galleryUrls?: string[];
   /** G8-F1D — atribución acreditada de los medios (ALT, caption, crédito). */
   galleryMedia?: PublicMediaAttribution[];
+  /** Destinos publicados del corpus real para continuidad territorial. */
+  nearbyDestinations?: DestinationPremiumNearbySource[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
   /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
@@ -252,6 +260,7 @@ export function DestinationSurfaceContractBoundary({
   galleryUrls,
   galleryMedia,
   premiumEnabled,
+  nearbyDestinations,
 }: DestinationSurfaceContractBoundaryProps) {
   if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
     const accreditedMedia = (galleryMedia ?? []).filter(
@@ -263,6 +272,7 @@ export function DestinationSurfaceContractBoundary({
       destination: dbData,
       media: accreditedMedia,
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
+      nearbyDestinations,
     });
     return (
       <div

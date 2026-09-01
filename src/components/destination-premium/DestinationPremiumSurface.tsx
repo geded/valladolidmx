@@ -14,7 +14,7 @@
  *  - Iconografía de categorías exclusivamente con `CategoryNavGrid`
  *    (glifos bordados G6, fail-closed).
  *  - "Tours" no es categoría pública: subtipo interno de Experiencias.
- *  - Pueblo Mágico sólo como estado editorial en texto.
+ *  - Pueblo Mágico sólo desde el registro y la marca institucional acreditada.
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
 import { useMemo, useState, type ReactNode } from "react";
@@ -40,6 +40,7 @@ import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experienc
 import { cn } from "@/lib/utils";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
+import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import {
   DESTINATION_PREMIUM_G4_CONTENT,
   DESTINATION_PREMIUM_SECTION_ORDER,
@@ -200,13 +201,36 @@ export function DestinationPremiumSurface({
 
 /* ------------------------------------------------------------------ */
 
-function EditorialStatus({ content }: { content: DestinationPremiumContent }) {
-  if (!content.hero.statusBadge || !isPuebloMagico(content.slug)) return null;
+function DestinationIdentity({ content }: { content: DestinationPremiumContent }) {
+  const items = [
+    ...(content.hero.statusBadge && isPuebloMagico(content.slug)
+      ? [
+          {
+            kind: "pueblo-magico" as const,
+            slug: `pueblo-magico:${content.slug}`,
+            source: "destination" as const,
+          },
+        ]
+      : []),
+    {
+      kind: "oriente-maya" as const,
+      slug: `oriente-maya:${content.slug}`,
+      source: "destination" as const,
+    },
+  ];
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-      {content.hero.statusBadge}
-      <span className="sr-only">(estado editorial provisional en texto; sin logotipo oficial)</span>
-    </span>
+    <InstitutionalBadgesBlock
+      config={{
+        source: "destination",
+        subjectSlug: content.slug,
+        variant: "soft",
+        size: "md",
+        layout: "strip",
+        items,
+        ariaLabel: `Identidad institucional de ${content.hero.title}`,
+        capabilities: { showLabel: true, showTooltip: true, mobileVisibleMax: 3 },
+      }}
+    />
   );
 }
 
@@ -221,12 +245,7 @@ function HeroCopy({
 }) {
   return (
     <div className={compact ? "" : "max-w-2xl"}>
-      <div className="flex flex-wrap items-center gap-2">
-        <EditorialStatus content={content} />
-        <span className="rounded-pill border border-border bg-background/70 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          {content.hero.regionBadge}
-        </span>
-      </div>
+      <DestinationIdentity content={content} />
       <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
         {content.hero.title}
       </h1>
@@ -566,10 +585,12 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
               <div className="p-4">
                 <h3 className="font-serif text-lg">{d.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
-                <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
-                  <MapIcon className="size-3.5" aria-hidden />
-                  {d.distance}
-                </p>
+                {d.distance ? (
+                  <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
+                    <MapIcon className="size-3.5" aria-hidden />
+                    {d.distance}
+                  </p>
+                ) : null}
               </div>
             </article>
           );

@@ -6,6 +6,13 @@ import type {
   DestinationPremiumMedia,
 } from "./destination-premium-content";
 
+export interface DestinationPremiumNearbySource {
+  title: string;
+  subtitle: string;
+  href: string;
+  mediaUrl: string;
+}
+
 function mediaOf(item: PublicMediaAttribution): DestinationPremiumMedia {
   return { url: item.url, alt: item.alt ?? "" };
 }
@@ -15,8 +22,9 @@ export function buildDestinationPremiumRuntime(input: {
   destination: PublicDestinationDTO;
   media: PublicMediaAttribution[];
   mapPoints: ExperienceMapPoint[];
+  nearbyDestinations?: DestinationPremiumNearbySource[];
 }): DestinationPremiumContent {
-  const { destination, media, mapPoints } = input;
+  const { destination, media, mapPoints, nearbyDestinations = [] } = input;
   const cover = media.find((item) => item.role === "cover") ?? null;
   const gallery = media.filter((item) => item.role === "gallery");
   const allMedia = [...(cover ? [cover] : []), ...gallery];
@@ -121,8 +129,18 @@ export function buildDestinationPremiumRuntime(input: {
     nearby: {
       kicker: "Oriente Maya de Yucatán",
       title: `Cerca de ${destination.name}`,
-      description: "",
-      items: [],
+      description: "Continúa el recorrido por los destinos publicados del territorio.",
+      items: nearbyDestinations
+        .filter((item) => item.href !== `/oriente-maya/${destination.slug}`)
+        .slice(0, 5)
+        .map((item) => ({
+          slug: item.href.split("/").filter(Boolean).at(-1) ?? item.title.toLowerCase(),
+          name: item.title,
+          distance: "",
+          tagline: item.subtitle,
+          media: { url: item.mediaUrl, alt: item.title },
+          href: item.href,
+        })),
     },
   };
 }

@@ -11,7 +11,8 @@
  *  - Sólo medios gobernados existentes vía la ruta pública estable.
  *  - Mapa exclusivamente con el bloque oficial `ExperienceMapBlock`.
  *  - Iconografía de categorías con los glifos bordados G6.
- *  - Pueblo Mágico sólo como estado editorial en texto.
+ *  - Pueblo Mágico se resuelve desde el registro institucional y su
+ *    marca oficial acreditada.
  *  - Vista interna, no indexable y sin persistencia.
  */
 import { useState } from "react";
