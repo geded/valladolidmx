@@ -14,7 +14,7 @@ import {
 export const Route = createFileRoute("/_authenticated/cms/lugares/")({
   head: () => ({
     meta: [
-      { title: "Lugares y atractivos · CMS Studio" },
+      { title: "Lugares y sitios de interés · CMS Studio" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -86,9 +86,9 @@ function LugaresPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-serif text-2xl text-foreground">Lugares y atractivos</h1>
+          <h1 className="font-serif text-2xl text-foreground">Lugares y sitios de interés</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Cenotes, museos, plazas y patrimonio del Oriente Maya.
+            Sitios arqueológicos, cenotes, museos, plazas, naturaleza y patrimonio del Oriente Maya.
           </p>
         </div>
         <Link

@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "scope": "restaurant-listing-approved-preview",
+  "policy": {
+    "aiGenerated": true,
+    "conceptual": true,
+    "temporary": true,
+    "documentary": false,
+    "productionEligible": false,
+    "replacementRequired": true,
+    "binding": "canonical-media-library"
+  },
+  "assets": [
+    {
+      "path": "/api/public/studio-media/2026/1788291771784-5vcdnt-restaurante-fonda-mercado-conceptual-v1.webp",
+      "theme": "cocina-de-origen"
+    },
+    {
+      "path": "/api/public/studio-media/2026/1788291775648-7j8tiw-restaurante-patio-colonial-conceptual-v1.webp",
+      "theme": "patio-colonial"
+    },
+    {
+      "path": "/api/public/studio-media/2026/1788291770675-89lsmh-restaurante-patio-izamal-conceptual-v1.webp",
+      "theme": "patio-izamal"
+    },
+    {
+      "path": "/api/public/studio-media/2026/1788291772757-yp7xx5-restaurante-comal-cocina-maya-conceptual-v1.webp",
+      "theme": "comal-y-cocina-maya"
+    },
+    {
+      "path": "/api/public/studio-media/2026/1788291773480-6zjzv5-restaurante-costa-el-cuyo-conceptual-v1.webp",
+      "theme": "costa-el-cuyo"
+    },
+    {
+      "path": "/api/public/studio-media/2026/1788291774706-qcx0r0-restaurante-campo-milpa-conceptual-v1.webp",
+      "theme": "campo-y-milpa"
+    }
+  ]
+}

@@ -228,7 +228,7 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     kicker: "Lo esencial",
     title: "Antes de ir",
     description:
-      "Datos operativos de demostración. En producción provendrán del CMS de Lugares y atractivos, nunca del código.",
+      "Datos operativos de demostración. En producción provendrán del CMS de Lugares y sitios de interés, nunca del código.",
     facts: [
       { key: "horarios", label: "Horarios", value: "8:00 – 17:00", hint: "Todos los días (demo)" },
       {

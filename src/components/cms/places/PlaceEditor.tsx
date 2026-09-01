@@ -385,7 +385,7 @@ export function PlaceEditor({ placeId }: Props) {
       <section className="mx-auto w-full max-w-3xl space-y-5">
         <header className="border-b border-border pb-4">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            Lugares y atractivos
+            Lugares y sitios de interés
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">Nuevo lugar o atractivo</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -574,7 +574,7 @@ export function PlaceEditor({ placeId }: Props) {
       <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            Lugares y atractivos
+            Lugares y sitios de interés
           </p>
           <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight">
             {String(place.name)}
@@ -970,9 +970,7 @@ export function PlaceEditor({ placeId }: Props) {
         }
         value={
           (((place?.metadata as Record<string, unknown> | null)?.presentation_mode as
-            | "editorial"
-            | "cinematic"
-            | undefined) ?? null) as "editorial" | "cinematic" | null
+            "editorial" | "cinematic" | undefined) ?? null) as "editorial" | "cinematic" | null
         }
         hasApprovedCover={(() => {
           const rows = (det.media ?? []) as PlaceMediaRow[];

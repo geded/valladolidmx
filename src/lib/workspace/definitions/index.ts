@@ -709,7 +709,7 @@ const cms: WorkspaceDefinition = {
     {
       id: "cms.lugares",
       workspaceId: "cms",
-      label: "Lugares y atractivos",
+      label: "Lugares y sitios de interés",
       icon: MapPin,
       to: "/cms/lugares",
       group: "territorio",
