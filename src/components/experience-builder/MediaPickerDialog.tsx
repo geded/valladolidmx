@@ -3,8 +3,8 @@
  * (G8-M1 · Safe Media Replacement MVP).
  *
  *  - Flujo único: seleccionar o subir dentro del mismo diálogo.
- *  - Subida segura: `signStudioMediaUpload` → bucket → `registerStudioMedia`.
- *    Si el PUT firmado es bloqueado, usa un fallback server-side gobernado.
+ *  - Subida segura gobernada por servidor. Los bytes se conservan al elegir
+ *    el archivo para que el navegador no pierda el acceso antes de enviar.
  *    Nunca guarda `data:` URI ni base64 en la composición.
  *  - Metadata obligatoria de derechos y naturaleza (documental/conceptual/IA).
  *  - Todo activo nuevo nace `draft` + `unreviewed`; sólo un rol administrativo
@@ -26,12 +26,9 @@ import {
 import {
   approveStudioMedia,
   listStudioMediaLibrary,
-  registerStudioMedia,
-  signStudioMediaUpload,
   uploadStudioMediaViaServer,
 } from "@/lib/experience-builder/studio-media.functions";
 import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
-import { supabase } from "@/integrations/supabase/client";
 import { validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
 
 export interface PickedMedia {
@@ -120,8 +117,6 @@ const RIGHTS_ERRORS: Record<string, string> = {
 
 const humanize = (msg: string) => RIGHTS_ERRORS[msg] ?? msg;
 
-const SERVER_FALLBACK_LIMIT = 8 * 1024 * 1024;
-
 async function fileToBase64(file: File) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   let binary = "";
@@ -138,8 +133,6 @@ export function MediaPickerDialog({
   role = "gallery",
 }: MediaPickerDialogProps) {
   const list = useServerFn(listStudioMediaLibrary);
-  const sign = useServerFn(signStudioMediaUpload);
-  const register = useServerFn(registerStudioMedia);
   const serverUpload = useServerFn(uploadStudioMediaViaServer);
   const approve = useServerFn(approveStudioMedia);
 
@@ -152,6 +145,8 @@ export function MediaPickerDialog({
   const [notice, setNotice] = useState<string | null>(null);
   const [mode, setMode] = useState<"library" | "upload">("library");
   const [file, setFile] = useState<File | null>(null);
+  const [fileBytesBase64, setFileBytesBase64] = useState<string | null>(null);
+  const [readingFile, setReadingFile] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [rights, setRights] = useState({ ...emptyRights });
 
@@ -181,25 +176,41 @@ export function MediaPickerDialog({
     if (open) return;
     setMode("library");
     setFile(null);
+    setFileBytesBase64(null);
+    setReadingFile(false);
     setPreview(null);
     setRights({ ...emptyRights });
     setError(null);
     setNotice(null);
   }, [open]);
 
-  function chooseFile(f: File) {
+  async function chooseFile(f: File) {
     const invalid = validateImageFile(f);
     if (invalid) {
       setError(invalid.reason);
       return;
     }
     setError(null);
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
+    setReadingFile(true);
+    setFile(null);
+    setFileBytesBase64(null);
+    setPreview(null);
+    try {
+      // Debe leerse durante el evento de selección. Algunos navegadores
+      // eliminan el archivo temporal antes de que el usuario termine la ficha.
+      const bytesBase64 = await fileToBase64(f);
+      setFile(f);
+      setFileBytesBase64(bytesBase64);
+      setPreview(URL.createObjectURL(f));
+    } catch {
+      setError("No se pudo leer la imagen seleccionada. Vuelve a elegir el archivo.");
+    } finally {
+      setReadingFile(false);
+    }
   }
 
   async function handleUpload() {
-    if (!file || uploading) return;
+    if (!file || !fileBytesBase64 || uploading || readingFile) return;
     const invalid = validateMediaRights(rights);
     if (invalid) {
       setError(humanize(invalid));
@@ -211,46 +222,20 @@ export function MediaPickerDialog({
       // La biblioteca conserva el original. El rol sólo gobierna cómo se
       // presenta en el slot; no debe recortar destructivamente el activo.
       void role;
-      let directUpload: { path: string } | null = null;
-      try {
-        const { path, token, bucket } = await sign({
-          data: { filename: file.name, contentType: file.type },
-        });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const storage = (supabase.storage as any).from(bucket);
-        const { error: upErr } = await storage.uploadToSignedUrl(path, token, file, {
-          contentType: file.type,
-          upsert: false,
-        });
-        if (upErr) throw upErr;
-        directUpload = { path };
-      } catch (directError) {
-        if (file.size > SERVER_FALLBACK_LIMIT) throw directError;
-      }
-      if (directUpload) {
-        await register({
-          data: {
-            storagePath: directUpload.path,
-            mime: file.type,
-            sizeBytes: file.size,
-            rights,
-          },
-        });
-      } else {
-        await serverUpload({
-          data: {
-            filename: file.name,
-            mime: file.type,
-            sizeBytes: file.size,
-            bytesBase64: await fileToBase64(file),
-            rights,
-          },
-        });
-      }
+      await serverUpload({
+        data: {
+          filename: file.name,
+          mime: file.type,
+          sizeBytes: file.size,
+          bytesBase64: fileBytesBase64,
+          rights,
+        },
+      });
       setNotice(
         "Imagen subida como borrador. Queda pendiente de aprobación antes de poder usarse en un slot.",
       );
       setFile(null);
+      setFileBytesBase64(null);
       setPreview(null);
       setRights({ ...emptyRights });
       setMode("library");
@@ -368,6 +353,7 @@ export function MediaPickerDialog({
               preview={preview}
               rights={rights}
               uploading={uploading}
+              readingFile={readingFile}
               onChooseFile={chooseFile}
               onRights={(patch) => setRights((r) => ({ ...r, ...patch }))}
               onSubmit={handleUpload}
@@ -484,6 +470,7 @@ function UploadForm({
   preview,
   rights,
   uploading,
+  readingFile,
   onChooseFile,
   onRights,
   onSubmit,
@@ -492,7 +479,8 @@ function UploadForm({
   preview: string | null;
   rights: typeof emptyRights;
   uploading: boolean;
-  onChooseFile: (f: File) => void;
+  readingFile: boolean;
+  onChooseFile: (f: File) => void | Promise<void>;
   onRights: (patch: Partial<typeof emptyRights>) => void;
   onSubmit: () => void;
 }) {
@@ -501,7 +489,11 @@ function UploadForm({
     <div className="mx-auto max-w-2xl space-y-3">
       <label className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-border bg-muted/30 text-xs font-medium hover:bg-accent">
         <Upload className="size-4" aria-hidden />
-        {file ? `Archivo: ${file.name}` : "Elegir archivo del dispositivo"}
+        {readingFile
+          ? "Leyendo archivo…"
+          : file
+            ? `Archivo: ${file.name}`
+            : "Elegir archivo del dispositivo"}
         <input
           type="file"
           accept="image/*"
@@ -509,7 +501,7 @@ function UploadForm({
           onChange={(e) => {
             const f = e.target.files?.[0];
             e.target.value = "";
-            if (f) onChooseFile(f);
+            if (f) void onChooseFile(f);
           }}
         />
       </label>
@@ -611,7 +603,7 @@ function UploadForm({
 
       <button
         type="button"
-        disabled={!file || uploading}
+        disabled={!file || uploading || readingFile}
         onClick={onSubmit}
         className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"
       >

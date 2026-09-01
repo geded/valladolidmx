@@ -53,23 +53,22 @@ describe("DEF-M-02 · subida segura sin referencias base64", () => {
     expect(INSPECTOR).not.toContain("readAsDataURL(");
   });
 
-  test("el diálogo intenta URL firmada y tiene fallback gobernado", () => {
+  test("el diálogo conserva los bytes al elegir y usa la subida gobernada", () => {
     expect(PICKER).not.toContain("new FileReader");
-    expect(PICKER).toContain("signStudioMediaUpload");
-    expect(PICKER).toContain("uploadToSignedUrl");
-    expect(PICKER).toContain("registerStudioMedia");
     expect(PICKER).toContain("uploadStudioMediaViaServer");
-    expect(PICKER).toContain("SERVER_FALLBACK_LIMIT");
+    expect(PICKER).toContain("setFileBytesBase64");
+    expect(PICKER).toContain("bytesBase64: fileBytesBase64");
+    expect(PICKER).not.toContain("bytesBase64: await fileToBase64(file)");
     expect(PICKER).not.toContain("prepareImageForRole");
-    expect(PICKER).toContain("upsert: false");
   });
 
-  test("el fallback conserva bytes, permisos, checksum y limpia si falla el registro", () => {
+  test("el servidor conserva bytes, permisos, checksum y limpia si falla el registro", () => {
     expect(FUNCTIONS).toContain("uploadStudioMediaViaServer");
     expect(FUNCTIONS).toContain("await assertEditorial(context)");
     expect(FUNCTIONS).toContain("upload_size_mismatch");
     expect(FUNCTIONS).toContain("insertMediaAsset");
     expect(FUNCTIONS).toContain("remove([path])");
+    expect(FUNCTIONS).toContain("upsert: false");
   });
 });
 
