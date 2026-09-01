@@ -6,8 +6,7 @@ import { getPublicListing } from "@/lib/listings/listing-public-reads.functions"
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
-import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
-import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
+import { RestaurantsPremiumListingSurface } from "@/components/listing-premium/RestaurantsPremiumListingSurface";
 
 const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
 
@@ -52,6 +51,8 @@ function buildRestaurantesContext(destino: string | undefined): RouteContextDecl
 export const Route = createFileRoute("/restaurantes")({
   validateSearch: (search: Record<string, unknown>) => ({
     destino: typeof search.destino === "string" ? search.destino : undefined,
+    presentacion:
+      search.presentacion === "cinematografica" ? ("cinematografica" as const) : undefined,
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps }) => ({
@@ -70,18 +71,17 @@ export const Route = createFileRoute("/restaurantes")({
 
 function RestaurantesRoute() {
   const { dto } = Route.useLoaderData();
-  const { destino } = Route.useSearch();
+  const { destino, presentacion } = Route.useSearch();
   const contextDeclaration = buildRestaurantesContext(destino);
   const legacyCrumbs = [
     { label: "Restaurantes", to: "/restaurantes" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
-  const destinoFacet = buildDestinationFacet([...dto.items]);
   return (
     <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
-      <ListingPremiumSurfaceFromDTO
+      <RestaurantsPremiumListingSurface
         dto={dto}
-        facets={destino || !destinoFacet ? [] : [destinoFacet]}
+        presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
       />
     </PublicShell>
   );
