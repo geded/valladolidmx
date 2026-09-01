@@ -21,8 +21,7 @@ import {
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
-import { HotelsPremiumListingSurface } from "./HotelsPremiumListingSurface";
-import { RestaurantsPremiumListingSurface } from "./RestaurantsPremiumListingSurface";
+import { PremiumDiscoveryListingSurface } from "./PremiumDiscoveryListingSurface";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
@@ -167,11 +166,8 @@ export function ListingPremiumSurfaceFromDTO({
   // Perfiles visuales aprobados dentro de la única entrada canónica. Comparten
   // el mismo PublicListingDTO, mapa, Alux, Mi Viaje y expediente de concierge;
   // no crean lecturas ni rutas paralelas.
-  if (dto.family === "hoteles") {
-    return <HotelsPremiumListingSurface dto={dto} presentation={presentation} />;
-  }
-  if (dto.family === "restaurantes") {
-    return <RestaurantsPremiumListingSurface dto={dto} presentation={presentation} />;
+  if (dto.family === "hoteles" || dto.family === "restaurantes") {
+    return <PremiumDiscoveryListingSurface dto={dto} presentation={presentation} />;
   }
 
   const mediaItems = dto.items.filter((item): item is TourismCardVM & { mediaUrl: string } =>
