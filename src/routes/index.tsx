@@ -17,8 +17,11 @@ const ContinuityWelcomeSurface = lazy(() =>
 );
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
-import heroLcpImage from "@/assets/brand/hero/bg01.webp";
-import { getDiscoverySection, type DiscoverySectionKind } from "@/lib/discovery/sections-registry";
+import {
+  HOME_PREMIUM_G4_CONTRACT_VERSION,
+  homePremiumG4DefaultConfig,
+} from "@/components/home-premium/home-premium-config";
+import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -29,8 +32,7 @@ const publishedHomeQuery = queryOptions({
 export const Route = createFileRoute("/")({
   head: (ctx) => {
     const loaderData = ctx.loaderData as
-      | { seo?: Record<string, unknown> | null; fallbackImage?: string | null }
-      | undefined;
+      { seo?: Record<string, unknown> | null; fallbackImage?: string | null } | undefined;
     const seo = (loaderData?.seo ?? {}) as {
       title?: string;
       description?: string;
@@ -53,13 +55,16 @@ export const Route = createFileRoute("/")({
         ? undefined
         : [webPageJsonLd({ title, description, path, image: ogImage })],
     });
-    // H2 · LCP preload: la imagen del hero de la Home es el LCP dominante en móvil.
+    // Sólo precarga el medio acreditado por la composición publicada. El
+    // fallback editorial no inventa ni acopla una portada desde el código.
     return {
       ...head,
-      links: [
-        ...(head.links ?? []),
-        { rel: "preload", as: "image", href: heroLcpImage, fetchPriority: "high" as const },
-      ],
+      links: ogImage
+        ? [
+            ...(head.links ?? []),
+            { rel: "preload", as: "image", href: ogImage, fetchPriority: "high" as const },
+          ]
+        : head.links,
     };
   },
   loader: async ({ context }) => {
@@ -79,15 +84,14 @@ export const Route = createFileRoute("/")({
  *
  * Renderiza la Home pública a partir de una composición publicada
  * desde el Experience Builder. Si todavía no existe una composición
- * publicada para `page_type='home'` (o si la lectura falla), cae al
- * Home legacy hardcodeado — Progressive Migration: cada bloque puede
- * activarse o revertirse de forma independiente sin afectar el sitio.
+ * publicada para `page_type='home'` (o si la lectura falla), instancia el
+ * mismo bloque compuesto Premium G4 usado por Studio y publicación.
  */
 function HomePage() {
   const { data: published } = useQuery(publishedHomeQuery);
   const editWrap = useSectionEditWrap({ pageSlug: "home" });
 
-  if (published?.snapshot) {
+  if (published?.snapshot && hasHomePremiumAuthority(published.snapshot)) {
     return (
       <PublicShell variant="hero">
         <Suspense fallback={null}>
@@ -98,40 +102,34 @@ function HomePage() {
     );
   }
 
-  return <LegacyHome />;
-}
-
-/**
- * LegacyHome — Fallback hardcodeado (Doc 12). Se conserva hasta que la
- * composición de Home esté publicada y validada en producción.
- */
-/**
- * Orden canónico de bloques del fallback Home — Discovery Sections Registry
- * es la única fuente de verdad para los componentes.
- */
-const HOME_FALLBACK_SECTIONS: readonly DiscoverySectionKind[] = [
-  "hero",
-  "destinos",
-  "categorias",
-  "eventos",
-  "promociones",
-  "rutas",
-  "consejo-alux",
-  "arma-tu-viaje",
-  "empresas",
-  "resenas",
-];
-
-function LegacyHome() {
   return (
     <PublicShell variant="hero">
       <Suspense fallback={null}>
         <ContinuityWelcomeSurface />
       </Suspense>
-      {HOME_FALLBACK_SECTIONS.map((kind) => {
-        const Section = getDiscoverySection(kind).component;
-        return <Section key={kind} />;
-      })}
+      <CompositionRenderer tree={HOME_PREMIUM_FALLBACK_TREE} pageType="home" wrap={editWrap} />
     </PublicShell>
   );
 }
+
+function hasHomePremiumAuthority(snapshot: unknown): boolean {
+  return JSON.stringify(snapshot ?? null).includes('"vmx.home.premium-g4"');
+}
+
+/**
+ * Fallback canónico de runtime. No duplica JSX ni contenido: instancia el
+ * mismo bloque compuesto que consumen Studio, preview y publicación. Los
+ * medios permanecen vacíos hasta que el resolutor real acredite una portada.
+ */
+const HOME_PREMIUM_FALLBACK_TREE: CompositionTree = {
+  root: {
+    children: [
+      {
+        id: "home-premium-g4-runtime-fallback",
+        type: "vmx.home.premium-g4",
+        version: HOME_PREMIUM_G4_CONTRACT_VERSION,
+        config: homePremiumG4DefaultConfig(),
+      },
+    ],
+  },
+};

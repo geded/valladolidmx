@@ -27,6 +27,7 @@ import {
   Hotel,
   Images,
   Map as MapIcon,
+  Search,
   Sparkles,
   Tag,
   UtensilsCrossed,
@@ -38,6 +39,7 @@ import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
@@ -149,13 +151,18 @@ export function DestinationPremiumSurface({
             );
           case "services":
             return (
-              <Container key={key} className="mt-12">
-                <ServiciosStrip
-                  content={content}
-                  active={activeService}
-                  onSelect={setActiveService}
-                />
-              </Container>
+              <div key={key}>
+                <Container className="mt-8">
+                  <AluxDestinationGuide content={content} />
+                </Container>
+                <Container className="mt-8">
+                  <ServiciosStrip
+                    content={content}
+                    active={activeService}
+                    onSelect={setActiveService}
+                  />
+                </Container>
+              </div>
             );
           case "descubre":
             return (
@@ -196,6 +203,45 @@ export function DestinationPremiumSurface({
         }
       })}
     </div>
+  );
+}
+
+function AluxDestinationGuide({ content }: { content: DestinationPremiumContent }) {
+  return (
+    <section
+      className="grid gap-4 rounded-3xl border border-border bg-card p-5 shadow-soft lg:grid-cols-[1fr_auto] lg:items-center"
+      aria-label="Alux, copiloto territorial"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+          <Sparkles className="size-5" aria-hidden />
+        </span>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            Alux · copiloto de viaje
+          </p>
+          <h2 className="mt-1 font-serif text-2xl">
+            Explora {content.hero.title} según tu momento
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+            Alux usa las fechas, compañía y guardados de Mi Viaje. La cercanía y ubicación sólo se
+            consideran cuando ya estás en la región y diste permiso.
+          </p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        className="min-h-11 rounded-pill"
+        onClick={() =>
+          openAluxFloating({
+            reason: "manual",
+            hint: `Ayúdame a explorar ${content.hero.title} usando el contexto real de Mi Viaje.`,
+          })
+        }
+      >
+        Planear con Alux
+      </Button>
+    </section>
   );
 }
 
@@ -553,7 +599,16 @@ function ServicioPreview({
 }
 
 function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
+  const regionalCatalog = content.slug === "oriente-maya";
+  const [query, setQuery] = useState("");
+  const [visible, setVisible] = useState(8);
   if (content.nearby.items.length === 0) return null;
+  const filtered = content.nearby.items.filter((item) => {
+    const needle = query.trim().toLocaleLowerCase("es-MX");
+    if (!needle) return true;
+    return `${item.name} ${item.tagline}`.toLocaleLowerCase("es-MX").includes(needle);
+  });
+  const shown = regionalCatalog ? filtered.slice(0, visible) : filtered;
   return (
     <section aria-labelledby="cerca-del-destino">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -563,8 +618,26 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
         {content.nearby.title}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{content.nearby.description}</p>
+      {regionalCatalog ? (
+        <div className="relative mt-5 max-w-xl">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setVisible(8);
+            }}
+            placeholder="Buscar destino, costa, cenote o cultura"
+            className="min-h-12 w-full rounded-pill border border-border bg-background pl-11 pr-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+      ) : null}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {content.nearby.items.map((d) => {
+        {shown.map((d) => {
           const card = (
             <article
               key={d.slug}
@@ -607,6 +680,23 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
           );
         })}
       </div>
+      {regionalCatalog && shown.length < filtered.length ? (
+        <div className="mt-6 flex justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-pill"
+            onClick={() => setVisible((count) => count + 8)}
+          >
+            Mostrar más destinos
+          </Button>
+        </div>
+      ) : null}
+      {regionalCatalog && filtered.length === 0 ? (
+        <p className="mt-6 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          No encontramos destinos con esa búsqueda. Prueba con otra palabra.
+        </p>
+      ) : null}
     </section>
   );
 }

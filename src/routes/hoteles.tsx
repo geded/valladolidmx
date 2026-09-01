@@ -6,7 +6,7 @@ import { getPublicListing } from "@/lib/listings/listing-public-reads.functions"
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
-import { HotelsPremiumListingSurface } from "@/components/listing-premium/HotelsPremiumListingSurface";
+import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
 const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
 
@@ -57,6 +57,8 @@ function buildHotelesContext(destino: string | undefined): RouteContextDeclarati
 export const Route = createFileRoute("/hoteles")({
   validateSearch: (search: Record<string, unknown>) => ({
     destino: typeof search.destino === "string" ? search.destino : undefined,
+    presentacion:
+      search.presentacion === "cinematografica" ? ("cinematografica" as const) : undefined,
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps }) => ({
@@ -74,7 +76,7 @@ export const Route = createFileRoute("/hoteles")({
 
 function HotelesRoute() {
   const { dto } = Route.useLoaderData();
-  const { destino } = Route.useSearch();
+  const { destino, presentacion } = Route.useSearch();
   const contextDeclaration = buildHotelesContext(destino);
   const legacyCrumbs = [
     { label: "Hoteles", to: "/hoteles" },
@@ -82,7 +84,12 @@ function HotelesRoute() {
   ];
   return (
     <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
-      <HotelsPremiumListingSurface dto={dto} />
+      <ListingPremiumSurfaceFromDTO
+        dto={dto}
+        presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+        showAddToTrip
+        showFavorite
+      />
     </PublicShell>
   );
 }

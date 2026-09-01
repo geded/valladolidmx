@@ -6,7 +6,7 @@ import { getPublicListing } from "@/lib/listings/listing-public-reads.functions"
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
-import { RestaurantsPremiumListingSurface } from "@/components/listing-premium/RestaurantsPremiumListingSurface";
+import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
 const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
 
@@ -79,9 +79,11 @@ function RestaurantesRoute() {
   ];
   return (
     <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
-      <RestaurantsPremiumListingSurface
+      <ListingPremiumSurfaceFromDTO
         dto={dto}
         presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+        showAddToTrip
+        showFavorite
       />
     </PublicShell>
   );

@@ -143,8 +143,11 @@ export function businessToTourismCard(
     href,
     tagline: b.tagline || null,
     businessName: null,
-    mediaUrl: null,
-    mediaAlt: null,
+    // La lectura pública ya resolvió la portada oficial mediante
+    // business_media → media_assets. El adaptador no debe descartarla:
+    // es la misma autoridad gobernada que consumen ficha, mapa y Mi Viaje.
+    mediaUrl: b.cover_url ?? null,
+    mediaAlt: b.cover_url ? b.display_name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
     coordinates:

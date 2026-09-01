@@ -2,9 +2,86 @@ import { PremiumAction } from "./PremiumAction";
 import type { PremiumHeroVM } from "./types";
 import { cn } from "@/lib/utils";
 
-export function PremiumHero({ vm }: { vm: PremiumHeroVM }) {
+export function PremiumHero({
+  vm,
+  layout = "default",
+}: {
+  vm: PremiumHeroVM;
+  /** La variante listing pertenece al mismo bloque; no crea otro hero. */
+  layout?: "default" | "listing";
+}) {
   const cinematic = vm.presentation === "cinematic";
   const hasMedia = Boolean(vm.media);
+  const listing = layout === "listing";
+
+  if (listing) {
+    return (
+      <section
+        data-premium-presentation={vm.presentation}
+        data-premium-media={hasMedia ? "governed" : "fallback"}
+        data-premium-layout="listing"
+        className="relative isolate overflow-hidden rounded-[1.75rem] border border-border bg-card shadow-soft"
+      >
+        <div
+          className={cn(
+            "grid min-h-[21rem]",
+            hasMedia && "lg:grid-cols-[1.06fr_.94fr]",
+            cinematic && hasMedia && "min-h-[32rem] lg:grid-cols-1",
+          )}
+        >
+          {hasMedia ? (
+            <div
+              className={cn(
+                "relative min-h-56 overflow-hidden bg-muted",
+                cinematic && "absolute inset-0 -z-20 min-h-0",
+              )}
+            >
+              <img
+                src={vm.media?.url}
+                alt={vm.media?.alt ?? ""}
+                className="size-full object-cover"
+              />
+              <div
+                aria-hidden
+                className={cn(
+                  "absolute inset-0",
+                  cinematic
+                    ? "bg-gradient-to-t from-[#0f382b]/95 via-[#0f382b]/55 to-black/10"
+                    : "bg-gradient-to-t from-black/25 to-transparent",
+                )}
+              />
+            </div>
+          ) : null}
+
+          <div
+            className={cn(
+              "relative flex flex-col justify-center overflow-hidden bg-[#123e2f] px-6 py-9 text-white sm:px-9 lg:px-11",
+              cinematic &&
+                "min-h-[32rem] items-center justify-end bg-transparent pb-12 text-center",
+            )}
+          >
+            <div
+              aria-hidden
+              className="absolute -right-20 -top-20 size-64 rounded-full border border-white/10"
+            />
+            {vm.eyebrow ? (
+              <p className="relative text-xs font-semibold uppercase tracking-[0.18em] text-[#edb84f]">
+                {vm.eyebrow}
+              </p>
+            ) : null}
+            <h1 className="relative mt-3 max-w-3xl text-balance font-serif text-4xl leading-[0.98] sm:text-5xl lg:text-6xl">
+              {vm.title}
+            </h1>
+            {vm.description ? (
+              <p className="relative mt-5 max-w-2xl text-pretty text-base leading-7 text-white/85 sm:text-lg">
+                {vm.description}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

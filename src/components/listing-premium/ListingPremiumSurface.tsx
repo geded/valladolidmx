@@ -11,9 +11,59 @@
  * Standard). Esta capa sólo traduce el contenido aprobado a las props de
  * la superficie oficial; no introduce layout paralelo ni chrome global.
  */
-import { TourismListingSurface, type FacetDef } from "@/components/surfaces/TourismListingSurface";
+import { lazy, Suspense, type ReactNode } from "react";
+import {
+  TourismListingSurface,
+  buildDestinationFacet,
+  buildEntityKindFacet,
+  type FacetDef,
+} from "@/components/surfaces/TourismListingSurface";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
+import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+
+const InteractiveMap = lazy(() =>
+  import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
+);
+
+const FAMILY_EXPERIENCE = {
+  hoteles: {
+    label: "opciones de hospedaje",
+    prompts: [
+      "Hotel boutique",
+      "Viaje en pareja",
+      "Cerca del centro",
+      "Con piscina",
+      "Base para explorar",
+    ],
+  },
+  restaurantes: {
+    label: "mesas y experiencias gastronómicas",
+    prompts: [
+      "Cocina yucateca",
+      "Cena en pareja",
+      "Viaje familiar",
+      "Patio tranquilo",
+      "Sabores locales",
+    ],
+  },
+  experiencias: {
+    label: "experiencias",
+    prompts: ["Naturaleza", "Cultura maya", "Con guía local", "En familia", "Aventura"],
+  },
+  eventos: {
+    label: "eventos",
+    prompts: ["Esta semana", "Cultura", "Gastronomía", "En familia", "Entrada libre"],
+  },
+  "casas-de-vacaciones": {
+    label: "casas de vacaciones",
+    prompts: ["Viaje familiar", "Estancia larga", "Con piscina", "Cerca del centro", "Con cocina"],
+  },
+  "que-hacer": {
+    label: "lugares y actividades",
+    prompts: ["Primera visita", "Un día", "Naturaleza", "Cultura", "Cerca de Valladolid"],
+  },
+} as const;
 
 export interface ListingPremiumSurfaceProps {
   hero: {
@@ -32,6 +82,10 @@ export interface ListingPremiumSurfaceProps {
   emptyMessage?: string;
   showAddToTrip?: boolean;
   showFavorite?: boolean;
+  presentation?: PremiumPresentation;
+  familyLabel?: string;
+  intentPrompts?: readonly string[];
+  mapSlot?: ReactNode;
   className?: string;
 }
 
@@ -39,12 +93,16 @@ export function ListingPremiumSurface({
   hero,
   items,
   facets,
-  columns = 3,
+  columns,
   destinationSlug = "valladolid",
   destinationLabel = "Valladolid",
   emptyMessage,
   showAddToTrip = false,
   showFavorite = false,
+  presentation = "editorial",
+  familyLabel,
+  intentPrompts,
+  mapSlot,
   className,
 }: ListingPremiumSurfaceProps) {
   return (
@@ -64,6 +122,10 @@ export function ListingPremiumSurface({
       destinationLabel={destinationLabel}
       showAddToTrip={showAddToTrip}
       capabilities={{ showFavorite }}
+      presentation={presentation}
+      familyLabel={familyLabel}
+      intentPrompts={intentPrompts}
+      mapSlot={mapSlot}
       emptyMessage={
         emptyMessage ?? "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya."
       }
@@ -81,6 +143,7 @@ export interface ListingPremiumSurfaceFromDTOProps {
   columns?: 1 | 2 | 3;
   showAddToTrip?: boolean;
   showFavorite?: boolean;
+  presentation?: PremiumPresentation;
   className?: string;
 }
 
@@ -93,29 +156,70 @@ export function ListingPremiumSurfaceFromDTO({
   titleOverride,
   subtitleOverride,
   facets,
-  columns = 3,
+  columns,
   showAddToTrip = false,
   showFavorite = false,
+  presentation = "editorial",
   className,
 }: ListingPremiumSurfaceFromDTOProps) {
+  const mediaItems = dto.items.filter((item): item is TourismCardVM & { mediaUrl: string } =>
+    Boolean(item.mediaUrl),
+  );
+  const mapped = dto.items.filter(
+    (item): item is TourismCardVM & { coordinates: { lat: number; lng: number } } =>
+      item.coordinates?.lat != null && item.coordinates?.lng != null,
+  );
+  const family = FAMILY_EXPERIENCE[dto.family];
+  const defaultFacets = [
+    buildDestinationFacet([...dto.items]),
+    buildEntityKindFacet([...dto.items]),
+  ].filter((facet): facet is FacetDef => facet != null);
+  const mapSlot = mapped.length ? (
+    <Suspense
+      fallback={
+        <div className="grid min-h-[26rem] place-items-center text-sm text-muted-foreground">
+          Preparando mapa territorial…
+        </div>
+      }
+    >
+      <InteractiveMap
+        lat={mapped[0].coordinates.lat}
+        lng={mapped[0].coordinates.lng}
+        zoom={10}
+        markerTitle={mapped[0].name}
+        markers={mapped.map((item) => ({
+          lat: item.coordinates.lat,
+          lng: item.coordinates.lng,
+          title: item.name,
+          href: item.href,
+        }))}
+        className="min-h-[30rem] h-full"
+      />
+    </Suspense>
+  ) : null;
+
   return (
     <ListingPremiumSurface
       hero={{
         eyebrow: dto.hero.eyebrow,
         title: titleOverride?.trim() || dto.hero.title,
         subtitle: subtitleOverride?.trim() || dto.hero.subtitle,
-        mediaUrl: null,
-        mediaAlt: null,
+        mediaUrl: mediaItems[0]?.mediaUrl ?? null,
+        mediaAlt: mediaItems[0]?.mediaAlt ?? mediaItems[0]?.name ?? null,
         metaLabel: dto.hero.metaLabel,
       }}
       items={[...dto.items]}
-      facets={facets}
-      columns={columns}
+      facets={facets ?? defaultFacets}
+      columns={columns ?? (presentation === "cinematic" ? 2 : dto.family === "hoteles" ? 1 : 2)}
       destinationSlug={dto.destinationSlug}
       destinationLabel={dto.destinationLabel}
       emptyMessage={dto.emptyMessage}
       showAddToTrip={showAddToTrip}
       showFavorite={showFavorite}
+      presentation={presentation}
+      familyLabel={family.label}
+      intentPrompts={family.prompts}
+      mapSlot={mapSlot}
       className={className}
     />
   );

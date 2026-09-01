@@ -21,8 +21,9 @@
  * puramente presentacionales — cada ruta pre-filtra por sus search
  * params antes de pasar `items`.
  */
-import { useMemo, useState } from "react";
-import { MapPin } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Map as MapIcon, MapPin, Sparkles } from "lucide-react";
 import { PremiumHero } from "@/components/premium";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
@@ -32,6 +33,7 @@ import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
   TourismCard,
+  TourismCardRow,
   type TourismCardCapabilities,
   type TourismCardVM,
   type TourismEntityKind,
@@ -40,6 +42,7 @@ import type { ExperienceHeroBadge } from "@/lib/experience-builder/blocks/experi
 import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/experience-institutional-badges/contract";
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
 
 /* ------------------------------------------------------------------ *
  * Hero — spec ligera; la superficie construye el DTO oficial.
@@ -105,6 +108,10 @@ export interface TourismListingSurfaceProps {
   showAddToTrip?: boolean;
   /** G5 · presentación compartida; se deriva del medio cuando no se especifica. */
   presentation?: PremiumPresentation;
+  /** Identidad funcional del listado; sólo ajusta copy, nunca datos. */
+  familyLabel?: string;
+  /** Preguntas de entrada aprobadas para el copiloto. */
+  intentPrompts?: readonly string[];
   className?: string;
 }
 
@@ -126,10 +133,14 @@ export function TourismListingSurface({
   favoriteKindFor,
   showAddToTrip = true,
   presentation,
+  familyLabel = "opciones",
+  intentPrompts = [],
   className,
 }: TourismListingSurfaceProps) {
   const [active, setActive] = useState<Record<string, string | null>>({});
   const [nearMeOn, setNearMeOn] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [heroIndex, setHeroIndex] = useState(0);
   const geo = useVisitorGeolocation();
 
   // A13 · ¿Algún item publicó coordenadas? Sin coords no hay ranking real.
@@ -185,7 +196,33 @@ export function TourismListingSurface({
     );
   }, [filtered, nearMeOn, geo.location, destinationLabel]);
 
-  const premiumPresentation = presentation ?? (hero.mediaUrl ? "cinematic" : "editorial");
+  const heroMedia = useMemo(() => {
+    const rows = [
+      ...(hero.mediaUrl ? [{ url: hero.mediaUrl, alt: hero.mediaAlt }] : []),
+      ...items
+        .filter((item) => Boolean(item.mediaUrl))
+        .map((item) => ({ url: item.mediaUrl as string, alt: item.mediaAlt ?? item.name })),
+    ];
+    return rows
+      .filter((row, index) => rows.findIndex((candidate) => candidate.url === row.url) === index)
+      .slice(0, 3);
+  }, [hero.mediaAlt, hero.mediaUrl, items]);
+
+  // Editorial es el fallback universal. Cinematográfica sólo se activa
+  // cuando fue seleccionada y existe fotografía gobernada.
+  const premiumPresentation: PremiumPresentation =
+    presentation === "cinematic" && heroMedia.length > 0 ? "cinematic" : "editorial";
+  const activeHeroMedia = heroMedia[heroIndex % Math.max(heroMedia.length, 1)] ?? null;
+
+  useEffect(() => {
+    if (heroMedia.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return;
+    const timer = window.setInterval(
+      () => setHeroIndex((current) => (current + 1) % heroMedia.length),
+      6500,
+    );
+    return () => window.clearInterval(timer);
+  }, [heroMedia.length]);
 
   const badgeItems = useMemo<InstitutionalBadgeItem[]>(() => {
     if (institutionalBadgeItems && institutionalBadgeItems.length > 0)
@@ -209,20 +246,67 @@ export function TourismListingSurface({
   return (
     <div className={cn("space-y-6", className)}>
       <PremiumHero
+        layout="listing"
         vm={{
           presentation: premiumPresentation,
           eyebrow: hero.eyebrow ?? undefined,
           title: hero.title,
           description: hero.subtitle ?? undefined,
-          media: hero.mediaUrl
+          media: activeHeroMedia
             ? {
-                url: hero.mediaUrl,
-                alt: hero.mediaAlt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
+                url: activeHeroMedia.url,
+                alt: activeHeroMedia.alt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
               }
             : null,
           badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
         }}
       />
+
+      <section
+        className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+        aria-label="Alux, copiloto de viaje"
+      >
+        <div className="grid gap-4 lg:grid-cols-[minmax(15rem,.7fr)_minmax(0,1.4fr)_auto] lg:items-center">
+          <div className="flex items-center gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+              <Sparkles className="size-5" aria-hidden />
+            </span>
+            <div>
+              <p className="text-xs text-muted-foreground">Alux · copiloto de Valladolid.mx</p>
+              <h2 className="font-serif text-xl">¿Qué necesitas para tu viaje?</h2>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {intentPrompts.slice(0, 5).map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() =>
+                  openAluxFloating({
+                    reason: "manual",
+                    hint: `Ayúdame a comparar ${familyLabel}. Mi prioridad es: ${prompt}.`,
+                  })
+                }
+                className="min-h-10 rounded-pill border border-border bg-background px-3 py-2 text-sm transition hover:border-primary/50 hover:bg-primary/5"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              openAluxFloating({
+                reason: "manual",
+                hint: `Ayúdame a elegir entre estas ${familyLabel} usando el contexto real de Mi Viaje.`,
+              })
+            }
+            className="min-h-11 rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            Afinar con Alux
+          </button>
+        </div>
+      </section>
 
       {showBadges ? (
         <InstitutionalBadgesBlock
@@ -283,6 +367,17 @@ export function TourismListingSurface({
                   : "Cerca de mí"}
             </button>
           ) : null}
+          {mapSlot ? (
+            <button
+              type="button"
+              onClick={() => setMapOpen((value) => !value)}
+              aria-expanded={mapOpen}
+              className="inline-flex items-center gap-1.5 rounded-pill bg-muted px-3 py-1 text-xs font-semibold text-foreground/80 hover:bg-muted/70 xl:hidden"
+            >
+              <MapIcon className="size-3.5" aria-hidden />
+              {mapOpen ? "Ocultar mapa" : "Ver mapa"}
+            </button>
+          ) : null}
           {Object.values(active).some(Boolean) ? (
             <button
               type="button"
@@ -295,54 +390,100 @@ export function TourismListingSurface({
         </div>
       ) : null}
 
-      {mapSlot ? <div>{mapSlot}</div> : null}
-
       {displayItems.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
           <p className="text-sm text-muted-foreground">{emptyMessage}</p>
           {emptyHint ? <div className="mt-3 text-sm">{emptyHint}</div> : null}
         </div>
       ) : (
-        <ul role="list" className={cn("grid gap-5", colClass)}>
-          {displayItems.map((vm) => (
-            <li key={vm.id}>
-              <TourismCard
-                vm={vm}
-                capabilities={capabilities}
-                renderActions={(v) => {
-                  const kind = favoriteKindFor?.(v) ?? favoriteKindFromEntity(v.entityKind);
-                  const travelKind = travelKindFromEntity(v.entityKind);
-                  const canAddToTrip =
-                    showAddToTrip &&
-                    travelKind != null &&
-                    evaluateTripEligibility({
-                      kind: travelKind,
-                      targetId: v.id,
-                      title: v.name,
-                      mode: "universal",
-                    }).eligible;
-                  if (!kind && !canAddToTrip) return null;
-                  return (
-                    <div className="flex flex-wrap items-center gap-2">
-                      {kind ? <FavoriteButton entityKind={kind} entityId={v.id} /> : null}
-                      {canAddToTrip ? (
-                        <AddToTravelPlanButton
-                          kind={travelKind as TravelItemKind}
-                          targetId={v.id}
-                          title={v.name}
-                          slug={null}
-                          imageUrl={v.mediaUrl}
-                          subtitle={v.tagline ?? v.businessName ?? null}
-                        />
-                      ) : null}
-                    </div>
-                  );
-                }}
-              />
-            </li>
-          ))}
-        </ul>
+        <div
+          className={cn(
+            mapSlot && "grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,.75fr)]",
+          )}
+        >
+          <ul role="list" className={cn("grid gap-5", colClass)}>
+            {displayItems.map((vm) => (
+              <li key={vm.id}>
+                {columns === 1 ? (
+                  <TourismCardRow
+                    vm={vm}
+                    capabilities={capabilities}
+                    renderActions={(v) => renderCardActions(v, favoriteKindFor, showAddToTrip)}
+                  />
+                ) : (
+                  <TourismCard
+                    vm={vm}
+                    capabilities={capabilities}
+                    renderActions={(v) => renderCardActions(v, favoriteKindFor, showAddToTrip)}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
+          {mapSlot ? (
+            <aside
+              className={cn(
+                "overflow-hidden rounded-2xl border border-border bg-card shadow-soft",
+                mapOpen ? "block" : "hidden xl:block",
+              )}
+              aria-label="Mapa del listado"
+            >
+              {mapSlot}
+            </aside>
+          ) : null}
+        </div>
       )}
+
+      <section className="flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            Continuidad del viaje
+          </p>
+          <h2 className="mt-1 font-serif text-2xl">
+            Convierte tus guardados en un itinerario real
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Alux organiza tu selección; cuando el plan esté listo, puedes enviarlo a un concierge
+            humano para recibir una propuesta.
+          </p>
+        </div>
+        <Link
+          to="/arma-tu-viaje"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground"
+        >
+          Abrir Arma tu viaje
+        </Link>
+      </section>
+    </div>
+  );
+}
+
+function renderCardActions(
+  v: TourismCardVM,
+  favoriteKindFor: TourismListingSurfaceProps["favoriteKindFor"],
+  showAddToTrip: boolean,
+) {
+  const kind = favoriteKindFor?.(v) ?? favoriteKindFromEntity(v.entityKind);
+  const travelKind = travelKindFromEntity(v.entityKind);
+  const canAddToTrip =
+    showAddToTrip &&
+    travelKind != null &&
+    evaluateTripEligibility({ kind: travelKind, targetId: v.id, title: v.name, mode: "universal" })
+      .eligible;
+  if (!kind && !canAddToTrip) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {kind ? <FavoriteButton entityKind={kind} entityId={v.id} /> : null}
+      {canAddToTrip ? (
+        <AddToTravelPlanButton
+          kind={travelKind as TravelItemKind}
+          targetId={v.id}
+          title={v.name}
+          slug={v.href?.split("/").filter(Boolean).at(-1) ?? null}
+          imageUrl={v.mediaUrl}
+          subtitle={v.tagline ?? v.businessName ?? null}
+        />
+      ) : null}
     </div>
   );
 }

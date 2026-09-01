@@ -19,7 +19,8 @@ import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
-import { RegionDestinationsPremiumSurface } from "@/components/destination-premium/RegionDestinationsPremiumSurface";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { buildRegionPremiumRuntime } from "@/components/destination-premium/region-premium-runtime";
 
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import {
@@ -111,7 +112,7 @@ export const Route = createFileRoute("/oriente-maya/")({
 
 /** Una composición sólo tiene autoridad si declara un bloque premium G4. */
 function hasPremiumAuthority(snapshot: unknown): boolean {
-  return JSON.stringify(snapshot ?? null).includes("premium-g4");
+  return JSON.stringify(snapshot ?? null).includes('"vmx.destination.premium-g4"');
 }
 
 function OrienteMayaIndex() {
@@ -125,7 +126,7 @@ function OrienteMayaIndex() {
     <ContextEngineProvider declaration={declaration}>
       {usePremium ? (
         <div data-destination-template="premium-g4" data-destination-presentation="editorial">
-          <RegionDestinationsPremiumSurface destinations={destinations} />
+          <DestinationPremiumSurface content={buildRegionPremiumRuntime({ destinations })} />
         </div>
       ) : (
         <CompositionRenderer tree={composition!.snapshot} />

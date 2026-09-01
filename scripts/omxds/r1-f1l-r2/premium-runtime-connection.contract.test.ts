@@ -31,44 +31,39 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
 
   test("la portada regional usa el catálogo premium de hasta veinte destinos", () => {
     const route = read("src/routes/oriente-maya/index.tsx");
-    const surface = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
+    const surface = read("src/components/destination-premium/DestinationPremiumSurface.tsx");
     const publicReads = read("src/lib/cms/public-reads.functions.ts");
 
-    expect(route).toContain("RegionDestinationsPremiumSurface");
+    expect(route).toContain("DestinationPremiumSurface");
+    expect(route).toContain("buildRegionPremiumRuntime");
     expect(route).toContain('data-destination-template="premium-g4"');
-    expect(surface).toContain("PAGE_SIZE = 8");
+    expect(surface).toContain("setVisible(8)");
     expect(surface).toContain("Mostrar más destinos");
-    expect(surface).toContain('"el-cuyo"');
-    expect(surface).toContain('"las-coloradas"');
-    expect(surface).toContain('"rio-lagartos"');
-    expect(surface).toContain("¿Planeando o ya estás aquí?");
-    expect(surface).toContain("Solicita ubicación sólo si ya estoy en la región");
-    expect(surface).toContain("InteractiveMap");
+    expect(surface).toContain('content.slug === "oriente-maya"');
+    expect(surface).toContain("AluxDestinationGuide");
+    expect(surface).toContain("La cercanía y ubicación sólo se consideran");
+    expect(surface).toContain("ExperienceMapBlock");
     expect(publicReads).toContain("highlights, latitude, longitude");
   });
 
-  test("hoteles conserva DTO real, filtro territorial, mapa, Alux y escalamiento humano", () => {
+  test("los listados conservan una sola autoridad con DTO real, mapa, Alux y Mi Viaje", () => {
     const route = read("src/routes/hoteles.tsx");
-    const surface = read("src/components/listing-premium/HotelsPremiumListingSurface.tsx");
-    const manifest = JSON.parse(
-      read("public/media/preview-generated/hoteles-hero-manifest.json"),
-    ) as { policy: { productionEligible: boolean }; assets: Array<{ theme: string }> };
+    const restaurantRoute = read("src/routes/restaurantes.tsx");
+    const wrapper = read("src/components/listing-premium/ListingPremiumSurface.tsx");
+    const surface = read("src/components/surfaces/TourismListingSurface.tsx");
+    const adapter = read("src/lib/experience-builder/adapters/tourism-listing-adapters.ts");
 
-    expect(route).toContain("HotelsPremiumListingSurface");
+    expect(route).toContain("ListingPremiumSurfaceFromDTO");
+    expect(restaurantRoute).toContain("ListingPremiumSurfaceFromDTO");
     expect(route).toContain("getPublicListing");
-    expect(surface).toContain('label="Destino"');
-    expect(surface).toContain("InteractiveMap");
+    expect(wrapper).toContain("buildDestinationFacet");
+    expect(wrapper).toContain("InteractiveMap");
     expect(surface).toContain("TourismCardRow");
     expect(surface).toContain("AddToTravelPlanButton");
-    expect(surface).toContain("RequestConciergeButton");
-    expect(surface).toContain("No pidas ubicación si todavía estoy preparando el viaje");
-    expect(surface).toContain("CONCEPT_HERO_SLIDES");
-    expect(manifest.policy.productionEligible).toBe(false);
-    expect(manifest.assets.map((asset) => asset.theme)).toEqual([
-      "hotel-colonial",
-      "campo-y-siembra",
-      "costa-y-playa",
-    ]);
+    expect(surface).toContain("openAluxFloating");
+    expect(surface).toContain('to="/arma-tu-viaje"');
+    expect(surface).not.toContain("RequestConciergeButton");
+    expect(adapter).toContain("mediaUrl: b.cover_url ?? null");
   });
 
   test("la autoridad visual conserva los enlaces del mapa y de las tarjetas", () => {
