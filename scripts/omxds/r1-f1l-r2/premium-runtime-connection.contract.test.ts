@@ -47,6 +47,30 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(publicReads).toContain("highlights, latitude, longitude");
   });
 
+  test("hoteles conserva DTO real, filtro territorial, mapa, Alux y escalamiento humano", () => {
+    const route = read("src/routes/hoteles.tsx");
+    const surface = read("src/components/listing-premium/HotelsPremiumListingSurface.tsx");
+    const manifest = JSON.parse(
+      read("public/media/preview-generated/hoteles-hero-manifest.json"),
+    ) as { policy: { productionEligible: boolean }; assets: Array<{ theme: string }> };
+
+    expect(route).toContain("HotelsPremiumListingSurface");
+    expect(route).toContain("getPublicListing");
+    expect(surface).toContain('label="Destino"');
+    expect(surface).toContain("InteractiveMap");
+    expect(surface).toContain("TourismCardRow");
+    expect(surface).toContain("AddToTravelPlanButton");
+    expect(surface).toContain("RequestConciergeButton");
+    expect(surface).toContain("No pidas ubicación si todavía estoy preparando el viaje");
+    expect(surface).toContain("CONCEPT_HERO_SLIDES");
+    expect(manifest.policy.productionEligible).toBe(false);
+    expect(manifest.assets.map((asset) => asset.theme)).toEqual([
+      "hotel-colonial",
+      "campo-y-siembra",
+      "costa-y-playa",
+    ]);
+  });
+
   test("la autoridad visual conserva los enlaces del mapa y de las tarjetas", () => {
     const surface = read("src/components/destination-premium/DestinationPremiumSurface.tsx");
     expect(surface).toContain("href: p.href ?? null");

@@ -6,8 +6,7 @@ import { getPublicListing } from "@/lib/listings/listing-public-reads.functions"
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
-import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
-import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
+import { HotelsPremiumListingSurface } from "@/components/listing-premium/HotelsPremiumListingSurface";
 
 const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
 
@@ -81,13 +80,9 @@ function HotelesRoute() {
     { label: "Hoteles", to: "/hoteles" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
-  const destinoFacet = buildDestinationFacet([...dto.items]);
   return (
     <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
-      <ListingPremiumSurfaceFromDTO
-        dto={dto}
-        facets={destino || !destinoFacet ? [] : [destinoFacet]}
-      />
+      <HotelsPremiumListingSurface dto={dto} />
     </PublicShell>
   );
 }
