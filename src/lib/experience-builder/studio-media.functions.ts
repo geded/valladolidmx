@@ -190,6 +190,77 @@ interface RegisterInput {
   rights: MediaRightsInput;
 }
 
+interface ServerUploadInput {
+  filename: string;
+  mime: string;
+  sizeBytes: number;
+  bytesBase64: string;
+  width?: number | null;
+  height?: number | null;
+  rights: MediaRightsInput;
+}
+
+const MAX_SERVER_UPLOAD_BYTES = 8 * 1024 * 1024;
+const ACCEPTED_SERVER_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+]);
+
+async function insertMediaAsset(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  context: { supabase: any; userId: string },
+  data: RegisterInput,
+  bytes: ArrayBuffer,
+) {
+  const checksum = await sha256Hex(bytes);
+  const metadata = buildRightsMetadata(data.rights);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = context.supabase as any;
+  const { data: asset, error } = await db
+    .from("media_assets")
+    .insert({
+      kind: "image",
+      storage_bucket: BUCKET,
+      storage_path: data.storagePath,
+      alt_text: data.rights.alt.trim(),
+      alt_text_source: "human",
+      credit: data.rights.credit?.trim() || data.rights.author?.trim() || null,
+      title: data.rights.place?.trim() || null,
+      mime_type: data.mime ?? null,
+      size_bytes: data.sizeBytes ?? bytes.byteLength,
+      width: data.width ?? null,
+      height: data.height ?? null,
+      original_bucket: BUCKET,
+      original_path: data.storagePath,
+      original_bytes: bytes.byteLength,
+      original_mime: data.mime ?? null,
+      original_checksum: checksum,
+      metadata,
+      status: "draft",
+      review_state: "unreviewed",
+      created_by: context.userId,
+      updated_by: context.userId,
+    })
+    .select("id, storage_path, alt_text, credit, review_state, status, original_checksum")
+    .single();
+  if (error) throw error;
+  return {
+    id: asset.id as string,
+    url: publicProxyUrl(asset.storage_path as string),
+    alt: asset.alt_text as string | null,
+    credit: asset.credit as string | null,
+    nature: data.rights.nature,
+    reviewState: asset.review_state as string,
+    status: asset.status as string,
+    checksum: asset.original_checksum as string | null,
+    focalX: metadata.focal.x,
+    focalY: metadata.focal.y,
+  };
+}
+
 /**
  * G8-M1 · Registro seguro.
  *  - Siempre crea un `media_asset` NUEVO (nunca sobrescribe).
@@ -212,51 +283,63 @@ export const registerStudioMedia = createServerFn({ method: "POST" })
     const { data: blob, error: dlErr } = await storage.from(BUCKET).download(data.storagePath);
     if (dlErr) throw dlErr;
     const bytes: ArrayBuffer = await blob.arrayBuffer();
-    const checksum = await sha256Hex(bytes);
+    return insertMediaAsset(context, data, bytes);
+  });
 
-    const metadata = buildRightsMetadata(data.rights);
+/**
+ * Fallback del mismo flujo gobernado para navegadores donde el PUT firmado
+ * directo al bucket es bloqueado por red/CORS. Los bytes viajan al server-fn,
+ * se conservan sin recorte ni recompresión y mantienen permisos y auditoría.
+ */
+export const uploadStudioMediaViaServer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: ServerUploadInput) => {
+    if (!d?.filename || !d?.bytesBase64 || !d?.mime) throw new Error("invalid_input");
+    if (!ACCEPTED_SERVER_MIME.has(d.mime)) throw new Error("invalid_mime");
+    if (
+      !Number.isFinite(d.sizeBytes) ||
+      d.sizeBytes <= 0 ||
+      d.sizeBytes > MAX_SERVER_UPLOAD_BYTES
+    ) {
+      throw new Error("server_upload_too_large");
+    }
+    const invalid = validateMediaRights(d.rights);
+    if (invalid) throw new Error(invalid);
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+    const decoded = Uint8Array.from(Buffer.from(data.bytesBase64, "base64"));
+    if (decoded.byteLength !== data.sizeBytes) throw new Error("upload_size_mismatch");
+    const bytes = decoded.buffer;
+    const clean = sanitizeFilename(data.filename);
+    const path = `${new Date().getFullYear()}/${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}-${clean}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = context.supabase as any;
-    const { data: asset, error } = await db
-      .from("media_assets")
-      .insert({
-        kind: "image",
-        storage_bucket: BUCKET,
-        storage_path: data.storagePath,
-        alt_text: data.rights.alt.trim(),
-        alt_text_source: "human",
-        credit: data.rights.credit?.trim() || data.rights.author?.trim() || null,
-        title: data.rights.place?.trim() || null,
-        mime_type: data.mime ?? null,
-        size_bytes: data.sizeBytes ?? bytes.byteLength,
-        width: data.width ?? null,
-        height: data.height ?? null,
-        original_bucket: BUCKET,
-        original_path: data.storagePath,
-        original_bytes: bytes.byteLength,
-        original_mime: data.mime ?? null,
-        original_checksum: checksum,
-        metadata,
-        status: "draft",
-        review_state: "unreviewed",
-        created_by: context.userId,
-        updated_by: context.userId,
-      })
-      .select("id, storage_path, alt_text, credit, review_state, status, original_checksum")
-      .single();
-    if (error) throw error;
-    return {
-      id: asset.id as string,
-      url: publicProxyUrl(asset.storage_path as string),
-      alt: asset.alt_text as string | null,
-      credit: asset.credit as string | null,
-      nature: data.rights.nature,
-      reviewState: asset.review_state as string,
-      status: asset.status as string,
-      checksum: asset.original_checksum as string | null,
-      focalX: metadata.focal.x,
-      focalY: metadata.focal.y,
-    };
+    const storage = context.supabase.storage as any;
+    const { error: uploadError } = await storage.from(BUCKET).upload(path, bytes, {
+      contentType: data.mime,
+      upsert: false,
+    });
+    if (uploadError) throw uploadError;
+    try {
+      return await insertMediaAsset(
+        context,
+        {
+          storagePath: path,
+          mime: data.mime,
+          sizeBytes: decoded.byteLength,
+          width: data.width ?? null,
+          height: data.height ?? null,
+          rights: data.rights,
+        },
+        bytes,
+      );
+    } catch (error) {
+      await storage.from(BUCKET).remove([path]);
+      throw error;
+    }
   });
 
 /* ───────────────  Aprobar para uso público (gobernado)  ─────────────── */

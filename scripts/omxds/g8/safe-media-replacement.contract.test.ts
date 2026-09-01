@@ -46,19 +46,30 @@ describe("DEF-M-01 · flujo único del inspector", () => {
   });
 });
 
-describe("DEF-M-02 · subida segura sin base64", () => {
+describe("DEF-M-02 · subida segura sin referencias base64", () => {
   test("el inspector no usa FileReader ni data: URI", () => {
     expect(INSPECTOR).not.toContain("new FileReader");
     expect(INSPECTOR).not.toContain("readAsDataURL");
     expect(INSPECTOR).not.toContain("readAsDataURL(");
   });
 
-  test("el diálogo sube exclusivamente por URL firmada y registra el activo", () => {
+  test("el diálogo intenta URL firmada y tiene fallback gobernado", () => {
     expect(PICKER).not.toContain("new FileReader");
     expect(PICKER).toContain("signStudioMediaUpload");
     expect(PICKER).toContain("uploadToSignedUrl");
     expect(PICKER).toContain("registerStudioMedia");
+    expect(PICKER).toContain("uploadStudioMediaViaServer");
+    expect(PICKER).toContain("SERVER_FALLBACK_LIMIT");
+    expect(PICKER).not.toContain("prepareImageForRole");
     expect(PICKER).toContain("upsert: false");
+  });
+
+  test("el fallback conserva bytes, permisos, checksum y limpia si falla el registro", () => {
+    expect(FUNCTIONS).toContain("uploadStudioMediaViaServer");
+    expect(FUNCTIONS).toContain("await assertEditorial(context)");
+    expect(FUNCTIONS).toContain("upload_size_mismatch");
+    expect(FUNCTIONS).toContain("insertMediaAsset");
+    expect(FUNCTIONS).toContain("remove([path])");
   });
 });
 
@@ -116,6 +127,10 @@ describe("DEF-M-05/08 · derechos y procedencia fail-closed", () => {
     expect(meta.rights.ai_generated).toBe(true);
     expect(meta.rights.documentary).toBe(false);
     expect(meta.rights.conceptual).toBe(true);
+    expect(meta.lifecycle.temporary).toBe(true);
+    expect(meta.lifecycle.production_eligible).toBe(false);
+    expect(meta.lifecycle.replacement_required).toBe(true);
+    expect(meta.lifecycle.usage).toBe("preview_only");
   });
 });
 

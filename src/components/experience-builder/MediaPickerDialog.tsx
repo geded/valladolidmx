@@ -4,7 +4,8 @@
  *
  *  - Flujo único: seleccionar o subir dentro del mismo diálogo.
  *  - Subida segura: `signStudioMediaUpload` → bucket → `registerStudioMedia`.
- *    Cero `FileReader`, cero `data:` URI, cero base64 en la composición.
+ *    Si el PUT firmado es bloqueado, usa un fallback server-side gobernado.
+ *    Nunca guarda `data:` URI ni base64 en la composición.
  *  - Metadata obligatoria de derechos y naturaleza (documental/conceptual/IA).
  *  - Todo activo nuevo nace `draft` + `unreviewed`; sólo un rol administrativo
  *    puede `Aprobar para uso público`.
@@ -27,10 +28,11 @@ import {
   listStudioMediaLibrary,
   registerStudioMedia,
   signStudioMediaUpload,
+  uploadStudioMediaViaServer,
 } from "@/lib/experience-builder/studio-media.functions";
 import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
 import { supabase } from "@/integrations/supabase/client";
-import { prepareImageForRole, validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
+import { validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
 
 export interface PickedMedia {
   /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
@@ -118,6 +120,17 @@ const RIGHTS_ERRORS: Record<string, string> = {
 
 const humanize = (msg: string) => RIGHTS_ERRORS[msg] ?? msg;
 
+const SERVER_FALLBACK_LIMIT = 8 * 1024 * 1024;
+
+async function fileToBase64(file: File) {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += 32_768) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 32_768));
+  }
+  return btoa(binary);
+}
+
 export function MediaPickerDialog({
   open,
   onClose,
@@ -127,6 +140,7 @@ export function MediaPickerDialog({
   const list = useServerFn(listStudioMediaLibrary);
   const sign = useServerFn(signStudioMediaUpload);
   const register = useServerFn(registerStudioMedia);
+  const serverUpload = useServerFn(uploadStudioMediaViaServer);
   const approve = useServerFn(approveStudioMedia);
 
   const [rows, setRows] = useState<Row[]>([]);
@@ -194,25 +208,45 @@ export function MediaPickerDialog({
     setError(null);
     setUploading(true);
     try {
-      const prepared = await prepareImageForRole(file, role);
-      const { path, token, bucket } = await sign({
-        data: { filename: prepared.name, contentType: prepared.type },
-      });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const storage = (supabase.storage as any).from(bucket);
-      const { error: upErr } = await storage.uploadToSignedUrl(path, token, prepared, {
-        contentType: prepared.type,
-        upsert: false,
-      });
-      if (upErr) throw upErr;
-      await register({
-        data: {
-          storagePath: path,
-          mime: prepared.type,
-          sizeBytes: prepared.size,
-          rights,
-        },
-      });
+      // La biblioteca conserva el original. El rol sólo gobierna cómo se
+      // presenta en el slot; no debe recortar destructivamente el activo.
+      void role;
+      let directUpload: { path: string } | null = null;
+      try {
+        const { path, token, bucket } = await sign({
+          data: { filename: file.name, contentType: file.type },
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const storage = (supabase.storage as any).from(bucket);
+        const { error: upErr } = await storage.uploadToSignedUrl(path, token, file, {
+          contentType: file.type,
+          upsert: false,
+        });
+        if (upErr) throw upErr;
+        directUpload = { path };
+      } catch (directError) {
+        if (file.size > SERVER_FALLBACK_LIMIT) throw directError;
+      }
+      if (directUpload) {
+        await register({
+          data: {
+            storagePath: directUpload.path,
+            mime: file.type,
+            sizeBytes: file.size,
+            rights,
+          },
+        });
+      } else {
+        await serverUpload({
+          data: {
+            filename: file.name,
+            mime: file.type,
+            sizeBytes: file.size,
+            bytesBase64: await fileToBase64(file),
+            rights,
+          },
+        });
+      }
       setNotice(
         "Imagen subida como borrador. Queda pendiente de aprobación antes de poder usarse en un slot.",
       );
