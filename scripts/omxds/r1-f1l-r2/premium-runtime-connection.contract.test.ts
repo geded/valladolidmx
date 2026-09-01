@@ -29,10 +29,22 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     ]);
   });
 
-  test("la portada regional no presenta destinos como selector de servicios", () => {
+  test("la portada regional usa el catálogo premium de hasta veinte destinos", () => {
     const route = read("src/routes/oriente-maya/index.tsx");
-    expect(route).toContain("services: false");
+    const surface = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
+    const publicReads = read("src/lib/cms/public-reads.functions.ts");
+
+    expect(route).toContain("RegionDestinationsPremiumSurface");
     expect(route).toContain('data-destination-template="premium-g4"');
+    expect(surface).toContain("PAGE_SIZE = 8");
+    expect(surface).toContain("Mostrar más destinos");
+    expect(surface).toContain('"el-cuyo"');
+    expect(surface).toContain('"las-coloradas"');
+    expect(surface).toContain('"rio-lagartos"');
+    expect(surface).toContain("¿Planeando o ya estás aquí?");
+    expect(surface).toContain("Solicita ubicación sólo si ya estoy en la región");
+    expect(surface).toContain("InteractiveMap");
+    expect(publicReads).toContain("highlights, latitude, longitude");
   });
 
   test("la autoridad visual conserva los enlaces del mapa y de las tarjetas", () => {

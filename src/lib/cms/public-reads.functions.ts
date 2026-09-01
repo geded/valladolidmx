@@ -15,6 +15,8 @@ import type { Database } from "@/integrations/supabase/types";
 import type { Destination } from "@/types/territory";
 import type { SuggestedRoute, BusinessTeaser, Review } from "@/types/entities";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
+import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -173,7 +175,7 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
     const { data, error } = await supabase
       .from("destinations")
       .select(
-        "id, slug, name, tagline, description, hero_palette, highlights, status, deleted_at, tourism_regions ( slug )",
+        "id, slug, name, tagline, description, hero_palette, highlights, latitude, longitude, status, deleted_at, tourism_regions ( slug ), media_assets:hero_media_id ( storage_bucket, storage_path, status, deleted_at, is_demo_seed, review_state, pipeline_status, original_checksum, alt_text, credit, metadata )",
       )
       .eq("status", "published")
       .is("deleted_at", null)
@@ -188,6 +190,12 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
       const heroPalette = ALLOWED_HERO_PALETTES.has(row.hero_palette)
         ? (row.hero_palette as Destination["hero_palette"])
         : "territorio";
+      const heroMedia = row.media_assets as unknown as Parameters<
+        typeof isAccreditedDestinationMedia
+      >[0];
+      const imageUrl = isAccreditedDestinationMedia(heroMedia)
+        ? toStablePublicMediaUrl(heroMedia.storage_bucket, heroMedia.storage_path)
+        : null;
       return {
         id: row.id,
         region_slug: regionSlug,
@@ -197,6 +205,9 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
         long_description: row.description ?? undefined,
         hero_palette: heroPalette,
         highlights: (row.highlights ?? []) as readonly string[],
+        ...(imageUrl ? { image_url: imageUrl } : {}),
+        latitude: row.latitude ?? null,
+        longitude: row.longitude ?? null,
       };
     });
   },

@@ -19,8 +19,7 @@ import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
-import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
-import { buildRegionPremiumRuntime } from "@/components/destination-premium/region-premium-runtime";
+import { RegionDestinationsPremiumSurface } from "@/components/destination-premium/RegionDestinationsPremiumSurface";
 
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import {
@@ -122,23 +121,11 @@ function OrienteMayaIndex() {
   // modo Editorial (marcador neutral sin fotografía acreditada). La
   // composición sólo prevalece si ya declara autoridad premium.
   const usePremium = !composition || !hasPremiumAuthority(composition.snapshot);
-  const premiumContent = buildRegionPremiumRuntime({ destinations });
   return (
     <ContextEngineProvider declaration={declaration}>
       {usePremium ? (
         <div data-destination-template="premium-g4" data-destination-presentation="editorial">
-          <DestinationPremiumSurface
-            content={premiumContent}
-            heroVariant="editorial"
-            sections={{
-              // La portada regional enumera destinos en `nearby`; no reutiliza
-              // el selector de categorías de una ficha de destino.
-              services: false,
-              gallery: false,
-              servicePreview: false,
-              map: premiumContent.map.points.length > 0,
-            }}
-          />
+          <RegionDestinationsPremiumSurface destinations={destinations} />
         </div>
       ) : (
         <CompositionRenderer tree={composition!.snapshot} />

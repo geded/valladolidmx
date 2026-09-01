@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Temporary conceptual preview media for the Oriente Maya destination listing hero",
+  "generatedAt": "2026-09-01",
+  "policy": {
+    "aiGenerated": true,
+    "conceptual": true,
+    "temporary": true,
+    "documentary": false,
+    "productionEligible": false
+  },
+  "items": [
+    {
+      "path": "oriente-maya-hero-territorio-v1.webp",
+      "subject": "Valladolid and the Oriente Maya territory"
+    },
+    {
+      "path": "oriente-maya-hero-naturaleza-v1.webp",
+      "subject": "Cenote nature and active exploration"
+    },
+    {
+      "path": "oriente-maya-hero-cultura-v1.webp",
+      "subject": "Living Maya culture and embroidery"
+    }
+  ]
+}

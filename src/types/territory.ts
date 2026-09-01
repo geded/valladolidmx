@@ -43,6 +43,8 @@ export interface Destination {
    * gradiente. Listo para sustituirse por activos oficiales de valladolid.mx.
    */
   image_url?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   highlights: readonly string[];
 }
 
