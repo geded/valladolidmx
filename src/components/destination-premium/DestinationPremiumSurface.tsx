@@ -39,7 +39,7 @@ import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
-import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
@@ -208,40 +208,12 @@ export function DestinationPremiumSurface({
 
 function AluxDestinationGuide({ content }: { content: DestinationPremiumContent }) {
   return (
-    <section
-      className="grid gap-4 rounded-3xl border border-border bg-card p-5 shadow-soft lg:grid-cols-[1fr_auto] lg:items-center"
-      aria-label="Alux, copiloto territorial"
-    >
-      <div className="flex items-start gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-          <Sparkles className="size-5" aria-hidden />
-        </span>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-            Alux · copiloto de viaje
-          </p>
-          <h2 className="mt-1 font-serif text-2xl">
-            Explora {content.hero.title} según tu momento
-          </h2>
-          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-            Alux usa las fechas, compañía y guardados de Mi Viaje. La cercanía y ubicación sólo se
-            consideran cuando ya estás en la región y diste permiso.
-          </p>
-        </div>
-      </div>
-      <Button
-        type="button"
-        className="min-h-11 rounded-pill"
-        onClick={() =>
-          openAluxFloating({
-            reason: "manual",
-            hint: `Ayúdame a explorar ${content.hero.title} usando el contexto real de Mi Viaje.`,
-          })
-        }
-      >
-        Planear con Alux
-      </Button>
-    </section>
+    <TourismAluxPanel
+      title={`Explora ${content.hero.title} según tu momento`}
+      description="Cuéntame si estás planeando venir o si ya estás aquí. Usaré fechas, compañía y guardados; la ubicación sólo cuando estés en la región y la autorices."
+      task={`Ayúdame a explorar ${content.hero.title} usando el contexto real de Mi Viaje.`}
+      prompts={["Estoy planeando", "Ya estoy aquí", "Viajo en pareja", "Viajo en familia"]}
+    />
   );
 }
 

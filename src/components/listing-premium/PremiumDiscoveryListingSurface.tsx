@@ -19,7 +19,7 @@ import {
   UserRoundCheck,
 } from "lucide-react";
 
-import { AluxMark } from "@/components/alux/AluxMark";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
@@ -44,7 +44,6 @@ interface FamilyProfile {
   title: string;
   subtitle: string;
   aluxTitle: string;
-  aluxRole: string;
   prompts: readonly string[];
   primaryFilterLabel: string;
   secondaryFilterLabel: string;
@@ -77,7 +76,6 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
     title: "Hoteles para vivir el Oriente Maya",
     subtitle: "Encuentra dónde hospedarte según tu ruta, tus noches y tu forma de viajar.",
     aluxTitle: "¿Cómo quieres hospedarte?",
-    aluxRole: "asistente de viaje de Valladolid.mx",
     prompts: [
       "Hotel boutique",
       "Viaje en pareja",
@@ -118,7 +116,6 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
     title: "Sabores del Oriente Maya de Yucatán",
     subtitle: "Tradición que inspira, ingredientes locales y experiencias que se quedan contigo.",
     aluxTitle: "¿Qué se te antoja hoy?",
-    aluxRole: "copiloto gastronómico de Valladolid.mx",
     prompts: ["Cocina yucateca", "Cena en pareja", "Familiar", "Comida local", "Patio tranquilo"],
     primaryFilterLabel: "Tipo de cocina",
     secondaryFilterLabel: "Experiencia",
@@ -324,7 +321,7 @@ function PremiumHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-b-[2rem] border-x border-b border-border bg-[#123e2f] shadow-soft",
+        "relative overflow-hidden rounded-b-[2rem] border-x border-b border-border bg-selva shadow-soft",
         cinematic ? "min-h-[34rem]" : "grid min-h-[22rem] lg:grid-cols-2",
       )}
     >
@@ -347,10 +344,10 @@ function PremiumHero({
       <div
         className={cn(
           "relative flex flex-col justify-center px-7 py-10 text-white sm:px-10 lg:px-12",
-          cinematic ? "min-h-[34rem] max-w-3xl" : "bg-[#123e2f]",
+          cinematic ? "min-h-[34rem] max-w-3xl" : "bg-selva",
         )}
       >
-        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f4b33e]">
+        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           {profile.icon}
           {profile.eyebrow}
         </p>
@@ -367,51 +364,13 @@ function PremiumHero({
 
 function AluxPreferenceBar({ profile }: { profile: FamilyProfile }) {
   return (
-    <section className="relative z-10 -mt-1 border-x border-b border-border bg-card px-5 py-4 shadow-sm lg:px-7">
-      <div className="grid gap-4 lg:grid-cols-[auto_minmax(0,1fr)_18rem] lg:items-center">
-        <div className="flex min-w-0 items-center gap-3">
-          <AluxMark family="avatar" size={58} decorative />
-          <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">Alux · {profile.aluxRole}</p>
-            <h2 className="font-display text-2xl leading-tight text-foreground">
-              {profile.aluxTitle}
-            </h2>
-          </div>
-        </div>
-        <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
-          {profile.prompts.map((prompt, index) => (
-            <button
-              key={prompt}
-              type="button"
-              onClick={() => askAlux(profile, prompt)}
-              className={cn(
-                "min-h-11 shrink-0 rounded-lg border px-4 text-sm transition-colors",
-                index === 0
-                  ? "border-[#173d2e] bg-[#173d2e] text-white"
-                  : "border-border bg-background hover:border-[#173d2e]/45",
-              )}
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-          <button
-            type="button"
-            onClick={() => askAlux(profile, "Ayúdame a elegir entre todas las opciones")}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#173d2e] px-5 text-sm font-semibold text-white"
-          >
-            Afinar con Alux <Compass className="size-4" aria-hidden />
-          </button>
-          <a
-            href="#resultados"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-5 text-sm font-medium"
-          >
-            Ver todos
-          </a>
-        </div>
-      </div>
-    </section>
+    <TourismAluxPanel
+      className="relative z-10 -mt-1 rounded-t-none"
+      title={profile.aluxTitle}
+      description={`Cuéntame si estás planeando venir o si ya estás aquí. Ajustaré ${profile.itemNounPlural}, rutas y tiempos a tu momento real.`}
+      task={`Ayúdame a ${profile.family === "hoteles" ? "elegir dónde hospedarme" : "elegir dónde comer"} en el Oriente Maya.`}
+      prompts={profile.prompts}
+    />
   );
 }
 
@@ -446,7 +405,7 @@ function FilterBar(props: FilterBarProps) {
             value={props.query}
             onChange={(event) => props.setQuery(event.target.value)}
             placeholder={`Buscar ${props.profile.itemNoun}, zona o servicio`}
-            className="min-h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 text-sm outline-none focus:border-[#173d2e]"
+            className="min-h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 text-sm outline-none focus:border-selva"
           />
         </label>
         <SelectFilter
@@ -498,7 +457,7 @@ function SelectFilter({
       <select
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        className="min-h-11 w-full appearance-none rounded-lg border border-border bg-background px-3 pr-9 text-sm outline-none focus:border-[#173d2e]"
+        className="min-h-11 w-full appearance-none rounded-lg border border-border bg-background px-3 pr-9 text-sm outline-none focus:border-selva"
       >
         <option value={ALL}>{label}: todos</option>
         {options.map((option) => (
@@ -557,7 +516,7 @@ function PremiumListingCard({
           className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
         />
         {featured ? (
-          <span className="absolute left-3 top-3 rounded-pill bg-[#b94d26] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+          <span className="absolute left-3 top-3 rounded-pill bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
             Destacado
           </span>
         ) : null}
@@ -570,7 +529,7 @@ function PremiumListingCard({
       <div className="flex min-w-0 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8b5b1f]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
               {itemType(item, profile)}
             </p>
             <h3 className="mt-1 font-display text-2xl leading-tight text-foreground">
@@ -592,7 +551,7 @@ function PremiumListingCard({
             .map((value) => (
               <span
                 key={value}
-                className="rounded-pill border border-[#d8d5bc] bg-[#f4f2df] px-2.5 py-1 text-[11px] text-[#315c45]"
+                className="rounded-pill border border-border bg-secondary px-2.5 py-1 text-[11px] text-secondary-foreground"
               >
                 {value}
               </span>
@@ -602,7 +561,7 @@ function PremiumListingCard({
           {item.href ? (
             <a
               href={item.href}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#173d2e] px-4 text-sm font-semibold text-white"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-selva px-4 text-sm font-semibold text-selva-foreground"
             >
               {profile.actionLabel}
               <ArrowRight className="size-4" aria-hidden />
@@ -634,7 +593,7 @@ function MapPanel({
   return (
     <section className="sticky top-24 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="border-b border-border px-4 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#b17b22]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
           Mapa Valladolid.mx
         </p>
         <h2 className="font-display text-xl">
@@ -670,7 +629,7 @@ function MapPanel({
         </div>
       )}
       <div className="flex min-h-14 items-center gap-3 border-t border-border px-4 text-sm">
-        <Compass className="size-5 text-[#173d2e]" aria-hidden />
+        <Compass className="size-5 text-selva" aria-hidden />
         <span>Tu plan de viaje conecta lugares guardados y noches.</span>
       </div>
     </section>
@@ -687,7 +646,7 @@ function RoutePanel({ profile }: { profile: FamilyProfile }) {
       <button
         type="button"
         onClick={() => askAlux(profile, "Conecta estas opciones con mi ruta")}
-        className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#173d2e]"
+        className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-selva"
       >
         Ver sugerencias <ArrowRight className="size-4" aria-hidden />
       </button>
@@ -708,7 +667,7 @@ function ConciergePanel({
   return (
     <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
       <div className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-full bg-[#f4ead9] text-[#9d4a29]">
+        <span className="grid size-10 place-items-center rounded-full bg-primary/15 text-primary">
           <UserRoundCheck className="size-5" aria-hidden />
         </span>
         <h2 className="font-display text-lg leading-tight">{profile.conciergeTitle}</h2>

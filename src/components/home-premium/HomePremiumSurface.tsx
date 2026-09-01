@@ -33,6 +33,7 @@ import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { recordAluxSignal } from "@/lib/alux/memory-store";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
 import {
@@ -416,11 +417,14 @@ function AluxPlanner({
     onSelectRoute(suggested.id);
     openAluxFloating({
       reason: "manual",
-      hint: `${selectedPrompt}. ${
-        selectedParty
-          ? `Composición del viaje: ${PARTY_OPTIONS.find((item) => item.value === selectedParty)?.label}. `
-          : ""
-      }Ruta sugerida: ${suggested.title}. ${suggested.description}`,
+      hint: buildAluxStageAwareHint(
+        `Ayúdame a convertir esta propuesta en un viaje real. Ruta sugerida: ${suggested.title}. ${suggested.description}`,
+        `${selectedPrompt}. ${
+          selectedParty
+            ? `Composición del viaje: ${PARTY_OPTIONS.find((item) => item.value === selectedParty)?.label}.`
+            : ""
+        }`,
+      ),
     });
   };
   return (

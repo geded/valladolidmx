@@ -11,8 +11,7 @@
  *    se aplica una sombra suave para legibilidad, sin recolorear.
  */
 import { cn } from "@/lib/utils";
-import { SITE } from "@/config/site";
-import logoUrl from "@/assets/brand/logo.png";
+import { ACTIVE_BRAND } from "@/config/brand";
 
 interface Props {
   tone?: "dark" | "light";
@@ -36,10 +35,10 @@ export function BrandLogo({
 }: Props) {
   return (
     <img
-      src={logoUrl}
-      alt={SITE.name}
-      width={470}
-      height={159}
+      src={ACTIVE_BRAND.logo.src}
+      alt={ACTIVE_BRAND.name}
+      width={ACTIVE_BRAND.logo.width}
+      height={ACTIVE_BRAND.logo.height}
       className={cn(
         "w-auto select-none",
         SIZE_MAP[size],

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Accessibility,
@@ -7,16 +7,12 @@ import {
   Heart,
   Leaf,
   MapPin,
-  Menu,
-  Moon,
   Plus,
   Shirt,
   Sparkles,
-  Sun,
   UtensilsCrossed,
 } from "lucide-react";
-import { AluxMark } from "@/components/alux/AluxMark";
-import { BrandLogo } from "@/components/brand/BrandLogo";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 
 export const Route = createFileRoute("/lovable/founder-zazil-premium-preview")({
   head: () => ({
@@ -36,22 +32,18 @@ const HERO =
   "/api/public/studio-media/conceptual-preview/2026-09-01/zazil-tunich-hero-preview.webp";
 
 function FounderZazilPremiumPreview() {
-  const [theme, setTheme] = useState<"sol" | "luna">("sol");
-  const luna = theme === "luna";
+  const luna = false;
 
   return (
     <div
-      data-founder-preview="zazil-sol-luna"
-      data-theme={theme}
-      className={luna ? "min-h-svh bg-[#050e12] text-[#eee9df]" : "min-h-svh bg-[#f7f3ea] text-[#0b3827]"}
+      data-founder-preview="zazil-premium-integrated"
+      className="min-h-svh bg-background text-foreground"
     >
-      <FounderHeader theme={theme} onTheme={setTheme} />
-
       <main>
         <section className="relative isolate min-h-[40rem] overflow-hidden border-b border-current/15 sm:min-h-[42rem] lg:min-h-[28.5rem]">
           <img src={HERO} alt="Caverna de piedra caliza con agua turquesa y sendero iluminado" className="absolute inset-0 -z-30 size-full object-cover" />
           <div className={luna ? "absolute inset-0 -z-20 bg-gradient-to-r from-[#050e12] via-[#050e12]/90 to-black/5" : "absolute inset-0 -z-20 bg-gradient-to-r from-[#f7f3ea] via-[#f7f3ea]/90 to-transparent"} />
-          <div className="mx-auto grid min-h-[inherit] max-w-[1500px] items-center px-6 pb-10 pt-28 sm:px-10 lg:px-16 lg:pb-8 lg:pt-24">
+          <div className="mx-auto grid min-h-[inherit] max-w-[1500px] items-center px-6 py-10 sm:px-10 lg:px-16 lg:py-8">
             <div className="max-w-2xl">
               <h1 className="font-serif text-6xl leading-[0.92] sm:text-7xl">Zazil Tunich</h1>
               <p className="mt-3 font-serif text-2xl text-[#b97b00] sm:text-3xl">Cenote-Museo · Valladolid, Yucatán</p>
@@ -64,7 +56,7 @@ function FounderZazilPremiumPreview() {
               </div>
             </div>
           </div>
-          <Link to="/auth" className="absolute right-6 top-28 z-10 hidden min-h-11 items-center gap-3 rounded-full border border-white/60 bg-black/15 px-4 text-white backdrop-blur-sm lg:inline-flex xl:right-16" aria-label="Iniciar sesión para guardar Zazil Tunich"><span className="grid size-9 place-items-center rounded-full border border-white/70"><Heart className="size-5" /></span><span className="text-sm">Guardar</span></Link>
+          <Link to="/auth" className="absolute right-6 top-6 z-10 hidden min-h-11 items-center gap-3 rounded-full border border-white/60 bg-black/15 px-4 text-white backdrop-blur-sm lg:inline-flex xl:right-16" aria-label="Iniciar sesión para guardar Zazil Tunich"><span className="grid size-9 place-items-center rounded-full border border-white/70"><Heart className="size-5" /></span><span className="text-sm">Guardar</span></Link>
         </section>
 
         <ProofStrip luna={luna} />
@@ -79,34 +71,6 @@ function FounderZazilPremiumPreview() {
         <AluxBand />
       </main>
     </div>
-  );
-}
-
-function FounderHeader({ theme, onTheme }: { theme: "sol" | "luna"; onTheme: (theme: "sol" | "luna") => void }) {
-  const luna = theme === "luna";
-  return (
-    <header className={`absolute inset-x-0 top-0 z-30 border-b backdrop-blur-[6px] ${luna ? "border-white/10 bg-[#050e12]/35 text-white" : "border-[#0b3827]/15 bg-[#f7f3ea]/82 text-[#0b3827] shadow-[0_1px_0_rgba(11,56,39,0.08)]"}`}>
-      <div className="mx-auto flex min-h-24 max-w-[1500px] items-center justify-between gap-5 px-6 sm:px-10 lg:px-16">
-        <Link to="/" className="shrink-0">
-          <BrandLogo tone={luna ? "light" : "dark"} size="lg" className="h-12 sm:h-14" />
-        </Link>
-        <nav className={`hidden items-center gap-9 text-sm font-medium uppercase tracking-wide lg:flex ${luna ? "drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "[&_a:hover]:text-[#a96f00]"}`} aria-label="Navegación principal">
-          <Link to="/oriente-maya/valladolid">Valladolid</Link>
-          <Link to="/oriente-maya">Oriente Maya</Link>
-          <Link to="/experiencias">Experiencias</Link>
-          <Link to="/que-hacer">Inspírate</Link>
-          <Link to="/alux">Alux <span className="text-[#b97b00]">✦</span></Link>
-        </nav>
-        <div className="flex items-center gap-3">
-          <div className={`flex rounded-full border p-1 backdrop-blur-sm ${luna ? "border-white/35 bg-black/20" : "border-[#172319]/30 bg-white/35"}`} aria-label="Tema Sol o Luna">
-            <button type="button" onClick={() => onTheme("sol")} aria-pressed={theme === "sol"} aria-label="Vista Sol" className={`grid size-9 place-items-center rounded-full ${theme === "sol" ? "bg-white text-[#0b3827] shadow" : "opacity-55"}`}><Sun className="size-5" /></button>
-            <button type="button" onClick={() => onTheme("luna")} aria-pressed={theme === "luna"} aria-label="Vista Luna" className={`grid size-9 place-items-center rounded-full ${theme === "luna" ? "bg-[#253139] text-amber-300 shadow" : "opacity-55"}`}><Moon className="size-5" /></button>
-          </div>
-          <Link to="/arma-tu-viaje" className="hidden min-h-12 items-center rounded-full border border-[#b97b00] px-6 text-sm font-medium uppercase tracking-wide text-[#b97b00] sm:inline-flex">Arma tu viaje</Link>
-          <button type="button" className={`grid size-11 place-items-center rounded-full border lg:hidden ${luna ? "border-white/35" : "border-[#172319]/30"}`} aria-label="Abrir menú"><Menu /></button>
-        </div>
-      </div>
-    </header>
   );
 }
 
@@ -158,5 +122,5 @@ function TerritorialContext() {
 }
 
 function AluxBand() {
-  return <div className="mx-auto max-w-[980px] px-6 pb-14"><section className="flex flex-col items-center gap-5 rounded-3xl border border-[#c78a14]/60 px-7 py-5 sm:flex-row"><AluxMark family="full" size={104} decorative /><div className="flex-1"><h2 className="font-serif text-3xl text-[#b97b00]">Alux te ayuda a planear tu viaje</h2><p className="mt-1 text-sm opacity-75">Conecta esta experiencia con cenotes, zonas arqueológicas, haciendas y pueblos con encanto.</p></div><Link to="/alux" className="inline-flex min-h-12 items-center rounded-lg border border-current px-6 text-sm font-medium uppercase tracking-wide">Planear mi ruta con Alux</Link></section></div>;
+  return <div className="mx-auto max-w-[1100px] px-6 pb-14"><TourismAluxPanel title="Conecta Zazil Tunich con tu viaje" description="Alux combina esta experiencia con cenotes, zonas arqueológicas, gastronomía y pueblos del Oriente Maya según tus fechas y tu momento de viaje." task="Ayúdame a integrar Zazil Tunich en una ruta real por el Oriente Maya." prompts={["Estoy planeando", "Ya estoy en Valladolid", "Viajo en pareja", "Quiero una propuesta"]} /></div>;
 }

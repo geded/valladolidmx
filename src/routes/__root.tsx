@@ -78,6 +78,7 @@ import { LazyToasterHost } from "@/components/ui/LazyToasterHost";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
+import { ACTIVE_BRAND, ACTIVE_BRAND_THEME_STYLE } from "@/config/brand";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
@@ -218,6 +219,8 @@ function RootShell({ children }: { children: ReactNode }) {
     <html
       lang="es"
       suppressHydrationWarning
+      data-tourism-brand={ACTIVE_BRAND.key}
+      style={ACTIVE_BRAND_THEME_STYLE}
       data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>
@@ -248,8 +251,10 @@ function RootComponent() {
     pathname.startsWith("/cuenta") ||
     pathname.startsWith("/concierge") ||
     pathname.startsWith("/empresa") ||
-    pathname.startsWith("/lovable/founder-");
-  const showPublicAlux = !isAppShellRoute || pathname === "/lovable/founder-home-premium-preview";
+    (pathname.startsWith("/lovable/founder-") &&
+      pathname !== "/lovable/founder-home-premium-preview" &&
+      pathname !== "/lovable/founder-zazil-premium-preview");
+  const showPublicAlux = !isAppShellRoute;
 
   // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
   // este punto se cambia por registro real con vite-plugin-pwa.
