@@ -30,6 +30,7 @@ import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation"
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { cn } from "@/lib/utils";
 import { ACTIVE_BRAND } from "@/config/brand";
+import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
@@ -178,15 +179,27 @@ function unique(values: Array<string | null | undefined>): string[] {
 }
 
 function itemAttributes(item: TourismCardVM): string[] {
-  return unique([...item.highlights, ...item.badges.map((badge) => badge.label)]).filter(
-    (value) => !/verificad|oriente maya/i.test(value),
-  );
+  const structured = ["services", "amenities", "accessibility", "traveler_profile"]
+    .flatMap((key) => attributeValues(item.filterAttributes?.[key]))
+    .map(humanizeAttributeValue);
+  return unique([
+    ...structured,
+    ...item.highlights,
+    ...item.badges.map((badge) => badge.label),
+  ]).filter((value) => !/verificad|oriente maya/i.test(value));
 }
 
 function itemType(item: TourismCardVM, profile: FamilyProfile): string {
+  const structured = attributeValues(item.filterAttributes?.hotel_type)[0];
+  if (structured) return humanizeAttributeValue(structured);
   const eyebrow = item.eyebrow?.trim();
   if (eyebrow && !/hotel|hospedaje|restaurante|gastronom/i.test(eyebrow)) return eyebrow;
   return profile.family === "hoteles" ? "Hospedaje" : "Cocina local";
+}
+
+function itemZone(item: TourismCardVM): string | null {
+  const value = attributeValues(item.filterAttributes?.zone)[0];
+  return value ? humanizeAttributeValue(value) : null;
 }
 
 function mediaFor(item: TourismCardVM, index: number, profile: FamilyProfile) {
@@ -217,7 +230,8 @@ export function PremiumDiscoveryListingSurface({
   // entrada canónica. El fallback mantiene estable el orden de hooks aun ante
   // un DTO inválido y evita una segunda vía de render.
   const profile = PROFILES[dto.family as SupportedFamily] ?? PROFILES.hoteles;
-  const [destination, setDestination] = useState(dto.destinationLabel ?? ALL);
+  const territorial = Boolean(dto.destinationSlug);
+  const [destination, setDestination] = useState(ALL);
   const [primary, setPrimary] = useState(ALL);
   const [secondary, setSecondary] = useState(ALL);
   const [query, setQuery] = useState("");
@@ -235,8 +249,9 @@ export function PremiumDiscoveryListingSurface({
 
   const items = useMemo(() => [...dto.items], [dto.items]);
   const destinations = useMemo(
-    () => unique(items.map((item) => item.location?.label ?? null)),
-    [items],
+    () =>
+      unique(items.map((item) => (territorial ? itemZone(item) : (item.location?.label ?? null)))),
+    [items, territorial],
   );
   const primaryValues = useMemo(
     () => unique(items.map((item) => itemType(item, profile))),
@@ -249,7 +264,8 @@ export function PremiumDiscoveryListingSurface({
   const filtered = useMemo(() => {
     const q = normalized(query.trim());
     return items.filter((item) => {
-      if (destination !== ALL && item.location?.label !== destination) return false;
+      const scope = territorial ? itemZone(item) : item.location?.label;
+      if (destination !== ALL && scope !== destination) return false;
       if (primary !== ALL && itemType(item, profile) !== primary) return false;
       if (secondary !== ALL && !itemAttributes(item).includes(secondary)) return false;
       if (!q) return true;
@@ -282,6 +298,7 @@ export function PremiumDiscoveryListingSurface({
           destination={destination}
           setDestination={setDestination}
           destinations={destinations}
+          destinationLabel={territorial ? "Zona" : "Destino"}
           primary={primary}
           setPrimary={setPrimary}
           primaryValues={primaryValues}
@@ -413,6 +430,7 @@ interface FilterBarProps {
   destination: string;
   setDestination: (value: string) => void;
   destinations: string[];
+  destinationLabel: string;
   primary: string;
   setPrimary: (value: string) => void;
   primaryValues: string[];
@@ -441,7 +459,7 @@ function FilterBar(props: FilterBarProps) {
           />
         </label>
         <SelectFilter
-          label="Destino"
+          label={props.destinationLabel}
           value={props.destination}
           setValue={props.setDestination}
           options={props.destinations}

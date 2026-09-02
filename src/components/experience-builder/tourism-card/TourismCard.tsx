@@ -21,6 +21,7 @@
  */
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
 
 /* ------------------------------------------------------------------ *
  * View Model — común a toda la Biblioteca Turística.
@@ -104,6 +105,8 @@ export interface TourismCardVM {
   secondaryAction: TourismCardAction | null;
   /** Explainable-by-default: motivo por el que aparece esta card. */
   rationale?: string | null;
+  /** Valores editoriales confirmados; las ausencias nunca se infieren. */
+  filterAttributes?: TourismFilterAttributes;
 }
 
 export interface TourismCardCapabilities {

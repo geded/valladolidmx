@@ -15,6 +15,10 @@ import type { Database } from "@/integrations/supabase/types";
 import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 import { resolveMediaAlt, type MediaLocale } from "@/lib/media/resolve-alt";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import {
+  normalizeFilterAttributes,
+  type TourismFilterAttributes,
+} from "@/lib/business-attributes/types";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -47,6 +51,8 @@ export interface MarketplaceBusinessCard {
   /** Ola 7.8 · Spotlight manual del Founder. */
   spotlight_headline?: string | null;
   spotlight_boost?: number;
+  /** Atributos confirmados y administrables usados por filtros territoriales. */
+  filter_attributes?: TourismFilterAttributes;
 }
 
 export interface MarketplaceProductCard {
@@ -180,11 +186,7 @@ export interface ProductReviewItem {
   language: string | null;
   visit_type: string | null;
   verified_source:
-    | "verified_purchase"
-    | "managed_visit"
-    | "verified_visit"
-    | "declared_visitor"
-    | null;
+    "verified_purchase" | "managed_visit" | "verified_visit" | "declared_visitor" | null;
   business_response: string | null;
   business_response_at: string | null;
 }
@@ -615,7 +617,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
     const { data, error } = await supabase
       .from("businesses")
       .select(
-        "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )",
+        "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )",
       )
       .eq("status", "published")
       .is("deleted_at", null)
@@ -647,6 +649,9 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         latitude: rawLat == null ? null : Number(rawLat),
         longitude: rawLng == null ? null : Number(rawLng),
         address_line1: typeof rawAddr === "string" ? rawAddr : null,
+        filter_attributes: normalizeFilterAttributes(
+          (row as { filter_attributes?: unknown }).filter_attributes,
+        ),
       };
     });
 
