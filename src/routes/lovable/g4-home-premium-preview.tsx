@@ -465,7 +465,7 @@ function G4HomePremiumPreview() {
 
   return (
     <div
-      className="min-h-screen overflow-x-clip bg-background pb-20"
+      className="min-h-screen overflow-x-clip bg-background"
       data-premium-direction={tuning.direction}
     >
       <HomePremiumRibbon />
@@ -480,9 +480,9 @@ function G4HomePremiumPreview() {
         sections={tuning.sections}
         order={tuning.order}
       />
-      <Container className="mt-8">
+      <div className="mt-12">
         <HomePremiumFooter />
-      </Container>
+      </div>
       <TuningPanel value={tuning} onChange={setTuning} />
     </div>
   );
