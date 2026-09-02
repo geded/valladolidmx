@@ -27,8 +27,6 @@ import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import {
-  HomePremiumFooter,
-  HomePremiumHeader,
   HomePremiumRibbon,
   HomePremiumSurface,
 } from "@/components/home-premium/HomePremiumSurface";
@@ -469,8 +467,6 @@ function G4HomePremiumPreview() {
       data-premium-direction={tuning.direction}
     >
       <HomePremiumRibbon />
-      <HomePremiumHeader />
-      <G7IntegratedFixture />
       {/* G8-D · autoridad visual única: la preview consume la misma superficie
           que el renderer del Experience Builder. */}
       <HomePremiumSurface
@@ -480,9 +476,6 @@ function G4HomePremiumPreview() {
         sections={tuning.sections}
         order={tuning.order}
       />
-      <div className="mt-12">
-        <HomePremiumFooter />
-      </div>
       <TuningPanel value={tuning} onChange={setTuning} />
     </div>
   );
