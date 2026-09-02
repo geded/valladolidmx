@@ -421,8 +421,8 @@ const SECTION_LABELS: Record<SectionKey, string> = {
 
 const DEFAULT_ORDER: SectionKey[] = [
   "destinos",
-  "pueblosMagicos",
   "rutas",
+  "pueblosMagicos",
   "experiencias",
   "servicios",
   "eventos",
