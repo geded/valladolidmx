@@ -1106,7 +1106,7 @@ function MapSection({
           </p>
         </div>
       </div>
-      <div className="max-h-[25rem] overflow-hidden rounded-2xl lg:max-h-none">
+      <div className="max-h-[18rem] overflow-hidden rounded-2xl sm:max-h-[25rem] lg:max-h-none">
         <ExperienceMapBlock
           dto={mapDto}
           interactiveOnly
