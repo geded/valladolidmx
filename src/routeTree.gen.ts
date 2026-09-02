@@ -52,6 +52,7 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableTerritorialListingPremiumPreviewRouteImport } from './routes/lovable/territorial-listing-premium-preview'
 import { Route as LovableG8p2VacationRentalPremiumPreviewRouteImport } from './routes/lovable/g8p2-vacation-rental-premium-preview'
 import { Route as LovableG8p2TourPremiumPreviewRouteImport } from './routes/lovable/g8p2-tour-premium-preview'
 import { Route as LovableG8ePremiumTemplateCatalogRouteImport } from './routes/lovable/g8e-premium-template-catalog'
@@ -447,6 +448,12 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableTerritorialListingPremiumPreviewRoute =
+  LovableTerritorialListingPremiumPreviewRouteImport.update({
+    id: '/lovable/territorial-listing-premium-preview',
+    path: '/lovable/territorial-listing-premium-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG8p2VacationRentalPremiumPreviewRoute =
@@ -1571,6 +1578,7 @@ export interface FileRoutesByFullPath {
   '/lovable/g8p2-tour-premium-preview': typeof LovableG8p2TourPremiumPreviewRoute
   '/lovable/g8p2-vacation-rental-premium-preview': typeof LovableG8p2VacationRentalPremiumPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
+  '/lovable/territorial-listing-premium-preview': typeof LovableTerritorialListingPremiumPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -1788,6 +1796,7 @@ export interface FileRoutesByTo {
   '/lovable/g8p2-tour-premium-preview': typeof LovableG8p2TourPremiumPreviewRoute
   '/lovable/g8p2-vacation-rental-premium-preview': typeof LovableG8p2VacationRentalPremiumPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
+  '/lovable/territorial-listing-premium-preview': typeof LovableTerritorialListingPremiumPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -2009,6 +2018,7 @@ export interface FileRoutesById {
   '/lovable/g8p2-tour-premium-preview': typeof LovableG8p2TourPremiumPreviewRoute
   '/lovable/g8p2-vacation-rental-premium-preview': typeof LovableG8p2VacationRentalPremiumPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
+  '/lovable/territorial-listing-premium-preview': typeof LovableTerritorialListingPremiumPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -2234,6 +2244,7 @@ export interface FileRouteTypes {
     | '/lovable/g8p2-tour-premium-preview'
     | '/lovable/g8p2-vacation-rental-premium-preview'
     | '/lovable/protected-actions-preview'
+    | '/lovable/territorial-listing-premium-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -2451,6 +2462,7 @@ export interface FileRouteTypes {
     | '/lovable/g8p2-tour-premium-preview'
     | '/lovable/g8p2-vacation-rental-premium-preview'
     | '/lovable/protected-actions-preview'
+    | '/lovable/territorial-listing-premium-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -2671,6 +2683,7 @@ export interface FileRouteTypes {
     | '/lovable/g8p2-tour-premium-preview'
     | '/lovable/g8p2-vacation-rental-premium-preview'
     | '/lovable/protected-actions-preview'
+    | '/lovable/territorial-listing-premium-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -2887,6 +2900,7 @@ export interface RootRouteChildren {
   LovableG8p2TourPremiumPreviewRoute: typeof LovableG8p2TourPremiumPreviewRoute
   LovableG8p2VacationRentalPremiumPreviewRoute: typeof LovableG8p2VacationRentalPremiumPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
+  LovableTerritorialListingPremiumPreviewRoute: typeof LovableTerritorialListingPremiumPreviewRoute
   LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
@@ -3224,6 +3238,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/territorial-listing-premium-preview': {
+      id: '/lovable/territorial-listing-premium-preview'
+      path: '/lovable/territorial-listing-premium-preview'
+      fullPath: '/lovable/territorial-listing-premium-preview'
+      preLoaderRoute: typeof LovableTerritorialListingPremiumPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g8p2-vacation-rental-premium-preview': {
@@ -5054,6 +5075,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableG8p2VacationRentalPremiumPreviewRoute:
     LovableG8p2VacationRentalPremiumPreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
+  LovableTerritorialListingPremiumPreviewRoute:
+    LovableTerritorialListingPremiumPreviewRoute,
   LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,

@@ -18,8 +18,11 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
+  CalendarCheck,
   Check,
   Clock,
+  Gift,
+  Heart,
   Lock,
   Mail,
   Map as MapIcon,
@@ -27,8 +30,8 @@ import {
   Phone,
   Shield,
   SlidersHorizontal,
+  Users,
   UtensilsCrossed,
-  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
@@ -37,6 +40,7 @@ import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experienc
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PremiumPresentationControl, PremiumTerritorialBreadcrumb } from "@/components/premium";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 
 export const Route = createFileRoute("/lovable/g4-restaurant-premium-preview")({
   head: () => ({
@@ -90,18 +94,35 @@ const MEDIA = {
 } as const;
 
 const RESTAURANT = {
-  name: "Cocina de Zací",
+  name: "Casa del Maíz · Cocina de Oriente",
   eyebrow: "Oriente Maya de Yucatán · Valladolid, Yucatán",
-  claim: "Cocina yucateca de fuego lento en una casona del Centro Histórico",
+  claim: "Cocina yucateca contemporánea en una casona del barrio de Sisal",
   cuisine: "Yucateca contemporánea",
-  schedule: "Mar a Dom · 13:00 – 22:30",
-  priceRange: "$$ · rango orientativo",
-  location: "Calle 41 · Centro Histórico de Valladolid",
+  schedule: "Desayuno · Comida · Cena",
+  location: "Barrio de Sisal · Valladolid",
   lat: 20.6893,
   lng: -88.2018,
 } as const;
 
-const GALLERY = [MEDIA.cover, MEDIA.cochinita, MEDIA.comedor, MEDIA.calle, MEDIA.plaza] as const;
+const GALLERY = [MEDIA.cover, MEDIA.cochinita, MEDIA.comedor] as const;
+
+const SPECIALTIES = [
+  {
+    name: "Sabores de la tierra",
+    text: "Recetas tradicionales y producto local de temporada.",
+    media: MEDIA.cochinita,
+  },
+  {
+    name: "Del milpa",
+    text: "El maíz como protagonista de la cocina de Oriente.",
+    media: MEDIA.cover,
+  },
+  {
+    name: "Algo dulce",
+    text: "Postres inspirados en frutas y sabores de la región.",
+    media: MEDIA.comedor,
+  },
+] as const;
 
 const SUBNAV = [
   { key: "relato", label: "El relato" },
@@ -112,12 +133,14 @@ const SUBNAV = [
 ] as const;
 
 const SERVICIOS = [
+  "Desayuno",
+  "Comida",
+  "Cena",
+  "Reservación recomendada",
   "Terraza al aire libre",
-  "Cocina de horno de tierra",
   "Opciones vegetarianas",
   "Accesible en planta baja",
-  "Grupos pequeños",
-  "Wi-Fi para huéspedes",
+  "Opciones sin gluten",
 ] as const;
 
 const CERCANOS = [
@@ -231,15 +254,21 @@ function G4RestaurantPremiumPreview() {
         {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
       </Container>
 
+      <Container className="mt-6">
+        <TourismAluxPanel
+          title="¿Qué tipo de experiencia gastronómica buscas?"
+          description="Cuéntame la ocasión y te ayudaré a elegir mesa, horario y lugares cercanos para completar tu recorrido."
+          task={`Ayúdame a decidir si ${RESTAURANT.name} es adecuado para mi visita a Valladolid.`}
+          prompts={["Cena romántica", "En familia", "Cocina tradicional", "Algo especial"]}
+          compact
+        />
+      </Container>
+
       {tuning.role !== "visitante" ? (
         <Container className="mt-10">
           <PermissionMatrix role={tuning.role} />
         </Container>
       ) : null}
-
-      <Container className="mt-10">
-        <SubNav />
-      </Container>
 
       {tuning.showStory ? (
         <Container className="mt-14">
@@ -252,6 +281,14 @@ function G4RestaurantPremiumPreview() {
           <Galeria layout={tuning.gallery} />
         </Container>
       ) : null}
+
+      <Container className="mt-16">
+        <MenuEspecialidades />
+      </Container>
+
+      <Container className="mt-16">
+        <AmbienteYOcasiones />
+      </Container>
 
       {tuning.showMap ? (
         <Container className="mt-16">
@@ -266,6 +303,10 @@ function G4RestaurantPremiumPreview() {
           <Servicios />
         </Container>
       ) : null}
+
+      <Container className="mt-16">
+        <PoliticasYContacto />
+      </Container>
 
       {tuning.showNearby ? (
         <Container className="mt-16">
@@ -332,18 +373,18 @@ function HeroPanel({ compact = false }: { compact?: boolean }) {
       <dl className="mt-6 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
         <Fact icon={UtensilsCrossed} label="Cocina" value={RESTAURANT.cuisine} />
         <Fact icon={Clock} label="Horario" value={RESTAURANT.schedule} />
-        <Fact icon={Wallet} label="Rango de precio" value={RESTAURANT.priceRange} />
         <Fact icon={MapPin} label="Ubicación" value={RESTAURANT.location} />
       </dl>
 
-      <div className="mt-7">
-        <Button size="lg" className="rounded-pill px-7">
-          Cómo llegar
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+        <Button size="lg" className="w-full rounded-pill px-7 sm:w-auto">
+          Reservar mesa
           <ArrowRight className="ml-2 size-4" aria-hidden />
         </Button>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          Acción dominante única. Sin reservas ni disponibilidad en esta vista.
-        </p>
+        <Button size="lg" variant="outline" className="w-full rounded-pill px-7 sm:w-auto">
+          <Heart className="mr-2 size-4" aria-hidden />
+          Agregar a mi viaje
+        </Button>
       </div>
     </div>
   );
@@ -361,20 +402,32 @@ function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string;
   );
 }
 
-/** Above the fold asimétrico: 2/3 fotografía + 1/3 panel editorial. */
+/** Hero editorial compartido: móvil prioriza imagen; desktop equilibra relato y galería. */
 function HeroEditorial() {
   return (
-    <section className="grid gap-8 lg:grid-cols-3 lg:items-center">
-      <div className="lg:col-span-2">
+    <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:p-9">
+      <div className="order-2 lg:order-1">
+        <HeroPanel />
+      </div>
+      <div className="order-1 grid grid-cols-2 gap-3 sm:gap-4 lg:order-2">
         <img
           src={MEDIA.cover.url}
           alt={MEDIA.cover.alt}
           loading="eager"
-          className="h-[300px] w-full rounded-3xl object-cover shadow-elevated sm:h-[440px] lg:h-[560px]"
+          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-80"
         />
-      </div>
-      <div className="lg:col-span-1">
-        <HeroPanel />
+        <img
+          src={MEDIA.cochinita.url}
+          alt={MEDIA.cochinita.alt}
+          loading="lazy"
+          className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44"
+        />
+        <img
+          src={MEDIA.comedor.url}
+          alt={MEDIA.comedor.alt}
+          loading="lazy"
+          className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44"
+        />
       </div>
     </section>
   );
@@ -546,15 +599,81 @@ function Galeria({ layout }: { layout: GalleryLayout }) {
   );
 }
 
+function MenuEspecialidades() {
+  return (
+    <section aria-labelledby="menu-especialidades">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">La cocina</p>
+      <h2 id="menu-especialidades" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+        Menú y especialidades
+      </h2>
+      <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+        {SPECIALTIES.map((item) => (
+          <article
+            key={item.name}
+            className="w-[82%] shrink-0 snap-center overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto"
+          >
+            <img
+              src={item.media.url}
+              alt={item.media.alt}
+              loading="lazy"
+              className="h-40 w-full object-cover"
+            />
+            <div className="p-5">
+              <h3 className="font-serif text-xl">{item.name}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.text}</p>
+              <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                Demo visual · sin precios
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AmbienteYOcasiones() {
+  const occasions = [
+    { icon: Heart, label: "Romántico" },
+    { icon: Users, label: "En familia" },
+    { icon: UtensilsCrossed, label: "Amigable" },
+    { icon: Gift, label: "Celebraciones" },
+  ] as const;
+  return (
+    <section
+      aria-labelledby="ambiente-ocasiones"
+      className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
+    >
+      <h2 id="ambiente-ocasiones" className="font-serif text-2xl tracking-tight">
+        Ambiente y ocasiones
+      </h2>
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {occasions.map(({ icon: Icon, label }) => (
+          <div
+            key={label}
+            className="flex min-h-20 flex-col items-center justify-center rounded-2xl bg-muted/45 p-3 text-center"
+          >
+            <Icon className="size-5 text-primary" aria-hidden />
+            <span className="mt-2 text-sm">{label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Servicios() {
   return (
-    <section id="servicios" className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+    <section id="servicios">
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Servicios</p>
         <h2 className="mt-2 font-serif text-3xl tracking-tight">Lo que encuentras en la casa</h2>
-        <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+        <ul className="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
           {SERVICIOS.map((s) => (
-            <li key={s} className="flex items-start gap-2 text-sm text-foreground/85">
+            <li
+              key={s}
+              className="flex min-h-16 items-center gap-2 rounded-2xl border border-border bg-card px-3 py-3 text-sm text-foreground/85 shadow-soft"
+            >
               <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
               {s}
             </li>
@@ -564,9 +683,27 @@ function Servicios() {
           DEMO VISUAL · listado ilustrativo
         </p>
       </div>
-      <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Contacto</p>
-        <h3 className="mt-1 font-serif text-2xl tracking-tight">Habla con la casa</h3>
+    </section>
+  );
+}
+
+function PoliticasYContacto() {
+  return (
+    <section className="grid gap-4 lg:grid-cols-2">
+      <details open className="group rounded-3xl border border-border bg-card p-5 shadow-soft">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between font-serif text-2xl">
+          Políticas <CalendarCheck className="size-5 text-primary" aria-hidden />
+        </summary>
+        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+          <li>Reservaciones: recomendadas.</li>
+          <li>Cancelaciones: consultar las políticas al reservar.</li>
+          <li>Condiciones especiales: sujetas a confirmación.</li>
+        </ul>
+      </details>
+      <details open className="group rounded-3xl border border-border bg-card p-5 shadow-soft">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between font-serif text-2xl">
+          Contacto <Phone className="size-5 text-primary" aria-hidden />
+        </summary>
         <ul className="mt-4 space-y-3 text-sm text-foreground/85">
           <li className="flex items-center gap-2.5">
             <Phone className="size-4 text-primary" aria-hidden /> Teléfono de contacto (demo)
@@ -579,9 +716,9 @@ function Servicios() {
           </li>
         </ul>
         <Button variant="outline" className="mt-5 w-full rounded-pill">
-          Contactar
+          Enviar mensaje
         </Button>
-      </div>
+      </details>
     </section>
   );
 }
@@ -591,11 +728,11 @@ function Cercanias() {
     <section id="cerca">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Cerca de aquí</p>
       <h2 className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">A pie desde la mesa</h2>
-      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+      <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
         {CERCANOS.map((c) => (
           <article
             key={c.name}
-            className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+            className="w-[72%] shrink-0 snap-center overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto"
           >
             <img
               src={c.media.url}

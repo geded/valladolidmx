@@ -165,6 +165,7 @@ export function businessToTourismCard(
     priceHint: null,
     primaryAction: null,
     secondaryAction: null,
+    filterAttributes: b.filter_attributes,
   };
 }
 

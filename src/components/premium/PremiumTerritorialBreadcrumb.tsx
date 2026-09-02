@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Home } from "lucide-react";
 import type { CrumbVM } from "@/components/surfaces/kit/types";
 import { cn } from "@/lib/utils";
 
 export function PremiumTerritorialBreadcrumb({ crumbs }: { crumbs: readonly CrumbVM[] }) {
   return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
+    <nav aria-label="Ruta territorial" className="overflow-x-auto text-sm [scrollbar-width:none]">
+      <ol className="flex min-w-max flex-nowrap items-center gap-1.5 whitespace-nowrap text-muted-foreground sm:min-w-0 sm:flex-wrap sm:whitespace-normal">
         {crumbs.map((crumb, index) => {
           const current = index === crumbs.length - 1;
           return (
@@ -17,6 +17,7 @@ export function PremiumTerritorialBreadcrumb({ crumbs }: { crumbs: readonly Crum
                   to={crumb.href}
                   className="inline-flex min-h-11 items-center rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
                 >
+                  {index === 0 ? <Home className="mr-1.5 size-4" aria-hidden /> : null}
                   {crumb.label}
                 </Link>
               ) : (

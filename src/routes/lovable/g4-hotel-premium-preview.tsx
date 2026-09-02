@@ -48,6 +48,7 @@ import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experienc
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PremiumPresentationControl, PremiumTerritorialBreadcrumb } from "@/components/premium";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 
 export const Route = createFileRoute("/lovable/g4-hotel-premium-preview")({
   head: () => ({
@@ -326,6 +327,16 @@ function G4HotelPremiumPreview() {
         {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
       </Container>
 
+      <Container className="mt-6">
+        <TourismAluxPanel
+          title="¿Cómo te gustaría hospedarte?"
+          description="Cuéntame cómo viajas para recomendarte una estancia y ayudarte a completar tu ruta por Valladolid."
+          task={`Ayúdame a decidir si ${HOTEL.name} es adecuado para mi estancia en Valladolid.`}
+          prompts={["Viajo en pareja", "Viajo en familia", "Viajo solo/a", "Viajo con amigos"]}
+          compact
+        />
+      </Container>
+
       {tuning.role !== "visitante" ? (
         <Container className="mt-10">
           <PermissionMatrix role={tuning.role} />
@@ -437,12 +448,12 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
       <p className="mt-2 text-sm text-muted-foreground">
         Indicadores editoriales provisionales. Sin certificaciones ni distintivos acreditados.
       </p>
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button size="lg" className="rounded-pill px-6">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button size="lg" className="w-full rounded-pill px-6 sm:w-auto">
           Solicitar disponibilidad
           <ArrowRight className="ml-2 size-4" aria-hidden />
         </Button>
-        <Button size="lg" variant="outline" className="rounded-pill px-6">
+        <Button size="lg" variant="outline" className="w-full rounded-pill px-6 sm:w-auto">
           <Heart className="mr-2 size-4" aria-hidden />
           Agregar a mi viaje
         </Button>
@@ -453,26 +464,28 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
 
 function HeroEditorial() {
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <HeroCopy />
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+    <section className="grid gap-6 overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:p-9">
+      <div className="order-2 lg:order-1">
+        <HeroCopy />
+      </div>
+      <div className="order-1 grid grid-cols-2 gap-3 sm:gap-4 lg:order-2">
         <img
           src={MEDIA.cover.url}
           alt={MEDIA.cover.alt}
           loading="eager"
-          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
+          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-80"
         />
         <img
           src={MEDIA.habitacion.url}
           alt={MEDIA.habitacion.alt}
           loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
+          className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44"
         />
         <img
           src={MEDIA.terraza.url}
           alt={MEDIA.terraza.alt}
           loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
+          className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44"
         />
       </div>
     </section>
@@ -629,11 +642,11 @@ function Habitaciones() {
       <h2 id="habitaciones-hotel" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
         Habitaciones
       </h2>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
         {ROOMS.map((r) => (
           <article
             key={r.id}
-            className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+            className="w-[82%] shrink-0 snap-center overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto"
           >
             <img
               src={r.media.url}
@@ -686,13 +699,13 @@ function Amenidades() {
       <h2 id="amenidades-hotel" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
         Amenidades y servicios
       </h2>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-3">
         {AMENITIES.map((a) => {
           const Icon = a.icon;
           return (
             <div
               key={a.label}
-              className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-soft"
+              className="flex min-h-16 items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 shadow-soft sm:px-4"
             >
               <Icon className="size-4 text-primary" aria-hidden />
               <span className="text-sm">{a.label}</span>
@@ -801,11 +814,11 @@ function CercaDelHotel() {
         Experiencias, restaurantes y atractivos del micrositio de Valladolid. Contenido ilustrativo
         de maquetación.
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
         {NEARBY.map((n) => (
           <article
             key={n.id}
-            className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+            className="group w-[72%] shrink-0 snap-center overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto"
           >
             <img
               src={n.media.url}
