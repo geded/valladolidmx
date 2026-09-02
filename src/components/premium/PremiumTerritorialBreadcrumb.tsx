@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Home } from "lucide-react";
 import type { CrumbVM } from "@/components/surfaces/kit/types";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ export function PremiumTerritorialBreadcrumb({ crumbs }: { crumbs: readonly Crum
                   to={crumb.href}
                   className="inline-flex min-h-11 items-center rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
                 >
+                  {index === 0 ? <Home className="mr-1.5 size-4" aria-hidden /> : null}
                   {crumb.label}
                 </Link>
               ) : (
