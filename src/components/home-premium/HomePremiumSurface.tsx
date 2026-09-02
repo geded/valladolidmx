@@ -435,99 +435,19 @@ function AluxPlanner({
     });
   };
   return (
-    <section
-      aria-labelledby="alux-title"
-      className="overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-soft"
-    >
-      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
-        <div className="bg-selva p-6 text-selva-foreground sm:p-8">
-          <div className="flex items-center gap-2">
-            <Sparkles className="size-5 text-primary" aria-hidden />
-            <p className="text-xs font-semibold uppercase">{content.alux.eyebrow}</p>
-          </div>
-          <h2 id="alux-title" className="mt-3 font-display text-3xl">
-            {content.alux.heading}
-          </h2>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-selva-foreground/80">
-            {content.alux.description}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {content.alux.prompts.map((prompt) => (
-              <Button
-                key={prompt}
-                type="button"
-                size="sm"
-                variant={selectedPrompt === prompt ? "default" : "secondary"}
-                onClick={() => onSelectPrompt(prompt)}
-                className="min-h-11 rounded-pill whitespace-normal text-left"
-              >
-                {prompt}
-              </Button>
-            ))}
-          </div>
-          <p className="mt-6 text-xs font-semibold uppercase text-selva-foreground/80">
-            ¿Con quién viajas?
-          </p>
-          <div
-            className="mt-2 flex flex-wrap gap-2"
-            role="group"
-            aria-label="Composición del viaje"
-          >
-            {PARTY_OPTIONS.map((option) => (
-              <Button
-                key={option.value}
-                type="button"
-                size="sm"
-                variant={selectedParty === option.value ? "default" : "secondary"}
-                aria-pressed={selectedParty === option.value}
-                onClick={() => onSelectParty(option.value)}
-                className="min-h-11 rounded-pill"
-              >
-                {option.label}
-              </Button>
-            ))}
+    <section aria-labelledby="alux-title" className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft">
+      <div className="grid min-h-28 items-center gap-4 px-5 sm:grid-cols-[7rem_1fr_auto]">
+        <div className="flex items-center gap-3 border-r border-white/20 pr-4">
+          <img src="/brand/alux/master/alux-ia-full-master-transparent.png" alt="Alux" className="h-24 w-auto shrink-0 object-contain" />
+          <div><h2 id="alux-title" className="font-display text-xl">Alux</h2><p className="text-xs text-white/70">Tu concierge IA</p></div>
+        </div>
+        <div>
+          <p className="font-display text-xl">¿Cómo viajas hoy?</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Composición del viaje">
+            {PARTY_OPTIONS.map((option) => <Button key={option.value} type="button" size="sm" variant={selectedParty === option.value ? "default" : "secondary"} onClick={() => onSelectParty(option.value)} className="min-h-9 rounded-pill">{option.label}</Button>)}
           </div>
         </div>
-        <div className="p-6 sm:p-8" aria-live="polite">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs text-muted-foreground">
-              Propuesta construida sobre destinos publicados
-            </span>
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Para “{selectedPrompt}”, empezaría por:
-          </p>
-          <h3 className="mt-1 font-display text-2xl">{suggested?.title}</h3>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <Stat icon={<Clock3 />} label={suggested?.duration ?? ""} />
-            <Stat icon={<MapPin />} label={`${suggested?.stops ?? 0} paradas`} />
-            <Stat icon={<RouteIcon />} label="Orden sugerido" />
-          </div>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Propongo iniciar en el centro, continuar por la parada que requiere más luz de día y
-            cerrar cerca de opciones de comida. La distancia y tiempos reales se confirmarían con
-            datos acreditados.
-          </p>
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Button type="button" onClick={openAlux} className="min-h-11 rounded-pill">
-              <MessageCircle className="mr-2 size-4" aria-hidden />
-              Personalizar con Alux
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onAdd}
-              className="min-h-11 rounded-pill"
-            >
-              {added ? (
-                <Check className="mr-2 size-4" aria-hidden />
-              ) : (
-                <Compass className="mr-2 size-4" aria-hidden />
-              )}
-              {added ? "Ruta agregada" : "Agregar ruta a mi viaje"}
-            </Button>
-          </div>
-        </div>
+        <Button type="button" onClick={openAlux} className="size-11 rounded-full p-0" aria-label="Continuar con Alux"><ChevronRight className="size-5" /></Button>
       </div>
     </section>
   );
@@ -641,6 +561,9 @@ function DestinationsSection({
   opened: string | null;
   onOpen: (value: string) => void;
 }) {
+  const items = content.destinos.items;
+  const featured = items[0];
+  if (!featured) return null;
   return (
     <section id="destinos" aria-labelledby="destinations-title">
       <SectionHead
@@ -649,103 +572,29 @@ function DestinationsSection({
         description={content.destinos.description}
         action={content.destinos.action}
       />
-      <div
-        className={cn(
-          "grid gap-3",
-          layout === "cuadricula"
-            ? "sm:grid-cols-2"
-            : layout === "carrusel"
-              ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[32%]"
-              : "sm:grid-cols-2 xl:grid-cols-4",
-        )}
-      >
-        {content.destinos.items.map((destination) => {
-          return (
-            <article
-              key={destination.name}
-              className={cn(
-                "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
-                cinematic &&
-                  "relative min-h-[20rem] justify-end border-0 bg-[#071814] text-[#f7f3ea] shadow-elevated sm:min-h-[22rem]",
-              )}
-            >
-              <div className={cn("relative", cinematic && "absolute inset-0")}>
-                <EditorialMediaFrame
-                  media={destination.media}
-                  label={destination.name}
-                  className={cn(
-                    "w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]",
-                    cinematic ? "h-full" : "aspect-[4/3]",
-                  )}
-                />
-                {cinematic ? (
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent"
-                    aria-hidden
-                  />
-                ) : null}
-                <span
-                  className={cn(
-                    "absolute left-3 top-3 rounded-pill px-2.5 py-1 text-[10px] font-semibold uppercase shadow-soft",
-                    cinematic
-                      ? "border border-white/25 bg-black/35 text-white backdrop-blur-sm"
-                      : "bg-card text-card-foreground",
-                  )}
-                >
-                  {destination.puebloMagico ? "Pueblo Mágico" : "Destino"}
-                </span>
+      <div className="grid min-h-[30rem] gap-4 lg:grid-cols-[1.2fr_1fr]">
+        <article className="group relative min-h-[30rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
+          <EditorialMediaFrame media={featured.media} label={featured.name} className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden />
+          <div className="absolute inset-x-0 bottom-0 z-10 p-5">
+            <h3 className="font-display text-3xl">{featured.name}</h3>
+            <p className="mt-2 text-sm text-white/80">{featured.note}</p>
+            {featured.href ? <Link to={featured.href} onClick={() => onOpen(featured.name)} className="mt-3 inline-flex text-sm font-semibold">Ver destino <ChevronRight className="size-4" /></Link> : null}
+          </div>
+        </article>
+        <div className="grid grid-rows-3 gap-3">
+          {items.slice(1, 4).map((destination) => (
+            <Link key={destination.name} to={destination.href ?? "/destinos"} onClick={() => onOpen(destination.name)} className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card">
+              <EditorialMediaFrame media={destination.media} label={destination.name} className="h-full w-full object-cover" />
+              <div className="flex min-w-0 flex-col justify-center p-4">
+                <p className="text-[10px] font-semibold uppercase text-primary">Destino</p>
+                <h3 className="mt-1 font-display text-xl">{destination.name}</h3>
+                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{destination.note}</p>
+                <span className="mt-2 inline-flex items-center text-xs font-semibold">Ver destino <ChevronRight className="size-3" /></span>
               </div>
-              <div
-                className={cn(
-                  "flex flex-1 flex-col p-4",
-                  cinematic && "relative z-10 justify-end p-5",
-                )}
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className={cn("font-display text-2xl", cinematic && "text-3xl text-white")}>
-                    {destination.name}
-                  </h3>
-                  {destination.puebloMagico ? (
-                    <span
-                      className={cn(
-                        "rounded-pill border px-2 py-0.5 text-[10px] font-semibold uppercase",
-                        cinematic
-                          ? "border-white/25 bg-white/10 text-white/85"
-                          : "border-border bg-muted text-muted-foreground",
-                      )}
-                    >
-                      Pueblo Mágico
-                    </span>
-                  ) : null}
-                </div>
-                <p
-                  className={cn(
-                    "mt-1 text-sm leading-relaxed text-muted-foreground",
-                    cinematic && "text-white/80",
-                  )}
-                >
-                  {destination.note}
-                </p>
-                {destination.href ? (
-                  <Button
-                    asChild
-                    variant="outline"
-                    className={cn(
-                      "mt-4 min-h-11 rounded-pill",
-                      cinematic &&
-                        "border-white/45 bg-black/25 text-white hover:bg-white hover:text-[#071814]",
-                    )}
-                  >
-                    <Link to={destination.href} onClick={() => onOpen(destination.name)}>
-                      <Landmark className="mr-2 size-4" aria-hidden />
-                      Ver micrositio
-                    </Link>
-                  </Button>
-                ) : null}
-              </div>
-            </article>
-          );
-        })}
+            </Link>
+          ))}
+        </div>
       </div>
       <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
         {content.destinos.disclaimer}
@@ -770,36 +619,25 @@ function PueblosMagicosSection({
         description={content.pueblosMagicos.description}
         action={content.pueblosMagicos.action}
       />
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {pueblos.map((pueblo) => (
           <article
             key={pueblo.name}
-            className="flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3"
+            className="group relative min-h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
           >
             <EditorialMediaFrame
               media={pueblo.media}
-              className="size-20 shrink-0 rounded-xl object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="min-w-0">
-              <span className="rounded-pill border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
-                Pueblo Mágico
-              </span>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" aria-hidden />
+            <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+              <p className="text-[10px] font-semibold uppercase text-primary">Pueblo Mágico</p>
               <h3 className="mt-1 font-display text-xl">{pueblo.name}</h3>
-              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                {pueblo.note}
-              </p>
+              <p className="mt-1 line-clamp-1 text-xs text-white/80">{pueblo.note}</p>
+              <span className="mt-2 inline-flex items-center text-xs font-semibold">Descubrir <ChevronRight className="size-3" /></span>
             </div>
           </article>
         ))}
-      </div>
-      <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {content.pueblosMagicos.badgeNote}
-        </p>
-        <Button type="button" onClick={onCreateRoute} className="min-h-11 rounded-pill">
-          <RouteIcon className="mr-2 size-4" aria-hidden />
-          {content.pueblosMagicos.ctaLabel}
-        </Button>
       </div>
     </section>
   );
@@ -1076,39 +914,21 @@ function EditorialSection({
             <Link
               key={item.title}
               to={item.href}
-              className={cn(
-                "grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block",
-                cinematic &&
-                  "relative min-h-[24rem] border-0 bg-[#071814] text-white shadow-elevated",
-              )}
+              className="relative min-h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
             >
               <EditorialMediaFrame
                 media={item.media}
                 label={item.title}
-                className={cn(
-                  "h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto",
-                  cinematic && "absolute inset-0 h-full min-h-0 md:h-full",
-                )}
+                className="absolute inset-0 h-full w-full object-cover"
               />
-              {cinematic ? (
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
-                  aria-hidden
-                />
-              ) : null}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden />
               <div
-                className={cn(
-                  "p-4",
-                  cinematic && "relative z-10 flex h-full flex-col justify-end self-end",
-                )}
+                className="absolute inset-x-0 bottom-0 z-10 p-4"
               >
                 <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
                 <h3 className="mt-1 font-display text-xl">{item.title}</h3>
                 <p
-                  className={cn(
-                    "mt-2 text-sm leading-relaxed text-muted-foreground",
-                    cinematic && "text-white/80",
-                  )}
+                  className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/80"
                 >
                   {item.body}
                 </p>
