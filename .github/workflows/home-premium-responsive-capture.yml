@@ -1,0 +1,38 @@
+name: Capture Home responsive review
+on:
+  push:
+    branches: [design/home-premium-system-review-v1]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: 1.3.14 }
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - name: Stage approved review media
+        shell: bash
+        run: |
+          mkdir -p public/review-media
+          origin="https://valladolidmx.lovable.app/api/public/studio-media/conceptual-preview/2026-09-01"
+          for file in home-izamal-editorial-preview.webp home-valladolid-editorial-preview.webp oriente-maya-hero-naturaleza-v1.webp valladolid-san-servacio-hero-preview.webp; do
+            curl --fail --location --retry 3 "$origin/$file" --output "public/review-media/$file"
+          done
+          sed -i 's#/api/public/studio-media/conceptual-preview/2026-09-01#/review-media#g' src/components/home-premium/home-premium-content.ts
+      - run: bun run dev -- --host 127.0.0.1 > /tmp/home-responsive.log 2>&1 &
+      - run: bunx wait-on http://127.0.0.1:8080/lovable/g4-home-premium-preview --timeout 120000
+      - name: Capture iPad and mobile
+        run: |
+          bunx playwright screenshot --browser chromium --viewport-size "768,1024" --full-page --wait-for-timeout 3000 http://127.0.0.1:8080/lovable/g4-home-premium-preview home-ipad.png
+          bunx playwright screenshot --browser chromium --viewport-size "390,844" --full-page --wait-for-timeout 3000 http://127.0.0.1:8080/lovable/g4-home-premium-preview home-mobile.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: home-responsive-review
+          path: |
+            home-ipad.png
+            home-mobile.png
+          if-no-files-found: error
