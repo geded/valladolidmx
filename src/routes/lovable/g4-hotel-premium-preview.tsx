@@ -329,8 +329,8 @@ function G4HotelPremiumPreview() {
 
       <Container className="mt-6">
         <TourismAluxPanel
-          title="Encuentra la estancia adecuada para tu viaje"
-          description="Dime cómo viajas y qué valoras al hospedarte. Te ayudaré a comparar este hotel con alternativas de Valladolid y a completar tu ruta por el territorio."
+          title="¿Cómo te gustaría hospedarte?"
+          description="Cuéntame cómo viajas para recomendarte una estancia y ayudarte a completar tu ruta por Valladolid."
           task={`Ayúdame a decidir si ${HOTEL.name} es adecuado para mi estancia en Valladolid.`}
           prompts={["Viajo en pareja", "Viajo en familia", "Viajo solo/a", "Viajo con amigos"]}
           compact
@@ -448,12 +448,12 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
       <p className="mt-2 text-sm text-muted-foreground">
         Indicadores editoriales provisionales. Sin certificaciones ni distintivos acreditados.
       </p>
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button size="lg" className="rounded-pill px-6">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button size="lg" className="w-full rounded-pill px-6 sm:w-auto">
           Solicitar disponibilidad
           <ArrowRight className="ml-2 size-4" aria-hidden />
         </Button>
-        <Button size="lg" variant="outline" className="rounded-pill px-6">
+        <Button size="lg" variant="outline" className="w-full rounded-pill px-6 sm:w-auto">
           <Heart className="mr-2 size-4" aria-hidden />
           Agregar a mi viaje
         </Button>
@@ -465,25 +465,27 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
 function HeroEditorial() {
   return (
     <section className="grid gap-6 overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:p-9">
-      <HeroCopy />
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="order-2 lg:order-1">
+        <HeroCopy />
+      </div>
+      <div className="order-1 grid grid-cols-2 gap-3 sm:gap-4 lg:order-2">
         <img
           src={MEDIA.cover.url}
           alt={MEDIA.cover.alt}
           loading="eager"
-          className="col-span-2 h-52 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-80"
+          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-80"
         />
         <img
           src={MEDIA.habitacion.url}
           alt={MEDIA.habitacion.alt}
           loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
+          className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44"
         />
         <img
           src={MEDIA.terraza.url}
           alt={MEDIA.terraza.alt}
           loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
+          className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44"
         />
       </div>
     </section>

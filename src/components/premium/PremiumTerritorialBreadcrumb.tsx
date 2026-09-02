@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 export function PremiumTerritorialBreadcrumb({ crumbs }: { crumbs: readonly CrumbVM[] }) {
   return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
+    <nav aria-label="Ruta territorial" className="overflow-x-auto text-sm [scrollbar-width:none]">
+      <ol className="flex min-w-max flex-nowrap items-center gap-1.5 whitespace-nowrap text-muted-foreground sm:min-w-0 sm:flex-wrap sm:whitespace-normal">
         {crumbs.map((crumb, index) => {
           const current = index === crumbs.length - 1;
           return (
