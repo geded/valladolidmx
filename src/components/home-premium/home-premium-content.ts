@@ -209,8 +209,8 @@ export const HOME_PREMIUM_SECTION_LABELS: Record<HomePremiumSectionKey, string> 
 
 export const HOME_PREMIUM_DEFAULT_ORDER: HomePremiumSectionKey[] = [
   "destinos",
-  "pueblosMagicos",
   "rutas",
+  "pueblosMagicos",
   "experiencias",
   "servicios",
   "eventos",
