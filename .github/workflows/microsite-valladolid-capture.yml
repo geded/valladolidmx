@@ -15,12 +15,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          bun-version: 1.3.14
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - name: Stage approved review media
         shell: bash
         run: |
@@ -31,11 +30,11 @@ jobs:
           done
           sed -i 's#/api/public/studio-media/governed/v1p1c#/review-media#g' src/components/destination-premium/destination-premium-content.ts
       - name: Start preview
-        run: npm run dev -- --host 127.0.0.1 > /tmp/vmx-microsite-vite.log 2>&1 &
+        run: bun run dev -- --host 127.0.0.1 > /tmp/vmx-microsite-vite.log 2>&1 &
       - name: Wait for preview
-        run: npx wait-on http://127.0.0.1:8080/lovable/g4-destination-microsite-preview --timeout 120000
+        run: bunx wait-on http://127.0.0.1:8080/lovable/g4-destination-microsite-preview --timeout 120000
       - name: Capture desktop
-        run: npx playwright screenshot --browser chromium --viewport-size "1440,1000" --full-page --wait-for-timeout 3000 http://127.0.0.1:8080/lovable/g4-destination-microsite-preview micrositio-valladolid-desktop.png
+        run: bunx playwright screenshot --browser chromium --viewport-size "1440,1000" --full-page --wait-for-timeout 3000 http://127.0.0.1:8080/lovable/g4-destination-microsite-preview micrositio-valladolid-desktop.png
       - uses: actions/upload-artifact@v4
         with:
           name: micrositio-valladolid-desktop
