@@ -150,7 +150,7 @@ export function DestinationMicrositeReviewSurface() {
 
 function Hero() {
   return (
-    <section className="relative min-h-[680px] overflow-hidden bg-[#142d25] text-white">
+    <section className="relative min-h-[34rem] overflow-hidden bg-[#142d25] text-white sm:min-h-[38rem] lg:min-h-[680px]">
       <img
         src={media.cover.url}
         alt={media.cover.alt}
@@ -158,22 +158,22 @@ function Hero() {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-      <Container className="relative flex min-h-[680px] items-end pb-14 pt-32">
+      <Container className="relative flex min-h-[34rem] items-end pb-9 pt-24 sm:min-h-[38rem] sm:pb-12 lg:min-h-[680px] lg:pb-14 lg:pt-32">
         <div className="max-w-[43rem]">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f2b84b]">
             Pueblo Mágico · Oriente Maya
           </p>
-          <h1 className="mt-4 font-serif text-6xl leading-[0.94] tracking-[-0.045em] sm:text-7xl lg:text-[6.25rem]">
+          <h1 className="mt-3 font-serif text-5xl leading-[0.94] tracking-[-0.045em] sm:text-6xl lg:mt-4 lg:text-[6.25rem]">
             Valladolid
           </h1>
-          <p className="mt-5 max-w-xl font-serif text-2xl leading-tight text-white/90 sm:text-3xl">
+          <p className="mt-4 max-w-xl font-serif text-xl leading-tight text-white/90 sm:text-2xl lg:mt-5 lg:text-3xl">
             La capital para descubrir el Oriente Maya de Yucatán
           </p>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75">
+          <p className="mt-4 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75 lg:mt-5 lg:text-base">
             Historia, naturaleza y cultura viva se encuentran aquí. Haz de Valladolid tu punto de
             partida y deja que el territorio se revele a su propio ritmo.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-2 lg:mt-7 lg:gap-3">
             <Button
               size="lg"
               className="rounded-full bg-[#f4a928] px-6 text-[#17352b] hover:bg-[#ffc55c]"
@@ -198,7 +198,7 @@ function TerritoryContext() {
   return (
     <nav
       aria-label="Ubicación territorial"
-      className="flex min-h-12 items-center gap-2 rounded-full border border-black/10 bg-white px-5 text-sm shadow-sm"
+      className="flex min-h-11 items-center gap-1.5 overflow-x-auto whitespace-nowrap rounded-full border border-black/10 bg-white px-3 text-xs shadow-sm sm:min-h-12 sm:gap-2 sm:px-5 sm:text-sm"
     >
       <a
         href="/"
@@ -223,21 +223,21 @@ function TerritoryContext() {
 
 function DestinationIntro() {
   return (
-    <section className="grid gap-7 rounded-[2rem] border border-black/10 bg-white p-7 shadow-sm lg:grid-cols-[.95fr_1.05fr] lg:p-10">
+    <section className="grid gap-4 rounded-[1.5rem] border border-black/10 bg-white p-5 shadow-sm sm:p-7 lg:grid-cols-[.95fr_1.05fr] lg:gap-7 lg:rounded-[2rem] lg:p-10">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#b65d2f]">
           El corazón del Oriente Maya
         </p>
-        <h2 className="mt-3 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
+        <h2 className="mt-2 font-serif text-3xl leading-tight tracking-tight sm:text-4xl lg:mt-3 lg:text-5xl">
           Una ciudad para quedarse. Un territorio para descubrir.
         </h2>
       </div>
-      <div className="grid content-center gap-4 text-[15px] leading-7 text-black/65">
-        <p>
+      <div className="grid content-center gap-3 text-sm leading-6 text-black/65 lg:gap-4 lg:text-[15px] lg:leading-7">
+        <p className="line-clamp-3 lg:line-clamp-none">
           Valladolid combina la calma de una ciudad histórica con la energía de un territorio vivo:
           cenotes, comunidades mayas, haciendas, cocina local y patrimonio a menos de una jornada.
         </p>
-        <p>
+        <p className="hidden lg:block">
           No es sólo una escala entre Mérida y el Caribe. Es la base desde la que el viaje comienza
           a tomar forma.
         </p>
@@ -248,9 +248,9 @@ function DestinationIntro() {
 
 function AluxGuide() {
   return (
-    <section className="grid items-center gap-5 overflow-hidden rounded-[1.5rem] bg-[#123f32] px-6 py-5 text-white shadow-lg md:grid-cols-[auto_1fr_auto]">
+    <section className="grid items-center gap-3 overflow-hidden rounded-[1.5rem] bg-[#123f32] px-4 py-4 text-white shadow-lg sm:grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto] md:px-5 lg:gap-5 lg:px-6 lg:py-5">
       <div className="flex items-center gap-3">
-        <AluxMark family="avatar" size={64} decorative />
+        <AluxMark family="avatar" size={48} decorative />
         <div>
           <p className="font-serif text-xl">Alux</p>
           <p className="text-xs text-white/60">Tu concierge IA</p>
@@ -260,15 +260,15 @@ function AluxGuide() {
         <p className="text-xs uppercase tracking-[0.18em] text-[#efb74b]">
           Para recomendarte mejor
         </p>
-        <h2 className="mt-1 font-serif text-2xl">
+        <h2 className="mt-1 font-serif text-lg sm:text-xl lg:text-2xl">
           ¿Ya estás en la región o estás planeando tu viaje?
         </h2>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:mt-3 lg:flex-wrap lg:overflow-visible">
           {["Estoy planeando", "Ya estoy aquí", "Viajo en pareja", "Viajo en familia"].map(
             (item) => (
               <button
                 key={item}
-                className="rounded-full border border-white/25 px-4 py-2 text-xs text-white/85 hover:bg-white/10"
+                className="shrink-0 rounded-full border border-white/25 px-3 py-1.5 text-[11px] text-white/85 hover:bg-white/10 lg:px-4 lg:py-2 lg:text-xs"
               >
                 {item}
               </button>
@@ -297,7 +297,9 @@ function SectionHeading({
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#b65d2f]">
         {eyebrow}
       </p>
-      <h2 className="mt-1 font-serif text-3xl leading-tight tracking-tight sm:text-4xl">{title}</h2>
+      <h2 className="mt-1 font-serif text-2xl leading-tight tracking-tight sm:text-3xl lg:text-4xl">
+        {title}
+      </h2>
     </header>
   );
 }
@@ -322,8 +324,8 @@ function FeatureRail({
   return (
     <section>
       <SectionHeading eyebrow={eyebrow} title={title} />
-      <div className="grid h-[30rem] gap-4 lg:grid-cols-[1.65fr_1fr]">
-        <article className="group relative overflow-hidden rounded-[1.75rem] bg-black">
+      <div className="grid gap-3 lg:h-[30rem] lg:grid-cols-[1.65fr_1fr] lg:gap-4">
+        <article className="group relative h-[18rem] overflow-hidden rounded-[1.5rem] bg-black sm:h-[22rem] lg:h-auto lg:rounded-[1.75rem]">
           <Image
             item={lead.image}
             className="h-full w-full transition duration-700 group-hover:scale-105"
@@ -339,14 +341,14 @@ function FeatureRail({
             </p>
           </div>
         </article>
-        <div className="grid min-h-0 grid-rows-3 gap-4">
+        <div className="grid min-h-0 grid-flow-col auto-cols-[82%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[47%] lg:grid-flow-row lg:grid-rows-3 lg:gap-4 lg:overflow-visible lg:pb-0">
           {rail.map((item) => (
             <article
               key={item.title}
-              className="grid min-h-0 overflow-hidden rounded-[1.25rem] border border-black/10 bg-white grid-cols-[42%_1fr]"
+              className="grid min-h-[8.5rem] overflow-hidden rounded-[1.25rem] border border-black/10 bg-white grid-cols-[42%_1fr] lg:min-h-0"
             >
               <Image item={item.image} className="h-full min-h-0 w-full" />
-              <div className="flex flex-col justify-center p-5">
+              <div className="flex flex-col justify-center p-3 lg:p-5">
                 <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-[#b65d2f]">
                   {item.eyebrow}
                 </p>
@@ -377,13 +379,13 @@ function ThreeCards({
   return (
     <section>
       <SectionHeading eyebrow={eyebrow} title={title} />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0 lg:gap-4">
         {items.map((item) => (
           <article
             key={item.title}
             className="group overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-sm"
           >
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-48 overflow-hidden lg:h-56">
               <Image
                 item={item.image}
                 className="h-full w-full transition duration-700 group-hover:scale-105"
@@ -418,13 +420,13 @@ function StayAndEat() {
         eyebrow="Hospitalidad y gastronomía"
         title="Descansa bien, come con contexto"
       />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-flow-col auto-cols-[72%] gap-3 overflow-x-auto pb-2 sm:grid-flow-row sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4 lg:gap-4">
         {cards.map((item) => (
           <article
             key={item.title}
             className="overflow-hidden rounded-[1.25rem] border border-black/10 bg-white"
           >
-            <Image item={item.image} className="h-44 w-full" />
+            <Image item={item.image} className="h-36 w-full lg:h-44" />
             <div className="p-4">
               <p className="text-[10px] uppercase tracking-[.15em] text-[#b65d2f]">{item.type}</p>
               <h3 className="mt-1 font-serif text-lg">{item.title}</h3>
@@ -443,7 +445,7 @@ function Agenda() {
   return (
     <section>
       <SectionHeading eyebrow="Agenda local" title="Lo que está pasando en Valladolid" />
-      <div className="grid overflow-hidden rounded-[1.5rem] bg-[#123f32] text-white md:grid-cols-3">
+      <div className="grid grid-flow-col auto-cols-[82%] overflow-x-auto rounded-[1.5rem] bg-[#123f32] text-white sm:auto-cols-[48%] md:grid-flow-row md:grid-cols-3 md:overflow-hidden">
         {[
           ["16", "MAY", "Noche de Valladolid"],
           ["24", "MAY", "Festival de la Calzada"],
@@ -451,7 +453,7 @@ function Agenda() {
         ].map(([day, month, title], index) => (
           <article
             key={title}
-            className={`flex items-center gap-5 p-6 ${index ? "border-t border-white/15 md:border-l md:border-t-0" : ""}`}
+            className={`flex items-center gap-4 p-4 lg:gap-5 lg:p-6 ${index ? "border-l border-white/15" : ""}`}
           >
             <div>
               <p className="font-serif text-4xl text-[#f4b640]">{day}</p>
@@ -476,8 +478,8 @@ function TerritoryMap() {
         eyebrow="Muévete con sentido"
         title="Valladolid y el territorio que la rodea"
       />
-      <div className="grid min-h-[27rem] overflow-hidden rounded-[1.75rem] border border-black/10 bg-white lg:grid-cols-[1.65fr_1fr]">
-        <div className="relative bg-[#d9e0d2]">
+      <div className="grid overflow-hidden rounded-[1.5rem] border border-black/10 bg-white lg:min-h-[27rem] lg:grid-cols-[1.65fr_1fr] lg:rounded-[1.75rem]">
+        <div className="relative h-[15rem] bg-[#d9e0d2] sm:h-[20rem] lg:h-auto">
           <div
             className="absolute inset-0 opacity-30"
             style={{
@@ -492,14 +494,14 @@ function TerritoryMap() {
             Valladolid
           </span>
         </div>
-        <div className="divide-y divide-black/10 p-6">
+        <div className="divide-y divide-black/10 p-4 lg:p-6">
           {[
             ["28 km", "Ek’ Balam"],
             ["45 km", "Chichén Itzá"],
             ["105 km", "Río Lagartos"],
           ].map(([distance, place]) => (
             <div key={place} className="flex items-center gap-4 py-5">
-              <span className="grid size-12 place-items-center rounded-full bg-[#f7eee0] text-xs font-semibold text-[#a9532b]">
+              <span className="grid size-10 place-items-center rounded-full bg-[#f7eee0] text-[10px] font-semibold text-[#a9532b] lg:size-12 lg:text-xs">
                 {distance}
               </span>
               <div>
@@ -517,19 +519,21 @@ function TerritoryMap() {
 
 function TripClose() {
   return (
-    <section className="grid items-center gap-5 rounded-[1.75rem] bg-[#123f32] px-7 py-7 text-white sm:grid-cols-[auto_1fr_auto]">
+    <section className="grid items-center gap-4 rounded-[1.5rem] bg-[#123f32] px-5 py-5 text-white sm:grid-cols-[auto_1fr_auto] lg:gap-5 lg:rounded-[1.75rem] lg:px-7 lg:py-7">
       <div className="flex justify-center">
         <img
           src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
           alt=""
           aria-hidden
-          className="h-[72px] w-[72px] object-contain"
+          className="h-14 w-14 object-contain lg:h-[72px] lg:w-[72px]"
         />
       </div>
       <div>
         <p className="text-xs uppercase tracking-[.18em] text-[#efb74b]">Tu viaje empieza aquí</p>
-        <h2 className="mt-1 font-serif text-3xl">Deja que Valladolid te abra el territorio</h2>
-        <p className="mt-2 text-sm text-white/60">
+        <h2 className="mt-1 font-serif text-2xl lg:text-3xl">
+          Deja que Valladolid te abra el territorio
+        </h2>
+        <p className="mt-2 hidden text-sm text-white/60 sm:block">
           Guarda lugares, arma una ruta y continúa con Alux cuando lo necesites.
         </p>
       </div>
@@ -542,8 +546,8 @@ function TripClose() {
 
 function ReviewFooter() {
   return (
-    <footer className="mt-20 bg-[#171b18] text-white">
-      <Container className="grid gap-10 py-14 md:grid-cols-[1.25fr_1fr_1fr_1fr]">
+    <footer className="mt-14 bg-[#171b18] text-white lg:mt-20">
+      <Container className="grid grid-cols-2 gap-7 py-9 md:grid-cols-[1.25fr_1fr_1fr_1fr] lg:gap-10 lg:py-14">
         <div>
           <BrandLogo tone="light" size="md" />
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/55">
