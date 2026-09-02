@@ -117,18 +117,9 @@ export function HomePremiumSurface({
   };
 
   const enabled = (key: HomePremiumSectionKey) => sections?.[key] !== false;
-  const presentationOrder: HomePremiumSectionKey[] = cinematic
-    ? [
-        "destinos",
-        "experiencias",
-        "rutas",
-        "pueblosMagicos",
-        "eventos",
-        "servicios",
-        "mapa",
-        "queHacer",
-      ]
-    : order;
+  // Editorial y cinematográfica son variantes visuales del mismo sistema.
+  // Nunca cambian jerarquía, orden ni geometría entre sí.
+  const presentationOrder: HomePremiumSectionKey[] = order;
 
   const renderSection = (key: HomePremiumSectionKey) => {
     if (key === "destinos")
@@ -436,9 +427,9 @@ function AluxPlanner({
   };
   return (
     <section aria-labelledby="alux-title" className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft">
-      <div className="grid min-h-28 items-center gap-4 px-5 sm:grid-cols-[7rem_1fr_auto]">
-        <div className="flex items-center gap-3 border-r border-white/20 pr-4">
-          <img src="/brand/alux/master/alux-ia-full-master-transparent.png" alt="Alux" className="h-24 w-auto shrink-0 object-contain" />
+      <div className="grid min-h-24 items-center gap-4 px-5 sm:grid-cols-[7rem_1fr_auto]">
+        <div className="flex h-24 items-center gap-3 overflow-hidden border-r border-white/20 pr-4">
+          <img src="/brand/alux/master/alux-ia-avatar-master-transparent.png" alt="Alux" className="h-20 w-20 shrink-0 object-contain" />
           <div><h2 id="alux-title" className="font-display text-xl">Alux</h2><p className="text-xs text-white/70">Tu concierge IA</p></div>
         </div>
         <div>
@@ -572,8 +563,8 @@ function DestinationsSection({
         description={content.destinos.description}
         action={content.destinos.action}
       />
-      <div className="grid min-h-[30rem] gap-4 lg:grid-cols-[1.2fr_1fr]">
-        <article className="group relative min-h-[30rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
+      <div className="grid gap-4 lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
+        <article className="group relative min-h-[24rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:min-h-0">
           <EditorialMediaFrame media={featured.media} label={featured.name} className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden />
           <div className="absolute inset-x-0 bottom-0 z-10 p-5">
@@ -623,7 +614,7 @@ function PueblosMagicosSection({
         {pueblos.map((pueblo) => (
           <article
             key={pueblo.name}
-            className="group relative min-h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
+            className="group relative h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
           >
             <EditorialMediaFrame
               media={pueblo.media}
@@ -665,7 +656,7 @@ function ExperiencesSection({
       />
       <div
         className={cn(
-          "grid gap-4",
+          "grid gap-4 lg:h-[30rem]",
           layout === "carrusel"
             ? "grid-flow-col auto-cols-[86%] overflow-x-auto pb-2 sm:auto-cols-[48%]"
             : "lg:grid-cols-[1.2fr_1fr]",
@@ -673,8 +664,8 @@ function ExperiencesSection({
       >
         <article
           className={cn(
-            "overflow-hidden rounded-2xl border border-border bg-card",
-            cinematic && "relative min-h-[30rem] border-0 bg-[#071814] text-white shadow-elevated",
+            "h-full overflow-hidden rounded-2xl border border-border bg-card",
+            cinematic && "relative border-0 bg-[#071814] text-white shadow-elevated",
           )}
         >
           <EditorialMediaFrame
@@ -721,7 +712,7 @@ function ExperiencesSection({
             ) : null}
           </div>
         </article>
-        <div className="grid gap-3">
+        <div className="grid min-h-0 grid-rows-3 gap-3">
           {items.slice(1).map((item: HomePremiumExperience) => (
             <CompactMediaRow key={item.title} item={item} />
           ))}
@@ -746,7 +737,7 @@ function CompactMediaRow({
   return (
     <Link
       to={item.href}
-      className="grid min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr]"
+      className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
     >
       <EditorialMediaFrame
         media={item.media}
@@ -914,7 +905,7 @@ function EditorialSection({
             <Link
               key={item.title}
               to={item.href}
-              className="relative min-h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
+              className="relative h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
             >
               <EditorialMediaFrame
                 media={item.media}
