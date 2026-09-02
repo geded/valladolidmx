@@ -29,6 +29,7 @@ import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroSearchPill } from "@/components/home/HeroSearchPill";
+import { ACTIVE_BRAND } from "@/config/brand";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { cn } from "@/lib/utils";
@@ -291,6 +292,9 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
           <p className="mt-4 max-w-xl text-[0.95rem] leading-6 text-muted-foreground">
             {content.hero.subtitle}
           </p>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-selva">
+            {ACTIVE_BRAND.discoveryPromise}
+          </p>
           <div className="mt-5">
             <HeroSearch />
           </div>
@@ -336,6 +340,9 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-[#f7f3ea] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-[3.35rem]">
             {content.hero.title}
           </h1>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            {ACTIVE_BRAND.discoveryPromise}
+          </p>
         </div>
       </div>
       <div className="grid gap-4 bg-card p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">

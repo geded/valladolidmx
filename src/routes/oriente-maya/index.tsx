@@ -15,15 +15,10 @@ import {
 } from "@/lib/discovery/seo";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
-import { RegionSurface } from "@/components/surfaces/RegionSurface";
 import { RegionDestinationsPremiumSurface } from "@/components/destination-premium/RegionDestinationsPremiumSurface";
 
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
-import {
-  ContextEngineProvider,
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
 /**
  * H-02 · I7 · Fila 1 — Región-hub declara contexto raíz.
@@ -97,20 +92,27 @@ export const Route = createFileRoute("/oriente-maya/")({
   },
   component: OrienteMayaIndex,
   errorComponent: () => (
-    <PublicShell title={ORIENTE_MAYA.name} crumbs={[{ label: ORIENTE_MAYA.name }]}>
-      <RegionSurface />
+    <PublicShell variant="hero" crumbs={[{ label: ORIENTE_MAYA.name }]}>
+      <RegionDestinationsPremiumSurface destinations={[]} />
     </PublicShell>
   ),
 });
 
 function OrienteMayaIndex() {
   const { destinations } = Route.useLoaderData();
+  const { presentacion } = Route.useSearch() as { presentacion?: string };
   const declaration = buildRegionContext();
   return (
-    <ContextEngineProvider declaration={declaration}>
-      <div data-region-template="premium-approved" data-region-presentation="editorial">
-        <RegionDestinationsPremiumSurface destinations={destinations} />
+    <PublicShell variant="hero" contextDeclaration={declaration} useContextCrumbs>
+      <div
+        data-region-template="premium-approved"
+        data-region-presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+      >
+        <RegionDestinationsPremiumSurface
+          destinations={destinations}
+          presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+        />
       </div>
-    </ContextEngineProvider>
+    </PublicShell>
   );
 }

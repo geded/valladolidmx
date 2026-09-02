@@ -6,7 +6,7 @@
  * Editorial conserva una lectura clara aun sin fotografía propia.
  * Cinematográfica amplía el protagonismo del medio sin cambiar datos ni acciones.
  */
-import { lazy, Suspense, useMemo, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   BedDouble,
@@ -29,6 +29,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { cn } from "@/lib/utils";
+import { ACTIVE_BRAND } from "@/config/brand";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
@@ -67,6 +68,8 @@ const RESTAURANT_MEDIA = [
   "/api/public/studio-media/2026/1788291772757-yp7xx5-restaurante-comal-cocina-maya-conceptual-v1.webp",
   "/api/public/studio-media/2026/1788291775648-7j8tiw-restaurante-patio-colonial-conceptual-v1.webp",
   "/api/public/studio-media/2026/1788291770675-89lsmh-restaurante-patio-izamal-conceptual-v1.webp",
+  "/api/public/studio-media/2026/1788291773480-6zjzv5-restaurante-costa-el-cuyo-conceptual-v1.webp",
+  "/api/public/studio-media/2026/1788291774706-qcx0r0-restaurante-campo-milpa-conceptual-v1.webp",
 ] as const;
 
 const PROFILES: Record<SupportedFamily, FamilyProfile> = {
@@ -141,6 +144,21 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
         label: "Patios de Valladolid",
         alt: "Visual conceptual temporal de restaurante en patio colonial",
       },
+      {
+        src: RESTAURANT_MEDIA[3],
+        label: "Izamal",
+        alt: "Visual conceptual temporal de gastronomía en Izamal",
+      },
+      {
+        src: RESTAURANT_MEDIA[4],
+        label: "Costa de El Cuyo",
+        alt: "Visual conceptual temporal de cocina costera en El Cuyo",
+      },
+      {
+        src: RESTAURANT_MEDIA[5],
+        label: "Campo y milpa",
+        alt: "Visual conceptual temporal de cocina de campo y milpa",
+      },
     ],
     icon: <ChefHat className="size-4" aria-hidden />,
   },
@@ -204,6 +222,16 @@ export function PremiumDiscoveryListingSurface({
   const [secondary, setSecondary] = useState(ALL);
   const [query, setQuery] = useState("");
   const [showMapMobile, setShowMapMobile] = useState(false);
+  const [heroIndex, setHeroIndex] = useState(0);
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+    const timer = window.setInterval(
+      () => setHeroIndex((value) => (value + 1) % profile.heroSlides.length),
+      6800,
+    );
+    return () => window.clearInterval(timer);
+  }, [profile.heroSlides.length]);
 
   const items = useMemo(() => [...dto.items], [dto.items]);
   const destinations = useMemo(
@@ -239,7 +267,7 @@ export function PremiumDiscoveryListingSurface({
   const heroItem = items.find((item) => item.mediaUrl) ?? null;
   const hero = heroItem
     ? { src: heroItem.mediaUrl!, alt: heroItem.mediaAlt ?? heroItem.name, conceptual: false }
-    : { ...profile.heroSlides[0], conceptual: true };
+    : { ...profile.heroSlides[heroIndex], conceptual: true };
   const cinematic = presentation === "cinematic";
 
   return (
@@ -357,6 +385,9 @@ function PremiumHero({
         <p className="mt-5 max-w-xl text-base leading-7 text-white/82 sm:text-lg">
           {profile.subtitle}
         </p>
+        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+          {ACTIVE_BRAND.discoveryPromise}
+        </p>
       </div>
     </section>
   );
@@ -370,6 +401,7 @@ function AluxPreferenceBar({ profile }: { profile: FamilyProfile }) {
       description={`Cuéntame si estás planeando venir o si ya estás aquí. Ajustaré ${profile.itemNounPlural}, rutas y tiempos a tu momento real.`}
       task={`Ayúdame a ${profile.family === "hoteles" ? "elegir dónde hospedarme" : "elegir dónde comer"} en el Oriente Maya.`}
       prompts={profile.prompts}
+      compact
     />
   );
 }
@@ -561,7 +593,7 @@ function PremiumListingCard({
           {item.href ? (
             <a
               href={item.href}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-selva px-4 text-sm font-semibold text-selva-foreground"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-selva px-4 text-sm font-semibold text-selva-foreground"
             >
               {profile.actionLabel}
               <ArrowRight className="size-4" aria-hidden />

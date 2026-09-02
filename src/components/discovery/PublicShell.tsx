@@ -97,9 +97,23 @@ function PublicShellBody({
   useContextCrumbs,
   children,
 }: PublicShellBodyProps) {
-  if (variant === "minimal" || variant === "hero") {
+  if (variant === "minimal") {
     return (
       <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
+        {children}
+      </main>
+    );
+  }
+
+  if (variant === "hero") {
+    const hasCrumbs = useContextCrumbs || Boolean(crumbs && crumbs.length > 0);
+    return (
+      <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
+        {hasCrumbs ? (
+          <Container className="py-3">
+            <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} />
+          </Container>
+        ) : null}
         {children}
       </main>
     );

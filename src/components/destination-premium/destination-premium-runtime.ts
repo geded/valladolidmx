@@ -27,7 +27,24 @@ export function buildDestinationPremiumRuntime(input: {
   const { destination, media, mapPoints, nearbyDestinations = [] } = input;
   const cover = media.find((item) => item.role === "cover") ?? null;
   const gallery = media.filter((item) => item.role === "gallery");
-  const allMedia = [...(cover ? [cover] : []), ...gallery];
+  const approvedConceptual =
+    destination.slug === "valladolid" && !cover
+      ? [
+          {
+            url: "/api/public/studio-media/conceptual-preview/2026-09-01/valladolid-san-servacio-hero-preview.webp",
+            alt: "Visual conceptual temporal de Valladolid, reemplazable en Medios",
+          },
+          {
+            url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-valladolid-editorial-preview.webp",
+            alt: "Visual conceptual temporal del centro de Valladolid, reemplazable en Medios",
+          },
+        ]
+      : [];
+  const allMedia = [
+    ...(cover ? [mediaOf(cover)] : approvedConceptual.slice(0, 1)),
+    ...gallery.map(mediaOf),
+    ...approvedConceptual.slice(1),
+  ];
   const paragraphs = destination.description?.trim() ? [destination.description.trim()] : [];
   const mapItems = [
     ...(destination.latitude != null && destination.longitude != null
@@ -73,8 +90,8 @@ export function buildDestinationPremiumRuntime(input: {
         `Explora ${destination.name} y prepara tu recorrido por el Oriente Maya de Yucatán.`,
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Explorar servicios", href: "#servicios-destino" },
-      cover: cover ? mediaOf(cover) : { url: "", alt: "" },
-      supporting: gallery.slice(0, 2).map(mediaOf),
+      cover: allMedia[0] ?? { url: "", alt: "" },
+      supporting: allMedia.slice(1, 3),
     },
     services: [
       { key: "hoteles", label: "Hoteles", hint: "Dónde dormir", media: { url: "", alt: "" } },
@@ -104,13 +121,15 @@ export function buildDestinationPremiumRuntime(input: {
       kicker: "El destino",
       title: `Descubre ${destination.name}`,
       paragraphs,
-      media: gallery.slice(0, 3).map(mediaOf),
+      media: allMedia.slice(1, 4),
     },
     gallery: {
       kicker: "Galería",
       title: `${destination.name} en imágenes`,
-      note: "Fotografías acreditadas para uso público.",
-      items: allMedia.map(mediaOf),
+      note: cover
+        ? "Fotografías acreditadas para uso público."
+        : "Visuales conceptuales temporales, reemplazables desde Medios.",
+      items: allMedia,
     },
     servicePreview: {
       actionLabel: "Ver todo",

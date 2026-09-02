@@ -193,9 +193,10 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
       const heroMedia = row.media_assets as unknown as Parameters<
         typeof isAccreditedDestinationMedia
       >[0];
-      const imageUrl = isAccreditedDestinationMedia(heroMedia)
-        ? toStablePublicMediaUrl(heroMedia.storage_bucket, heroMedia.storage_path)
-        : null;
+      const imageUrl =
+        heroMedia && isAccreditedDestinationMedia(heroMedia)
+          ? toStablePublicMediaUrl(heroMedia.storage_bucket, heroMedia.storage_path)
+          : null;
       return {
         id: row.id,
         region_slug: regionSlug,

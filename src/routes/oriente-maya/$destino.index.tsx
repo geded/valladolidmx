@@ -19,14 +19,10 @@ import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import { stableIndexableImageUrl } from "@/lib/media/stable-public-url";
 import {
-  DestinationSurface,
   DestinationSurfaceContractBoundary,
   DestinationSurfaceProvider,
 } from "@/components/surfaces/DestinationSurface";
-import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import { getDestinationPremiumEligibility } from "@/lib/omxds/surfaces/destination-premium-eligibility.server";
-import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
-import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import {
   getPublicDestinationBySlug,
   getDestinationRelated,
@@ -38,11 +34,7 @@ import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 
-import {
-  ContextEngineProvider,
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
 /**
  * H-02 · I3 — Construye la declaración de contexto de la ficha de
@@ -74,20 +66,11 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
     const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
-    // SEO.A2.M1 · Territorial Landing MVP — se resuelve primero una
-    // composición específica por slug (`dest-<slug>`) y, en su ausencia,
-    // la plantilla oficial `__tpl_destination__`. Misma arquitectura que
-    // `/oriente-maya` (Región).
-    // 19.23 — La elegibilidad Premium del destino se lee SIEMPRE y es
-    // independiente del flag global (fail-closed dentro del server fn).
     const [
       db,
       related,
       mapPoints,
       galleryMedia,
-      specific,
-      template,
-      surfaceContractsEnabled,
       premiumEligibility,
       evaluationLot,
       homeRealContent,
@@ -96,9 +79,6 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
       getDestinationMapPoints({ data: { slug: params.destino } }).catch(() => []),
       getDestinationGalleryMedia({ data: { slug: params.destino } }).catch(() => []),
-      getPublishedCompositionBySlug({ data: { slug: `dest-${params.destino}` } }).catch(() => null),
-      getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
-      getOmxdsSurfaceContractsFlag().catch(() => false),
       getDestinationPremiumEligibility({ data: { slug: params.destino } }).catch(() => null),
       // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
       getEvaluationLotSlugs().catch(() => null),
@@ -110,13 +90,9 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       name: db?.name ?? mock?.name ?? params.destino,
       tagline: db?.tagline ?? mock?.tagline ?? "",
       hero_palette: (db?.hero_palette ?? mock?.hero_palette ?? "territorio") as
-        | "territorio"
-        | "selva"
-        | "cenote"
-        | "atardecer",
+        "territorio" | "selva" | "cenote" | "atardecer",
       highlights: (db?.highlights?.length ? db.highlights : (mock?.highlights ?? [])) as string[],
     };
-    const composition = specific ?? template ?? null;
     const premiumEnabled = premiumEligibility?.eligible === true;
     // 19.23 — Fuente estable para OG/JSON-LD (proxy canónico), nunca una
     // URL firmada temporal. Sin cover gobernada se conserva el
@@ -138,8 +114,6 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       mapPoints,
       galleryMedia,
       galleryUrls: governedGalleryUrls.length > 0 ? governedGalleryUrls : galleryUrls,
-      composition,
-      surfaceContractsEnabled,
       premiumEnabled,
       stableCoverUrl,
       // G8-R1-F1L · Los 7 destinos bajo revisión visual F1K permanecen
@@ -199,18 +173,17 @@ function DestinoPage() {
     mapPoints,
     galleryUrls,
     galleryMedia,
-    composition,
-    surfaceContractsEnabled,
     premiumEnabled,
     nearbyDestinations,
   } = Route.useLoaderData();
+  const search = Route.useSearch() as { presentacion?: "cinematografica" };
   const declaration = buildDestinationContext(dest.slug, dest.name);
   // SEO.A2.M1 — La ruta hidrata `DestinationSurfaceProvider` con los
   // datos server-side. Si existe composición publicada (plantilla o
   // específica), se renderiza vía Experience Builder; en su ausencia
   // cae al render directo de `<DestinationSurface />` (misma UI).
   return (
-    <ContextEngineProvider declaration={declaration}>
+    <PublicShell variant="hero" contextDeclaration={declaration} useContextCrumbs>
       <DestinationSurfaceProvider
         db={db ?? null}
         related={related ?? null}
@@ -220,10 +193,6 @@ function DestinoPage() {
         galleryMedia={galleryMedia ?? []}
       >
         <DestinationSurfaceContractBoundary
-          // 19.23 — Premium por ficha: el flag global conserva su función
-          // para el resto de contratos; la habilitación del destino
-          // depende del conjunto gobernado completo.
-          enabled={surfaceContractsEnabled || premiumEnabled}
           destinationSlug={dest.slug}
           dbData={db ?? undefined}
           related={related ?? undefined}
@@ -231,24 +200,11 @@ function DestinoPage() {
           galleryUrls={galleryUrls ?? []}
           galleryMedia={galleryMedia ?? []}
           premiumEnabled={premiumEnabled}
+          presentation={search.presentacion === "cinematografica" ? "cinematic" : "editorial"}
           nearbyDestinations={nearbyDestinations}
-          legacy={
-            composition ? (
-              <CompositionRenderer tree={composition.snapshot} />
-            ) : (
-              <DestinationSurface
-                dbData={db ?? undefined}
-                related={related ?? undefined}
-                mapPoints={mapPoints ?? []}
-                galleryUrls={galleryUrls ?? []}
-                galleryMedia={galleryMedia ?? []}
-                premiumEnabled={premiumEnabled}
-              />
-            )
-          }
         />
       </DestinationSurfaceProvider>
-    </ContextEngineProvider>
+    </PublicShell>
   );
 }
 

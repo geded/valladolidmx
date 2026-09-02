@@ -1,9 +1,8 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass, Map as MapIcon, MapPin, Palmtree, Search } from "lucide-react";
 
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
-import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { Container } from "@/components/layout/Container";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { Button } from "@/components/ui/button";
@@ -19,13 +18,26 @@ const InteractiveMap = lazy(() =>
 const PAGE_SIZE = 8;
 const PUEBLOS_MAGICOS = new Set(["valladolid", "izamal", "espita"]);
 const COASTAL = new Set(["el-cuyo", "las-coloradas", "rio-lagartos", "san-felipe"]);
-const HERO_MEDIA =
-  "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-territorio-v1.webp";
+const HERO_MEDIA = [
+  {
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-territorio-v1.webp",
+    alt: "Valladolid como puerta de entrada al Oriente Maya",
+  },
+  {
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-naturaleza-v1.webp",
+    alt: "Naturaleza y cenotes del Oriente Maya",
+  },
+  {
+    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-cultura-v1.webp",
+    alt: "Cultura maya viva del oriente de Yucatán",
+  },
+] as const;
 
 function destinationFamily(destination: Destination): string {
   if (PUEBLOS_MAGICOS.has(destination.slug)) return "pueblos";
   if (COASTAL.has(destination.slug)) return "costa";
-  const text = `${destination.name} ${destination.tagline} ${destination.highlights.join(" ")}`.toLowerCase();
+  const text =
+    `${destination.name} ${destination.tagline} ${destination.highlights.join(" ")}`.toLowerCase();
   if (/cenote|agua|reserva|naturaleza|flamenco/.test(text)) return "naturaleza";
   if (/maya|arqueol|historia|cultura/.test(text)) return "cultura";
   return "territorio";
@@ -56,16 +68,35 @@ function orderedDestinations(destinations: Destination[]): Destination[] {
  * Catálogo regional aprobado (IMG_0575), conectado a destinos reales.
  * La identidad proviene de ACTIVE_BRAND; el motor es reutilizable por otras marcas.
  */
-export function RegionDestinationsPremiumSurface({ destinations }: { destinations: Destination[] }) {
+export function RegionDestinationsPremiumSurface({
+  destinations,
+  presentation = "editorial",
+}: {
+  destinations: Destination[];
+  presentation?: "editorial" | "cinematic";
+}) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("todos");
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [heroIndex, setHeroIndex] = useState(0);
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+    const timer = window.setInterval(
+      () => setHeroIndex((value) => (value + 1) % HERO_MEDIA.length),
+      6800,
+    );
+    return () => window.clearInterval(timer);
+  }, []);
   const ordered = useMemo(() => orderedDestinations(destinations), [destinations]);
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase("es");
     return ordered.filter((destination) => {
       const matchesFamily = filter === "todos" || destinationFamily(destination) === filter;
-      const haystack = `${destination.name} ${destination.tagline} ${destination.highlights.join(" ")}`.toLocaleLowerCase("es");
+      const haystack =
+        `${destination.name} ${destination.tagline} ${destination.highlights.join(" ")}`.toLocaleLowerCase(
+          "es",
+        );
       return matchesFamily && (!needle || haystack.includes(needle));
     });
   }, [filter, ordered, query]);
@@ -75,12 +106,32 @@ export function RegionDestinationsPremiumSurface({ destinations }: { destination
       typeof destination.latitude === "number" && typeof destination.longitude === "number",
   );
   const heroDestination = ordered.find((destination) => destination.slug === "valladolid");
-  const heroMedia = heroDestination?.image_url || HERO_MEDIA;
+  const heroMedia = heroDestination?.image_url
+    ? { src: heroDestination.image_url, alt: `Valladolid, punto de partida del Oriente Maya` }
+    : HERO_MEDIA[heroIndex];
+  const cinematic = presentation === "cinematic";
 
   return (
     <main className="pb-20" data-region-destinations="premium-approved">
       <Container className="pt-5">
-        <section className="overflow-hidden rounded-[2rem] border border-border bg-selva shadow-soft lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]">
+        <section
+          className={cn(
+            "relative isolate overflow-hidden rounded-[2rem] border border-border bg-selva shadow-soft",
+            cinematic
+              ? "min-h-[34rem]"
+              : "lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]",
+          )}
+        >
+          {cinematic ? (
+            <img
+              src={heroMedia.src}
+              alt={heroMedia.alt}
+              className="absolute inset-0 -z-20 size-full object-cover"
+            />
+          ) : null}
+          {cinematic ? (
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/82 via-black/48 to-transparent" />
+          ) : null}
           <div className="flex flex-col justify-center p-7 text-selva-foreground sm:p-10 lg:p-12">
             <p className="text-xs font-semibold uppercase tracking-[.19em] text-primary">
               {ACTIVE_BRAND.tagline}
@@ -97,10 +148,12 @@ export function RegionDestinationsPremiumSurface({ destinations }: { destination
               cenotes sagrados, costa y sabores únicos.
             </p>
           </div>
-          <div className="relative min-h-72 overflow-hidden lg:min-h-full">
+          <div
+            className={cn("relative min-h-72 overflow-hidden lg:min-h-full", cinematic && "hidden")}
+          >
             <img
-              src={heroMedia}
-              alt="Valladolid como punto de partida para descubrir el Oriente Maya de Yucatán"
+              src={heroMedia.src}
+              alt={heroMedia.alt}
               className="absolute inset-0 size-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/24 via-transparent to-transparent" />
@@ -117,7 +170,13 @@ export function RegionDestinationsPremiumSurface({ destinations }: { destination
           title="¿Qué lugares quieres conocer?"
           description="Te propongo una ruta según tus días, compañía e intereses; Valladolid funciona como base para descubrir la región sin convertir el viaje en una carrera."
           task="Ayúdame a descubrir destinos del Oriente Maya desde Valladolid y convertirlos en una ruta real."
-          prompts={["Pueblos Mágicos", "Cenotes y comunidades", "Historia y gastronomía", "Tengo un día"]}
+          prompts={[
+            "Pueblos Mágicos",
+            "Cenotes y comunidades",
+            "Historia y gastronomía",
+            "Tengo un día",
+          ]}
+          compact
         />
 
         <section className="mt-5 rounded-3xl border border-border bg-card p-3 shadow-sm">
@@ -166,7 +225,10 @@ export function RegionDestinationsPremiumSurface({ destinations }: { destination
         </section>
 
         <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(26rem,.96fr)]">
-          <section className="min-w-0 rounded-3xl border border-border bg-card p-4 shadow-sm" aria-labelledby="destination-list-heading">
+          <section
+            className="min-w-0 rounded-3xl border border-border bg-card p-4 shadow-sm"
+            aria-labelledby="destination-list-heading"
+          >
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
@@ -201,7 +263,10 @@ export function RegionDestinationsPremiumSurface({ destinations }: { destination
             ) : null}
           </section>
 
-          <section className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-sm xl:sticky xl:top-24 xl:self-start" aria-labelledby="territory-map-heading">
+          <section
+            className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-sm xl:sticky xl:top-24 xl:self-start"
+            aria-labelledby="territory-map-heading"
+          >
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
@@ -327,15 +392,7 @@ function DestinationCard({ destination, index }: { destination: Destination; ind
           </span>
         </div>
       </Link>
-      <div className="mt-auto grid gap-2 border-t border-border p-3 sm:grid-cols-2">
-        <FavoriteButton
-          entityKind="destination"
-          entityId={destination.id}
-          entityTitle={destination.name}
-          entitySlug={destination.slug}
-          entityImageUrl={destination.image_url}
-          className="min-h-11 justify-center rounded-full"
-        />
+      <div className="mt-auto border-t border-border p-3">
         <AddToTravelPlanButton
           kind="destination"
           targetId={destination.id}

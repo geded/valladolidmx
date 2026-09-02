@@ -16,18 +16,35 @@ import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experienc
 export type HomePremiumMedia = { url: string; alt: string };
 
 /**
- * G8-R1-F1L-R2 · Ningún medio de la Home se declara en el fixture.
- * La fotografía sólo llega desde el resolutor real del CMS con
- * acreditación G8-M1. Sin acreditación, `EditorialMediaFrame` rinde el
- * marcador editorial neutral aprobado. Nunca se reutiliza una imagen ajena.
+ * Medios conceptuales aprobados para visualizar la Home completa antes de
+ * producción. Todos viven en Medios, están marcados como IA/temporales y el
+ * resolutor real del CMS los sustituye en cuanto existe fotografía acreditada.
  */
 export const HOME_PREMIUM_MEDIA = {
-  plaza: { url: "", alt: "Plaza principal de Valladolid" },
-  calle: { url: "", alt: "Calle colonial de Valladolid" },
-  centro: { url: "", alt: "Centro histórico de Valladolid" },
-  cocina: { url: "", alt: "Cocina yucateca del Oriente Maya" },
-  patio: { url: "", alt: "Patio colonial de piedra caliza" },
-  cenote: { url: "", alt: "Cenote del Oriente Maya de Yucatán" },
+  plaza: {
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-valladolid-editorial-preview.webp",
+    alt: "Visual conceptual temporal de la plaza principal de Valladolid",
+  },
+  calle: {
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/home-izamal-editorial-preview.webp",
+    alt: "Visual conceptual temporal de arquitectura colonial del Oriente Maya",
+  },
+  centro: {
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/valladolid-san-servacio-hero-preview.webp",
+    alt: "Visual conceptual temporal del centro histórico de Valladolid",
+  },
+  cocina: {
+    url: "/api/public/studio-media/2026/1788291772757-yp7xx5-restaurante-comal-cocina-maya-conceptual-v1.webp",
+    alt: "Visual conceptual temporal de cocina yucateca del Oriente Maya",
+  },
+  patio: {
+    url: "/api/public/studio-media/2026/1788291775648-7j8tiw-restaurante-patio-colonial-conceptual-v1.webp",
+    alt: "Visual conceptual temporal de un patio colonial",
+  },
+  cenote: {
+    url: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-naturaleza-v1.webp",
+    alt: "Visual conceptual temporal de un cenote del Oriente Maya",
+  },
 } as const satisfies Record<string, HomePremiumMedia>;
 
 export type HomePremiumSectionKey =

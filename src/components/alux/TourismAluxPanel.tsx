@@ -12,6 +12,7 @@ export interface TourismAluxPanelProps {
   prompts?: readonly string[];
   className?: string;
   variant?: "bar" | "card";
+  compact?: boolean;
 }
 
 export function buildAluxStageAwareHint(task: string, preference?: string): string {
@@ -35,6 +36,7 @@ export function TourismAluxPanel({
   prompts = [],
   className,
   variant = "bar",
+  compact = false,
 }: TourismAluxPanelProps) {
   const ask = (preference?: string) =>
     openAluxFloating({
@@ -44,7 +46,11 @@ export function TourismAluxPanel({
 
   return (
     <section
-      className={cn("rounded-3xl border border-border bg-card p-4 shadow-soft sm:p-5", className)}
+      className={cn(
+        "rounded-3xl border border-border bg-card shadow-soft",
+        compact ? "p-3 sm:p-4" : "p-4 sm:p-5",
+        className,
+      )}
       aria-label={`${ACTIVE_BRAND.conciergeName}, concierge IA`}
     >
       <div
@@ -59,26 +65,34 @@ export function TourismAluxPanel({
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               {ACTIVE_BRAND.conciergeName} · Concierge IA
             </p>
-            <h2 className="mt-1 font-serif text-2xl leading-tight text-foreground">{title}</h2>
+            <h2
+              className={cn(
+                "mt-1 font-serif leading-tight text-foreground",
+                compact ? "text-xl" : "text-2xl",
+              )}
+            >
+              {title}
+            </h2>
           </div>
         </div>
 
         <div>
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
-          {prompts.length ? (
-            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
-              {prompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => ask(prompt)}
-                  className="min-h-11 shrink-0 rounded-full border border-border bg-background px-4 text-sm text-foreground transition-colors hover:border-primary hover:bg-primary/10"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          ) : null}
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
+            {["Estoy planeando", "Ya estoy en la región", ...prompts].map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() => ask(prompt)}
+                className={cn(
+                  "shrink-0 rounded-full border border-border bg-background px-4 text-sm text-foreground transition-colors hover:border-primary hover:bg-primary/10",
+                  compact ? "min-h-9" : "min-h-11",
+                )}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
         </div>
 
         <button

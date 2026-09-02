@@ -6,6 +6,7 @@ export interface TourismBrandDefinition {
   name: string;
   shortName: string;
   tagline: string;
+  discoveryPromise: string;
   conciergeName: string;
   logo: { src: string; width: number; height: number };
   palette: {
@@ -35,6 +36,7 @@ export const ACTIVE_BRAND: TourismBrandDefinition = {
   name: "Valladolid.mx",
   shortName: "Valladolid",
   tagline: "Oriente Maya de Yucatán",
+  discoveryPromise: "Despierta en Valladolid y descubre el Oriente Maya de Yucatán",
   conciergeName: "Alux",
   logo: { src: "/logo.png", width: 470, height: 159 },
   palette: {

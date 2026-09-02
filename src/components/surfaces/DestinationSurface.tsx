@@ -64,7 +64,6 @@ import {
   type DestinationPremiumNearbySource,
 } from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -190,8 +189,7 @@ export function buildDestinationSurfaceContract(
 }
 
 export interface DestinationSurfaceContractBoundaryProps extends DestinationSurfaceProps {
-  enabled: boolean;
-  legacy: ReactNode;
+  presentation?: "editorial" | "cinematic";
 }
 
 function PremiumRelatedCollection({ service, name }: { service: string; name: string }) {
@@ -251,8 +249,6 @@ function withoutUnaccreditedRelatedMedia(
 }
 
 export function DestinationSurfaceContractBoundary({
-  enabled,
-  legacy,
   destinationSlug,
   dbData,
   related,
@@ -260,16 +256,39 @@ export function DestinationSurfaceContractBoundary({
   galleryUrls,
   galleryMedia,
   premiumEnabled,
+  presentation = "editorial",
   nearbyDestinations,
 }: DestinationSurfaceContractBoundaryProps) {
-  if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
+  const approvedMock = destinationSlug
+    ? DESTINOS_MOCK.find(
+        (destination) =>
+          destination.slug === destinationSlug && destination.region_slug === ORIENTE_MAYA.slug,
+      )
+    : null;
+  const premiumDestination =
+    dbData ??
+    (approvedMock
+      ? {
+          id: approvedMock.id,
+          slug: approvedMock.slug,
+          name: approvedMock.name,
+          tagline: approvedMock.tagline,
+          description: approvedMock.tagline,
+          highlights: [...approvedMock.highlights],
+          hero_palette: approvedMock.hero_palette,
+          hero_url: approvedMock.image_url ?? null,
+          latitude: approvedMock.latitude ?? null,
+          longitude: approvedMock.longitude ?? null,
+        }
+      : null);
+  if (destinationSlug && premiumDestination) {
     const accreditedMedia = (galleryMedia ?? []).filter(
       (item) => !hasForbiddenDestinationMedia(item),
     );
     const safeRelated = withoutUnaccreditedRelatedMedia(related);
     const content = buildDestinationPremiumRuntime({
       id: `destination:${destinationSlug}`,
-      destination: dbData,
+      destination: premiumDestination,
       media: accreditedMedia,
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
       nearbyDestinations,
@@ -278,10 +297,10 @@ export function DestinationSurfaceContractBoundary({
       <div
         data-omxds-visual-foundations="enabled"
         data-destination-template="premium-g4"
-        data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}
+        data-destination-presentation={presentation}
       >
         <DestinationSurfaceProvider
-          db={dbData}
+          db={dbData ?? null}
           related={safeRelated}
           slug={destinationSlug}
           mapPoints={mapPoints}
@@ -290,62 +309,31 @@ export function DestinationSurfaceContractBoundary({
         >
           <DestinationPremiumSurface
             content={content}
-            heroVariant={premiumEnabled ? "cinematic" : "editorial"}
+            heroVariant={presentation}
             sections={{ gallery: accreditedMedia.length > 0 }}
             heroAction={
-              dbData.id ? (
+              premiumDestination.id ? (
                 <AddToTravelPlanButton
                   kind="destination"
-                  targetId={dbData.id}
-                  title={dbData.name}
+                  targetId={premiumDestination.id}
+                  title={premiumDestination.name}
                   slug={destinationSlug}
                   imageUrl={content.hero.cover.url || null}
-                  subtitle={dbData.tagline}
+                  subtitle={premiumDestination.tagline}
                   variant="full"
                   eligibilityMode="legacy"
                 />
               ) : null
             }
             renderServicePreview={(service) => (
-              <PremiumRelatedCollection service={service.key} name={dbData.name} />
+              <PremiumRelatedCollection service={service.key} name={premiumDestination.name} />
             )}
           />
         </DestinationSurfaceProvider>
       </div>
     );
   }
-  if (!enabled || !destinationSlug) return legacy;
-
-  const mock = DESTINOS_MOCK.find(
-    (destination) =>
-      destination.slug === destinationSlug && destination.region_slug === ORIENTE_MAYA.slug,
-  );
-  if (!dbData && !mock) return legacy;
-
-  const input = toDestinationBlockInput(dbData, mock ?? null, {
-    slug: destinationSlug,
-    regionSlug: ORIENTE_MAYA.slug,
-    regionName: ORIENTE_MAYA.name,
-    counts: destinationRelatedCounts(related),
-    galleryUrls: galleryUrls ?? [],
-    mediaAttribution: galleryMedia ?? [],
-    mapPoints: mapPoints ?? [],
-  });
-  const surfaceContract = buildDestinationSurfaceContract(input);
-  if (!surfaceContract) return legacy;
-
-  return (
-    <DestinationSurface
-      destinationSlug={destinationSlug}
-      dbData={dbData}
-      related={related}
-      mapPoints={mapPoints}
-      galleryUrls={galleryUrls}
-      galleryMedia={galleryMedia}
-      surfaceContract={surfaceContract}
-      premiumEnabled={premiumEnabled}
-    />
-  );
+  return null;
 }
 
 export function DestinationSurface({
