@@ -157,11 +157,14 @@ function Filters() {
   return (
     <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
       <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
-        <label className="relative min-w-[15rem] lg:min-w-0">
+        <label className="relative min-w-[12.5rem] lg:min-w-0">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]" aria-hidden />
           <span className="sr-only">Buscar hotel</span>
           <input placeholder="Buscar hotel, zona o servicio" className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none" />
         </label>
+        <button className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden">
+          <Map className="size-4" aria-hidden /> Ver mapa
+        </button>
         {['Zona', 'Tipo de hospedaje', 'Servicios'].map((label) => (
           <button key={label} className="inline-flex min-h-11 min-w-max items-center justify-between gap-3 rounded-xl border border-[#ded7c9] bg-[#fbfaf6] px-4 text-sm lg:min-w-0">
             {label} <span className="text-xs">⌄</span>
@@ -231,7 +234,7 @@ function NearbySection() {
 
 function MapPanel() {
   return (
-    <aside className="order-first lg:order-none lg:sticky lg:top-24">
+    <aside className="order-first hidden sm:block lg:order-none lg:sticky lg:top-24">
       <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-[#ded7c9] px-4 py-3">
           <div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#ba641e]">Mapa territorial</p><h2 className="font-display text-xl">Hoteles en Valladolid</h2></div>
