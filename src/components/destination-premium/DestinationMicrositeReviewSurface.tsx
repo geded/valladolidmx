@@ -2,6 +2,7 @@ import {
   ArrowRight,
   CalendarDays,
   Facebook,
+  Home,
   Instagram,
   MapPin,
   Route as RouteIcon,
@@ -192,6 +193,15 @@ function TerritoryContext() {
       aria-label="Ubicación territorial"
       className="flex min-h-12 items-center gap-2 rounded-full border border-black/10 bg-white px-5 text-sm shadow-sm"
     >
+      <a
+        href="/"
+        aria-label="Volver al inicio"
+        title="Inicio"
+        className="grid size-8 shrink-0 place-items-center rounded-full text-[#1e5a48] transition-colors hover:bg-[#edf4ef]"
+      >
+        <Home className="size-4" aria-hidden />
+      </a>
+      <span className="text-black/30">/</span>
       <a href="/oriente-maya" className="font-medium text-[#1e5a48]">
         Oriente Maya
       </a>
