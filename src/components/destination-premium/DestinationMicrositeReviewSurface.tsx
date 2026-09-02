@@ -1,6 +1,8 @@
 import {
   ArrowRight,
   CalendarDays,
+  Facebook,
+  Instagram,
   MapPin,
   Route as RouteIcon,
   Sparkles,
@@ -8,6 +10,7 @@ import {
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/ui/button";
 import {
   DESTINATION_PREMIUM_G4_CONTENT,
@@ -131,6 +134,8 @@ export function DestinationMicrositeReviewSurface() {
       <Container className="mt-12">
         <TripClose />
       </Container>
+
+      <ReviewFooter />
     </main>
   );
 }
@@ -496,7 +501,14 @@ function TerritoryMap() {
 function TripClose() {
   return (
     <section className="grid items-center gap-5 rounded-[1.75rem] bg-[#123f32] px-7 py-7 text-white sm:grid-cols-[auto_1fr_auto]">
-      <AluxMark family="avatar" size={72} decorative />
+      <div className="flex justify-center">
+        <img
+          src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
+          alt=""
+          aria-hidden
+          className="h-[72px] w-[72px] object-contain"
+        />
+      </div>
       <div>
         <p className="text-xs uppercase tracking-[.18em] text-[#efb74b]">Tu viaje empieza aquí</p>
         <h2 className="mt-1 font-serif text-3xl">Deja que Valladolid te abra el territorio</h2>
@@ -508,5 +520,76 @@ function TripClose() {
         Armar mi viaje <Sparkles className="ml-2 size-4" />
       </Button>
     </section>
+  );
+}
+
+function ReviewFooter() {
+  return (
+    <footer className="mt-20 bg-[#171b18] text-white">
+      <Container className="grid gap-10 py-14 md:grid-cols-[1.25fr_1fr_1fr_1fr]">
+        <div>
+          <BrandLogo tone="light" size="md" />
+          <p className="mt-4 max-w-xs text-sm leading-6 text-white/55">
+            Despierta en Valladolid y descubre todo el Oriente Maya de Yucatán.
+          </p>
+        </div>
+        <FooterColumn
+          title="Descubre"
+          links={["Destinos", "Experiencias", "Rutas", "Pueblos Mágicos"]}
+        />
+        <FooterColumn
+          title="Planea"
+          links={["Hoteles", "Restaurantes", "Casas de vacaciones", "Eventos"]}
+        />
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#f4b640]">
+            Síguenos
+          </p>
+          <div className="mt-5 flex gap-3">
+            <a
+              href="#"
+              aria-label="Instagram"
+              className="grid size-10 place-items-center rounded-full border border-white/20"
+            >
+              <Instagram className="size-4" />
+            </a>
+            <a
+              href="#"
+              aria-label="Facebook"
+              className="grid size-10 place-items-center rounded-full border border-white/20"
+            >
+              <Facebook className="size-4" />
+            </a>
+          </div>
+        </div>
+      </Container>
+      <div className="border-t border-white/10">
+        <Container className="flex flex-col justify-between gap-3 py-6 text-xs text-white/40 sm:flex-row">
+          <p>© 2026 Valladolid.mx · Oriente Maya de Yucatán</p>
+          <div className="flex gap-5">
+            <span>Privacidad</span>
+            <span>Términos</span>
+            <span>Contacto</span>
+          </div>
+        </Container>
+      </div>
+    </footer>
+  );
+}
+
+function FooterColumn({ title, links }: { title: string; links: string[] }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#f4b640]">{title}</p>
+      <ul className="mt-5 space-y-3 text-sm text-white/55">
+        {links.map((link) => (
+          <li key={link}>
+            <a href="#" className="hover:text-white">
+              {link}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
