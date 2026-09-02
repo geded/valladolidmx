@@ -26,7 +26,7 @@ const experiences = [
   { title: "Cenotes y mundo subterráneo", eyebrow: "Naturaleza sagrada", image: media.cenote },
   { title: "Calzada de los Frailes", eyebrow: "Caminar la historia", image: media.calle },
   { title: "Sabores con identidad", eyebrow: "Cocina vallisoletana", image: media.cochinita },
-  { title: "Ek’ Balam al amanecer", eyebrow: "Legado maya", image: media.piramide },
+  { title: "Talleres y oficios de Valladolid", eyebrow: "Cultura viva", image: media.plaza },
 ];
 
 const routes = [
@@ -36,7 +36,11 @@ const routes = [
     meta: "Día completo · Naturaleza y cultura viva",
     image: media.cenote,
   },
-  { title: "Legado maya", meta: "Medio día · Ek’ Balam y territorio", image: media.piramide },
+  {
+    title: "Valladolid al caer la tarde",
+    meta: "Medio día · Barrios, plaza y sabores",
+    image: media.calle,
+  },
 ];
 
 const places = [
@@ -53,7 +57,10 @@ const stories = [
 
 export function DestinationMicrositeReviewSurface() {
   return (
-    <main className="bg-[#f7f3ea] pb-20 text-[#18221d]">
+    <main
+      data-content-policy="destination-first-nearby-fallback"
+      className="bg-[#f7f3ea] pb-20 text-[#18221d]"
+    >
       <Hero />
 
       <Container className="mt-5">
