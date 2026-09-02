@@ -21,6 +21,34 @@ jobs:
           bun-version: 1.3.14
       - run: bun install --frozen-lockfile
       - run: bunx playwright@1.55.0 install --with-deps chromium
+      - name: Stage approved media for isolated review
+        run: |
+          mkdir -p public/review-media/governed public/review-media/conceptual
+          base=https://valladolidmx.lovable.app/api/public/studio-media
+          for file in destination-gallery-1.jpg destination-gallery-2.jpg destination-cover.jpg restaurant-cover.jpg hotel-cover.jpg experience-cover.jpg; do
+            curl --fail --location --retry 3 "$base/governed/v1p1c/$file" --output "public/review-media/governed/$file"
+          done
+          for file in home-valladolid-editorial-preview.webp home-izamal-editorial-preview.webp home-espita-editorial-preview.webp home-temozon-editorial-preview.webp; do
+            curl --fail --location --retry 3 "$base/conceptual-preview/2026-09-01/$file" --output "public/review-media/conceptual/$file"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("src/routes/lovable/g4-home-premium-preview.tsx")
+          text = path.read_text()
+          text = text.replace(
+              'const OFFICIAL_MEDIA_ORIGIN = "https://valladolidmx.lovable.app";',
+              'const OFFICIAL_MEDIA_ORIGIN = "";'
+          )
+          text = text.replace(
+              '${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/governed/v1p1c',
+              '/review-media/governed'
+          )
+          text = text.replace(
+              '${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/conceptual-preview/2026-09-01',
+              '/review-media/conceptual'
+          )
+          path.write_text(text)
+          PY
       - name: Start visual preview
         run: |
           bun run dev --host 127.0.0.1 --port 4173 > preview.log 2>&1 &
