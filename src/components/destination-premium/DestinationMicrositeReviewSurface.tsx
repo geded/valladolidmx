@@ -1,17 +1,7 @@
-import {
-  ArrowRight,
-  CalendarDays,
-  Facebook,
-  Home,
-  Instagram,
-  MapPin,
-  Route as RouteIcon,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, CalendarDays, Home, MapPin, Route as RouteIcon, Sparkles } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { AluxMark } from "@/components/alux/AluxMark";
-import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/ui/button";
 import {
   DESTINATION_PREMIUM_G4_CONTENT,
@@ -142,8 +132,6 @@ export function DestinationMicrositeReviewSurface() {
       <Container className="mt-12">
         <TripClose />
       </Container>
-
-      <ReviewFooter />
     </main>
   );
 }
@@ -541,76 +529,5 @@ function TripClose() {
         Armar mi viaje <Sparkles className="ml-2 size-4" />
       </Button>
     </section>
-  );
-}
-
-function ReviewFooter() {
-  return (
-    <footer className="mt-14 bg-[#171b18] text-white lg:mt-20">
-      <Container className="grid grid-cols-2 gap-7 py-9 md:grid-cols-[1.25fr_1fr_1fr_1fr] lg:gap-10 lg:py-14">
-        <div>
-          <BrandLogo tone="light" size="md" />
-          <p className="mt-4 max-w-xs text-sm leading-6 text-white/55">
-            Despierta en Valladolid y descubre todo el Oriente Maya de Yucatán.
-          </p>
-        </div>
-        <FooterColumn
-          title="Descubre"
-          links={["Destinos", "Experiencias", "Rutas", "Pueblos Mágicos"]}
-        />
-        <FooterColumn
-          title="Planea"
-          links={["Hoteles", "Restaurantes", "Casas de vacaciones", "Eventos"]}
-        />
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#f4b640]">
-            Síguenos
-          </p>
-          <div className="mt-5 flex gap-3">
-            <a
-              href="#"
-              aria-label="Instagram"
-              className="grid size-10 place-items-center rounded-full border border-white/20"
-            >
-              <Instagram className="size-4" />
-            </a>
-            <a
-              href="#"
-              aria-label="Facebook"
-              className="grid size-10 place-items-center rounded-full border border-white/20"
-            >
-              <Facebook className="size-4" />
-            </a>
-          </div>
-        </div>
-      </Container>
-      <div className="border-t border-white/10">
-        <Container className="flex flex-col justify-between gap-3 py-6 text-xs text-white/40 sm:flex-row">
-          <p>© 2026 Valladolid.mx · Oriente Maya de Yucatán</p>
-          <div className="flex gap-5">
-            <span>Privacidad</span>
-            <span>Términos</span>
-            <span>Contacto</span>
-          </div>
-        </Container>
-      </div>
-    </footer>
-  );
-}
-
-function FooterColumn({ title, links }: { title: string; links: string[] }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#f4b640]">{title}</p>
-      <ul className="mt-5 space-y-3 text-sm text-white/55">
-        {links.map((link) => (
-          <li key={link}>
-            <a href="#" className="hover:text-white">
-              {link}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
