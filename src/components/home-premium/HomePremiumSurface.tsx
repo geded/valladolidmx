@@ -200,13 +200,13 @@ export function HomePremiumSurface({
 
         {presentationOrder.map((key) =>
           enabled(key) ? (
-            <Container key={key} className="mt-10 sm:mt-12">
+            <Container key={key} className="mt-8 lg:mt-12">
               <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
             </Container>
           ) : null,
         )}
 
-        <Container className="mt-10 sm:mt-12">
+        <Container className="mt-8 lg:mt-12">
           <TravelPlanClose
             content={content}
             selectedRoute={selectedRoute}
@@ -275,12 +275,12 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
       <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
-        <div className="flex flex-col justify-center bg-card p-6 sm:p-8 lg:p-10">
+        <div className="flex flex-col justify-center bg-card p-5 sm:p-7 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">{content.hero.eyebrow}</p>
-          <h1 className="mt-2.5 text-balance font-display text-4xl leading-[1.02] sm:text-5xl lg:text-[3.35rem]">
+          <h1 className="mt-2.5 text-balance font-display text-3xl leading-[1.02] sm:text-4xl lg:text-[3.35rem]">
             {content.hero.title}
           </h1>
-          <p className="mt-4 max-w-xl text-[0.95rem] leading-6 text-muted-foreground">
+          <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-5 text-muted-foreground lg:mt-4 lg:text-[0.95rem] lg:leading-6">
             {content.hero.subtitle}
           </p>
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-selva">
@@ -290,7 +290,7 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
             <HeroSearch />
           </div>
         </div>
-        <figure className="relative min-h-[21rem] overflow-hidden lg:min-h-[32rem]">
+        <figure className="relative min-h-[16rem] overflow-hidden sm:min-h-[20rem] lg:min-h-[32rem]">
           <EditorialMediaFrame
             media={slide.media}
             label={content.hero.title}
@@ -312,7 +312,7 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="relative min-h-[27rem] sm:min-h-[32rem]">
+      <div className="relative min-h-[23rem] sm:min-h-[28rem] lg:min-h-[32rem]">
         <EditorialMediaFrame
           media={slide.media}
           label={content.hero.title}
@@ -361,9 +361,11 @@ function SectionHead({
     <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-3xl">
         <p className="text-xs font-semibold uppercase text-primary">{kicker}</p>
-        <h2 className="mt-2 text-balance font-display text-3xl sm:text-4xl">{title}</h2>
+        <h2 className="mt-1.5 text-balance font-display text-2xl sm:text-3xl lg:text-4xl">
+          {title}
+        </h2>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-relaxed text-muted-foreground lg:text-base">
             {description}
           </p>
         ) : null}
@@ -426,19 +428,53 @@ function AluxPlanner({
     });
   };
   return (
-    <section aria-labelledby="alux-title" className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft">
-      <div className="grid min-h-24 items-center gap-4 px-5 sm:grid-cols-[7rem_1fr_auto]">
-        <div className="flex h-24 items-center gap-3 overflow-hidden border-r border-white/20 pr-4">
-          <img src="/brand/alux/master/alux-ia-avatar-master-transparent.png" alt="Alux" className="h-20 w-20 shrink-0 object-contain" />
-          <div><h2 id="alux-title" className="font-display text-xl">Alux</h2><p className="text-xs text-white/70">Tu concierge IA</p></div>
-        </div>
-        <div>
-          <p className="font-display text-xl">¿Cómo viajas hoy?</p>
-          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Composición del viaje">
-            {PARTY_OPTIONS.map((option) => <Button key={option.value} type="button" size="sm" variant={selectedParty === option.value ? "default" : "secondary"} onClick={() => onSelectParty(option.value)} className="min-h-9 rounded-pill">{option.label}</Button>)}
+    <section
+      aria-labelledby="alux-title"
+      className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
+    >
+      <div className="grid min-h-20 items-center gap-3 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
+        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-white/20 sm:pr-3 lg:h-24">
+          <img
+            src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
+            alt="Alux"
+            className="h-14 w-14 shrink-0 object-contain lg:h-20 lg:w-20"
+          />
+          <div>
+            <h2 id="alux-title" className="font-display text-xl">
+              Alux
+            </h2>
+            <p className="text-xs text-white/70">Tu concierge IA</p>
           </div>
         </div>
-        <Button type="button" onClick={openAlux} className="size-11 rounded-full p-0" aria-label="Continuar con Alux"><ChevronRight className="size-5" /></Button>
+        <div>
+          <p className="font-display text-lg lg:text-xl">¿Cómo viajas hoy?</p>
+          <div
+            className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
+            role="group"
+            aria-label="Composición del viaje"
+          >
+            {PARTY_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                type="button"
+                size="sm"
+                variant={selectedParty === option.value ? "default" : "secondary"}
+                onClick={() => onSelectParty(option.value)}
+                className="min-h-9 rounded-pill"
+              >
+                {option.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+        <Button
+          type="button"
+          onClick={openAlux}
+          className="size-11 rounded-full p-0"
+          aria-label="Continuar con Alux"
+        >
+          <ChevronRight className="size-5" />
+        </Button>
       </div>
     </section>
   );
@@ -463,7 +499,7 @@ function RoutesSection({
         description={content.rutas.description}
         action={content.rutas.action}
       />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-flow-col auto-cols-[84%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31.5%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0">
         {content.rutas.items.map((route: HomePremiumRoute) => {
           const active = route.id === selectedRoute;
           return (
@@ -494,9 +530,14 @@ function RoutesSection({
                   </p>
                 </div>
               </div>
-              <div className="p-4">
-                <p className="text-sm leading-relaxed text-muted-foreground">{route.description}</p>
-                <ol className="mt-4 space-y-2" aria-label={`Paradas de ${route.title}`}>
+              <div className="p-3 lg:p-4">
+                <p className="hidden text-sm leading-relaxed text-muted-foreground lg:block">
+                  {route.description}
+                </p>
+                <ol
+                  className="mt-4 hidden space-y-2 lg:block"
+                  aria-label={`Paradas de ${route.title}`}
+                >
                   {route.sequence.map((stop, index) => (
                     <li key={stop} className="flex items-center gap-3 text-sm">
                       <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary font-semibold">
@@ -509,7 +550,7 @@ function RoutesSection({
                     </li>
                   ))}
                 </ol>
-                <div className="mt-5 grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 lg:mt-5">
                   <Button
                     type="button"
                     variant={active ? "default" : "outline"}
@@ -563,25 +604,77 @@ function DestinationsSection({
         description={content.destinos.description}
         action={content.destinos.action}
       />
-      <div className="grid gap-4 lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
-        <article className="group relative min-h-[24rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:min-h-0">
-          <EditorialMediaFrame media={featured.media} label={featured.name} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden />
+      <div className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
+        {items.slice(0, 4).map((destination, index) => (
+          <Link
+            key={destination.name}
+            to={destination.href ?? "/destinos"}
+            onClick={() => onOpen(destination.name)}
+            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
+          >
+            <EditorialMediaFrame
+              media={destination.media}
+              label={destination.name}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+              <p className="text-[10px] font-semibold uppercase text-primary">
+                {index === 0 ? "Punto de partida" : "Destino"}
+              </p>
+              <h3 className="mt-1 font-display text-2xl">{destination.name}</h3>
+              <p className="mt-1 line-clamp-1 text-xs text-white/75">{destination.note}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <div className="hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
+        <article className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
+          <EditorialMediaFrame
+            media={featured.media}
+            label={featured.name}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
+            aria-hidden
+          />
           <div className="absolute inset-x-0 bottom-0 z-10 p-5">
             <h3 className="font-display text-3xl">{featured.name}</h3>
             <p className="mt-2 text-sm text-white/80">{featured.note}</p>
-            {featured.href ? <Link to={featured.href} onClick={() => onOpen(featured.name)} className="mt-3 inline-flex text-sm font-semibold">Ver destino <ChevronRight className="size-4" /></Link> : null}
+            {featured.href ? (
+              <Link
+                to={featured.href}
+                onClick={() => onOpen(featured.name)}
+                className="mt-3 inline-flex text-sm font-semibold"
+              >
+                Ver destino <ChevronRight className="size-4" />
+              </Link>
+            ) : null}
           </div>
         </article>
         <div className="grid grid-rows-3 gap-3">
           {items.slice(1, 4).map((destination) => (
-            <Link key={destination.name} to={destination.href ?? "/destinos"} onClick={() => onOpen(destination.name)} className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card">
-              <EditorialMediaFrame media={destination.media} label={destination.name} className="h-full w-full object-cover" />
+            <Link
+              key={destination.name}
+              to={destination.href ?? "/destinos"}
+              onClick={() => onOpen(destination.name)}
+              className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
+            >
+              <EditorialMediaFrame
+                media={destination.media}
+                label={destination.name}
+                className="h-full w-full object-cover"
+              />
               <div className="flex min-w-0 flex-col justify-center p-4">
                 <p className="text-[10px] font-semibold uppercase text-primary">Destino</p>
                 <h3 className="mt-1 font-display text-xl">{destination.name}</h3>
-                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{destination.note}</p>
-                <span className="mt-2 inline-flex items-center text-xs font-semibold">Ver destino <ChevronRight className="size-3" /></span>
+                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                  {destination.note}
+                </p>
+                <span className="mt-2 inline-flex items-center text-xs font-semibold">
+                  Ver destino <ChevronRight className="size-3" />
+                </span>
               </div>
             </Link>
           ))}
@@ -610,22 +703,27 @@ function PueblosMagicosSection({
         description={content.pueblosMagicos.description}
         action={content.pueblosMagicos.action}
       />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0">
         {pueblos.map((pueblo) => (
           <article
             key={pueblo.name}
-            className="group relative h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
+            className="group relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
           >
             <EditorialMediaFrame
               media={pueblo.media}
               className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" aria-hidden />
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent"
+              aria-hidden
+            />
             <div className="absolute inset-x-0 bottom-0 z-10 p-4">
               <p className="text-[10px] font-semibold uppercase text-primary">Pueblo Mágico</p>
               <h3 className="mt-1 font-display text-xl">{pueblo.name}</h3>
               <p className="mt-1 line-clamp-1 text-xs text-white/80">{pueblo.note}</p>
-              <span className="mt-2 inline-flex items-center text-xs font-semibold">Descubrir <ChevronRight className="size-3" /></span>
+              <span className="mt-2 inline-flex items-center text-xs font-semibold">
+                Descubrir <ChevronRight className="size-3" />
+              </span>
             </div>
           </article>
         ))}
@@ -654,9 +752,32 @@ function ExperiencesSection({
         description={content.experiencias.description}
         action={content.experiencias.action}
       />
+      <div className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
+        {items.map((item) =>
+          item.href ? (
+            <Link
+              key={item.title}
+              to={item.href}
+              className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white sm:w-[46%]"
+            >
+              <EditorialMediaFrame
+                media={item.media}
+                label={item.title}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+                <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
+                <h3 className="mt-1 font-display text-2xl">{item.title}</h3>
+                <p className="mt-1 line-clamp-1 text-xs text-white/75">{item.summary}</p>
+              </div>
+            </Link>
+          ) : null,
+        )}
+      </div>
       <div
         className={cn(
-          "grid gap-4 lg:h-[30rem]",
+          "hidden gap-4 lg:grid lg:h-[30rem]",
           layout === "carrusel"
             ? "grid-flow-col auto-cols-[86%] overflow-x-auto pb-2 sm:auto-cols-[48%]"
             : "lg:grid-cols-[1.2fr_1fr]",
@@ -766,7 +887,7 @@ function ServicesSection({ content }: { content: HomePremiumContent }) {
         title={content.servicios.title}
         description={content.servicios.description}
       />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2 lg:gap-6">
         <ServiceColumn
           icon={<Hotel />}
           title={content.servicios.staysTitle}
@@ -801,19 +922,21 @@ function ServiceColumn({
         {items.map((item) => (
           <article
             key={item.title}
-            className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[11rem_1fr]"
+            className="grid grid-cols-[6rem_1fr] overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-[11rem_1fr]"
           >
             <EditorialMediaFrame
               media={item.media}
               label={item.title}
-              className="h-full min-h-40 w-full object-cover"
+              className="h-full min-h-28 w-full object-cover lg:min-h-40"
             />
             <div className="min-w-0 p-4">
               <p className="text-[10px] font-semibold uppercase text-primary">
                 {item.destination} · {item.category}
               </p>
               <h4 className="mt-1 font-display text-xl">{item.title}</h4>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{item.summary}</p>
+              <p className="mt-2 hidden text-xs leading-relaxed text-muted-foreground lg:block">
+                {item.summary}
+              </p>
               {item.href ? (
                 <Button asChild variant="link" className="mt-2 h-auto min-h-11 p-0">
                   <Link to={item.href}>
@@ -835,26 +958,26 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
       aria-labelledby="events-title"
       className="rounded-3xl border border-border bg-card p-5 sm:p-8"
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,34%)_1fr]">
+      <div className="grid gap-5 md:grid-cols-[minmax(0,34%)_1fr] lg:gap-6">
         <div>
           <p className="text-xs font-semibold uppercase text-primary">{content.eventos.kicker}</p>
           <h2 id="events-title" className="mt-2 font-display text-3xl">
             {content.eventos.title}
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {content.eventos.description}
           </p>
           <EditorialMediaFrame
             media={content.eventos.media}
             label={content.eventos.title}
-            className="mt-5 aspect-[16/10] w-full rounded-2xl object-cover"
+            className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
           />
         </div>
         <ol className="divide-y divide-border border-y border-border">
           {content.eventos.items.map((event, index) => (
             <li
               key={event.title}
-              className="grid gap-3 py-5 sm:grid-cols-[3rem_1fr_auto] sm:items-center"
+              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 py-3 lg:grid-cols-[3rem_1fr_auto] lg:py-5"
             >
               <span className="grid size-10 place-items-center rounded-full bg-secondary font-display text-lg">
                 {index + 1}
@@ -864,14 +987,14 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                   {event.day} · {event.type}
                 </p>
                 <h3 className="mt-1 font-display text-xl">{event.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{event.detail}</p>
+                <p className="mt-1 hidden text-sm text-muted-foreground lg:block">{event.detail}</p>
               </div>
               {event.href ? (
                 <Button
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="min-h-11 justify-self-start rounded-pill sm:justify-self-end"
+                  className="hidden min-h-11 justify-self-start rounded-pill lg:inline-flex lg:justify-self-end"
                 >
                   <Link to={event.href}>Ver agenda</Link>
                 </Button>
@@ -899,28 +1022,27 @@ function EditorialSection({
         description={content.queHacer.description}
         action={content.queHacer.action}
       />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0">
         {content.queHacer.items.map((item: HomePremiumEditorial) =>
           item.href ? (
             <Link
               key={item.title}
               to={item.href}
-              className="relative h-[15rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
+              className="relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
             >
               <EditorialMediaFrame
                 media={item.media}
                 label={item.title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" aria-hidden />
               <div
-                className="absolute inset-x-0 bottom-0 z-10 p-4"
-              >
+                className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
+                aria-hidden
+              />
+              <div className="absolute inset-x-0 bottom-0 z-10 p-4">
                 <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
                 <h3 className="mt-1 font-display text-xl">{item.title}</h3>
-                <p
-                  className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/80"
-                >
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/80">
                   {item.body}
                 </p>
               </div>
@@ -984,12 +1106,14 @@ function MapSection({
           </p>
         </div>
       </div>
-      <ExperienceMapBlock
-        dto={mapDto}
-        interactiveOnly
-        immersive
-        connectByRoad={routePoints.length >= 2}
-      />
+      <div className="max-h-[25rem] overflow-hidden rounded-2xl lg:max-h-none">
+        <ExperienceMapBlock
+          dto={mapDto}
+          interactiveOnly
+          immersive
+          connectByRoad={routePoints.length >= 2}
+        />
+      </div>
     </section>
   );
 }
