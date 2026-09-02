@@ -324,7 +324,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   },
   experiencias: {
     kicker: "Experiencias",
-    title: "Vive lo que da forma al territorio",
+    title: "Hay experiencias que no te puedes perder",
     description: "Experiencias publicadas por empresas acreditadas del territorio.",
     action: "Ver experiencias",
     items: [],
