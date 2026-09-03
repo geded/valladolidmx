@@ -1,6 +1,6 @@
 /**
  * G8-P2 · Vista previa interna de la plantilla premium de CASA DE
- * VACACIONES (pendiente de aceptación visual del Founder).
+ * VACACIONES (guía visual aprobada para la familia).
  *
  * Reutiliza las primitivas premium y la composición general de Hotel,
  * pero declara la semántica propia de la familia: propiedad completa,
@@ -15,10 +15,10 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { BedDouble, Bath, Users, CalendarClock, Waves, ChefHat, MapPin } from "lucide-react";
 import { Container } from "@/components/layout/Container";
+import { PublicShell } from "@/components/discovery";
 import {
   PremiumHero,
   PremiumSection,
-  PremiumTerritorialBreadcrumb,
   PremiumPresentationControl,
 } from "@/components/premium";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
@@ -87,7 +87,14 @@ function G8P2VacationRentalPremiumPreview() {
   };
 
   return (
-    <main className="min-h-svh bg-background">
+    <PublicShell
+      crumbs={[
+        { label: "Oriente Maya", to: "/oriente-maya" },
+        { label: "Valladolid", to: "/oriente-maya/valladolid" },
+        { label: "Casas de vacaciones", to: "/casas-de-vacaciones?destino=valladolid" },
+        { label: RENTAL.name },
+      ]}
+    >
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
 
       <PremiumHero
@@ -112,15 +119,12 @@ function G8P2VacationRentalPremiumPreview() {
       />
 
       <Container className="py-6">
-        <PremiumTerritorialBreadcrumb
-          crumbs={[{ label: "Oriente Maya" }, { label: "Valladolid" }, { label: RENTAL.name }]}
-        />
-        <div className="mt-4">
+        <div>
           <PremiumPresentationControl value={presentation} onChange={setPresentation} />
         </div>
         <p className="mt-4 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-          Preview interna pendiente de aceptación visual del Founder. Este preset no se asigna
-          automáticamente a entidades públicas.
+          Guía visual responsive de la familia. La ficha pública toma exclusivamente los datos,
+          medios y atributos confirmados en CMS o Portal Empresa.
         </p>
       </Container>
 
@@ -226,6 +230,6 @@ function G8P2VacationRentalPremiumPreview() {
           Solicitar reserva
         </a>
       </PremiumSection>
-    </main>
+    </PublicShell>
   );
 }
