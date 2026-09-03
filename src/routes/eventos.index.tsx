@@ -39,10 +39,10 @@ function buildEventosContext(destino: string | undefined): RouteContextDeclarati
 }
 
 export const Route = createFileRoute("/eventos/")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    destino: typeof search.destino === "string" ? search.destino : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { destino?: string } =>
+    typeof search.destino === "string" && search.destino ? { destino: search.destino } : {},
   loaderDeps: ({ search }) => ({ destino: search.destino }),
+
   head: () =>
     buildPublicHead({
       title: `Eventos · ${SITE.name}`,
