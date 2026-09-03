@@ -31,8 +31,10 @@ interface ListingItem {
   tags: string[];
   type: string;
   href?: string;
+  startsAt?: string | null;
   source?: TourismCardVM;
 }
+
 
 interface NearbyItem {
   name: string;
