@@ -16,6 +16,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
   adaptPlaceToPremiumSurface,
   type PublicPlaceDTO,
@@ -113,6 +114,15 @@ function PlaceRoute() {
       variant={binding?.variant ?? projection.variant ?? undefined}
       builderNotice={projection.resolution.builderNotice}
       draftNotice={isDraft ? "Borrador · no publicado" : null}
+      aluxSlot={
+        <TourismAluxPanel
+          title="¿Cuándo estarás en la región?"
+          description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+          task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
+          prompts={projection.content.alux.prompts}
+          compact
+        />
+      }
     />
   );
 }

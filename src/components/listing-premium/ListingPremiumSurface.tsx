@@ -56,6 +56,10 @@ const FAMILY_EXPERIENCE = {
     label: "eventos",
     prompts: ["Esta semana", "Cultura", "Gastronomía", "En familia", "Entrada libre"],
   },
+  lugares: {
+    label: "lugares y sitios de interés",
+    prompts: ["Cenotes", "Historia colonial", "Cultura maya", "Entrada libre", "Media jornada"],
+  },
   "casas-de-vacaciones": {
     label: "casas de vacaciones",
     prompts: ["Viaje familiar", "Estancia larga", "Con piscina", "Cerca del centro", "Con cocina"],
@@ -176,11 +180,14 @@ export function ListingPremiumSurfaceFromDTO({
     dto.family === "hoteles" ||
     dto.family === "restaurantes" ||
     dto.family === "casas-de-vacaciones" ||
-    dto.family === "eventos"
+    dto.family === "eventos" ||
+    dto.family === "lugares"
   ) {
     return (
       <TerritorialListingReviewSurface
-        family={dto.family as "hoteles" | "restaurantes" | "casas-de-vacaciones" | "eventos"}
+        family={
+          dto.family as "hoteles" | "restaurantes" | "casas-de-vacaciones" | "eventos" | "lugares"
+        }
         dto={dto}
         nearbyItems={nearbyItems}
         lockedDestinationLabel={lockedDestinationLabel}
