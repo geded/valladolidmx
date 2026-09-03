@@ -285,7 +285,7 @@ export const getPlaceCms = createServerFn({ method: "POST" })
       alt_text: string | null;
       review_state: string | null;
       status: string | null;
-      metadata: Record<string, unknown> | null;
+      metadata: { temporary_placeholder?: boolean; generated_ai?: boolean; ai_generated?: boolean } | null;
       is_demo_seed: boolean | null;
       demo_seed_batch: string | null;
     }> = [];
