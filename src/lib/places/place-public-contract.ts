@@ -17,6 +17,10 @@
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
 import {
+  PLACE_ATTRACTION_FAMILY_LABELS,
+  type PlaceAttractionFamily,
+} from "./place-taxonomy";
+import {
   getPlacePremiumVariant,
   resolvePlacePresentation,
   type PlacePresentationResolution,
@@ -66,6 +70,12 @@ export interface PublicPlaceDTO {
   status: string;
   typeSlug: string | null;
   typeLabel: string | null;
+  /**
+   * Adenda documental · Inventario de Atractivos Turísticos del Oriente Maya.
+   * Clasificación PRINCIPAL en dos familias (tangible|intangible). El tipo y
+   * las categorías siguen siendo niveles subordinados.
+   */
+  attractionFamily: PlaceAttractionFamily;
   destination: { slug: string; name: string };
   zone: { id: string; name: string } | null;
   regionLabel: string;
@@ -115,6 +125,8 @@ export interface PublicPlaceCard {
   short_description: string | null;
   type_slug: string | null;
   type_label: string | null;
+  /** Familia documental principal (tangible|intangible). */
+  attraction_family: PlaceAttractionFamily;
   destination_slug: string | null;
   destination_name: string | null;
   zone_name: string | null;
