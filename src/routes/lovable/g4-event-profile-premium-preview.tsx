@@ -53,31 +53,31 @@ function EventProfilePremiumPreview() {
     >
       <main className="bg-[#f7f2e8] pb-16 text-[#17251f]">
         <Container className="pt-4 sm:pt-6">
-          <section className="relative min-h-[30rem] overflow-hidden rounded-[2rem] shadow-elevated sm:min-h-[34rem] lg:min-h-[38rem]">
-            <img
-              src={`${MEDIA}/destination-gallery-1.jpg`}
-              alt="Plaza principal de Valladolid al atardecer"
-              className="absolute inset-0 size-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/48 to-black/8" />
-            <div className="relative flex min-h-[30rem] max-w-3xl flex-col justify-end p-6 text-white sm:min-h-[34rem] sm:p-10 lg:min-h-[38rem] lg:p-14">
-              <p className="text-xs font-bold uppercase tracking-[.2em] text-[#f3a61e]">Cultura y tradición · Valladolid</p>
-              <h1 className="mt-3 font-display text-5xl leading-[.94] sm:text-6xl lg:text-7xl">Noche de Valladolid</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/82 sm:text-xl">
-                Una velada de trova, patrimonio y sabores locales para vivir el corazón del Oriente Maya después del atardecer.
-              </p>
-              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/25 pt-5 sm:grid-cols-4">
+          <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-[#ded7c9] bg-white p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9">
+            <div className="order-2 lg:order-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-[#0d4b38]/25 bg-[#0d4b38]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[.16em] text-[#0d4b38]">Cultura y tradición</span>
+                <span className="rounded-full border border-[#ded7c9] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[#667067]">Valladolid · Oriente Maya</span>
+              </div>
+              <h1 className="mt-4 font-display text-4xl leading-[1.04] tracking-tight sm:text-5xl">Noche de Valladolid</h1>
+              <p className="mt-3 text-lg leading-7 text-[#4f5d54]">Una velada de trova, patrimonio y sabores locales para vivir la ciudad después del atardecer.</p>
+              <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-4 text-sm">
                 {facts.map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="min-w-0">
-                    <dt className="flex items-center gap-2 text-[10px] uppercase tracking-[.14em] text-white/60"><Icon className="size-4 text-[#f3a61e]" />{label}</dt>
-                    <dd className="mt-1 text-sm font-semibold">{value}</dd>
+                  <div key={label} className="flex min-w-0 items-start gap-2">
+                    <Icon className="mt-0.5 size-4 shrink-0 text-[#ba641e]" />
+                    <div><dt className="text-[10px] uppercase tracking-[.14em] text-[#788078]">{label}</dt><dd className="mt-0.5 font-semibold">{value}</dd></div>
                   </div>
                 ))}
-              </div>
+              </dl>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" className="rounded-full bg-[#f3a61e] px-7 font-bold text-[#193126] hover:bg-[#f3a61e]/90">Agregar a Mi Viaje <ArrowRight className="ml-2 size-4" /></Button>
-                <Button size="lg" variant="outline" className="rounded-full border-white/50 bg-white/10 px-7 text-white hover:bg-white/20 hover:text-white">Ver cómo llegar</Button>
+                <Button size="lg" className="w-full rounded-full px-7 sm:w-auto">Agregar a Mi Viaje <ArrowRight className="ml-2 size-4" /></Button>
+                <Button size="lg" variant="outline" className="w-full rounded-full px-7 sm:w-auto">Ver cómo llegar</Button>
               </div>
+            </div>
+            <div className="order-1 grid grid-cols-2 gap-3 sm:gap-4 lg:order-2">
+              <img src={`${MEDIA}/destination-gallery-1.jpg`} alt="Plaza principal de Valladolid al atardecer" className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-80" />
+              <img src={`${MEDIA}/destination-gallery-2.jpg`} alt="Calles coloniales de Valladolid" className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44" />
+              <img src={`${MEDIA}/restaurant-gallery-1.jpg`} alt="Sabores del Oriente Maya" className="hidden h-36 w-full rounded-2xl object-cover shadow-soft sm:block sm:h-44" />
             </div>
           </section>
         </Container>
