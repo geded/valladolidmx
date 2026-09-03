@@ -22,7 +22,6 @@ import {
   Compass,
   Heart,
   ImageOff,
-  Sparkles,
   Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,10 @@ import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { PremiumHero, PremiumTerritorialBreadcrumb } from "@/components/premium";
-import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import {
+  DEFAULT_PREMIUM_PRESENTATION,
+  type PremiumPresentation,
+} from "@/lib/omxds/presentation/presentation";
 import { cn } from "@/lib/utils";
 import {
   PLACE_PREMIUM_DEMO_CONTENT,
@@ -80,6 +82,14 @@ export function PlacePremiumSurface({
     content.essentials.accessibility.length > 0;
   const hasGallery = content.gallery.items.length > 0;
   const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
+  /* Destino y, cuando el dato real la declara, subzona del destino. */
+  const heroEyebrow = [
+    content.identity.eyebrow,
+    content.identity.destinationLabel,
+    content.identity.zoneLabel || null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
@@ -145,94 +155,69 @@ export function PlacePremiumSurface({
         ) : null}
       </Container>
 
-      {cinematic ? (
-        <>
-          {showBreadcrumbs ? (
-            <div className="sticky top-0 z-20 mt-4 border-y border-border bg-background/90 backdrop-blur">
-              <Container className="py-1.5">
-                <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-              </Container>
-            </div>
-          ) : null}
-          <div className="mt-4">
-            <PremiumHero
-              vm={{
-                presentation: "cinematic",
-                eyebrow: content.identity.eyebrow,
-                title: content.identity.title,
-                description: content.identity.subtitle,
-                media: content.hero.cover.url
-                  ? {
-                      url: content.hero.cover.url,
-                      alt: content.hero.cover.alt,
-                      credit: content.hero.cover.credit,
-                    }
-                  : null,
-                badges: content.identity.badges.map((label) => ({ label })),
-                primaryAction: { label: content.hero.primaryCta.label },
-                secondaryAction: {
-                  label: content.hero.secondaryCta.label,
-                  href: content.hero.secondaryCta.href,
-                },
-              }}
-            />
-          </div>
-          {content.hero.cover.url ? null : (
-            <Container className="mt-3">
-              <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
-            </Container>
-          )}
-          <Container className="mt-8">
-            <IdentityStrip content={content} dense />
-          </Container>
-          {aluxSlot ? <Container className="mt-6">{aluxSlot}</Container> : null}
-          {hasEssentials ? (
-            <Container className="mt-8">
-              <EssentialsBand content={content} />
-            </Container>
-          ) : null}
-          {hasGallery ? (
-            <Container className="mt-10">
-              <GalleryFilmstrip content={content} />
-            </Container>
-          ) : null}
-          {hasIntro ? (
-            <Container className="mt-14">
-              <IntroCentered content={content} />
-            </Container>
-          ) : null}
-        </>
-      ) : (
-        <>
-          {showBreadcrumbs ? (
-            <Container className="mt-4">
-              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-            </Container>
-          ) : null}
-          <Container className="mt-5">
-            <HeroEditorial content={content} />
-          </Container>
-          {aluxSlot ? <Container className="mt-6">{aluxSlot}</Container> : null}
-          <Container className="mt-10">
-            <IdentityStrip content={content} />
-          </Container>
-          {hasIntro ? (
-            <Container className="mt-14">
-              <IntroEditorial content={content} />
-            </Container>
-          ) : null}
-          {hasEssentials ? (
-            <Container className="mt-14">
-              <EssentialsPanel content={content} />
-            </Container>
-          ) : null}
-          {hasGallery ? (
-            <Container className="mt-14">
-              <GalleryMosaic content={content} />
-            </Container>
-          ) : null}
-        </>
+      {showBreadcrumbs ? (
+        <Container className="mt-4">
+          <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+        </Container>
+      ) : null}
+
+      {/* Hero: misma familia y proporción aprobadas en las fichas Premium
+          de hotel y restaurante (`PremiumHero`, presentación editorial).
+          No existe hero propio de Lugares ni selector visible de
+          dirección visual. */}
+      <div className="mt-4">
+        <PremiumHero
+          vm={{
+            presentation: DEFAULT_PREMIUM_PRESENTATION,
+            eyebrow: heroEyebrow,
+            title: content.identity.title,
+            description: content.identity.subtitle,
+            media: content.hero.cover.url
+              ? {
+                  url: content.hero.cover.url,
+                  alt: content.hero.cover.alt,
+                  credit: content.hero.cover.credit,
+                }
+              : null,
+            badges: content.identity.badges.map((label) => ({ label })),
+            primaryAction: { label: content.hero.primaryCta.label },
+            secondaryAction: {
+              label: content.hero.secondaryCta.label,
+              href: content.hero.secondaryCta.href,
+            },
+          }}
+        />
+      </div>
+      {content.hero.cover.url ? null : (
+        <Container className="mt-3">
+          <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
+        </Container>
       )}
+
+      <Container className="mt-8">
+        <IdentityStrip content={content} dense={cinematic} />
+      </Container>
+      {aluxSlot ? <Container className="mt-6">{aluxSlot}</Container> : null}
+      {hasIntro ? (
+        <Container className="mt-12">
+          {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
+        </Container>
+      ) : null}
+      {hasEssentials ? (
+        <Container className="mt-12">
+          {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
+        </Container>
+      ) : null}
+      {hasGallery ? (
+        <Container className="mt-12">
+          {cinematic ? (
+            <GalleryFilmstrip content={content} />
+          ) : (
+            <GalleryMosaic content={content} />
+          )}
+        </Container>
+      ) : null}
+
 
       {hasMap ? (
         <Container className="mt-16">
@@ -349,7 +334,9 @@ export function PlacePremiumSurface({
         <div
           className={cn(
             "grid gap-5",
-            cinematic ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" : "lg:grid-cols-2",
+            /* Alux vive en el módulo compartido (`aluxSlot`) y en el
+               botón flotante global: la ficha no lo duplica. */
+            "lg:grid-cols-1",
           )}
         >
           <section
@@ -368,30 +355,6 @@ export function PlacePremiumSurface({
             </Button>
           </section>
 
-          <section
-            aria-labelledby="alux-title"
-            className="rounded-3xl border border-border bg-card p-6"
-          >
-            <Sparkles className="size-5 text-primary" aria-hidden />
-            <h2 id="alux-title" className="mt-3 font-serif text-2xl">
-              {content.alux.title}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {content.alux.description}
-            </p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {content.alux.prompts.map((prompt, index) => (
-                <li key={`prompt-${index}`}>
-                  <span className="inline-flex min-h-11 items-center rounded-pill border border-border bg-background px-4 text-sm">
-                    {prompt}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <Button type="button" variant="outline" className="mt-5 min-h-11 rounded-pill">
-              {content.alux.actionLabel}
-            </Button>
-          </section>
         </div>
       </Container>
 
@@ -503,75 +466,6 @@ function IdentityStrip({
     </section>
   );
 }
-
-function HeroEditorial({ content }: { content: PlacePremiumContent }) {
-  return (
-    <section
-      aria-label="Presentación del lugar"
-      /* Composición editorial aprobada (paridad exacta con la ficha de
-         Evento y con hoteles/restaurantes): una sola tarjeta contenedora,
-         información y datos a la IZQUIERDA, galería a la DERECHA. */
-      className="grid gap-7 overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9"
-    >
-      <div className="order-2 lg:order-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-pill border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-            {content.identity.eyebrow}
-          </span>
-          <span className="rounded-pill border border-border px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            {content.identity.destinationLabel} · {content.identity.regionLabel}
-          </span>
-        </div>
-        <h1 className="mt-4 text-balance font-serif text-4xl leading-[1.04] tracking-tight sm:text-5xl">
-          {content.identity.title}
-        </h1>
-        {content.identity.subtitle ? (
-          <p className="mt-3 text-pretty text-lg leading-7 text-muted-foreground">
-            {content.identity.subtitle}
-          </p>
-        ) : null}
-        {content.identity.badges.length ? (
-          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Clasificación">
-            {content.identity.badges.map((badge) => (
-              <li
-                key={badge}
-                className="rounded-pill border border-border bg-background px-3 py-1 text-xs font-medium"
-              >
-                {badge}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <Button type="button" className="min-h-11 rounded-pill">
-            {content.hero.primaryCta.label}
-          </Button>
-          <Button asChild variant="outline" className="min-h-11 rounded-pill">
-            <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
-          </Button>
-        </div>
-      </div>
-      <div className="order-1 lg:order-2">
-        <DemoImage
-          media={content.hero.cover}
-          className="h-56 w-full rounded-3xl sm:h-72 lg:h-[26rem]"
-        />
-        {content.hero.supporting.length ? (
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {content.hero.supporting.map((media, index) => (
-              <DemoImage
-                key={`media-${index}`}
-                media={media}
-                className="aspect-[3/2] rounded-2xl"
-              />
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </section>
-  );
-}
-
 
 function IntroEditorial({ content }: { content: PlacePremiumContent }) {
   return (

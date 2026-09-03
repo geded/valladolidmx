@@ -76,7 +76,9 @@ export function TourismAluxPanel({
           </div>
         </div>
 
-        <div>
+        {/* `min-w-0`: la fila de sugerencias hace scroll horizontal interno y
+            no debe ensanchar la rejilla ni la página en móvil. */}
+        <div className="min-w-0">
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
             {["Estoy planeando", "Ya estoy en la región", ...prompts].map((prompt) => (

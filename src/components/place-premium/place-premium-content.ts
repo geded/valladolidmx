@@ -76,6 +76,8 @@ export interface PlacePremiumContent {
     subtitle: string;
     typeLabel: string;
     destinationLabel: string;
+    /** Subzona del destino cuando el dato real la declara (jerarquía territorial). */
+    zoneLabel?: string | null;
     regionLabel: string;
     badges: string[];
   };
