@@ -130,7 +130,7 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
         "place_type_id, destination_id, destination_zone_id, latitude, longitude, address_line, " +
         "directions, admission_kind, entry_fee_notes, price_from, price_to, price_currency, " +
         "visit_duration_minutes, best_time_to_visit, accessibility, amenities, contact_phone, " +
-        "contact_whatsapp, contact_email, contact_website, social_links, metadata",
+        "contact_whatsapp, contact_email, contact_website, social_links, metadata, attraction_family",
     )
     .eq("slug", input.placeSlug)
     .is("deleted_at", null)
@@ -156,7 +156,11 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
 
   const [typeRes, catRes, hoursRes, authRes, prodRes, evtRes, seoRes] = await Promise.all([
     place.place_type_id
-      ? sb.from("place_types").select("slug, name").eq("id", place.place_type_id).maybeSingle()
+      ? sb
+          .from("place_types")
+          .select("slug, name, attraction_family")
+          .eq("id", place.place_type_id)
+          .maybeSingle()
       : Promise.resolve({ data: null }),
     sb.from("place_category_links").select("category_id").eq("place_id", place.id),
     sb
@@ -296,6 +300,11 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
     status: place.status,
     typeSlug: typeRes.data?.slug ?? null,
     typeLabel: typeRes.data?.name ?? null,
+    /* Adenda documental: familia principal (override de ficha → tipo). */
+    attractionFamily: resolvePlaceAttractionFamily(
+      (place as any).attraction_family,
+      typeRes.data?.attraction_family,
+    ),
     destination: { slug: destination.slug, name: destination.name },
     zone,
     regionLabel: REGION_LABEL,
@@ -397,7 +406,7 @@ export async function readPublishedPlaceCards(
     .select(
       "id, slug, name, short_description, place_type_id, destination_id, destination_zone_id, " +
         "latitude, longitude, admission_kind, price_from, price_to, price_currency, " +
-        "visit_duration_minutes, best_time_to_visit, amenities, accessibility",
+        "visit_duration_minutes, best_time_to_visit, amenities, accessibility, attraction_family",
     )
     .eq("status", "published")
     .is("deleted_at", null)
@@ -419,7 +428,7 @@ export async function readPublishedPlaceCards(
       ? sb.from("destinations").select("id, slug, name").in("id", destinationIds).is("deleted_at", null)
       : Promise.resolve({ data: [] }),
     typeIds.length
-      ? sb.from("place_types").select("id, slug, name").in("id", typeIds)
+      ? sb.from("place_types").select("id, slug, name, attraction_family").in("id", typeIds)
       : Promise.resolve({ data: [] }),
     zoneIds.length
       ? sb
@@ -439,8 +448,11 @@ export async function readPublishedPlaceCards(
   const destById = new Map<string, { slug: string; name: string }>(
     ((destRes.data ?? []) as any[]).map((d) => [d.id, { slug: d.slug, name: d.name }]),
   );
-  const typeById = new Map<string, { slug: string; name: string }>(
-    ((typeRes.data ?? []) as any[]).map((t) => [t.id, { slug: t.slug, name: t.name }]),
+  const typeById = new Map<string, { slug: string; name: string; attraction_family?: string }>(
+    ((typeRes.data ?? []) as any[]).map((t) => [
+      t.id,
+      { slug: t.slug, name: t.name, attraction_family: t.attraction_family },
+    ]),
   );
   const zoneById = new Map<string, { name: string; destination_id: string }>(
     ((zoneRes.data ?? []) as any[]).map((z) => [
@@ -528,7 +540,11 @@ export async function readPublishedPlaceCards(
     const amenities = strArray(p.amenities);
     const accessibility = accessibilityList(p.accessibility);
 
+    const attractionFamily = resolvePlaceAttractionFamily(p.attraction_family, type?.attraction_family);
+
     const attrs: Record<string, string | string[]> = {};
+    /* Clasificación principal del Inventario de Atractivos. */
+    attrs.attraction_family = [attractionFamily];
     if (type) attrs.place_type = [type.slug];
     if (categories.length) attrs.experience_category = categories.map((c) => c.slug);
     if (p.admission_kind) attrs.admission_type = [p.admission_kind];
@@ -546,6 +562,7 @@ export async function readPublishedPlaceCards(
       short_description: p.short_description ?? null,
       type_slug: type?.slug ?? null,
       type_label: type?.name ?? null,
+      attraction_family: attractionFamily,
       destination_slug: destination?.slug ?? null,
       destination_name: destination?.name ?? null,
       zone_name: zone,
