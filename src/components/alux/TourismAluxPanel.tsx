@@ -60,7 +60,7 @@ export function TourismAluxPanel({
         )}
       >
         <div className="flex min-w-0 items-center gap-3">
-          <AluxMark family="avatar" size={52} decorative loading="eager" />
+          <AluxMark family="avatar" size={44} className="shrink-0" decorative loading="eager" />
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               {ACTIVE_BRAND.conciergeName} · Concierge IA
@@ -80,14 +80,14 @@ export function TourismAluxPanel({
             no debe ensanchar la rejilla ni la página en móvil. */}
         <div className="min-w-0">
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
+          <div className="-mx-1 mt-3 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
             {["Estoy planeando", "Ya estoy en la región", ...prompts].map((prompt) => (
               <button
                 key={prompt}
                 type="button"
                 onClick={() => ask(prompt)}
                 className={cn(
-                  "shrink-0 rounded-full border border-border bg-background px-4 text-sm text-foreground transition-colors hover:border-primary hover:bg-primary/10",
+                  "inline-flex shrink-0 snap-start items-center whitespace-nowrap rounded-full border border-border bg-background px-4 text-sm text-foreground transition-colors hover:border-primary hover:bg-primary/10",
                   compact ? "min-h-9" : "min-h-11",
                 )}
               >
@@ -100,7 +100,7 @@ export function TourismAluxPanel({
         <button
           type="button"
           onClick={() => ask()}
-          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-selva px-5 text-sm font-semibold text-selva-foreground transition-opacity hover:opacity-90"
+          className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-selva px-5 text-sm font-semibold text-selva-foreground transition-opacity hover:opacity-90 lg:w-auto"
         >
           {variant === "card" ? <Sparkles className="size-4" /> : <Compass className="size-4" />}
           Planear con {ACTIVE_BRAND.conciergeName}

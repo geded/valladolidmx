@@ -133,7 +133,7 @@ export function PlacePremiumSurface({
       data-alux-safe-zone="true"
       className={cn("pb-24", className)}
     >
-      <Container className="pt-6">
+      <Container className="pt-3 sm:pt-6">
         {content.demoNotice ? <DemoNotice text={content.demoNotice} /> : null}
         {draftNotice ? (
           <p
@@ -165,7 +165,7 @@ export function PlacePremiumSurface({
           de hotel y restaurante (`PremiumHero`, presentación editorial).
           No existe hero propio de Lugares ni selector visible de
           dirección visual. */}
-      <div className="mt-4">
+      <div className="mt-3 sm:mt-4">
         <PremiumHero
           vm={{
             presentation: DEFAULT_PREMIUM_PRESENTATION,
@@ -194,22 +194,22 @@ export function PlacePremiumSurface({
         </Container>
       )}
 
-      <Container className="mt-8">
+      <Container className="mt-5 sm:mt-8">
         <IdentityStrip content={content} dense={cinematic} />
       </Container>
-      {aluxSlot ? <Container className="mt-6">{aluxSlot}</Container> : null}
+      {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
       {hasIntro ? (
-        <Container className="mt-12">
+        <Container className="mt-8 sm:mt-12">
           {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
         </Container>
       ) : null}
       {hasEssentials ? (
-        <Container className="mt-12">
+        <Container className="mt-8 sm:mt-12">
           {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
         </Container>
       ) : null}
       {hasGallery ? (
-        <Container className="mt-12">
+        <Container className="mt-8 sm:mt-12">
           {cinematic ? (
             <GalleryFilmstrip content={content} />
           ) : (
@@ -220,7 +220,7 @@ export function PlacePremiumSurface({
 
 
       {hasMap ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
           <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             {content.map.points.length ? <ExperienceMapBlock dto={mapDto} /> : null}
@@ -239,7 +239,7 @@ export function PlacePremiumSurface({
       ) : null}
 
       {content.services.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="servicios-lugar" kicker="Servicios" title="Servicios disponibles" />
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {content.services.map((service) => (
@@ -256,7 +256,7 @@ export function PlacePremiumSurface({
       ) : null}
 
       {content.experiences.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading
             id="experiencias-lugar"
             kicker="Planea tu visita"
@@ -290,7 +290,7 @@ export function PlacePremiumSurface({
 
       {/* Eventos: sin contenido → el módulo se oculta por completo. */}
       {content.events.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="eventos-lugar" kicker="Agenda" title="Eventos relacionados" />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {content.events.map((item) => (
@@ -305,7 +305,7 @@ export function PlacePremiumSurface({
       ) : null}
 
       {content.nearby.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="cerca-lugar" kicker="Alrededor" title="Lugares cercanos" />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2">
             {content.nearby.map((item) => (
@@ -330,7 +330,7 @@ export function PlacePremiumSurface({
         </Container>
       ) : null}
 
-      <Container className="mt-16">
+      <Container className="mt-10 sm:mt-16">
         <div
           className={cn(
             "grid gap-5",
@@ -374,7 +374,7 @@ export function PlacePremiumSurface({
 
 function DemoNotice({ text }: { text: string }) {
   return (
-    <p className="rounded-2xl border border-warning/40 bg-warning/10 px-4 py-3 text-xs font-medium leading-5 text-foreground">
+    <p className="rounded-full border border-warning/40 bg-warning/10 px-3 py-1.5 text-[11px] font-medium leading-4 text-foreground sm:rounded-2xl sm:px-4 sm:py-3 sm:text-xs sm:leading-5">
       {text}
     </p>
   );
@@ -384,7 +384,7 @@ function SectionHeading({ id, kicker, title }: { id: string; kicker: string; tit
   return (
     <header id={id}>
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{kicker}</p>
-      <h2 className="mt-2 text-balance font-serif text-3xl sm:text-4xl">{title}</h2>
+      <h2 className="mt-1.5 text-balance font-serif text-2xl sm:mt-2 sm:text-4xl">{title}</h2>
     </header>
   );
 }
@@ -451,15 +451,18 @@ function IdentityStrip({
   return (
     <section
       aria-label="Identidad y clasificación"
-      className={cn("rounded-3xl border border-border bg-card", dense ? "p-4" : "p-6")}
+      /* Móvil: fila compacta de tres datos (no tarjeta vertical alta). */
+      className={cn("rounded-3xl border border-border bg-card p-3 sm:p-6", dense && "sm:p-4")}
     >
-      <dl className={cn("grid gap-4", dense ? "sm:grid-cols-3" : "sm:grid-cols-3")}>
+      <dl className="grid grid-cols-3 gap-2 sm:gap-4">
         {rows.map((row) => (
-          <div key={row.label}>
-            <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div key={row.label} className="min-w-0">
+            <dt className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-xs sm:tracking-[0.16em]">
               {row.label}
             </dt>
-            <dd className="mt-1 font-medium">{row.value}</dd>
+            <dd className="mt-0.5 truncate text-sm font-medium sm:mt-1 sm:text-base">
+              {row.value}
+            </dd>
           </div>
         ))}
       </dl>
