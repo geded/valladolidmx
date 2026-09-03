@@ -23,7 +23,11 @@ import {
   transitionPlaceStatus,
   updatePlaceCms,
 } from "@/lib/places/places-cms.functions";
-import { PLACE_ADMISSION_KINDS } from "@/lib/places/place-taxonomy";
+import {
+  PLACE_ADMISSION_KINDS,
+  PLACE_ATTRACTION_FAMILIES,
+  PLACE_ATTRACTION_FAMILY_LABELS,
+} from "@/lib/places/place-taxonomy";
 import {
   ZONE_DESTINATION_MISMATCH,
   ZONE_DESTINATION_MISMATCH_MESSAGE,
@@ -208,6 +212,7 @@ export function PlaceEditor({ placeId }: Props) {
   const [values, setValues] = useState<Values>({});
   const [zoneId, setZoneId] = useState("");
   const [admission, setAdmission] = useState("");
+  const [attractionFamily, setAttractionFamily] = useState("");
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
   const [duration, setDuration] = useState("");
@@ -225,6 +230,7 @@ export function PlaceEditor({ placeId }: Props) {
     setValues(next);
     setZoneId((place.destination_zone_id as string | null) ?? "");
     setAdmission((place.admission_kind as string | null) ?? "");
+    setAttractionFamily((place.attraction_family as string | null) ?? "");
     setPriceFrom(
       place.price_from === null || place.price_from === undefined ? "" : String(place.price_from),
     );
@@ -299,6 +305,9 @@ export function PlaceEditor({ placeId }: Props) {
       contact_website: text("contact_website"),
       price_currency: (values.price_currency || "MXN").trim().toUpperCase(),
       admission_kind: admission ? (admission as (typeof PLACE_ADMISSION_KINDS)[number]) : null,
+      attraction_family: attractionFamily
+        ? (attractionFamily as (typeof PLACE_ATTRACTION_FAMILIES)[number])
+        : null,
       price_from: priceFrom === "" ? null : Number(priceFrom),
       price_to: priceTo === "" ? null : Number(priceTo),
       visit_duration_minutes: duration === "" ? null : Number(duration),
@@ -603,6 +612,26 @@ export function PlaceEditor({ placeId }: Props) {
         title="Identidad y territorio"
         description="El tipo se cambia por endpoint gobernado; las categorías son autoridad de descubrimiento independiente."
       >
+        <PlaceField
+          name="attraction_family"
+          label="Familia de atractivo (Inventario Oriente Maya)"
+        >
+          {({ id }) => (
+            <select
+              id={id}
+              className={inputClass}
+              value={attractionFamily}
+              onChange={(e) => setAttractionFamily(e.target.value)}
+            >
+              <option value="">Heredar del tipo</option>
+              {PLACE_ATTRACTION_FAMILIES.map((f) => (
+                <option key={f} value={f}>
+                  {PLACE_ATTRACTION_FAMILY_LABELS[f]}
+                </option>
+              ))}
+            </select>
+          )}
+        </PlaceField>
         <PlaceField name="type" label="Tipo de lugar">
           {({ id }) => (
             <select
