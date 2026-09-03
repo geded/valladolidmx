@@ -509,8 +509,16 @@ export async function readPublishedPlaceCards(
     }
   }
 
-  return places.map((p) => {
-    const destination = p.destination_id ? (destById.get(p.destination_id) ?? null) : null;
+  /* Fail-closed territorial: un lugar sólo es públicamente navegable si su
+     destino también es público (RLS anon: destinos published y no
+     eliminados). Sin destino resoluble no existe URL canónica
+     /oriente-maya/:destino/lugares/:slug → el lugar NO se lista. */
+  const navigablePlaces = places.filter(
+    (p) => typeof p.destination_id === "string" && destById.has(p.destination_id),
+  );
+
+  return navigablePlaces.map((p) => {
+    const destination = destById.get(p.destination_id) ?? null;
     const type = p.place_type_id ? (typeById.get(p.place_type_id) ?? null) : null;
     const zoneRow = p.destination_zone_id ? (zoneById.get(p.destination_zone_id) ?? null) : null;
     /* Fail-closed territorial: la zona sólo se expone si pertenece al
