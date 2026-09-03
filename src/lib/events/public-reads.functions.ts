@@ -339,7 +339,11 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       ? (biz!.business_categories?.slug ?? null)
       : null;
     return {
+      filter_attributes: normalizeFilterAttributes(r.filter_attributes),
+      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
+      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
       id: r.id,
+
       slug: r.slug,
       title: r.title,
       summary: r.summary ?? null,
