@@ -81,7 +81,7 @@ function PlacePremiumPreview() {
   }));
 
   return (
-    <PublicShell crumbs={crumbs} variant="hero">
+    <PublicShell crumbs={crumbs} variant="hero" compactCrumbsOnMobile>
       {conceptual ? (
         <div className="mx-auto w-full max-w-7xl px-4 pt-2 sm:px-6 sm:pt-3 lg:px-8">
           {/* Móvil: chip de una línea; desde `sm` el aviso completo. */}

@@ -116,7 +116,7 @@ function PlaceRoute() {
   }));
 
   return (
-    <PublicShell crumbs={crumbs} variant="hero">
+    <PublicShell crumbs={crumbs} variant="hero" compactCrumbsOnMobile>
       <div className="bg-background">
         <PlacePremiumSurface
           content={projection.content}
