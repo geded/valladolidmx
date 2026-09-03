@@ -1519,14 +1519,14 @@ function PlaceListingBody({
       valuesOf: (item: ListingItem) => string[],
     ): FacetOption[] => {
       void key;
-      const counts = new Map<string, number>();
+      const counts: Record<string, number> = {};
       for (const item of items) {
         if (!matches(item, skip)) continue;
         for (const value of unique(valuesOf(item))) {
-          counts.set(value, (counts.get(value) ?? 0) + 1);
+          counts[value] = (counts[value] ?? 0) + 1;
         }
       }
-      return Array.from(counts.entries())
+      return Object.entries(counts)
         .filter(([, count]) => count > 0)
         .map(([value, count]) => ({ value, label: value, count }))
         .sort((a, b) => a.label.localeCompare(b.label, "es"));
