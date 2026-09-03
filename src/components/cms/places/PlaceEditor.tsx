@@ -615,7 +615,6 @@ export function PlaceEditor({ placeId }: Props) {
         <PlaceField
           name="attraction_family"
           label="Familia de atractivo (Inventario Oriente Maya)"
-          hint="Clasificación principal del inventario: tangible o intangible. Sin valor propio se hereda la del tipo."
         >
           {({ id }) => (
             <select
