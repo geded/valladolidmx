@@ -682,7 +682,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           venue_name: (e.venue_name as string | null) ?? null,
           is_free: Boolean(e.is_free),
           destination_slug: dest.slug,
-          destination_name: dest.name ?? null,
+          destination_name: null,
           filter_attributes: {},
           latitude: null,
           longitude: null,
