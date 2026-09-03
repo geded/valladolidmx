@@ -26,6 +26,7 @@ const EDITABLE_TABLES = [
   "business_categories",
   "businesses",
   "products",
+  "events",
 ] as const;
 type EditableTable = (typeof EDITABLE_TABLES)[number];
 
@@ -42,6 +43,7 @@ const TABLE_TO_ENTITY_KIND: Record<
   | "business_category"
   | "business"
   | "product"
+  | "event"
 > = {
   tourism_regions: "tourism_region",
   destinations: "destination",
@@ -49,6 +51,7 @@ const TABLE_TO_ENTITY_KIND: Record<
   business_categories: "business_category",
   businesses: "business",
   products: "product",
+  events: "event",
 };
 
 const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
@@ -102,6 +105,23 @@ const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
     "capacity",
     "cover_media_id",
     "metadata",
+  ],
+  // Eventos (circuito funcional de EVENTOS). Los atributos estructurados
+  // (`filter_attributes`) se administran con su panel dedicado, nunca por
+  // payload libre.
+  events: [
+    "destination_id",
+    "business_id",
+    "slug",
+    "title",
+    "summary",
+    "body",
+    "starts_at",
+    "ends_at",
+    "venue_name",
+    "is_free",
+    "external_url",
+    "cover_media_id",
   ],
 };
 
