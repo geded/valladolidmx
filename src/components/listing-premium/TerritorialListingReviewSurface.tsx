@@ -1467,95 +1467,149 @@ function PlaceListingBody({
   const [showMore, setShowMore] = useState(false);
 
   const locked = Boolean(lockedDestinationLabel);
-  const destinos = useMemo(() => unique(items.map((item) => item.zone)), [items]);
-  /* Subzonas válidas del destino en contexto (o del destino seleccionado).
-     Dentro del micrositio el destino es fijo, así que sólo se ofrece cuando ese
-     destino tiene subzonas con registros reales. */
-  const subzonas = useMemo(
-    () =>
-      unique(
-        items
-          .filter((item) => locked || !destino || item.zone === destino)
-          .flatMap((item) => attrOf(item, "zone").map(humanizeAttributeValue)),
-      ),
-    [items, destino, locked],
-  );
-  useEffect(() => {
-    if (subzona && !subzonas.includes(subzona)) setSubzona("");
-  }, [subzona, subzonas]);
-  const placeTypes = useMemo(
-    () => unique(items.flatMap((item) => attrOf(item, "place_type").map(humanizeAttributeValue))),
-    [items],
-  );
-  const categories = useMemo(
-    () =>
-      unique(
-        items.flatMap((item) => attrOf(item, "experience_category").map(humanizeAttributeValue)),
-      ),
-    [items],
-  );
-  const secondaryGroups = useMemo(
-    () =>
-      PLACE_SECONDARY_FILTERS.map((group) => ({
-        ...group,
-        options: unique(
-          items.flatMap((item) => attrOf(item, group.key).map(humanizeAttributeValue)),
-        ),
-      })).filter((group) => group.options.length > 0),
-    [items],
-  );
+  const needle = normalize(query);
 
-  /* Clasificación principal del Inventario de Atractivos del Oriente Maya:
-     dos familias documentales (tangibles e intangibles). Se muestra siempre,
-     por encima del tipo específico y de las categorías de descubrimiento. */
-  const familyCounts = useMemo(() => {
-    const counts = { tangible: 0, intangible: 0 };
-    for (const item of items) {
-      const value = attrOf(item, "attraction_family")[0];
-      if (value === "intangible") counts.intangible += 1;
-      else if (value === "tangible") counts.tangible += 1;
-    }
-    return counts;
-  }, [items]);
-
-  const activeSecondary = Object.entries(secondary).filter(([, value]) => value);
-  const hasActiveFilters =
-    Boolean(query || family || subzona || placeType || category || (!locked && destino)) ||
-    activeSecondary.length > 0;
-
-  const filteredItems = useMemo(() => {
-    const needle = normalize(query);
-    return items.filter((item) => {
-      if (family && !attrOf(item, "attraction_family").includes(family)) return false;
-      if (!locked && destino && item.zone !== destino) return false;
-      if (subzona && !attrOf(item, "zone").map(humanizeAttributeValue).includes(subzona))
+  /* Predicado único y combinable: destino + subzona + familia + tipo +
+     categoría + facetas secundarias (naturaleza/gestión, entrada,
+     accesibilidad, servicios, duración, mejor momento) + búsqueda.
+     `skip` permite contar una faceta ignorando su propio valor activo. */
+  const activeSecondary = useMemo(
+    () => Object.entries(secondary).filter(([, value]) => value),
+    [secondary],
+  );
+  const matches = useMemo(() => {
+    return (item: ListingItem, skip?: string) => {
+      if (skip !== "family" && family && !attrOf(item, "attraction_family").includes(family))
+        return false;
+      if (skip !== "destino" && !locked && destino && item.zone !== destino) return false;
+      if (
+        skip !== "subzona" &&
+        subzona &&
+        !attrOf(item, "zone").map(humanizeAttributeValue).includes(subzona)
+      )
         return false;
       if (
+        skip !== "place_type" &&
         placeType &&
         !attrOf(item, "place_type").map(humanizeAttributeValue).includes(placeType)
-      ) {
+      )
         return false;
-      }
       if (
+        skip !== "experience_category" &&
         category &&
         !attrOf(item, "experience_category").map(humanizeAttributeValue).includes(category)
-      ) {
+      )
         return false;
-      }
       for (const [key, value] of activeSecondary) {
+        if (skip === key) continue;
         if (!attrOf(item, key).map(humanizeAttributeValue).includes(value)) return false;
       }
       if (!needle) return true;
       return normalize(
         [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
       ).includes(needle);
-    });
-  }, [items, query, family, destino, subzona, placeType, category, activeSecondary, locked]);
+    };
+  }, [family, locked, destino, subzona, placeType, category, activeSecondary, needle]);
 
+  /** Conteo real por opción dentro del contexto vigente; sin resultados, sin opción. */
+  const facetOptions = useMemo(() => {
+    return (
+      key: string,
+      skip: string,
+      valuesOf: (item: ListingItem) => string[],
+    ): FacetOption[] => {
+      void key;
+      const counts = new Map<string, number>();
+      for (const item of items) {
+        if (!matches(item, skip)) continue;
+        for (const value of unique(valuesOf(item))) {
+          counts.set(value, (counts.get(value) ?? 0) + 1);
+        }
+      }
+      return Array.from(counts.entries())
+        .filter(([, count]) => count > 0)
+        .map(([value, count]) => ({ value, label: value, count }))
+        .sort((a, b) => a.label.localeCompare(b.label, "es"));
+    };
+  }, [items, matches]);
+
+  const destinos = useMemo(
+    () => facetOptions("zone", "destino", (item) => [item.zone]),
+    [facetOptions],
+  );
+  /* Subzonas válidas del destino en contexto (o del destino seleccionado).
+     Dentro del micrositio el destino es fijo, así que sólo se ofrece cuando ese
+     destino tiene subzonas con registros reales. */
+  const subzonas = useMemo(
+    () =>
+      facetOptions("zone", "subzona", (item) =>
+        attrOf(item, "zone").map(humanizeAttributeValue),
+      ),
+    [facetOptions],
+  );
+  useEffect(() => {
+    if (subzona && !subzonas.some((option) => option.value === subzona)) setSubzona("");
+  }, [subzona, subzonas]);
+  /* Tipo de lugar: taxonomía canónica `place_types` publicada por la lectura. */
+  const placeTypes = useMemo(
+    () =>
+      facetOptions("place_type", "place_type", (item) =>
+        attrOf(item, "place_type").map(humanizeAttributeValue),
+      ),
+    [facetOptions],
+  );
+  useEffect(() => {
+    if (placeType && !placeTypes.some((option) => option.value === placeType)) setPlaceType("");
+  }, [placeType, placeTypes]);
+  /* Qué puedes descubrir: `place_categories` reales enlazadas al lugar. */
+  const categories = useMemo(
+    () =>
+      facetOptions("experience_category", "experience_category", (item) =>
+        attrOf(item, "experience_category").map(humanizeAttributeValue),
+      ),
+    [facetOptions],
+  );
+  useEffect(() => {
+    if (category && !categories.some((option) => option.value === category)) setCategory("");
+  }, [category, categories]);
+  const secondaryGroups = useMemo(
+    () =>
+      PLACE_SECONDARY_FILTERS.map((group) => ({
+        ...group,
+        options: facetOptions(group.key, group.key, (item) =>
+          attrOf(item, group.key).map(humanizeAttributeValue),
+        ),
+      })).filter((group) => group.options.length > 0),
+    [facetOptions],
+  );
+
+  /* Clasificación principal del Inventario de Atractivos del Oriente Maya:
+     dos familias documentales (tangibles e intangibles). Se muestra siempre,
+     por encima del tipo específico y de las categorías de descubrimiento. */
+  const familyCounts = useMemo(() => {
+    const counts = { total: 0, tangible: 0, intangible: 0 };
+    for (const item of items) {
+      if (!matches(item, "family")) continue;
+      counts.total += 1;
+      const value = attrOf(item, "attraction_family")[0];
+      if (value === "intangible") counts.intangible += 1;
+      else if (value === "tangible") counts.tangible += 1;
+    }
+    return counts;
+  }, [items, matches]);
+
+  const hasActiveFilters =
+    Boolean(query || family || subzona || placeType || category || (!locked && destino)) ||
+    activeSecondary.length > 0;
+
+  const filteredItems = useMemo(() => items.filter((item) => matches(item)), [items, matches]);
+
+  /* Limpiar restaura el contexto territorial: dentro del micrositio el destino
+     fijo nunca se pierde (no es un filtro del usuario). */
   const clearAll = () => {
     setQuery("");
     setFamily("");
-    setDestino("");
+    if (!locked) setDestino("");
     setSubzona("");
     setPlaceType("");
     setCategory("");
@@ -1594,10 +1648,12 @@ function PlaceListingBody({
           className="mt-4 flex flex-wrap items-center gap-2"
         >
           {[
-            { value: "", label: "Todos" },
+            { value: "", label: "Todos", count: familyCounts.total },
             { value: "tangible", label: "Tangibles", count: familyCounts.tangible },
             { value: "intangible", label: "Intangibles", count: familyCounts.intangible },
-          ].map((option) => {
+          ]
+            .filter((option) => option.value === "" || option.count > 0)
+            .map((option) => {
             const active = family === option.value;
             return (
               <button
@@ -1642,7 +1698,7 @@ function PlaceListingBody({
                 <MapPin className="size-4" aria-hidden /> {lockedDestinationLabel}
               </span>
             ) : (
-              <EventSelect
+              <FacetSelect
                 label="Destino"
                 value={destino}
                 onChange={setDestino}
@@ -1651,11 +1707,11 @@ function PlaceListingBody({
             )}
 
             {subzonas.length > 0 ? (
-              <EventSelect label="Subzona" value={subzona} onChange={setSubzona} options={subzonas} />
+              <FacetSelect label="Subzona" value={subzona} onChange={setSubzona} options={subzonas} />
             ) : null}
 
             {placeTypes.length > 0 ? (
-              <EventSelect
+              <FacetSelect
                 label="Tipo de lugar"
                 value={placeType}
                 onChange={setPlaceType}
@@ -1664,8 +1720,8 @@ function PlaceListingBody({
             ) : null}
 
             {categories.length > 0 ? (
-              <EventSelect
-                label="Categoría"
+              <FacetSelect
+                label="Qué puedes descubrir"
                 value={category}
                 onChange={setCategory}
                 options={categories}
@@ -1688,7 +1744,7 @@ function PlaceListingBody({
           {showMore && secondaryGroups.length > 0 ? (
             <div className="mt-3 grid gap-3 border-t border-[#ded7c9] pt-3 sm:grid-cols-2 lg:grid-cols-3">
               {secondaryGroups.map((group) => (
-                <EventSelect
+                <FacetSelect
                   key={group.key}
                   label={group.label}
                   value={secondary[group.key] ?? ""}
