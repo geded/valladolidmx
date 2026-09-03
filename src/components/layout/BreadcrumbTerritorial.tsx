@@ -157,7 +157,8 @@ function CompactMobileCrumbs({
   const anchor = Math.min(Math.max(rawAnchor, 0), Math.max(lastIndex - 1, 0));
   const current = crumbs[lastIndex];
   const anchorCrumb = anchor < lastIndex ? crumbs[anchor] : undefined;
-  const hidden = crumbs.filter((_, i) => i !== lastIndex && i !== anchor);
+  // La casita ya cubre Home: no se repite dentro del menú.
+  const hidden = crumbs.filter((c, i) => i !== lastIndex && i !== anchor && c.to !== "/");
 
   if (!current) return null;
 
