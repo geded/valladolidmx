@@ -1494,6 +1494,7 @@ function PlaceListingBody({
 
   const clearAll = () => {
     setQuery("");
+    setFamily("");
     setDestino("");
     setPlaceType("");
     setCategory("");
