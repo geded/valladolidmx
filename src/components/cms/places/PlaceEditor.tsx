@@ -470,7 +470,7 @@ export function PlaceEditor({ placeId }: Props) {
           </PlaceField>
           <PlaceField
             name="new-zone"
-            label="Zona del destino (opcional)"
+            label="Subzona del destino (opcional)"
             help={
               !newPlace.destination_id
                 ? "Elige primero un destino para ver sus zonas."
@@ -651,11 +651,11 @@ export function PlaceEditor({ placeId }: Props) {
         </PlaceField>
         <PlaceField
           name="zone"
-          label="Zona territorial (opcional)"
+          label="Subzona del destino (opcional)"
           help={
             editZones.length === 0
-              ? "Este destino todavía no tiene zonas registradas. Puedes guardar el lugar sin zona."
-              : "Sólo se listan zonas activas del destino de este lugar."
+              ? "Este destino todavía no tiene subzonas registradas. Puedes guardar el lugar sin subzona."
+              : "Jerarquía territorial: Oriente Maya > Destino > Subzona > Lugar. Sólo se listan subzonas activas del destino de este lugar."
           }
         >
           {({ id, describedBy }) => (

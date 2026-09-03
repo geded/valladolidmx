@@ -142,17 +142,17 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
   if (place.destination_id !== destination.id) return null;
   if (!input.allowUnpublished && place.status !== "published") return null;
 
-  let zone: { id: string; name: string } | null = null;
+  let zone: { id: string; slug: string | null; name: string } | null = null;
   if (place.destination_zone_id) {
     const { data: zoneRow } = await sb
       .from("destination_zones")
-      .select("id, name, destination_id")
+      .select("id, slug, name, destination_id")
       .eq("id", place.destination_zone_id)
       .is("deleted_at", null)
       .maybeSingle();
     // La zona sólo se muestra si pertenece al mismo destino.
     if (zoneRow && zoneRow.destination_id === destination.id)
-      zone = { id: zoneRow.id, name: zoneRow.name };
+      zone = { id: zoneRow.id, slug: (zoneRow as any).slug ?? null, name: zoneRow.name };
   }
 
   const [typeRes, catRes, hoursRes, authRes, prodRes, evtRes, seoRes] = await Promise.all([
@@ -434,7 +434,7 @@ export async function readPublishedPlaceCards(
     zoneIds.length
       ? sb
           .from("destination_zones")
-          .select("id, name, destination_id")
+          .select("id, slug, name, destination_id")
           .in("id", zoneIds)
           .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
@@ -455,10 +455,13 @@ export async function readPublishedPlaceCards(
       { slug: t.slug, name: t.name, attraction_family: t.attraction_family },
     ]),
   );
-  const zoneById = new Map<string, { name: string; destination_id: string }>(
+  const zoneById = new Map<
+    string,
+    { slug: string | null; name: string; destination_id: string }
+  >(
     ((zoneRes.data ?? []) as any[]).map((z) => [
       z.id,
-      { name: z.name, destination_id: z.destination_id },
+      { slug: z.slug ?? null, name: z.name, destination_id: z.destination_id },
     ]),
   );
 
@@ -536,7 +539,9 @@ export async function readPublishedPlaceCards(
     const zoneRow = p.destination_zone_id ? (zoneById.get(p.destination_zone_id) ?? null) : null;
     /* Fail-closed territorial: la zona sólo se expone si pertenece al
        destino del propio lugar. */
-    const zone = zoneRow && zoneRow.destination_id === p.destination_id ? zoneRow.name : null;
+    const belongsToDestination = Boolean(zoneRow && zoneRow.destination_id === p.destination_id);
+    const zone = belongsToDestination ? (zoneRow as { name: string }).name : null;
+    const zoneSlug = belongsToDestination ? ((zoneRow as any).slug ?? null) : null;
     const categories = categoriesByPlace.get(p.id) ?? [];
     const amenities = strArray(p.amenities);
     const accessibility = accessibilityList(p.accessibility);
@@ -567,6 +572,7 @@ export async function readPublishedPlaceCards(
       destination_slug: destination?.slug ?? null,
       destination_name: destination?.name ?? null,
       zone_name: zone,
+      zone_slug: zoneSlug,
       latitude: p.latitude != null ? Number(p.latitude) : null,
       longitude: p.longitude != null ? Number(p.longitude) : null,
       admission_kind: p.admission_kind ?? null,

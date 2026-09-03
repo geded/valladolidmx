@@ -12,7 +12,7 @@ import {
   Sparkles,
   UtensilsCrossed,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import {
@@ -1393,8 +1393,10 @@ function EventMapPanel({
  * ofrecen como filtro. Cero fixtures.
  * ------------------------------------------------------------------ */
 
+/* La subzona NO es un filtro secundario: es el nivel territorial que sigue al
+   destino en la jerarquía canónica (Región > Destino > Subzona > Lugar), por
+   lo que se ofrece en la fila principal y depende del destino elegido. */
 const PLACE_SECONDARY_FILTERS = [
-  { key: "zone", label: "Zona" },
   { key: "admission_type", label: "Entrada" },
   { key: "accessibility", label: "Accesibilidad" },
   { key: "amenities", label: "Servicios" },
@@ -1418,6 +1420,7 @@ function PlaceListingBody({
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState("");
   const [destino, setDestino] = useState("");
+  const [subzona, setSubzona] = useState("");
   const [placeType, setPlaceType] = useState("");
   const [category, setCategory] = useState("");
   const [secondary, setSecondary] = useState<Record<string, string>>({});
@@ -1425,6 +1428,21 @@ function PlaceListingBody({
 
   const locked = Boolean(lockedDestinationLabel);
   const destinos = useMemo(() => unique(items.map((item) => item.zone)), [items]);
+  /* Subzonas válidas del destino en contexto (o del destino seleccionado).
+     Dentro del micrositio el destino es fijo, así que sólo se ofrece cuando ese
+     destino tiene subzonas con registros reales. */
+  const subzonas = useMemo(
+    () =>
+      unique(
+        items
+          .filter((item) => locked || !destino || item.zone === destino)
+          .flatMap((item) => attrOf(item, "zone").map(humanizeAttributeValue)),
+      ),
+    [items, destino, locked],
+  );
+  useEffect(() => {
+    if (subzona && !subzonas.includes(subzona)) setSubzona("");
+  }, [subzona, subzonas]);
   const placeTypes = useMemo(
     () => unique(items.flatMap((item) => attrOf(item, "place_type").map(humanizeAttributeValue))),
     [items],
@@ -1462,7 +1480,7 @@ function PlaceListingBody({
 
   const activeSecondary = Object.entries(secondary).filter(([, value]) => value);
   const hasActiveFilters =
-    Boolean(query || family || placeType || category || (!locked && destino)) ||
+    Boolean(query || family || subzona || placeType || category || (!locked && destino)) ||
     activeSecondary.length > 0;
 
   const filteredItems = useMemo(() => {
@@ -1470,6 +1488,8 @@ function PlaceListingBody({
     return items.filter((item) => {
       if (family && !attrOf(item, "attraction_family").includes(family)) return false;
       if (!locked && destino && item.zone !== destino) return false;
+      if (subzona && !attrOf(item, "zone").map(humanizeAttributeValue).includes(subzona))
+        return false;
       if (
         placeType &&
         !attrOf(item, "place_type").map(humanizeAttributeValue).includes(placeType)
@@ -1490,12 +1510,13 @@ function PlaceListingBody({
         [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
       ).includes(needle);
     });
-  }, [items, query, family, destino, placeType, category, activeSecondary, locked]);
+  }, [items, query, family, destino, subzona, placeType, category, activeSecondary, locked]);
 
   const clearAll = () => {
     setQuery("");
     setFamily("");
     setDestino("");
+    setSubzona("");
     setPlaceType("");
     setCategory("");
     setSecondary({});
@@ -1588,6 +1609,10 @@ function PlaceListingBody({
                 options={destinos}
               />
             )}
+
+            {subzonas.length > 0 ? (
+              <EventSelect label="Subzona" value={subzona} onChange={setSubzona} options={subzonas} />
+            ) : null}
 
             {placeTypes.length > 0 ? (
               <EventSelect
@@ -1685,7 +1710,8 @@ function PlaceListingBody({
                   Lugares cerca de {lockedDestinationLabel}
                 </h2>
                 <p className="mt-1 text-sm text-[#667067]">
-                  Se muestran aparte para conservar claro qué pertenece al destino.
+                  Pertenecen a otros destinos por proximidad territorial: no son una
+                  subzona de {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>
                 <div className="mt-4 space-y-4">
                   {nearbyItems.slice(0, 6).map((card) => (
