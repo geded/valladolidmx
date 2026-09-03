@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TerritorialListingReviewSurface } from "@/components/listing-premium/TerritorialListingReviewSurface";
 import { PublicShell } from "@/components/discovery";
+import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
+import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 
 export const Route = createFileRoute("/lovable/territorial-listing-premium-preview")({
   validateSearch: (search: Record<string, unknown>) => ({
     familia: search.familia === "restaurantes" ? ("restaurantes" as const) : ("hoteles" as const),
+  }),
+  loaderDeps: ({ search }) => ({ familia: search.familia }),
+  loader: async ({ deps }) => ({
+    dto: await getPublicListing({ data: { family: deps.familia, destino: "valladolid" } }),
   }),
   head: () => ({
     meta: [
@@ -20,10 +25,10 @@ export const Route = createFileRoute("/lovable/territorial-listing-premium-previ
 });
 
 function TerritorialListingPremiumPreview() {
-  const { familia } = Route.useSearch();
+  const { dto } = Route.useLoaderData();
   return (
     <PublicShell variant="default">
-      <TerritorialListingReviewSurface family={familia} />
+      <ListingPremiumSurfaceFromDTO dto={dto} showAddToTrip showFavorite />
     </PublicShell>
   );
 }
