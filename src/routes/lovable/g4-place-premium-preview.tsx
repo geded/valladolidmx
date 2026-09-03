@@ -17,6 +17,7 @@ import {
   type PublicPlaceDTO,
 } from "@/lib/places/place-public-contract";
 import { getPublicPlace } from "@/lib/places/place-public-reads.functions";
+import { PLACE_REVIEW_FIXTURE_NOTICE } from "@/lib/places/place-review-fixtures";
 
 export const Route = createFileRoute("/lovable/g4-place-premium-preview")({
   validateSearch: (search: Record<string, unknown>): { lugar?: string } =>
@@ -43,9 +44,19 @@ export const Route = createFileRoute("/lovable/g4-place-premium-preview")({
 
 function PlacePremiumPreview() {
   const { place, lugar } = Route.useLoaderData();
-  const projection = useMemo(
-    () => (place ? adaptPlaceToPremiumSurface(place) : null),
+  /* Superficie interna de revisión: se admiten portadas conceptuales
+     temporales (IA) aún no aprobadas para poder validar la composición
+     visual. Las lecturas públicas siguen exigiendo activo aprobado. */
+  const reviewPlace = useMemo<PublicPlaceDTO | null>(
+    () =>
+      place
+        ? { ...place, media: place.media.map((m) => ({ ...m, approved: true })) }
+        : null,
     [place],
+  );
+  const projection = useMemo(
+    () => (reviewPlace ? adaptPlaceToPremiumSurface(reviewPlace) : null),
+    [reviewPlace],
   );
 
   if (!place || !projection) {
@@ -62,7 +73,18 @@ function PlacePremiumPreview() {
     );
   }
 
+  const conceptual = place.media.some((m) => m.aiGenerated);
+
   return (
+    <>
+      {conceptual ? (
+        <div className="mx-auto w-full max-w-[86rem] px-4 pt-3 sm:px-6 lg:px-8">
+          <p className="rounded-lg border border-dashed border-[#ded7c9] bg-[#faf7f1] px-3 py-2 text-[11px] leading-relaxed text-[#6b6357]">
+            Datos de prueba: las imágenes son representaciones conceptuales generadas con IA,
+            temporales y pendientes de sustitución por fotografía real.
+          </p>
+        </div>
+      ) : null}
     <PlacePremiumSurface
       content={projection.content}
       presentation={projection.presentation}
@@ -78,5 +100,6 @@ function PlacePremiumPreview() {
         />
       }
     />
+    </>
   );
 }
