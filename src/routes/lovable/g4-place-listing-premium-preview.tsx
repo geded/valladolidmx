@@ -7,6 +7,11 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
+import {
+  PLACE_REVIEW_FIXTURE_NOTICE,
+  applyPlaceReviewFixtures,
+  listingWithPlaceReviewFixtures,
+} from "@/lib/places/place-review-fixtures";
 
 type Estado = "regional" | "valladolid";
 
@@ -26,14 +31,18 @@ export const Route = createFileRoute("/lovable/g4-place-listing-premium-preview"
   }),
   loader: async ({ deps }) => {
     const destino = deps.estado === "valladolid" ? "valladolid" : null;
-    const [dto, regional] = await Promise.all([
-      getPublicListing({ data: { family: "lugares", destino } }),
+    const [realDto, regional] = await Promise.all([
+      getPublicListing({ data: { family: "lugares", destino, previewMedia: true } }),
       destino
-        ? getPublicListing({ data: { family: "lugares", destino: null } })
+        ? getPublicListing({ data: { family: "lugares", destino: null, previewMedia: true } })
         : Promise.resolve(null),
     ]);
+    /* Datos reales + atributos DEMO sólo en esta superficie de revisión. */
+    const dto = listingWithPlaceReviewFixtures(realDto);
     const nearby = regional
-      ? regional.items.filter((item) => !dto.items.some((local) => local.id === item.id))
+      ? applyPlaceReviewFixtures(
+          regional.items.filter((item) => !dto.items.some((local) => local.id === item.id)),
+        )
       : [];
     return { dto, nearby, estado: deps.estado as Estado };
   },
@@ -59,6 +68,11 @@ function PlaceListingPremiumPreview() {
             {option === "regional" ? "Regional" : "Valladolid"}
           </Link>
         ))}
+      </div>
+      <div className="mx-auto w-full max-w-[86rem] px-4 pt-3 sm:px-6 lg:px-8">
+        <p className="rounded-lg border border-dashed border-[#ded7c9] bg-[#faf7f1] px-3 py-2 text-[11px] leading-relaxed text-[#6b6357]">
+          {PLACE_REVIEW_FIXTURE_NOTICE}
+        </p>
       </div>
       <ListingPremiumSurfaceFromDTO
         dto={dto}
