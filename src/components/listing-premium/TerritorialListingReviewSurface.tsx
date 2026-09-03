@@ -317,9 +317,15 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
 export function TerritorialListingReviewSurface({
   family = "hoteles",
   dto,
+  nearbyItems,
+  lockedDestinationLabel,
 }: {
   family?: TerritorialListingFamily;
   dto?: PublicListingDTO;
+  /** Eventos de otros destinos: sección de descubrimiento separada. */
+  nearbyItems?: readonly TourismCardVM[];
+  /** Contexto territorial bloqueado (listado dentro de un destino). */
+  lockedDestinationLabel?: string | null;
 }) {
   const profile = PROFILES[family];
   const [query, setQuery] = useState("");
@@ -330,6 +336,60 @@ export function TerritorialListingReviewSurface({
     () => (dto ? dto.items.map((item) => listingItemFromDTO(item, profile)) : profile.items),
     [dto, profile],
   );
+  if (family === "eventos") {
+    return (
+      <EventListingBody
+        profile={profile}
+        items={items}
+        dto={dto}
+        nearbyItems={nearbyItems}
+        lockedDestinationLabel={lockedDestinationLabel ?? dto?.destinationLabel ?? null}
+      />
+    );
+  }
+  return (
+    <TerritorialListingBody
+      profile={profile}
+      items={items}
+      dto={dto}
+      query={query}
+      setQuery={setQuery}
+      zone={zone}
+      setZone={setZone}
+      primary={primary}
+      setPrimary={setPrimary}
+      secondary={secondary}
+      setSecondary={setSecondary}
+    />
+  );
+}
+
+function TerritorialListingBody({
+  profile,
+  items,
+  dto,
+  query,
+  setQuery,
+  zone,
+  setZone,
+  primary,
+  setPrimary,
+  secondary,
+  setSecondary,
+}: {
+  profile: ListingProfile;
+  items: ListingItem[];
+  dto?: PublicListingDTO;
+  query: string;
+  setQuery: (v: string) => void;
+  zone: string;
+  setZone: (v: string) => void;
+  primary: string;
+  setPrimary: (v: string) => void;
+  secondary: string;
+  setSecondary: (v: string) => void;
+}) {
+
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
   const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
   const secondaryValues = useMemo(
