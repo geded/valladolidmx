@@ -146,6 +146,10 @@ export interface ListingPremiumSurfaceFromDTOProps {
   showFavorite?: boolean;
   presentation?: PremiumPresentation;
   className?: string;
+  /** Eventos de otros destinos (sección separada de descubrimiento). */
+  nearbyItems?: readonly TourismCardVM[];
+  /** Contexto territorial bloqueado del listado contextual. */
+  lockedDestinationLabel?: string | null;
 }
 
 /**
@@ -162,6 +166,8 @@ export function ListingPremiumSurfaceFromDTO({
   showFavorite = false,
   presentation = "editorial",
   className,
+  nearbyItems,
+  lockedDestinationLabel,
 }: ListingPremiumSurfaceFromDTOProps) {
   // Perfiles visuales aprobados dentro de la única entrada canónica. Comparten
   // el mismo PublicListingDTO, mapa, Alux, Mi Viaje y expediente de concierge;
@@ -169,12 +175,15 @@ export function ListingPremiumSurfaceFromDTO({
   if (
     dto.family === "hoteles" ||
     dto.family === "restaurantes" ||
-    dto.family === "casas-de-vacaciones"
+    dto.family === "casas-de-vacaciones" ||
+    dto.family === "eventos"
   ) {
     return (
       <TerritorialListingReviewSurface
-        family={dto.family as "hoteles" | "restaurantes" | "casas-de-vacaciones"}
+        family={dto.family as "hoteles" | "restaurantes" | "casas-de-vacaciones" | "eventos"}
         dto={dto}
+        nearbyItems={nearbyItems}
+        lockedDestinationLabel={lockedDestinationLabel}
       />
     );
   }
