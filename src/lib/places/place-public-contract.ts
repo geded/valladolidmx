@@ -244,12 +244,9 @@ export function buildPlaceBreadcrumbs(dto: PublicPlaceDTO) {
     { label: dto.destination.name, href: `/oriente-maya/${dto.destination.slug}` },
   ];
   if (dto.zone?.name) {
-    crumbs.push({
-      label: dto.zone.name,
-      href: dto.zone.slug
-        ? `/oriente-maya/${dto.destination.slug}/lugares?subzona=${encodeURIComponent(dto.zone.slug)}`
-        : undefined,
-    });
+    // La subzona no tiene ruta propia: se muestra como nivel territorial real
+    // sin enlace inventado.
+    crumbs.push({ label: dto.zone.name });
   }
   crumbs.push(
     {
