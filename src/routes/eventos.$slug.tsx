@@ -10,7 +10,8 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
-import { EventSurface, EventSurfaceContractBoundary } from "@/components/surfaces/EventSurface";
+import { EventSurfaceContractBoundary } from "@/components/surfaces/EventSurface";
+import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
 import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import { bindEventRoute } from "@/lib/experience-builder/canonical-entity-binding";
 import {
@@ -138,7 +139,7 @@ function EventoPage() {
       <EventSurfaceContractBoundary
         enabled={surfaceContractsEnabled && canonicalBinding.surface === "premium"}
         event={event}
-        legacy={<EventSurface event={event} />}
+        legacy={<EventPremiumSurface event={event} />}
       />
     </ContextEngineProvider>
   );

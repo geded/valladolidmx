@@ -14,7 +14,6 @@ import { PublicShell } from "@/components/discovery";
 import { Container } from "@/components/layout/Container";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
@@ -84,12 +83,6 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
     attributeValues(attrs[key]).map((value) => humanizeAttributeValue(value)),
   );
 
-  const trip = evaluateTripEligibility({
-    kind: "event",
-    targetId: event.id,
-    title: event.title,
-  });
-
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" as const },
     ...(event.destination_slug && event.destination_name
@@ -139,16 +132,15 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
                 </dl>
               ) : null}
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                {trip.eligible && trip.identity ? (
-                  <AddToTravelPlanButton
-                    kind={trip.identity.kind}
-                    targetId={trip.identity.targetId}
-                    title={event.title}
-                    slug={event.slug ?? null}
-                    imageUrl={event.cover_url ?? null}
-                    subtitle={startDay}
-                  />
-                ) : null}
+                <AddToTravelPlanButton
+                  kind="event"
+                  targetId={event.id}
+                  title={event.title}
+                  slug={event.slug ?? null}
+                  imageUrl={event.cover_url ?? null}
+                  subtitle={startDay}
+                  variant="full"
+                />
                 {event.external_url ? (
                   <a
                     href={event.external_url}
