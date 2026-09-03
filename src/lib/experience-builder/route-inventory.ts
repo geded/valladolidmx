@@ -269,6 +269,21 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     maturity: "L3",
     migrationStatus: "planned",
   },
+  "src/routes/_authenticated/cms/eventos.index.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+  },
+  "src/routes/_authenticated/cms/eventos.nuevo.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+  },
+  "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+  },
   "src/routes/hoteles.tsx": {
     businessPriority: "high",
     maturity: "L3",
@@ -377,6 +392,9 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/destinos.nueva.tsx",
   "src/routes/_authenticated/cms/demo-pack.tsx",
   "src/routes/_authenticated/cms/rc-visual.tsx",
+  "src/routes/_authenticated/cms/eventos.index.tsx",
+  "src/routes/_authenticated/cms/eventos.nuevo.tsx",
+  "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx",
   "src/routes/_authenticated/cms/empresas.$businessId.editar.tsx",
   "src/routes/_authenticated/cms/empresas.$businessId.preview.tsx",
   "src/routes/_authenticated/cms/empresas.index.tsx",

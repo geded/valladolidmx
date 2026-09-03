@@ -31,8 +31,10 @@ interface ListingItem {
   tags: string[];
   type: string;
   href?: string;
+  startsAt?: string | null;
   source?: TourismCardVM;
 }
+
 
 interface NearbyItem {
   name: string;
@@ -315,9 +317,15 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
 export function TerritorialListingReviewSurface({
   family = "hoteles",
   dto,
+  nearbyItems,
+  lockedDestinationLabel,
 }: {
   family?: TerritorialListingFamily;
   dto?: PublicListingDTO;
+  /** Eventos de otros destinos: sección de descubrimiento separada. */
+  nearbyItems?: readonly TourismCardVM[];
+  /** Contexto territorial bloqueado (listado dentro de un destino). */
+  lockedDestinationLabel?: string | null;
 }) {
   const profile = PROFILES[family];
   const [query, setQuery] = useState("");
@@ -328,6 +336,60 @@ export function TerritorialListingReviewSurface({
     () => (dto ? dto.items.map((item) => listingItemFromDTO(item, profile)) : profile.items),
     [dto, profile],
   );
+  if (family === "eventos") {
+    return (
+      <EventListingBody
+        profile={profile}
+        items={items}
+        dto={dto}
+        nearbyItems={nearbyItems}
+        lockedDestinationLabel={lockedDestinationLabel ?? dto?.destinationLabel ?? null}
+      />
+    );
+  }
+  return (
+    <TerritorialListingBody
+      profile={profile}
+      items={items}
+      dto={dto}
+      query={query}
+      setQuery={setQuery}
+      zone={zone}
+      setZone={setZone}
+      primary={primary}
+      setPrimary={setPrimary}
+      secondary={secondary}
+      setSecondary={setSecondary}
+    />
+  );
+}
+
+function TerritorialListingBody({
+  profile,
+  items,
+  dto,
+  query,
+  setQuery,
+  zone,
+  setZone,
+  primary,
+  setPrimary,
+  secondary,
+  setSecondary,
+}: {
+  profile: ListingProfile;
+  items: ListingItem[];
+  dto?: PublicListingDTO;
+  query: string;
+  setQuery: (v: string) => void;
+  zone: string;
+  setZone: (v: string) => void;
+  primary: string;
+  setPrimary: (v: string) => void;
+  secondary: string;
+  setSecondary: (v: string) => void;
+}) {
+
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
   const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
   const secondaryValues = useMemo(
@@ -450,6 +512,8 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
       ? humanizeAttributeValue(structuredType)
       : item.eyebrow?.trim() || profile.itemLabel,
     href: item.href ?? undefined,
+    startsAt: item.startsAt ?? null,
+
     source: item,
   };
 }
@@ -802,6 +866,424 @@ function MapPanel({ profile }: { profile: ListingProfile }) {
         <button className="mt-4 min-h-11 rounded-full bg-[#f3a61e] px-5 text-sm font-bold text-[#193126]">
           Personalizar con Alux
         </button>
+      </section>
+    </aside>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * EVENTOS — filtros profesionales sobre el mismo lenguaje visual.
+ *
+ * Fuente única: `PublicListingDTO` (lecturas reales). Los atributos
+ * estructurados provienen del CMS (`events.filter_attributes`); los que
+ * no existen simplemente no se ofrecen como filtro.
+ * ------------------------------------------------------------------ */
+
+const EVENT_SECONDARY_FILTERS = [
+  { key: "audience", label: "Ideal para" },
+  { key: "admission_type", label: "Entrada" },
+  { key: "time_of_day", label: "Horario" },
+  { key: "venue_type", label: "Sede o modalidad" },
+  { key: "accessibility", label: "Accesibilidad" },
+  { key: "reservation_required", label: "Reservación" },
+] as const;
+
+const EVENT_DATE_RANGES = [
+  { value: "hoy", label: "Hoy" },
+  { value: "fin-de-semana", label: "Este fin de semana" },
+  { value: "7-dias", label: "Próximos 7 días" },
+  { value: "este-mes", label: "Este mes" },
+  { value: "proximo-mes", label: "Próximo mes" },
+] as const;
+
+type EventDateRange = (typeof EVENT_DATE_RANGES)[number]["value"] | "";
+
+function attrOf(item: ListingItem, key: string): string[] {
+  return attributeValues(item.source?.filterAttributes?.[key]);
+}
+
+function matchesDateRange(startsAt: string | null | undefined, range: EventDateRange): boolean {
+  if (!range) return true;
+  if (!startsAt) return false;
+  const date = new Date(startsAt);
+  if (Number.isNaN(date.getTime())) return false;
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const day = (n: number) => new Date(startOfToday.getTime() + n * 86400000);
+  if (range === "hoy") return date >= startOfToday && date < day(1);
+  if (range === "7-dias") return date >= startOfToday && date < day(7);
+  if (range === "fin-de-semana") {
+    const dow = startOfToday.getDay(); // 0 domingo
+    const daysToSaturday = (6 - dow + 7) % 7;
+    const saturday = day(daysToSaturday);
+    const monday = new Date(saturday.getTime() + 2 * 86400000);
+    return date >= saturday && date < monday;
+  }
+  const monthStart = new Date(now.getFullYear(), now.getMonth() + (range === "este-mes" ? 0 : 1), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + (range === "este-mes" ? 1 : 2), 1);
+  return date >= monthStart && date < monthEnd;
+}
+
+function EventListingBody({
+  profile,
+  items,
+  dto,
+  nearbyItems,
+  lockedDestinationLabel,
+}: {
+  profile: ListingProfile;
+  items: ListingItem[];
+  dto?: PublicListingDTO;
+  nearbyItems?: readonly TourismCardVM[];
+  lockedDestinationLabel?: string | null;
+}) {
+  const [query, setQuery] = useState("");
+  const [destino, setDestino] = useState("");
+  const [dateRange, setDateRange] = useState<EventDateRange>("");
+  const [eventType, setEventType] = useState("");
+  const [secondary, setSecondary] = useState<Record<string, string>>({});
+  const [showMore, setShowMore] = useState(false);
+
+  const locked = Boolean(lockedDestinationLabel);
+  const destinos = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
+  const types = useMemo(
+    () => unique(items.flatMap((item) => attrOf(item, "event_type").map(humanizeAttributeValue))),
+    [items],
+  );
+  const secondaryGroups = useMemo(
+    () =>
+      EVENT_SECONDARY_FILTERS.map((group) => ({
+        ...group,
+        options: unique(
+          items.flatMap((item) => attrOf(item, group.key).map(humanizeAttributeValue)),
+        ),
+      })).filter((group) => group.options.length > 0),
+    [items],
+  );
+
+  const activeSecondary = Object.entries(secondary).filter(([, value]) => value);
+  const hasActiveFilters =
+    Boolean(query || dateRange || eventType || (!locked && destino)) || activeSecondary.length > 0;
+
+  const filteredItems = useMemo(() => {
+    const needle = normalize(query);
+    return items.filter((item) => {
+      if (!locked && destino && itemZone(item) !== destino) return false;
+      if (!matchesDateRange(item.startsAt, dateRange)) return false;
+      if (
+        eventType &&
+        !attrOf(item, "event_type").map(humanizeAttributeValue).includes(eventType)
+      ) {
+        return false;
+      }
+      for (const [key, value] of activeSecondary) {
+        if (!attrOf(item, key).map(humanizeAttributeValue).includes(value)) return false;
+      }
+      if (!needle) return true;
+      return normalize(
+        [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
+      ).includes(needle);
+    });
+  }, [items, query, destino, dateRange, eventType, activeSecondary, locked]);
+
+  const clearAll = () => {
+    setQuery("");
+    setDestino("");
+    setDateRange("");
+    setEventType("");
+    setSecondary({});
+  };
+
+  const resultsTitle = lockedDestinationLabel
+    ? `Agenda en ${lockedDestinationLabel}`
+    : dto
+      ? "Agenda del Oriente Maya"
+      : profile.resultsTitle;
+
+  return (
+    <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
+        <TerritorialBreadcrumb profile={profile} />
+        <ListingIntro
+          profile={
+            lockedDestinationLabel
+              ? { ...profile, title: `Eventos en ${lockedDestinationLabel}` }
+              : dto
+                ? { ...profile, title: "Eventos del Oriente Maya" }
+                : profile
+          }
+        />
+        <AluxBar profile={profile} />
+
+        <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+          <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
+            <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
+              <Search
+                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]"
+                aria-hidden
+              />
+              <span className="sr-only">{profile.searchLabel}</span>
+              <input
+                placeholder={profile.searchPlaceholder}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
+              />
+            </label>
+
+            {locked ? (
+              <span className="inline-flex min-h-11 min-w-max items-center gap-2 rounded-xl border border-[#0d4b38]/25 bg-[#0d4b38]/8 px-4 text-sm font-semibold text-[#0d4b38]">
+                <MapPin className="size-4" aria-hidden /> {lockedDestinationLabel}
+              </span>
+            ) : (
+              <EventSelect
+                label="Destino"
+                value={destino}
+                onChange={setDestino}
+                options={destinos}
+              />
+            )}
+
+            <label className="relative min-w-max lg:min-w-0">
+              <span className="sr-only">Fecha</span>
+              <select
+                aria-label="Fecha"
+                value={dateRange}
+                onChange={(event) => setDateRange(event.target.value as EventDateRange)}
+                className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+              >
+                <option value="">Fecha: cualquiera</option>
+                {EVENT_DATE_RANGES.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+                ⌄
+              </span>
+            </label>
+
+            <EventSelect
+              label="Tipo de evento"
+              value={eventType}
+              onChange={setEventType}
+              options={types}
+            />
+
+            {secondaryGroups.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setShowMore((value) => !value)}
+                aria-expanded={showMore}
+                className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38]"
+              >
+                <SlidersHorizontal className="size-4" aria-hidden /> Más filtros
+                {activeSecondary.length ? ` (${activeSecondary.length})` : ""}
+              </button>
+            ) : null}
+          </div>
+
+          {showMore && secondaryGroups.length > 0 ? (
+            <div className="mt-3 grid gap-3 border-t border-[#ded7c9] pt-3 sm:grid-cols-2 lg:grid-cols-3">
+              {secondaryGroups.map((group) => (
+                <EventSelect
+                  key={group.key}
+                  label={group.label}
+                  value={secondary[group.key] ?? ""}
+                  onChange={(value) =>
+                    setSecondary((current) => ({ ...current, [group.key]: value }))
+                  }
+                  options={group.options}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {hasActiveFilters ? (
+            <div className="mt-3 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={clearAll}
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          ) : null}
+        </section>
+
+        <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
+          <div className="min-w-0">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                  {lockedDestinationLabel ? "Primero en el destino" : "Agenda regional"}
+                </p>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl">{resultsTitle}</h2>
+              </div>
+              <p className="shrink-0 text-sm text-[#667067]">
+                {filteredItems.length} {filteredItems.length === 1 ? "evento" : "eventos"}
+              </p>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {filteredItems.map((item, index) => (
+                <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
+              ))}
+              {!filteredItems.length ? (
+                <div className="rounded-2xl border border-[#ded7c9] bg-white p-8 text-center text-sm text-[#5d685f]">
+                  {dto && !hasActiveFilters
+                    ? dto.emptyMessage
+                    : "No encontramos eventos con esos filtros. Prueba quitando una selección."}
+                </div>
+              ) : null}
+            </div>
+
+            {nearbyItems && nearbyItems.length ? (
+              <section className="mt-10 border-t border-[#ded7c9] pt-7">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                  Amplía la ruta
+                </p>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl">
+                  Eventos cerca de {lockedDestinationLabel}
+                </h2>
+                <p className="mt-1 text-sm text-[#667067]">
+                  Se muestran aparte y no cuentan dentro de la agenda local.
+                </p>
+                <div className="mt-4 space-y-4">
+                  {nearbyItems.slice(0, 6).map((card) => (
+                    <ListingCard
+                      key={card.id}
+                      item={listingItemFromDTO(card, profile)}
+                      featured={false}
+                      profile={profile}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {!dto ? <NearbySection profile={profile} /> : null}
+          </div>
+
+          <EventMapPanel profile={profile} items={filteredItems} />
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function EventSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+}) {
+  return (
+    <label className="relative min-w-max lg:min-w-0">
+      <span className="sr-only">{label}</span>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+      >
+        <option value="">{label}: todos</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+        ⌄
+      </span>
+    </label>
+  );
+}
+
+function EventMapPanel({ profile, items }: { profile: ListingProfile; items: ListingItem[] }) {
+  const points = items
+    .map((item, index) => ({
+      item,
+      index,
+      lat: item.source?.coordinates?.lat ?? null,
+      lng: item.source?.coordinates?.lng ?? null,
+    }))
+    .filter((point) => point.lat != null && point.lng != null) as {
+    item: ListingItem;
+    index: number;
+    lat: number;
+    lng: number;
+  }[];
+  const lats = points.map((p) => p.lat);
+  const lngs = points.map((p) => p.lng);
+  const spread = (value: number, values: number[]) => {
+    if (values.length < 2) return 50;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    if (max === min) return 50;
+    return 18 + ((value - min) / (max - min)) * 64;
+  };
+  return (
+    <aside className="order-first hidden sm:block lg:order-none lg:sticky lg:top-24">
+      <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-[#ded7c9] px-4 py-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#ba641e]">
+              Mapa territorial
+            </p>
+            <h2 className="font-display text-xl">{profile.mapTitle}</h2>
+          </div>
+          <span className="rounded-full bg-[#efe8da] px-3 py-1 text-xs font-semibold">
+            {items.length}
+          </span>
+        </div>
+        <div
+          className="relative h-64 overflow-hidden bg-[#dfe9df] sm:h-80 lg:h-[31rem]"
+          style={{
+            backgroundImage: "radial-gradient(#b8c7b8 1px, transparent 1px)",
+            backgroundSize: "18px 18px",
+          }}
+        >
+          <div className="absolute inset-0 opacity-50 [background:linear-gradient(135deg,transparent_42%,#fff_43%,#fff_47%,transparent_48%),linear-gradient(35deg,transparent_54%,#c9d8c8_55%,#c9d8c8_59%,transparent_60%)]" />
+          {points.map((point) => (
+            <span
+              key={point.item.name}
+              title={point.item.name}
+              className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-[#f3a61e] text-xs font-bold shadow-md"
+              style={{
+                left: `${spread(point.lng, lngs)}%`,
+                top: `${100 - spread(point.lat, lats)}%`,
+              }}
+            >
+              {point.index + 1}
+            </span>
+          ))}
+          {!points.length ? (
+            <span className="absolute inset-x-6 top-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-center text-xs text-[#5d685f] shadow">
+              Los eventos filtrados aún no publican coordenadas de su destino.
+            </span>
+          ) : null}
+        </div>
+        <div className="flex items-center justify-between gap-3 border-t border-[#ded7c9] p-4 text-sm">
+          <span className="text-[#5d685f]">
+            {items.length} {items.length === 1 ? "evento" : "eventos"} en el mapa
+          </span>
+        </div>
+      </section>
+      <section className="mt-4 hidden rounded-2xl bg-[#073f31] p-5 text-white lg:block">
+        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#f3a61e]">
+          Alux conecta tu viaje
+        </p>
+        <h2 className="mt-2 font-display text-2xl">{profile.aluxMapTitle}</h2>
+        <p className="mt-2 text-sm leading-6 text-white/70">{profile.aluxMapDescription}</p>
       </section>
     </aside>
   );

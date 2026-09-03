@@ -3333,6 +3333,7 @@ export type Database = {
           destination_id: string | null
           ends_at: string | null
           external_url: string | null
+          filter_attributes: Json
           id: string
           is_demo_seed: boolean
           is_free: boolean
@@ -3360,6 +3361,7 @@ export type Database = {
           destination_id?: string | null
           ends_at?: string | null
           external_url?: string | null
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
@@ -3387,6 +3389,7 @@ export type Database = {
           destination_id?: string | null
           ends_at?: string | null
           external_url?: string | null
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean

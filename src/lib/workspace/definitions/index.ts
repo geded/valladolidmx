@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
 import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, CalendarDays } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -684,6 +684,16 @@ const cms: WorkspaceDefinition = {
       to: "/cms/destinos",
       group: "territorio",
       order: 3,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
+      id: "cms.eventos",
+      workspaceId: "cms",
+      label: "Eventos",
+      icon: CalendarDays,
+      to: "/cms/eventos",
+      group: "territorio",
+      order: 5,
       surfaces: ["sidebar", "palette"],
     },
     {
