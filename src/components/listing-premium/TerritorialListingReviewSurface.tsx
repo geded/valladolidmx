@@ -13,7 +13,7 @@ import {
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
-type TerritorialListingFamily = "hoteles" | "restaurantes";
+type TerritorialListingFamily = "hoteles" | "restaurantes" | "casas-de-vacaciones";
 
 interface ListingItem {
   name: string;
@@ -131,6 +131,46 @@ const RESTAURANT_NEARBY: NearbyItem[] = [
   },
 ];
 
+const VACATION_RENTAL_ITEMS: ListingItem[] = [
+  {
+    name: "Casa de patio colonial",
+    zone: "Centro Histórico · Valladolid",
+    copy: "Una casa completa con patio de piedra y alberca privada para vivir la ciudad y explorar desde aquí.",
+    image: `${MEDIA}/hotel-cover.jpg`,
+    tags: ["Hasta 8 huéspedes", "3 recámaras", "Alberca privada"],
+    type: "Casa completa",
+  },
+  {
+    name: "Villa Sisal",
+    zone: "Barrio de Sisal · Valladolid",
+    copy: "Jardín, hamacas y cocina equipada cerca de la Calzada de los Frailes.",
+    image: `${MEDIA}/hotel-gallery-1.jpg`,
+    tags: ["Hasta 6 huéspedes", "Jardín", "Estancia larga"],
+    type: "Villa",
+  },
+  {
+    name: "Casa del camino a los cenotes",
+    zone: "Zona de cenotes · Valladolid",
+    copy: "Una estancia independiente para combinar descanso, naturaleza y recorridos cercanos.",
+    image: `${MEDIA}/hotel-gallery-2.jpg`,
+    tags: ["Hasta 10 huéspedes", "4 recámaras", "Estacionamiento"],
+    type: "Casa rural",
+  },
+];
+
+const VACATION_RENTAL_NEARBY: NearbyItem[] = [
+  {
+    name: "Villa cerca de Ek’ Balam",
+    zone: "A 28 km de Valladolid",
+    image: `${MEDIA}/destination-gallery-1.jpg`,
+  },
+  {
+    name: "Estancia rumbo a Río Lagartos",
+    zone: "A 46 km de Valladolid",
+    image: `${MEDIA}/experience-gallery-1.jpg`,
+  },
+];
+
 const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
   hoteles: {
     family: "hoteles",
@@ -175,6 +215,28 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
       "Guarda tus favoritos y Alux los combinará con mercados, barrios y experiencias cercanas.",
     items: RESTAURANT_ITEMS,
     nearby: RESTAURANT_NEARBY,
+  },
+  "casas-de-vacaciones": {
+    family: "casas-de-vacaciones",
+    breadcrumb: "Casas de vacaciones",
+    eyebrow: "Dónde quedarte",
+    title: "Casas de vacaciones en Valladolid",
+    description:
+      "Encuentra una casa completa para tu grupo y úsala como punto de partida para descubrir todo el territorio.",
+    resultsTitle: "Casas en Valladolid",
+    itemLabel: "casa",
+    searchLabel: "Buscar casa",
+    searchPlaceholder: "Buscar casa, zona o servicio",
+    aluxQuestion: "¿Cómo te gustaría vivir tu estancia?",
+    aluxOptions: ["En familia", "En pareja", "Con amigos", "Con piscina", "Estancia larga"],
+    filters: ["Zona", "Tipo de propiedad", "Espacios y servicios"],
+    nearbyTitle: "Casas cerca de Valladolid",
+    mapTitle: "Casas de vacaciones en Valladolid",
+    aluxMapTitle: "Tu casa también organiza la ruta.",
+    aluxMapDescription:
+      "Guarda opciones y Alux conectará huéspedes, noches, trayectos y experiencias cercanas.",
+    items: VACATION_RENTAL_ITEMS,
+    nearby: VACATION_RENTAL_NEARBY,
   },
 };
 
@@ -248,7 +310,12 @@ function TerritorialBreadcrumb({ profile }: { profile: ListingProfile }) {
 }
 
 function ListingIntro({ profile }: { profile: ListingProfile }) {
-  const Icon = profile.family === "restaurantes" ? UtensilsCrossed : BedDouble;
+  const Icon =
+    profile.family === "restaurantes"
+      ? UtensilsCrossed
+      : profile.family === "casas-de-vacaciones"
+        ? Home
+        : BedDouble;
   return (
     <header className="grid gap-5 border-y border-[#ded7c9] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
       <div className="max-w-3xl">
