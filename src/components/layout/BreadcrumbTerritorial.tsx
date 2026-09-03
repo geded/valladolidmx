@@ -8,7 +8,9 @@
  * Dependencias: @tanstack/react-router Link, types/territory.
  */
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, MoreHorizontal } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import type { BreadcrumbCrumb } from "@/types/territory";
 import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
