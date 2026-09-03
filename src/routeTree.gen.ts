@@ -74,6 +74,7 @@ import { Route as LovableG4HotelPremiumPreviewRouteImport } from './routes/lovab
 import { Route as LovableG4HomePremiumPreviewRouteImport } from './routes/lovable/g4-home-premium-preview'
 import { Route as LovableG4ExperiencePremiumPreviewRouteImport } from './routes/lovable/g4-experience-premium-preview'
 import { Route as LovableG4EventPremiumPreviewRouteImport } from './routes/lovable/g4-event-premium-preview'
+import { Route as LovableG4EventListingPremiumPreviewRouteImport } from './routes/lovable/g4-event-listing-premium-preview'
 import { Route as LovableG4DestinationMicrositePreviewRouteImport } from './routes/lovable/g4-destination-microsite-preview'
 import { Route as LovableFounderZazilPremiumPreviewRouteImport } from './routes/lovable/founder-zazil-premium-preview'
 import { Route as LovableFounderHomePremiumPreviewRouteImport } from './routes/lovable/founder-home-premium-preview'
@@ -581,6 +582,12 @@ const LovableG4EventPremiumPreviewRoute =
   LovableG4EventPremiumPreviewRouteImport.update({
     id: '/lovable/g4-event-premium-preview',
     path: '/lovable/g4-event-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4EventListingPremiumPreviewRoute =
+  LovableG4EventListingPremiumPreviewRouteImport.update({
+    id: '/lovable/g4-event-listing-premium-preview',
+    path: '/lovable/g4-event-listing-premium-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG4DestinationMicrositePreviewRoute =
@@ -1572,6 +1579,7 @@ export interface FileRoutesByFullPath {
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
+  '/lovable/g4-event-listing-premium-preview': typeof LovableG4EventListingPremiumPreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
@@ -1792,6 +1800,7 @@ export interface FileRoutesByTo {
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
+  '/lovable/g4-event-listing-premium-preview': typeof LovableG4EventListingPremiumPreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
@@ -2016,6 +2025,7 @@ export interface FileRoutesById {
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
+  '/lovable/g4-event-listing-premium-preview': typeof LovableG4EventListingPremiumPreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
@@ -2244,6 +2254,7 @@ export interface FileRouteTypes {
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
     | '/lovable/g4-destination-microsite-preview'
+    | '/lovable/g4-event-listing-premium-preview'
     | '/lovable/g4-event-premium-preview'
     | '/lovable/g4-experience-premium-preview'
     | '/lovable/g4-home-premium-preview'
@@ -2464,6 +2475,7 @@ export interface FileRouteTypes {
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
     | '/lovable/g4-destination-microsite-preview'
+    | '/lovable/g4-event-listing-premium-preview'
     | '/lovable/g4-event-premium-preview'
     | '/lovable/g4-experience-premium-preview'
     | '/lovable/g4-home-premium-preview'
@@ -2687,6 +2699,7 @@ export interface FileRouteTypes {
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
     | '/lovable/g4-destination-microsite-preview'
+    | '/lovable/g4-event-listing-premium-preview'
     | '/lovable/g4-event-premium-preview'
     | '/lovable/g4-experience-premium-preview'
     | '/lovable/g4-home-premium-preview'
@@ -2906,6 +2919,7 @@ export interface RootRouteChildren {
   LovableFounderHomePremiumPreviewRoute: typeof LovableFounderHomePremiumPreviewRoute
   LovableFounderZazilPremiumPreviewRoute: typeof LovableFounderZazilPremiumPreviewRoute
   LovableG4DestinationMicrositePreviewRoute: typeof LovableG4DestinationMicrositePreviewRoute
+  LovableG4EventListingPremiumPreviewRoute: typeof LovableG4EventListingPremiumPreviewRoute
   LovableG4EventPremiumPreviewRoute: typeof LovableG4EventPremiumPreviewRoute
   LovableG4ExperiencePremiumPreviewRoute: typeof LovableG4ExperiencePremiumPreviewRoute
   LovableG4HomePremiumPreviewRoute: typeof LovableG4HomePremiumPreviewRoute
@@ -3420,6 +3434,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/g4-event-premium-preview'
       fullPath: '/lovable/g4-event-premium-preview'
       preLoaderRoute: typeof LovableG4EventPremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-event-listing-premium-preview': {
+      id: '/lovable/g4-event-listing-premium-preview'
+      path: '/lovable/g4-event-listing-premium-preview'
+      fullPath: '/lovable/g4-event-listing-premium-preview'
+      preLoaderRoute: typeof LovableG4EventListingPremiumPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g4-destination-microsite-preview': {
@@ -5091,6 +5112,8 @@ const rootRouteChildren: RootRouteChildren = {
     LovableFounderZazilPremiumPreviewRoute,
   LovableG4DestinationMicrositePreviewRoute:
     LovableG4DestinationMicrositePreviewRoute,
+  LovableG4EventListingPremiumPreviewRoute:
+    LovableG4EventListingPremiumPreviewRoute,
   LovableG4EventPremiumPreviewRoute: LovableG4EventPremiumPreviewRoute,
   LovableG4ExperiencePremiumPreviewRoute:
     LovableG4ExperiencePremiumPreviewRoute,
