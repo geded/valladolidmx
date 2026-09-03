@@ -88,7 +88,7 @@ function isSlug(s: unknown): s is string {
 }
 
 const SELECT_CARD =
-  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id, cover_media_id, destinations:destination_id ( slug ), media_assets:cover_media_id ( storage_bucket, storage_path )";
+  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, filter_attributes, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
 
 type CardRow = {
   id: string;
@@ -99,9 +99,15 @@ type CardRow = {
   ends_at: string | null;
   venue_name: string | null;
   is_free: boolean;
+  filter_attributes?: unknown;
   destination_id: string | null;
   cover_media_id: string | null;
-  destinations?: { slug?: string | null } | null;
+  destinations?: {
+    slug?: string | null;
+    name?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
   media_assets?: { storage_bucket?: string | null; storage_path?: string | null } | null;
 };
 
@@ -117,12 +123,17 @@ async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEven
       venue_name: r.venue_name ?? null,
       is_free: Boolean(r.is_free),
       destination_slug: r.destinations?.slug ?? null,
+      destination_name: r.destinations?.name ?? null,
+      filter_attributes: normalizeFilterAttributes(r.filter_attributes),
+      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
+      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
       cover_url: withCover
         ? await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path)
         : null,
     })),
   );
 }
+
 
 export const listPublishedEvents = createServerFn({ method: "GET" })
   .inputValidator(
