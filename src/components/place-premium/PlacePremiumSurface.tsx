@@ -14,7 +14,7 @@
  *  - `editorial`: lectura tipo revista territorial (historia primero).
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import {
   Accessibility,
   CalendarDays,
@@ -47,6 +47,11 @@ export interface PlacePremiumSurfaceProps {
   builderNotice?: string | null;
   /** G8-Q2D-B · aviso de preview administrativa (“Borrador · no publicado”). */
   draftNotice?: string | null;
+  /**
+   * G4-PLACES · panel Alux contextual (TourismAluxPanel) inyectado por la
+   * ruta. La superficie sigue siendo render-only: sólo lo posiciona.
+   */
+  aluxSlot?: ReactNode;
   className?: string;
 }
 
@@ -56,6 +61,7 @@ export function PlacePremiumSurface({
   variant,
   builderNotice = null,
   draftNotice = null,
+  aluxSlot = null,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
@@ -170,6 +176,7 @@ export function PlacePremiumSurface({
           <Container className="mt-8">
             <IdentityStrip content={content} dense />
           </Container>
+          {aluxSlot ? <Container className="mt-6">{aluxSlot}</Container> : null}
           {hasEssentials ? (
             <Container className="mt-8">
               <EssentialsBand content={content} />
@@ -194,6 +201,7 @@ export function PlacePremiumSurface({
           <Container className="mt-5">
             <HeroEditorial content={content} />
           </Container>
+          {aluxSlot ? <Container className="mt-6">{aluxSlot}</Container> : null}
           <Container className="mt-10">
             <IdentityStrip content={content} />
           </Container>
@@ -489,10 +497,12 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
   return (
     <section
       aria-label="Presentación del lugar"
-      className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]"
+      /* Patrón editorial aprobado (paridad con Eventos/Hoteles): la
+         información y los datos van a la IZQUIERDA, la galería a la
+         DERECHA. En móvil la imagen abre la ficha. */
+      className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:items-center"
     >
-      <DemoImage media={content.hero.cover} className="aspect-[4/3] rounded-3xl lg:aspect-[5/4]" />
-      <div className="flex flex-col justify-center rounded-3xl border border-border bg-card p-6 sm:p-8">
+      <div className="order-2 flex flex-col justify-center rounded-3xl border border-border bg-card p-6 sm:p-8 lg:order-1">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
           {content.identity.eyebrow}
         </p>
@@ -520,11 +530,23 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
             <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
           </Button>
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {content.hero.supporting.map((media, index) => (
-            <DemoImage key={`media-${index}`} media={media} className="aspect-[3/2] rounded-2xl" />
-          ))}
-        </div>
+      </div>
+      <div className="order-1 lg:order-2">
+        <DemoImage
+          media={content.hero.cover}
+          className="aspect-[4/3] rounded-3xl lg:aspect-[5/4]"
+        />
+        {content.hero.supporting.length ? (
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {content.hero.supporting.map((media, index) => (
+              <DemoImage
+                key={`media-${index}`}
+                media={media}
+                className="aspect-[3/2] rounded-2xl"
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );
