@@ -687,6 +687,16 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.eventos",
+      workspaceId: "cms",
+      label: "Eventos",
+      icon: CalendarDays,
+      to: "/cms/eventos",
+      group: "territorio",
+      order: 5,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.zonas",
       workspaceId: "cms",
       label: "Zonas",
