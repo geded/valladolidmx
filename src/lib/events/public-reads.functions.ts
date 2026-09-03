@@ -11,6 +11,10 @@
  * seguras del esquema vigente de `events` (sin nuevas columnas).
  */
 import { createServerFn } from "@tanstack/react-start";
+import {
+  normalizeFilterAttributes,
+  type TourismFilterAttributes,
+} from "@/lib/business-attributes/types";
 
 export interface PublicEventCard {
   id: string;
@@ -22,8 +26,19 @@ export interface PublicEventCard {
   venue_name: string | null;
   is_free: boolean;
   destination_slug: string | null;
+  destination_name: string | null;
   cover_url: string | null;
+  /**
+   * Atributos estructurados administrables (event_type, audience,
+   * admission_type, time_of_day, venue_type, accessibility,
+   * reservation_required). Vacío cuando el CMS no los capturó: nunca se
+   * infieren ni se inventan.
+   */
+  filter_attributes: TourismFilterAttributes;
+  latitude: number | null;
+  longitude: number | null;
 }
+
 
 export interface PublicEventDetail extends PublicEventCard {
   body: string | null;
