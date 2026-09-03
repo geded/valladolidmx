@@ -186,7 +186,7 @@ function formatDate(iso: string | null | undefined): string | null {
 }
 
 export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
-  const destinationLabel = humanizeSlug(e.destination_slug);
+  const destinationLabel = e.destination_name || humanizeSlug(e.destination_slug);
   const dateLabel = formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
   return {
     id: e.id,
@@ -200,19 +200,25 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
     mediaAlt: e.title,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
+    coordinates:
+      e.latitude != null && e.longitude != null ? { lat: e.latitude, lng: e.longitude } : null,
     territorialContext: null,
     highlights: [],
     badges: e.is_free ? [{ label: "Entrada libre", tone: "success" }] : [],
     institutionalBadges: institutionalBadgesForDestination(e.destination_slug),
     dateLabel,
+    startsAt: e.starts_at,
+    endsAt: e.ends_at,
     availabilityLabel: null,
     priceAmount: null,
     priceCurrency: null,
     priceHint: null,
     primaryAction: null,
     secondaryAction: null,
+    filterAttributes: e.filter_attributes ?? {},
   };
 }
+
 
 /* ------------------------------------------------------------------ *
  * Promotion (marketplace) → TourismCardVM
