@@ -14,6 +14,7 @@ import type {
   PublicPlaceMediaDTO,
 } from "./place-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import { resolvePlaceAttractionFamily } from "./place-taxonomy";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
