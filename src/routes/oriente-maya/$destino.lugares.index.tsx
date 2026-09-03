@@ -48,12 +48,6 @@ function buildContext(destino: string): RouteContextDeclaration {
 }
 
 export const Route = createFileRoute("/oriente-maya/$destino/lugares/")({
-  head: ({ params }) =>
-    buildPublicHead({
-      title: `Lugares y sitios de interés en ${destinationLabel(params.destino)} · ${SITE.name}`,
-      description: `Cenotes, conventos y sitios emblemáticos de ${destinationLabel(params.destino)}, Oriente Maya.`,
-      path: `/oriente-maya/${params.destino}/lugares`,
-    }),
   loader: async ({ params }) => {
     const destino = params.destino;
     const [dto, regional] = await Promise.all([
@@ -65,6 +59,12 @@ export const Route = createFileRoute("/oriente-maya/$destino/lugares/")({
     );
     return { dto, nearby, destino };
   },
+  head: ({ params }) =>
+    buildPublicHead({
+      title: `Lugares y sitios de interés en ${destinationLabel(params.destino)} · ${SITE.name}`,
+      description: `Cenotes, conventos y sitios emblemáticos de ${destinationLabel(params.destino)}, Oriente Maya.`,
+      path: `/oriente-maya/${params.destino}/lugares`,
+    }),
   component: LugaresDestinoPage,
 });
 
