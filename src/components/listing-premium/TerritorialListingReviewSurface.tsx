@@ -1710,7 +1710,8 @@ function PlaceListingBody({
                   Lugares cerca de {lockedDestinationLabel}
                 </h2>
                 <p className="mt-1 text-sm text-[#667067]">
-                  Se muestran aparte para conservar claro qué pertenece al destino.
+                  Pertenecen a otros destinos por proximidad territorial: no son una
+                  subzona de {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>
                 <div className="mt-4 space-y-4">
                   {nearbyItems.slice(0, 6).map((card) => (
