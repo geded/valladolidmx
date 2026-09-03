@@ -43,6 +43,8 @@ export interface PublicShellProps {
    * Default `false`: la prop `crumbs` sigue siendo la fuente.
    */
   useContextCrumbs?: boolean;
+  /** Progressive disclosure del breadcrumb en móvil (≤639px). */
+  compactCrumbsOnMobile?: boolean;
 }
 
 export function PublicShell({
@@ -55,6 +57,7 @@ export function PublicShell({
   children,
   contextDeclaration,
   useContextCrumbs = false,
+  compactCrumbsOnMobile = false,
 }: PublicShellProps) {
   const body = (
     <PublicShellBody
@@ -65,6 +68,7 @@ export function PublicShell({
       variant={variant}
       className={className}
       useContextCrumbs={useContextCrumbs}
+      compactCrumbsOnMobile={compactCrumbsOnMobile}
     >
       {children}
     </PublicShellBody>
@@ -84,6 +88,7 @@ interface PublicShellBodyProps {
   variant: PublicShellVariant;
   className?: string;
   useContextCrumbs: boolean;
+  compactCrumbsOnMobile?: boolean;
   children: ReactNode;
 }
 
@@ -95,6 +100,7 @@ function PublicShellBody({
   variant,
   className,
   useContextCrumbs,
+  compactCrumbsOnMobile = false,
   children,
 }: PublicShellBodyProps) {
   if (variant === "minimal") {
@@ -111,7 +117,7 @@ function PublicShellBody({
       <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
         {hasCrumbs ? (
           <Container className="py-3">
-            <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} />
+            <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} compactOnMobile={compactCrumbsOnMobile} />
           </Container>
         ) : null}
         {children}
@@ -126,7 +132,7 @@ function PublicShellBody({
     <main id="main" tabIndex={-1} className={cn("pb-24 pt-8 md:pt-12", className)}>
       <Container>
         {hasCrumbs ? (
-          <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} />
+          <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} compactOnMobile={compactCrumbsOnMobile} />
         ) : null}
         {hasHeader ? (
           <header className={cn("max-w-3xl", hasCrumbs ? "mt-6" : null)}>
