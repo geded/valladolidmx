@@ -27,8 +27,20 @@ interface Props {
    * usan como migas. Si no hay contexto disponible, cae a `crumbs`.
    */
   useContextCrumbs?: boolean;
+  /**
+   * Progressive disclosure en móvil (≤639px): sólo se muestran casita,
+   * la miga ancla (por defecto el destino) y la miga actual truncada.
+   * Los niveles intermedios se agrupan en un menú accesible.
+   */
+  compactOnMobile?: boolean;
+  /**
+   * Índice (dentro de `crumbs`) de la miga que permanece visible en
+   * móvil. Default: `crumbs.length - 3` (destino en rutas canónicas).
+   */
+  mobileAnchorIndex?: number;
   className?: string;
 }
+
 
 function crumbsFromContext(
   ctx: NonNullable<ReturnType<typeof useResolvedContext>>,
