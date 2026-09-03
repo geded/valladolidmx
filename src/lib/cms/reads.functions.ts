@@ -209,3 +209,25 @@ export const listReviewsCms = createServerFn({ method: "POST" })
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
   });
+
+/* ─────────────────────────────  Eventos  ─────────────────────────────── */
+
+export const listEventsCms = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+    const { limit, offset, search } = normalizeInput(data);
+    let q = context.supabase
+      .from("events")
+      .select("id, slug, title, status, destination_id, starts_at, is_free, updated_at", {
+        count: "exact",
+      })
+      .is("deleted_at", null)
+      .order("starts_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+    if (search) q = q.ilike("title", `%${search}%`);
+    const { data: rows, count, error } = await q;
+    if (error) throw error;
+    return { rows: rows ?? [], total: count ?? 0, limit, offset };
+  });

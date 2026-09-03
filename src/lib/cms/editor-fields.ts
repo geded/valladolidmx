@@ -194,3 +194,42 @@ export const PRODUCT_FIELDS: EditorField[] = [
   { name: "duration_minutes", label: "Duración (min)", type: "number" },
   { name: "capacity", label: "Capacidad", type: "number" },
 ];
+
+/**
+ * EVENT_FIELDS — usado por `EventEditor`.
+ *
+ * Los combos de destino y empresa organizadora se inyectan en tiempo de
+ * render (se cargan desde el servidor). Los atributos estructurados que
+ * alimentan los filtros públicos viven en su panel dedicado.
+ */
+export const EVENT_FIELDS: EditorField[] = [
+  { name: "title", label: "Título", type: "text", required: true },
+  {
+    name: "slug",
+    label: "Slug",
+    type: "text",
+    required: true,
+    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+  },
+  { name: "summary", label: "Resumen", type: "textarea" },
+  { name: "body", label: "Cuerpo", type: "textarea" },
+  { name: "destination_id", label: "Destino", type: "select", required: true, options: [] },
+  {
+    name: "business_id",
+    label: "Organizador (empresa)",
+    type: "select",
+    options: [],
+    helpText: "Opcional. Sólo empresas registradas en la plataforma.",
+  },
+  { name: "starts_at", label: "Inicio", type: "datetime", required: true },
+  { name: "ends_at", label: "Fin", type: "datetime" },
+  { name: "venue_name", label: "Sede", type: "text" },
+  { name: "is_free", label: "Entrada libre", type: "boolean" },
+  { name: "external_url", label: "URL externa", type: "text" },
+  {
+    name: "cover_media_id",
+    label: "Portada (media id)",
+    type: "text",
+    helpText: "Identificador del medio aprobado que se usará como portada.",
+  },
+];
