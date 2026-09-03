@@ -54,12 +54,15 @@ export const getPlacePreview = createServerFn({ method: "POST" })
  * superficie los omite. Nunca fixtures.
  */
 export const listPublishedPlaces = createServerFn({ method: "GET" })
-  .inputValidator((input?: { destinationSlug?: string | null }) => {
+  .inputValidator((input?: { destinationSlug?: string | null; previewMedia?: boolean }) => {
     const slug = input?.destinationSlug ?? null;
     if (slug !== null && !SLUG.test(slug)) throw new Error("invalid_slug");
-    return { destinationSlug: slug };
+    return { destinationSlug: slug, previewMedia: input?.previewMedia === true };
   })
   .handler(async ({ data }): Promise<PublicPlaceCard[]> => {
     const { readPublishedPlaceCards } = await import("./place-public-reads.server");
-    return readPublishedPlaceCards({ destinationSlug: data.destinationSlug });
+    return readPublishedPlaceCards({
+      destinationSlug: data.destinationSlug,
+      previewMedia: data.previewMedia,
+    });
   });

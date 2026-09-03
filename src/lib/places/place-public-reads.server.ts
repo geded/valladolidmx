@@ -386,7 +386,7 @@ function durationFilterBucket(minutes: number): string {
 }
 
 export async function readPublishedPlaceCards(
-  input: { destinationSlug?: string | null } = {},
+  input: { destinationSlug?: string | null; previewMedia?: boolean } = {},
 ): Promise<PublicPlaceCard[]> {
   const sb = await anonClient();
 
@@ -543,8 +543,13 @@ export async function readPublishedPlaceCards(
       let url: string | null = null;
       for (const link of own) {
         const asset = assetById.get(link.media_asset_id);
-        if (!asset || asset.review_state !== "approved") continue;
-        if ((asset.metadata as Record<string, unknown> | null)?.ai_generated === true) continue;
+        if (!asset) continue;
+        /* Superficies de revisión interna (/lovable/*) pueden mostrar activos
+           conceptuales temporales; las lecturas públicas nunca. */
+        if (!input.previewMedia) {
+          if (asset.review_state !== "approved") continue;
+          if ((asset.metadata as Record<string, unknown> | null)?.ai_generated === true) continue;
+        }
         if (!asset.storage_bucket || !asset.storage_path) continue;
         const { data: signed } = await supabaseAdmin.storage
           .from(asset.storage_bucket)
