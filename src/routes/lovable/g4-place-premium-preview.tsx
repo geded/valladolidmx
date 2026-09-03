@@ -17,7 +17,6 @@ import {
   type PublicPlaceDTO,
 } from "@/lib/places/place-public-contract";
 import { getPublicPlace } from "@/lib/places/place-public-reads.functions";
-import { PLACE_REVIEW_FIXTURE_NOTICE } from "@/lib/places/place-review-fixtures";
 
 export const Route = createFileRoute("/lovable/g4-place-premium-preview")({
   validateSearch: (search: Record<string, unknown>): { lugar?: string } =>
