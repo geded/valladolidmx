@@ -285,12 +285,17 @@ export const getPlaceCms = createServerFn({ method: "POST" })
       alt_text: string | null;
       review_state: string | null;
       status: string | null;
+      metadata: { temporary_placeholder?: boolean; generated_ai?: boolean; ai_generated?: boolean } | null;
+      is_demo_seed: boolean | null;
+      demo_seed_batch: string | null;
     }> = [];
     if (mediaRows.length > 0) {
       assets = (unwrap(
         await ctx.supabase
           .from("media_assets")
-          .select("id, storage_path, alt_text, review_state, status")
+          .select(
+            "id, storage_path, alt_text, review_state, status, metadata, is_demo_seed, demo_seed_batch",
+          )
           .in(
             "id",
             mediaRows.map((r) => r.media_asset_id),
@@ -626,6 +631,53 @@ export const detachPlaceMedia = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     await auditPlace(ctx, "place.media.detach", data.place_id, {
       before: { media_id: data.media_id },
+    });
+    return { ok: true };
+  });
+
+/**
+ * Borrado del activo temporal: desasocia y marca el `media_asset` como
+ * eliminado (borrado lógico). Nunca toca activos oficiales aprobados.
+ */
+export const deletePlaceMediaAsset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { place_id: string; media_id: string; media_asset_id: string }) => ({
+    place_id: String(d?.place_id ?? ""),
+    media_id: String(d?.media_id ?? ""),
+    media_asset_id: String(d?.media_asset_id ?? ""),
+  }))
+  .handler(async ({ data, context }) => {
+    const ctx = context as Ctx;
+    await assertPlacesStaff(ctx);
+    const asset = unwrap(
+      await ctx.supabase
+        .from("media_assets")
+        .select("id, review_state, metadata")
+        .eq("id", data.media_asset_id)
+        .maybeSingle(),
+    ) as { id: string; review_state: string | null; metadata: Record<string, unknown> | null } | null;
+    if (!asset) throw new Error("media_asset_not_found");
+    const meta = (asset.metadata ?? {}) as Record<string, unknown>;
+    const temporary = meta.temporary_placeholder === true || meta.generated_ai === true;
+    if (asset.review_state === "approved" && !temporary) {
+      throw new Error("official_asset_delete_blocked");
+    }
+
+    const del = await ctx.supabase
+      .from("place_media")
+      .delete()
+      .eq("id", data.media_id)
+      .eq("place_id", data.place_id);
+    if (del.error) throw new Error(del.error.message);
+
+    const upd = await ctx.supabase
+      .from("media_assets")
+      .update({ deleted_at: new Date().toISOString(), status: "archived" })
+      .eq("id", data.media_asset_id);
+    if (upd.error) throw new Error(upd.error.message);
+
+    await auditPlace(ctx, "place.media.delete", data.place_id, {
+      before: { media_id: data.media_id, media_asset_id: data.media_asset_id },
     });
     return { ok: true };
   });

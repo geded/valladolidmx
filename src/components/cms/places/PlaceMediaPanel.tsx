@@ -15,6 +15,7 @@ import {
 } from "@/components/experience-builder/MediaPickerDialog";
 import {
   attachPlaceMedia,
+  deletePlaceMediaAsset,
   detachPlaceMedia,
   reorderPlaceMedia,
 } from "@/lib/places/places-cms.functions";
@@ -33,6 +34,15 @@ export interface PlaceMediaAsset {
   alt_text: string | null;
   review_state: string | null;
   status: string | null;
+  metadata?: { temporary_placeholder?: boolean; generated_ai?: boolean; ai_generated?: boolean } | null;
+  is_demo_seed?: boolean | null;
+  demo_seed_batch?: string | null;
+}
+
+/** Activo conceptual temporal generado con IA, pendiente de sustitución. */
+function isTemporaryAiAsset(asset: PlaceMediaAsset | undefined): boolean {
+  const meta = asset?.metadata ?? {};
+  return meta.temporary_placeholder === true || meta.generated_ai === true || meta.ai_generated === true;
 }
 
 interface Props {
@@ -47,6 +57,7 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
   const attachFn = useServerFn(attachPlaceMedia);
   const detachFn = useServerFn(detachPlaceMedia);
   const reorderFn = useServerFn(reorderPlaceMedia);
+  const deleteFn = useServerFn(deletePlaceMediaAsset);
 
   const byId = new Map(assets.map((a) => [a.id, a]));
   const cover = media.find((m) => m.role === "cover") ?? null;
@@ -77,6 +88,29 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo desvincular."),
   });
 
+  const remove = useMutation({
+    mutationFn: (args: { mediaId: string; mediaAssetId: string }) =>
+      deleteFn({
+        data: {
+          place_id: placeId,
+          media_id: args.mediaId,
+          media_asset_id: args.mediaAssetId,
+        },
+      }),
+    onSuccess: () => {
+      onChanged();
+      toast.success("Activo temporal borrado. Los activos oficiales aprobados no se tocan.");
+    },
+    onError: (e) =>
+      toast.error(
+        e instanceof Error && e.message === "official_asset_delete_blocked"
+          ? "Es un activo oficial aprobado: sólo puede desasociarse, no borrarse."
+          : e instanceof Error
+            ? e.message
+            : "No se pudo borrar el activo.",
+      ),
+  });
+
   const reorder = useMutation({
     mutationFn: (ids: string[]) =>
       reorderFn({ data: { place_id: placeId, ordered_media_ids: ids } }),
@@ -100,15 +134,44 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
   const renderAsset = (row: PlaceMediaRow) => {
     const asset = byId.get(row.media_asset_id);
     const approved = asset?.review_state === "approved";
+    const temporary = isTemporaryAiAsset(asset);
     return (
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-medium">{asset?.alt_text || "Sin texto alternativo"}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate text-xs font-medium">
+            {asset?.alt_text || "Sin texto alternativo"}
+          </p>
+          {temporary ? (
+            <span className="rounded-pill border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning-foreground">
+              Temporal · IA
+            </span>
+          ) : null}
+        </div>
         <p className="mt-0.5 text-[11px] text-muted-foreground">
           {approved ? "Aprobada" : "Pendiente de aprobación"} · {asset?.status ?? "draft"}
+          {temporary ? " · pendiente de sustitución por fotografía real" : ""}
         </p>
       </div>
     );
   };
+
+  const renderRowActions = (row: PlaceMediaRow, role: "cover" | "gallery") => (
+    <>
+      <button type="button" className={buttonClass} onClick={() => setPicker(role)}>
+        Reemplazar
+      </button>
+      <button type="button" className={buttonClass} onClick={() => detach.mutate(row.id)}>
+        Desasociar
+      </button>
+      <button
+        type="button"
+        className={buttonClass}
+        onClick={() => remove.mutate({ mediaId: row.id, mediaAssetId: row.media_asset_id })}
+      >
+        Borrar
+      </button>
+    </>
+  );
 
   return (
     <PlaceSection
@@ -128,15 +191,9 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
           </div>
           <div className="mt-3">
             {cover ? (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 {renderAsset(cover)}
-                <button
-                  type="button"
-                  className={buttonClass}
-                  onClick={() => detach.mutate(cover.id)}
-                >
-                  Quitar
-                </button>
+                <div className="flex items-center gap-2">{renderRowActions(cover, "cover")}</div>
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">Sin portada seleccionada.</p>
@@ -180,13 +237,7 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
                     >
                       ↓
                     </button>
-                    <button
-                      type="button"
-                      className={buttonClass}
-                      onClick={() => detach.mutate(row.id)}
-                    >
-                      Quitar
-                    </button>
+                    {renderRowActions(row, "gallery")}
                   </div>
                 </li>
               ))}

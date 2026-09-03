@@ -24,13 +24,22 @@ import {
 export interface GetPublicListingInput {
   family: ListingFamilyId;
   destino?: string | null;
+  /**
+   * Sólo superficies internas de revisión (`/lovable/*`, noindex): permite
+   * mostrar portadas conceptuales temporales aún no aprobadas. Las lecturas
+   * públicas jamás lo activan.
+   */
+  previewMedia?: boolean;
 }
 
 export const getPublicListing = createServerFn({ method: "GET" })
-  .inputValidator((data: { family?: unknown; destino?: unknown } | undefined) => ({
-    family: (isListingFamilyId(data?.family) ? data?.family : "hoteles") as ListingFamilyId,
-    destino: typeof data?.destino === "string" && data.destino.trim() ? data.destino : null,
-  }))
+  .inputValidator(
+    (data: { family?: unknown; destino?: unknown; previewMedia?: unknown } | undefined) => ({
+      family: (isListingFamilyId(data?.family) ? data?.family : "hoteles") as ListingFamilyId,
+      destino: typeof data?.destino === "string" && data.destino.trim() ? data.destino : null,
+      previewMedia: data?.previewMedia === true,
+    }),
+  )
   .handler(async ({ data }): Promise<PublicListingDTO> => {
     const contract = listingFamilyContract(data.family);
 
@@ -48,7 +57,7 @@ export const getPublicListing = createServerFn({ method: "GET" })
 
     if (contract.source === "places") {
       const places = await listPublishedPlaces({
-        data: { destinationSlug: data.destino },
+        data: { destinationSlug: data.destino, previewMedia: data.previewMedia },
       }).catch(() => []);
       return buildPublicListing({ family: contract.id, destino: data.destino, places });
     }

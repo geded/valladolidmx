@@ -218,6 +218,7 @@ export function PlaceEditor({ placeId }: Props) {
   const [duration, setDuration] = useState("");
   const [highlights, setHighlights] = useState("");
   const [amenities, setAmenities] = useState("");
+  const [accessibility, setAccessibility] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
@@ -244,6 +245,16 @@ export function PlaceEditor({ placeId }: Props) {
     );
     setHighlights(Array.isArray(place.highlights) ? (place.highlights as string[]).join("\n") : "");
     setAmenities(Array.isArray(place.amenities) ? (place.amenities as string[]).join("\n") : "");
+    /* Accesibilidad real capturada como lista de rasgos declarados. */
+    const acc = place.accessibility as Record<string, unknown> | null;
+    setAccessibility(
+      acc && typeof acc === "object"
+        ? Object.entries(acc)
+            .filter(([, v]) => v === true || (typeof v === "string" && v.trim().length > 0))
+            .map(([k, v]) => (typeof v === "string" ? `${k}: ${v}` : k))
+            .join("\n")
+        : "",
+    );
     setLatitude(
       place.latitude === null || place.latitude === undefined ? "" : String(place.latitude),
     );
@@ -313,6 +324,14 @@ export function PlaceEditor({ placeId }: Props) {
       visit_duration_minutes: duration === "" ? null : Number(duration),
       highlights: list(highlights),
       amenities: list(amenities),
+      accessibility: Object.fromEntries(
+        list(accessibility).map((line) => {
+          const [key, ...rest] = line.split(":");
+          const label = (key ?? "").trim();
+          const value = rest.join(":").trim();
+          return [label, value.length ? value : true];
+        }),
+      ) as Record<string, unknown>,
     };
   };
 
@@ -818,8 +837,8 @@ export function PlaceEditor({ placeId }: Props) {
         </PlaceField>
         <PlaceField
           name="amenities"
-          label="Servicios y accesibilidad"
-          help="Una amenidad por línea (estacionamiento, rampa, sanitarios…)."
+          label="Servicios"
+          help="Un servicio por línea (estacionamiento, sanitarios, guardarropa…)."
         >
           {({ id }) => (
             <textarea
@@ -827,6 +846,20 @@ export function PlaceEditor({ placeId }: Props) {
               className={textareaClass}
               value={amenities}
               onChange={(e) => setAmenities(e.target.value)}
+            />
+          )}
+        </PlaceField>
+        <PlaceField
+          name="accessibility"
+          label="Accesibilidad"
+          help="Un rasgo por línea (rampa, sendero firme, escaleras empinadas). Puedes usar «rasgo: detalle». Déjalo vacío si no hay dato verificado."
+        >
+          {({ id }) => (
+            <textarea
+              id={id}
+              className={textareaClass}
+              value={accessibility}
+              onChange={(e) => setAccessibility(e.target.value)}
             />
           )}
         </PlaceField>
