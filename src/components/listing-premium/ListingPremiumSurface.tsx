@@ -21,7 +21,7 @@ import {
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
-import { PremiumDiscoveryListingSurface } from "./PremiumDiscoveryListingSurface";
+import { TerritorialListingReviewSurface } from "./TerritorialListingReviewSurface";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
@@ -171,7 +171,12 @@ export function ListingPremiumSurfaceFromDTO({
     dto.family === "restaurantes" ||
     dto.family === "casas-de-vacaciones"
   ) {
-    return <PremiumDiscoveryListingSurface dto={dto} presentation={presentation} />;
+    return (
+      <TerritorialListingReviewSurface
+        family={dto.family as "hoteles" | "restaurantes" | "casas-de-vacaciones"}
+        dto={dto}
+      />
+    );
   }
 
   const mediaItems = dto.items.filter((item): item is TourismCardVM & { mediaUrl: string } =>
