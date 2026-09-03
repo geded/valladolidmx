@@ -9,7 +9,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { PublicPlaceDTO } from "./place-public-contract";
+import type { PublicPlaceCard, PublicPlaceDTO } from "./place-public-contract";
 
 const SLUG = /^[a-z0-9-]{1,120}$/;
 
@@ -46,4 +46,20 @@ export const getPlacePreview = createServerFn({ method: "POST" })
       allowUnpublished: true,
       client: ctx.supabase,
     });
+  });
+
+/**
+ * G4-PLACES · Listado público de lugares publicados (tarjetas).
+ * Sólo `status='published'`; los campos sin captura llegan vacíos y la
+ * superficie los omite. Nunca fixtures.
+ */
+export const listPublishedPlaces = createServerFn({ method: "GET" })
+  .inputValidator((input?: { destinationSlug?: string | null }) => {
+    const slug = input?.destinationSlug ?? null;
+    if (slug !== null && !SLUG.test(slug)) throw new Error("invalid_slug");
+    return { destinationSlug: slug };
+  })
+  .handler(async ({ data }): Promise<PublicPlaceCard[]> => {
+    const { readPublishedPlaceCards } = await import("./place-public-reads.server");
+    return readPublishedPlaceCards({ destinationSlug: data.destinationSlug });
   });

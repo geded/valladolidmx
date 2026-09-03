@@ -13,6 +13,7 @@ import type {
   MarketplacePromotionCard,
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import type { PublicPlaceCard } from "@/lib/places/place-public-contract";
 import type { Destination } from "@/types/territory";
 import type {
   TourismCardVM,
@@ -219,6 +220,42 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
   };
 }
 
+/* ------------------------------------------------------------------ *
+ * Place (points_of_interest) → TourismCardVM
+ * ------------------------------------------------------------------ */
+export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
+  const destinationLabel = p.destination_name || humanizeSlug(p.destination_slug);
+  return {
+    id: p.id,
+    entityKind: "place",
+    eyebrow: p.type_label ?? "Lugar y sitio de interés",
+    name: p.name,
+    href: p.destination_slug ? `/oriente-maya/${p.destination_slug}/lugares/${p.slug}` : null,
+    tagline: p.short_description || null,
+    businessName: null,
+    // Portada gobernada del propio lugar (aprobada, no IA); sin medio
+    // acreditado la tarjeta muestra el marcador neutral, nunca otra imagen.
+    mediaUrl: p.cover_url || null,
+    mediaAlt: p.cover_url ? p.name : null,
+    rating: null,
+    location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
+    coordinates:
+      p.latitude != null && p.longitude != null ? { lat: p.latitude, lng: p.longitude } : null,
+    territorialContext: "Oriente Maya",
+    highlights: [],
+    badges:
+      p.admission_kind === "gratuito" ? [{ label: "Entrada libre", tone: "success" }] : [],
+    institutionalBadges: institutionalBadgesForDestination(p.destination_slug),
+    dateLabel: null,
+    availabilityLabel: null,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: null,
+    secondaryAction: null,
+    filterAttributes: p.filter_attributes ?? {},
+  };
+}
 
 /* ------------------------------------------------------------------ *
  * Promotion (marketplace) → TourismCardVM

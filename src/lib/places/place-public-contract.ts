@@ -15,6 +15,7 @@
  *    ausencia la superficie cae a Editorial (regla fail-closed Q2D-A).
  */
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
 import {
   getPlacePremiumVariant,
   resolvePlacePresentation,
@@ -102,6 +103,42 @@ export interface PublicPlaceDTO {
   seo: { title: string | null; description: string | null } | null;
 }
 
+/**
+ * G4-PLACES · Tarjeta pública del listado territorial de Lugares.
+ * Proyección ligera de `points_of_interest` (sólo lecturas reales):
+ * los campos no capturados llegan en `null`/`[]` y se omiten en la UI.
+ */
+export interface PublicPlaceCard {
+  id: string;
+  slug: string;
+  name: string;
+  short_description: string | null;
+  type_slug: string | null;
+  type_label: string | null;
+  destination_slug: string | null;
+  destination_name: string | null;
+  zone_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  admission_kind: string | null;
+  price_from: number | null;
+  price_to: number | null;
+  price_currency: string | null;
+  visit_duration_minutes: number | null;
+  best_time_to_visit: string | null;
+  amenities: string[];
+  accessibility: string[];
+  categories: Array<{ slug: string; name: string }>;
+  /** Portada gobernada y aprobada del propio lugar; nunca medios ajenos. */
+  cover_url: string | null;
+  /**
+   * Atributos estructurados derivados EXCLUSIVAMENTE de columnas reales
+   * (place_type, experience_category, admission_type, zone, accessibility,
+   * amenities, duration, best_time). Vacío cuando no hay captura.
+   */
+  filter_attributes: TourismFilterAttributes;
+}
+
 /* ───────────────────────────────  JSON-LD  ─────────────────────────────── */
 
 /**
@@ -179,14 +216,18 @@ export function findApprovedCover(
 /* ─────────────────────────────  Territorio  ────────────────────────────── */
 
 export function buildPlaceBreadcrumbs(dto: PublicPlaceDTO) {
+  // Cadena aprobada: Inicio > Oriente Maya > Destino > Lugares y sitios de
+  // interés > Lugar. El nivel de familia enlaza al listado contextual del
+  // destino; la zona se comunica en la ficha, no en el breadcrumb.
   const crumbs: { label: string; href?: string }[] = [
     { label: "Inicio", href: "/" },
     { label: "Oriente Maya", href: "/oriente-maya" },
     { label: dto.destination.name, href: `/oriente-maya/${dto.destination.slug}` },
+    {
+      label: "Lugares y sitios de interés",
+      href: `/oriente-maya/${dto.destination.slug}/lugares`,
+    },
   ];
-  // La zona sólo aparece si pertenece al destino resuelto (fail-closed en
-  // el servidor: `zone` llega en `null` cuando no es compatible).
-  if (dto.zone) crumbs.push({ label: dto.zone.name });
   crumbs.push({ label: dto.name });
   return crumbs;
 }
@@ -402,8 +443,13 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     },
     alux: {
       title: "Pregúntale a Alux",
-      description: "Tu copiloto de viaje resuelve horarios, traslados y combinaciones cercanas.",
-      prompts: [`¿Cómo llego a ${dto.name}?`, `¿Qué hago cerca de ${dto.destination.name}?`],
+      description:
+        "Tu concierge IA te ayuda a decidir cuándo ir, cuánto tiempo dedicar y qué combinar cerca.",
+      prompts: [
+        `¿Cuándo es mejor visitar ${dto.name}?`,
+        `¿Cuánto tiempo necesito en ${dto.name}?`,
+        `Combínalo con experiencias y eventos cerca de ${dto.destination.name}`,
+      ],
       actionLabel: "Abrir Alux",
     },
   };
