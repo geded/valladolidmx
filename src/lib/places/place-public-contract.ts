@@ -308,6 +308,12 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
   });
 
   const typeLabel = dto.typeLabel ?? variantDef?.label ?? "Lugar y atractivo";
+  /* Adenda documental: un atractivo INTANGIBLE (fiesta, tradición, saber,
+     expresión cultural) no se fuerza a una ficha física. Se omiten dirección,
+     mapa, horarios, admisión y precio; se priorizan descripción cultural,
+     comunidad/territorio, temporalidad y recomendaciones responsables. */
+  const isIntangible = dto.attractionFamily === "intangible";
+  const familyLabel = PLACE_ATTRACTION_FAMILY_LABELS[dto.attractionFamily];
   const placeholderLabel = `Fotografía pendiente · ${dto.name}`;
 
   const supporting = dto.media
@@ -320,14 +326,16 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     .map((m) => toSurfaceMedia(m, placeholderLabel));
 
   const facts: PlacePremiumContent["essentials"]["facts"] = [];
-  if (dto.admissionKind)
+  /* La familia es METADATA declarada, nunca un selector visual de estilo. */
+  facts.push({ key: "attraction-family", label: "Familia de atractivo", value: familyLabel });
+  if (!isIntangible && dto.admissionKind)
     facts.push({
       key: "admission",
       label: "Admisión",
       value: ADMISSION_LABELS[dto.admissionKind] ?? dto.admissionKind,
       hint: dto.entryFeeNotes?.trim() || undefined,
     });
-  const price = priceLabel(dto);
+  const price = isIntangible ? null : priceLabel(dto);
   if (price) facts.push({ key: "price", label: "Precio", value: price });
   if (dto.visitDurationMinutes)
     facts.push({
@@ -337,10 +345,14 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     });
   if (dto.bestTimeToVisit)
     facts.push({ key: "best-time", label: "Mejor momento", value: dto.bestTimeToVisit });
-  for (const line of formatPlaceHours(dto.hours)) {
-    facts.push({ key: `hours-${line}`, label: "Horario", value: line });
+  if (!isIntangible) {
+    for (const line of formatPlaceHours(dto.hours)) {
+      facts.push({ key: `hours-${line}`, label: "Horario", value: line });
+    }
+    if (dto.addressLine) facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
   }
-  if (dto.addressLine) facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
+  /* Comunidad y territorio: relevante sobre todo para intangibles. */
+  if (dto.zone) facts.push({ key: "zone", label: "Comunidad o zona", value: dto.zone.name });
   if (dto.contact.website)
     facts.push({ key: "website", label: "Sitio web", value: dto.contact.website });
   if (dto.contact.phone) facts.push({ key: "phone", label: "Teléfono", value: dto.contact.phone });
@@ -384,7 +396,9 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
       cover: toSurfaceMedia(cover, placeholderLabel),
       supporting,
       primaryCta: { label: "Agregar a Mi Viaje" },
-      secondaryCta: { label: "Cómo llegar", href: "#mapa-lugar" },
+      secondaryCta: isIntangible
+        ? { label: "Ver galería", href: "#galeria-lugar" }
+        : { label: "Cómo llegar", href: "#mapa-lugar" },
     },
     intro: {
       kicker: "La historia",
@@ -411,7 +425,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
       heading: "Ubicación y cómo llegar",
       center: { lat: dto.latitude ?? 0, lng: dto.longitude ?? 0, zoom: 13 },
       points:
-        dto.latitude != null && dto.longitude != null
+        !isIntangible && dto.latitude != null && dto.longitude != null
           ? [
               {
                 id: dto.id,
@@ -424,7 +438,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
               },
             ]
           : [],
-      directions: dto.directions?.trim()
+      directions: !isIntangible && dto.directions?.trim()
         ? dto.directions
             .split(/\n+/u)
             .map((line) => line.trim())
