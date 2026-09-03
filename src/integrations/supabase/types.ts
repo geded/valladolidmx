@@ -1548,7 +1548,6 @@ export type Database = {
           description: string | null
           destination_id: string
           display_name: string
-          filter_attributes: Json
           id: string
           is_demo_seed: boolean
           last_verified_at: string | null
@@ -1583,7 +1582,6 @@ export type Database = {
           description?: string | null
           destination_id: string
           display_name: string
-          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -1618,7 +1616,6 @@ export type Database = {
           description?: string | null
           destination_id?: string
           display_name?: string
-          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
