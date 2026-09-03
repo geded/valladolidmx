@@ -77,7 +77,12 @@ export interface PublicPlaceDTO {
    */
   attractionFamily: PlaceAttractionFamily;
   destination: { slug: string; name: string };
-  zone: { id: string; name: string } | null;
+  /**
+   * Subzona del destino (jerarquía canónica Región > Destino > Subzona >
+   * Lugar). Opcional: sólo existe cuando el dato real la declara y pertenece
+   * al mismo destino. Nunca se infiere ni se sustituye por el centro.
+   */
+  zone: { id: string; slug: string | null; name: string } | null;
   regionLabel: string;
   description: string | null;
   shortDescription: string | null;
@@ -130,6 +135,8 @@ export interface PublicPlaceCard {
   destination_slug: string | null;
   destination_name: string | null;
   zone_name: string | null;
+  /** Slug de la subzona, para filtrado y deep-links del listado. */
+  zone_slug: string | null;
   latitude: number | null;
   longitude: number | null;
   admission_kind: string | null;
@@ -228,19 +235,29 @@ export function findApprovedCover(
 /* ─────────────────────────────  Territorio  ────────────────────────────── */
 
 export function buildPlaceBreadcrumbs(dto: PublicPlaceDTO) {
-  // Cadena aprobada: Inicio > Oriente Maya > Destino > Lugares y sitios de
-  // interés > Lugar. El nivel de familia enlaza al listado contextual del
-  // destino; la zona se comunica en la ficha, no en el breadcrumb.
+  // Jerarquía canónica: Inicio > Oriente Maya > Destino > Subzona (si existe)
+  // > Lugares y sitios de interés > Lugar. Sin subzona real ese nivel se omite
+  // por completo: jamás se muestra vacío ni se inventa una.
   const crumbs: { label: string; href?: string }[] = [
     { label: "Inicio", href: "/" },
     { label: "Oriente Maya", href: "/oriente-maya" },
     { label: dto.destination.name, href: `/oriente-maya/${dto.destination.slug}` },
+  ];
+  if (dto.zone?.name) {
+    crumbs.push({
+      label: dto.zone.name,
+      href: dto.zone.slug
+        ? `/oriente-maya/${dto.destination.slug}/lugares?subzona=${encodeURIComponent(dto.zone.slug)}`
+        : undefined,
+    });
+  }
+  crumbs.push(
     {
       label: "Lugares y sitios de interés",
       href: `/oriente-maya/${dto.destination.slug}/lugares`,
     },
-  ];
-  crumbs.push({ label: dto.name });
+    { label: dto.name },
+  );
   return crumbs;
 }
 
@@ -352,7 +369,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     if (dto.addressLine) facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
   }
   /* Comunidad y territorio: relevante sobre todo para intangibles. */
-  if (dto.zone) facts.push({ key: "zone", label: "Comunidad o zona", value: dto.zone.name });
+  if (dto.zone) facts.push({ key: "zone", label: "Subzona del destino", value: dto.zone.name });
   if (dto.contact.website)
     facts.push({ key: "website", label: "Sitio web", value: dto.contact.website });
   if (dto.contact.phone) facts.push({ key: "phone", label: "Teléfono", value: dto.contact.phone });
