@@ -1,15 +1,17 @@
 /**
- * G8-R1 · R1-A · Lectura canónica única de los seis listados turísticos.
+ * G8-R1 · R1-A · Lectura canónica única de los listados turísticos
+ * (siete familias desde v1.1.0 · G4-PLACES).
  *
  * Reutiliza EXCLUSIVAMENTE las consultas productivas vigentes
  * (`listMarketplaceBusinesses`, `listPublishedEvents`,
- * `listPublishedDestinations`) y las proyecta al DTO público único.
- * No crea backend nuevo, no escribe, no modifica estado editorial y no
- * introduce fixtures.
+ * `listPublishedPlaces`, `listPublishedDestinations`) y las proyecta al
+ * DTO público único. No crea backend nuevo, no escribe, no modifica
+ * estado editorial y no introduce fixtures.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { listMarketplaceBusinesses } from "@/lib/catalog/marketplace-reads.functions";
 import { listPublishedEvents } from "@/lib/events/public-reads.functions";
+import { listPublishedPlaces } from "@/lib/places/place-public-reads.functions";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import {
   buildPublicListing,
@@ -42,6 +44,13 @@ export const getPublicListing = createServerFn({ method: "GET" })
         data: { upcomingOnly: true, limit: 60 },
       }).catch(() => []);
       return buildPublicListing({ family: contract.id, destino: data.destino, events });
+    }
+
+    if (contract.source === "places") {
+      const places = await listPublishedPlaces({
+        data: { destinationSlug: data.destino },
+      }).catch(() => []);
+      return buildPublicListing({ family: contract.id, destino: data.destino, places });
     }
 
     const [destinations, events] = await Promise.all([

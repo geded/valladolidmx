@@ -266,6 +266,10 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
     items = (input.events ?? [])
       .filter((e) => !destino || e.destination_slug === destino)
       .map(eventToTourismCard);
+  } else if (contract.source === "places") {
+    items = (input.places ?? [])
+      .filter((p) => !destino || p.destination_slug === destino)
+      .map(placeToTourismCard);
   } else {
     items = [
       ...(input.destinations ?? []).map(destinationToTourismCard),
@@ -279,7 +283,9 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
       : contract.hero.title;
 
   const emptyMessage =
-    destino && contract.source === "businesses" && contract.destinoAwareEmptyMessage !== false
+    destino &&
+    (contract.source === "businesses" || contract.source === "places") &&
+    contract.destinoAwareEmptyMessage !== false
       ? `Aún no hay ${contract.label.toLowerCase()} publicados en ${destinationLabel}.`
       : contract.emptyMessage;
 
