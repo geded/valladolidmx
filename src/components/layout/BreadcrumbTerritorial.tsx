@@ -41,7 +41,13 @@ function crumbsFromContext(
   }));
 }
 
-export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, className }: Props) {
+export function BreadcrumbTerritorial({
+  crumbs,
+  useContextCrumbs = false,
+  compactOnMobile = false,
+  mobileAnchorIndex,
+  className,
+}: Props) {
   const ctx = useResolvedContext();
   const effectiveCrumbs: readonly BreadcrumbCrumb[] =
     useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);
@@ -53,8 +59,17 @@ export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, classN
       aria-label="Ruta territorial"
       className={cn("flex items-start justify-between gap-3 text-sm", className)}
     >
+      {compactOnMobile ? (
+        <CompactMobileCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
+      ) : null}
       {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
-      <ol className="flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal">
+      <ol
+        className={cn(
+          "flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
+          compactOnMobile ? "hidden sm:flex" : null,
+        )}
+      >
+
         <li className="flex shrink-0 items-center gap-1.5">
           <Link
             to="/"
