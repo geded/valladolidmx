@@ -1,9 +1,9 @@
 /**
  * G8-R1 · R1-A · Contrato público tipado de listados.
  *
- * Verifica la vía canónica única de H-R1-01: seis familias declaradas,
- * origen productivo real, fail-closed, cero fixtures y cero invención de
- * elementos.
+ * Verifica la vía canónica única de H-R1-01: siete familias declaradas
+ * (v1.1.0 · G4-PLACES incorpora `lugares`), origen productivo real,
+ * fail-closed, cero fixtures y cero invención de elementos.
  */
 import { describe, expect, test } from "bun:test";
 import {
@@ -44,26 +44,54 @@ const event = (over: Record<string, unknown> = {}) =>
     ...over,
   }) as never;
 
-describe("G8-R1 · R1-A · contrato de listados (casos 1-6)", () => {
-  test("1 · las seis familias autorizadas están declaradas", () => {
+const place = (over: Record<string, unknown> = {}) =>
+  ({
+    id: "p1",
+    slug: "cenote-zaci",
+    name: "Cenote Zací",
+    short_description: "Cenote urbano en el corazón de Valladolid.",
+    type_slug: "cenote",
+    type_label: "Cenote",
+    destination_slug: "valladolid",
+    destination_name: "Valladolid",
+    zone_name: null,
+    latitude: 20.69,
+    longitude: -88.2,
+    admission_kind: null,
+    price_from: null,
+    price_to: null,
+    price_currency: null,
+    visit_duration_minutes: null,
+    best_time_to_visit: null,
+    amenities: [],
+    accessibility: [],
+    categories: [],
+    cover_url: null,
+    filter_attributes: { place_type: ["cenote"] },
+    ...over,
+  }) as never;
+
+describe("G8-R1 · R1-A · contrato de listados (casos 1-7)", () => {
+  test("1 · las siete familias autorizadas están declaradas", () => {
     expect([...LISTING_FAMILY_IDS].sort()).toEqual(
       [
         "casas-de-vacaciones",
         "eventos",
         "experiencias",
         "hoteles",
+        "lugares",
         "que-hacer",
         "restaurantes",
       ].sort(),
     );
-    expect(LISTING_PUBLIC_CONTRACT_VERSION).toBe("1.0.0");
+    expect(LISTING_PUBLIC_CONTRACT_VERSION).toBe("1.1.0");
   });
 
   test("2 · cada familia declara ruta canónica y origen productivo real", () => {
     for (const id of LISTING_FAMILY_IDS) {
       const c = LISTING_FAMILY_CONTRACTS[id];
       expect(c.route.startsWith("/")).toBe(true);
-      expect(["businesses", "events", "editorial"]).toContain(c.source);
+      expect(["businesses", "events", "places", "editorial"]).toContain(c.source);
       expect(c.hero.title.length).toBeGreaterThan(0);
       expect(c.emptyMessage.length).toBeGreaterThan(0);
     }
@@ -110,5 +138,25 @@ describe("G8-R1 · R1-A · contrato de listados (casos 1-6)", () => {
     expect(queHacer.source).toBe("editorial");
     expect(queHacer.items).toHaveLength(1);
     expect(queHacer.hero.title).toBe("¿Qué hacer en el Oriente Maya?");
+  });
+
+  test("7 · lugares proyecta el feed real de points_of_interest", () => {
+    const lugares = buildPublicListing({ family: "lugares", places: [place()] });
+    expect(lugares.source).toBe("places");
+    expect(lugares.items).toHaveLength(1);
+    expect(lugares.items[0].entityKind).toBe("place");
+    expect(lugares.items[0].href).toBe("/oriente-maya/valladolid/lugares/cenote-zaci");
+
+    const filtrado = buildPublicListing({
+      family: "lugares",
+      destino: "izamal",
+      places: [place()],
+    });
+    expect(filtrado.items).toHaveLength(0);
+    expect(filtrado.hero.title).toBe("Lugares y sitios de interés en Izamal");
+    expect(filtrado.emptyMessage).toContain("Izamal");
+
+    // Sin feed no se inventa contenido (fail-closed).
+    expect(buildPublicListing({ family: "lugares" }).items).toEqual([]);
   });
 });
