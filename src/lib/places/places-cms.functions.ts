@@ -139,6 +139,8 @@ interface ListPlacesInput {
   destinationZoneId?: string;
   placeTypeId?: string;
   categoryId?: string;
+  /** Adenda 3: familia documental del Inventario (tangible | intangible). */
+  attractionFamily?: string;
   status?: string;
   limit?: number;
   offset?: number;
@@ -179,6 +181,7 @@ export const listPlacesCms = createServerFn({ method: "POST" })
     if (data.destinationId) q = q.eq("destination_id", data.destinationId);
     if (data.destinationZoneId) q = q.eq("destination_zone_id", data.destinationZoneId);
     if (data.placeTypeId) q = q.eq("place_type_id", data.placeTypeId);
+    if (data.attractionFamily) q = q.eq("attraction_family", data.attractionFamily);
     if (data.status) q = q.eq("status", data.status);
     if (placeIdFilter) q = q.in("id", placeIdFilter);
 

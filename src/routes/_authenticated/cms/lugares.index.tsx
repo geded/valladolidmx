@@ -41,6 +41,11 @@ function LugaresPage() {
   const [destinationId, setDestinationId] = useState("");
   const [zoneId, setZoneId] = useState("");
   const [status, setStatus] = useState("");
+  /* Adenda 3: segmentación por taxonomía canónica (familia documental,
+     `place_types` y `place_categories`). Sin etiquetas inventadas. */
+  const [family, setFamily] = useState("");
+  const [placeTypeId, setPlaceTypeId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
 
   const options = useQuery({
     queryKey: ["cms", "places", "options"],
@@ -50,6 +55,8 @@ function LugaresPage() {
   const opts = (options.data ?? {}) as {
     destinations?: Array<{ id: string; name: string }>;
     zones?: TerritorialZone[];
+    placeTypes?: Array<{ id: string; slug: string; name: string }>;
+    categories?: Array<{ id: string; slug: string; name: string }>;
   };
 
   // Addendum Q2B: el filtro de zona siempre depende del destino elegido.
@@ -64,7 +71,12 @@ function LugaresPage() {
   };
 
   const list = useQuery({
-    queryKey: ["cms", "places", "list", { search, destinationId, zoneId, status }],
+    queryKey: [
+      "cms",
+      "places",
+      "list",
+      { search, destinationId, zoneId, status, family, placeTypeId, categoryId },
+    ],
     queryFn: () =>
       listFn({
         data: {
@@ -72,6 +84,9 @@ function LugaresPage() {
           destinationId: destinationId || undefined,
           destinationZoneId: zoneId || undefined,
           status: status || undefined,
+          attractionFamily: family || undefined,
+          placeTypeId: placeTypeId || undefined,
+          categoryId: categoryId || undefined,
         },
       }),
   });
@@ -142,6 +157,48 @@ function LugaresPage() {
             {zones.map((z) => (
               <option key={z.id} value={z.id}>
                 {z.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-foreground">Familia de atractivo</span>
+          <select
+            className={`${inputClass} mt-1.5`}
+            value={family}
+            onChange={(e) => setFamily(e.target.value)}
+          >
+            <option value="">Todas</option>
+            <option value="tangible">Tangibles</option>
+            <option value="intangible">Intangibles</option>
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-foreground">Tipo de lugar</span>
+          <select
+            className={`${inputClass} mt-1.5`}
+            value={placeTypeId}
+            onChange={(e) => setPlaceTypeId(e.target.value)}
+          >
+            <option value="">Todos los tipos</option>
+            {(opts.placeTypes ?? []).map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-foreground">Qué puedes descubrir</span>
+          <select
+            className={`${inputClass} mt-1.5`}
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+          >
+            <option value="">Todas las categorías</option>
+            {(opts.categories ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </select>

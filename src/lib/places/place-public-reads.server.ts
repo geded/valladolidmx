@@ -424,7 +424,7 @@ export async function readPublishedPlaceCards(
   const typeIds = uniq(places.map((p) => p.place_type_id));
   const zoneIds = uniq(places.map((p) => p.destination_zone_id));
 
-  const [destRes, typeRes, zoneRes, linkRes, mediaRes] = await Promise.all([
+  const [destRes, typeRes, zoneRes, linkRes, authorityRes, mediaRes] = await Promise.all([
     destinationIds.length
       ? sb.from("destinations").select("id, slug, name").in("id", destinationIds).is("deleted_at", null)
       : Promise.resolve({ data: [] }),
@@ -439,6 +439,10 @@ export async function readPublishedPlaceCards(
           .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
     sb.from("place_category_links").select("place_id, category_id").in("place_id", placeIds),
+    sb
+      .from("place_authorities")
+      .select("place_id, authority_kind_id, is_primary")
+      .in("place_id", placeIds),
     sb
       .from("place_media")
       .select("place_id, media_asset_id, role, sort_order")
@@ -475,6 +479,33 @@ export async function readPublishedPlaceCards(
       .in("id", categoryIds);
     for (const c of (cats ?? []) as any[]) catById.set(c.id, { slug: c.slug, name: c.name });
   }
+  /* Naturaleza o gestión del lugar (Adenda 3.3): se deriva EXCLUSIVAMENTE de
+     las relaciones reales place_authorities → place_authority_kinds. Nunca se
+     infiere "sitio público" por el nombre, el tipo o la fotografía. */
+  const authorityLinks = (authorityRes.data ?? []) as Array<{
+    place_id: string;
+    authority_kind_id: string;
+    is_primary: boolean | null;
+  }>;
+  const authorityKindIds = uniq(authorityLinks.map((l) => l.authority_kind_id));
+  const authorityKindById = new Map<string, { slug: string; name: string }>();
+  if (authorityKindIds.length) {
+    const { data: kinds } = await sb
+      .from("place_authority_kinds")
+      .select("id, slug, name")
+      .in("id", authorityKindIds)
+      .eq("is_active", true);
+    for (const k of (kinds ?? []) as any[]) authorityKindById.set(k.id, { slug: k.slug, name: k.name });
+  }
+  const authorityKindsByPlace = new Map<string, string[]>();
+  for (const link of authorityLinks) {
+    const kind = authorityKindById.get(link.authority_kind_id);
+    if (!kind) continue;
+    const list = authorityKindsByPlace.get(link.place_id) ?? [];
+    if (!list.includes(kind.name)) list.push(kind.name);
+    authorityKindsByPlace.set(link.place_id, list);
+  }
+
   const categoriesByPlace = new Map<string, Array<{ slug: string; name: string }>>();
   for (const link of links) {
     const cat = catById.get(link.category_id);
@@ -560,6 +591,8 @@ export async function readPublishedPlaceCards(
     if (p.visit_duration_minutes != null)
       attrs.duration = [durationFilterBucket(Number(p.visit_duration_minutes))];
     if (p.best_time_to_visit) attrs.best_time = [String(p.best_time_to_visit)];
+    const authorityKinds = authorityKindsByPlace.get(p.id) ?? [];
+    if (authorityKinds.length) attrs.authority_kind = authorityKinds;
 
     return {
       id: p.id,
