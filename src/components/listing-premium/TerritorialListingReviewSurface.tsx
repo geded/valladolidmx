@@ -1167,7 +1167,15 @@ function EventListingBody({
             {!dto ? <NearbySection profile={profile} /> : null}
           </div>
 
-          <EventMapPanel profile={profile} items={filteredItems} />
+          <EventMapPanel
+            profile={profile}
+            items={filteredItems}
+            title={
+              lockedDestinationLabel
+                ? `Eventos en ${lockedDestinationLabel}`
+                : "Eventos del Oriente Maya"
+            }
+          />
         </div>
       </div>
     </main>
@@ -1208,7 +1216,15 @@ function EventSelect({
   );
 }
 
-function EventMapPanel({ profile, items }: { profile: ListingProfile; items: ListingItem[] }) {
+function EventMapPanel({
+  profile,
+  items,
+  title,
+}: {
+  profile: ListingProfile;
+  items: ListingItem[];
+  title?: string;
+}) {
   const points = items
     .map((item, index) => ({
       item,
@@ -1239,7 +1255,7 @@ function EventMapPanel({ profile, items }: { profile: ListingProfile; items: Lis
             <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#ba641e]">
               Mapa territorial
             </p>
-            <h2 className="font-display text-xl">{profile.mapTitle}</h2>
+            <h2 className="font-display text-xl">{title ?? profile.mapTitle}</h2>
           </div>
           <span className="rounded-full bg-[#efe8da] px-3 py-1 text-xs font-semibold">
             {items.length}
