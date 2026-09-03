@@ -166,7 +166,11 @@ export function ListingPremiumSurfaceFromDTO({
   // Perfiles visuales aprobados dentro de la única entrada canónica. Comparten
   // el mismo PublicListingDTO, mapa, Alux, Mi Viaje y expediente de concierge;
   // no crean lecturas ni rutas paralelas.
-  if (dto.family === "hoteles" || dto.family === "restaurantes") {
+  if (
+    dto.family === "hoteles" ||
+    dto.family === "restaurantes" ||
+    dto.family === "casas-de-vacaciones"
+  ) {
     return <PremiumDiscoveryListingSurface dto={dto} presentation={presentation} />;
   }
 

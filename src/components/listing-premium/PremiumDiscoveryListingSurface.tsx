@@ -11,6 +11,7 @@ import {
   ArrowRight,
   BedDouble,
   ChefHat,
+  Home,
   Compass,
   Map as MapIcon,
   MapPin,
@@ -38,7 +39,7 @@ const InteractiveMap = lazy(() =>
 
 const ALL = "__all__";
 
-type SupportedFamily = "hoteles" | "restaurantes";
+type SupportedFamily = "hoteles" | "restaurantes" | "casas-de-vacaciones";
 
 interface FamilyProfile {
   family: SupportedFamily;
@@ -163,6 +164,40 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
     ],
     icon: <ChefHat className="size-4" aria-hidden />,
   },
+  "casas-de-vacaciones": {
+    family: "casas-de-vacaciones",
+    eyebrow: "Estancias completas para vivir el territorio",
+    title: "Casas de vacaciones en el Oriente Maya",
+    subtitle: "Encuentra una casa según tu grupo, tus noches y la ruta que quieres descubrir.",
+    aluxTitle: "¿Cómo quieres vivir tu estancia?",
+    prompts: ["Viaje familiar", "En pareja", "Con amigos", "Con piscina", "Estancia larga"],
+    primaryFilterLabel: "Tipo de propiedad",
+    secondaryFilterLabel: "Espacios y servicios",
+    itemNoun: "casa",
+    itemNounPlural: "casas",
+    actionLabel: "Ver casa",
+    conciergeTitle: "Encuentra la casa adecuada para tu viaje",
+    conciergeCopy:
+      "Alux considera huéspedes, noches, habitaciones y ruta; un concierge humano puede ayudarte a confirmar.",
+    heroSlides: [
+      {
+        src: HOTEL_MEDIA[0],
+        label: "Casas coloniales",
+        alt: "Visual conceptual temporal de estancia colonial en el Oriente Maya",
+      },
+      {
+        src: HOTEL_MEDIA[1],
+        label: "Estancias rurales",
+        alt: "Visual conceptual temporal de estancia rural en el Oriente Maya",
+      },
+      {
+        src: HOTEL_MEDIA[2],
+        label: "Casas cerca de la costa",
+        alt: "Visual conceptual temporal de estancia cercana a la costa del Oriente Maya",
+      },
+    ],
+    icon: <Home className="size-4" aria-hidden />,
+  },
 };
 
 function normalized(value: string): string {
@@ -182,6 +217,8 @@ function itemAttributes(item: TourismCardVM, profile: FamilyProfile): string[] {
   const keys =
     profile.family === "restaurantes"
       ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
+      : profile.family === "casas-de-vacaciones"
+        ? ["capacity", "bedrooms", "amenities", "stay_features", "traveler_profile"]
       : ["services", "amenities", "accessibility", "traveler_profile"];
   const structured = keys
     .flatMap((key) => attributeValues(item.filterAttributes?.[key]))
@@ -194,12 +231,19 @@ function itemAttributes(item: TourismCardVM, profile: FamilyProfile): string[] {
 }
 
 function itemType(item: TourismCardVM, profile: FamilyProfile): string {
-  const typeKey = profile.family === "restaurantes" ? "cuisine_type" : "hotel_type";
+  const typeKey =
+    profile.family === "restaurantes"
+      ? "cuisine_type"
+      : profile.family === "casas-de-vacaciones"
+        ? "property_type"
+        : "hotel_type";
   const structured = attributeValues(item.filterAttributes?.[typeKey])[0];
   if (structured) return humanizeAttributeValue(structured);
   const eyebrow = item.eyebrow?.trim();
   if (eyebrow && !/hotel|hospedaje|restaurante|gastronom/i.test(eyebrow)) return eyebrow;
-  return profile.family === "hoteles" ? "Hospedaje" : "Cocina local";
+  if (profile.family === "hoteles") return "Hospedaje";
+  if (profile.family === "casas-de-vacaciones") return "Propiedad completa";
+  return "Cocina local";
 }
 
 function itemZone(item: TourismCardVM): string | null {
@@ -217,7 +261,12 @@ function mediaFor(item: TourismCardVM, index: number, profile: FamilyProfile) {
 }
 
 function askAlux(profile: FamilyProfile, preference: string) {
-  const task = profile.family === "hoteles" ? "elegir dónde hospedarme" : "elegir dónde comer";
+  const task =
+    profile.family === "restaurantes"
+      ? "elegir dónde comer"
+      : profile.family === "casas-de-vacaciones"
+        ? "elegir una casa de vacaciones"
+        : "elegir dónde hospedarme";
   openAluxFloating({
     reason: "manual",
     hint: `Ayúdame a ${task}. Preferencia inicial: ${preference}. Primero determina si estoy planeando el viaje o si ya estoy en Valladolid o el Oriente Maya. Si planeo, pregunta fechas, acompañantes y presupuesto; pide ubicación sólo si ya estoy en destino y con permiso. Usa Mi Viaje y explica por qué recomiendas cada opción.`,

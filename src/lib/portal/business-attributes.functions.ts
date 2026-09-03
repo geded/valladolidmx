@@ -51,7 +51,17 @@ async function readEditorDTO(
           normalizedCategory,
         )
       ? "restaurantes"
-      : null;
+      : [
+            "casa-de-vacaciones",
+            "casas-de-vacaciones",
+            "casas-vacacionales",
+            "villas",
+            "renta-vacacional",
+            "rentas-vacacionales",
+            "casas",
+          ].includes(normalizedCategory)
+        ? "casas-de-vacaciones"
+        : null;
   if (!family) {
     return { businessId, family: null, editable: false, values: {}, definitions: [] };
   }

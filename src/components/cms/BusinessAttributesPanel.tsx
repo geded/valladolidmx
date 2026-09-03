@@ -50,7 +50,11 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
     <section className="rounded-xl border border-border bg-card p-5">
       <div className="max-w-2xl">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-          Características del {query.data.family === "restaurantes" ? "restaurante" : "hospedaje"}
+          Características de {query.data.family === "restaurantes"
+            ? "restaurante"
+            : query.data.family === "casas-de-vacaciones"
+              ? "la casa de vacaciones"
+              : "hospedaje"}
         </p>
         <h2 className="mt-2 text-2xl">Datos que alimentan filtros, ficha y Alux</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">

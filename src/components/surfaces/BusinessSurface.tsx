@@ -55,6 +55,7 @@ import {
 } from "@/lib/omxds/surfaces/business-surface.contract";
 import { adaptHotelSurfaceContract } from "@/lib/omxds/surfaces/hotel-surface.adapter";
 import { adaptRestaurantSurfaceContract } from "@/lib/omxds/surfaces/restaurant-surface.adapter";
+import { adaptVacationRentalSurfaceContract } from "@/lib/omxds/surfaces/vacation-rental-surface.adapter";
 import {
   isOmxdsSurfaceContract,
   type OmxdsSurfaceContract,
@@ -164,6 +165,21 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
     productsHeading: "Servicios",
     productsEmpty: "Sin servicios publicados.",
   },
+  "casas-de-vacaciones": {
+    eyebrow: "Casa de vacaciones",
+    productsHeading: "Estancias y servicios",
+    productsEmpty: "Sin opciones de estancia publicadas.",
+  },
+  "casas-vacacionales": {
+    eyebrow: "Casa de vacaciones",
+    productsHeading: "Estancias y servicios",
+    productsEmpty: "Sin opciones de estancia publicadas.",
+  },
+  villas: {
+    eyebrow: "Villa",
+    productsHeading: "Estancias y servicios",
+    productsEmpty: "Sin opciones de estancia publicadas.",
+  },
 };
 
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
@@ -228,7 +244,9 @@ export function BusinessSurfaceContractBoundary({
 
   const input = businessToSurfaceContractInput(business, related);
   const verticalContract =
-    adaptHotelSurfaceContract(input) ?? adaptRestaurantSurfaceContract(input);
+    adaptHotelSurfaceContract(input) ??
+    adaptRestaurantSurfaceContract(input) ??
+    adaptVacationRentalSurfaceContract(input);
   if (verticalContract)
     return (
       <BusinessSurface

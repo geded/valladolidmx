@@ -92,7 +92,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
     const composition = specific ?? template ?? null;
     // G8-R1-C2 · La decisión de presentación pasa por el resolutor canónico:
     // override editorial aprobado → preset premium de familia → superficie
-    // estándar fail-closed. `vacation_rental` nunca se autoasigna.
+    // estándar fail-closed. `vacation_rental` usa su preset aprobado.
     const canonicalBinding = bindBusinessRoute({
       businessId: business.id,
       categorySlug: business.category_slug,

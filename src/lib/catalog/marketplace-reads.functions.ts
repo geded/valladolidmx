@@ -758,19 +758,33 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
   })
   .handler(async ({ data }): Promise<MarketplaceBusinessDetail | null> => {
     const supabase = publicClient();
-    const { data: biz, error } = await supabase
+    const detailSelect =
+      "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )";
+    const legacyDetailSelect =
+      "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )";
+    const primaryBusinessResult = await supabase
       .from("businesses")
-      .select(
-        "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
-      )
+      .select(detailSelect)
       .eq("slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
       // G8-R1-F1I-R1 · lectura de FICHA DIRECTA: no se aplica elegibilidad
       // pública (la ruta sigue respondiendo 200 con `noindex, nofollow`).
       // La elegibilidad sólo gobierna superficies de descubrimiento.
-
       .maybeSingle();
+    let biz: Record<string, unknown> | null = primaryBusinessResult.data;
+    let error = primaryBusinessResult.error;
+    if (error && /filter_attributes|column .* does not exist/i.test(error.message)) {
+      const legacyResult = await supabase
+        .from("businesses")
+        .select(legacyDetailSelect)
+        .eq("slug", data.slug)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle();
+      biz = legacyResult.data;
+      error = legacyResult.error;
+    }
     if (error) throw new Error(`marketplace_business_failed: ${error.message}`);
     if (!biz) return null;
 
@@ -781,7 +795,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           .select(
             "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
           )
-          .eq("business_id", biz.id)
+          .eq("business_id", String(biz.id))
           .eq("status", "published")
           .is("deleted_at", null)
           .order("name", { ascending: true })
@@ -791,7 +805,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           .select(
             "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
           )
-          .eq("business_id", biz.id)
+          .eq("business_id", String(biz.id))
           .eq("status", "published")
           .is("deleted_at", null)
           .order("ends_at", { ascending: true, nullsFirst: false })
@@ -801,7 +815,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           .select(
             "label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at",
           )
-          .eq("business_id", biz.id)
+          .eq("business_id", String(biz.id))
           .is("deleted_at", null)
           .order("is_primary", { ascending: false })
           .limit(1),
@@ -836,16 +850,17 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       : null;
 
     return {
-      id: biz.id,
-      slug: biz.slug,
-      display_name: biz.display_name,
-      tagline: biz.tagline ?? "",
-      description: biz.description ?? "",
+      id: String(biz.id),
+      slug: String(biz.slug),
+      display_name: String(biz.display_name),
+      tagline: typeof biz.tagline === "string" ? biz.tagline : "",
+      description: typeof biz.description === "string" ? biz.description : "",
       primary_location: detailPrimaryLocation,
       provenance: "published",
       verified: Boolean(biz.verified),
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
+      filter_attributes: normalizeFilterAttributes(biz.filter_attributes),
       plan_tier: planTier,
       products: (products ?? []).map((p) => ({
         id: p.id,
@@ -855,8 +870,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         product_type: String(p.product_type),
         price_amount: p.price_amount,
         price_currency: p.price_currency,
-        business_slug: biz.slug,
-        business_name: biz.display_name,
+        business_slug: String(biz.slug),
+        business_name: String(biz.display_name),
         conversion_mode: String((p as Record<string, unknown>).conversion_mode ?? "informacion"),
         primary_action_label:
           ((p as Record<string, unknown>).primary_action_label as string | null) ?? null,
@@ -876,8 +891,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         discount_percent: p.discount_percent !== null ? Number(p.discount_percent) : null,
         starts_at: p.starts_at,
         ends_at: p.ends_at,
-        business_slug: biz.slug,
-        business_name: biz.display_name,
+        business_slug: String(biz.slug),
+        business_name: String(biz.display_name),
       })),
     };
   });

@@ -61,14 +61,14 @@ describe("C2 · empresa", () => {
     expect(b.surface).toBe("premium");
   });
 
-  it("casa de vacaciones NO se autoasigna (fail-closed)", () => {
+  it("casa de vacaciones elegible usa su preset premium", () => {
     const b = bindBusinessRoute({
       businessId: "b3",
       categorySlug: "casas-de-vacaciones",
       premiumEligible: true,
     });
-    expect(b.surface).toBe("standard");
-    expect(b.presetId).toBeNull();
+    expect(b.surface).toBe("premium");
+    expect(b.presetId).toBe("premium-entity-vacation-rental");
   });
 
   // G8-R1-F1L·P0 — familia ≠ medios: la carencia de fotografía acreditada ya

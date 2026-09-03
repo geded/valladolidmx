@@ -76,6 +76,18 @@ export const ALUX_SURFACE_INVENTORY: readonly AluxSurfaceRecord[] = [
     duplication: "none",
   },
   {
+    family: "Casa de vacaciones",
+    globalDock: true,
+    planner: true,
+    master: "avatar+full",
+    context: [
+      "entidad: business",
+      "territorio: destino/zona aproximada",
+      "relaciones: capacidad, estancia, cercanos",
+    ],
+    duplication: "none",
+  },
+  {
     family: "Evento",
     globalDock: true,
     planner: true,
@@ -127,12 +139,8 @@ export const ALUX_SURFACE_INVENTORY: readonly AluxSurfaceRecord[] = [
   },
 ];
 
-/**
- * Casa de vacaciones permanece SIN autoasignación productiva mientras siga
- * pendiente de aceptación visual Founder. No aparece en el inventario
- * productivo y no recibe planner ni preset por defecto.
- */
-export const ALUX_SURFACE_WITHHELD: readonly string[] = ["Casa de vacaciones (vacation_rental)"];
+/** Familias sin presencia contextual de Alux. */
+export const ALUX_SURFACE_WITHHELD: readonly string[] = [];
 
 /** Invariantes verificables por gate. */
 export const ALUX_PRESENCE_INVARIANTS = {

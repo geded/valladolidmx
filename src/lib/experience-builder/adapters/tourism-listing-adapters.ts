@@ -61,7 +61,7 @@ function categoryToEntityKind(categorySlug: string | null | undefined): TourismE
       "casas",
     ].includes(s)
   )
-    return "hotel";
+    return "business";
   return "business";
 }
 
