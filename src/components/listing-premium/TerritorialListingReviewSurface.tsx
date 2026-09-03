@@ -1061,7 +1061,6 @@ function EventListingBody({
 
   const clearAll = () => {
     setQuery("");
-    setFamily("");
     setDestino("");
     setDateRange("");
     setEventType("");
@@ -1089,39 +1088,7 @@ function EventListingBody({
         />
         <AluxBar profile={profile} />
 
-        <div
-          role="group"
-          aria-label="Familia de atractivo"
-          className="mt-4 flex flex-wrap items-center gap-2"
-        >
-          {[
-            { value: "", label: "Todos" },
-            { value: "tangible", label: "Tangibles", count: familyCounts.tangible },
-            { value: "intangible", label: "Intangibles", count: familyCounts.intangible },
-          ].map((option) => {
-            const active = family === option.value;
-            return (
-              <button
-                key={option.value || "todos"}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setFamily(option.value)}
-                className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-                  active
-                    ? "border-[#0d4b38] bg-[#0d4b38] text-white"
-                    : "border-[#ded7c9] bg-white text-[#17251f]"
-                }`}
-              >
-                {option.label}
-                {typeof option.count === "number" ? (
-                  <span className={active ? "text-white/75" : "text-[#788078]"}>{option.count}</span>
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
-
-        <section className="mt-3 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+        <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
           <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
             <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
               <Search
@@ -1559,7 +1526,40 @@ function PlaceListingBody({
         />
         <AluxBar profile={profile} />
 
-        <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+        <div
+          role="group"
+          aria-label="Familia de atractivo"
+          className="mt-4 flex flex-wrap items-center gap-2"
+        >
+          {[
+            { value: "", label: "Todos" },
+            { value: "tangible", label: "Tangibles", count: familyCounts.tangible },
+            { value: "intangible", label: "Intangibles", count: familyCounts.intangible },
+          ].map((option) => {
+            const active = family === option.value;
+            return (
+              <button
+                key={option.value || "todos"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setFamily(option.value)}
+                className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                  active
+                    ? "border-[#0d4b38] bg-[#0d4b38] text-white"
+                    : "border-[#ded7c9] bg-white text-[#17251f]"
+                }`}
+              >
+                {option.label}
+                {typeof option.count === "number" ? (
+                  <span className={active ? "text-white/75" : "text-[#788078]"}>{option.count}</span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+
+        <section className="mt-3 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
           <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
             <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
               <Search
