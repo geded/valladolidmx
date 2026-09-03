@@ -44,11 +44,14 @@ async function readEditorDTO(
   if (businessError || !business)
     throw new Error(`get_business_attributes_failed:${businessError?.message ?? "not_found"}`);
   const categorySlug = business.business_categories?.slug ?? null;
-  const family = ["hotel", "hoteles", "hospedaje", "hospedajes"].includes(
-    String(categorySlug).toLowerCase(),
-  )
+  const normalizedCategory = String(categorySlug).toLowerCase();
+  const family = ["hotel", "hoteles", "hospedaje", "hospedajes"].includes(normalizedCategory)
     ? "hoteles"
-    : null;
+    : ["restaurante", "restaurantes", "gastronomia", "gastronomía"].includes(
+          normalizedCategory,
+        )
+      ? "restaurantes"
+      : null;
   if (!family) {
     return { businessId, family: null, editable: false, values: {}, definitions: [] };
   }

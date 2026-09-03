@@ -178,8 +178,12 @@ function unique(values: Array<string | null | undefined>): string[] {
   ).sort((a, b) => a.localeCompare(b, "es"));
 }
 
-function itemAttributes(item: TourismCardVM): string[] {
-  const structured = ["services", "amenities", "accessibility", "traveler_profile"]
+function itemAttributes(item: TourismCardVM, profile: FamilyProfile): string[] {
+  const keys =
+    profile.family === "restaurantes"
+      ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
+      : ["services", "amenities", "accessibility", "traveler_profile"];
+  const structured = keys
     .flatMap((key) => attributeValues(item.filterAttributes?.[key]))
     .map(humanizeAttributeValue);
   return unique([
@@ -190,7 +194,8 @@ function itemAttributes(item: TourismCardVM): string[] {
 }
 
 function itemType(item: TourismCardVM, profile: FamilyProfile): string {
-  const structured = attributeValues(item.filterAttributes?.hotel_type)[0];
+  const typeKey = profile.family === "restaurantes" ? "cuisine_type" : "hotel_type";
+  const structured = attributeValues(item.filterAttributes?.[typeKey])[0];
   if (structured) return humanizeAttributeValue(structured);
   const eyebrow = item.eyebrow?.trim();
   if (eyebrow && !/hotel|hospedaje|restaurante|gastronom/i.test(eyebrow)) return eyebrow;
@@ -258,8 +263,8 @@ export function PremiumDiscoveryListingSurface({
     [items, profile],
   );
   const secondaryValues = useMemo(
-    () => unique(items.flatMap(itemAttributes)).slice(0, 12),
-    [items],
+    () => unique(items.flatMap((item) => itemAttributes(item, profile))).slice(0, 12),
+    [items, profile],
   );
   const filtered = useMemo(() => {
     const q = normalized(query.trim());
@@ -267,10 +272,10 @@ export function PremiumDiscoveryListingSurface({
       const scope = territorial ? itemZone(item) : item.location?.label;
       if (destination !== ALL && scope !== destination) return false;
       if (primary !== ALL && itemType(item, profile) !== primary) return false;
-      if (secondary !== ALL && !itemAttributes(item).includes(secondary)) return false;
+      if (secondary !== ALL && !itemAttributes(item, profile).includes(secondary)) return false;
       if (!q) return true;
       return normalized(
-        [item.name, item.tagline, item.location?.label, ...itemAttributes(item)]
+        [item.name, item.tagline, item.location?.label, ...itemAttributes(item, profile)]
           .filter(Boolean)
           .join(" "),
       ).includes(q);
@@ -596,7 +601,7 @@ function PremiumListingCard({
           <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.tagline}</p>
         ) : null}
         <div className="mt-3 flex flex-wrap gap-2">
-          {itemAttributes(item)
+          {itemAttributes(item, profile)
             .slice(0, 3)
             .map((value) => (
               <span

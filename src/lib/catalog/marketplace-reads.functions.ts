@@ -614,19 +614,36 @@ export interface MarketplaceSearchInput {
 export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handler(
   async (): Promise<MarketplaceBusinessCard[]> => {
     const supabase = publicClient();
-    const { data, error } = await supabase
+    const selectWithAttributes =
+      "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
+    const legacySelect =
+      "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
+    const primaryResult = await supabase
       .from("businesses")
-      .select(
-        "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )",
-      )
+      .select(selectWithAttributes)
       .eq("status", "published")
       .is("deleted_at", null)
       // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
       .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(120);
+    let data: unknown[] | null = primaryResult.data;
+    let error = primaryResult.error;
+    if (error && /filter_attributes|column .* does not exist/i.test(error.message)) {
+      const legacyResult = await supabase
+        .from("businesses")
+        .select(legacySelect)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
+        .order("display_name", { ascending: true })
+        .limit(120);
+      data = legacyResult.data;
+      error = legacyResult.error;
+    }
     if (error) throw new Error(`marketplace_businesses_failed: ${error.message}`);
-    const rows: MarketplaceBusinessCard[] = (data ?? []).map((row) => {
+    const rows: MarketplaceBusinessCard[] = (data ?? []).map((rawRow) => {
+      const row = rawRow as Record<string, unknown>;
       const dest = (row.destinations as { slug?: unknown } | null)?.slug;
       const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
       const locs = (
@@ -639,10 +656,10 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       const rawLng = primary ? (primary as { longitude?: unknown }).longitude : null;
       const rawAddr = primary ? (primary as { address_line1?: unknown }).address_line1 : null;
       return {
-        id: row.id,
-        slug: row.slug,
-        display_name: row.display_name,
-        tagline: row.tagline ?? "",
+        id: String(row.id),
+        slug: String(row.slug),
+        display_name: String(row.display_name),
+        tagline: typeof row.tagline === "string" ? row.tagline : "",
         verified: Boolean(row.verified),
         destination_slug: typeof dest === "string" ? dest : "",
         category_slug: typeof cat === "string" ? cat : "",
