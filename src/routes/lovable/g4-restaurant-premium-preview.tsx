@@ -260,6 +260,7 @@ function G4RestaurantPremiumPreview() {
           description="Cuéntame la ocasión y te ayudaré a elegir mesa, horario y lugares cercanos para completar tu recorrido."
           task={`Ayúdame a decidir si ${RESTAURANT.name} es adecuado para mi visita a Valladolid.`}
           prompts={["Cena romántica", "En familia", "Cocina tradicional", "Algo especial"]}
+          className="border-selva/20 bg-selva/[0.06] ring-1 ring-selva/5"
           compact
         />
       </Container>

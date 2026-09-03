@@ -141,7 +141,10 @@ export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
     surface: "landing" as EditorialSurface,
     family: "listing" as const,
     targetRoute: route,
-    visualAuthorityRoute: "/lovable/g5-listing-readiness-preview",
+    visualAuthorityRoute:
+      family === "hoteles" || family === "restaurantes"
+        ? `/lovable/territorial-listing-premium-preview?familia=${family}`
+        : "/lovable/g5-listing-readiness-preview",
     contractVersion: "1.0.0",
     status: "aprobada" as const,
     pageKinds: PAGE_KINDS_BY_FAMILY.listing,

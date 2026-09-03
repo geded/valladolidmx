@@ -8,17 +8,57 @@ import {
   Search,
   SlidersHorizontal,
   Sparkles,
+  UtensilsCrossed,
 } from "lucide-react";
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
-const LOCAL_HOTELS = [
+type TerritorialListingFamily = "hoteles" | "restaurantes";
+
+interface ListingItem {
+  name: string;
+  zone: string;
+  copy: string;
+  image: string;
+  tags: string[];
+  type: string;
+}
+
+interface NearbyItem {
+  name: string;
+  zone: string;
+  image: string;
+}
+
+interface ListingProfile {
+  family: TerritorialListingFamily;
+  breadcrumb: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  resultsTitle: string;
+  itemLabel: string;
+  searchLabel: string;
+  searchPlaceholder: string;
+  aluxQuestion: string;
+  aluxOptions: string[];
+  filters: string[];
+  nearbyTitle: string;
+  mapTitle: string;
+  aluxMapTitle: string;
+  aluxMapDescription: string;
+  items: ListingItem[];
+  nearby: NearbyItem[];
+}
+
+const HOTEL_ITEMS: ListingItem[] = [
   {
     name: "Hacienda San Servacio Boutique",
     zone: "Centro Histórico · Valladolid",
     copy: "Una casona serena para caminar la ciudad y comenzar desde aquí cada ruta.",
     image: `${MEDIA}/hotel-cover.jpg`,
     tags: ["Hotel boutique", "Alberca", "Desayuno yucateco"],
+    type: "Hotel boutique",
   },
   {
     name: "Posada Calzada de los Frailes",
@@ -26,6 +66,7 @@ const LOCAL_HOTELS = [
     copy: "Habitaciones alrededor de un patio de piedra, cerca del convento y la Calzada.",
     image: `${MEDIA}/hotel-gallery-1.jpg`,
     tags: ["Patio colonial", "Céntrico", "Viaje en pareja"],
+    type: "Posada",
   },
   {
     name: "Casa de los Arcos",
@@ -33,10 +74,11 @@ const LOCAL_HOTELS = [
     copy: "Una estancia íntima para explorar mercados, barrios y sabores caminando.",
     image: `${MEDIA}/hotel-gallery-2.jpg`,
     tags: ["Casa histórica", "Terraza", "Cerca del centro"],
+    type: "Hotel urbano",
   },
 ];
 
-const NEARBY = [
+const HOTEL_NEARBY: NearbyItem[] = [
   {
     name: "Hacienda de campo",
     zone: "A 28 km de Valladolid",
@@ -49,14 +91,106 @@ const NEARBY = [
   },
 ];
 
-export function TerritorialListingReviewSurface() {
+const RESTAURANT_ITEMS: ListingItem[] = [
+  {
+    name: "Casa del Maíz · Cocina de Oriente",
+    zone: "Centro Histórico · Valladolid",
+    copy: "Recados, maíz y productos de temporada narran el Oriente Maya desde una mesa contemporánea.",
+    image: `${MEDIA}/restaurant-cover.jpg`,
+    tags: ["Cocina yucateca", "Producto local", "Ideal en pareja"],
+    type: "Cocina de autor",
+  },
+  {
+    name: "El Atrio del Mayab",
+    zone: "Plaza principal · Valladolid",
+    copy: "Sabores regionales frente al corazón de la ciudad, pensados para una comida sin prisa.",
+    image: `${MEDIA}/restaurant-gallery-1.jpg`,
+    tags: ["Regional", "Terraza", "En familia"],
+    type: "Cocina regional",
+  },
+  {
+    name: "Patio de los Frailes",
+    zone: "Barrio de Sisal · Valladolid",
+    copy: "Una cocina íntima junto a la Calzada, con ingredientes locales y ambiente de patio colonial.",
+    image: `${MEDIA}/restaurant-gallery-2.jpg`,
+    tags: ["Cena", "Patio colonial", "Opciones vegetarianas"],
+    type: "Bistró yucateco",
+  },
+];
+
+const RESTAURANT_NEARBY: NearbyItem[] = [
+  {
+    name: "Cocina de comunidad",
+    zone: "A 18 km de Valladolid",
+    image: `${MEDIA}/destination-gallery-1.jpg`,
+  },
+  {
+    name: "Mesa junto al cenote",
+    zone: "A 27 km de Valladolid",
+    image: `${MEDIA}/experience-gallery-1.jpg`,
+  },
+];
+
+const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
+  hoteles: {
+    family: "hoteles",
+    breadcrumb: "Hoteles",
+    eyebrow: "Dónde dormir",
+    title: "Hoteles en Valladolid",
+    description:
+      "Encuentra una estancia que acompañe tu forma de viajar y te conecte con todo el territorio.",
+    resultsTitle: "Hospedajes en Valladolid",
+    itemLabel: "hotel",
+    searchLabel: "Buscar hotel",
+    searchPlaceholder: "Buscar hotel, zona o servicio",
+    aluxQuestion: "¿Cómo te gustaría hospedarte?",
+    aluxOptions: ["Boutique", "En pareja", "En familia", "Con piscina", "Cerca del centro"],
+    filters: ["Zona", "Tipo de hospedaje", "Servicios"],
+    nearbyTitle: "Opciones cerca de Valladolid",
+    mapTitle: "Hoteles en Valladolid",
+    aluxMapTitle: "Dormir bien también organiza la ruta.",
+    aluxMapDescription:
+      "Guarda opciones y Alux calculará noches, trayectos y experiencias cercanas.",
+    items: HOTEL_ITEMS,
+    nearby: HOTEL_NEARBY,
+  },
+  restaurantes: {
+    family: "restaurantes",
+    breadcrumb: "Restaurantes",
+    eyebrow: "Dónde comer",
+    title: "Restaurantes en Valladolid",
+    description:
+      "Descubre cocinas que cuentan el territorio con maíz, recados, producto local y hospitalidad vallisoletana.",
+    resultsTitle: "Mesas en Valladolid",
+    itemLabel: "restaurante",
+    searchLabel: "Buscar restaurante",
+    searchPlaceholder: "Buscar restaurante, cocina o zona",
+    aluxQuestion: "¿Qué experiencia gastronómica buscas?",
+    aluxOptions: ["Cocina local", "En pareja", "En familia", "Terraza", "Cerca de mí"],
+    filters: ["Zona", "Tipo de cocina", "Ideal para"],
+    nearbyTitle: "Sabores cerca de Valladolid",
+    mapTitle: "Restaurantes en Valladolid",
+    aluxMapTitle: "Cada mesa puede abrir una nueva ruta.",
+    aluxMapDescription:
+      "Guarda tus favoritos y Alux los combinará con mercados, barrios y experiencias cercanas.",
+    items: RESTAURANT_ITEMS,
+    nearby: RESTAURANT_NEARBY,
+  },
+};
+
+export function TerritorialListingReviewSurface({
+  family = "hoteles",
+}: {
+  family?: TerritorialListingFamily;
+}) {
+  const profile = PROFILES[family];
   return (
     <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb />
-        <ListingIntro />
-        <AluxBar />
-        <Filters />
+        <TerritorialBreadcrumb profile={profile} />
+        <ListingIntro profile={profile} />
+        <AluxBar profile={profile} />
+        <Filters profile={profile} />
 
         <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
           <div className="min-w-0">
@@ -65,28 +199,28 @@ export function TerritorialListingReviewSurface() {
                 <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
                   Primero en el destino
                 </p>
-                <h2 className="mt-1 font-display text-2xl sm:text-3xl">Hospedajes en Valladolid</h2>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl">{profile.resultsTitle}</h2>
               </div>
               <p className="shrink-0 text-sm text-[#667067]">3 opciones</p>
             </div>
 
             <div className="mt-4 space-y-4">
-              {LOCAL_HOTELS.map((hotel, index) => (
-                <HotelCard key={hotel.name} hotel={hotel} featured={index === 0} />
+              {profile.items.map((item, index) => (
+                <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
             </div>
 
-            <NearbySection />
+            <NearbySection profile={profile} />
           </div>
 
-          <MapPanel />
+          <MapPanel profile={profile} />
         </div>
       </div>
     </main>
   );
 }
 
-function TerritorialBreadcrumb() {
+function TerritorialBreadcrumb({ profile }: { profile: ListingProfile }) {
   return (
     <nav
       aria-label="Ubicación territorial"
@@ -108,24 +242,24 @@ function TerritorialBreadcrumb() {
         Valladolid
       </a>
       <ChevronRight className="size-3 shrink-0" aria-hidden />
-      <span className="font-semibold text-[#17251f]">Hoteles</span>
+      <span className="font-semibold text-[#17251f]">{profile.breadcrumb}</span>
     </nav>
   );
 }
 
-function ListingIntro() {
+function ListingIntro({ profile }: { profile: ListingProfile }) {
+  const Icon = profile.family === "restaurantes" ? UtensilsCrossed : BedDouble;
   return (
     <header className="grid gap-5 border-y border-[#ded7c9] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
       <div className="max-w-3xl">
         <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[#ba641e]">
-          <BedDouble className="size-4" aria-hidden /> Dónde dormir
+          <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
         <h1 className="mt-3 font-display text-[2.4rem] leading-[.98] sm:text-5xl lg:text-6xl">
-          Hoteles en Valladolid
+          {profile.title}
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-[#5d685f] sm:text-lg">
-          Encuentra una estancia que acompañe tu forma de viajar y te conecte con todo el
-          territorio.
+          {profile.description}
         </p>
       </div>
       <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#0d4b38] px-5 text-sm font-semibold text-[#0d4b38]">
@@ -135,8 +269,7 @@ function ListingIntro() {
   );
 }
 
-function AluxBar() {
-  const options = ["Boutique", "En pareja", "En familia", "Con piscina", "Cerca del centro"];
+function AluxBar({ profile }: { profile: ListingProfile }) {
   return (
     <section className="mt-5 overflow-hidden rounded-2xl bg-[#073f31] text-white shadow-[0_12px_30px_rgba(7,63,49,.12)]">
       <div className="grid gap-3 p-4 sm:grid-cols-[auto_1fr] sm:items-center sm:p-5 lg:grid-cols-[auto_1fr_auto]">
@@ -152,9 +285,9 @@ function AluxBar() {
           </div>
         </div>
         <div className="min-w-0 sm:pl-3">
-          <p className="text-sm font-semibold sm:text-base">¿Cómo te gustaría hospedarte?</p>
+          <p className="text-sm font-semibold sm:text-base">{profile.aluxQuestion}</p>
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {options.map((option) => (
+            {profile.aluxOptions.map((option) => (
               <button
                 key={option}
                 className="min-h-9 shrink-0 rounded-full border border-white/25 px-3 text-xs text-white/90"
@@ -172,7 +305,7 @@ function AluxBar() {
   );
 }
 
-function Filters() {
+function Filters({ profile }: { profile: ListingProfile }) {
   return (
     <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
       <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
@@ -181,16 +314,16 @@ function Filters() {
             className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]"
             aria-hidden
           />
-          <span className="sr-only">Buscar hotel</span>
+          <span className="sr-only">{profile.searchLabel}</span>
           <input
-            placeholder="Buscar hotel, zona o servicio"
+            placeholder={profile.searchPlaceholder}
             className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
           />
         </label>
         <button className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden">
           <Map className="size-4" aria-hidden /> Ver mapa
         </button>
-        {["Zona", "Tipo de hospedaje", "Servicios"].map((label) => (
+        {profile.filters.map((label) => (
           <button
             key={label}
             className="inline-flex min-h-11 min-w-max items-center justify-between gap-3 rounded-xl border border-[#ded7c9] bg-[#fbfaf6] px-4 text-sm lg:min-w-0"
@@ -206,19 +339,21 @@ function Filters() {
   );
 }
 
-function HotelCard({
-  hotel,
+function ListingCard({
+  item,
   featured,
+  profile,
 }: {
-  hotel: (typeof LOCAL_HOTELS)[number];
+  item: ListingItem;
   featured: boolean;
+  profile: ListingProfile;
 }) {
   return (
     <article className="group grid min-w-0 grid-cols-[7.25rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm sm:grid-cols-[13rem_minmax(0,1fr)]">
       <div className="relative min-h-[10rem] overflow-hidden bg-[#ded7c9] sm:min-h-[13rem]">
         <img
-          src={hotel.image}
-          alt={hotel.name}
+          src={item.image}
+          alt={item.name}
           className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
         />
         {featured ? (
@@ -231,23 +366,23 @@ function HotelCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[#ba641e]">
-              Hotel boutique
+              {item.type}
             </p>
-            <h3 className="mt-1 font-display text-xl leading-tight sm:text-2xl">{hotel.name}</h3>
+            <h3 className="mt-1 font-display text-xl leading-tight sm:text-2xl">{item.name}</h3>
           </div>
           <button
-            aria-label={`Guardar ${hotel.name}`}
+            aria-label={`Guardar ${item.name}`}
             className="grid size-9 shrink-0 place-items-center rounded-full border border-[#ded7c9]"
           >
             <Heart className="size-4" aria-hidden />
           </button>
         </div>
         <p className="mt-1 flex items-center gap-1 text-xs text-[#697269]">
-          <MapPin className="size-3" aria-hidden /> {hotel.zone}
+          <MapPin className="size-3" aria-hidden /> {item.zone}
         </p>
-        <p className="mt-3 hidden text-sm leading-6 text-[#5d685f] sm:block">{hotel.copy}</p>
+        <p className="mt-3 hidden text-sm leading-6 text-[#5d685f] sm:block">{item.copy}</p>
         <div className="mt-3 hidden flex-wrap gap-2 md:flex">
-          {hotel.tags.map((tag) => (
+          {item.tags.map((tag) => (
             <span key={tag} className="rounded-full bg-[#f1ece2] px-2.5 py-1 text-[11px]">
               {tag}
             </span>
@@ -255,7 +390,7 @@ function HotelCard({
         </div>
         <div className="mt-auto flex items-center gap-2 pt-3">
           <button className="min-h-10 rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
-            Ver hotel
+            Ver {profile.itemLabel}
           </button>
           <button className="hidden min-h-11 rounded-full border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38] sm:inline-flex sm:items-center">
             Agregar a mi viaje
@@ -266,7 +401,7 @@ function HotelCard({
   );
 }
 
-function NearbySection() {
+function NearbySection({ profile }: { profile: ListingProfile }) {
   return (
     <section className="mt-10 border-t border-[#ded7c9] pt-7">
       <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
@@ -274,7 +409,7 @@ function NearbySection() {
       </p>
       <div className="mt-1 flex items-end justify-between gap-4">
         <div>
-          <h2 className="font-display text-2xl sm:text-3xl">Opciones cerca de Valladolid</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">{profile.nearbyTitle}</h2>
           <p className="mt-1 text-sm text-[#667067]">
             Se muestran aparte para conservar claro qué pertenece al destino.
           </p>
@@ -284,7 +419,7 @@ function NearbySection() {
         </a>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
-        {NEARBY.map((item) => (
+        {profile.nearby.map((item) => (
           <article
             key={item.name}
             className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white"
@@ -307,7 +442,7 @@ function NearbySection() {
   );
 }
 
-function MapPanel() {
+function MapPanel({ profile }: { profile: ListingProfile }) {
   return (
     <aside className="order-first hidden sm:block lg:order-none lg:sticky lg:top-24">
       <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
@@ -316,7 +451,7 @@ function MapPanel() {
             <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#ba641e]">
               Mapa territorial
             </p>
-            <h2 className="font-display text-xl">Hoteles en Valladolid</h2>
+            <h2 className="font-display text-xl">{profile.mapTitle}</h2>
           </div>
           <button
             className="grid size-10 place-items-center rounded-full bg-[#efe8da] lg:hidden"
@@ -359,10 +494,8 @@ function MapPanel() {
         <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#f3a61e]">
           Alux conecta tu viaje
         </p>
-        <h2 className="mt-2 font-display text-2xl">Dormir bien también organiza la ruta.</h2>
-        <p className="mt-2 text-sm leading-6 text-white/70">
-          Guarda opciones y Alux calculará noches, trayectos y experiencias cercanas.
-        </p>
+        <h2 className="mt-2 font-display text-2xl">{profile.aluxMapTitle}</h2>
+        <p className="mt-2 text-sm leading-6 text-white/70">{profile.aluxMapDescription}</p>
         <button className="mt-4 min-h-11 rounded-full bg-[#f3a61e] px-5 text-sm font-bold text-[#193126]">
           Personalizar con Alux
         </button>
