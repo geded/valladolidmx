@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Heart,
   Home,
+  Landmark,
   Map,
   MapPin,
   Search,
@@ -21,7 +22,12 @@ import {
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
-type TerritorialListingFamily = "hoteles" | "restaurantes" | "casas-de-vacaciones" | "eventos";
+type TerritorialListingFamily =
+  | "hoteles"
+  | "restaurantes"
+  | "casas-de-vacaciones"
+  | "eventos"
+  | "lugares";
 
 interface ListingItem {
   name: string;
@@ -312,6 +318,30 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: EVENT_ITEMS,
     nearby: EVENT_NEARBY,
   },
+  /* G4-PLACES · sin fixtures: la familia `lugares` sólo se alimenta del
+     PublicListingDTO productivo (points_of_interest). */
+  lugares: {
+    family: "lugares",
+    breadcrumb: "Lugares y sitios de interés",
+    eyebrow: "Qué visitar",
+    title: "Lugares y sitios de interés en Valladolid",
+    description:
+      "Cenotes, conventos, calles y sitios emblemáticos que cuentan la historia viva del Oriente Maya.",
+    resultsTitle: "Lugares en Valladolid",
+    itemLabel: "lugar",
+    searchLabel: "Buscar lugar",
+    searchPlaceholder: "Buscar lugar, tipo o zona",
+    aluxQuestion: "¿Qué te gustaría descubrir?",
+    aluxOptions: ["Cenotes", "Historia colonial", "Cultura maya", "Entrada libre", "Media jornada"],
+    filters: ["Zona", "Tipo de lugar", "Categoría"],
+    nearbyTitle: "Lugares cerca de Valladolid",
+    mapTitle: "Lugares en Valladolid",
+    aluxMapTitle: "Cada lugar abre una nueva ruta.",
+    aluxMapDescription:
+      "Guarda tus imprescindibles y Alux organizará recorridos, tiempos y combinaciones cercanas.",
+    items: [],
+    nearby: [],
+  },
 };
 
 export function TerritorialListingReviewSurface({
@@ -339,6 +369,17 @@ export function TerritorialListingReviewSurface({
   if (family === "eventos") {
     return (
       <EventListingBody
+        profile={profile}
+        items={items}
+        dto={dto}
+        nearbyItems={nearbyItems}
+        lockedDestinationLabel={lockedDestinationLabel ?? dto?.destinationLabel ?? null}
+      />
+    );
+  }
+  if (family === "lugares") {
+    return (
+      <PlaceListingBody
         profile={profile}
         items={items}
         dto={dto}
@@ -481,6 +522,8 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
   const typeKey =
     profile.family === "eventos"
       ? "event_type"
+      : profile.family === "lugares"
+      ? "place_type"
       : profile.family === "restaurantes"
       ? "cuisine_type"
       : profile.family === "casas-de-vacaciones"
@@ -489,6 +532,8 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
   const secondaryKeys =
     profile.family === "eventos"
       ? ["date_range", "audience", "accessibility", "venue_type", "admission_type"]
+      : profile.family === "lugares"
+      ? ["experience_category", "admission_type", "accessibility", "amenities", "duration", "best_time"]
       : profile.family === "restaurantes"
       ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
       : profile.family === "casas-de-vacaciones"
@@ -502,7 +547,9 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     name: item.name,
     zone: item.location?.label ?? profile.breadcrumb,
     copy: item.tagline ?? "",
-    image: item.mediaUrl ?? `${MEDIA}/hotel-cover.jpg`,
+    // G4-PLACES: los lugares sin medio acreditado usan marcador neutral;
+    // nunca heredan una imagen hotelera u otro medio ajeno.
+    image: item.mediaUrl ?? (profile.family === "lugares" ? "" : `${MEDIA}/hotel-cover.jpg`),
     tags: unique([
       ...structuredTags,
       ...item.highlights,
@@ -518,7 +565,19 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
   };
 }
 
-function TerritorialBreadcrumb({ profile }: { profile: ListingProfile }) {
+function TerritorialBreadcrumb({
+  profile,
+  destinationLabel = "Valladolid",
+  destinationSlug = "valladolid",
+  omitDestination = false,
+}: {
+  profile: ListingProfile;
+  /** Destino real del listado contextual; por defecto conserva Valladolid. */
+  destinationLabel?: string;
+  destinationSlug?: string;
+  /** Listados regionales sin destino fijo omiten el nivel de destino. */
+  omitDestination?: boolean;
+}) {
   return (
     <nav
       aria-label="Ubicación territorial"
@@ -535,10 +594,14 @@ function TerritorialBreadcrumb({ profile }: { profile: ListingProfile }) {
       <a href="/oriente-maya" className="hover:text-[#0d4b38]">
         Oriente Maya
       </a>
-      <ChevronRight className="size-3 shrink-0" aria-hidden />
-      <a href="/oriente-maya/valladolid" className="hover:text-[#0d4b38]">
-        Valladolid
-      </a>
+      {!omitDestination ? (
+        <>
+          <ChevronRight className="size-3 shrink-0" aria-hidden />
+          <a href={`/oriente-maya/${destinationSlug}`} className="hover:text-[#0d4b38]">
+            {destinationLabel}
+          </a>
+        </>
+      ) : null}
       <ChevronRight className="size-3 shrink-0" aria-hidden />
       <span className="font-semibold text-[#17251f]">{profile.breadcrumb}</span>
     </nav>
@@ -549,6 +612,8 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
   const Icon =
     profile.family === "eventos"
       ? CalendarDays
+      : profile.family === "lugares"
+      ? Landmark
       : profile.family === "restaurantes"
       ? UtensilsCrossed
       : profile.family === "casas-de-vacaciones"
@@ -712,11 +777,19 @@ function ListingCard({
   return (
     <article className="group grid min-w-0 grid-cols-[7.25rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm sm:grid-cols-[13rem_minmax(0,1fr)]">
       <div className="relative min-h-[10rem] overflow-hidden bg-[#ded7c9] sm:min-h-[13rem]">
-        <img
-          src={item.image}
-          alt={item.name}
-          className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
-        />
+        {item.image ? (
+          <img
+            src={item.image}
+            alt={item.name}
+            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
+          />
+        ) : (
+          /* Marcador neutral: sin medio propio acreditado no se hereda
+             ninguna imagen de otra familia o entidad. */
+          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#efe8da] to-[#ded7c9]">
+            <Landmark className="size-8 text-[#8b9389]" aria-hidden />
+          </div>
+        )}
         {featured ? (
           <span className="absolute left-2 top-2 rounded-full bg-[#f3a61e] px-2 py-1 text-[10px] font-bold text-[#193126]">
             Recomendado
@@ -1220,10 +1293,16 @@ function EventMapPanel({
   profile,
   items,
   title,
+  nounSingular = "evento",
+  nounPlural = "eventos",
+  emptyCoordsMessage = "Los eventos filtrados aún no publican coordenadas de su destino.",
 }: {
   profile: ListingProfile;
   items: ListingItem[];
   title?: string;
+  nounSingular?: string;
+  nounPlural?: string;
+  emptyCoordsMessage?: string;
 }) {
   const points = items
     .map((item, index) => ({
@@ -1284,13 +1363,13 @@ function EventMapPanel({
           ))}
           {!points.length ? (
             <span className="absolute inset-x-6 top-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-center text-xs text-[#5d685f] shadow">
-              Los eventos filtrados aún no publican coordenadas de su destino.
+              {emptyCoordsMessage}
             </span>
           ) : null}
         </div>
         <div className="flex items-center justify-between gap-3 border-t border-[#ded7c9] p-4 text-sm">
           <span className="text-[#5d685f]">
-            {items.length} {items.length === 1 ? "evento" : "eventos"} en el mapa
+            {items.length} {items.length === 1 ? nounSingular : nounPlural} en el mapa
           </span>
         </div>
       </section>
