@@ -175,6 +175,7 @@ import { Route as AuthenticatedCmsRelacionadosIndexRouteImport } from './routes/
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsProductosIndexRouteImport } from './routes/_authenticated/cms/productos.index'
 import { Route as AuthenticatedCmsLugaresIndexRouteImport } from './routes/_authenticated/cms/lugares.index'
+import { Route as AuthenticatedCmsEventosIndexRouteImport } from './routes/_authenticated/cms/eventos.index'
 import { Route as AuthenticatedCmsEmpresasIndexRouteImport } from './routes/_authenticated/cms/empresas.index'
 import { Route as AuthenticatedCmsDestinosIndexRouteImport } from './routes/_authenticated/cms/destinos.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
@@ -1170,6 +1171,12 @@ const AuthenticatedCmsLugaresIndexRoute =
     path: '/lugares/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsEventosIndexRoute =
+  AuthenticatedCmsEventosIndexRouteImport.update({
+    id: '/eventos/',
+    path: '/eventos/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsEmpresasIndexRoute =
   AuthenticatedCmsEmpresasIndexRouteImport.update({
     id: '/empresas/',
@@ -1733,6 +1740,7 @@ export interface FileRoutesByFullPath {
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
   '/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
+  '/cms/eventos/': typeof AuthenticatedCmsEventosIndexRoute
   '/cms/lugares/': typeof AuthenticatedCmsLugaresIndexRoute
   '/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
@@ -1951,6 +1959,7 @@ export interface FileRoutesByTo {
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasIndexRoute
+  '/cms/eventos': typeof AuthenticatedCmsEventosIndexRoute
   '/cms/lugares': typeof AuthenticatedCmsLugaresIndexRoute
   '/cms/productos': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
@@ -2181,6 +2190,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
   '/_authenticated/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
+  '/_authenticated/cms/eventos/': typeof AuthenticatedCmsEventosIndexRoute
   '/_authenticated/cms/lugares/': typeof AuthenticatedCmsLugaresIndexRoute
   '/_authenticated/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
@@ -2411,6 +2421,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/'
     | '/cms/destinos/'
     | '/cms/empresas/'
+    | '/cms/eventos/'
     | '/cms/lugares/'
     | '/cms/productos/'
     | '/cms/regiones/'
@@ -2629,6 +2640,7 @@ export interface FileRouteTypes {
     | '/cms/categorias'
     | '/cms/destinos'
     | '/cms/empresas'
+    | '/cms/eventos'
     | '/cms/lugares'
     | '/cms/productos'
     | '/cms/regiones'
@@ -2858,6 +2870,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/destinos/'
     | '/_authenticated/cms/empresas/'
+    | '/_authenticated/cms/eventos/'
     | '/_authenticated/cms/lugares/'
     | '/_authenticated/cms/productos/'
     | '/_authenticated/cms/regiones/'
@@ -4157,6 +4170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsLugaresIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/eventos/': {
+      id: '/_authenticated/cms/eventos/'
+      path: '/eventos'
+      fullPath: '/cms/eventos/'
+      preLoaderRoute: typeof AuthenticatedCmsEventosIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/empresas/': {
       id: '/_authenticated/cms/empresas/'
       path: '/empresas'
@@ -4888,6 +4908,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsCategoriasIndexRoute: typeof AuthenticatedCmsCategoriasIndexRoute
   AuthenticatedCmsDestinosIndexRoute: typeof AuthenticatedCmsDestinosIndexRoute
   AuthenticatedCmsEmpresasIndexRoute: typeof AuthenticatedCmsEmpresasIndexRoute
+  AuthenticatedCmsEventosIndexRoute: typeof AuthenticatedCmsEventosIndexRoute
   AuthenticatedCmsLugaresIndexRoute: typeof AuthenticatedCmsLugaresIndexRoute
   AuthenticatedCmsProductosIndexRoute: typeof AuthenticatedCmsProductosIndexRoute
   AuthenticatedCmsRegionesIndexRoute: typeof AuthenticatedCmsRegionesIndexRoute
@@ -4937,6 +4958,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsCategoriasIndexRoute: AuthenticatedCmsCategoriasIndexRoute,
   AuthenticatedCmsDestinosIndexRoute: AuthenticatedCmsDestinosIndexRoute,
   AuthenticatedCmsEmpresasIndexRoute: AuthenticatedCmsEmpresasIndexRoute,
+  AuthenticatedCmsEventosIndexRoute: AuthenticatedCmsEventosIndexRoute,
   AuthenticatedCmsLugaresIndexRoute: AuthenticatedCmsLugaresIndexRoute,
   AuthenticatedCmsProductosIndexRoute: AuthenticatedCmsProductosIndexRoute,
   AuthenticatedCmsRegionesIndexRoute: AuthenticatedCmsRegionesIndexRoute,
