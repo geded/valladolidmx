@@ -1397,12 +1397,52 @@ function EventMapPanel({
    destino en la jerarquía canónica (Región > Destino > Subzona > Lugar), por
    lo que se ofrece en la fila principal y depende del destino elegido. */
 const PLACE_SECONDARY_FILTERS = [
+  /* Naturaleza o gestión: sólo aparece cuando existen relaciones reales
+     place_authorities → place_authority_kinds capturadas en el CMS. */
+  { key: "authority_kind", label: "Naturaleza o gestión" },
   { key: "admission_type", label: "Entrada" },
   { key: "accessibility", label: "Accesibilidad" },
   { key: "amenities", label: "Servicios" },
   { key: "duration", label: "Tiempo de visita" },
   { key: "best_time", label: "Mejor momento" },
 ] as const;
+
+type FacetOption = { value: string; label: string; count: number };
+
+/** Selector de faceta con conteo real; las opciones sin resultados se ocultan. */
+function FacetSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: FacetOption[];
+}) {
+  return (
+    <label className="relative min-w-max lg:min-w-0">
+      <span className="sr-only">{label}</span>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+      >
+        <option value="">{label}: todos</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label} ({option.count})
+          </option>
+        ))}
+      </select>
+      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+        ⌄
+      </span>
+    </label>
+  );
+}
 
 function PlaceListingBody({
   profile,
