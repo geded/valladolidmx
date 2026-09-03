@@ -1383,3 +1383,288 @@ function EventMapPanel({
     </aside>
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * LUGARES — G4-PLACES · filtros reales sobre el mismo lenguaje visual.
+ *
+ * Fuente única: `PublicListingDTO` (lecturas reales de
+ * `points_of_interest`). Los atributos estructurados provienen de
+ * columnas reales del CMS; los que no existen simplemente no se
+ * ofrecen como filtro. Cero fixtures.
+ * ------------------------------------------------------------------ */
+
+const PLACE_SECONDARY_FILTERS = [
+  { key: "zone", label: "Zona" },
+  { key: "admission_type", label: "Entrada" },
+  { key: "accessibility", label: "Accesibilidad" },
+  { key: "amenities", label: "Servicios" },
+  { key: "duration", label: "Tiempo de visita" },
+  { key: "best_time", label: "Mejor momento" },
+] as const;
+
+function PlaceListingBody({
+  profile,
+  items,
+  dto,
+  nearbyItems,
+  lockedDestinationLabel,
+}: {
+  profile: ListingProfile;
+  items: ListingItem[];
+  dto?: PublicListingDTO;
+  nearbyItems?: readonly TourismCardVM[];
+  lockedDestinationLabel?: string | null;
+}) {
+  const [query, setQuery] = useState("");
+  const [destino, setDestino] = useState("");
+  const [placeType, setPlaceType] = useState("");
+  const [category, setCategory] = useState("");
+  const [secondary, setSecondary] = useState<Record<string, string>>({});
+  const [showMore, setShowMore] = useState(false);
+
+  const locked = Boolean(lockedDestinationLabel);
+  const destinos = useMemo(() => unique(items.map((item) => item.zone)), [items]);
+  const placeTypes = useMemo(
+    () => unique(items.flatMap((item) => attrOf(item, "place_type").map(humanizeAttributeValue))),
+    [items],
+  );
+  const categories = useMemo(
+    () =>
+      unique(
+        items.flatMap((item) => attrOf(item, "experience_category").map(humanizeAttributeValue)),
+      ),
+    [items],
+  );
+  const secondaryGroups = useMemo(
+    () =>
+      PLACE_SECONDARY_FILTERS.map((group) => ({
+        ...group,
+        options: unique(
+          items.flatMap((item) => attrOf(item, group.key).map(humanizeAttributeValue)),
+        ),
+      })).filter((group) => group.options.length > 0),
+    [items],
+  );
+
+  const activeSecondary = Object.entries(secondary).filter(([, value]) => value);
+  const hasActiveFilters =
+    Boolean(query || placeType || category || (!locked && destino)) || activeSecondary.length > 0;
+
+  const filteredItems = useMemo(() => {
+    const needle = normalize(query);
+    return items.filter((item) => {
+      if (!locked && destino && item.zone !== destino) return false;
+      if (
+        placeType &&
+        !attrOf(item, "place_type").map(humanizeAttributeValue).includes(placeType)
+      ) {
+        return false;
+      }
+      if (
+        category &&
+        !attrOf(item, "experience_category").map(humanizeAttributeValue).includes(category)
+      ) {
+        return false;
+      }
+      for (const [key, value] of activeSecondary) {
+        if (!attrOf(item, key).map(humanizeAttributeValue).includes(value)) return false;
+      }
+      if (!needle) return true;
+      return normalize(
+        [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
+      ).includes(needle);
+    });
+  }, [items, query, destino, placeType, category, activeSecondary, locked]);
+
+  const clearAll = () => {
+    setQuery("");
+    setDestino("");
+    setPlaceType("");
+    setCategory("");
+    setSecondary({});
+  };
+
+  const resultsTitle = lockedDestinationLabel
+    ? `Lugares en ${lockedDestinationLabel}`
+    : dto
+      ? "Lugares del Oriente Maya"
+      : profile.resultsTitle;
+
+  return (
+    <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
+        <TerritorialBreadcrumb
+          profile={profile}
+          destinationLabel={lockedDestinationLabel ?? undefined}
+          destinationSlug={dto?.destinationSlug ?? undefined}
+          omitDestination={!locked}
+        />
+        <ListingIntro
+          profile={
+            lockedDestinationLabel
+              ? { ...profile, title: `Lugares y sitios de interés en ${lockedDestinationLabel}` }
+              : dto
+                ? { ...profile, title: "Lugares y sitios de interés del Oriente Maya" }
+                : profile
+          }
+        />
+        <AluxBar profile={profile} />
+
+        <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+          <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
+            <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
+              <Search
+                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]"
+                aria-hidden
+              />
+              <span className="sr-only">{profile.searchLabel}</span>
+              <input
+                placeholder={profile.searchPlaceholder}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
+              />
+            </label>
+
+            {locked ? (
+              <span className="inline-flex min-h-11 min-w-max items-center gap-2 rounded-xl border border-[#0d4b38]/25 bg-[#0d4b38]/8 px-4 text-sm font-semibold text-[#0d4b38]">
+                <MapPin className="size-4" aria-hidden /> {lockedDestinationLabel}
+              </span>
+            ) : (
+              <EventSelect
+                label="Destino"
+                value={destino}
+                onChange={setDestino}
+                options={destinos}
+              />
+            )}
+
+            {placeTypes.length > 0 ? (
+              <EventSelect
+                label="Tipo de lugar"
+                value={placeType}
+                onChange={setPlaceType}
+                options={placeTypes}
+              />
+            ) : null}
+
+            {categories.length > 0 ? (
+              <EventSelect
+                label="Categoría"
+                value={category}
+                onChange={setCategory}
+                options={categories}
+              />
+            ) : null}
+
+            {secondaryGroups.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setShowMore((value) => !value)}
+                aria-expanded={showMore}
+                className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38]"
+              >
+                <SlidersHorizontal className="size-4" aria-hidden /> Más filtros
+                {activeSecondary.length ? ` (${activeSecondary.length})` : ""}
+              </button>
+            ) : null}
+          </div>
+
+          {showMore && secondaryGroups.length > 0 ? (
+            <div className="mt-3 grid gap-3 border-t border-[#ded7c9] pt-3 sm:grid-cols-2 lg:grid-cols-3">
+              {secondaryGroups.map((group) => (
+                <EventSelect
+                  key={group.key}
+                  label={group.label}
+                  value={secondary[group.key] ?? ""}
+                  onChange={(value) =>
+                    setSecondary((current) => ({ ...current, [group.key]: value }))
+                  }
+                  options={group.options}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {hasActiveFilters ? (
+            <div className="mt-3 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={clearAll}
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          ) : null}
+        </section>
+
+        <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
+          <div className="min-w-0">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                  {lockedDestinationLabel ? "Primero en el destino" : "Territorio y patrimonio"}
+                </p>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl">{resultsTitle}</h2>
+              </div>
+              <p className="shrink-0 text-sm text-[#667067]">
+                {filteredItems.length} {filteredItems.length === 1 ? "lugar" : "lugares"}
+              </p>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {filteredItems.map((item, index) => (
+                <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
+              ))}
+              {!filteredItems.length ? (
+                <div className="rounded-2xl border border-[#ded7c9] bg-white p-8 text-center text-sm text-[#5d685f]">
+                  {dto && !hasActiveFilters
+                    ? dto.emptyMessage
+                    : "No encontramos lugares con esos filtros. Prueba quitando una selección."}
+                </div>
+              ) : null}
+            </div>
+
+            {nearbyItems && nearbyItems.length ? (
+              <section className="mt-10 border-t border-[#ded7c9] pt-7">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                  Amplía la ruta
+                </p>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl">
+                  Lugares cerca de {lockedDestinationLabel}
+                </h2>
+                <p className="mt-1 text-sm text-[#667067]">
+                  Se muestran aparte para conservar claro qué pertenece al destino.
+                </p>
+                <div className="mt-4 space-y-4">
+                  {nearbyItems.slice(0, 6).map((card) => (
+                    <ListingCard
+                      key={card.id}
+                      item={listingItemFromDTO(card, profile)}
+                      featured={false}
+                      profile={profile}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </div>
+
+          <EventMapPanel
+            profile={profile}
+            items={filteredItems}
+            title={
+              lockedDestinationLabel
+                ? `Lugares en ${lockedDestinationLabel}`
+                : "Lugares del Oriente Maya"
+            }
+            nounSingular="lugar"
+            nounPlural="lugares"
+            emptyCoordsMessage="Los lugares filtrados aún no publican coordenadas."
+          />
+        </div>
+      </div>
+    </main>
+  );
+}
