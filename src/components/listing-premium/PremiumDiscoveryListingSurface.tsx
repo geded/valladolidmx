@@ -166,9 +166,9 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
   },
   "casas-de-vacaciones": {
     family: "casas-de-vacaciones",
-    eyebrow: "Estancias completas para vivir el territorio",
-    title: "Casas de vacaciones en el Oriente Maya",
-    subtitle: "Encuentra una casa según tu grupo, tus noches y la ruta que quieres descubrir.",
+    eyebrow: "Estancias completas · Valladolid y Oriente Maya",
+    title: "Casas para vivir Valladolid y descubrir el territorio",
+    subtitle: "Elige una casa para tu grupo y conviértela en punto de partida hacia cenotes, comunidades y pueblos del Oriente Maya.",
     aluxTitle: "¿Cómo quieres vivir tu estancia?",
     prompts: ["Viaje familiar", "En pareja", "Con amigos", "Con piscina", "Estancia larga"],
     primaryFilterLabel: "Tipo de propiedad",
@@ -182,18 +182,18 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
     heroSlides: [
       {
         src: HOTEL_MEDIA[0],
-        label: "Casas coloniales",
-        alt: "Visual conceptual temporal de estancia colonial en el Oriente Maya",
+        label: "Valladolid colonial",
+        alt: "Casa de inspiración colonial para una estancia en Valladolid",
       },
       {
         src: HOTEL_MEDIA[1],
-        label: "Estancias rurales",
-        alt: "Visual conceptual temporal de estancia rural en el Oriente Maya",
+        label: "Cerca de la naturaleza",
+        alt: "Casa desde la cual explorar el paisaje del Oriente Maya",
       },
       {
         src: HOTEL_MEDIA[2],
-        label: "Casas cerca de la costa",
-        alt: "Visual conceptual temporal de estancia cercana a la costa del Oriente Maya",
+        label: "Rutas hacia la costa",
+        alt: "Casa como punto de partida hacia la costa del Oriente Maya",
       },
     ],
     icon: <Home className="size-4" aria-hidden />,
@@ -342,7 +342,7 @@ export function PremiumDiscoveryListingSurface({
 
   return (
     <div className="pb-12">
-      <div className="mx-auto max-w-[94rem] px-3 sm:px-5 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <PremiumHero profile={profile} hero={hero} cinematic={cinematic} />
         <AluxPreferenceBar profile={profile} />
         <FilterBar
@@ -420,11 +420,11 @@ function PremiumHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-b-[2rem] border-x border-b border-border bg-selva shadow-soft",
-        cinematic ? "min-h-[34rem]" : "grid min-h-[22rem] lg:grid-cols-2",
+        "relative overflow-hidden rounded-[2rem] border border-border bg-selva shadow-soft",
+        cinematic ? "min-h-[38rem]" : "grid min-h-[31rem] lg:grid-cols-[1.08fr_.92fr]",
       )}
     >
-      <div className={cn("relative min-h-64 overflow-hidden", cinematic && "absolute inset-0")}>
+      <div className={cn("relative min-h-[20rem] overflow-hidden sm:min-h-[24rem]", cinematic && "absolute inset-0")}>
         <img src={hero.src} alt={hero.alt} className="absolute inset-0 size-full object-cover" />
         <div
           className={cn(
@@ -443,7 +443,7 @@ function PremiumHero({
       <div
         className={cn(
           "relative flex flex-col justify-center px-7 py-10 text-white sm:px-10 lg:px-12",
-          cinematic ? "min-h-[34rem] max-w-3xl" : "bg-selva",
+          cinematic ? "min-h-[38rem] max-w-3xl" : "bg-selva",
         )}
       >
         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
@@ -467,10 +467,10 @@ function PremiumHero({
 function AluxPreferenceBar({ profile }: { profile: FamilyProfile }) {
   return (
     <TourismAluxPanel
-      className="relative z-10 -mt-1 rounded-t-none"
+      className="relative z-10 mt-4"
       title={profile.aluxTitle}
       description={`Cuéntame si estás planeando venir o si ya estás aquí. Ajustaré ${profile.itemNounPlural}, rutas y tiempos a tu momento real.`}
-      task={`Ayúdame a ${profile.family === "hoteles" ? "elegir dónde hospedarme" : "elegir dónde comer"} en el Oriente Maya.`}
+      task={`Ayúdame a ${profile.family === "hoteles" ? "elegir dónde hospedarme" : profile.family === "casas-de-vacaciones" ? "elegir una casa de vacaciones" : "elegir dónde comer"} en el Oriente Maya.`}
       prompts={profile.prompts}
       compact
     />
