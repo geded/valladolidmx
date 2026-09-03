@@ -1548,6 +1548,7 @@ export type Database = {
           description: string | null
           destination_id: string
           display_name: string
+          filter_attributes: Json
           id: string
           is_demo_seed: boolean
           last_verified_at: string | null
@@ -1582,6 +1583,7 @@ export type Database = {
           description?: string | null
           destination_id: string
           display_name: string
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -1616,6 +1618,7 @@ export type Database = {
           description?: string | null
           destination_id?: string
           display_name?: string
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -6359,6 +6362,95 @@ export type Database = {
         }
         Relationships: []
       }
+      tourism_attribute_definitions: {
+        Row: {
+          active: boolean
+          attribute_key: string
+          created_at: string
+          family_key: string
+          filter_group: string
+          filterable: boolean
+          help_text: string | null
+          id: string
+          input_type: string
+          label: string
+          required: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          attribute_key: string
+          created_at?: string
+          family_key: string
+          filter_group: string
+          filterable?: boolean
+          help_text?: string | null
+          id?: string
+          input_type: string
+          label: string
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          attribute_key?: string
+          created_at?: string
+          family_key?: string
+          filter_group?: string
+          filterable?: boolean
+          help_text?: string | null
+          id?: string
+          input_type?: string
+          label?: string
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tourism_attribute_options: {
+        Row: {
+          active: boolean
+          created_at: string
+          definition_id: string
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          definition_id: string
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          definition_id?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourism_attribute_options_definition_id_fkey"
+            columns: ["definition_id"]
+            isOneToOne: false
+            referencedRelation: "tourism_attribute_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tourism_regions: {
         Row: {
           created_at: string
@@ -8517,6 +8609,10 @@ export type Database = {
       }
       resolve_business_claim_state: {
         Args: { _business_id: string }
+        Returns: string
+      }
+      resolve_tourism_attribute_family: {
+        Args: { _category_slug: string }
         Returns: string
       }
       review_entity_presentation_mode: {
