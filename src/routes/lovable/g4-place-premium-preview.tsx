@@ -83,10 +83,11 @@ function PlacePremiumPreview() {
   return (
     <PublicShell crumbs={crumbs} variant="hero">
       {conceptual ? (
-        <div className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 lg:px-8">
-          <p className="rounded-2xl border border-dashed border-border bg-muted/40 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
-            Datos de prueba: las imágenes son representaciones conceptuales generadas con IA,
-            temporales y pendientes de sustitución por fotografía real.
+        <div className="mx-auto w-full max-w-7xl px-4 pt-2 sm:px-6 sm:pt-3 lg:px-8">
+          {/* Móvil: chip de una línea; desde `sm` el aviso completo. */}
+          <p className="truncate rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 text-[11px] leading-4 text-muted-foreground sm:overflow-visible sm:whitespace-normal sm:rounded-2xl sm:py-2 sm:leading-relaxed">
+            Datos de prueba: imágenes conceptuales generadas con IA, temporales y pendientes de
+            sustitución por fotografía real.
           </p>
         </div>
       ) : null}
