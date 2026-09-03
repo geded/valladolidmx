@@ -10,6 +10,13 @@ import {
   Sparkles,
   UtensilsCrossed,
 } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
+import {
+  attributeValues,
+  humanizeAttributeValue,
+} from "@/lib/business-attributes/types";
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
@@ -22,6 +29,8 @@ interface ListingItem {
   image: string;
   tags: string[];
   type: string;
+  href?: string;
+  source?: TourismCardVM;
 }
 
 interface NearbyItem {
@@ -242,17 +251,58 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
 
 export function TerritorialListingReviewSurface({
   family = "hoteles",
+  dto,
 }: {
   family?: TerritorialListingFamily;
+  dto?: PublicListingDTO;
 }) {
   const profile = PROFILES[family];
+  const [query, setQuery] = useState("");
+  const [zone, setZone] = useState("");
+  const [primary, setPrimary] = useState("");
+  const [secondary, setSecondary] = useState("");
+  const items = useMemo(
+    () => (dto ? dto.items.map((item) => listingItemFromDTO(item, profile)) : profile.items),
+    [dto, profile],
+  );
+  const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
+  const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
+  const secondaryValues = useMemo(
+    () => unique(items.flatMap((item) => item.tags)).slice(0, 18),
+    [items],
+  );
+  const filteredItems = useMemo(() => {
+    const needle = normalize(query);
+    return items.filter((item) => {
+      if (zone && itemZone(item) !== zone) return false;
+      if (primary && item.type !== primary) return false;
+      if (secondary && !item.tags.includes(secondary)) return false;
+      if (!needle) return true;
+      return normalize([item.name, item.zone, item.copy, item.type, ...item.tags].join(" ")).includes(
+        needle,
+      );
+    });
+  }, [items, primary, query, secondary, zone]);
   return (
     <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
         <TerritorialBreadcrumb profile={profile} />
         <ListingIntro profile={profile} />
         <AluxBar profile={profile} />
-        <Filters profile={profile} />
+        <Filters
+          profile={profile}
+          query={query}
+          setQuery={setQuery}
+          zone={zone}
+          setZone={setZone}
+          zones={zones}
+          primary={primary}
+          setPrimary={setPrimary}
+          primaryValues={primaryValues}
+          secondary={secondary}
+          setSecondary={setSecondary}
+          secondaryValues={secondaryValues}
+        />
 
         <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
           <div className="min-w-0">
@@ -263,16 +313,23 @@ export function TerritorialListingReviewSurface({
                 </p>
                 <h2 className="mt-1 font-display text-2xl sm:text-3xl">{profile.resultsTitle}</h2>
               </div>
-              <p className="shrink-0 text-sm text-[#667067]">3 opciones</p>
+              <p className="shrink-0 text-sm text-[#667067]">
+                {filteredItems.length} {filteredItems.length === 1 ? "opción" : "opciones"}
+              </p>
             </div>
 
             <div className="mt-4 space-y-4">
-              {profile.items.map((item, index) => (
+              {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
+              {!filteredItems.length ? (
+                <div className="rounded-2xl border border-[#ded7c9] bg-white p-8 text-center text-sm text-[#5d685f]">
+                  No encontramos opciones con esos filtros. Prueba quitando una selección.
+                </div>
+              ) : null}
             </div>
 
-            <NearbySection profile={profile} />
+            {!dto ? <NearbySection profile={profile} /> : null}
           </div>
 
           <MapPanel profile={profile} />
@@ -280,6 +337,54 @@ export function TerritorialListingReviewSurface({
       </div>
     </main>
   );
+}
+
+function normalize(value: string): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function unique(values: string[]): string[] {
+  return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function itemZone(item: ListingItem): string {
+  const structured = item.source ? attributeValues(item.source.filterAttributes?.zone)[0] : null;
+  return structured ? humanizeAttributeValue(structured) : item.zone;
+}
+
+function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): ListingItem {
+  const typeKey =
+    profile.family === "restaurantes"
+      ? "cuisine_type"
+      : profile.family === "casas-de-vacaciones"
+        ? "property_type"
+        : "hotel_type";
+  const secondaryKeys =
+    profile.family === "restaurantes"
+      ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
+      : profile.family === "casas-de-vacaciones"
+        ? ["capacity", "bedrooms", "amenities", "stay_features", "traveler_profile", "price_level"]
+        : ["services", "amenities", "accessibility", "traveler_profile", "price_level"];
+  const structuredType = attributeValues(item.filterAttributes?.[typeKey])[0];
+  const structuredTags = secondaryKeys.flatMap((key) =>
+    attributeValues(item.filterAttributes?.[key]).map(humanizeAttributeValue),
+  );
+  return {
+    name: item.name,
+    zone: item.location?.label ?? profile.breadcrumb,
+    copy: item.tagline ?? "",
+    image: item.mediaUrl ?? `${MEDIA}/hotel-cover.jpg`,
+    tags: unique([
+      ...structuredTags,
+      ...item.highlights,
+      ...item.badges.map((badge) => badge.label),
+    ]),
+    type: structuredType
+      ? humanizeAttributeValue(structuredType)
+      : item.eyebrow?.trim() || profile.itemLabel,
+    href: item.href ?? undefined,
+    source: item,
+  };
 }
 
 function TerritorialBreadcrumb({ profile }: { profile: ListingProfile }) {
@@ -372,7 +477,43 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
   );
 }
 
-function Filters({ profile }: { profile: ListingProfile }) {
+function Filters({
+  profile,
+  query,
+  setQuery,
+  zone,
+  setZone,
+  zones,
+  primary,
+  setPrimary,
+  primaryValues,
+  secondary,
+  setSecondary,
+  secondaryValues,
+}: {
+  profile: ListingProfile;
+  query: string;
+  setQuery: (value: string) => void;
+  zone: string;
+  setZone: (value: string) => void;
+  zones: string[];
+  primary: string;
+  setPrimary: (value: string) => void;
+  primaryValues: string[];
+  secondary: string;
+  setSecondary: (value: string) => void;
+  secondaryValues: string[];
+}) {
+  const selects = [
+    { label: profile.filters[0], value: zone, setValue: setZone, options: zones },
+    { label: profile.filters[1], value: primary, setValue: setPrimary, options: primaryValues },
+    {
+      label: profile.filters[2],
+      value: secondary,
+      setValue: setSecondary,
+      options: secondaryValues,
+    },
+  ];
   return (
     <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
       <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
@@ -384,22 +525,42 @@ function Filters({ profile }: { profile: ListingProfile }) {
           <span className="sr-only">{profile.searchLabel}</span>
           <input
             placeholder={profile.searchPlaceholder}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
             className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
           />
         </label>
         <button className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden">
           <Map className="size-4" aria-hidden /> Ver mapa
         </button>
-        {profile.filters.map((label) => (
-          <button
-            key={label}
-            className="inline-flex min-h-11 min-w-max items-center justify-between gap-3 rounded-xl border border-[#ded7c9] bg-[#fbfaf6] px-4 text-sm lg:min-w-0"
-          >
-            {label} <span className="text-xs">⌄</span>
-          </button>
+        {selects.map(({ label, value, setValue, options }) => (
+          <label key={label} className="relative min-w-max lg:min-w-0">
+            <span className="sr-only">{label}</span>
+            <select
+              aria-label={label}
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+            >
+              <option value="">{label}: todos</option>
+              {options.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">⌄</span>
+          </label>
         ))}
-        <button className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold">
-          <SlidersHorizontal className="size-4" aria-hidden /> Más filtros
+        <button
+          type="button"
+          onClick={() => {
+            setQuery("");
+            setZone("");
+            setPrimary("");
+            setSecondary("");
+          }}
+          className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
+        >
+          <SlidersHorizontal className="size-4" aria-hidden /> Limpiar
         </button>
       </div>
     </section>
@@ -456,9 +617,15 @@ function ListingCard({
           ))}
         </div>
         <div className="mt-auto flex items-center gap-2 pt-3">
-          <button className="min-h-10 rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
-            Ver {profile.itemLabel}
-          </button>
+          {item.href ? (
+            <a href={item.href} className="inline-flex min-h-10 items-center rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
+              Ver {profile.itemLabel}
+            </a>
+          ) : (
+            <button className="min-h-10 rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
+              Ver {profile.itemLabel}
+            </button>
+          )}
           <button className="hidden min-h-11 rounded-full border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38] sm:inline-flex sm:items-center">
             Agregar a mi viaje
           </button>
