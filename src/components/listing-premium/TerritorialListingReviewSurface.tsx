@@ -1,5 +1,6 @@
 import {
   BedDouble,
+  CalendarDays,
   ChevronRight,
   Heart,
   Home,
@@ -20,7 +21,7 @@ import {
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
-type TerritorialListingFamily = "hoteles" | "restaurantes" | "casas-de-vacaciones";
+type TerritorialListingFamily = "hoteles" | "restaurantes" | "casas-de-vacaciones" | "eventos";
 
 interface ListingItem {
   name: string;
@@ -180,6 +181,46 @@ const VACATION_RENTAL_NEARBY: NearbyItem[] = [
   },
 ];
 
+const EVENT_ITEMS: ListingItem[] = [
+  {
+    name: "Noche de Valladolid",
+    zone: "Centro Histórico · Valladolid",
+    copy: "Trova, patrimonio y sabores locales para vivir la ciudad cuando cae la tarde.",
+    image: `${MEDIA}/destination-gallery-1.jpg`,
+    tags: ["14 septiembre", "19:00 h", "Cultural", "Entrada libre"],
+    type: "Cultura y tradición",
+  },
+  {
+    name: "Encuentro de cocinas del Oriente",
+    zone: "Barrio de Sisal · Valladolid",
+    copy: "Cocineras, productores y mesas compartidas alrededor de los sabores de la región.",
+    image: `${MEDIA}/restaurant-gallery-1.jpg`,
+    tags: ["21 septiembre", "12:00 h", "Gastronomía", "En familia"],
+    type: "Gastronomía",
+  },
+  {
+    name: "Música bajo las estrellas",
+    zone: "Calzada de los Frailes · Valladolid",
+    copy: "Una velada íntima que conecta música yucateca con el paisaje nocturno de Valladolid.",
+    image: `${MEDIA}/destination-cover.jpg`,
+    tags: ["28 septiembre", "20:00 h", "Música", "Reservación"],
+    type: "Música",
+  },
+];
+
+const EVENT_NEARBY: NearbyItem[] = [
+  {
+    name: "Fiesta tradicional de comunidad",
+    zone: "A 18 km de Valladolid",
+    image: `${MEDIA}/destination-gallery-2.jpg`,
+  },
+  {
+    name: "Agenda cultural de Espita",
+    zone: "A 27 km de Valladolid",
+    image: `${MEDIA}/experience-gallery-1.jpg`,
+  },
+];
+
 const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
   hoteles: {
     family: "hoteles",
@@ -246,6 +287,28 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
       "Guarda opciones y Alux conectará huéspedes, noches, trayectos y experiencias cercanas.",
     items: VACATION_RENTAL_ITEMS,
     nearby: VACATION_RENTAL_NEARBY,
+  },
+  eventos: {
+    family: "eventos",
+    breadcrumb: "Eventos",
+    eyebrow: "Qué sucede",
+    title: "Eventos en Valladolid",
+    description:
+      "Encuentra lo que sucede durante tu estancia y convierte cada fecha en una forma de descubrir el territorio.",
+    resultsTitle: "Agenda en Valladolid",
+    itemLabel: "evento",
+    searchLabel: "Buscar evento",
+    searchPlaceholder: "Buscar evento, fecha o sede",
+    aluxQuestion: "¿Qué fechas estarás en la región?",
+    aluxOptions: ["Este fin de semana", "En familia", "Cultura", "Gastronomía", "Entrada libre"],
+    filters: ["Fecha", "Tipo de evento", "Ideal para"],
+    nearbyTitle: "Eventos cerca de Valladolid",
+    mapTitle: "Eventos en Valladolid",
+    aluxMapTitle: "Tu agenda también puede descubrir territorio.",
+    aluxMapDescription:
+      "Dime tus fechas y Alux combinará eventos, trayectos y experiencias sin romper el ritmo del viaje.",
+    items: EVENT_ITEMS,
+    nearby: EVENT_NEARBY,
   },
 };
 
@@ -354,13 +417,17 @@ function itemZone(item: ListingItem): string {
 
 function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): ListingItem {
   const typeKey =
-    profile.family === "restaurantes"
+    profile.family === "eventos"
+      ? "event_type"
+      : profile.family === "restaurantes"
       ? "cuisine_type"
       : profile.family === "casas-de-vacaciones"
         ? "property_type"
         : "hotel_type";
   const secondaryKeys =
-    profile.family === "restaurantes"
+    profile.family === "eventos"
+      ? ["date_range", "audience", "accessibility", "venue_type", "admission_type"]
+      : profile.family === "restaurantes"
       ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
       : profile.family === "casas-de-vacaciones"
         ? ["capacity", "bedrooms", "amenities", "stay_features", "traveler_profile", "price_level"]
@@ -416,7 +483,9 @@ function TerritorialBreadcrumb({ profile }: { profile: ListingProfile }) {
 
 function ListingIntro({ profile }: { profile: ListingProfile }) {
   const Icon =
-    profile.family === "restaurantes"
+    profile.family === "eventos"
+      ? CalendarDays
+      : profile.family === "restaurantes"
       ? UtensilsCrossed
       : profile.family === "casas-de-vacaciones"
         ? Home
