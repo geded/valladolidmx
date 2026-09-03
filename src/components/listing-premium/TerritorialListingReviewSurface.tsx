@@ -512,6 +512,8 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
       ? humanizeAttributeValue(structuredType)
       : item.eyebrow?.trim() || profile.itemLabel,
     href: item.href ?? undefined,
+    startsAt: item.startsAt ?? null,
+
     source: item,
   };
 }
