@@ -204,9 +204,11 @@ export function PlacePremiumSurface({
         </>
       ) : (
         <>
-          <Container className="mt-4">
-            <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-          </Container>
+          {showBreadcrumbs ? (
+            <Container className="mt-4">
+              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+            </Container>
+          ) : null}
           <Container className="mt-5">
             <HeroEditorial content={content} />
           </Container>
