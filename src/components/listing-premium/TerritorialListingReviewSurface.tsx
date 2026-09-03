@@ -1061,6 +1061,7 @@ function EventListingBody({
 
   const clearAll = () => {
     setQuery("");
+    setFamily("");
     setDestino("");
     setDateRange("");
     setEventType("");
@@ -1088,7 +1089,39 @@ function EventListingBody({
         />
         <AluxBar profile={profile} />
 
-        <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+        <div
+          role="group"
+          aria-label="Familia de atractivo"
+          className="mt-4 flex flex-wrap items-center gap-2"
+        >
+          {[
+            { value: "", label: "Todos" },
+            { value: "tangible", label: "Tangibles", count: familyCounts.tangible },
+            { value: "intangible", label: "Intangibles", count: familyCounts.intangible },
+          ].map((option) => {
+            const active = family === option.value;
+            return (
+              <button
+                key={option.value || "todos"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setFamily(option.value)}
+                className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                  active
+                    ? "border-[#0d4b38] bg-[#0d4b38] text-white"
+                    : "border-[#ded7c9] bg-white text-[#17251f]"
+                }`}
+              >
+                {option.label}
+                {typeof option.count === "number" ? (
+                  <span className={active ? "text-white/75" : "text-[#788078]"}>{option.count}</span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        <section className="mt-3 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
           <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
             <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
               <Search
@@ -1416,6 +1449,7 @@ function PlaceListingBody({
   lockedDestinationLabel?: string | null;
 }) {
   const [query, setQuery] = useState("");
+  const [family, setFamily] = useState("");
   const [destino, setDestino] = useState("");
   const [placeType, setPlaceType] = useState("");
   const [category, setCategory] = useState("");
@@ -1446,13 +1480,28 @@ function PlaceListingBody({
     [items],
   );
 
+  /* Clasificación principal del Inventario de Atractivos del Oriente Maya:
+     dos familias documentales (tangibles e intangibles). Se muestra siempre,
+     por encima del tipo específico y de las categorías de descubrimiento. */
+  const familyCounts = useMemo(() => {
+    const counts = { tangible: 0, intangible: 0 };
+    for (const item of items) {
+      const value = attrOf(item, "attraction_family")[0];
+      if (value === "intangible") counts.intangible += 1;
+      else if (value === "tangible") counts.tangible += 1;
+    }
+    return counts;
+  }, [items]);
+
   const activeSecondary = Object.entries(secondary).filter(([, value]) => value);
   const hasActiveFilters =
-    Boolean(query || placeType || category || (!locked && destino)) || activeSecondary.length > 0;
+    Boolean(query || family || placeType || category || (!locked && destino)) ||
+    activeSecondary.length > 0;
 
   const filteredItems = useMemo(() => {
     const needle = normalize(query);
     return items.filter((item) => {
+      if (family && !attrOf(item, "attraction_family").includes(family)) return false;
       if (!locked && destino && item.zone !== destino) return false;
       if (
         placeType &&
@@ -1474,7 +1523,7 @@ function PlaceListingBody({
         [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
       ).includes(needle);
     });
-  }, [items, query, destino, placeType, category, activeSecondary, locked]);
+  }, [items, query, family, destino, placeType, category, activeSecondary, locked]);
 
   const clearAll = () => {
     setQuery("");
