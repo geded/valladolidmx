@@ -298,8 +298,9 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("events")
       .select(
-        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name ), media_assets:cover_media_id ( storage_bucket, storage_path ), businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
+        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, filter_attributes, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path ), businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
       )
+
       .eq("slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
