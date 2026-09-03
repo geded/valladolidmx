@@ -52,6 +52,11 @@ export interface PlacePremiumSurfaceProps {
    * ruta. La superficie sigue siendo render-only: sólo lo posiciona.
    */
   aluxSlot?: ReactNode;
+  /**
+   * G4-PLACES · cuando la ruta ya renderiza el breadcrumb territorial
+   * compartido (`PublicShell`), la superficie no debe duplicarlo.
+   */
+  showBreadcrumbs?: boolean;
   className?: string;
 }
 
@@ -62,6 +67,7 @@ export function PlacePremiumSurface({
   builderNotice = null,
   draftNotice = null,
   aluxSlot = null,
+  showBreadcrumbs = true,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
@@ -78,7 +84,10 @@ export function PlacePremiumSurface({
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
       variant: "cluster",
-      heading: content.map.heading,
+      /* El encabezado ya lo aporta `SectionHeading`: el bloque de mapa no
+         debe repetirlo (paridad con el resto de fichas Premium). */
+      heading: null,
+
       center: content.map.center,
       points: content.map.points.map((p) => ({
         id: p.id,
@@ -138,13 +147,13 @@ export function PlacePremiumSurface({
 
       {cinematic ? (
         <>
-          {/* Breadcrumb territorial permanente: visible ANTES del hero y
-              persistente al hacer scroll, igual que en Editorial. */}
-          <div className="sticky top-0 z-20 mt-4 border-y border-border bg-background/90 backdrop-blur">
-            <Container className="py-1.5">
-              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-            </Container>
-          </div>
+          {showBreadcrumbs ? (
+            <div className="sticky top-0 z-20 mt-4 border-y border-border bg-background/90 backdrop-blur">
+              <Container className="py-1.5">
+                <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+              </Container>
+            </div>
+          ) : null}
           <div className="mt-4">
             <PremiumHero
               vm={{
@@ -195,9 +204,11 @@ export function PlacePremiumSurface({
         </>
       ) : (
         <>
-          <Container className="mt-4">
-            <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-          </Container>
+          {showBreadcrumbs ? (
+            <Container className="mt-4">
+              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+            </Container>
+          ) : null}
           <Container className="mt-5">
             <HeroEditorial content={content} />
           </Container>
@@ -497,32 +508,41 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
   return (
     <section
       aria-label="Presentación del lugar"
-      /* Patrón editorial aprobado (paridad con Eventos/Hoteles): la
-         información y los datos van a la IZQUIERDA, la galería a la
-         DERECHA. En móvil la imagen abre la ficha. */
-      className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:items-center"
+      /* Composición editorial aprobada (paridad exacta con la ficha de
+         Evento y con hoteles/restaurantes): una sola tarjeta contenedora,
+         información y datos a la IZQUIERDA, galería a la DERECHA. */
+      className="grid gap-7 overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9"
     >
-      <div className="order-2 flex flex-col justify-center rounded-3xl border border-border bg-card p-6 sm:p-8 lg:order-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-          {content.identity.eyebrow}
-        </p>
-        <h1 className="mt-3 text-balance font-serif text-4xl leading-[1.02] sm:text-5xl">
+      <div className="order-2 lg:order-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-pill border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+            {content.identity.eyebrow}
+          </span>
+          <span className="rounded-pill border border-border px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            {content.identity.destinationLabel} · {content.identity.regionLabel}
+          </span>
+        </div>
+        <h1 className="mt-4 text-balance font-serif text-4xl leading-[1.04] tracking-tight sm:text-5xl">
           {content.identity.title}
         </h1>
-        <p className="mt-4 text-pretty leading-7 text-muted-foreground">
-          {content.identity.subtitle}
-        </p>
-        <ul className="mt-5 flex flex-wrap gap-2" aria-label="Clasificación">
-          {content.identity.badges.map((badge) => (
-            <li
-              key={badge}
-              className="rounded-pill border border-border bg-background px-3 py-1 text-xs font-medium"
-            >
-              {badge}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-6 flex flex-wrap gap-3">
+        {content.identity.subtitle ? (
+          <p className="mt-3 text-pretty text-lg leading-7 text-muted-foreground">
+            {content.identity.subtitle}
+          </p>
+        ) : null}
+        {content.identity.badges.length ? (
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Clasificación">
+            {content.identity.badges.map((badge) => (
+              <li
+                key={badge}
+                className="rounded-pill border border-border bg-background px-3 py-1 text-xs font-medium"
+              >
+                {badge}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Button type="button" className="min-h-11 rounded-pill">
             {content.hero.primaryCta.label}
           </Button>
@@ -534,7 +554,7 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
       <div className="order-1 lg:order-2">
         <DemoImage
           media={content.hero.cover}
-          className="aspect-[4/3] rounded-3xl lg:aspect-[5/4]"
+          className="h-56 w-full rounded-3xl sm:h-72 lg:h-[26rem]"
         />
         {content.hero.supporting.length ? (
           <div className="mt-3 grid grid-cols-2 gap-3">
@@ -551,6 +571,7 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
     </section>
   );
 }
+
 
 function IntroEditorial({ content }: { content: PlacePremiumContent }) {
   return (

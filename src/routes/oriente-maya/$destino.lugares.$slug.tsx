@@ -16,6 +16,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { PublicShell } from "@/components/discovery";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
   adaptPlaceToPremiumSurface,
@@ -107,23 +108,35 @@ function PlaceRoute() {
     return <PlaceNotFound />;
   }
 
+  /* Shell público compartido (paridad exacta con eventos/hoteles):
+     breadcrumb territorial y contenedor común provienen del sistema. */
+  const crumbs = projection.content.breadcrumbs.map((c) => ({
+    label: c.label,
+    ...(c.href ? { to: c.href } : {}),
+  }));
+
   return (
-    <PlacePremiumSurface
-      content={projection.content}
-      presentation={projection.presentation}
-      variant={binding?.variant ?? projection.variant ?? undefined}
-      builderNotice={projection.resolution.builderNotice}
-      draftNotice={isDraft ? "Borrador · no publicado" : null}
-      aluxSlot={
-        <TourismAluxPanel
-          title="¿Cuándo estarás en la región?"
-          description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
-          task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
-          prompts={projection.content.alux.prompts}
-          compact
+    <PublicShell crumbs={crumbs}>
+      <div className="bg-background">
+        <PlacePremiumSurface
+          content={projection.content}
+          presentation={projection.presentation}
+          variant={binding?.variant ?? projection.variant ?? undefined}
+          builderNotice={projection.resolution.builderNotice}
+          draftNotice={isDraft ? "Borrador · no publicado" : null}
+          showBreadcrumbs={false}
+          aluxSlot={
+            <TourismAluxPanel
+              title="¿Cuándo estarás en la región?"
+              description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+              task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
+              prompts={projection.content.alux.prompts}
+              compact
+            />
+          }
         />
-      }
-    />
+      </div>
+    </PublicShell>
   );
 }
 
