@@ -5333,6 +5333,7 @@ export type Database = {
       }
       place_types: {
         Row: {
+          attraction_family: string
           created_at: string
           description: string | null
           id: string
@@ -5343,6 +5344,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attraction_family?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -5353,6 +5355,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attraction_family?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -5436,6 +5439,7 @@ export type Database = {
           address_line: string | null
           admission_kind: string | null
           amenities: Json
+          attraction_family: string | null
           best_time_to_visit: string | null
           contact_email: string | null
           contact_phone: string | null
@@ -5479,6 +5483,7 @@ export type Database = {
           address_line?: string | null
           admission_kind?: string | null
           amenities?: Json
+          attraction_family?: string | null
           best_time_to_visit?: string | null
           contact_email?: string | null
           contact_phone?: string | null
@@ -5522,6 +5527,7 @@ export type Database = {
           address_line?: string | null
           admission_kind?: string | null
           amenities?: Json
+          attraction_family?: string | null
           best_time_to_visit?: string | null
           contact_email?: string | null
           contact_phone?: string | null
