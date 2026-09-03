@@ -14,23 +14,29 @@
  */
 import type { MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import type { PublicPlaceCard } from "@/lib/places/place-public-contract";
 import type { Destination } from "@/types/territory";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import {
   businessToTourismCard,
   eventToTourismCard,
+  placeToTourismCard,
   destinationToTourismCard,
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { ORIENTE_MAYA } from "@/config/regions";
 
-export const LISTING_PUBLIC_CONTRACT_VERSION = "1.0.0" as const;
-export const LISTING_PUBLIC_CONTRACT_EFFECTIVE_DATE = "2026-08-28" as const;
+/* v1.1.0 · G4-PLACES — se incorpora la familia `lugares` (fuente real
+   `points_of_interest`) como séptima familia del contrato. Cambio aditivo:
+   las seis familias originales conservan copys, fuentes y semántica. */
+export const LISTING_PUBLIC_CONTRACT_VERSION = "1.1.0" as const;
+export const LISTING_PUBLIC_CONTRACT_EFFECTIVE_DATE = "2026-09-14" as const;
 
 export const LISTING_FAMILY_IDS = [
   "hoteles",
   "restaurantes",
   "experiencias",
   "eventos",
+  "lugares",
   "casas-de-vacaciones",
   "que-hacer",
 ] as const;
@@ -38,7 +44,7 @@ export const LISTING_FAMILY_IDS = [
 export type ListingFamilyId = (typeof LISTING_FAMILY_IDS)[number];
 
 /** Origen productivo real de cada familia. Nunca "fixture". */
-export type ListingSource = "businesses" | "events" | "editorial";
+export type ListingSource = "businesses" | "events" | "places" | "editorial";
 
 export interface ListingFamilyContract {
   readonly id: ListingFamilyId;
@@ -127,6 +133,22 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     emptyMessage:
       "Aún no hay eventos publicados. Estamos armando el calendario de fiestas, festivales y celebraciones.",
   },
+  lugares: {
+    id: "lugares",
+    label: "Lugares y sitios de interés",
+    route: "/lugares",
+    source: "places",
+    categorySlugs: [],
+    forcedCategorySlug: null,
+    hero: {
+      eyebrow: "Qué visitar",
+      title: "Lugares y sitios de interés",
+      subtitle:
+        "Cenotes, conventos, zonas arqueológicas, calles y rincones que cuentan el Oriente Maya.",
+    },
+    emptyMessage:
+      "Aún no hay lugares publicados. Estamos documentando cenotes, conventos y sitios emblemáticos del Oriente Maya.",
+  },
   "casas-de-vacaciones": {
     id: "casas-de-vacaciones",
     label: "Casas de vacaciones",
@@ -202,6 +224,7 @@ export interface PublicListingDTO {
 export interface ListingFeedInput {
   readonly businesses?: readonly MarketplaceBusinessCard[];
   readonly events?: readonly PublicEventCard[];
+  readonly places?: readonly PublicPlaceCard[];
   readonly destinations?: readonly Destination[];
 }
 
