@@ -57,6 +57,49 @@ export const PLACE_AUTHORITY_KIND_SLUGS = [
 
 export type PlaceAuthorityKindSlug = (typeof PLACE_AUTHORITY_KIND_SLUGS)[number];
 
+/* ───────────────  Familia documental del Inventario de Atractivos  ─────────
+ * Fuente oficial: "[vf] Inventario de Atractivos Turísticos de la Región
+ * Oriente Maya". Clasificación PRINCIPAL en dos familias. No sustituye ni se
+ * confunde con `place_types` (tipo específico) ni con `place_categories`
+ * (categorías de descubrimiento), que permanecen subordinados.
+ * ------------------------------------------------------------------------ */
+
+export const PLACE_ATTRACTION_FAMILIES = ["tangible", "intangible"] as const;
+
+export type PlaceAttractionFamily = (typeof PLACE_ATTRACTION_FAMILIES)[number];
+
+export const PLACE_ATTRACTION_FAMILY_LABELS: Record<PlaceAttractionFamily, string> = {
+  tangible: "Atractivo tangible",
+  intangible: "Atractivo intangible",
+};
+
+export const PLACE_ATTRACTION_FAMILY_PLURALS: Record<PlaceAttractionFamily, string> = {
+  tangible: "Tangibles",
+  intangible: "Intangibles",
+};
+
+export function isPlaceAttractionFamily(value: unknown): value is PlaceAttractionFamily {
+  return (
+    typeof value === "string" &&
+    (PLACE_ATTRACTION_FAMILIES as readonly string[]).includes(value.trim().toLowerCase())
+  );
+}
+
+/**
+ * Resolución de familia: override de la ficha → familia del tipo → `tangible`.
+ * Nunca inventa una tercera familia ni deduce por nombre.
+ */
+export function resolvePlaceAttractionFamily(
+  placeOverride: unknown,
+  typeFamily?: unknown,
+): PlaceAttractionFamily {
+  if (isPlaceAttractionFamily(placeOverride))
+    return placeOverride.trim().toLowerCase() as PlaceAttractionFamily;
+  if (isPlaceAttractionFamily(typeFamily))
+    return (typeFamily as string).trim().toLowerCase() as PlaceAttractionFamily;
+  return "tangible";
+}
+
 /** La familia SEO de Lugares se gobierna en `seo_metadata` (entity_kind). */
 export const PLACE_SEO_ENTITY_KIND = "point_of_interest" as const;
 
