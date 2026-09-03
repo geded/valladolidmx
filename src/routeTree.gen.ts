@@ -24,6 +24,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
+import { Route as LugaresRouteImport } from './routes/lugares'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
@@ -39,6 +40,7 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as LugaresIndexRouteImport } from './routes/lugares.index'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as ViajeroHandleRouteImport } from './routes/viajero.$handle'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
@@ -70,6 +72,8 @@ import { Route as LovableG5ListingReadinessPreviewRouteImport } from './routes/l
 import { Route as LovableG4VacationRentalListingPremiumPreviewRouteImport } from './routes/lovable/g4-vacation-rental-listing-premium-preview'
 import { Route as LovableG4RestaurantPremiumPreviewRouteImport } from './routes/lovable/g4-restaurant-premium-preview'
 import { Route as LovableG4RestaurantListingPremiumPreviewRouteImport } from './routes/lovable/g4-restaurant-listing-premium-preview'
+import { Route as LovableG4PlacePremiumPreviewRouteImport } from './routes/lovable/g4-place-premium-preview'
+import { Route as LovableG4PlaceListingPremiumPreviewRouteImport } from './routes/lovable/g4-place-listing-premium-preview'
 import { Route as LovableG4HotelPremiumPreviewRouteImport } from './routes/lovable/g4-hotel-premium-preview'
 import { Route as LovableG4HomePremiumPreviewRouteImport } from './routes/lovable/g4-home-premium-preview'
 import { Route as LovableG4ExperiencePremiumPreviewRouteImport } from './routes/lovable/g4-experience-premium-preview'
@@ -165,6 +169,7 @@ import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminAnfitrionesRouteImport } from './routes/_authenticated/admin/anfitriones'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as OrienteMayaDestinoLugaresIndexRouteImport } from './routes/oriente-maya/$destino.lugares.index'
 import { Route as OrienteMayaDestinoCategoriaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.index'
 import { Route as AuthenticatedPortalResenasIndexRouteImport } from './routes/_authenticated/portal/resenas.index'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
@@ -315,6 +320,11 @@ const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
   path: '/manifest.webmanifest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LugaresRoute = LugaresRouteImport.update({
+  id: '/lugares',
+  path: '/lugares',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   id: '/llms.txt',
   path: '/llms.txt',
@@ -388,6 +398,11 @@ const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LugaresIndexRoute = LugaresIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LugaresRoute,
 } as any)
 const EventosIndexRoute = EventosIndexRouteImport.update({
   id: '/',
@@ -562,6 +577,18 @@ const LovableG4RestaurantListingPremiumPreviewRoute =
   LovableG4RestaurantListingPremiumPreviewRouteImport.update({
     id: '/lovable/g4-restaurant-listing-premium-preview',
     path: '/lovable/g4-restaurant-listing-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4PlacePremiumPreviewRoute =
+  LovableG4PlacePremiumPreviewRouteImport.update({
+    id: '/lovable/g4-place-premium-preview',
+    path: '/lovable/g4-place-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4PlaceListingPremiumPreviewRoute =
+  LovableG4PlaceListingPremiumPreviewRouteImport.update({
+    id: '/lovable/g4-place-listing-premium-preview',
+    path: '/lovable/g4-place-listing-premium-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG4HotelPremiumPreviewRoute =
@@ -1113,6 +1140,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaDestinoLugaresIndexRoute =
+  OrienteMayaDestinoLugaresIndexRouteImport.update({
+    id: '/lugares/',
+    path: '/lugares/',
+    getParentRoute: () => OrienteMayaDestinoRoute,
+  } as any)
 const OrienteMayaDestinoCategoriaIndexRoute =
   OrienteMayaDestinoCategoriaIndexRouteImport.update({
     id: '/',
@@ -1566,6 +1599,7 @@ export interface FileRoutesByFullPath {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/lugares': typeof LugaresRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
@@ -1613,6 +1647,8 @@ export interface FileRoutesByFullPath {
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
+  '/lovable/g4-place-listing-premium-preview': typeof LovableG4PlaceListingPremiumPreviewRoute
+  '/lovable/g4-place-premium-preview': typeof LovableG4PlacePremiumPreviewRoute
   '/lovable/g4-restaurant-listing-premium-preview': typeof LovableG4RestaurantListingPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/g4-vacation-rental-listing-premium-preview': typeof LovableG4VacationRentalListingPremiumPreviewRoute
@@ -1644,6 +1680,7 @@ export interface FileRoutesByFullPath {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/eventos/': typeof EventosIndexRoute
+  '/lugares/': typeof LugaresIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1766,6 +1803,7 @@ export interface FileRoutesByFullPath {
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/portal/resenas/': typeof AuthenticatedPortalResenasIndexRoute
   '/oriente-maya/$destino/$categoria/': typeof OrienteMayaDestinoCategoriaIndexRoute
+  '/oriente-maya/$destino/lugares/': typeof OrienteMayaDestinoLugaresIndexRoute
   '/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
@@ -1838,6 +1876,8 @@ export interface FileRoutesByTo {
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
+  '/lovable/g4-place-listing-premium-preview': typeof LovableG4PlaceListingPremiumPreviewRoute
+  '/lovable/g4-place-premium-preview': typeof LovableG4PlacePremiumPreviewRoute
   '/lovable/g4-restaurant-listing-premium-preview': typeof LovableG4RestaurantListingPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/g4-vacation-rental-listing-premium-preview': typeof LovableG4VacationRentalListingPremiumPreviewRoute
@@ -1868,6 +1908,7 @@ export interface FileRoutesByTo {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/eventos': typeof EventosIndexRoute
+  '/lugares': typeof LugaresIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1987,6 +2028,7 @@ export interface FileRoutesByTo {
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/portal/resenas': typeof AuthenticatedPortalResenasIndexRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaIndexRoute
+  '/oriente-maya/$destino/lugares': typeof OrienteMayaDestinoLugaresIndexRoute
   '/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
@@ -2020,6 +2062,7 @@ export interface FileRoutesById {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/lugares': typeof LugaresRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
@@ -2067,6 +2110,8 @@ export interface FileRoutesById {
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
+  '/lovable/g4-place-listing-premium-preview': typeof LovableG4PlaceListingPremiumPreviewRoute
+  '/lovable/g4-place-premium-preview': typeof LovableG4PlacePremiumPreviewRoute
   '/lovable/g4-restaurant-listing-premium-preview': typeof LovableG4RestaurantListingPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/g4-vacation-rental-listing-premium-preview': typeof LovableG4VacationRentalListingPremiumPreviewRoute
@@ -2098,6 +2143,7 @@ export interface FileRoutesById {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/eventos/': typeof EventosIndexRoute
+  '/lugares/': typeof LugaresIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -2220,6 +2266,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/portal/resenas/': typeof AuthenticatedPortalResenasIndexRoute
   '/oriente-maya/$destino/$categoria/': typeof OrienteMayaDestinoCategoriaIndexRoute
+  '/oriente-maya/$destino/lugares/': typeof OrienteMayaDestinoLugaresIndexRoute
   '/_authenticated/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
   '/_authenticated/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/_authenticated/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
@@ -2253,6 +2300,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/llms.txt'
+    | '/lugares'
     | '/manifest.webmanifest'
     | '/mapa'
     | '/marketplace'
@@ -2300,6 +2348,8 @@ export interface FileRouteTypes {
     | '/lovable/g4-experience-premium-preview'
     | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
+    | '/lovable/g4-place-listing-premium-preview'
+    | '/lovable/g4-place-premium-preview'
     | '/lovable/g4-restaurant-listing-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/g4-vacation-rental-listing-premium-preview'
@@ -2331,6 +2381,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/eventos/'
+    | '/lugares/'
     | '/oriente-maya/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -2453,6 +2504,7 @@ export interface FileRouteTypes {
     | '/portal/invitaciones/'
     | '/portal/resenas/'
     | '/oriente-maya/$destino/$categoria/'
+    | '/oriente-maya/$destino/lugares/'
     | '/cms/categorias/$id/editar'
     | '/cms/destinos/$destinationId/editar'
     | '/cms/empresas/$businessId/editar'
@@ -2525,6 +2577,8 @@ export interface FileRouteTypes {
     | '/lovable/g4-experience-premium-preview'
     | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
+    | '/lovable/g4-place-listing-premium-preview'
+    | '/lovable/g4-place-premium-preview'
     | '/lovable/g4-restaurant-listing-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/g4-vacation-rental-listing-premium-preview'
@@ -2555,6 +2609,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/eventos'
+    | '/lugares'
     | '/oriente-maya'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -2674,6 +2729,7 @@ export interface FileRouteTypes {
     | '/portal/invitaciones'
     | '/portal/resenas'
     | '/oriente-maya/$destino/$categoria'
+    | '/oriente-maya/$destino/lugares'
     | '/cms/categorias/$id/editar'
     | '/cms/destinos/$destinationId/editar'
     | '/cms/empresas/$businessId/editar'
@@ -2706,6 +2762,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/llms.txt'
+    | '/lugares'
     | '/manifest.webmanifest'
     | '/mapa'
     | '/marketplace'
@@ -2753,6 +2810,8 @@ export interface FileRouteTypes {
     | '/lovable/g4-experience-premium-preview'
     | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
+    | '/lovable/g4-place-listing-premium-preview'
+    | '/lovable/g4-place-premium-preview'
     | '/lovable/g4-restaurant-listing-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/g4-vacation-rental-listing-premium-preview'
@@ -2784,6 +2843,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/eventos/'
+    | '/lugares/'
     | '/oriente-maya/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -2906,6 +2966,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/portal/resenas/'
     | '/oriente-maya/$destino/$categoria/'
+    | '/oriente-maya/$destino/lugares/'
     | '/_authenticated/cms/categorias/$id/editar'
     | '/_authenticated/cms/destinos/$destinationId/editar'
     | '/_authenticated/cms/empresas/$businessId/editar'
@@ -2939,6 +3000,7 @@ export interface RootRouteChildren {
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
+  LugaresRoute: typeof LugaresRouteWithChildren
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   MapaRoute: typeof MapaRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
@@ -2977,6 +3039,8 @@ export interface RootRouteChildren {
   LovableG4ExperiencePremiumPreviewRoute: typeof LovableG4ExperiencePremiumPreviewRoute
   LovableG4HomePremiumPreviewRoute: typeof LovableG4HomePremiumPreviewRoute
   LovableG4HotelPremiumPreviewRoute: typeof LovableG4HotelPremiumPreviewRoute
+  LovableG4PlaceListingPremiumPreviewRoute: typeof LovableG4PlaceListingPremiumPreviewRoute
+  LovableG4PlacePremiumPreviewRoute: typeof LovableG4PlacePremiumPreviewRoute
   LovableG4RestaurantListingPremiumPreviewRoute: typeof LovableG4RestaurantListingPremiumPreviewRoute
   LovableG4RestaurantPremiumPreviewRoute: typeof LovableG4RestaurantPremiumPreviewRoute
   LovableG4VacationRentalListingPremiumPreviewRoute: typeof LovableG4VacationRentalListingPremiumPreviewRoute
@@ -3139,6 +3203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lugares': {
+      id: '/lugares'
+      path: '/lugares'
+      fullPath: '/lugares'
+      preLoaderRoute: typeof LugaresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/llms.txt': {
       id: '/llms.txt'
       path: '/llms.txt'
@@ -3243,6 +3314,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oriente-maya/'
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/lugares/': {
+      id: '/lugares/'
+      path: '/'
+      fullPath: '/lugares/'
+      preLoaderRoute: typeof LugaresIndexRouteImport
+      parentRoute: typeof LugaresRoute
     }
     '/eventos/': {
       id: '/eventos/'
@@ -3459,6 +3537,20 @@ declare module '@tanstack/react-router' {
       path: '/lovable/g4-restaurant-listing-premium-preview'
       fullPath: '/lovable/g4-restaurant-listing-premium-preview'
       preLoaderRoute: typeof LovableG4RestaurantListingPremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-place-premium-preview': {
+      id: '/lovable/g4-place-premium-preview'
+      path: '/lovable/g4-place-premium-preview'
+      fullPath: '/lovable/g4-place-premium-preview'
+      preLoaderRoute: typeof LovableG4PlacePremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-place-listing-premium-preview': {
+      id: '/lovable/g4-place-listing-premium-preview'
+      path: '/lovable/g4-place-listing-premium-preview'
+      fullPath: '/lovable/g4-place-listing-premium-preview'
+      preLoaderRoute: typeof LovableG4PlaceListingPremiumPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g4-hotel-premium-preview': {
@@ -4125,6 +4217,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/oriente-maya/$destino/lugares/': {
+      id: '/oriente-maya/$destino/lugares/'
+      path: '/lugares'
+      fullPath: '/oriente-maya/$destino/lugares/'
+      preLoaderRoute: typeof OrienteMayaDestinoLugaresIndexRouteImport
+      parentRoute: typeof OrienteMayaDestinoRoute
     }
     '/oriente-maya/$destino/$categoria/': {
       id: '/oriente-maya/$destino/$categoria/'
@@ -5082,6 +5181,17 @@ const EventosRouteChildren: EventosRouteChildren = {
 const EventosRouteWithChildren =
   EventosRoute._addFileChildren(EventosRouteChildren)
 
+interface LugaresRouteChildren {
+  LugaresIndexRoute: typeof LugaresIndexRoute
+}
+
+const LugaresRouteChildren: LugaresRouteChildren = {
+  LugaresIndexRoute: LugaresIndexRoute,
+}
+
+const LugaresRouteWithChildren =
+  LugaresRoute._addFileChildren(LugaresRouteChildren)
+
 interface MarketplaceRouteChildren {
   MarketplaceSplatRoute: typeof MarketplaceSplatRoute
 }
@@ -5134,6 +5244,7 @@ interface OrienteMayaDestinoRouteChildren {
   OrienteMayaDestinoCategoriaRoute: typeof OrienteMayaDestinoCategoriaRouteWithChildren
   OrienteMayaDestinoIndexRoute: typeof OrienteMayaDestinoIndexRoute
   OrienteMayaDestinoLugaresSlugRoute: typeof OrienteMayaDestinoLugaresSlugRoute
+  OrienteMayaDestinoLugaresIndexRoute: typeof OrienteMayaDestinoLugaresIndexRoute
 }
 
 const OrienteMayaDestinoRouteChildren: OrienteMayaDestinoRouteChildren = {
@@ -5141,6 +5252,7 @@ const OrienteMayaDestinoRouteChildren: OrienteMayaDestinoRouteChildren = {
     OrienteMayaDestinoCategoriaRouteWithChildren,
   OrienteMayaDestinoIndexRoute: OrienteMayaDestinoIndexRoute,
   OrienteMayaDestinoLugaresSlugRoute: OrienteMayaDestinoLugaresSlugRoute,
+  OrienteMayaDestinoLugaresIndexRoute: OrienteMayaDestinoLugaresIndexRoute,
 }
 
 const OrienteMayaDestinoRouteWithChildren =
@@ -5161,6 +5273,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
+  LugaresRoute: LugaresRouteWithChildren,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   MapaRoute: MapaRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
@@ -5209,6 +5322,9 @@ const rootRouteChildren: RootRouteChildren = {
     LovableG4ExperiencePremiumPreviewRoute,
   LovableG4HomePremiumPreviewRoute: LovableG4HomePremiumPreviewRoute,
   LovableG4HotelPremiumPreviewRoute: LovableG4HotelPremiumPreviewRoute,
+  LovableG4PlaceListingPremiumPreviewRoute:
+    LovableG4PlaceListingPremiumPreviewRoute,
+  LovableG4PlacePremiumPreviewRoute: LovableG4PlacePremiumPreviewRoute,
   LovableG4RestaurantListingPremiumPreviewRoute:
     LovableG4RestaurantListingPremiumPreviewRoute,
   LovableG4RestaurantPremiumPreviewRoute:
