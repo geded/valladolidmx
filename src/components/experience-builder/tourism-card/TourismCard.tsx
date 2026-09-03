@@ -97,6 +97,11 @@ export interface TourismCardVM {
   /** Distintivos institucionales oficiales (Pueblo Mágico, etc.). */
   institutionalBadges: TourismCardBadge[];
   dateLabel: string | null;
+  /** Fecha ISO real de inicio (eventos). Permite filtros por rango. */
+  startsAt?: string | null;
+  /** Fecha ISO real de fin (eventos). */
+  endsAt?: string | null;
+
   availabilityLabel: string | null;
   priceAmount: number | null;
   priceCurrency: string | null;
