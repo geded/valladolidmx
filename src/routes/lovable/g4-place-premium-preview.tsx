@@ -11,6 +11,7 @@
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { PublicShell } from "@/components/discovery";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
   adaptPlaceToPremiumSurface,
@@ -74,31 +75,39 @@ function PlacePremiumPreview() {
 
   const conceptual = place.media.some((m) => m.aiGenerated);
 
+  const crumbs = projection.content.breadcrumbs.map((c) => ({
+    label: c.label,
+    ...(c.href ? { to: c.href } : {}),
+  }));
+
   return (
-    <>
+    <PublicShell crumbs={crumbs} variant="hero">
       {conceptual ? (
-        <div className="mx-auto w-full max-w-[86rem] px-4 pt-3 sm:px-6 lg:px-8">
-          <p className="rounded-lg border border-dashed border-[#ded7c9] bg-[#faf7f1] px-3 py-2 text-[11px] leading-relaxed text-[#6b6357]">
+        <div className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 lg:px-8">
+          <p className="rounded-2xl border border-dashed border-border bg-muted/40 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
             Datos de prueba: las imágenes son representaciones conceptuales generadas con IA,
             temporales y pendientes de sustitución por fotografía real.
           </p>
         </div>
       ) : null}
-    <PlacePremiumSurface
-      content={projection.content}
-      presentation={projection.presentation}
-      variant={projection.variant ?? undefined}
-      builderNotice={projection.resolution.builderNotice}
-      aluxSlot={
-        <TourismAluxPanel
-          title="¿Cuándo estarás en la región?"
-          description={`Alux combina ${place.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
-          task={`Ayúdame a integrar ${place.name} en mi viaje por el Oriente Maya.`}
-          prompts={projection.content.alux.prompts}
-          compact
+      <div className="bg-background">
+        <PlacePremiumSurface
+          content={projection.content}
+          presentation={projection.presentation}
+          variant={projection.variant ?? undefined}
+          builderNotice={projection.resolution.builderNotice}
+          showBreadcrumbs={false}
+          aluxSlot={
+            <TourismAluxPanel
+              title="¿Cuándo estarás en la región?"
+              description={`Alux combina ${place.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+              task={`Ayúdame a integrar ${place.name} en mi viaje por el Oriente Maya.`}
+              prompts={projection.content.alux.prompts}
+              compact
+            />
+          }
         />
-      }
-    />
-    </>
+      </div>
+    </PublicShell>
   );
 }

@@ -403,6 +403,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
       subtitle: dto.shortDescription?.trim() || "",
       typeLabel,
       destinationLabel: dto.destination.name,
+      zoneLabel: dto.zone?.name ?? null,
       regionLabel: dto.regionLabel,
       badges: dto.categories.map((c) => c.name),
     },
