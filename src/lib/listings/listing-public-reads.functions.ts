@@ -44,8 +44,17 @@ export const getPublicListing = createServerFn({ method: "GET" })
     const contract = listingFamilyContract(data.family);
 
     if (contract.source === "businesses") {
-      const businesses = await listMarketplaceBusinesses().catch(() => []);
-      return buildPublicListing({ family: contract.id, destino: data.destino, businesses });
+      // Lote 3C — la pertenencia categoría→familia se administra en CMS.
+      const [businesses, taxonomy] = await Promise.all([
+        listMarketplaceBusinesses().catch(() => []),
+        getListingFamilyTaxonomy().catch(() => ({})),
+      ]);
+      return buildPublicListing({
+        family: contract.id,
+        destino: data.destino,
+        businesses,
+        categorySlugs: taxonomy[contract.id],
+      });
     }
 
     if (contract.source === "events") {
