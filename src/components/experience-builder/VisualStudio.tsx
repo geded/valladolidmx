@@ -1139,6 +1139,12 @@ function PageVisualEditor({
   }, []);
   const skipNextAutoSave = useRef(false);
   /**
+   * Firma canónica (misma función que el cliente usa siempre) del último
+   * árbol persistido: cargado del servidor o guardado con éxito.
+   */
+  const savedSignatureRef = useRef<string | null>(null);
+
+  /**
    * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
    * al aplicar cada mutación desde `commitTree`. `undo` / `redo` restauran
    * sin disparar `commitTree` de nuevo (marcan `skipHistory`). El
