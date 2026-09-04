@@ -176,7 +176,38 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     notes:
       "G8-Q2D-B/G4-PLACES · Ficha de Lugar y Atractivo con lecturas reales (hero editorial dividido + Alux contextual). Fail-closed: no publicado → 404 público; preview autenticada sólo para staff editorial.",
   },
+  // Lote 3B · D — Gobernanza: rutas previamente sin entry, registradas con
+  // metadatos exactos. No se altera su comportamiento ni su routing.
+  "src/routes/oriente-maya/destinos.tsx": {
+    category: "studio",
+    businessPriority: "high",
+    maturity: "L4",
+    migrationStatus: "native-studio",
+    functionalOwner: "Product",
+    dependencies: ["destinations", "PremiumShowcase", "DestinationsAtlasSurface"],
+    notes:
+      "Atlas/listado de destinos del Oriente Maya. Reutiliza el sistema visual Premium del Home; sin motor propio.",
+  },
+  "src/routes/lovable/g4-destination-listing-premium-preview.tsx": {
+    category: "system",
+    businessPriority: "low",
+    maturity: "L3",
+    migrationStatus: "technical-exception",
+    functionalOwner: "Product",
+    dependencies: ["PremiumShowcase", "destinations"],
+    notes: "Preview interna de aprobación visual (no indexable, no pública).",
+  },
+  "src/routes/lovable/g4-experience-listing-premium-preview.tsx": {
+    category: "system",
+    businessPriority: "low",
+    maturity: "L3",
+    migrationStatus: "technical-exception",
+    functionalOwner: "Product",
+    dependencies: ["ExperienceFiltersBar", "TourismListingSurface"],
+    notes: "Preview interna de aprobación visual del listado de Experiencias.",
+  },
   "src/routes/oriente-maya/index.tsx": {
+
     category: "studio",
     businessPriority: "critical",
     maturity: "L4",
@@ -412,6 +443,8 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/categorias.nueva.tsx",
   "src/routes/_authenticated/cms/destinos.$destinationId.editar.tsx",
   "src/routes/_authenticated/cms/destinos.index.tsx",
+  "src/routes/_authenticated/cms/distintivos.tsx",
+
   "src/routes/_authenticated/cms/destinos.nueva.tsx",
   "src/routes/_authenticated/cms/demo-pack.tsx",
   "src/routes/_authenticated/cms/rc-visual.tsx",
@@ -545,7 +578,10 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/experience-map-preview.tsx",
   "src/routes/lovable/founder-home-premium-preview.tsx",
   "src/routes/lovable/founder-zazil-premium-preview.tsx",
+  "src/routes/lovable/g4-destination-listing-premium-preview.tsx",
   "src/routes/lovable/g4-destination-microsite-preview.tsx",
+  "src/routes/lovable/g4-experience-listing-premium-preview.tsx",
+
   "src/routes/lovable/g4-hotel-premium-preview.tsx",
   "src/routes/lovable/g4-restaurant-premium-preview.tsx",
   "src/routes/lovable/g4-restaurant-listing-premium-preview.tsx",
@@ -600,7 +636,9 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/oriente-maya/$destino.lugares.$slug.tsx",
   "src/routes/oriente-maya/$destino.lugares.index.tsx",
   "src/routes/oriente-maya/$destino.tsx",
+  "src/routes/oriente-maya/destinos.tsx",
   "src/routes/oriente-maya/index.tsx",
+
   "src/routes/p.$slug.tsx",
   "src/routes/preview.$token.tsx",
   "src/routes/preview/composition.$token.tsx",

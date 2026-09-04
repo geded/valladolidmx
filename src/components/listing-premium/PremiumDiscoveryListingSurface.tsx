@@ -30,7 +30,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { cn } from "@/lib/utils";
-import { ACTIVE_BRAND } from "@/config/brand";
+import { useBrand } from "@/lib/brand/brand-context";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
 const InteractiveMap = lazy(() =>
@@ -417,6 +417,7 @@ function PremiumHero({
   hero: { src: string; alt: string; conceptual: boolean };
   cinematic: boolean;
 }) {
+  const brand = useBrand();
   return (
     <section
       className={cn(
@@ -457,7 +458,7 @@ function PremiumHero({
           {profile.subtitle}
         </p>
         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-          {ACTIVE_BRAND.discoveryPromise}
+          {brand.discoveryPromise}
         </p>
       </div>
     </section>

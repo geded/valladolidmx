@@ -22,6 +22,8 @@ import {
   Star,
   type LucideIcon,
 } from "lucide-react";
+import { getAuthorizedSlugs } from "@/lib/institutional/institutional-authority";
+
 
 export const BADGE_KINDS = [
   "pueblo-magico",
@@ -186,13 +188,25 @@ export function getBadgeRegistryEntry(kind: BadgeKind): BadgeRegistryEntry {
   return INSTITUTIONAL_BADGE_REGISTRY[kind] ?? INSTITUTIONAL_BADGE_REGISTRY.custom;
 }
 
-/** Autorización institucional (§12: `pueblo-magico` sólo en destinos autorizados). */
+/**
+ * Autorización institucional (§12: `pueblo-magico` sólo en destinos
+ * autorizados).
+ *
+ * Lote 3B · C — La autoridad vigente la administra el CMS
+ * (`institutional.badges.authority`). El registry conserva
+ * `restrictedSlugs` únicamente como FALLBACK seguro para cuando el CMS
+ * todavía no se pronuncia sobre ese distintivo. Sigue prohibido añadir
+ * condicionales por slug fuera de este punto.
+ */
 export function isBadgeAuthorized(kind: BadgeKind, subjectSlug?: string): boolean {
   const entry = getBadgeRegistryEntry(kind);
-  if (!entry.restrictedSlugs) return true;
+  const managed = getAuthorizedSlugs(kind);
+  const restricted = managed ?? entry.restrictedSlugs;
+  if (!restricted) return true;
   if (!subjectSlug) return false;
-  return entry.restrictedSlugs.includes(subjectSlug.toLowerCase());
+  return restricted.includes(subjectSlug.toLowerCase());
 }
+
 
 export interface BadgeEvidence {
   kind: BadgeKind;

@@ -71,3 +71,68 @@ prohibido por el control (2). Se documenta como decisión, no como omisión.
 `lovable/g4-destination-listing-premium-preview.tsx`,
 `lovable/g4-experience-listing-premium-preview.tsx`,
 `oriente-maya/destinos.tsx`.
+
+---
+
+# Adenda v1.1 — Objetivos B (Marca conectada) y C (Distintivos administrables)
+
+## B · Marca conectada a los consumidores públicos reales
+
+- `src/lib/brand/brand-context.tsx` (`BrandProvider` / `useBrand` / `useBrandLogo`)
+  se monta en `__root.tsx` dentro de `QueryClientProvider`, con **precarga SSR**
+  (`brandSettingsQueryOptions` en el loader raíz) para evitar parpadeo.
+- Consumidores migrados de `ACTIVE_BRAND` a `brand.identity`:
+  `BrandLogo` (logotipo y texto alternativo), `SiteFooter` (nombre en el aviso de
+  derechos), `TourismAluxPanel` (nombre del concierge, 3 puntos),
+  `PremiumShowcase` (`PremiumEditorialHero` promesa + `PremiumAluxBar` nombre y
+  etiqueta del botón), `PremiumDiscoveryListingSurface` (promesa),
+  `RegionDestinationsPremiumSurface` (lema).
+- `ACTIVE_BRAND` queda **exclusivamente como fallback** (predeterminados de
+  `BRAND_SETTINGS_DEFAULTS` y dimensiones del logotipo). Fail-safe conservado:
+  cualquier error de lectura devuelve los valores actuales.
+- `continueLabel` de `PremiumAluxBar` pasa de valor por defecto en la firma a
+  resolución en cuerpo (`?? Continuar con ${brand.conciergeName}`): mismo texto
+  renderizado, ahora administrable.
+- **No se creó ningún logotipo ni activo Alux nuevo.**
+
+## C · Distintivos institucionales administrables
+
+Separación explícita de responsabilidades:
+
+| Capa | Responsable | Contenido |
+|---|---|---|
+| Contrato del distintivo | `institutional-badges.registry.ts` | kind, icono, token de color, prioridad, verificación |
+| Autoridad vigente | `platform_settings` → `institutional.badges.authority` | qué destinos la ostentan |
+
+- `src/lib/institutional/institutional-authority.ts` — store sincrónico
+  (`setInstitutionalAuthority` / `getAuthorizedSlugs`), para no cambiar la firma
+  de `isBadgeAuthorized` ni de `buildDestinationBadgeItems`.
+- `institutional-authority.functions.ts` — lectura pública anónima fail-safe,
+  lectura admin y escritura restringida a `admin`/`super_admin` (`has_role`).
+- `institutional-context.ts` — `institutionalAuthorityQueryOptions` +
+  `useInstitutionalAuthority`; hidratación en SSR (loader raíz) y en cliente
+  (`<InstitutionalAuthoritySync />`, no pinta nada).
+- `isBadgeAuthorized` usa la autoridad del CMS y cae a `restrictedSlugs` del
+  registry cuando el CMS no se pronuncia. **Sigue sin condicionales por slug.**
+- Pantalla `/cms/distintivos` (registrada en el Route Inventory), precargada con
+  la autoridad vigente y con "Restaurar valores actuales".
+- Sin fila sembrada en `platform_settings`: la ausencia equivale al fallback
+  actual, por lo que **la salida visual no cambia** hasta que un administrador
+  edite conscientemente.
+
+## Verificación
+
+- Typecheck limpio · Build OK · `bun test`: 756/756.
+- Route Inventory: ✔ 241 rutas cubiertas.
+- Navegador (1280px): `/`, `/oriente-maya`, `/oriente-maya/valladolid`,
+  `/izamal`, `/espita`, `/ek-balam` → 200.
+  Pueblo Mágico presente en Valladolid, Izamal y Espita; **ausente en Ek Balam**.
+  Lema de marca "Oriente Maya de Yucatán" intacto en todas.
+- Aviso de consola sobre claves duplicadas en chips de Alux: **preexistente**,
+  ajeno a este lote, no tocado.
+
+## Pendiente declarado
+
+Objetivo A (materializar el contenido de la Home en la composición del CMS)
+sigue abierto: requiere demostración de equivalencia visual en 1440/834/430/390
+antes de mover el copy fuera del fixture aprobado.

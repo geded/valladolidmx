@@ -79,6 +79,14 @@ import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 import { ACTIVE_BRAND, ACTIVE_BRAND_THEME_STYLE } from "@/config/brand";
+import { BrandProvider, brandSettingsQueryOptions } from "@/lib/brand/brand-context";
+import { BRAND_SETTINGS_DEFAULTS } from "@/lib/brand/brand-settings.functions";
+import {
+  institutionalAuthorityQueryOptions,
+  useInstitutionalAuthority,
+} from "@/lib/institutional/institutional-context";
+
+
 import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
@@ -148,10 +156,33 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+/**
+ * Lote 3B · C — Sincroniza la autoridad institucional administrada en el
+ * CMS con el store sincrónico que consultan los distintivos. No pinta
+ * nada: cero impacto visual.
+ */
+function InstitutionalAuthoritySync() {
+  useInstitutionalAuthority();
+  return null;
+}
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: async () => ({
-    omxdsVisualFoundationsEnabled: await getOmxdsVisualFoundationsFlag(),
-  }),
+  loader: async ({ context }) => {
+    // Lote 3B · B — La identidad de marca administrable se precarga en SSR
+    // para que header, pie y superficies públicas la pinten sin parpadeo.
+    // Fail-safe: ante cualquier error se conserva el fallback de código.
+    const [omxdsVisualFoundationsEnabled] = await Promise.all([
+      getOmxdsVisualFoundationsFlag(),
+      context.queryClient
+        .ensureQueryData(brandSettingsQueryOptions)
+        .catch(() => BRAND_SETTINGS_DEFAULTS),
+      // Lote 3B · C — Autoridad institucional vigente (distintivos).
+      context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+    ]);
+
+    return { omxdsVisualFoundationsEnabled };
+  },
+
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -296,6 +327,8 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
+        <BrandProvider>
+        <InstitutionalAuthoritySync />
         <AuthProvider>
           {!isAppShellRoute ? <SkipLink /> : null}
           {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
@@ -345,7 +378,9 @@ function RootComponent() {
         */}
           <GlobalNavigationSessionBridge />
         </AuthProvider>
+        </BrandProvider>
       </I18nProvider>
+
     </QueryClientProvider>
   );
 }

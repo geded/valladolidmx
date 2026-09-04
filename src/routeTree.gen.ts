@@ -159,6 +159,7 @@ import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_au
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsMarcaRouteImport } from './routes/_authenticated/cms/marca'
 import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
+import { Route as AuthenticatedCmsDistintivosRouteImport } from './routes/_authenticated/cms/distintivos'
 import { Route as AuthenticatedCmsDemoPackRouteImport } from './routes/_authenticated/cms/demo-pack'
 import { Route as AuthenticatedCmsContenidoEvaluacionRouteImport } from './routes/_authenticated/cms/contenido-evaluacion'
 import { Route as AuthenticatedCmsAluxRouteImport } from './routes/_authenticated/cms/alux'
@@ -1086,6 +1087,12 @@ const AuthenticatedCmsExperienceBuilderRoute =
     path: '/experience-builder',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsDistintivosRoute =
+  AuthenticatedCmsDistintivosRouteImport.update({
+    id: '/distintivos',
+    path: '/distintivos',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsDemoPackRoute =
   AuthenticatedCmsDemoPackRouteImport.update({
     id: '/demo-pack',
@@ -1725,6 +1732,7 @@ export interface FileRoutesByFullPath {
   '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
   '/cms/contenido-evaluacion': typeof AuthenticatedCmsContenidoEvaluacionRoute
   '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
+  '/cms/distintivos': typeof AuthenticatedCmsDistintivosRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/marca': typeof AuthenticatedCmsMarcaRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
@@ -1956,6 +1964,7 @@ export interface FileRoutesByTo {
   '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
   '/cms/contenido-evaluacion': typeof AuthenticatedCmsContenidoEvaluacionRoute
   '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
+  '/cms/distintivos': typeof AuthenticatedCmsDistintivosRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/marca': typeof AuthenticatedCmsMarcaRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
@@ -2196,6 +2205,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
   '/_authenticated/cms/contenido-evaluacion': typeof AuthenticatedCmsContenidoEvaluacionRoute
   '/_authenticated/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
+  '/_authenticated/cms/distintivos': typeof AuthenticatedCmsDistintivosRoute
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/marca': typeof AuthenticatedCmsMarcaRoute
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
@@ -2438,6 +2448,7 @@ export interface FileRouteTypes {
     | '/cms/alux'
     | '/cms/contenido-evaluacion'
     | '/cms/demo-pack'
+    | '/cms/distintivos'
     | '/cms/experience-builder'
     | '/cms/marca'
     | '/cms/media'
@@ -2669,6 +2680,7 @@ export interface FileRouteTypes {
     | '/cms/alux'
     | '/cms/contenido-evaluacion'
     | '/cms/demo-pack'
+    | '/cms/distintivos'
     | '/cms/experience-builder'
     | '/cms/marca'
     | '/cms/media'
@@ -2908,6 +2920,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/alux'
     | '/_authenticated/cms/contenido-evaluacion'
     | '/_authenticated/cms/demo-pack'
+    | '/_authenticated/cms/distintivos'
     | '/_authenticated/cms/experience-builder'
     | '/_authenticated/cms/marca'
     | '/_authenticated/cms/media'
@@ -4201,6 +4214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsExperienceBuilderRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/distintivos': {
+      id: '/_authenticated/cms/distintivos'
+      path: '/distintivos'
+      fullPath: '/cms/distintivos'
+      preLoaderRoute: typeof AuthenticatedCmsDistintivosRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/demo-pack': {
       id: '/_authenticated/cms/demo-pack'
       path: '/demo-pack'
@@ -5106,6 +5126,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsAluxRoute: typeof AuthenticatedCmsAluxRouteWithChildren
   AuthenticatedCmsContenidoEvaluacionRoute: typeof AuthenticatedCmsContenidoEvaluacionRoute
   AuthenticatedCmsDemoPackRoute: typeof AuthenticatedCmsDemoPackRoute
+  AuthenticatedCmsDistintivosRoute: typeof AuthenticatedCmsDistintivosRoute
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMarcaRoute: typeof AuthenticatedCmsMarcaRoute
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
@@ -5156,6 +5177,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsContenidoEvaluacionRoute:
     AuthenticatedCmsContenidoEvaluacionRoute,
   AuthenticatedCmsDemoPackRoute: AuthenticatedCmsDemoPackRoute,
+  AuthenticatedCmsDistintivosRoute: AuthenticatedCmsDistintivosRoute,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
   AuthenticatedCmsMarcaRoute: AuthenticatedCmsMarcaRoute,

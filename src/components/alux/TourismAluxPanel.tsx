@@ -1,6 +1,6 @@
 import { Compass, Sparkles } from "lucide-react";
 
-import { ACTIVE_BRAND } from "@/config/brand";
+import { useBrand } from "@/lib/brand/brand-context";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { cn } from "@/lib/utils";
 import { AluxMark } from "./AluxMark";
@@ -38,6 +38,7 @@ export function TourismAluxPanel({
   variant = "bar",
   compact = false,
 }: TourismAluxPanelProps) {
+  const brand = useBrand();
   const ask = (preference?: string) =>
     openAluxFloating({
       reason: "manual",
@@ -51,7 +52,7 @@ export function TourismAluxPanel({
         compact ? "p-3 sm:p-4" : "p-4 sm:p-5",
         className,
       )}
-      aria-label={`${ACTIVE_BRAND.conciergeName}, concierge IA`}
+      aria-label={`${brand.conciergeName}, concierge IA`}
     >
       <div
         className={cn(
@@ -63,7 +64,7 @@ export function TourismAluxPanel({
           <AluxMark family="avatar" size={44} className="shrink-0" decorative loading="eager" />
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-              {ACTIVE_BRAND.conciergeName} · Concierge IA
+              {brand.conciergeName} · Concierge IA
             </p>
             <h2
               className={cn(
@@ -103,7 +104,7 @@ export function TourismAluxPanel({
           className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-selva px-5 text-sm font-semibold text-selva-foreground transition-opacity hover:opacity-90 lg:w-auto"
         >
           {variant === "card" ? <Sparkles className="size-4" /> : <Compass className="size-4" />}
-          Planear con {ACTIVE_BRAND.conciergeName}
+          Planear con {brand.conciergeName}
         </button>
       </div>
     </section>
