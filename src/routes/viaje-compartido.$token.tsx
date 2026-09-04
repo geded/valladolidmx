@@ -81,6 +81,7 @@ const KIND_LABEL: Record<SharedPlanItem["item_kind"], string> = {
   product: "Experiencia",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
 };
 
 function KindIcon({ kind }: { kind: SharedPlanItem["item_kind"] }) {

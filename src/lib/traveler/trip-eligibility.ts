@@ -23,7 +23,7 @@ import type { TravelItemKind } from "./travel-plans.functions";
  * en modo legacy (opt-in de la superficie) — no se universaliza en esta
  * iniciativa. `region` y `promotion` quedan fuera por decisión Founder.
  */
-export const TRIP_UNIVERSAL_KINDS = new Set<TravelItemKind>(["product", "business", "event"]);
+export const TRIP_UNIVERSAL_KINDS = new Set<TravelItemKind>(["product", "business", "event", "route"]);
 
 export const TRIP_LEGACY_KINDS = new Set<TravelItemKind>(["destination"]);
 

@@ -9403,6 +9403,7 @@ export type Database = {
         | "product"
         | "event"
         | "note"
+        | "route"
       travel_plan_source: "web" | "import" | "concierge" | "alux"
       travel_plan_status:
         | "draft"
@@ -9695,7 +9696,14 @@ export const Constants = {
       related_override_mode: ["pin", "hide"],
       system_alert_severity: ["info", "warning", "critical"],
       system_alert_status: ["open", "acknowledged", "resolved"],
-      travel_item_kind: ["destination", "business", "product", "event", "note"],
+      travel_item_kind: [
+        "destination",
+        "business",
+        "product",
+        "event",
+        "note",
+        "route",
+      ],
       travel_plan_source: ["web", "import", "concierge", "alux"],
       travel_plan_status: [
         "draft",

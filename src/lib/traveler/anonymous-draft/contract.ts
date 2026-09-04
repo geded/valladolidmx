@@ -30,6 +30,7 @@ export const AnonymousItemKindSchema = z.enum([
   "product",
   "event",
   "note",
+  "route",
   // Compatibilidad de lectura con la cola local anterior. Al importar se
   // normalizan a los contratos canónicos de Travel Plan.
   "promotion",

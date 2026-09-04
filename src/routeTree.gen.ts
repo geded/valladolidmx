@@ -39,11 +39,13 @@ import { Route as ArmaTuViajeRouteImport } from './routes/arma-tu-viaje'
 import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RutasIndexRouteImport } from './routes/rutas.index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
 import { Route as LugaresIndexRouteImport } from './routes/lugares.index'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as ViajeroHandleRouteImport } from './routes/viajero.$handle'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
+import { Route as RutasSlugRouteImport } from './routes/rutas.$slug'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewF1kDestinationsRouteImport } from './routes/preview/f1k-destinations'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
@@ -399,6 +401,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RutasIndexRoute = RutasIndexRouteImport.update({
+  id: '/rutas/',
+  path: '/rutas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
@@ -422,6 +429,11 @@ const ViajeroHandleRoute = ViajeroHandleRouteImport.update({
 const ViajeCompartidoTokenRoute = ViajeCompartidoTokenRouteImport.update({
   id: '/viaje-compartido/$token',
   path: '/viaje-compartido/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RutasSlugRoute = RutasSlugRouteImport.update({
+  id: '/rutas/$slug',
+  path: '/rutas/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductoSlugRoute = ProductoSlugRouteImport.update({
@@ -1713,11 +1725,13 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/eventos/': typeof EventosIndexRoute
   '/lugares/': typeof LugaresIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/rutas/': typeof RutasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
@@ -1946,11 +1960,13 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/eventos': typeof EventosIndexRoute
   '/lugares': typeof LugaresIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/rutas': typeof RutasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
@@ -2186,11 +2202,13 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/eventos/': typeof EventosIndexRoute
   '/lugares/': typeof LugaresIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/rutas/': typeof RutasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
@@ -2429,11 +2447,13 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/rutas/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/eventos/'
     | '/lugares/'
     | '/oriente-maya/'
+    | '/rutas/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/anfitriones'
@@ -2662,11 +2682,13 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/rutas/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/eventos'
     | '/lugares'
     | '/oriente-maya'
+    | '/rutas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/anfitriones'
@@ -2901,11 +2923,13 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/rutas/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/eventos/'
     | '/lugares/'
     | '/oriente-maya/'
+    | '/rutas/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/anfitriones'
@@ -3134,9 +3158,11 @@ export interface RootRouteChildren {
   PreviewTokenRoute: typeof PreviewTokenRoute
   PreviewF1kDestinationsRoute: typeof PreviewF1kDestinationsRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
+  RutasSlugRoute: typeof RutasSlugRoute
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  RutasIndexRoute: typeof RutasIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDevMediaPipelineDeriveRoute: typeof ApiDevMediaPipelineDeriveRoute
@@ -3374,6 +3400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rutas/': {
+      id: '/rutas/'
+      path: '/rutas'
+      fullPath: '/rutas/'
+      preLoaderRoute: typeof RutasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/oriente-maya/': {
       id: '/oriente-maya/'
       path: '/oriente-maya'
@@ -3407,6 +3440,13 @@ declare module '@tanstack/react-router' {
       path: '/viaje-compartido/$token'
       fullPath: '/viaje-compartido/$token'
       preLoaderRoute: typeof ViajeCompartidoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rutas/$slug': {
+      id: '/rutas/$slug'
+      path: '/rutas/$slug'
+      fullPath: '/rutas/$slug'
+      preLoaderRoute: typeof RutasSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/producto/$slug': {
@@ -5470,9 +5510,11 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewTokenRoute: PreviewTokenRoute,
   PreviewF1kDestinationsRoute: PreviewF1kDestinationsRoute,
   ProductoSlugRoute: ProductoSlugRoute,
+  RutasSlugRoute: RutasSlugRoute,
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  RutasIndexRoute: RutasIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDevMediaPipelineDeriveRoute: ApiDevMediaPipelineDeriveRoute,

@@ -353,6 +353,19 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     maturity: "L3",
     migrationStatus: "planned",
   },
+  "src/routes/rutas.index.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+    notes: "Lote 3C — listado público de Rutas/Itinerarios (CMS-first).",
+  },
+  "src/routes/rutas.$slug.tsx": {
+    category: "dynamic-template",
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+    notes: "Lote 3C — perfil público de Ruta/Itinerario (CMS-first).",
+  },
   "src/routes/empresas.tsx": {
     businessPriority: "high",
     maturity: "L3",
@@ -651,6 +664,8 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/resenar.negocio.$slug.tsx",
   "src/routes/reset-password.tsx",
   "src/routes/restaurantes.tsx",
+  "src/routes/rutas.$slug.tsx",
+  "src/routes/rutas.index.tsx",
   "src/routes/robots[.]txt.ts",
   "src/routes/sitemap[.]xml.ts",
   "src/routes/terminos.tsx",

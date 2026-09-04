@@ -26,6 +26,7 @@ import {
   Building2,
   Luggage,
   MapPin,
+  Route as RouteIcon,
   ShoppingBag,
   Sparkles,
   StickyNote,
@@ -70,6 +71,7 @@ const KIND_ICON: Record<TravelItemKind, React.ComponentType<{ className?: string
   product: ShoppingBag,
   event: Ticket,
   note: StickyNote,
+  route: RouteIcon,
 };
 
 const KIND_LABEL: Record<TravelItemKind, string> = {
@@ -78,6 +80,7 @@ const KIND_LABEL: Record<TravelItemKind, string> = {
   product: "Producto",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
 };
 
 const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?: string }>> = {
@@ -86,6 +89,7 @@ const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?
   product: ShoppingBag,
   event: Ticket,
   note: StickyNote,
+  route: RouteIcon,
   promotion: Ticket,
   custom: StickyNote,
 };
@@ -96,6 +100,7 @@ const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
   product: "Experiencia",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
   promotion: "Promoción",
   custom: "Idea",
 };
