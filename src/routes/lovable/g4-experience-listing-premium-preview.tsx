@@ -11,7 +11,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { ExperiencesListingSurface } from "@/components/experience-premium/ExperiencesListingSurface";
-import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
+import { getExperiencesListing } from "@/lib/experiences/experience-public-reads.functions";
 import {
   EXPERIENCE_DEMO_ATTRIBUTE_AXES,
   EXPERIENCE_DEMO_NOTICE,
@@ -44,18 +44,24 @@ export const Route = createFileRoute("/lovable/g4-experience-listing-premium-pre
   }),
   loader: async ({ deps }) => {
     if (deps.modo === "real") {
+      /* Revisión interna: incluye registros administrables en revisión. */
+      const real = await getExperiencesListing({
+        data: { destino: deps.destino, includeInReview: true },
+      });
       return {
         modo: deps.modo,
         destino: deps.destino,
-        dto: await getPublicListing({
-          data: { family: "experiencias", destino: deps.destino },
-        }),
+        dto: real.dto,
+        axes: real.axes,
+        valueLabels: real.valueLabels,
       };
     }
     return {
       modo: deps.modo,
       destino: deps.destino,
       dto: buildExperienceDemoListingDTO(deps.destino),
+      axes: EXPERIENCE_DEMO_ATTRIBUTE_AXES,
+      valueLabels: EXPERIENCE_DEMO_VALUE_LABELS,
     };
   },
   component: ExperienceListingPreview,
@@ -67,7 +73,7 @@ const MODOS: readonly { id: Modo; label: string }[] = [
 ];
 
 function ExperienceListingPreview() {
-  const { dto, modo } = Route.useLoaderData();
+  const { dto, modo, axes, valueLabels } = Route.useLoaderData();
   const isDemo = modo === "demo";
   return (
     <PublicShell variant="default" compactCrumbsOnMobile>
@@ -92,8 +98,8 @@ function ExperienceListingPreview() {
             ? EXPERIENCE_DEMO_NOTICE
             : "Superficie de revisión interna · lecturas CMS reales, no indexable."
         }
-        attributeAxes={isDemo ? EXPERIENCE_DEMO_ATTRIBUTE_AXES : []}
-        attributeValueLabels={isDemo ? EXPERIENCE_DEMO_VALUE_LABELS : {}}
+        attributeAxes={axes}
+        attributeValueLabels={valueLabels}
       />
     </PublicShell>
   );

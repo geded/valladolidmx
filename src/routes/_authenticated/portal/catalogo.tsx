@@ -24,6 +24,8 @@ import {
 } from "@/lib/portal/business-catalog.functions";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { ProductAdvancedPanel } from "@/components/portal/ProductAdvancedPanel";
+import { ProductAttributesPanel } from "@/components/cms/ProductAttributesPanel";
+
 import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
 import { toast } from "@/lib/toast";
 
@@ -454,6 +456,8 @@ function ProductRow({
         productStatus={product.status}
         onStatusChanged={onRefresh}
       />
+      <ProductAttributesPanel productId={product.id} />
+
     </li>
   );
 }
