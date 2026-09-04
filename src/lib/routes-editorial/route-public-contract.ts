@@ -128,7 +128,7 @@ export function routeToTourismCard(
       (route.destinationSlugs.length ? labelOf(route.destinationSlugs[0]) : null),
     highlights,
     badges: routeDifficultyLabel(route.difficulty)
-      ? [{ label: routeDifficultyLabel(route.difficulty)!, tone: "neutral" as const }]
+      ? [{ label: routeDifficultyLabel(route.difficulty)!, tone: "info" as const }]
       : [],
     institutionalBadges: [],
     dateLabel: null,
