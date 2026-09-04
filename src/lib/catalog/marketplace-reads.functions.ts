@@ -469,9 +469,6 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
-    // Lote 3C — familia de listado declarada en CMS (autoridad única).
-    const catFamily = (biz.business_categories as { listing_family_key?: unknown } | null)
-      ?.listing_family_key;
     const planTier = resolveBusinessPlanTier(
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
@@ -877,6 +874,9 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
+    // Lote 3C — familia de listado declarada en CMS (autoridad única).
+    const catFamily = (biz.business_categories as { listing_family_key?: unknown } | null)
+      ?.listing_family_key;
     const planTier = resolveBusinessPlanTier(
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
