@@ -344,7 +344,7 @@ function ExperienceListCard({ vm }: { vm: TourismCardVM }) {
     priceCurrency: vm.priceCurrency,
   });
   /* Duración publicada (eje `duracion`); se omite si no hay dato. */
-  const durationLabel = vm.filterAttributes?.duracion?.[0]?.label ?? null;
+  const durationLabel = vm.filterAttributes?.duracion?.[0] ?? null;
   return (
     <div className="flex flex-col gap-2">
       <PremiumCompactRow item={toShowcaseItem(vm)} />
