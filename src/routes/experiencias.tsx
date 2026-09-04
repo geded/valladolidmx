@@ -82,8 +82,8 @@ function ExperienciasRoute() {
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
     ...(humanTema && !destino ? [{ label: humanTema }] : []),
   ];
-  const destinoFacet = buildDestinationFacet([...dto.items]);
   const titleOverride = !destino && humanTema ? `Experiencias · ${humanTema}` : null;
+  const heroDto = titleOverride ? { ...dto, hero: { ...dto.hero, title: titleOverride } } : dto;
   return (
     <PublicShell
       crumbs={legacyCrumbs}
@@ -91,11 +91,7 @@ function ExperienciasRoute() {
       useContextCrumbs={!humanTema || !!destino}
       compactCrumbsOnMobile
     >
-      <ListingPremiumSurfaceFromDTO
-        dto={dto}
-        titleOverride={titleOverride}
-        facets={destino || !destinoFacet ? [] : [destinoFacet]}
-      />
+      <ExperiencesListingSurface dto={heroDto} />
     </PublicShell>
   );
 }
