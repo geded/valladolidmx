@@ -429,6 +429,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/lugares.$placeId.editar.tsx",
   "src/routes/_authenticated/cms/lugares.index.tsx",
   "src/routes/_authenticated/cms/lugares.nuevo.tsx",
+  "src/routes/_authenticated/cms/marca.tsx",
   "src/routes/_authenticated/cms/media.tsx",
   "src/routes/_authenticated/cms/observabilidad.tsx",
   "src/routes/_authenticated/cms/pagos.tsx",
