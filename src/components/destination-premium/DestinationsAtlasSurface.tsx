@@ -1080,10 +1080,6 @@ function AtlasCard({
         <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
           {destination.tagline}
         </p>
-
-        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
-          {destination.tagline}
-        </p>
         {proximityLabel ? (
           <p className="mt-2 inline-flex items-center gap-1 text-xs text-foreground">
             <MapPin className="size-3.5 text-selva" /> {proximityLabel}
