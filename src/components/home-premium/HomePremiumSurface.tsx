@@ -273,38 +273,17 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
   useHeroAutoplay(content.hero.slides.length, setIndex);
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
-    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
-        <div className="flex flex-col justify-center bg-card p-5 sm:p-7 lg:p-10">
-          <p className="text-xs font-semibold uppercase text-primary">{content.hero.eyebrow}</p>
-          <h1 className="mt-2.5 text-balance font-display text-3xl leading-[1.02] sm:text-4xl lg:text-[3.35rem]">
-            {content.hero.title}
-          </h1>
-          <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-5 text-muted-foreground lg:mt-4 lg:text-[0.95rem] lg:leading-6">
-            {content.hero.subtitle}
-          </p>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-selva">
-            {ACTIVE_BRAND.discoveryPromise}
-          </p>
-          <div className="mt-5">
-            <HeroSearch />
-          </div>
-        </div>
-        <figure className="relative min-h-[16rem] overflow-hidden sm:min-h-[20rem] lg:min-h-[32rem]">
-          <EditorialMediaFrame
-            media={slide.media}
-            label={content.hero.title}
-            loading="eager"
-            className="absolute inset-0 size-full object-cover"
-          />
-          <figcaption className="absolute bottom-4 left-4 rounded-md bg-foreground/85 px-3 py-2 text-xs text-background">
-            {slide.caption}
-          </figcaption>
-        </figure>
-      </div>
-    </section>
+    <PremiumEditorialHero
+      eyebrow={content.hero.eyebrow}
+      title={content.hero.title}
+      subtitle={content.hero.subtitle}
+      media={slide.media}
+      caption={slide.caption}
+      searchSlot={<HeroSearch />}
+    />
   );
 }
+
 
 function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
