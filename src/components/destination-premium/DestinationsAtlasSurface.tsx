@@ -433,7 +433,22 @@ export function DestinationsAtlasSurface({
                     El mapa aparecerá cuando los destinos tengan coordenadas verificadas en CMS.
                   </div>
                 )}
+                {/* Panel inferior de ruta (móvil): destino enfocado en el mapa. */}
+                <div className="mt-3 lg:hidden">
+                  <PremiumCompactRow
+                    item={toShowcaseItem(
+                      activeDestination ?? mapped[0] ?? list[0]!,
+                      (() => {
+                        const target = activeDestination ?? mapped[0] ?? list[0];
+                        const info = target ? proximityOf(target) : null;
+                        return info ? formatProximity(info) : null;
+                      })(),
+                    )}
+                    active
+                  />
+                </div>
               </div>
+
             </div>
           </section>,
         )}
