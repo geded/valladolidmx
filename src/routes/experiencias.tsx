@@ -7,7 +7,7 @@ import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
-import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
+import { ExperiencesListingSurface } from "@/components/experience-premium/ExperiencesListingSurface";
 
 const CATEGORY_SLUGS = new Set(["experiencias", "experiencias-tours", "tours"]);
 
