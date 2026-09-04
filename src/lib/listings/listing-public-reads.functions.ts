@@ -22,8 +22,9 @@ import {
 } from "./listing-public-contract";
 import {
   getListingFamilyTaxonomy,
-  type ListingFamilyTaxonomy,
+  type ListingFamilyTaxonomyResult,
 } from "./listing-family-taxonomy.functions";
+
 
 export interface GetPublicListingInput {
   family: ListingFamilyId;
