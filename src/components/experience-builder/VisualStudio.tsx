@@ -1265,6 +1265,7 @@ function PageVisualEditor({
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
+      const signature = canonicalizeClient(tree);
       void save({ data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" } })
         .then((res) => {
           setPage((current) =>
@@ -1272,8 +1273,10 @@ function PageVisualEditor({
               ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
               : current,
           );
+          savedSignatureRef.current = signature;
           setSaveStatus("saved");
         })
+
         .catch((e) => {
           setSaveStatus("error");
           const msg = e instanceof Error ? e.message : String(e);
