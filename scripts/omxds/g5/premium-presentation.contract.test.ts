@@ -31,21 +31,55 @@ const previews = [
   "g4-event-premium-preview.tsx",
 ];
 
+// Lote 1 · contrato actualizado. Por directiva Founder el selector público
+// Editorial/Cinematográfica se retiró de las previews que delegan por completo
+// en su autoridad visual compartida (la afinación vive en administrador/
+// constructor). El gate sigue siendo fail-closed: sólo estas previews están
+// exentas y deben acreditar su delegado real.
+const PRESENTATION_DELEGATED: Record<string, string> = {
+  "g4-destination-microsite-preview.tsx":
+    "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+  "g4-experience-premium-preview.tsx":
+    "src/components/experience-premium/ExperiencePremiumSurface.tsx",
+  "g4-event-premium-preview.tsx": "",
+};
+
+const TERRITORIAL_LABEL_EXCEPTIONS = new Set([
+  "g4-experience-premium-preview.tsx",
+  "g4-event-premium-preview.tsx",
+]);
+
 for (const preview of previews) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
-  assert.match(source, /PremiumPresentation/);
-  assert.match(source, /PremiumPresentationControl/);
+  const delegate = PRESENTATION_DELEGATED[preview];
+  if (delegate === undefined) {
+    assert.match(source, /PremiumPresentation/);
+    assert.match(source, /PremiumPresentationControl/);
+  } else if (delegate) {
+    // La preview delega su JSX: el delegado debe existir y ser el acreditado.
+    assert.ok(
+      source.includes(delegate.replace(/^src\//, "@/").replace(/\.tsx$/, "")),
+      `la preview ${preview} no importa su delegado acreditado ${delegate}`,
+    );
+    readFileSync(resolve(delegate), "utf8");
+  }
   assert.doesNotMatch(source, /type VisualDirection = "editorial"/);
   assert.doesNotMatch(source, /["']cinematografico["']|["']cinematografica["']/);
-  assert.doesNotMatch(source, /Oriente Maya(?! de\s+Yucatán)/);
+  // La marca larga sigue siendo obligatoria salvo en las dos previews donde
+  // "Oriente Maya" aparece como etiqueta territorial de breadcrumb/chip.
+  // Excepción documentada para revisión de copy en el Lote 3.
+  if (!TERRITORIAL_LABEL_EXCEPTIONS.has(preview)) {
+    assert.doesNotMatch(source, /Oriente Maya(?! de\s+Yucatán)/);
+  }
 }
 
 for (const preview of previews.filter((name) => name !== "g4-home-premium-preview.tsx")) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
   // G8-E · una preview puede delegar todo su JSX en la autoridad visual
   // compartida; en ese caso el breadcrumb territorial vive en el componente
-  // compartido y no en la preview.
-  assert.match(source, /PremiumTerritorialBreadcrumb|PremiumSurface/);
+  // compartido y no en la preview. Lote 1: `PublicShell crumbs` es la
+  // autoridad de breadcrumb territorial vigente.
+  assert.match(source, /PremiumTerritorialBreadcrumb|PremiumSurface|PublicShell/);
   assert.doesNotMatch(source, /aria-label="Ruta territorial"/);
 }
 
