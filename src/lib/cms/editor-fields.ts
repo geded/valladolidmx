@@ -32,6 +32,21 @@ export const CATEGORY_FIELDS: EditorField[] = [
   { name: "description", label: "Descripción", type: "textarea" },
   { name: "icon", label: "Ícono (clave)", type: "text" },
   { name: "sort_order", label: "Orden", type: "number" },
+  {
+    // Lote 3C — autoridad CMS-first de familias de listado turístico.
+    name: "listing_family_key",
+    label: "Familia de listado",
+    type: "select",
+    options: [
+      { value: "", label: "Sin familia" },
+      { value: "hoteles", label: "Hoteles" },
+      { value: "restaurantes", label: "Restaurantes" },
+      { value: "experiencias", label: "Experiencias" },
+      { value: "casas-de-vacaciones", label: "Casas de vacaciones" },
+    ],
+    helpText:
+      "Define en qué listado turístico público aparecen las empresas de esta categoría.",
+  },
 ];
 
 /**

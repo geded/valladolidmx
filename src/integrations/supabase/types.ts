@@ -828,6 +828,7 @@ export type Database = {
           description: string | null
           icon: string | null
           id: string
+          listing_family_key: string | null
           metadata: Json
           name: string
           parent_id: string | null
@@ -845,6 +846,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          listing_family_key?: string | null
           metadata?: Json
           name: string
           parent_id?: string | null
@@ -862,6 +864,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          listing_family_key?: string | null
           metadata?: Json
           name?: string
           parent_id?: string | null
@@ -2986,66 +2989,158 @@ export type Database = {
           },
         ]
       }
+      editorial_route_stops: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          day_number: number | null
+          duration_minutes: number | null
+          entity_id: string | null
+          entity_kind: string
+          id: string
+          note: string | null
+          position: number
+          route_id: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          day_number?: number | null
+          duration_minutes?: number | null
+          entity_id?: string | null
+          entity_kind: string
+          id?: string
+          note?: string | null
+          position?: number
+          route_id: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          day_number?: number | null
+          duration_minutes?: number | null
+          entity_id?: string | null
+          entity_kind?: string
+          id?: string
+          note?: string | null
+          position?: number
+          route_id?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_route_stops_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editorial_routes: {
         Row: {
+          audiences: string[]
           body: string | null
           cover_media_id: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
           destination_ids: string[]
+          difficulty: string | null
           duration_days: number
+          duration_hours: number | null
+          gallery_media_ids: string[]
           id: string
+          interests: string[]
+          is_demo_seed: boolean
           locale: Database["public"]["Enums"]["locale_code"]
           name: string
+          origin_destination_id: string | null
+          pace: string | null
           palette: Database["public"]["Enums"]["hero_palette"] | null
           published_at: string | null
+          region_slug: string
+          seasons: string[]
           slug: string
           status: Database["public"]["Enums"]["content_status"]
           summary: string | null
           updated_at: string
           updated_by: string | null
+          zone_ids: string[]
         }
         Insert: {
+          audiences?: string[]
           body?: string | null
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
           destination_ids?: string[]
+          difficulty?: string | null
           duration_days?: number
+          duration_hours?: number | null
+          gallery_media_ids?: string[]
           id?: string
+          interests?: string[]
+          is_demo_seed?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           name: string
+          origin_destination_id?: string | null
+          pace?: string | null
           palette?: Database["public"]["Enums"]["hero_palette"] | null
           published_at?: string | null
+          region_slug?: string
+          seasons?: string[]
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
           summary?: string | null
           updated_at?: string
           updated_by?: string | null
+          zone_ids?: string[]
         }
         Update: {
+          audiences?: string[]
           body?: string | null
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
           destination_ids?: string[]
+          difficulty?: string | null
           duration_days?: number
+          duration_hours?: number | null
+          gallery_media_ids?: string[]
           id?: string
+          interests?: string[]
+          is_demo_seed?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           name?: string
+          origin_destination_id?: string | null
+          pace?: string | null
           palette?: Database["public"]["Enums"]["hero_palette"] | null
           published_at?: string | null
+          region_slug?: string
+          seasons?: string[]
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
           summary?: string | null
           updated_at?: string
           updated_by?: string | null
+          zone_ids?: string[]
         }
         Relationships: [
           {
@@ -3053,6 +3148,13 @@ export type Database = {
             columns: ["cover_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_routes_origin_destination_id_fkey"
+            columns: ["origin_destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
             referencedColumns: ["id"]
           },
         ]

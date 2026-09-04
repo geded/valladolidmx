@@ -233,6 +233,12 @@ export interface BuildPublicListingInput extends ListingFeedInput {
   readonly family: unknown;
   readonly destino?: string | null;
   readonly destinationLabelOf?: (slug: string) => string;
+  /**
+   * Lote 3C — Autoridad CMS-first: slugs de categoría administrados desde
+   * `business_categories.listing_family_key`. Cuando llega, sustituye a la
+   * lista declarada en el contrato (que queda como fallback fail-safe).
+   */
+  readonly categorySlugs?: readonly string[];
 }
 
 function humanize(slug: string): string {
@@ -249,12 +255,16 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
   const labelOf = input.destinationLabelOf ?? humanize;
   const destinationLabel = destino ? labelOf(destino) : null;
 
-  const allowed = new Set(contract.categorySlugs);
+  const allowed = new Set(
+    (input.categorySlugs?.length ? input.categorySlugs : contract.categorySlugs).map((slug) =>
+      slug.trim().toLowerCase(),
+    ),
+  );
   let items: TourismCardVM[] = [];
 
   if (contract.source === "businesses") {
     items = (input.businesses ?? [])
-      .filter((b) => allowed.has(b.category_slug))
+      .filter((b) => allowed.has(b.category_slug.trim().toLowerCase()))
       .filter((b) => !destino || b.destination_slug === destino)
       .map((b) =>
         businessToTourismCard(b, {
