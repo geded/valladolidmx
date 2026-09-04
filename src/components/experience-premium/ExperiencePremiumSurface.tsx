@@ -2,7 +2,7 @@
  * `ExperiencePremiumSurface` — ficha canónica de Experiencia (render-only).
  *
  * Autoridad visual: Home Premium aprobado. Reutiliza sin reinterpretar
- * `PremiumHero`, `EditorialMediaFrame`, `PremiumSectionHead`,
+ * `EditorialMediaFrame`, `PremiumSectionHead`,
  * `PremiumCompactRow`, `AddToTravelPlanButton` y el Alux oficial. No
  * renderiza chrome global: la ruta aporta `PublicShell` (con breadcrumb
  * territorial compacto en móvil).
@@ -14,7 +14,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 
-import { PremiumHero } from "@/components/premium";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import {
   PremiumSectionHead,
@@ -56,43 +55,60 @@ export function ExperiencePremiumSurface({
   }));
 
   return (
-    <div className={cn("space-y-8", className)}>
+    <div className={cn("space-y-10", className)}>
       {vm.demoNotice ? (
         <p className="rounded-pill border border-dashed border-border bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
           {vm.demoNotice}
         </p>
       ) : null}
 
-      <PremiumHero
-        vm={{
-          presentation: vm.cover ? "cinematic" : "editorial",
-          eyebrow: [vm.eyebrow, vm.destinationLabel].filter(Boolean).join(" · "),
-          title: vm.name,
-          description: vm.tagline ?? vm.description.slice(0, 220) ?? undefined,
-          media: vm.cover ? { url: vm.cover.url, alt: vm.cover.alt } : null,
-        }}
-      />
-
-      {/* Acciones — Mi Viaje y comercio real, nunca mezclados. */}
+      {/* Hero editorial compacto: media a un lado, decisión al otro. */}
       <section
-        aria-label="Acciones de la experiencia"
-        className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+        aria-label={vm.name}
+        className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-start"
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase text-primary">Operada por</p>
+        {vm.cover ? (
+          <EditorialMediaFrame
+            media={vm.cover}
+            label={vm.name}
+            className="aspect-[16/10] w-full rounded-3xl object-cover lg:aspect-[4/3]"
+          />
+        ) : null}
+
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            {[vm.eyebrow, vm.destinationLabel].filter(Boolean).join(" · ")}
+          </p>
+          <h1 className="mt-2 text-balance font-serif text-3xl leading-tight sm:text-4xl">
+            {vm.name}
+          </h1>
+          {vm.tagline ? (
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">{vm.tagline}</p>
+          ) : null}
+
+          <p className="mt-4 text-sm">
+            <span className="text-muted-foreground">Operada por </span>
             {vm.operatorHref ? (
-              <Link to={vm.operatorHref} className="font-display text-lg hover:underline">
+              <Link to={vm.operatorHref} className="font-semibold hover:underline">
                 {vm.operatorName}
               </Link>
             ) : (
-              <p className="font-display text-lg">{vm.operatorName}</p>
+              <span className="font-semibold">{vm.operatorName}</span>
             )}
-            {commerce.priceLabel ? (
-              <p className="mt-1 text-sm text-muted-foreground">Desde {commerce.priceLabel}</p>
-            ) : null}
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
+          </p>
+          {commerce.priceLabel ? (
+            <p className="mt-1 font-display text-2xl">Desde {commerce.priceLabel}</p>
+          ) : null}
+          {vm.rating ? (
+            <p className="mt-1 text-sm">
+              <span className="font-semibold">{vm.rating.value.toFixed(1)}</span>{" "}
+              <span className="text-muted-foreground">
+                · {vm.rating.count} {vm.rating.count === 1 ? "reseña" : "reseñas"} publicadas
+              </span>
+            </p>
+          ) : null}
+
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
             {tripEligibility.eligible ? (
               <AddToTravelPlanButton
                 kind="product"
@@ -114,27 +130,33 @@ export function ExperiencePremiumSurface({
                 href={commerce.contactHref}
                 target={commerce.contactHref.startsWith("http") ? "_blank" : undefined}
                 rel="noreferrer"
-                className="inline-flex min-h-11 items-center rounded-pill border border-border bg-background px-5 text-sm font-semibold"
+                className="inline-flex min-h-11 items-center justify-center rounded-pill border border-border bg-background px-5 text-sm font-semibold"
               >
                 {commerce.contactLabel}
               </a>
             ) : null}
           </div>
+
+          {commerce.saleGapNotice ? (
+            <p className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+              {commerce.saleGapNotice}
+            </p>
+          ) : null}
+          <p className="mt-3 text-xs text-muted-foreground">{commerce.rationale}</p>
+
+          {vm.facts.length > 0 ? (
+            <dl className="mt-5 grid grid-cols-2 gap-2 border-t border-border pt-4 sm:grid-cols-3">
+              {vm.facts.slice(0, 9).map((fact) => (
+                <div key={fact.label} className="min-w-0">
+                  <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+                    {fact.label}
+                  </dt>
+                  <dd className="mt-0.5 text-sm leading-snug">{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
         </div>
-        {commerce.saleGapNotice ? (
-          <p className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-            {commerce.saleGapNotice}
-          </p>
-        ) : null}
-        {vm.rating ? (
-          <p className="mt-3 text-sm">
-            <span className="font-semibold">{vm.rating.value.toFixed(1)}</span>{" "}
-            <span className="text-muted-foreground">
-              · {vm.rating.count} {vm.rating.count === 1 ? "reseña" : "reseñas"} publicadas
-            </span>
-          </p>
-        ) : null}
-        <p className="mt-3 text-xs text-muted-foreground">{commerce.rationale}</p>
       </section>
 
       {aluxSlot}
@@ -152,25 +174,6 @@ export function ExperiencePremiumSurface({
         </section>
       ) : null}
 
-      {vm.facts.length > 0 ? (
-        <section aria-labelledby="experiencia-datos">
-          <PremiumSectionHead
-            id="experiencia-datos"
-            kicker="Lo esencial"
-            title="Datos prácticos publicados"
-          />
-          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {vm.facts.map((fact) => (
-              <div key={fact.label} className="rounded-2xl border border-border bg-card p-4">
-                <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
-                  {fact.label}
-                </dt>
-                <dd className="mt-1 font-display text-lg">{fact.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      ) : null}
 
       {vm.gallery.length > 0 ? (
         <section aria-labelledby="experiencia-galeria">

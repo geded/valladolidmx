@@ -13,7 +13,7 @@
  *   de modo que sustituir estos registros por datos reales no toca plantilla.
  * · Los medios son activos DEMO YA REGISTRADOS en el gestor de Medios
  *   (`media_assets`, bucket privado `studio-media`, lote
- *   `places-preview-2026-09-03`, marcados IA/conceptual/temporal y
+ *   `experiences-preview-2026-09-04`, marcados IA/conceptual/temporal y
  *   `production_eligible = false`). No hay imports de imagen ni base64.
  *
  * Capa PURA: sin red, sin base de datos, sin React.
@@ -26,35 +26,39 @@ import { resolveExperienceCommerce } from "@/lib/experiences/experience-commerce
 export const EXPERIENCE_DEMO_BATCH_ID = "experiences-preview-2026-09-04" as const;
 
 export const EXPERIENCE_DEMO_NOTICE =
-  "Contenido de demostración · 8 experiencias ficticias con imágenes conceptuales generadas con IA " +
-  "(temporales, no aptas para producción). Ningún registro real fue creado ni modificado; esta " +
-  "superficie es interna y no indexable.";
+  "Contenido administrable de demostración · imágenes conceptuales temporales para revisión.";
 
 export const EXPERIENCE_DEMO_MEDIA_NOTICE =
   "Imágenes conceptuales generadas con IA, temporales y no aptas para producción.";
 
 /** Base pública estable del gestor de Medios (bucket privado con firma). */
-const MEDIA_BASE = "/api/public/studio-media/places-preview-2026-09-03";
+const MEDIA_BASE = "/api/public/studio-media/experiences-preview-2026-09-04";
 
 /**
- * Activos DEMO existentes en el gestor de Medios. Se reutilizan tal cual:
- * este módulo no sube, no genera y no borra medios.
+ * Activos DEMO del lote de Experiencias, registrados en el gestor de Medios
+ * (`media_assets`, bucket `studio-media`, marcados IA/conceptual/temporal y
+ * `production_eligible = false`). Cada experiencia usa EXCLUSIVAMENTE sus
+ * propios medios: prohibido reutilizar la portada de otra ficha.
  */
 const MEDIA = {
-  calzadaCover: `${MEDIA_BASE}/calzada-de-los-frailes-cover.png`,
-  calzadaGallery: `${MEDIA_BASE}/calzada-de-los-frailes-gallery.png`,
-  ikKilCover: `${MEDIA_BASE}/cenote-ik-kil-cover.png`,
-  ikKilGallery: `${MEDIA_BASE}/cenote-ik-kil-gallery.png`,
-  suytunCover: `${MEDIA_BASE}/cenote-suytun-cover.png`,
-  suytunGallery: `${MEDIA_BASE}/cenote-suytun-gallery.png`,
-  zaciCover: `${MEDIA_BASE}/cenote-zaci-cover.png`,
-  zaciGallery: `${MEDIA_BASE}/cenote-zaci-gallery.png`,
-  chichenCover: `${MEDIA_BASE}/chichen-itza-cover.png`,
-  chichenGallery: `${MEDIA_BASE}/chichen-itza-gallery.png`,
-  conventoCover: `${MEDIA_BASE}/convento-san-bernardino-cover.png`,
-  conventoGallery: `${MEDIA_BASE}/convento-san-bernardino-gallery.png`,
-  ekBalamGallery: `${MEDIA_BASE}/ek-balam-gallery.png`,
+  cocinaCover: `${MEDIA_BASE}/cocina-de-humo-cover.jpg`,
+  cocinaGallery: `${MEDIA_BASE}/cocina-de-humo-gallery.jpg`,
+  rutaNocturnaCover: `${MEDIA_BASE}/ruta-nocturna-cover.jpg`,
+  rutaNocturnaGallery: `${MEDIA_BASE}/ruta-nocturna-gallery.jpg`,
+  descensoCover: `${MEDIA_BASE}/descenso-cenote-cover.jpg`,
+  descensoGallery: `${MEDIA_BASE}/descenso-cenote-gallery.jpg`,
+  hamacaCover: `${MEDIA_BASE}/taller-hamaca-cover.jpg`,
+  hamacaGallery: `${MEDIA_BASE}/taller-hamaca-gallery.jpg`,
+  biciCover: `${MEDIA_BASE}/bici-izamal-cover.jpg`,
+  biciGallery: `${MEDIA_BASE}/bici-izamal-gallery.jpg`,
+  amanecerCover: `${MEDIA_BASE}/amanecer-arqueologico-cover.jpg`,
+  amanecerGallery: `${MEDIA_BASE}/amanecer-arqueologico-gallery.jpg`,
+  astronomiaCover: `${MEDIA_BASE}/astronomia-maya-cover.jpg`,
+  astronomiaGallery: `${MEDIA_BASE}/astronomia-maya-gallery.jpg`,
+  mercadoCover: `${MEDIA_BASE}/mercado-sobremesa-cover.jpg`,
+  mercadoGallery: `${MEDIA_BASE}/mercado-sobremesa-gallery.jpg`,
 } as const;
+
 
 /**
  * Ejes de filtro DEMO. El CMS todavía NO define atributos turísticos para la
@@ -78,6 +82,8 @@ export const EXPERIENCE_DEMO_ATTRIBUTE_AXES: readonly {
 
 interface DemoExperienceSeed {
   readonly slug: string;
+  /** UUID real del registro CMS (`products`) — identidad para Mi Viaje. */
+  readonly productId: string;
   readonly name: string;
   readonly categoryLabel: string;
   readonly tagline: string;
@@ -100,6 +106,7 @@ const conceptualAlt = (subject: string) =>
 const SEEDS: readonly DemoExperienceSeed[] = [
   {
     slug: "demo-cocina-de-humo-fogon-maya",
+    productId: "0a0dd8f5-1522-44d5-afe3-afc0d18976f5",
     name: "Cocina de humo en fogón maya",
     categoryLabel: "Gastronomía",
     tagline: "Una cocina familiar enciende el fogón y explica el maíz como se explica una herencia.",
@@ -108,11 +115,10 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Cocina demostrativa Xtabay",
     destinationSlug: "valladolid",
     destinationLabel: "Valladolid",
-    cover: { url: MEDIA.calzadaCover, alt: conceptualAlt("una cocina tradicional yucateca de fogón") },
-    cardMedia: { url: MEDIA.zaciGallery, alt: conceptualAlt("mesa yucateca servida en un solar colonial") },
+    cover: { url: MEDIA.cocinaCover, alt: conceptualAlt("una cocina de humo en fogón maya") },
+    cardMedia: { url: MEDIA.cocinaGallery, alt: conceptualAlt("una sobremesa yucateca en un solar colonial") },
     gallery: [
-      { url: MEDIA.calzadaGallery, alt: conceptualAlt("patio colonial con mesa larga preparada") },
-      { url: MEDIA.conventoGallery, alt: conceptualAlt("muro de piedra caliza de una casona vallisoletana") },
+      { url: MEDIA.cocinaGallery, alt: conceptualAlt("una sobremesa yucateca en un solar colonial") },
     ],
     attributes: {
       duracion: ["3-4-horas"],
@@ -132,6 +138,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-ruta-nocturna-calzada-de-los-frailes",
+    productId: "e7a7c4c7-b9a4-4980-8e9c-f84e941ec751",
     name: "Ruta nocturna por la Calzada de los Frailes",
     categoryLabel: "Cultura y patrimonio",
     tagline: "La calle más fotografiada de Valladolid contada por quien creció en ella.",
@@ -140,9 +147,11 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Guías demostrativos del Centro",
     destinationSlug: "valladolid",
     destinationLabel: "Valladolid",
-    cover: { url: MEDIA.conventoCover, alt: conceptualAlt("fachada colonial iluminada al anochecer") },
-    cardMedia: { url: MEDIA.calzadaGallery, alt: conceptualAlt("calle empedrada colonial con casas de colores") },
-    gallery: [{ url: MEDIA.calzadaCover, alt: conceptualAlt("Calzada de los Frailes al atardecer") }],
+    cover: { url: MEDIA.rutaNocturnaCover, alt: conceptualAlt("una calle colonial empedrada iluminada de noche") },
+    cardMedia: { url: MEDIA.rutaNocturnaGallery, alt: conceptualAlt("la fachada de piedra de un ex convento iluminada de noche") },
+    gallery: [
+      { url: MEDIA.rutaNocturnaGallery, alt: conceptualAlt("la fachada de piedra de un ex convento iluminada de noche") },
+    ],
     attributes: {
       duracion: ["2-3-horas"],
       horario: ["noche"],
@@ -158,6 +167,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-descenso-cenote-de-gruta",
+    productId: "59340bf6-998d-4b28-ab85-80f9028d05ef",
     name: "Descenso guiado a cenote de gruta",
     categoryLabel: "Cenotes y naturaleza",
     tagline: "Un cenote cerrado, cuerdas, casco y un guía que conoce cada saliente.",
@@ -166,11 +176,10 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Operadora demostrativa Xibalbá",
     destinationSlug: "temozon",
     destinationLabel: "Temozón",
-    cover: { url: MEDIA.suytunCover, alt: conceptualAlt("cenote de gruta con haz de luz sobre el agua") },
-    cardMedia: { url: MEDIA.ikKilGallery, alt: conceptualAlt("caverna inundada con estalactitas") },
+    cover: { url: MEDIA.descensoCover, alt: conceptualAlt("un descenso guiado con cuerda a un cenote de gruta") },
+    cardMedia: { url: MEDIA.descensoGallery, alt: conceptualAlt("equipo de descenso a cenote preparado en la boca de la gruta") },
     gallery: [
-      { url: MEDIA.suytunGallery, alt: conceptualAlt("plataforma de piedra dentro de un cenote cerrado") },
-      { url: MEDIA.ikKilCover, alt: conceptualAlt("cenote abierto de aguas turquesa") },
+      { url: MEDIA.descensoGallery, alt: conceptualAlt("equipo de descenso a cenote preparado en la boca de la gruta") },
     ],
     attributes: {
       duracion: ["medio-dia"],
@@ -187,7 +196,6 @@ const SEEDS: readonly DemoExperienceSeed[] = [
       acceptsOnlinePayment: false,
       priceAmount: 2100,
       priceCurrency: "MXN",
-      contact: { type: "email", value: "demo@valladolid.mx" },
     },
     facts: [
       { label: "Equipo", value: "Casco, arnés y chaleco incluidos (demostración)" },
@@ -196,6 +204,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-taller-urdido-de-hamaca",
+    productId: "5dd0b8c2-6042-4de7-84ad-ce3484ea3448",
     name: "Taller de urdido de hamaca",
     categoryLabel: "Artesanía viva",
     tagline: "Dos horas frente al bastidor bastan para entender por qué una hamaca tarda semanas.",
@@ -204,9 +213,11 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Taller demostrativo K'aan",
     destinationSlug: "espita",
     destinationLabel: "Espita",
-    cover: { url: MEDIA.zaciCover, alt: conceptualAlt("taller artesanal con bastidor de hamaca") },
-    cardMedia: { url: MEDIA.conventoGallery, alt: conceptualAlt("interior de casa yucateca con hamacas colgadas") },
-    gallery: [{ url: MEDIA.zaciGallery, alt: conceptualAlt("hilos de colores tensados en un bastidor") }],
+    cover: { url: MEDIA.hamacaCover, alt: conceptualAlt("un taller de urdido de hamaca con bastidor e hilos") },
+    cardMedia: { url: MEDIA.hamacaGallery, alt: conceptualAlt("hilos de colores y una hamaca yucateca terminada") },
+    gallery: [
+      { url: MEDIA.hamacaGallery, alt: conceptualAlt("hilos de colores y una hamaca yucateca terminada") },
+    ],
     attributes: {
       duracion: ["2-3-horas"],
       horario: ["tarde"],
@@ -217,17 +228,12 @@ const SEEDS: readonly DemoExperienceSeed[] = [
       nivel_precio: ["economico"],
     },
     priceAmount: 380,
-    commerce: {
-      conversionMode: "whatsapp",
-      acceptsOnlinePayment: false,
-      priceAmount: 380,
-      priceCurrency: "MXN",
-      contact: { type: "whatsapp", value: "+52 985 000 0000" },
-    },
+    commerce: { conversionMode: "informacion", acceptsOnlinePayment: false, priceAmount: 380, priceCurrency: "MXN" },
     facts: [{ label: "Incluye", value: "Materiales del taller (demostración)" }],
   },
   {
     slug: "demo-bici-amarilla-izamal",
+    productId: "ff7ad8d7-f7e0-427b-8db2-5a5862531b38",
     name: "Bici amarilla por la ciudad de los tres pueblos",
     categoryLabel: "Cultura y patrimonio",
     tagline: "Izamal entera es amarilla; en bicicleta se entiende por qué.",
@@ -236,9 +242,11 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Colectivo demostrativo Kinich",
     destinationSlug: "izamal",
     destinationLabel: "Izamal",
-    cover: { url: MEDIA.chichenCover, alt: conceptualAlt("plaza colonial amarilla con arcadas") },
-    cardMedia: { url: MEDIA.conventoCover, alt: conceptualAlt("convento franciscano de muros amarillos") },
-    gallery: [{ url: MEDIA.chichenGallery, alt: conceptualAlt("basamento prehispánico entre casas bajas") }],
+    cover: { url: MEDIA.biciCover, alt: conceptualAlt("un recorrido en bicicleta por una plaza colonial amarilla") },
+    cardMedia: { url: MEDIA.biciGallery, alt: conceptualAlt("una bicicleta recargada en un muro amarillo colonial") },
+    gallery: [
+      { url: MEDIA.biciGallery, alt: conceptualAlt("una bicicleta recargada en un muro amarillo colonial") },
+    ],
     attributes: {
       duracion: ["3-4-horas"],
       horario: ["manana"],
@@ -254,6 +262,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-amanecer-arqueologico-ek-balam",
+    productId: "a53c1adf-4425-42d7-b025-508314231070",
     name: "Amanecer arqueológico en Ek' Balam",
     categoryLabel: "Arqueología",
     tagline: "Llegar antes que los autobuses cambia por completo la escala de la Acrópolis.",
@@ -262,9 +271,11 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Guianza demostrativa Balam",
     destinationSlug: "valladolid",
     destinationLabel: "Cercanías de Valladolid",
-    cover: { url: MEDIA.ekBalamGallery, alt: conceptualAlt("acrópolis maya entre selva baja al amanecer") },
-    cardMedia: { url: MEDIA.chichenGallery, alt: conceptualAlt("estructura piramidal maya de piedra caliza") },
-    gallery: [{ url: MEDIA.chichenCover, alt: conceptualAlt("explanada de una zona arqueológica maya") }],
+    cover: { url: MEDIA.amanecerCover, alt: conceptualAlt("una acrópolis maya entre selva baja al amanecer") },
+    cardMedia: { url: MEDIA.amanecerGallery, alt: conceptualAlt("un friso maya labrado explicado por un guía") },
+    gallery: [
+      { url: MEDIA.amanecerGallery, alt: conceptualAlt("un friso maya labrado explicado por un guía") },
+    ],
     attributes: {
       duracion: ["medio-dia"],
       horario: ["amanecer"],
@@ -280,12 +291,12 @@ const SEEDS: readonly DemoExperienceSeed[] = [
       acceptsOnlinePayment: false,
       priceAmount: 1750,
       priceCurrency: "MXN",
-      contact: { type: "email", value: "demo@valladolid.mx" },
     },
     facts: [{ label: "Salida", value: "05:30 h desde Valladolid (demostración)" }],
   },
   {
     slug: "demo-astronomia-maya-atardecer",
+    productId: "249c83f4-9d7d-40e8-9fa2-0d70a788edd1",
     name: "Astronomía maya al atardecer",
     categoryLabel: "Cultura maya",
     tagline: "El calendario no se inventó mirando piedras, sino mirando el cielo sobre ellas.",
@@ -294,9 +305,11 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Observatorio demostrativo Nohoch Ek",
     destinationSlug: "valladolid",
     destinationLabel: "Cercanías de Chichén Itzá",
-    cover: { url: MEDIA.chichenGallery, alt: conceptualAlt("cielo nocturno estrellado sobre una zona arqueológica") },
-    cardMedia: { url: MEDIA.ekBalamGallery, alt: conceptualAlt("selva baja yucateca al anochecer") },
-    gallery: [{ url: MEDIA.chichenCover, alt: conceptualAlt("basamento maya iluminado al atardecer") }],
+    cover: { url: MEDIA.astronomiaCover, alt: conceptualAlt("una sesión de observación astronómica con telescopio bajo la vía láctea") },
+    cardMedia: { url: MEDIA.astronomiaGallery, alt: conceptualAlt("un grupo observando el cielo al anochecer sobre selva baja") },
+    gallery: [
+      { url: MEDIA.astronomiaGallery, alt: conceptualAlt("un grupo observando el cielo al anochecer sobre selva baja") },
+    ],
     attributes: {
       duracion: ["2-3-horas"],
       horario: ["noche"],
@@ -312,6 +325,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-mercado-y-sobremesa-yucateca",
+    productId: "df465805-2cb6-4cbd-901c-ccd96a8b1913",
     name: "Mercado y sobremesa yucateca",
     categoryLabel: "Gastronomía",
     tagline: "Primero se camina el mercado; después se cocina lo que se eligió.",
@@ -320,9 +334,11 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     operatorName: "Mesa demostrativa Sac Nicté",
     destinationSlug: "valladolid",
     destinationLabel: "Valladolid",
-    cover: { url: MEDIA.zaciGallery, alt: conceptualAlt("mercado municipal yucateco con puestos de frutas") },
-    cardMedia: { url: MEDIA.suytunGallery, alt: conceptualAlt("mesa de cocina con ingredientes yucatecos") },
-    gallery: [{ url: MEDIA.calzadaGallery, alt: conceptualAlt("calle del centro de Valladolid por la mañana") }],
+    cover: { url: MEDIA.mercadoCover, alt: conceptualAlt("un mercado municipal yucateco con puestos de frutas y chiles") },
+    cardMedia: { url: MEDIA.mercadoGallery, alt: conceptualAlt("la preparación de recados y cítricos en una cocina yucateca") },
+    gallery: [
+      { url: MEDIA.mercadoGallery, alt: conceptualAlt("la preparación de recados y cítricos en una cocina yucateca") },
+    ],
     attributes: {
       duracion: ["3-4-horas"],
       horario: ["manana"],
@@ -333,11 +349,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
       nivel_precio: ["medio"],
     },
     priceAmount: null,
-    commerce: {
-      conversionMode: "telefono",
-      acceptsOnlinePayment: false,
-      contact: { type: "telefono", value: "+52 985 000 0001" },
-    },
+    commerce: { conversionMode: "informacion", acceptsOnlinePayment: false },
     facts: [{ label: "Incluye", value: "Compra en mercado (demostración)" }],
   },
 ];
@@ -454,7 +466,7 @@ export function buildExperienceDemoVM(slug: string): ExperiencePremiumVM | null 
   const detail = DEMO_DETAILS[seed.slug] ?? {};
   const labelOf = (value: string) => EXPERIENCE_DEMO_VALUE_LABELS[value] ?? value;
   return {
-    id: seed.slug,
+    id: seed.productId,
     slug: seed.slug,
     name: seed.name,
     eyebrow: seed.categoryLabel,
@@ -469,6 +481,14 @@ export function buildExperienceDemoVM(slug: string): ExperiencePremiumVM | null 
     facts: [
       { label: "Tipo", value: seed.categoryLabel },
       { label: "Destino", value: seed.destinationLabel },
+      ...(["duracion", "horario", "intensidad", "apta_para", "nivel_precio"] as const)
+        .map((key) => {
+          const values = seed.attributes[key] ?? [];
+          if (values.length === 0) return null;
+          const label = EXPERIENCE_DEMO_ATTRIBUTE_AXES.find((axis) => axis.key === key)?.label ?? key;
+          return { label, value: values.map(labelOf).join(" · ") };
+        })
+        .filter((fact): fact is { label: string; value: string } => fact !== null),
       ...seed.facts,
     ],
     faqs: [

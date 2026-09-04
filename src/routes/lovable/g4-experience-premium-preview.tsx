@@ -55,8 +55,24 @@ export const Route = createFileRoute("/lovable/g4-experience-premium-preview")({
 
 function ExperiencePremiumPreview() {
   const { vm } = Route.useLoaderData();
+  const crumbs = [
+    { label: "Inicio", to: "/" },
+    { label: "Oriente Maya", to: "/oriente-maya" },
+    ...(vm.destinationSlug
+      ? [
+          {
+            label: vm.destinationLabel ?? vm.destinationSlug,
+            to: `/oriente-maya/${vm.destinationSlug}`,
+          },
+        ]
+      : []),
+
+    { label: "Experiencias", to: "/experiencias" },
+    { label: vm.name },
+  ];
+
   return (
-    <PublicShell variant="default" compactCrumbsOnMobile>
+    <PublicShell variant="default" crumbs={crumbs} compactCrumbsOnMobile>
       <ExperiencePremiumSurface
         vm={vm}
         aluxSlot={
@@ -71,3 +87,4 @@ function ExperiencePremiumPreview() {
     </PublicShell>
   );
 }
+
