@@ -113,7 +113,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "valladolid",
     destinationLabel: "Valladolid",
     cover: { url: MEDIA.cocinaCover, alt: conceptualAlt("una cocina de humo en fogón maya") },
-    cardMedia: { url: MEDIA.cocinaCover, alt: conceptualAlt("una cocina de humo en fogón maya") },
+    cardMedia: { url: MEDIA.cocinaGallery, alt: conceptualAlt("una sobremesa yucateca en un solar colonial") },
     gallery: [
       { url: MEDIA.cocinaGallery, alt: conceptualAlt("una sobremesa yucateca en un solar colonial") },
     ],
@@ -144,7 +144,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "valladolid",
     destinationLabel: "Valladolid",
     cover: { url: MEDIA.rutaNocturnaCover, alt: conceptualAlt("una calle colonial empedrada iluminada de noche") },
-    cardMedia: { url: MEDIA.rutaNocturnaCover, alt: conceptualAlt("una calle colonial empedrada iluminada de noche") },
+    cardMedia: { url: MEDIA.rutaNocturnaGallery, alt: conceptualAlt("la fachada de piedra de un ex convento iluminada de noche") },
     gallery: [
       { url: MEDIA.rutaNocturnaGallery, alt: conceptualAlt("la fachada de piedra de un ex convento iluminada de noche") },
     ],
@@ -172,7 +172,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "temozon",
     destinationLabel: "Temozón",
     cover: { url: MEDIA.descensoCover, alt: conceptualAlt("un descenso guiado con cuerda a un cenote de gruta") },
-    cardMedia: { url: MEDIA.descensoCover, alt: conceptualAlt("un descenso guiado con cuerda a un cenote de gruta") },
+    cardMedia: { url: MEDIA.descensoGallery, alt: conceptualAlt("equipo de descenso a cenote preparado en la boca de la gruta") },
     gallery: [
       { url: MEDIA.descensoGallery, alt: conceptualAlt("equipo de descenso a cenote preparado en la boca de la gruta") },
     ],
@@ -208,7 +208,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "espita",
     destinationLabel: "Espita",
     cover: { url: MEDIA.hamacaCover, alt: conceptualAlt("un taller de urdido de hamaca con bastidor e hilos") },
-    cardMedia: { url: MEDIA.hamacaCover, alt: conceptualAlt("un taller de urdido de hamaca con bastidor e hilos") },
+    cardMedia: { url: MEDIA.hamacaGallery, alt: conceptualAlt("hilos de colores y una hamaca yucateca terminada") },
     gallery: [
       { url: MEDIA.hamacaGallery, alt: conceptualAlt("hilos de colores y una hamaca yucateca terminada") },
     ],
@@ -236,7 +236,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "izamal",
     destinationLabel: "Izamal",
     cover: { url: MEDIA.biciCover, alt: conceptualAlt("un recorrido en bicicleta por una plaza colonial amarilla") },
-    cardMedia: { url: MEDIA.biciCover, alt: conceptualAlt("un recorrido en bicicleta por una plaza colonial amarilla") },
+    cardMedia: { url: MEDIA.biciGallery, alt: conceptualAlt("una bicicleta recargada en un muro amarillo colonial") },
     gallery: [
       { url: MEDIA.biciGallery, alt: conceptualAlt("una bicicleta recargada en un muro amarillo colonial") },
     ],
@@ -264,7 +264,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "valladolid",
     destinationLabel: "Cercanías de Valladolid",
     cover: { url: MEDIA.amanecerCover, alt: conceptualAlt("una acrópolis maya entre selva baja al amanecer") },
-    cardMedia: { url: MEDIA.amanecerCover, alt: conceptualAlt("una acrópolis maya entre selva baja al amanecer") },
+    cardMedia: { url: MEDIA.amanecerGallery, alt: conceptualAlt("un friso maya labrado explicado por un guía") },
     gallery: [
       { url: MEDIA.amanecerGallery, alt: conceptualAlt("un friso maya labrado explicado por un guía") },
     ],
@@ -297,7 +297,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "valladolid",
     destinationLabel: "Cercanías de Chichén Itzá",
     cover: { url: MEDIA.astronomiaCover, alt: conceptualAlt("una sesión de observación astronómica con telescopio bajo la vía láctea") },
-    cardMedia: { url: MEDIA.astronomiaCover, alt: conceptualAlt("una sesión de observación astronómica con telescopio bajo la vía láctea") },
+    cardMedia: { url: MEDIA.astronomiaGallery, alt: conceptualAlt("un grupo observando el cielo al anochecer sobre selva baja") },
     gallery: [
       { url: MEDIA.astronomiaGallery, alt: conceptualAlt("un grupo observando el cielo al anochecer sobre selva baja") },
     ],
@@ -325,7 +325,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
     destinationSlug: "valladolid",
     destinationLabel: "Valladolid",
     cover: { url: MEDIA.mercadoCover, alt: conceptualAlt("un mercado municipal yucateco con puestos de frutas y chiles") },
-    cardMedia: { url: MEDIA.mercadoCover, alt: conceptualAlt("un mercado municipal yucateco con puestos de frutas y chiles") },
+    cardMedia: { url: MEDIA.mercadoGallery, alt: conceptualAlt("la preparación de recados y cítricos en una cocina yucateca") },
     gallery: [
       { url: MEDIA.mercadoGallery, alt: conceptualAlt("la preparación de recados y cítricos en una cocina yucateca") },
     ],
