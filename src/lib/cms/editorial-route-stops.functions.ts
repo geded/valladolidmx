@@ -146,17 +146,22 @@ export const listRouteStopCandidatesCms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ id: string; label: string }[]> => {
     await assertEditorial(context);
     const kind = data.kind as RouteStopKind;
-    const map: Record<string, { table: string; label: string }> = {
-      place: { table: "points_of_interest", label: "name" },
-      destination: { table: "destinations", label: "name" },
-      business: { table: "businesses", label: "display_name" },
-      product: { table: "products", label: "name" },
-      experience: { table: "products", label: "name" },
-      event: { table: "events", label: "title" },
-    };
-    const conf = map[kind];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+    const conf: { table: string; label: string } | null =
+      kind === "place"
+        ? { table: "points_of_interest", label: "name" }
+        : kind === "destination"
+          ? { table: "destinations", label: "name" }
+          : kind === "business"
+            ? { table: "businesses", label: "display_name" }
+            : kind === "product" || kind === "experience"
+              ? { table: "products", label: "name" }
+              : kind === "event"
+                ? { table: "events", label: "title" }
+                : null;
     if (!conf) return [];
-    const { data: rows, error } = await context.supabase
+    const { data: rows, error } = await db
       .from(conf.table)
       .select(`id, ${conf.label}`)
       .eq("status", "published")
@@ -164,8 +169,8 @@ export const listRouteStopCandidatesCms = createServerFn({ method: "POST" })
       .order(conf.label, { ascending: true })
       .limit(200);
     if (error) throw error;
-    return (rows ?? []).map((r) => ({
-      id: String((r as Record<string, unknown>).id),
-      label: String((r as Record<string, unknown>)[conf.label] ?? "—"),
+    return ((rows ?? []) as Record<string, unknown>[]).map((r) => ({
+      id: String(r.id),
+      label: String(r[conf.label] ?? "—"),
     }));
   });
