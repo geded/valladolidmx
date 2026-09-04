@@ -297,72 +297,12 @@ export function DestinationsAtlasSurface({
                   title={content.startHere.title}
                   description={content.startHere.description}
                 />
-                <div className="mt-4 flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
-                  {[featured, ...companions].map((destination, index) => (
-                    <Link
-                      key={destination.slug}
-                      to="/oriente-maya/$destino"
-                      params={{ destino: destination.slug }}
-                      className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
-                    >
-                      <DestinationImage destination={destination} className="absolute inset-0 size-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-                      <div className="absolute inset-x-0 bottom-0 z-10 p-4">
-                        <p className="text-[10px] font-semibold uppercase text-primary">
-                          {index === 0 ? "Punto de partida" : "Destino"}
-                        </p>
-                        <h3 className="mt-1 font-serif text-2xl">{destination.name}</h3>
-                        <p className="mt-1 line-clamp-1 text-xs text-white/75">
-                          {destination.tagline}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-                <div className="mt-4 hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
-                  <article className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
-                    <DestinationImage destination={featured} className="absolute inset-0 size-full object-cover" />
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-                      <h3 className="font-serif text-3xl">{featured.name}</h3>
-                      <p className="mt-2 text-sm text-white/80">{featured.tagline}</p>
-                      <Link
-                        to="/oriente-maya/$destino"
-                        params={{ destino: featured.slug }}
-                        className="mt-3 inline-flex items-center text-sm font-semibold"
-                      >
-                        Ver destino <ChevronRight className="size-4" />
-                      </Link>
-                    </div>
-                  </article>
-                  <div className="grid grid-rows-3 gap-3">
-                    {companions.map((destination) => (
-                      <Link
-                        key={destination.slug}
-                        to="/oriente-maya/$destino"
-                        params={{ destino: destination.slug }}
-                        className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
-                      >
-                        <DestinationImage destination={destination} className="size-full object-cover" />
-                        <div className="flex min-w-0 flex-col justify-center p-4">
-                          <p className="text-[10px] font-semibold uppercase text-primary">
-                            {TERRITORY_TYPE_LABELS[classifyTerritoryType(destination)]}
-                          </p>
-                          <h3 className="mt-1 font-serif text-xl">{destination.name}</h3>
-                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                            {destination.tagline}
-                          </p>
-                          <span className="mt-2 inline-flex items-center text-xs font-semibold">
-                            Ver destino <ChevronRight className="size-3" />
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                <PremiumShowcaseGrid
+                  items={[featured, ...companions].map((destination) =>
+                    toShowcaseItem(destination),
+                  )}
+                />
+
                 <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
                   {content.startHere.disclaimer}
                 </p>
