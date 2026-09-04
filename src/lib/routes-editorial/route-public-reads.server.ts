@@ -136,7 +136,7 @@ export async function readPublishedRouteCards(input?: {
   if (!rows.length) return [];
 
   const destinationIds = rows.flatMap((r) => [
-    ...(((r.destination_ids ?? []) as string[]) ?? []),
+    ...((r.destination_ids ?? []) as string[]),
     ...(r.origin_destination_id ? [String(r.origin_destination_id)] : []),
   ]);
   const [destinations, media, counts] = await Promise.all([
@@ -295,11 +295,11 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
     .order("position", { ascending: true });
 
   const stopsRaw = (stopRows ?? []) as Array<Record<string, unknown>>;
-  const galleryIds = ((row.gallery_media_ids ?? []) as string[]) ?? [];
+  const galleryIds = (row.gallery_media_ids ?? []) as string[];
 
   const [destinations, media, hrefs] = await Promise.all([
     destinationSlugMap(sb, [
-      ...(((row.destination_ids ?? []) as string[]) ?? []),
+      ...((row.destination_ids ?? []) as string[]),
       ...(row.origin_destination_id ? [String(row.origin_destination_id)] : []),
     ]),
     signMedia([...(row.cover_media_id ? [String(row.cover_media_id)] : []), ...galleryIds]),
