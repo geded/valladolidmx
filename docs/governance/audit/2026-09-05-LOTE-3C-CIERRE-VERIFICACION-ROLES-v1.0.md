@@ -68,3 +68,86 @@ con prefijo `lote3c.`: 0). Sesiones mintadas con `lovable auth-session`.
 
 Cuentas, roles y membresías temporales eliminados. Los datos DEMO aprobados
 (casas y rutas) permanecen intactos conforme a la Demo Pack Policy.
+
+---
+
+## 6. Cierre técnico final (2026-09-04, ejecución real)
+
+### 6.1 Gates ejecutados
+
+| Gate | Comando | Resultado exacto |
+|---|---|---|
+| Typecheck | `bunx tsgo --noEmit` | exit 0, sin salida (limpio) |
+| Build | `bun run build` | exit 0 · `✓ built in 3.36s` · PWA `precache 619 entries (7813.53 KiB)` · `dist/sw.js` + `wrangler.json` + `dist/client/_headers` generados |
+| Suite | `bun test` | `761 pass · 0 fail · 5318 expect() calls · 71 files · 3.57s` |
+
+### 6.2 QA responsive — 7 superficies × 4 anchos (28 casos)
+
+Medición: `documentElement.scrollWidth - clientWidth`, longitud de texto
+renderizado y número de controles interactivos, tras hidratación.
+
+| Superficie | 1440 | 834 | 430 | 390 |
+|---|---|---|---|---|
+| `/arma-tu-viaje` | 200 · ov0 · 1839c · 31 ctl | 200 · ov0 · 1733c | 200 · ov0 · 1708c | 200 · ov0 · 1708c |
+| `/rutas` | 200 · ov0 · 1268c · 40 ctl | 200 · ov0 · 1140c | 200 · ov0 · 1104c | 200 · ov0 · 1104c |
+| `/rutas/valladolid-ek-balam` | 200 · ov0 · 1316c · 42 ctl | 200 · ov0 · 1210c | 200 · ov0 · 1155c | 200 · ov0 · 1155c |
+| `/casas-de-vacaciones` | 200 · ov0 · 1974c · 51 ctl | 200 · ov0 · 1686c | 200 · ov0 · 1152c | 200 · ov0 · 1152c |
+| `/oriente-maya/valladolid/casas-de-vacaciones/casa-colonial-sisal` | 200 · ov0 · 2081c · 45 ctl | 200 · ov0 · 1975c | 200 · ov0 · 1921c | 200 · ov0 · 1921c |
+| `/alux` | 200 · ov0 · 1524c · 35 ctl | 200 · ov0 · 1404c | 200 · ov0 · 1378c | 200 · ov0 · 1378c |
+| `/marketplace` (301 → `/oriente-maya`) | 200 · ov0 · 2113c · 56 ctl | 200 · ov0 · 2007c | 200 · ov0 · 1982c | 200 · ov0 · 1982c |
+
+Overflow horizontal máximo observado en los 28 casos: **0 px**. Todas las
+superficies presentan contenido y controles operables en los cuatro anchos.
+
+### 6.3 Verificación por interfaz del Portal Empresa (no Data API)
+
+Cuenta temporal `lote3c.ui.tmp@example.com`
+(`4d65a7fe-42b8-420a-b01f-b4f35cabe593`), rol `business_owner`, vínculo
+`business_users.owner` sobre `casa-colonial-sisal`.
+
+| Paso | Resultado |
+|---|---|
+| `/portal/ficha` carga con empresa activa "Casa Colonial Sisal" | PASS (`Tu rol: propietario · Estado: published`) |
+| Editar campo permitido `tagline` y pulsar "Guardar cambios" | PASS |
+| Recargar y observar persistencia | PASS (`…zócalo de Valladolid · QA3C`) |
+| Restaurar valor exacto original | PASS (`Casa privada colonial a 3 cuadras del zócalo de Valladolid`, confirmado en BD) |
+| Eliminar vínculo, rol y cuenta temporal | PASS (`auth.users like 'lote3c.%'` → 0) |
+
+No se repitieron pruebas RLS ya documentadas: esta verificación no reveló
+ningún fallo nuevo.
+
+### 6.4 Estado del repositorio
+
+- Rama efectiva de trabajo del entorno: `edit/edt-e5d84a85-5143-4403-a27c-db5d5923a24e`
+  (rama de edición gestionada por la plataforma; la integración a
+  `integration/lovable-valladolidmx` la realiza la plataforma al aplicar los
+  cambios; el agente no ejecuta git de estado).
+- SHA base del árbol verificado: `7a8c640bc9ebae13ebf7f441e010866110a9d70f`.
+- Árbol limpio antes de esta actualización documental (`git status --porcelain` vacío).
+- Archivos modificados en este cierre: únicamente
+  `docs/governance/audit/2026-09-05-LOTE-3C-CIERRE-VERIFICACION-ROLES-v1.0.md`.
+  Ninguna corrección de producto fue necesaria (no se demostró fallo).
+
+### 6.5 Enlaces de preview
+
+Base: `https://id-preview--fd89b51f-9afc-4e15-8ee2-21fe468f6aa9.lovable.app`
+
+- `/arma-tu-viaje`
+- `/rutas`
+- `/rutas/valladolid-ek-balam`
+- `/casas-de-vacaciones`
+- `/oriente-maya/valladolid/casas-de-vacaciones/casa-colonial-sisal`
+- `/alux`
+- `/marketplace`
+
+### 6.6 Matriz final
+
+| Comprobación | Estado |
+|---|---|
+| Build real ejecutado | PASS |
+| QA responsive 4 anchos × 7 superficies | PASS |
+| Edición por interfaz del Portal Empresa con persistencia y restauración | PASS |
+| Cuentas temporales restantes | 0 |
+| Typecheck / Suite (761) | PASS / PASS |
+
+Sin FAIL ni NO VERIFICADO. Lote 3C cerrado. No se avanza al Lote 3D.
