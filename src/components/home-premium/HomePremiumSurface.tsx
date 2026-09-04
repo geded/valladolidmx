@@ -604,30 +604,6 @@ function DestinationsSection({
         description={content.destinos.description}
         action={content.destinos.action}
       />
-      <div className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
-        {items.slice(0, 4).map((destination, index) => (
-          <Link
-            key={destination.name}
-            to={destination.href ?? "/destinos"}
-            onClick={() => onOpen(destination.name)}
-            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
-          >
-            <EditorialMediaFrame
-              media={destination.media}
-              label={destination.name}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 z-10 p-4">
-              <p className="text-[10px] font-semibold uppercase text-primary">
-                {index === 0 ? "Punto de partida" : "Destino"}
-              </p>
-              <h3 className="mt-1 font-display text-2xl">{destination.name}</h3>
-              <p className="mt-1 line-clamp-1 text-xs text-white/75">{destination.note}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
       <PremiumShowcaseGrid
         items={items.slice(0, 4).map((destination) => ({
           key: destination.name,
