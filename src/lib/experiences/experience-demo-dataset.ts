@@ -443,3 +443,36 @@ export function buildExperienceDemoVM(slug: string): ExperiencePremiumVM | null 
 export function listExperienceDemoSlugs(): readonly string[] {
   return SEEDS.map((seed) => seed.slug);
 }
+
+/** Etiquetas legibles de los valores DEMO (el CMS traerá las suyas). */
+export const EXPERIENCE_DEMO_VALUE_LABELS: Record<string, string> = {
+  "2-3-horas": "2–3 horas",
+  "3-4-horas": "3–4 horas",
+  "medio-dia": "Medio día",
+  amanecer: "Amanecer",
+  manana: "Mañana",
+  mediodia: "Mediodía",
+  tarde: "Tarde",
+  noche: "Noche",
+  espanol: "Español",
+  ingles: "Inglés",
+  frances: "Francés",
+  maya: "Maya",
+  "planta-baja": "Acceso en planta baja",
+  "silla-de-ruedas": "Silla de ruedas",
+  "ruta-a-pie": "Ruta a pie",
+  "escaleras-empinadas": "Escaleras empinadas",
+  "senderos-amplios": "Senderos amplios",
+  "apta-para-carriola": "Apta para carriola",
+  familias: "Familias",
+  parejas: "Parejas",
+  amigos: "Amigos",
+  solo: "Viaje en solitario",
+  aventura: "Aventura",
+  baja: "Baja",
+  media: "Media",
+  alta: "Alta",
+  economico: "Económico",
+  medio: "Medio",
+  alto: "Alto",
+};
