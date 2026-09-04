@@ -251,6 +251,11 @@ export function ExperiencesListingSurface({
             <div key={facet.id} className="flex snap-x items-center gap-2 overflow-x-auto pb-1">
               <span className="shrink-0 text-[11px] font-semibold uppercase text-muted-foreground">
                 {facet.label}
+                {facet.demo ? (
+                  <span className="ml-1 rounded-pill border border-dashed border-border px-1.5 py-0.5 text-[10px] font-medium normal-case">
+                    DEMO
+                  </span>
+                ) : null}
               </span>
               {facet.options.map((option) => {
                 const selected = active[facet.id] === option.value;
