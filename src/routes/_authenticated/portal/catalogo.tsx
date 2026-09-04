@@ -454,6 +454,8 @@ function ProductRow({
         productStatus={product.status}
         onStatusChanged={onRefresh}
       />
+      <ProductAttributesPanel productId={product.id} />
+
     </li>
   );
 }
