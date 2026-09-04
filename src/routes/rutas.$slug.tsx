@@ -18,6 +18,26 @@ import {
 import type { EditorialRouteDetailDTO } from "@/lib/routes-editorial/route-public-contract";
 
 function buildRouteContext(route: EditorialRouteDetailDTO): RouteContextDeclaration {
+  // Lote 3C-V — la ruta declara su territorio de origen para que el contexto
+  // (breadcrumb + Alux) reconozca región y destino sin heredarlos por azar.
+  const originSlug = route.originDestinationSlug ?? route.destinationSlugs[0] ?? null;
+  const explicitAncestors = originSlug
+    ? [
+        {
+          kind: "region" as const,
+          slug: ORIENTE_MAYA.slug,
+          label: ORIENTE_MAYA.name,
+          href: "/oriente-maya",
+        },
+        {
+          kind: "destination" as const,
+          slug: originSlug,
+          label:
+            route.originDestinationLabel ?? originSlug.replace(/-/g, " "),
+          href: `/oriente-maya/${originSlug}`,
+        },
+      ]
+    : [];
   return defineRouteContext({
     current: {
       kind: "route",
@@ -25,11 +45,13 @@ function buildRouteContext(route: EditorialRouteDetailDTO): RouteContextDeclarat
       label: route.name,
       href: `/rutas/${route.slug}`,
     },
-    inherit: ["region", "destination"],
+    ancestors: explicitAncestors,
+    inherit: explicitAncestors.length ? [] : ["region", "destination"],
     canonical: `/rutas/${route.slug}`,
     kindDefaults: [{ kind: "site_section", label: "Rutas", href: "/rutas" }],
   });
 }
+
 
 export const Route = createFileRoute("/rutas/$slug")({
   loader: async ({ params }) => {
