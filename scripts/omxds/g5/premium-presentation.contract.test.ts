@@ -44,6 +44,13 @@ const PRESENTATION_DELEGATED: Record<string, string> = {
   "g4-event-premium-preview.tsx": "",
 };
 
+const TERRITORIAL_LABEL_EXCEPTIONS = new Set([
+  "g4-experience-premium-preview.tsx",
+  "g4-event-premium-preview.tsx",
+]);
+
+
+
 for (const preview of previews) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
   const delegate = PRESENTATION_DELEGATED[preview];
