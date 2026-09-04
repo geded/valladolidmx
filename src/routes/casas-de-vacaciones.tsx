@@ -20,14 +20,6 @@ import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-
 import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
-const CATEGORY_SLUGS = new Set([
-  "casas-de-vacaciones",
-  "casas-vacacionales",
-  "villas",
-  "rentas-vacacionales",
-  "airbnb",
-  "casas",
-]);
 
 /** H-02 · I5 — Declaración de contexto (patrón I4). */
 function buildCasasContext(

@@ -11,7 +11,6 @@ import {
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ExperiencesListingSurface } from "@/components/experience-premium/ExperiencesListingSurface";
 
-const CATEGORY_SLUGS = new Set(["experiencias", "experiencias-tours", "tours"]);
 
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).
