@@ -105,6 +105,7 @@ function RoutePreview() {
             { label: "Rutas" },
             { label: TRIP.name },
           ]}
+          compactOnMobile
         />
         <div className="mt-4">
           <PremiumPresentationControl value={presentation} onChange={setPresentation} />

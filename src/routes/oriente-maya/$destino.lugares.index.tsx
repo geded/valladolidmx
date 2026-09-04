@@ -80,6 +80,7 @@ function LugaresDestinoPage() {
       ]}
       contextDeclaration={buildContext(destino)}
       useContextCrumbs
+      compactCrumbsOnMobile
     >
       <ListingPremiumSurfaceFromDTO
         dto={dto}

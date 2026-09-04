@@ -423,6 +423,7 @@ function TerritorialPath() {
         { label: "Hoteles" },
         { label: HOTEL.name },
       ]}
+      compactOnMobile
     />
   );
 }

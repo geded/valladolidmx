@@ -187,7 +187,7 @@ function CategoriaEnDestinoPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <CategorySurfaceRelatedProvider value={categoryValue}>
-        <PublicShell crumbs={crumbs}>
+        <PublicShell crumbs={crumbs} compactCrumbsOnMobile>
           <div onClick={handleListingClick}>
             <TourismListingSurface
               hero={{

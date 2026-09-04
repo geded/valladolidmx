@@ -8,13 +8,13 @@
  * Dependencias: @tanstack/react-router Link, types/territory.
  */
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Home, MoreHorizontal } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ChevronRight, Home } from "lucide-react";
 
 import type { BreadcrumbCrumb } from "@/types/territory";
 import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 import { TerritorialSwitcherMount } from "@/components/navigation/TerritorialSwitcherMount";
+import { CompactCrumbs, shouldCompactCrumbs } from "@/components/layout/CompactCrumbs";
 
 interface Props {
   /**
@@ -68,19 +68,22 @@ export function BreadcrumbTerritorial({
 
   if (effectiveCrumbs.length === 0) return null;
 
+  // Cadenas cortas (≤3 niveles con la casita) se renderizan completas.
+  const compact = compactOnMobile && shouldCompactCrumbs(effectiveCrumbs);
+
   return (
     <nav
       aria-label="Ruta territorial"
       className={cn("flex items-start justify-between gap-3 text-sm", className)}
     >
-      {compactOnMobile ? (
-        <CompactMobileCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
+      {compact ? (
+        <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
       ) : null}
       {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
       <ol
         className={cn(
           "flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
-          compactOnMobile ? "hidden sm:flex" : null,
+          compact ? "hidden sm:flex" : null,
         )}
       >
 
@@ -133,111 +136,9 @@ export function BreadcrumbTerritorial({
       <TerritorialSwitcherMount
         className={cn(
           "h-8 min-w-40 shrink-0 text-xs",
-          compactOnMobile ? "hidden sm:flex" : null,
+          compact ? "hidden sm:flex" : null,
         )}
       />
     </nav>
   );
 }
-
-/**
- * Variante compacta ≤639px: casita → (menú de niveles intermedios) →
- * ancla territorial → nombre actual truncado. Una sola línea, sin
- * scroll horizontal, con etiquetas completas para lectores de pantalla.
- */
-function CompactMobileCrumbs({
-  crumbs,
-  anchorIndex,
-}: {
-  crumbs: readonly BreadcrumbCrumb[];
-  anchorIndex?: number;
-}) {
-  const lastIndex = crumbs.length - 1;
-  const rawAnchor = anchorIndex ?? lastIndex - 2;
-  const anchor = Math.min(Math.max(rawAnchor, 0), Math.max(lastIndex - 1, 0));
-  const current = crumbs[lastIndex];
-  const anchorCrumb = anchor < lastIndex ? crumbs[anchor] : undefined;
-  // La casita ya cubre Home: no se repite dentro del menú.
-  const hidden = crumbs.filter((c, i) => i !== lastIndex && i !== anchor && c.to !== "/");
-
-  if (!current) return null;
-
-  return (
-    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-1.5 text-[13px] text-muted-foreground sm:hidden">
-      <li className="flex shrink-0 items-center">
-        <Link
-          to="/"
-          aria-label="Inicio"
-          className="inline-flex size-11 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
-        >
-          <Home className="size-4" aria-hidden />
-        </Link>
-      </li>
-
-      {hidden.length > 0 ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
-          <Popover>
-            <PopoverTrigger
-              aria-label="Mostrar niveles intermedios de la ruta"
-              className="inline-flex size-11 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
-            >
-              <MoreHorizontal className="size-4" aria-hidden />
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-56 p-1">
-              <ul className="flex flex-col">
-                {hidden.map((c, i) => (
-                  <li key={`${c.label}-${i}`}>
-                    {c.to ? (
-                      <Link
-                        to={c.to}
-                        params={c.params as never}
-                        className="flex min-h-11 items-center rounded-md px-2 text-sm hover:bg-accent hover:text-accent-foreground"
-                      >
-                        {c.label}
-                      </Link>
-                    ) : (
-                      <span className="flex min-h-11 items-center px-2 text-sm text-muted-foreground">
-                        {c.label}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </PopoverContent>
-          </Popover>
-        </li>
-      ) : null}
-
-      {anchorCrumb ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
-          {anchorCrumb.to ? (
-            <Link
-              to={anchorCrumb.to}
-              params={anchorCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[28vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
-            >
-              {anchorCrumb.label}
-            </Link>
-          ) : (
-            <span className="inline-flex min-h-11 max-w-[28vw] items-center truncate px-1">
-              {anchorCrumb.label}
-            </span>
-          )}
-        </li>
-      ) : null}
-
-      <li className="flex min-w-0 items-center gap-1.5">
-        <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
-        <span
-          aria-current="page"
-          className="block max-w-[42vw] truncate font-medium text-foreground"
-        >
-          {current.label}
-        </span>
-      </li>
-    </ol>
-  );
-}
-

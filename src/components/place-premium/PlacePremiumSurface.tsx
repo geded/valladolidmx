@@ -157,7 +157,7 @@ export function PlacePremiumSurface({
 
       {showBreadcrumbs ? (
         <Container className="mt-4">
-          <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+          <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} compactOnMobile />
         </Container>
       ) : null}
 

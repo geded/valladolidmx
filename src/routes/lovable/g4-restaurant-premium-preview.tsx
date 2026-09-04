@@ -343,6 +343,7 @@ function TerritorialPath() {
         { label: "Restaurantes" },
         { label: RESTAURANT.name },
       ]}
+      compactOnMobile
     />
   );
 }

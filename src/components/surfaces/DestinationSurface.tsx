@@ -308,6 +308,7 @@ export function DestinationSurfaceContractBoundary({
           galleryMedia={accreditedMedia}
         >
           <DestinationPremiumSurface
+            showBreadcrumbs={false}
             content={content}
             heroVariant={presentation}
             sections={{ gallery: accreditedMedia.length > 0 }}
