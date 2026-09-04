@@ -256,10 +256,18 @@ export function InteractiveMap({
   className,
   markers,
   connectByRoad = false,
+  routeStops,
+  optimizeRoute = false,
+  onRouteStatus,
+  onMarkerSelect,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const routeStatusRef = useRef(onRouteStatus);
+  const markerSelectRef = useRef(onMarkerSelect);
+  routeStatusRef.current = onRouteStatus;
+  markerSelectRef.current = onMarkerSelect;
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
@@ -288,24 +296,33 @@ export function InteractiveMap({
           fullscreenControl: true,
           gestureHandling: "cooperative",
         });
-        const list = markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
+        const list: InteractiveMapMarker[] =
+          markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
         const bounds = new google.maps.LatLngBounds();
         list.forEach((m, i) => {
-          const letter = labelForIndex(i);
-          new google.maps.Marker({
+          const selected = typeof m.order === "number" && m.order > 0;
+          const label = selected ? String(m.order) : labelForIndex(i);
+          const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map,
-            title: `${letter} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            title: `${label} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            zIndex: selected ? 20 : 10,
             icon: {
-              url: markerIconDataUri(letter),
+              url: markerIconDataUri(label, selected),
               scaledSize: new google.maps.Size(40, 48),
               anchor: new google.maps.Point(20, 48),
             },
           });
+          if (m.key) {
+            marker.addListener("click", () => markerSelectRef.current?.(m.key as string));
+          }
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
         if (list.length > 1) map.fitBounds(bounds, 88);
-        if (connectByRoad && list.length > 1) {
+
+        /* Capa de ruta: sólo con la capacidad real del proveedor. */
+        const stops = routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
+        if (stops.length > 1) {
           const directions = new google.maps.DirectionsService();
           const renderer = new google.maps.DirectionsRenderer({
             map,
@@ -319,23 +336,59 @@ export function InteractiveMap({
           });
           directions.route(
             {
-              origin: { lat: list[0].lat, lng: list[0].lng },
-              destination: { lat: list[list.length - 1].lat, lng: list[list.length - 1].lng },
-              waypoints: list.slice(1, -1).map((point) => ({
+              origin: { lat: stops[0].lat, lng: stops[0].lng },
+              destination: { lat: stops[stops.length - 1].lat, lng: stops[stops.length - 1].lng },
+              waypoints: stops.slice(1, -1).map((point) => ({
                 location: { lat: point.lat, lng: point.lng },
                 stopover: true,
               })),
               travelMode: google.maps.TravelMode.DRIVING,
-              optimizeWaypoints: false,
+              optimizeWaypoints: optimizeRoute,
             },
             (result, status) => {
+              if (cancelled) return;
               if (status === google.maps.DirectionsStatus.OK && result) {
                 renderer.setDirections(result);
-              } else {
-                map.fitBounds(bounds, 88);
+                const route = (
+                  result as {
+                    routes?: Array<{
+                      waypoint_order?: number[];
+                      legs?: Array<{
+                        distance?: { value?: number };
+                        duration?: { value?: number };
+                      }>;
+                    }>;
+                  }
+                ).routes?.[0];
+                const legs = route?.legs ?? [];
+                routeStatusRef.current?.({
+                  mode: "directions",
+                  distanceMeters: legs.reduce((s, l) => s + (l.distance?.value ?? 0), 0),
+                  durationSeconds: legs.reduce((s, l) => s + (l.duration?.value ?? 0), 0),
+                  waypointOrder: route?.waypoint_order,
+                });
+                return;
               }
+              /* Sin Directions: línea aproximada derivada de coordenadas CMS. */
+              new google.maps.Polyline({
+                map,
+                path: stops.map((s) => ({ lat: s.lat, lng: s.lng })),
+                strokeColor: "#c88a17",
+                strokeOpacity: 0,
+                icons: [
+                  {
+                    icon: { path: "M 0,-1 0,1", strokeOpacity: 0.9, scale: 3 },
+                    offset: "0",
+                    repeat: "14px",
+                  },
+                ],
+              });
+              map.fitBounds(bounds, 88);
+              routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
             },
           );
+        } else {
+          routeStatusRef.current?.({ mode: "none" });
         }
         setReady(true);
       })
@@ -345,7 +398,8 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, zoom, markerTitle, markers, connectByRoad]);
+  }, [lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+
 
   if (error) {
     return (
