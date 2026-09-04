@@ -48,6 +48,7 @@ import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewF1kDestinationsRouteImport } from './routes/preview/f1k-destinations'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as OrienteMayaDestinosRouteImport } from './routes/oriente-maya/destinos'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceSplatRouteImport } from './routes/marketplace.$'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
@@ -81,6 +82,7 @@ import { Route as LovableG4EventProfilePremiumPreviewRouteImport } from './route
 import { Route as LovableG4EventPremiumPreviewRouteImport } from './routes/lovable/g4-event-premium-preview'
 import { Route as LovableG4EventListingPremiumPreviewRouteImport } from './routes/lovable/g4-event-listing-premium-preview'
 import { Route as LovableG4DestinationMicrositePreviewRouteImport } from './routes/lovable/g4-destination-microsite-preview'
+import { Route as LovableG4DestinationListingPremiumPreviewRouteImport } from './routes/lovable/g4-destination-listing-premium-preview'
 import { Route as LovableFounderZazilPremiumPreviewRouteImport } from './routes/lovable/founder-zazil-premium-preview'
 import { Route as LovableFounderHomePremiumPreviewRouteImport } from './routes/lovable/founder-home-premium-preview'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
@@ -439,6 +441,11 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaDestinosRoute = OrienteMayaDestinosRouteImport.update({
+  id: '/oriente-maya/destinos',
+  path: '/oriente-maya/destinos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
   id: '/oriente-maya/$destino',
   path: '/oriente-maya/$destino',
@@ -631,6 +638,12 @@ const LovableG4DestinationMicrositePreviewRoute =
   LovableG4DestinationMicrositePreviewRouteImport.update({
     id: '/lovable/g4-destination-microsite-preview',
     path: '/lovable/g4-destination-microsite-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4DestinationListingPremiumPreviewRoute =
+  LovableG4DestinationListingPremiumPreviewRouteImport.update({
+    id: '/lovable/g4-destination-listing-premium-preview',
+    path: '/lovable/g4-destination-listing-premium-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableFounderZazilPremiumPreviewRoute =
@@ -1640,6 +1653,7 @@ export interface FileRoutesByFullPath {
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
+  '/lovable/g4-destination-listing-premium-preview': typeof LovableG4DestinationListingPremiumPreviewRoute
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/g4-event-listing-premium-preview': typeof LovableG4EventListingPremiumPreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
@@ -1673,6 +1687,7 @@ export interface FileRoutesByFullPath {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$': typeof MarketplaceSplatRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
+  '/oriente-maya/destinos': typeof OrienteMayaDestinosRoute
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
@@ -1869,6 +1884,7 @@ export interface FileRoutesByTo {
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
+  '/lovable/g4-destination-listing-premium-preview': typeof LovableG4DestinationListingPremiumPreviewRoute
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/g4-event-listing-premium-preview': typeof LovableG4EventListingPremiumPreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
@@ -1901,6 +1917,7 @@ export interface FileRoutesByTo {
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$': typeof MarketplaceSplatRoute
+  '/oriente-maya/destinos': typeof OrienteMayaDestinosRoute
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
@@ -2103,6 +2120,7 @@ export interface FileRoutesById {
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
+  '/lovable/g4-destination-listing-premium-preview': typeof LovableG4DestinationListingPremiumPreviewRoute
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/g4-event-listing-premium-preview': typeof LovableG4EventListingPremiumPreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
@@ -2136,6 +2154,7 @@ export interface FileRoutesById {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$': typeof MarketplaceSplatRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
+  '/oriente-maya/destinos': typeof OrienteMayaDestinosRoute
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
@@ -2341,6 +2360,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
+    | '/lovable/g4-destination-listing-premium-preview'
     | '/lovable/g4-destination-microsite-preview'
     | '/lovable/g4-event-listing-premium-preview'
     | '/lovable/g4-event-premium-preview'
@@ -2374,6 +2394,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-preview'
     | '/marketplace/$'
     | '/oriente-maya/$destino'
+    | '/oriente-maya/destinos'
     | '/p/$slug'
     | '/preview/$token'
     | '/preview/f1k-destinations'
@@ -2570,6 +2591,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
+    | '/lovable/g4-destination-listing-premium-preview'
     | '/lovable/g4-destination-microsite-preview'
     | '/lovable/g4-event-listing-premium-preview'
     | '/lovable/g4-event-premium-preview'
@@ -2602,6 +2624,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$'
+    | '/oriente-maya/destinos'
     | '/p/$slug'
     | '/preview/$token'
     | '/preview/f1k-destinations'
@@ -2803,6 +2826,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
+    | '/lovable/g4-destination-listing-premium-preview'
     | '/lovable/g4-destination-microsite-preview'
     | '/lovable/g4-event-listing-premium-preview'
     | '/lovable/g4-event-premium-preview'
@@ -2836,6 +2860,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-preview'
     | '/marketplace/$'
     | '/oriente-maya/$destino'
+    | '/oriente-maya/destinos'
     | '/p/$slug'
     | '/preview/$token'
     | '/preview/f1k-destinations'
@@ -3032,6 +3057,7 @@ export interface RootRouteChildren {
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
   LovableFounderHomePremiumPreviewRoute: typeof LovableFounderHomePremiumPreviewRoute
   LovableFounderZazilPremiumPreviewRoute: typeof LovableFounderZazilPremiumPreviewRoute
+  LovableG4DestinationListingPremiumPreviewRoute: typeof LovableG4DestinationListingPremiumPreviewRoute
   LovableG4DestinationMicrositePreviewRoute: typeof LovableG4DestinationMicrositePreviewRoute
   LovableG4EventListingPremiumPreviewRoute: typeof LovableG4EventListingPremiumPreviewRoute
   LovableG4EventPremiumPreviewRoute: typeof LovableG4EventPremiumPreviewRoute
@@ -3064,6 +3090,7 @@ export interface RootRouteChildren {
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
+  OrienteMayaDestinosRoute: typeof OrienteMayaDestinosRoute
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
   PreviewF1kDestinationsRoute: typeof PreviewF1kDestinationsRoute
@@ -3371,6 +3398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oriente-maya/destinos': {
+      id: '/oriente-maya/destinos'
+      path: '/oriente-maya/destinos'
+      fullPath: '/oriente-maya/destinos'
+      preLoaderRoute: typeof OrienteMayaDestinosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/oriente-maya/$destino': {
       id: '/oriente-maya/$destino'
       path: '/oriente-maya/$destino'
@@ -3600,6 +3634,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/g4-destination-microsite-preview'
       fullPath: '/lovable/g4-destination-microsite-preview'
       preLoaderRoute: typeof LovableG4DestinationMicrositePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-destination-listing-premium-preview': {
+      id: '/lovable/g4-destination-listing-premium-preview'
+      path: '/lovable/g4-destination-listing-premium-preview'
+      fullPath: '/lovable/g4-destination-listing-premium-preview'
+      preLoaderRoute: typeof LovableG4DestinationListingPremiumPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/founder-zazil-premium-preview': {
@@ -5311,6 +5352,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableFounderHomePremiumPreviewRoute: LovableFounderHomePremiumPreviewRoute,
   LovableFounderZazilPremiumPreviewRoute:
     LovableFounderZazilPremiumPreviewRoute,
+  LovableG4DestinationListingPremiumPreviewRoute:
+    LovableG4DestinationListingPremiumPreviewRoute,
   LovableG4DestinationMicrositePreviewRoute:
     LovableG4DestinationMicrositePreviewRoute,
   LovableG4EventListingPremiumPreviewRoute:
@@ -5356,6 +5399,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
+  OrienteMayaDestinosRoute: OrienteMayaDestinosRoute,
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
   PreviewF1kDestinationsRoute: PreviewF1kDestinationsRoute,
