@@ -20,7 +20,10 @@ import {
   type ListingFamilyId,
   type PublicListingDTO,
 } from "./listing-public-contract";
-import { getListingFamilyTaxonomy } from "./listing-family-taxonomy.functions";
+import {
+  getListingFamilyTaxonomy,
+  type ListingFamilyTaxonomy,
+} from "./listing-family-taxonomy.functions";
 
 export interface GetPublicListingInput {
   family: ListingFamilyId;
@@ -48,7 +51,7 @@ export const getPublicListing = createServerFn({ method: "GET" })
       // Lote 3C — la pertenencia categoría→familia se administra en CMS.
       const [businesses, taxonomy] = await Promise.all([
         listMarketplaceBusinesses().catch(() => []),
-        getListingFamilyTaxonomy().catch(() => ({})),
+        getListingFamilyTaxonomy().catch((): ListingFamilyTaxonomy => ({})),
       ]);
       return buildPublicListing({
         family: contract.id,
