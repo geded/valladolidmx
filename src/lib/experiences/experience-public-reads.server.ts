@@ -43,7 +43,9 @@ export async function listExperiencesListing(
 ): Promise<ExperiencesListingResult> {
   const contract = listingFamilyContract("experiencias");
   const destino = input.destino?.trim() || null;
-  const statuses = input.includeInReview ? ["published", "in_review"] : ["published"];
+  const statuses: Array<"published" | "in_review"> = input.includeInReview
+    ? ["published", "in_review"]
+    : ["published"];
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
