@@ -161,7 +161,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       context.queryClient
         .ensureQueryData(brandSettingsQueryOptions)
         .catch(() => BRAND_SETTINGS_DEFAULTS),
+      // Lote 3B · C — Autoridad institucional vigente (distintivos).
+      context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
     ]);
+
     return { omxdsVisualFoundationsEnabled };
   },
 
