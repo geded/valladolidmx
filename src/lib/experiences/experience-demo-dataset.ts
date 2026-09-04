@@ -82,6 +82,8 @@ export const EXPERIENCE_DEMO_ATTRIBUTE_AXES: readonly {
 
 interface DemoExperienceSeed {
   readonly slug: string;
+  /** UUID real del registro CMS (`products`) — identidad para Mi Viaje. */
+  readonly productId: string;
   readonly name: string;
   readonly categoryLabel: string;
   readonly tagline: string;
@@ -104,6 +106,7 @@ const conceptualAlt = (subject: string) =>
 const SEEDS: readonly DemoExperienceSeed[] = [
   {
     slug: "demo-cocina-de-humo-fogon-maya",
+    productId: "0a0dd8f5-1522-44d5-afe3-afc0d18976f5",
     name: "Cocina de humo en fogón maya",
     categoryLabel: "Gastronomía",
     tagline: "Una cocina familiar enciende el fogón y explica el maíz como se explica una herencia.",
@@ -135,6 +138,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-ruta-nocturna-calzada-de-los-frailes",
+    productId: "e7a7c4c7-b9a4-4980-8e9c-f84e941ec751",
     name: "Ruta nocturna por la Calzada de los Frailes",
     categoryLabel: "Cultura y patrimonio",
     tagline: "La calle más fotografiada de Valladolid contada por quien creció en ella.",
@@ -163,6 +167,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-descenso-cenote-de-gruta",
+    productId: "59340bf6-998d-4b28-ab85-80f9028d05ef",
     name: "Descenso guiado a cenote de gruta",
     categoryLabel: "Cenotes y naturaleza",
     tagline: "Un cenote cerrado, cuerdas, casco y un guía que conoce cada saliente.",
@@ -199,6 +204,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-taller-urdido-de-hamaca",
+    productId: "5dd0b8c2-6042-4de7-84ad-ce3484ea3448",
     name: "Taller de urdido de hamaca",
     categoryLabel: "Artesanía viva",
     tagline: "Dos horas frente al bastidor bastan para entender por qué una hamaca tarda semanas.",
@@ -227,6 +233,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-bici-amarilla-izamal",
+    productId: "ff7ad8d7-f7e0-427b-8db2-5a5862531b38",
     name: "Bici amarilla por la ciudad de los tres pueblos",
     categoryLabel: "Cultura y patrimonio",
     tagline: "Izamal entera es amarilla; en bicicleta se entiende por qué.",
@@ -255,6 +262,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-amanecer-arqueologico-ek-balam",
+    productId: "a53c1adf-4425-42d7-b025-508314231070",
     name: "Amanecer arqueológico en Ek' Balam",
     categoryLabel: "Arqueología",
     tagline: "Llegar antes que los autobuses cambia por completo la escala de la Acrópolis.",
@@ -288,6 +296,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-astronomia-maya-atardecer",
+    productId: "249c83f4-9d7d-40e8-9fa2-0d70a788edd1",
     name: "Astronomía maya al atardecer",
     categoryLabel: "Cultura maya",
     tagline: "El calendario no se inventó mirando piedras, sino mirando el cielo sobre ellas.",
@@ -316,6 +325,7 @@ const SEEDS: readonly DemoExperienceSeed[] = [
   },
   {
     slug: "demo-mercado-y-sobremesa-yucateca",
+    productId: "df465805-2cb6-4cbd-901c-ccd96a8b1913",
     name: "Mercado y sobremesa yucateca",
     categoryLabel: "Gastronomía",
     tagline: "Primero se camina el mercado; después se cocina lo que se eligió.",
@@ -456,7 +466,7 @@ export function buildExperienceDemoVM(slug: string): ExperiencePremiumVM | null 
   const detail = DEMO_DETAILS[seed.slug] ?? {};
   const labelOf = (value: string) => EXPERIENCE_DEMO_VALUE_LABELS[value] ?? value;
   return {
-    id: seed.slug,
+    id: seed.productId,
     slug: seed.slug,
     name: seed.name,
     eyebrow: seed.categoryLabel,
