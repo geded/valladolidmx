@@ -151,7 +151,7 @@ export function ExperiencesListingSurface({
 }: ExperiencesListingSurfaceProps) {
   const [query, setQuery] = useState("");
   const [party, setParty] = useState<PartyComposition | null>(null);
-  const [active, setActive] = useState<Record<string, string | null>>({});
+  const [active, setActive] = useState<FilterSelection>({});
 
   const items = dto.items;
   const facets = useMemo(
@@ -169,12 +169,23 @@ export function ExperiencesListingSurface({
           .some((value) => (value as string).toLowerCase().includes(needle));
       if (!matchesQuery) return false;
       return facets.every((facet) => {
-        const selected = active[facet.id];
-        if (!selected) return true;
-        return facet.values(vm).includes(selected);
+        const selected = active[facet.id] ?? [];
+        if (selected.length === 0) return true;
+        const values = facet.values(vm);
+        return selected.some((value) => values.includes(value));
       });
     });
   }, [items, facets, active, query]);
+
+  const toggleFacet = (groupId: string, value: string) =>
+    setActive((current) => {
+      const selected = current[groupId] ?? [];
+      const next = selected.includes(value)
+        ? selected.filter((item) => item !== value)
+        : [...selected, value];
+      return { ...current, [groupId]: next };
+    });
+
 
   const featured = filtered.slice(0, 4).map(toShowcaseItem);
   const rest = filtered.slice(4);
