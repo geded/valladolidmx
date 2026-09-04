@@ -148,6 +148,11 @@ export function FloatingTravelPlanDock() {
     });
   }, [enabled, q, confirmedQ]);
 
+  // El dock depende de estado local del navegador (borrador anónimo /
+  // sesión). Antes de hidratar no renderizamos nada para que el markup
+  // del servidor y el del cliente coincidan.
+  if (!mounted) return null;
+
   if (isHiddenRoute) return null;
 
   if (!user) {
