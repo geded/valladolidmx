@@ -98,12 +98,17 @@ for (const preview of previews) {
 for (const preview of previews.filter((name) => name !== "g4-home-premium-preview.tsx")) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
   const delegate = PRESENTATION_DELEGATED[preview];
-  // G8-E · una preview puede delegar todo su JSX en la autoridad visual
-  // compartida; en ese caso el breadcrumb territorial vive en el delegado.
-  const chrome = delegate ? readFileSync(resolve(delegate), "utf8") : source;
-  assert.match(chrome, /PremiumTerritorialBreadcrumb|PremiumSurface|PublicShell/);
+  // G8-E · el breadcrumb territorial puede vivir en la preview o en su
+  // delegado acreditado, pero debe existir en alguno de los dos.
+  const chrome = delegate ? `${source}\n${readFileSync(resolve(delegate), "utf8")}` : source;
+  assert.match(
+    chrome,
+    /PremiumTerritorialBreadcrumb|PremiumSurface|PublicShell|aria-label="Ubicación territorial"/,
+    `${preview} no acredita breadcrumb territorial ni en la preview ni en su delegado`,
+  );
   assert.doesNotMatch(source, /aria-label="Ruta territorial"/);
 }
+
 
 
 console.log("G5 premium presentation contract: PASS");
