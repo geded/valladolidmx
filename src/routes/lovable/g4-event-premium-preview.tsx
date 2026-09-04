@@ -58,8 +58,15 @@ const DEMO_EVENT: PublicEventDetail = {
     "21:30 · Cierre bajo las arcadas.",
   ].join("\n"),
   external_url: null,
-  destination_name_fallback: undefined,
-} as unknown as PublicEventDetail;
+  business_id: null,
+  destination_id: null,
+  published_at: null,
+  updated_at: null,
+  organizer_business_slug: null,
+  organizer_business_name: null,
+  organizer_destination_slug: null,
+  organizer_category_slug: null,
+};
 
 function EventProfilePremiumPreview() {
   return <EventPremiumSurface event={DEMO_EVENT} />;
