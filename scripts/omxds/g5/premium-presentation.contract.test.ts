@@ -31,23 +31,38 @@ const previews = [
   "g4-event-premium-preview.tsx",
 ];
 
-// Lote 1 · contrato actualizado. Por directiva Founder el selector público
+// Lote 1 · contrato reforzado. Por directiva Founder el selector público
 // Editorial/Cinematográfica se retiró de las previews que delegan por completo
 // en su autoridad visual compartida (la afinación vive en administrador/
-// constructor). El gate sigue siendo fail-closed: sólo estas previews están
-// exentas y deben acreditar su delegado real.
+// constructor). El gate es fail-closed: una preview sólo queda exenta del
+// control si acredita un delegado REAL y verificable, y ese delegado se
+// inspecciona con las mismas obligaciones aplicables.
 const PRESENTATION_DELEGATED: Record<string, string> = {
   "g4-destination-microsite-preview.tsx":
     "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
   "g4-experience-premium-preview.tsx":
     "src/components/experience-premium/ExperiencePremiumSurface.tsx",
-  "g4-event-premium-preview.tsx": "",
+  "g4-event-premium-preview.tsx": "src/components/surfaces/EventPremiumSurface.tsx",
 };
 
-const TERRITORIAL_LABEL_EXCEPTIONS = new Set([
-  "g4-experience-premium-preview.tsx",
-  "g4-event-premium-preview.tsx",
-]);
+/**
+ * Regla de marca uniforme (sin excepciones por archivo): "Oriente Maya" sólo
+ * puede aparecer como etiqueta de miga territorial hacia `/oriente-maya`.
+ * En cualquier otro copy visible debe usarse la marca larga.
+ */
+function stripTerritorialCrumbLabels(source: string): string {
+  return source
+    .replace(/label:\s*"Oriente Maya"/g, "")
+    .replace(/href="\/oriente-maya"[\s\S]{0,120}?Oriente Maya/g, "");
+}
+
+function assertBrandCopy(source: string, where: string) {
+  assert.doesNotMatch(
+    stripTerritorialCrumbLabels(source),
+    /Oriente Maya(?! de\s+Yucatán)/,
+    `${where} usa la marca corta fuera de una miga territorial`,
+  );
+}
 
 for (const preview of previews) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
@@ -55,32 +70,40 @@ for (const preview of previews) {
   if (delegate === undefined) {
     assert.match(source, /PremiumPresentation/);
     assert.match(source, /PremiumPresentationControl/);
-  } else if (delegate) {
-    // La preview delega su JSX: el delegado debe existir y ser el acreditado.
+  } else {
+    // La preview delega su JSX: el delegado debe existir, ser el acreditado y
+    // contener realmente la autoridad visual compartida (shell + breadcrumb).
+    assert.ok(
+      delegate.trim().length > 0,
+      `la preview ${preview} no puede quedar exenta sin delegado acreditado`,
+    );
     assert.ok(
       source.includes(delegate.replace(/^src\//, "@/").replace(/\.tsx$/, "")),
       `la preview ${preview} no importa su delegado acreditado ${delegate}`,
     );
-    readFileSync(resolve(delegate), "utf8");
+    const delegateSource = readFileSync(resolve(delegate), "utf8");
+    assert.match(
+      delegateSource,
+      /PublicShell|PremiumSurface|PremiumTerritorialBreadcrumb|BreadcrumbTerritorial|<nav/,
+      `el delegado ${delegate} no compone la autoridad visual compartida`,
+    );
+    assert.doesNotMatch(delegateSource, /PremiumPresentationControl/);
+    assertBrandCopy(delegateSource, delegate);
   }
   assert.doesNotMatch(source, /type VisualDirection = "editorial"/);
   assert.doesNotMatch(source, /["']cinematografico["']|["']cinematografica["']/);
-  // La marca larga sigue siendo obligatoria salvo en las dos previews donde
-  // "Oriente Maya" aparece como etiqueta territorial de breadcrumb/chip.
-  // Excepción documentada para revisión de copy en el Lote 3.
-  if (!TERRITORIAL_LABEL_EXCEPTIONS.has(preview)) {
-    assert.doesNotMatch(source, /Oriente Maya(?! de\s+Yucatán)/);
-  }
+  assertBrandCopy(source, preview);
 }
 
 for (const preview of previews.filter((name) => name !== "g4-home-premium-preview.tsx")) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
+  const delegate = PRESENTATION_DELEGATED[preview];
   // G8-E · una preview puede delegar todo su JSX en la autoridad visual
-  // compartida; en ese caso el breadcrumb territorial vive en el componente
-  // compartido y no en la preview. Lote 1: `PublicShell crumbs` es la
-  // autoridad de breadcrumb territorial vigente.
-  assert.match(source, /PremiumTerritorialBreadcrumb|PremiumSurface|PublicShell/);
+  // compartida; en ese caso el breadcrumb territorial vive en el delegado.
+  const chrome = delegate ? readFileSync(resolve(delegate), "utf8") : source;
+  assert.match(chrome, /PremiumTerritorialBreadcrumb|PremiumSurface|PublicShell/);
   assert.doesNotMatch(source, /aria-label="Ruta territorial"/);
 }
+
 
 console.log("G5 premium presentation contract: PASS");
