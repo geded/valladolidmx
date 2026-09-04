@@ -256,47 +256,18 @@ export function ExperiencesListingSurface({
         ))}
       </div>
 
-      {facets.length > 0 ? (
-        <section aria-label="Filtros publicados" className="space-y-3">
-          {facets.map((facet) => (
-            <div key={facet.id} className="flex snap-x items-center gap-2 overflow-x-auto pb-1">
-              <span className="shrink-0 text-[11px] font-semibold uppercase text-muted-foreground">
-                {facet.label}
-                {facet.demo ? (
-                  <span className="ml-1 rounded-pill border border-dashed border-border px-1.5 py-0.5 text-[10px] font-medium normal-case">
-                    DEMO
-                  </span>
-                ) : null}
-              </span>
-              {facet.options.map((option) => {
-                const selected = active[facet.id] === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() =>
-                      setActive((current) => ({
-                        ...current,
-                        [facet.id]: selected ? null : option.value,
-                      }))
-                    }
-                    className={cn(
-                      "min-h-11 shrink-0 snap-start rounded-pill border px-4 text-sm",
-                      selected
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border bg-background",
-                    )}
-                  >
-                    {option.label}
-                    <span className="ml-1 text-xs text-muted-foreground">{option.count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </section>
-      ) : null}
+      <ExperienceFiltersBar
+        groups={facets.map((facet) => ({
+          id: facet.id,
+          label: facet.label,
+          options: facet.options,
+        }))}
+        selection={active}
+        onToggle={toggleFacet}
+        onClear={() => setActive({})}
+        resultCount={filtered.length}
+      />
+
 
       {filtered.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
