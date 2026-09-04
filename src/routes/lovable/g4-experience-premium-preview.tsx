@@ -10,59 +10,20 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { PublicShell } from "@/components/discovery";
 import { ExperiencePremiumSurface } from "@/components/experience-premium/ExperiencePremiumSurface";
+import { buildExperienceVMFromProduct } from "@/components/experience-premium/experience-premium-vm";
 import {
-  buildExperienceVMFromProduct,
-  type ExperiencePremiumVM,
-} from "@/components/experience-premium/experience-premium-vm";
+  buildExperienceDemoVM,
+  listExperienceDemoSlugs,
+} from "@/lib/experiences/experience-demo-dataset";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { getMarketplaceProductBySlug } from "@/lib/catalog/marketplace-reads.functions";
-import { resolveExperienceCommerce } from "@/lib/experiences/experience-commerce";
-
-const DEMO_VM: ExperiencePremiumVM = {
-  id: "demo-experiencia",
-  slug: "demo-experiencia",
-  name: "Inframundo Maya",
-  eyebrow: "Experiencia guiada",
-  tagline:
-    "Un descenso documental a los cenotes que los mayas leyeron como puerta del Xibalbá, con guías del Oriente Maya.",
-  description:
-    "Caso DEMO de revisión visual. Ninguno de estos datos es información comercial real: sirven únicamente para validar composición, jerarquía y responsive de la ficha canónica de Experiencia.",
-  operatorName: "Operador demostrativo",
-  operatorHref: null,
-  destinationSlug: "valladolid",
-  destinationLabel: "Valladolid",
-  cover: {
-    url: "/api/public/studio-media/governed/v1p1c/experience-cover.jpg",
-    alt: "Cenote abierto de aguas turquesa en una caverna de piedra caliza cerca de Valladolid, Yucatán",
-  },
-  gallery: [
-    {
-      url: "/api/public/studio-media/governed/v1p1c/experience-gallery-1.jpg",
-      alt: "Interior de caverna de piedra caliza con estalactitas y haz de luz natural sobre el agua",
-    },
-    {
-      url: "/api/public/studio-media/governed/v1p1c/experience-gallery-2.jpg",
-      alt: "Sendero de selva baja yucateca con vegetación densa y suelo de piedra caliza",
-    },
-  ],
-  facts: [
-    { label: "Tipo", value: "Experiencia guiada" },
-    { label: "Destino", value: "Valladolid" },
-  ],
-  faqs: [],
-  related: [],
-  commerce: resolveExperienceCommerce({
-    conversionMode: "informacion",
-    acceptsOnlinePayment: false,
-  }),
-  demoNotice:
-    "Datos de prueba · caso DEMO de revisión visual. Sin precios, disponibilidad ni comercio reales.",
-};
 
 export const Route = createFileRoute("/lovable/g4-experience-premium-preview")({
-  validateSearch: (search: Record<string, unknown>): { slug?: string } =>
-    typeof search.slug === "string" && search.slug ? { slug: search.slug } : {},
-  loaderDeps: ({ search }) => ({ slug: search.slug ?? null }),
+  validateSearch: (search: Record<string, unknown>): { slug?: string; demo?: string } => ({
+    ...(typeof search.slug === "string" && search.slug ? { slug: search.slug } : {}),
+    ...(typeof search.demo === "string" && search.demo ? { demo: search.demo } : {}),
+  }),
+  loaderDeps: ({ search }) => ({ slug: search.slug ?? null, demo: search.demo ?? null }),
   head: () => ({
     meta: [
       { title: "Experiencia · Revisión visual de la ficha canónica" },
@@ -74,11 +35,14 @@ export const Route = createFileRoute("/lovable/g4-experience-premium-preview")({
     ],
   }),
   loader: async ({ deps }) => {
-    if (!deps.slug) return { vm: DEMO_VM };
+    const fallbackDemo = () =>
+      buildExperienceDemoVM(deps.demo ?? listExperienceDemoSlugs()[0]!) ??
+      buildExperienceDemoVM(listExperienceDemoSlugs()[0]!)!;
+    if (!deps.slug) return { vm: fallbackDemo() };
     const product = await getMarketplaceProductBySlug({ data: { slug: deps.slug } }).catch(
       () => null,
     );
-    if (!product) return { vm: DEMO_VM };
+    if (!product) return { vm: fallbackDemo() };
     return {
       vm: {
         ...buildExperienceVMFromProduct(product),
