@@ -59,8 +59,14 @@ function ExperiencePremiumPreview() {
     { label: "Inicio", to: "/" },
     { label: "Oriente Maya", to: "/oriente-maya" },
     ...(vm.destinationSlug
-      ? [{ label: vm.destinationLabel, to: `/oriente-maya/${vm.destinationSlug}` }]
+      ? [
+          {
+            label: vm.destinationLabel ?? vm.destinationSlug,
+            to: `/oriente-maya/${vm.destinationSlug}`,
+          },
+        ]
       : []),
+
     { label: "Experiencias", to: "/experiencias" },
     { label: vm.name },
   ];
