@@ -32,7 +32,14 @@ import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { ACTIVE_BRAND } from "@/config/brand";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import {
+  PremiumAluxBar,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+  PremiumShowcaseGrid,
+} from "./shared/PremiumShowcase";
 import { cn } from "@/lib/utils";
+
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { recordAluxSignal } from "@/lib/alux/memory-store";
@@ -273,38 +280,17 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
   useHeroAutoplay(content.hero.slides.length, setIndex);
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
-    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
-        <div className="flex flex-col justify-center bg-card p-5 sm:p-7 lg:p-10">
-          <p className="text-xs font-semibold uppercase text-primary">{content.hero.eyebrow}</p>
-          <h1 className="mt-2.5 text-balance font-display text-3xl leading-[1.02] sm:text-4xl lg:text-[3.35rem]">
-            {content.hero.title}
-          </h1>
-          <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-5 text-muted-foreground lg:mt-4 lg:text-[0.95rem] lg:leading-6">
-            {content.hero.subtitle}
-          </p>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-selva">
-            {ACTIVE_BRAND.discoveryPromise}
-          </p>
-          <div className="mt-5">
-            <HeroSearch />
-          </div>
-        </div>
-        <figure className="relative min-h-[16rem] overflow-hidden sm:min-h-[20rem] lg:min-h-[32rem]">
-          <EditorialMediaFrame
-            media={slide.media}
-            label={content.hero.title}
-            loading="eager"
-            className="absolute inset-0 size-full object-cover"
-          />
-          <figcaption className="absolute bottom-4 left-4 rounded-md bg-foreground/85 px-3 py-2 text-xs text-background">
-            {slide.caption}
-          </figcaption>
-        </figure>
-      </div>
-    </section>
+    <PremiumEditorialHero
+      eyebrow={content.hero.eyebrow}
+      title={content.hero.title}
+      subtitle={content.hero.subtitle}
+      media={slide.media}
+      caption={slide.caption}
+      searchSlot={<HeroSearch />}
+    />
   );
 }
+
 
 function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
@@ -346,39 +332,8 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
   );
 }
 
-function SectionHead({
-  kicker,
-  title,
-  description,
-  action,
-}: {
-  kicker: string;
-  title: string;
-  description?: string;
-  action?: string;
-}) {
-  return (
-    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="max-w-3xl">
-        <p className="text-xs font-semibold uppercase text-primary">{kicker}</p>
-        <h2 className="mt-1.5 text-balance font-display text-2xl sm:text-3xl lg:text-4xl">
-          {title}
-        </h2>
-        {description ? (
-          <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-relaxed text-muted-foreground lg:text-base">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      {action ? (
-        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
-          {action}
-          <ChevronRight className="size-4" aria-hidden />
-        </span>
-      ) : null}
-    </div>
-  );
-}
+const SectionHead = PremiumSectionHead;
+
 
 function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
@@ -428,57 +383,16 @@ function AluxPlanner({
     });
   };
   return (
-    <section
-      aria-labelledby="alux-title"
-      className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
-    >
-      <div className="grid min-h-20 items-center gap-3 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
-        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-white/20 sm:pr-3 lg:h-24">
-          <img
-            src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
-            alt="Alux"
-            className="h-14 w-14 shrink-0 object-contain lg:h-20 lg:w-20"
-          />
-          <div>
-            <h2 id="alux-title" className="font-display text-xl">
-              Alux
-            </h2>
-            <p className="text-xs text-white/70">Tu concierge IA</p>
-          </div>
-        </div>
-        <div>
-          <p className="font-display text-lg lg:text-xl">¿Cómo viajas hoy?</p>
-          <div
-            className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
-            role="group"
-            aria-label="Composición del viaje"
-          >
-            {PARTY_OPTIONS.map((option) => (
-              <Button
-                key={option.value}
-                type="button"
-                size="sm"
-                variant={selectedParty === option.value ? "default" : "secondary"}
-                onClick={() => onSelectParty(option.value)}
-                className="min-h-9 rounded-pill"
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <Button
-          type="button"
-          onClick={openAlux}
-          className="size-11 rounded-full p-0"
-          aria-label="Continuar con Alux"
-        >
-          <ChevronRight className="size-5" />
-        </Button>
-      </div>
-    </section>
+    <PremiumAluxBar
+
+      question="¿Cómo viajas hoy?"
+      selectedParty={selectedParty}
+      onSelectParty={onSelectParty}
+      onContinue={openAlux}
+    />
   );
 }
+
 
 function RoutesSection({
   content,
@@ -604,82 +518,17 @@ function DestinationsSection({
         description={content.destinos.description}
         action={content.destinos.action}
       />
-      <div className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
-        {items.slice(0, 4).map((destination, index) => (
-          <Link
-            key={destination.name}
-            to={destination.href ?? "/destinos"}
-            onClick={() => onOpen(destination.name)}
-            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
-          >
-            <EditorialMediaFrame
-              media={destination.media}
-              label={destination.name}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 z-10 p-4">
-              <p className="text-[10px] font-semibold uppercase text-primary">
-                {index === 0 ? "Punto de partida" : "Destino"}
-              </p>
-              <h3 className="mt-1 font-display text-2xl">{destination.name}</h3>
-              <p className="mt-1 line-clamp-1 text-xs text-white/75">{destination.note}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-      <div className="hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
-        <article className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
-          <EditorialMediaFrame
-            media={featured.media}
-            label={featured.name}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div
-            className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
-            aria-hidden
-          />
-          <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-            <h3 className="font-display text-3xl">{featured.name}</h3>
-            <p className="mt-2 text-sm text-white/80">{featured.note}</p>
-            {featured.href ? (
-              <Link
-                to={featured.href}
-                onClick={() => onOpen(featured.name)}
-                className="mt-3 inline-flex text-sm font-semibold"
-              >
-                Ver destino <ChevronRight className="size-4" />
-              </Link>
-            ) : null}
-          </div>
-        </article>
-        <div className="grid grid-rows-3 gap-3">
-          {items.slice(1, 4).map((destination) => (
-            <Link
-              key={destination.name}
-              to={destination.href ?? "/destinos"}
-              onClick={() => onOpen(destination.name)}
-              className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
-            >
-              <EditorialMediaFrame
-                media={destination.media}
-                label={destination.name}
-                className="h-full w-full object-cover"
-              />
-              <div className="flex min-w-0 flex-col justify-center p-4">
-                <p className="text-[10px] font-semibold uppercase text-primary">Destino</p>
-                <h3 className="mt-1 font-display text-xl">{destination.name}</h3>
-                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                  {destination.note}
-                </p>
-                <span className="mt-2 inline-flex items-center text-xs font-semibold">
-                  Ver destino <ChevronRight className="size-3" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+      <PremiumShowcaseGrid
+        items={items.slice(0, 4).map((destination) => ({
+          key: destination.name,
+          name: destination.name,
+          note: destination.note,
+          media: destination.media,
+          to: destination.href ?? "/destinos",
+        }))}
+        onOpen={onOpen}
+      />
+
       <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
         {content.destinos.disclaimer}
       </p>

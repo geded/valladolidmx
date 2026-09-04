@@ -1,18 +1,28 @@
 /**
  * G8 · Atlas de Destinos del Oriente Maya — plantilla maestra responsive.
  *
- * Reutiliza el sistema aprobado: PremiumHero (misma familia del Home),
- * TourismAluxPanel + dock global, tarjetas con AddToTravelPlanButton,
- * InteractiveMap territorial, tokens y marca configurable. No define
- * header, footer ni botón flotante propios: viven en el shell global.
+ * Autoridad visual: el Home Premium aprobado. Esta superficie NO define
+ * diseño propio: consume las piezas extraídas en
+ * `@/components/home-premium/shared/PremiumShowcase` (hero editorial, head de
+ * sección, barra de Alux, bloque Destinos y fila compacta), el `Container`
+ * del Home y los mismos tokens. Header, footer, breadcrumb y botón flotante
+ * viven en el shell global.
  */
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Compass, List, Map as MapIcon, MapPin, Search, Sparkles } from "lucide-react";
+import { ChevronRight, List, Map as MapIcon, MapPin, Search, Sparkles } from "lucide-react";
 
-import { PremiumHero } from "@/components/premium/PremiumHero";
-import { TourismAluxPanel, buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { Container } from "@/components/layout/Container";
+import {
+  PremiumAluxBar,
+  PremiumCompactRow,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+  PremiumShowcaseGrid,
+  type PremiumShowcaseItem,
+} from "@/components/home-premium/shared/PremiumShowcase";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +53,26 @@ import {
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((m) => ({ default: m.InteractiveMap })),
 );
+
+/** Medio del destino en el contrato editorial compartido. */
+function destinationMedia(destination: Destination) {
+  return destination.image_url ? { url: destination.image_url, alt: destination.name } : null;
+}
+
+/** Adaptador único destino → tarjeta compartida del Home. */
+function toShowcaseItem(destination: Destination, meta?: string | null): PremiumShowcaseItem {
+  return {
+    key: destination.slug,
+    name: destination.name,
+    note: destination.tagline,
+    media: destinationMedia(destination),
+    to: "/oriente-maya/$destino",
+    params: { destino: destination.slug },
+    kicker: TERRITORY_TYPE_LABELS[classifyTerritoryType(destination)],
+    meta: meta ?? null,
+  };
+}
+
 
 export interface DestinationsAtlasSurfaceProps {
   destinations: readonly Destination[];
@@ -176,33 +206,31 @@ export function DestinationsAtlasSurface({
     <div className="pb-16" data-surface="destinations-atlas">
       {section(
         "hero",
-        <div className="relative">
-          <PremiumHero
-            vm={{
-              presentation: "editorial",
-              eyebrow: content.hero.eyebrow,
-              title: content.hero.title,
-              description: content.hero.description,
-              media: { url: content.hero.media.url, alt: content.hero.media.alt },
-            }}
+        <Container className="pt-4 sm:pt-6">
+          <PremiumEditorialHero
+            eyebrow={content.hero.eyebrow}
+            title={content.hero.title}
+            subtitle={content.hero.description}
+            media={content.hero.media}
+            searchSlot={
+              <label className="relative block rounded-pill bg-card shadow-soft">
+                <Search className="pointer-events-none absolute left-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <span className="sr-only">{content.hero.searchPlaceholder}</span>
+                <Input
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={content.hero.searchPlaceholder}
+                  className="min-h-14 rounded-pill border-border pl-12 text-base"
+                />
+              </label>
+            }
           />
-          <Container className="-mt-8 sm:-mt-10">
-            <label className="relative block rounded-pill bg-card shadow-elevated">
-              <Search className="pointer-events-none absolute left-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <span className="sr-only">{content.hero.searchPlaceholder}</span>
-              <Input
-                value={query}
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setPage(1);
-                }}
-                placeholder={content.hero.searchPlaceholder}
-                className="min-h-14 rounded-pill border-border pl-12 text-base"
-              />
-            </label>
-          </Container>
-        </div>,
+        </Container>,
       )}
+
 
       <Container className="mt-6 space-y-10 sm:mt-8 sm:space-y-14">
         {fixtureNotice ? (
@@ -214,40 +242,37 @@ export function DestinationsAtlasSurface({
         {section(
           "alux",
           <section aria-label={`${ACTIVE_BRAND.conciergeName}, concierge IA`} className="space-y-3">
-            <TourismAluxPanel
-              title={content.alux.title}
-              description={content.alux.description}
-              task="Ayúdame a elegir destinos del Oriente Maya y convertirlos en una ruta real."
-              compact
+            <PremiumAluxBar
+              question={content.alux.title}
+              selectedParty={party}
+              onSelectParty={(value) => {
+                const option = PARTY_OPTIONS.find((o) => o.value === value);
+                if (!option) return;
+                setParty(value);
+                void trip.setTravelerCount(
+                  value === "familiar"
+                    ? { adults: 2, children: 2 }
+                    : { adults: option.partySize, children: 0 },
+                );
+              }}
+              onContinue={() => askAlux()}
             />
-            <div className="rounded-3xl border border-border bg-card p-4 shadow-soft">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {content.alux.description}
+              </p>
               <ChipRow
                 legend="Intereses"
                 options={content.alux.interests}
                 value={selectedInterest}
                 onChange={setSelectedInterest}
+                className="mt-3"
               />
               <ChipRow
                 legend="Tiempo disponible"
                 options={content.alux.durations}
                 value={selectedDuration}
                 onChange={setSelectedDuration}
-                className="mt-3"
-              />
-              <ChipRow
-                legend="Compañía"
-                options={PARTY_OPTIONS.map((option) => option.label)}
-                value={PARTY_OPTIONS.find((o) => o.value === party)?.label ?? null}
-                onChange={(label) => {
-                  const option = PARTY_OPTIONS.find((o) => o.label === label);
-                  if (!option) return;
-                  setParty(option.value);
-                  void trip.setTravelerCount(
-                    option.value === "familiar"
-                      ? { adults: 2, children: 2 }
-                      : { adults: option.partySize, children: 0 },
-                  );
-                }}
                 className="mt-3"
               />
               <Button
@@ -261,6 +286,7 @@ export function DestinationsAtlasSurface({
           </section>,
         )}
 
+
         {featured
           ? section(
               "start_here",
@@ -271,72 +297,12 @@ export function DestinationsAtlasSurface({
                   title={content.startHere.title}
                   description={content.startHere.description}
                 />
-                <div className="mt-4 flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
-                  {[featured, ...companions].map((destination, index) => (
-                    <Link
-                      key={destination.slug}
-                      to="/oriente-maya/$destino"
-                      params={{ destino: destination.slug }}
-                      className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
-                    >
-                      <DestinationImage destination={destination} className="absolute inset-0 size-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-                      <div className="absolute inset-x-0 bottom-0 z-10 p-4">
-                        <p className="text-[10px] font-semibold uppercase text-primary">
-                          {index === 0 ? "Punto de partida" : "Destino"}
-                        </p>
-                        <h3 className="mt-1 font-serif text-2xl">{destination.name}</h3>
-                        <p className="mt-1 line-clamp-1 text-xs text-white/75">
-                          {destination.tagline}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-                <div className="mt-4 hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
-                  <article className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
-                    <DestinationImage destination={featured} className="absolute inset-0 size-full object-cover" />
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-                      <h3 className="font-serif text-3xl">{featured.name}</h3>
-                      <p className="mt-2 text-sm text-white/80">{featured.tagline}</p>
-                      <Link
-                        to="/oriente-maya/$destino"
-                        params={{ destino: featured.slug }}
-                        className="mt-3 inline-flex items-center text-sm font-semibold"
-                      >
-                        Ver destino <ChevronRight className="size-4" />
-                      </Link>
-                    </div>
-                  </article>
-                  <div className="grid grid-rows-3 gap-3">
-                    {companions.map((destination) => (
-                      <Link
-                        key={destination.slug}
-                        to="/oriente-maya/$destino"
-                        params={{ destino: destination.slug }}
-                        className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
-                      >
-                        <DestinationImage destination={destination} className="size-full object-cover" />
-                        <div className="flex min-w-0 flex-col justify-center p-4">
-                          <p className="text-[10px] font-semibold uppercase text-primary">
-                            {TERRITORY_TYPE_LABELS[classifyTerritoryType(destination)]}
-                          </p>
-                          <h3 className="mt-1 font-serif text-xl">{destination.name}</h3>
-                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                            {destination.tagline}
-                          </p>
-                          <span className="mt-2 inline-flex items-center text-xs font-semibold">
-                            Ver destino <ChevronRight className="size-3" />
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                <PremiumShowcaseGrid
+                  items={[featured, ...companions].map((destination) =>
+                    toShowcaseItem(destination),
+                  )}
+                />
+
                 <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
                   {content.startHere.disclaimer}
                 </p>
@@ -467,7 +433,23 @@ export function DestinationsAtlasSurface({
                     El mapa aparecerá cuando los destinos tengan coordenadas verificadas en CMS.
                   </div>
                 )}
+                {/* Panel inferior de ruta (móvil): destino enfocado en el mapa. */}
+                {(() => {
+                  const target = activeDestination ?? mapped[0] ?? null;
+                  if (!target) return null;
+                  const info = proximityOf(target);
+                  return (
+                    <div className="mt-3 lg:hidden">
+                      <PremiumCompactRow
+                        item={toShowcaseItem(target, info ? formatProximity(info) : null)}
+                        active
+                      />
+                    </div>
+                  );
+                })()}
+
               </div>
+
             </div>
           </section>,
         )}
@@ -619,7 +601,7 @@ export function DestinationsAtlasSurface({
                   <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-primary">
                     {route.duration}
                   </p>
-                  <h3 className="mt-1 font-serif text-xl">{route.title}</h3>
+                  <h3 className="mt-1 font-display text-xl">{route.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{route.description}</p>
                   <ul className="mt-3 flex flex-wrap gap-2 text-xs text-foreground">
                     {route.stops.map((stop) => (
@@ -665,7 +647,7 @@ export function DestinationsAtlasSurface({
                   <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-primary">
                     {item.label}
                   </p>
-                  <h3 className="mt-1 font-serif text-lg">{item.title}</h3>
+                  <h3 className="mt-1 font-display text-lg">{item.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
                 </button>
               ))}
@@ -677,48 +659,45 @@ export function DestinationsAtlasSurface({
           "final_cta",
           <section
             aria-labelledby="atlas-cta"
-            className="rounded-3xl border border-border bg-secondary p-5 text-secondary-foreground shadow-soft sm:p-7"
+            className="overflow-hidden rounded-3xl bg-selva text-selva-foreground"
           >
-            <h2 id="atlas-cta" className="font-serif text-2xl sm:text-3xl">
-              {content.finalCta.title}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm sm:text-base">{content.finalCta.description}</p>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-              <Button type="button" className="min-h-11 rounded-pill" onClick={() => askAlux()}>
-                <Sparkles className="mr-2 size-4" /> {content.finalCta.primaryLabel}
-              </Button>
-              <Button asChild variant="outline" className="min-h-11 rounded-pill">
-                <Link to="/mi-viaje">{content.finalCta.secondaryLabel}</Link>
-              </Button>
+            <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <div className="flex items-center gap-2 text-primary">
+                  <Sparkles className="size-5" aria-hidden />
+                  <p className="text-xs font-semibold uppercase">{ACTIVE_BRAND.conciergeName}</p>
+                </div>
+                <h2 id="atlas-cta" className="mt-3 font-display text-3xl sm:text-4xl">
+                  {content.finalCta.title}
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-selva-foreground/80">
+                  {content.finalCta.description}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+                <Button
+                  type="button"
+                  size="lg"
+                  className="min-h-12 rounded-pill"
+                  onClick={() => askAlux()}
+                >
+                  <Sparkles className="mr-2 size-4" aria-hidden /> {content.finalCta.primaryLabel}
+                </Button>
+                <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
+                  <Link to="/mi-viaje">{content.finalCta.secondaryLabel}</Link>
+                </Button>
+              </div>
             </div>
           </section>,
         )}
+
       </Container>
     </div>
   );
 }
 
-function SectionHead({
-  kicker,
-  title,
-  description,
-  id,
-}: {
-  kicker: string;
-  title: string;
-  description?: string;
-  id: string;
-}) {
-  return (
-    <header className="max-w-3xl">
-      <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-primary">{kicker}</p>
-      <h2 id={id} className="mt-1 font-serif text-2xl sm:text-3xl">
-        {title}
-      </h2>
-      {description ? <p className="mt-2 text-sm text-muted-foreground">{description}</p> : null}
-    </header>
-  );
-}
+const SectionHead = PremiumSectionHead;
+
 
 function ChipRow({
   legend,
@@ -786,30 +765,11 @@ function FilterChip({
   );
 }
 
-function DestinationImage({
-  destination,
-  className,
-}: {
-  destination: Destination;
-  className?: string;
-}) {
-  if (!destination.image_url) {
-    return (
-      <div className={cn("grid place-items-center bg-muted text-selva/50", className)}>
-        <Compass className="size-8" />
-      </div>
-    );
-  }
-  return (
-    <img
-      src={destination.image_url}
-      alt={destination.name}
-      loading="lazy"
-      className={className}
-    />
-  );
-}
-
+/**
+ * Tarjeta del Atlas — misma geometría, radios y tipografía que las tarjetas
+ * del Home (fila compacta y tarjeta vertical). Añade sólo lo propio del
+ * atlas: distintivo Pueblo Mágico, cercanía administrada y Mi Viaje.
+ */
 function AtlasCard({
   destination,
   proximity,
@@ -833,9 +793,9 @@ function AtlasCard({
       onFocus={onFocus}
       onClick={onFocus}
       className={cn(
-        "group flex min-w-0 overflow-hidden rounded-2xl border bg-card shadow-soft",
-        active ? "border-primary" : "border-border",
-        layout === "row" ? "grid grid-cols-[7.5rem_1fr] sm:grid-cols-[11rem_1fr]" : "flex-col",
+        "group flex min-w-0 overflow-hidden rounded-2xl border bg-card",
+        active ? "border-primary shadow-elevated" : "border-border",
+        layout === "row" ? "grid grid-cols-[7rem_1fr] sm:grid-cols-[10rem_1fr]" : "flex-col",
       )}
     >
       <Link
@@ -844,8 +804,9 @@ function AtlasCard({
         className={cn("relative block overflow-hidden bg-muted", layout === "card" && "h-44")}
         aria-label={`Descubrir ${destination.name}`}
       >
-        <DestinationImage
-          destination={destination}
+        <EditorialMediaFrame
+          media={destinationMedia(destination)}
+          label={destination.name}
           className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
         {magic ? (
@@ -854,13 +815,17 @@ function AtlasCard({
           </span>
         ) : null}
       </Link>
-      <div className="flex min-w-0 flex-col p-3 sm:p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-primary">{type}</p>
-        <h3 className="mt-1 font-serif text-lg sm:text-xl">
+      <div className="flex min-w-0 flex-col p-4">
+        <p className="text-[10px] font-semibold uppercase text-primary">{type}</p>
+        <h3 className="mt-1 font-display text-xl">
           <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }}>
             {destination.name}
           </Link>
         </h3>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+          {destination.tagline}
+        </p>
+
         <p className="mt-1 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
           {destination.tagline}
         </p>
