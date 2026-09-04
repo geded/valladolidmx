@@ -57,7 +57,11 @@ function AYVPage() {
       description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
       crumbs={[{ label: "Arma tu Viaje" }]}
     >
-      {composition ? <CompositionRenderer tree={composition.snapshot} /> : <TripPlannerSurface />}
+      {composition && hasRenderableBlocks(composition.snapshot) ? (
+        <CompositionRenderer tree={composition.snapshot} />
+      ) : (
+        <TripPlannerSurface />
+      )}
     </PublicShell>
   );
 }
