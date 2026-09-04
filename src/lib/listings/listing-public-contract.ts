@@ -208,7 +208,8 @@ export interface PublicListingDTO {
   readonly route: string;
   readonly source: ListingSource;
   /** Trazabilidad probatoria: siempre lecturas reales. */
-  readonly provenance: "real_reads";
+  /** `demo_preview` sólo en superficies internas `/lovable/*` (noindex). */
+  readonly provenance: "real_reads" | "demo_preview";
   readonly hero: {
     readonly eyebrow: string;
     readonly title: string;
