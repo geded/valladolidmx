@@ -11,7 +11,6 @@ import {
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
-const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
 
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).

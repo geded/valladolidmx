@@ -90,6 +90,12 @@ export interface MarketplacePromotionCard {
 
 export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   description: string;
+  /**
+   * Lote 3C — familia de listado declarada en CMS
+   * (`business_categories.listing_family_key`). Autoridad única para elegir
+   * la superficie vertical de la ficha; `null` = el CMS no la declara.
+   */
+  category_family_key?: string | null;
   /** Plan comercial contratado. Resuelto vía Catálogo Central de Planes. */
   plan_tier: "free" | "starter" | "pro" | "premium";
   products: MarketplaceProductCard[];
@@ -802,7 +808,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<MarketplaceBusinessDetail | null> => {
     const supabase = publicClient();
     const detailSelect =
-      "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )";
+      "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug, listing_family_key )";
     const legacyDetailSelect =
       "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )";
     const primaryBusinessResult = await supabase
@@ -868,6 +874,9 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
+    // Lote 3C — familia de listado declarada en CMS (autoridad única).
+    const catFamily = (biz.business_categories as { listing_family_key?: unknown } | null)
+      ?.listing_family_key;
     const planTier = resolveBusinessPlanTier(
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
@@ -903,6 +912,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       verified: Boolean(biz.verified),
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
+      category_family_key: typeof catFamily === "string" && catFamily.trim() ? catFamily : null,
       filter_attributes: normalizeFilterAttributes(biz.filter_attributes),
       plan_tier: planTier,
       products: (products ?? []).map((p) => ({

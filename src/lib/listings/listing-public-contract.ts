@@ -256,10 +256,9 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
   const destinationLabel = destino ? labelOf(destino) : null;
 
   const allowed = new Set(
-    (input.categorySlugs?.length ? input.categorySlugs : contract.categorySlugs).map((slug) =>
-      slug.trim().toLowerCase(),
-    ),
+    (input.categorySlugs ?? contract.categorySlugs).map((slug) => slug.trim().toLowerCase()),
   );
+
   let items: TourismCardVM[] = [];
 
   if (contract.source === "businesses") {

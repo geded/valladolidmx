@@ -16,6 +16,17 @@ import { isListingFamilyId, type ListingFamilyId } from "./listing-public-contra
 
 export type ListingFamilyTaxonomy = Partial<Record<ListingFamilyId, string[]>>;
 
+/**
+ * Lote 3C · corrección final — `available` distingue "el CMS no declara
+ * membresía" (lista vacía autoritativa) de "no se pudo leer el CMS"
+ * (fallback fail-safe). Un fallback nunca inventa membresía de familia.
+ */
+export interface ListingFamilyTaxonomyResult {
+  readonly available: boolean;
+  readonly taxonomy: ListingFamilyTaxonomy;
+}
+
+
 function publicClient() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -26,7 +37,7 @@ function publicClient() {
 }
 
 export const getListingFamilyTaxonomy = createServerFn({ method: "GET" }).handler(
-  async (): Promise<ListingFamilyTaxonomy> => {
+  async (): Promise<ListingFamilyTaxonomyResult> => {
     const supabase = publicClient();
     const { data, error } = await supabase
       .from("business_categories")
@@ -35,7 +46,7 @@ export const getListingFamilyTaxonomy = createServerFn({ method: "GET" }).handle
       .eq("status", "published")
       .is("deleted_at", null)
       .limit(200);
-    if (error || !data) return {};
+    if (error || !data) return { available: false, taxonomy: {} };
     const taxonomy: ListingFamilyTaxonomy = {};
     for (const raw of data as unknown as Array<Record<string, unknown>>) {
       const family = raw.listing_family_key;
@@ -43,6 +54,7 @@ export const getListingFamilyTaxonomy = createServerFn({ method: "GET" }).handle
       if (!isListingFamilyId(family) || typeof slug !== "string" || !slug.trim()) continue;
       (taxonomy[family] ??= []).push(slug.trim().toLowerCase());
     }
-    return taxonomy;
+    return { available: true, taxonomy };
   },
+
 );

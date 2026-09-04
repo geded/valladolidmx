@@ -22,8 +22,9 @@ import {
 } from "./listing-public-contract";
 import {
   getListingFamilyTaxonomy,
-  type ListingFamilyTaxonomy,
+  type ListingFamilyTaxonomyResult,
 } from "./listing-family-taxonomy.functions";
+
 
 export interface GetPublicListingInput {
   family: ListingFamilyId;
@@ -49,17 +50,22 @@ export const getPublicListing = createServerFn({ method: "GET" })
 
     if (contract.source === "businesses") {
       // Lote 3C — la pertenencia categoría→familia se administra en CMS.
+      // Si el CMS respondió, su declaración es autoritativa (aunque esté
+      // vacía). El contrato sólo actúa como fallback si la lectura falló.
       const [businesses, taxonomy] = await Promise.all([
         listMarketplaceBusinesses().catch(() => []),
-        getListingFamilyTaxonomy().catch((): ListingFamilyTaxonomy => ({})),
+        getListingFamilyTaxonomy().catch(
+          (): ListingFamilyTaxonomyResult => ({ available: false, taxonomy: {} }),
+        ),
       ]);
       return buildPublicListing({
         family: contract.id,
         destino: data.destino,
         businesses,
-        categorySlugs: taxonomy[contract.id],
+        categorySlugs: taxonomy.available ? (taxonomy.taxonomy[contract.id] ?? []) : undefined,
       });
     }
+
 
     if (contract.source === "events") {
       const events = await listPublishedEvents({

@@ -11,7 +11,6 @@ import {
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
-const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
 
 /**
  * H-02 · I4 — Declaración de contexto de la categoría piloto.
