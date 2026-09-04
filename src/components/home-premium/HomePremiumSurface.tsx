@@ -32,7 +32,14 @@ import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { ACTIVE_BRAND } from "@/config/brand";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import {
+  PremiumAluxBar,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+  PremiumShowcaseGrid,
+} from "./shared/PremiumShowcase";
 import { cn } from "@/lib/utils";
+
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { recordAluxSignal } from "@/lib/alux/memory-store";
