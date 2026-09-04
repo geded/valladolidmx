@@ -7,7 +7,7 @@ import { Container } from "@/components/layout/Container";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ACTIVE_BRAND } from "@/config/brand";
+import { useBrand } from "@/lib/brand/brand-context";
 import { cn } from "@/lib/utils";
 import type { Destination } from "@/types/territory";
 
@@ -75,6 +75,7 @@ export function RegionDestinationsPremiumSurface({
   destinations: Destination[];
   presentation?: "editorial" | "cinematic";
 }) {
+  const brand = useBrand();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("todos");
   const [visible, setVisible] = useState(PAGE_SIZE);
@@ -134,7 +135,7 @@ export function RegionDestinationsPremiumSurface({
           ) : null}
           <div className="flex flex-col justify-center p-7 text-selva-foreground sm:p-10 lg:p-12">
             <p className="text-xs font-semibold uppercase tracking-[.19em] text-primary">
-              {ACTIVE_BRAND.tagline}
+              {brand.tagline}
             </p>
             <h1 className="mt-4 max-w-3xl text-balance font-serif text-4xl leading-[1.02] text-selva-foreground sm:text-5xl lg:text-6xl">
               Explora los destinos del Oriente Maya de Yucatán

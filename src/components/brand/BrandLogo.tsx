@@ -11,7 +11,11 @@
  *    se aplica una sombra suave para legibilidad, sin recolorear.
  */
 import { cn } from "@/lib/utils";
-import { ACTIVE_BRAND } from "@/config/brand";
+// Lote 3B · B — El logotipo y el nombre accesible se resuelven desde
+// `brand.identity` (CMS). `ACTIVE_BRAND` queda como fallback seguro
+// dentro del propio hook; aquí no se referencia directamente.
+import { useBrandLogo } from "@/lib/brand/brand-context";
+
 
 interface Props {
   tone?: "dark" | "light";
@@ -33,12 +37,14 @@ export function BrandLogo({
   size = "md",
   className,
 }: Props) {
+  const logo = useBrandLogo();
   return (
     <img
-      src={ACTIVE_BRAND.logo.src}
-      alt={ACTIVE_BRAND.name}
-      width={ACTIVE_BRAND.logo.width}
-      height={ACTIVE_BRAND.logo.height}
+      src={logo.src}
+      alt={logo.alt}
+      width={logo.width}
+      height={logo.height}
+
       className={cn(
         "w-auto select-none",
         SIZE_MAP[size],

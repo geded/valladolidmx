@@ -13,7 +13,7 @@ import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EditorialMediaFrame, type EditorialMedia } from "@/components/omxds/EditorialMediaFrame";
-import { ACTIVE_BRAND } from "@/config/brand";
+import { useBrand } from "@/lib/brand/brand-context";
 import { PARTY_OPTIONS, type PartyComposition } from "@/lib/traveler/party-composition";
 
 /* ------------------------------------------------------------------ *
@@ -75,6 +75,7 @@ export function PremiumEditorialHero({
   caption?: string;
   searchSlot?: ReactNode;
 }) {
+  const brand = useBrand();
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
       <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
@@ -87,7 +88,7 @@ export function PremiumEditorialHero({
             {subtitle}
           </p>
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-selva">
-            {ACTIVE_BRAND.discoveryPromise}
+            {brand.discoveryPromise}
           </p>
           {searchSlot ? <div className="mt-5">{searchSlot}</div> : null}
         </div>
@@ -118,7 +119,7 @@ export function PremiumAluxBar({
   selectedParty,
   onSelectParty,
   onContinue,
-  continueLabel = `Continuar con ${ACTIVE_BRAND.conciergeName}`,
+  continueLabel,
 }: {
   question: string;
   selectedParty: PartyComposition | null;
@@ -126,7 +127,10 @@ export function PremiumAluxBar({
   onContinue: () => void;
   continueLabel?: string;
 }) {
+  const brand = useBrand();
+  const resolvedContinueLabel = continueLabel ?? `Continuar con ${brand.conciergeName}`;
   return (
+
     <section
       aria-labelledby="alux-title"
       className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
@@ -135,12 +139,12 @@ export function PremiumAluxBar({
         <div className="flex min-w-0 items-center gap-2 sm:border-r sm:border-white/20 sm:pr-4">
           <img
             src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
-            alt={ACTIVE_BRAND.conciergeName}
+            alt={brand.conciergeName}
             className="size-12 shrink-0 object-contain lg:size-16"
           />
           <div className="min-w-0">
             <h2 id="alux-title" className="truncate font-display text-lg lg:text-xl">
-              {ACTIVE_BRAND.conciergeName}
+              {brand.conciergeName}
             </h2>
             <p className="text-xs text-white/70">Tu concierge IA</p>
           </div>
@@ -170,7 +174,7 @@ export function PremiumAluxBar({
           type="button"
           onClick={onContinue}
           className="size-11 shrink-0 self-center rounded-full p-0"
-          aria-label={continueLabel}
+          aria-label={resolvedContinueLabel}
         >
           <ChevronRight className="size-5" />
         </Button>
