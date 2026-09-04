@@ -20,7 +20,12 @@ import {
   PremiumShowcaseGrid,
   type PremiumShowcaseItem,
 } from "@/components/home-premium/shared/PremiumShowcase";
+import {
+  ExperienceFiltersBar,
+  type FilterSelection,
+} from "@/components/experience-premium/ExperienceFiltersBar";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
