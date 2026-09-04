@@ -50,14 +50,19 @@ const rowsOf = (value: unknown): Row[] =>
 const isCanonicalHref = (value: unknown): value is string =>
   typeof value === "string" && value.startsWith("/") && !value.includes("?") && !value.includes("#");
 
-function stripNonCanonicalHrefs(row: Row): Row {
-  const out: Row = {};
-  for (const [k, v] of Object.entries(row)) {
-    if (/href/i.test(k) && !isCanonicalHref(v)) continue;
-    out[k] = v;
+function stripNonCanonicalHrefs<T>(value: T): T {
+  if (Array.isArray(value)) return value.map((v) => stripNonCanonicalHrefs(v)) as unknown as T;
+  if (value && typeof value === "object") {
+    const out: Row = {};
+    for (const [k, v] of Object.entries(value as Row)) {
+      if (/href/i.test(k) && !isCanonicalHref(v)) continue;
+      out[k] = stripNonCanonicalHrefs(v);
+    }
+    return out as unknown as T;
   }
-  return out;
+  return value;
 }
+
 
 /**
  * Une la fila por defecto (texto/enlace acreditado) con la fila vigente del
