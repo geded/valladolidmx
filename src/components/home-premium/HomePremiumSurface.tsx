@@ -376,8 +376,8 @@ function AluxPlanner({
     });
   };
   return (
-    <section
     <PremiumAluxBar
+
       question="¿Cómo viajas hoy?"
       selectedParty={selectedParty}
       onSelectParty={onSelectParty}
