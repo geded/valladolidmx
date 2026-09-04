@@ -37,7 +37,8 @@ interface GMarker {
     title?: string;
     label?: unknown;
     icon?: unknown;
-  }): unknown;
+    zIndex?: number;
+  }): { addListener: (event: string, handler: () => void) => void };
 }
 interface GSize {
   new (width: number, height: number): unknown;
@@ -47,6 +48,9 @@ interface GPoint {
 }
 interface GLatLngBounds {
   new (): { extend: (position: LatLng) => void };
+}
+interface GPolyline {
+  new (opts: Record<string, unknown>): { setMap: (map: unknown) => void };
 }
 interface GDirectionsService {
   new (): {
@@ -66,11 +70,25 @@ interface GoogleMapsNamespace {
     Size: GSize;
     Point: GPoint;
     LatLngBounds: GLatLngBounds;
+    Polyline: GPolyline;
     DirectionsService: GDirectionsService;
     DirectionsRenderer: GDirectionsRenderer;
     TravelMode: { DRIVING: string };
     DirectionsStatus: { OK: string };
   };
+}
+
+/** Resultado de la capa de ruta, reportado a la superficie consumidora. */
+export interface MapRouteStatus {
+  /** `directions` = geometría vial real; `approximate` = línea entre coordenadas CMS. */
+  mode: "directions" | "approximate" | "none";
+  /** Estado devuelto por el proveedor cuando falla (bloqueo exacto). */
+  providerStatus?: string;
+  /** Sólo cuando `mode === "directions"`: métricas reales del proveedor. */
+  distanceMeters?: number;
+  durationSeconds?: number;
+  /** Orden optimizado devuelto por el proveedor (índices de waypoints). */
+  waypointOrder?: number[];
 }
 
 declare global {
