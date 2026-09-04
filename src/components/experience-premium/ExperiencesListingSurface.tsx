@@ -20,7 +20,12 @@ import {
   PremiumShowcaseGrid,
   type PremiumShowcaseItem,
 } from "@/components/home-premium/shared/PremiumShowcase";
+import {
+  ExperienceFiltersBar,
+  type FilterSelection,
+} from "@/components/experience-premium/ExperienceFiltersBar";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
@@ -151,7 +156,7 @@ export function ExperiencesListingSurface({
 }: ExperiencesListingSurfaceProps) {
   const [query, setQuery] = useState("");
   const [party, setParty] = useState<PartyComposition | null>(null);
-  const [active, setActive] = useState<Record<string, string | null>>({});
+  const [active, setActive] = useState<FilterSelection>({});
 
   const items = dto.items;
   const facets = useMemo(
@@ -169,12 +174,23 @@ export function ExperiencesListingSurface({
           .some((value) => (value as string).toLowerCase().includes(needle));
       if (!matchesQuery) return false;
       return facets.every((facet) => {
-        const selected = active[facet.id];
-        if (!selected) return true;
-        return facet.values(vm).includes(selected);
+        const selected = active[facet.id] ?? [];
+        if (selected.length === 0) return true;
+        const values = facet.values(vm);
+        return selected.some((value) => values.includes(value));
       });
     });
   }, [items, facets, active, query]);
+
+  const toggleFacet = (groupId: string, value: string) =>
+    setActive((current) => {
+      const selected = current[groupId] ?? [];
+      const next = selected.includes(value)
+        ? selected.filter((item) => item !== value)
+        : [...selected, value];
+      return { ...current, [groupId]: next };
+    });
+
 
   const featured = filtered.slice(0, 4).map(toShowcaseItem);
   const rest = filtered.slice(4);
@@ -222,70 +238,20 @@ export function ExperiencesListingSurface({
         }
       />
 
-      <PremiumAluxBar
-        question="¿Qué quieres vivir en el Oriente Maya?"
-        selectedParty={party}
-        onSelectParty={(value) => {
-          setParty(value);
-          askAlux();
-        }}
-        onContinue={() => askAlux()}
+      <ExperienceFiltersBar
+        groups={facets.map((facet) => ({
+          id: facet.id,
+          label: facet.label,
+          options: facet.options,
+        }))}
+        selection={active}
+        onToggle={toggleFacet}
+        onClear={() => setActive({})}
+        resultCount={filtered.length}
       />
 
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Intereses sugeridos">
-        {INTENT_PROMPTS.map((prompt) => (
-          <button
-            key={prompt}
-            type="button"
-            onClick={() => askAlux(prompt)}
-            className="min-h-11 rounded-pill border border-border bg-background px-4 text-sm"
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
 
-      {facets.length > 0 ? (
-        <section aria-label="Filtros publicados" className="space-y-3">
-          {facets.map((facet) => (
-            <div key={facet.id} className="flex snap-x items-center gap-2 overflow-x-auto pb-1">
-              <span className="shrink-0 text-[11px] font-semibold uppercase text-muted-foreground">
-                {facet.label}
-                {facet.demo ? (
-                  <span className="ml-1 rounded-pill border border-dashed border-border px-1.5 py-0.5 text-[10px] font-medium normal-case">
-                    DEMO
-                  </span>
-                ) : null}
-              </span>
-              {facet.options.map((option) => {
-                const selected = active[facet.id] === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() =>
-                      setActive((current) => ({
-                        ...current,
-                        [facet.id]: selected ? null : option.value,
-                      }))
-                    }
-                    className={cn(
-                      "min-h-11 shrink-0 snap-start rounded-pill border px-4 text-sm",
-                      selected
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border bg-background",
-                    )}
-                  >
-                    {option.label}
-                    <span className="ml-1 text-xs text-muted-foreground">{option.count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </section>
-      ) : null}
+
 
       {filtered.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
@@ -325,7 +291,33 @@ export function ExperiencesListingSurface({
           ) : null}
         </>
       )}
+
+      {/* Alux y sus atajos viven bajo los resultados: la rejilla debe
+          quedar visible en el primer viewport tras el hero. */}
+      <PremiumAluxBar
+        question="¿Qué quieres vivir en el Oriente Maya?"
+        selectedParty={party}
+        onSelectParty={(value) => {
+          setParty(value);
+          askAlux();
+        }}
+        onContinue={() => askAlux()}
+      />
+
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Intereses sugeridos">
+        {INTENT_PROMPTS.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => askAlux(prompt)}
+            className="min-h-11 rounded-pill border border-border bg-background px-4 text-sm"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
     </div>
+
   );
 }
 
