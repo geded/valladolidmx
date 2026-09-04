@@ -78,13 +78,14 @@ function mergeRow(defaultRow: Row | undefined, currentRow: Row): Row {
 
 export function materializeHomePremiumConfig(current: Cfg): Cfg {
   const defaults = homePremiumG4DefaultConfig() as Cfg;
-  const out: Cfg = { ...defaults };
+  const out: Cfg = stripNonCanonicalHrefs(defaults);
 
   // 1 · Escalares y decisiones vigentes ganan sobre el default.
   for (const [k, v] of Object.entries(current)) {
     if (LIST_KEYS.some((l) => l.key === k)) continue;
     out[k] = v;
   }
+
 
   // 2 · Colecciones: se materializa el texto por defecto sobre cada fila
   //     vigente, respetando índice, longitud y decisiones de medios.
