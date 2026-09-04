@@ -1100,6 +1100,28 @@ function AtlasCard({
               Descubrir
             </Link>
           </Button>
+          {onToggleStop ? (
+            <Button
+              type="button"
+              variant={stopOrder ? "default" : "outline"}
+              aria-pressed={Boolean(stopOrder)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleStop();
+              }}
+              className="min-h-11 rounded-pill"
+            >
+              {stopOrder ? (
+                <>
+                  <Check className="mr-2 size-4" aria-hidden /> Parada {stopOrder}
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 size-4" aria-hidden /> Agregar al recorrido
+                </>
+              )}
+            </Button>
+          ) : null}
           <AddToTravelPlanButton
             kind="destination"
             targetId={destination.id}
