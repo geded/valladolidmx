@@ -60,7 +60,14 @@ for (const preview of previews) {
   }
   assert.doesNotMatch(source, /type VisualDirection = "editorial"/);
   assert.doesNotMatch(source, /["']cinematografico["']|["']cinematografica["']/);
+  // La marca larga sigue siendo obligatoria salvo en las dos previews donde
+  // "Oriente Maya" aparece como etiqueta territorial de breadcrumb/chip.
+  // Excepción documentada para revisión de copy en el Lote 3.
+  if (!TERRITORIAL_LABEL_EXCEPTIONS.has(preview)) {
+    assert.doesNotMatch(source, /Oriente Maya(?! de\s+Yucatán)/);
+  }
 }
+
 
 for (const preview of previews.filter((name) => name !== "g4-home-premium-preview.tsx")) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
