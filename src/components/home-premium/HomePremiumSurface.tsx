@@ -377,56 +377,15 @@ function AluxPlanner({
   };
   return (
     <section
-      aria-labelledby="alux-title"
-      className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
-    >
-      <div className="grid min-h-20 items-center gap-3 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
-        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-white/20 sm:pr-3 lg:h-24">
-          <img
-            src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
-            alt="Alux"
-            className="h-14 w-14 shrink-0 object-contain lg:h-20 lg:w-20"
-          />
-          <div>
-            <h2 id="alux-title" className="font-display text-xl">
-              Alux
-            </h2>
-            <p className="text-xs text-white/70">Tu concierge IA</p>
-          </div>
-        </div>
-        <div>
-          <p className="font-display text-lg lg:text-xl">¿Cómo viajas hoy?</p>
-          <div
-            className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
-            role="group"
-            aria-label="Composición del viaje"
-          >
-            {PARTY_OPTIONS.map((option) => (
-              <Button
-                key={option.value}
-                type="button"
-                size="sm"
-                variant={selectedParty === option.value ? "default" : "secondary"}
-                onClick={() => onSelectParty(option.value)}
-                className="min-h-9 rounded-pill"
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <Button
-          type="button"
-          onClick={openAlux}
-          className="size-11 rounded-full p-0"
-          aria-label="Continuar con Alux"
-        >
-          <ChevronRight className="size-5" />
-        </Button>
-      </div>
-    </section>
+    <PremiumAluxBar
+      question="¿Cómo viajas hoy?"
+      selectedParty={selectedParty}
+      onSelectParty={onSelectParty}
+      onContinue={openAlux}
+    />
   );
 }
+
 
 function RoutesSection({
   content,
