@@ -1026,12 +1026,17 @@ function AtlasCard({
   layout,
   active = false,
   onFocus,
+  stopOrder = null,
+  onToggleStop,
 }: {
   destination: Destination;
   proximity: ProximityInfo | null;
   layout: "card" | "row";
   active?: boolean;
   onFocus?: () => void;
+  /** Posición dentro del recorrido seleccionado (1..n) o `null`. */
+  stopOrder?: number | null;
+  onToggleStop?: () => void;
 }) {
   const type = TERRITORY_TYPE_LABELS[classifyTerritoryType(destination)];
   const magic = PUEBLOS_MAGICOS.has(destination.slug);
