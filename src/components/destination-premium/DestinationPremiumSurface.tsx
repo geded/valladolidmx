@@ -57,6 +57,11 @@ export type DestinationHeroVariant = "editorial" | "cinematic";
 export type DestinationGalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
 
 export interface DestinationPremiumSurfaceProps {
+  /**
+   * Cuando el shell público ya emite la ruta territorial, la superficie
+   * no debe duplicarla. Default `true` (Studio y previews aislados).
+   */
+  showBreadcrumbs?: boolean;
   content?: DestinationPremiumContent;
   heroVariant?: DestinationHeroVariant;
   galleryLayout?: DestinationGalleryLayout;
@@ -81,6 +86,7 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
 };
 
 export function DestinationPremiumSurface({
+  showBreadcrumbs = true,
   content = DESTINATION_PREMIUM_G4_CONTENT,
   heroVariant = "editorial",
   galleryLayout = "mosaico",
@@ -132,9 +138,11 @@ export function DestinationPremiumSurface({
 
   return (
     <div className={cn("pb-24", className)}>
-      <Container className="pt-6">
-        <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-      </Container>
+      {showBreadcrumbs ? (
+        <Container className="pt-6">
+          <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} compactOnMobile />
+        </Container>
+      ) : null}
 
       {DESTINATION_PREMIUM_SECTION_ORDER.map((key) => {
         if (!visible(key)) return null;

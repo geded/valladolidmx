@@ -371,6 +371,7 @@ function TerritorialPath() {
         { label: "Experiencias" },
         { label: EXPERIENCE.name },
       ]}
+      compactOnMobile
     />
   );
 }
