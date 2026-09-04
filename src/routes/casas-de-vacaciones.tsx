@@ -68,11 +68,17 @@ export const Route = createFileRoute("/casas-de-vacaciones")({
     destino: typeof search.destino === "string" ? search.destino : undefined,
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps, context }) => ({
+  loader: async ({ deps, context }) => {
+    // Lote 3B — Nombres de destino reales disponibles en SSR.
+    await context.queryClient
+      .ensureQueryData(publishedDestinationsQueryOptions)
+      .catch(() => []);
+    return {
     dto: await getPublicListing({
       data: { family: "casas-de-vacaciones", destino: deps.destino ?? null },
     }),
-  }),
+    };
+  },
   head: () =>
     buildPublicHead({
       title: `Casas de vacaciones · ${SITE.name}`,

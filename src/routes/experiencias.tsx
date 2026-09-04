@@ -58,9 +58,13 @@ export const Route = createFileRoute("/experiencias")({
     ...(typeof search.tema === "string" ? { tema: search.tema } : {}),
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps, context }) => await getExperiencesListing({
-    data: { destino: deps.destino ?? null },
-  }),
+  loader: async ({ deps, context }) => {
+    // Lote 3B — Nombres de destino reales disponibles en SSR.
+    await context.queryClient
+      .ensureQueryData(publishedDestinationsQueryOptions)
+      .catch(() => []);
+    return await getExperiencesListing({ data: { destino: deps.destino ?? null } });
+  },
   head: () =>
     buildPublicHead({
       title: `Experiencias · ${SITE.name}`,

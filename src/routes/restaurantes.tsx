@@ -57,11 +57,17 @@ export const Route = createFileRoute("/restaurantes")({
       search.presentacion === "cinematografica" ? ("cinematografica" as const) : undefined,
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps, context }) => ({
+  loader: async ({ deps, context }) => {
+    // Lote 3B — Nombres de destino reales disponibles en SSR.
+    await context.queryClient
+      .ensureQueryData(publishedDestinationsQueryOptions)
+      .catch(() => []);
+    return {
     dto: await getPublicListing({
       data: { family: "restaurantes", destino: deps.destino ?? null },
     }),
-  }),
+    };
+  },
   head: () =>
     buildPublicHead({
       title: `Restaurantes · ${SITE.name}`,

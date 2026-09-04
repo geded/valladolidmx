@@ -67,6 +67,10 @@ export const Route = createFileRoute("/lugares/")({
       path: "/lugares",
     }),
   loader: async ({ deps, context }) => {
+    // Lote 3B — Nombres de destino reales disponibles en SSR.
+    await context.queryClient
+      .ensureQueryData(publishedDestinationsQueryOptions)
+      .catch(() => []);
     const destino = deps.destino ?? null;
     const [dto, regional] = await Promise.all([
       getPublicListing({ data: { family: "lugares", destino } }),
