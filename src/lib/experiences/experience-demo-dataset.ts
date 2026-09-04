@@ -397,10 +397,62 @@ export function buildExperienceDemoListingDTO(destino?: string | null): PublicLi
   };
 }
 
+/**
+ * Detalle extendido DEMO. Se define sólo para algunas experiencias a
+ * propósito: demuestra que la ficha OMITE cada sección sin dato real.
+ */
+const DEMO_DETAILS: Record<
+  string,
+  {
+    includes?: string[];
+    excludes?: string[];
+    itinerary?: { title: string; detail: string | null }[];
+    requirements?: string[];
+    policies?: { title: string; items: string[] }[];
+    location?: { label: string; address: string | null; latitude: number | null; longitude: number | null };
+  }
+> = {
+  "demo-cocina-de-humo-fogon-maya": {
+    includes: ["Comida completa", "Bebida tradicional", "Recetario impreso"],
+    excludes: ["Traslados", "Propinas"],
+    itinerary: [
+      { title: "Bienvenida en el solar", detail: "Recorrido por el huerto y presentación del fogón." },
+      { title: "Nixtamal y tortilla", detail: "Molienda a mano y comal." },
+      { title: "Sobremesa", detail: "Comida servida y conversación con la cocinera." },
+    ],
+    requirements: ["Avisar alergias alimentarias al reservar"],
+    policies: [
+      { title: "Política de cancelación", items: ["Cancelación sin costo hasta 24 h antes (dato de demostración)."] },
+    ],
+    location: { label: "Solar familiar del Centro (demostración)", address: "Centro, Valladolid, Yucatán", latitude: 20.6896, longitude: -88.2011 },
+  },
+  "demo-descenso-cenote-de-gruta": {
+    includes: ["Casco, arnés y chaleco", "Guía certificado", "Seguro de actividad"],
+    excludes: ["Fotografía profesional", "Alimentos"],
+    itinerary: [
+      { title: "Briefing de seguridad", detail: "Revisión de equipo y técnica de descenso." },
+      { title: "Descenso a la gruta", detail: null },
+      { title: "Nado y ascenso", detail: null },
+    ],
+    requirements: ["Saber nadar", "No apta para personas con vértigo"],
+    policies: [
+      { title: "Condiciones", items: ["Sujeta a nivel del agua y condiciones de la gruta (demostración)."] },
+    ],
+    location: { label: "Acceso a gruta demostrativa", address: "Temozón, Yucatán", latitude: 20.8069, longitude: -88.2036 },
+  },
+  "demo-taller-urdido-de-hamaca": {
+    includes: ["Materiales del taller", "Pieza elaborada"],
+    excludes: ["Traslados"],
+    requirements: ["Sin experiencia previa"],
+  },
+};
+
 /** VM DEMO con el MISMO contrato de la ficha canónica. */
 export function buildExperienceDemoVM(slug: string): ExperiencePremiumVM | null {
   const seed = SEEDS.find((item) => item.slug === slug);
   if (!seed) return null;
+  const detail = DEMO_DETAILS[seed.slug] ?? {};
+  const labelOf = (value: string) => EXPERIENCE_DEMO_VALUE_LABELS[value] ?? value;
   return {
     id: seed.slug,
     slug: seed.slug,
@@ -435,6 +487,15 @@ export function buildExperienceDemoVM(slug: string): ExperiencePremiumVM | null 
         note: item.destinationLabel,
         media: item.cardMedia,
       })),
+    includes: detail.includes ?? [],
+    excludes: detail.excludes ?? [],
+    itinerary: detail.itinerary ?? [],
+    requirements: detail.requirements ?? [],
+    languages: (seed.attributes.idioma ?? []).map(labelOf),
+    accessibility: (seed.attributes.accesibilidad ?? []).map(labelOf),
+    policies: detail.policies ?? [],
+    location: detail.location ?? null,
+    rating: null,
     commerce: resolveExperienceCommerce(seed.commerce),
     demoNotice: EXPERIENCE_DEMO_NOTICE,
   };

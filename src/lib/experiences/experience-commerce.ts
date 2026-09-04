@@ -18,6 +18,8 @@
 
 export type ExperienceCommerceCapability =
   | "book_online"
+  /** Marcada para venta pero SIN contrato operativo completo (regla B). */
+  | "sale_unverified"
   | "request_quote"
   | "contact_whatsapp"
   | "contact_phone"
@@ -39,6 +41,17 @@ export interface ExperienceCommerceInput {
   readonly secondaryActionLabel?: string | null;
   readonly contact?: ExperienceCommerceContact | null;
   readonly externalUrl?: string | null;
+  /**
+   * Contrato operativo de venta directa (`products.direct_sale_*`).
+   * Sin `enabled` + importe acreditado NO existe "Reservar" (regla C).
+   */
+  readonly directSale?: {
+    readonly enabled?: boolean | null;
+    readonly priceAmount?: number | null;
+    readonly maxQuantity?: number | null;
+  } | null;
+  /** Proveedor/operador acreditado que responderá la reserva. */
+  readonly hasProvider?: boolean | null;
 }
 
 export interface ExperienceCommerceDecision {
@@ -46,6 +59,8 @@ export interface ExperienceCommerceDecision {
   /** Único caso en el que puede existir un CTA de reserva/pago. */
   readonly canBookOnline: boolean;
   readonly bookLabel: string | null;
+  /** Estado honesto cuando la venta está marcada pero incompleta (regla B). */
+  readonly saleGapNotice: string | null;
   /** Acción de contacto real (nunca simula compra). */
   readonly contactLabel: string | null;
   readonly contactHref: string | null;
@@ -83,18 +98,64 @@ export function resolveExperienceCommerce(
   const base = {
     priceLabel,
     showAddToTrip: true as const,
+    saleGapNotice: null as string | null,
   };
 
-  if (mode === "reservar_en_linea" && input.acceptsOnlinePayment === true) {
+  const markedForSale = mode === "reservar_en_linea" || input.acceptsOnlinePayment === true;
+  const saleAmount = input.directSale?.priceAmount ?? input.priceAmount ?? null;
+  const saleContract = {
+    venta: mode === "reservar_en_linea" && input.acceptsOnlinePayment === true,
+    directa: input.directSale?.enabled === true,
+    precio: saleAmount != null && Number(saleAmount) > 0,
+    inventario: (input.directSale?.maxQuantity ?? 0) > 0 || input.requiresAvailability === true,
+    proveedor: input.hasProvider !== false,
+  };
+
+  const fallbackType = (input.contact?.type || "").toLowerCase();
+  const fallbackValue = input.contact?.value || null;
+  const fallbackHref =
+    fallbackType === "whatsapp" && fallbackValue
+      ? `https://wa.me/${digitsOnly(fallbackValue)}`
+      : fallbackType === "email" && fallbackValue
+        ? `mailto:${fallbackValue}`
+        : (fallbackType === "phone" || fallbackType === "telefono") && fallbackValue
+          ? `tel:${digitsOnly(fallbackValue)}`
+          : null;
+
+  if (markedForSale) {
+    const faltantes = Object.entries(saleContract)
+      .filter(([, ok]) => !ok)
+      .map(([key]) => key);
+
+    // Regla C · sólo con el contrato operativo completo se muestra "Reservar".
+    if (faltantes.length === 0) {
+      return {
+        ...base,
+        capability: "book_online",
+        canBookOnline: true,
+        bookLabel: input.primaryActionLabel || "Reservar",
+        contactLabel: null,
+        contactHref: null,
+        rationale:
+          "Venta en línea acreditada: modo de conversión, pago, venta directa, precio, inventario y proveedor validados.",
+      };
+    }
+
+    // Regla B · marcada para venta sin contrato completo: estado honesto.
     return {
       ...base,
-      capability: "book_online",
-      canBookOnline: true,
-      bookLabel: input.primaryActionLabel || "Reservar en línea",
-      contactLabel: null,
-      contactHref: null,
+      capability: "sale_unverified",
+      canBookOnline: false,
+      bookLabel: null,
+      // CTA de consulta sólo si la empresa publicó un canal real.
+      contactLabel: fallbackHref ? "Consultar disponibilidad con el operador" : null,
+      contactHref: fallbackHref,
+      saleGapNotice:
+        "Reserva en línea aún no disponible: el operador no ha completado " +
+        `${faltantes.join(", ")}. Puedes agregarla a Mi Viaje mientras tanto.`,
       rationale:
-        "La empresa declaró reserva en línea y pago en línea habilitado; el CTA de reserva usa la capacidad comercial real.",
+        "La experiencia está marcada para venta, pero el contrato operativo está incompleto; " +
+        "no se simula checkout ni disponibilidad.",
     };
   }
 

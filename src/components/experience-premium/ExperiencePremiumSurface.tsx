@@ -121,6 +121,19 @@ export function ExperiencePremiumSurface({
             ) : null}
           </div>
         </div>
+        {commerce.saleGapNotice ? (
+          <p className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+            {commerce.saleGapNotice}
+          </p>
+        ) : null}
+        {vm.rating ? (
+          <p className="mt-3 text-sm">
+            <span className="font-semibold">{vm.rating.value.toFixed(1)}</span>{" "}
+            <span className="text-muted-foreground">
+              · {vm.rating.count} {vm.rating.count === 1 ? "reseña" : "reseñas"} publicadas
+            </span>
+          </p>
+        ) : null}
         <p className="mt-3 text-xs text-muted-foreground">{commerce.rationale}</p>
       </section>
 
@@ -175,6 +188,146 @@ export function ExperiencePremiumSurface({
         </section>
       ) : null}
 
+
+      {vm.includes.length > 0 || vm.excludes.length > 0 ? (
+        <section aria-labelledby="experiencia-incluye">
+          <PremiumSectionHead
+            id="experiencia-incluye"
+            kicker="Qué contempla"
+            title="Incluye y no incluye"
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {vm.includes.length > 0 ? (
+              <ul className="space-y-2 rounded-2xl border border-border bg-card p-4 text-sm">
+                <li className="text-[11px] font-semibold uppercase text-primary">Incluye</li>
+                {vm.includes.map((item) => (
+                  <li key={item} className="text-muted-foreground">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {vm.excludes.length > 0 ? (
+              <ul className="space-y-2 rounded-2xl border border-border bg-card p-4 text-sm">
+                <li className="text-[11px] font-semibold uppercase text-muted-foreground">
+                  No incluye
+                </li>
+                {vm.excludes.map((item) => (
+                  <li key={item} className="text-muted-foreground">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {vm.itinerary.length > 0 ? (
+        <section aria-labelledby="experiencia-itinerario">
+          <PremiumSectionHead
+            id="experiencia-itinerario"
+            kicker="Paso a paso"
+            title="Itinerario publicado"
+          />
+          <ol className="space-y-3">
+            {vm.itinerary.map((step, index) => (
+              <li
+                key={step.title}
+                className="flex gap-3 rounded-2xl border border-border bg-card p-4"
+              >
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-pill bg-primary/10 text-sm font-semibold text-primary">
+                  {index + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-display text-base">{step.title}</p>
+                  {step.detail ? (
+                    <p className="mt-1 text-sm text-muted-foreground">{step.detail}</p>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
+      {vm.requirements.length > 0 || vm.languages.length > 0 || vm.accessibility.length > 0 ? (
+        <section aria-labelledby="experiencia-condiciones">
+          <PremiumSectionHead
+            id="experiencia-condiciones"
+            kicker="Antes de ir"
+            title="Requisitos, idiomas y accesibilidad"
+          />
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "Requisitos", values: vm.requirements },
+              { label: "Idiomas", values: vm.languages },
+              { label: "Accesibilidad", values: vm.accessibility },
+            ]
+              .filter((group) => group.values.length > 0)
+              .map((group) => (
+                <div key={group.label} className="rounded-2xl border border-border bg-card p-4">
+                  <p className="text-[11px] font-semibold uppercase text-muted-foreground">
+                    {group.label}
+                  </p>
+                  <ul className="mt-2 flex flex-wrap gap-2">
+                    {group.values.map((value) => (
+                      <li
+                        key={value}
+                        className="rounded-pill border border-border px-3 py-1 text-xs"
+                      >
+                        {value}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+          </div>
+        </section>
+      ) : null}
+
+      {vm.location ? (
+        <section aria-labelledby="experiencia-ubicacion">
+          <PremiumSectionHead id="experiencia-ubicacion" kicker="Dónde" title="Ubicación y encuentro" />
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="font-display text-lg">{vm.location.label}</p>
+            {vm.location.address ? (
+              <p className="mt-1 text-sm text-muted-foreground">{vm.location.address}</p>
+            ) : null}
+            {vm.location.latitude != null && vm.location.longitude != null ? (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${vm.location.latitude},${vm.location.longitude}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex min-h-11 items-center rounded-pill border border-border px-4 text-sm font-semibold"
+              >
+                Cómo llegar
+              </a>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {vm.policies.length > 0 ? (
+        <section aria-labelledby="experiencia-politicas">
+          <PremiumSectionHead id="experiencia-politicas" kicker="Reglas" title="Políticas publicadas" />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {vm.policies.map((policy) => (
+              <div key={policy.title} className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-[11px] font-semibold uppercase text-muted-foreground">
+                  {policy.title}
+                </p>
+                {policy.items.map((item) => (
+                  <p key={item} className="mt-1 text-sm text-muted-foreground">
+                    {item}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {vm.faqs.length > 0 ? (
         <section aria-labelledby="experiencia-faq">
           <PremiumSectionHead id="experiencia-faq" kicker="Preguntas" title="Antes de reservar" />
@@ -197,7 +350,7 @@ export function ExperiencePremiumSurface({
           <PremiumSectionHead
             id="experiencia-relacionadas"
             kicker="Sigue explorando"
-            title="Otras experiencias del operador"
+            title="Experiencias cercanas"
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {relatedItems.map((item) => (

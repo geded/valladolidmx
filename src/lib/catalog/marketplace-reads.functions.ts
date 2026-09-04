@@ -214,6 +214,20 @@ export interface MarketplaceProductDetail {
   accepts_online_payment: boolean;
   requires_availability: boolean;
   visibility_level: string;
+  /** Duración publicada por la empresa (minutos). */
+  duration_minutes: number | null;
+  /** Aforo máximo publicado. */
+  capacity: number | null;
+  /** Contrato operativo de venta directa (CV4.1). Sin él no hay "Reservar". */
+  direct_sale: {
+    enabled: boolean;
+    price_amount: number | null;
+    price_currency: string | null;
+    min_lead_hours: number | null;
+    max_quantity: number | null;
+    cancellation_policy: string | null;
+    terms: string | null;
+  };
   cover_url: string | null;
   media: ProductMediaItem[];
   business: ProductBusinessContext;
@@ -259,7 +273,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     const { data: prod, error } = await supabase
       .from("products")
       .select(
-        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id",
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -526,6 +540,35 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       accepts_online_payment: Boolean((prod as Record<string, unknown>).accepts_online_payment),
       requires_availability: Boolean((prod as Record<string, unknown>).requires_availability),
       visibility_level: String((prod as Record<string, unknown>).visibility_level ?? "standard"),
+      duration_minutes:
+        (prod as Record<string, unknown>).duration_minutes != null
+          ? Number((prod as Record<string, unknown>).duration_minutes)
+          : null,
+      capacity:
+        (prod as Record<string, unknown>).capacity != null
+          ? Number((prod as Record<string, unknown>).capacity)
+          : null,
+      direct_sale: {
+        enabled: Boolean((prod as Record<string, unknown>).direct_sale_enabled),
+        price_amount:
+          (prod as Record<string, unknown>).direct_sale_price_amount != null
+            ? Number((prod as Record<string, unknown>).direct_sale_price_amount)
+            : null,
+        price_currency:
+          ((prod as Record<string, unknown>).direct_sale_currency as string | null) ?? null,
+        min_lead_hours:
+          (prod as Record<string, unknown>).direct_sale_min_lead_hours != null
+            ? Number((prod as Record<string, unknown>).direct_sale_min_lead_hours)
+            : null,
+        max_quantity:
+          (prod as Record<string, unknown>).direct_sale_max_quantity != null
+            ? Number((prod as Record<string, unknown>).direct_sale_max_quantity)
+            : null,
+        cancellation_policy:
+          ((prod as Record<string, unknown>).direct_sale_cancellation_policy as string | null) ??
+          null,
+        terms: ((prod as Record<string, unknown>).direct_sale_terms as string | null) ?? null,
+      },
       cover_url: cover?.url ?? null,
       media,
       business: {

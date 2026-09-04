@@ -318,7 +318,7 @@ export function ExperiencesListingSurface({
               />
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {rest.map((vm) => (
-                  <ExperienceListCard key={vm.id} vm={vm} />
+                  <ExperienceListCard key={vm.id} vm={vm} valueLabels={attributeValueLabels} />
                 ))}
               </div>
             </section>
@@ -329,7 +329,13 @@ export function ExperiencesListingSurface({
   );
 }
 
-function ExperienceListCard({ vm }: { vm: TourismCardVM }) {
+function ExperienceListCard({
+  vm,
+  valueLabels,
+}: {
+  vm: TourismCardVM;
+  valueLabels: Record<string, string>;
+}) {
   const eligibility = evaluateTripEligibility({
     kind: "product",
     targetId: vm.id,
@@ -343,10 +349,18 @@ function ExperienceListCard({ vm }: { vm: TourismCardVM }) {
     priceAmount: vm.priceAmount,
     priceCurrency: vm.priceCurrency,
   });
+  /* Duración publicada (eje `duracion`); se omite si no hay dato. */
+  const durationRaw = attributeValues(vm, "duracion")[0] ?? null;
+  const durationLabel = durationRaw ? (valueLabels[durationRaw] ?? humanizeValue(durationRaw)) : null;
   return (
     <div className="flex flex-col gap-2">
       <PremiumCompactRow item={toShowcaseItem(vm)} />
       <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        {durationLabel ? (
+          <span className="rounded-pill border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
+            {durationLabel}
+          </span>
+        ) : null}
         {commerce.priceLabel ? (
           <span className="text-xs text-muted-foreground">Desde {commerce.priceLabel}</span>
         ) : (
