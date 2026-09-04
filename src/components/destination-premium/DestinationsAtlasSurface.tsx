@@ -206,33 +206,31 @@ export function DestinationsAtlasSurface({
     <div className="pb-16" data-surface="destinations-atlas">
       {section(
         "hero",
-        <div className="relative">
-          <PremiumHero
-            vm={{
-              presentation: "editorial",
-              eyebrow: content.hero.eyebrow,
-              title: content.hero.title,
-              description: content.hero.description,
-              media: { url: content.hero.media.url, alt: content.hero.media.alt },
-            }}
+        <Container className="pt-4 sm:pt-6">
+          <PremiumEditorialHero
+            eyebrow={content.hero.eyebrow}
+            title={content.hero.title}
+            subtitle={content.hero.description}
+            media={content.hero.media}
+            searchSlot={
+              <label className="relative block rounded-pill bg-card shadow-soft">
+                <Search className="pointer-events-none absolute left-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <span className="sr-only">{content.hero.searchPlaceholder}</span>
+                <Input
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={content.hero.searchPlaceholder}
+                  className="min-h-14 rounded-pill border-border pl-12 text-base"
+                />
+              </label>
+            }
           />
-          <Container className="-mt-8 sm:-mt-10">
-            <label className="relative block rounded-pill bg-card shadow-elevated">
-              <Search className="pointer-events-none absolute left-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <span className="sr-only">{content.hero.searchPlaceholder}</span>
-              <Input
-                value={query}
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setPage(1);
-                }}
-                placeholder={content.hero.searchPlaceholder}
-                className="min-h-14 rounded-pill border-border pl-12 text-base"
-              />
-            </label>
-          </Container>
-        </div>,
+        </Container>,
       )}
+
 
       <Container className="mt-6 space-y-10 sm:mt-8 sm:space-y-14">
         {fixtureNotice ? (
