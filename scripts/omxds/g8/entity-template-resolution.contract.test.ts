@@ -288,13 +288,16 @@ assert.equal(
   "una casa nunca adopta la plantilla de hotel ni al revés",
 );
 
-// Casa de vacaciones: pendiente de aceptación Founder → no auto-asignable.
+// Casa de vacaciones: preset aceptado por el Founder (commit b29a7400,
+// "feat: connect vacation rental premium surfaces") → auto-asignable.
 const rental = resolveEntityTemplate({
   entityId: "b-10",
   entityType: "business",
   categorySlug: "casas-de-vacaciones",
 });
-assert.equal(rental.source, "standard", "el preset de casa no se asigna hasta aceptación Founder");
+assert.equal(rental.source, "family", "el preset de casa aceptado se asigna por familia");
+assert.equal(rental.presetId, "premium-entity-vacation-rental");
+assert.equal(rental.family, "vacation_rental");
 
 // 18 · aislamiento entre entidades: un override no contamina a otras.
 const isolatedA = resolveEntityTemplate({
