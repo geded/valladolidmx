@@ -146,9 +146,9 @@ export function PremiumAluxBar({
           </div>
         </div>
         <div className="min-w-0">
-          <p className="font-display text-lg lg:text-xl">{question}</p>
+          <p className="font-display text-base leading-snug lg:text-xl">{question}</p>
           <div
-            className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
+            className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
             role="group"
             aria-label="Composición del viaje"
           >
@@ -159,7 +159,7 @@ export function PremiumAluxBar({
                 size="sm"
                 variant={selectedParty === option.value ? "default" : "secondary"}
                 onClick={() => onSelectParty(option.value)}
-                className="min-h-9 rounded-pill"
+                className="min-h-11 shrink-0 snap-start rounded-pill"
               >
                 {option.label}
               </Button>
@@ -169,7 +169,7 @@ export function PremiumAluxBar({
         <Button
           type="button"
           onClick={onContinue}
-          className="size-11 rounded-full p-0"
+          className="size-11 shrink-0 self-center rounded-full p-0"
           aria-label={continueLabel}
         >
           <ChevronRight className="size-5" />
