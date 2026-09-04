@@ -243,10 +243,22 @@ export function BusinessSurfaceContractBoundary({
   if (!enabled || !business) return legacy;
 
   const input = businessToSurfaceContractInput(business, related);
-  const verticalContract =
-    adaptHotelSurfaceContract(input) ??
-    adaptRestaurantSurfaceContract(input) ??
-    adaptVacationRentalSurfaceContract(input);
+  // Lote 3C · corrección final — la familia declarada en CMS
+  // (`business_categories.listing_family_key`) manda sobre cualquier slug.
+  // Sólo cuando el CMS no la declara se conserva la heurística previa.
+  const cmsFamily = business.category_family_key ?? null;
+  const verticalContract = cmsFamily
+    ? cmsFamily === "hoteles"
+      ? adaptHotelSurfaceContract(input)
+      : cmsFamily === "restaurantes"
+        ? adaptRestaurantSurfaceContract(input)
+        : cmsFamily === "casas-de-vacaciones"
+          ? adaptVacationRentalSurfaceContract({ ...input, categorySlug: "casas-de-vacaciones" })
+          : null
+    : (adaptHotelSurfaceContract(input) ??
+      adaptRestaurantSurfaceContract(input) ??
+      adaptVacationRentalSurfaceContract(input));
+
   if (verticalContract)
     return (
       <BusinessSurface
