@@ -346,39 +346,8 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
   );
 }
 
-function SectionHead({
-  kicker,
-  title,
-  description,
-  action,
-}: {
-  kicker: string;
-  title: string;
-  description?: string;
-  action?: string;
-}) {
-  return (
-    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="max-w-3xl">
-        <p className="text-xs font-semibold uppercase text-primary">{kicker}</p>
-        <h2 className="mt-1.5 text-balance font-display text-2xl sm:text-3xl lg:text-4xl">
-          {title}
-        </h2>
-        {description ? (
-          <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-relaxed text-muted-foreground lg:text-base">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      {action ? (
-        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
-          {action}
-          <ChevronRight className="size-4" aria-hidden />
-        </span>
-      ) : null}
-    </div>
-  );
-}
+const SectionHead = PremiumSectionHead;
+
 
 function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
