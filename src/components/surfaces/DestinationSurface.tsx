@@ -25,7 +25,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import type {
   PublicDestinationDTO,
@@ -259,28 +258,8 @@ export function DestinationSurfaceContractBoundary({
   presentation = "editorial",
   nearbyDestinations,
 }: DestinationSurfaceContractBoundaryProps) {
-  const approvedMock = destinationSlug
-    ? DESTINOS_MOCK.find(
-        (destination) =>
-          destination.slug === destinationSlug && destination.region_slug === ORIENTE_MAYA.slug,
-      )
-    : null;
-  const premiumDestination =
-    dbData ??
-    (approvedMock
-      ? {
-          id: approvedMock.id,
-          slug: approvedMock.slug,
-          name: approvedMock.name,
-          tagline: approvedMock.tagline,
-          description: approvedMock.tagline,
-          highlights: [...approvedMock.highlights],
-          hero_palette: approvedMock.hero_palette,
-          hero_url: approvedMock.image_url ?? null,
-          latitude: approvedMock.latitude ?? null,
-          longitude: approvedMock.longitude ?? null,
-        }
-      : null);
+  // Lote 3B — La ficha de destino se sirve exclusivamente desde CMS.
+  const premiumDestination = dbData ?? null;
   if (destinationSlug && premiumDestination) {
     const accreditedMedia = (galleryMedia ?? []).filter(
       (item) => !hasForbiddenDestinationMedia(item),
@@ -357,11 +336,7 @@ export function DestinationSurface({
   const effectiveMapPoints = mapPoints ?? ctx?.mapPoints ?? [];
   const effectiveGalleryUrls = galleryUrls ?? ctx?.galleryUrls ?? [];
   const effectiveGalleryMedia = galleryMedia ?? ctx?.galleryMedia ?? [];
-  const mock = slug
-    ? DESTINOS_MOCK.find((d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug)
-    : undefined;
-
-  if (!db && !mock) {
+  if (!db) {
     return (
       <PublicShell
         title="Destino no disponible"
@@ -372,7 +347,7 @@ export function DestinationSurface({
     );
   }
 
-  const input = toDestinationBlockInput(db, mock ?? null, {
+  const input = toDestinationBlockInput(db, null, {
     slug: slug ?? "",
     regionSlug: ORIENTE_MAYA.slug,
     regionName: ORIENTE_MAYA.name,

@@ -14,15 +14,17 @@ import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import {
+  publishedDestinationsQueryOptions,
+  useDestinationLabel,
+} from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
-function destinationLabel(slug: string): string {
-  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
-}
-
 /** Contexto territorial: el destino se hereda o se declara, nunca se pide. */
-function buildLugaresContext(destino: string | undefined): RouteContextDeclaration {
+function buildLugaresContext(
+  destino: string | undefined,
+  destinationLabel: (slug: string) => string,
+): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
         {
@@ -64,7 +66,11 @@ export const Route = createFileRoute("/lugares/")({
         "Cenotes, conventos, zonas arqueológicas, calles y rincones que cuentan el Oriente Maya.",
       path: "/lugares",
     }),
-  loader: async ({ deps }) => {
+  loader: async ({ deps, context }) => {
+    // Lote 3B — Nombres de destino reales disponibles en SSR.
+    await context.queryClient
+      .ensureQueryData(publishedDestinationsQueryOptions)
+      .catch(() => []);
     const destino = deps.destino ?? null;
     const [dto, regional] = await Promise.all([
       getPublicListing({ data: { family: "lugares", destino } }),
@@ -83,6 +89,7 @@ export const Route = createFileRoute("/lugares/")({
 });
 
 function LugaresPage() {
+  const destinationLabel = useDestinationLabel();
   const { dto, nearby, destino } = Route.useLoaderData();
   const label = destino ? (dto.destinationLabel ?? destinationLabel(destino)) : null;
   const crumbs = [
@@ -92,7 +99,7 @@ function LugaresPage() {
   return (
     <PublicShell
       crumbs={crumbs}
-      contextDeclaration={buildLugaresContext(destino ?? undefined)}
+      contextDeclaration={buildLugaresContext(destino ?? undefined, destinationLabel)}
       useContextCrumbs
       compactCrumbsOnMobile
     >

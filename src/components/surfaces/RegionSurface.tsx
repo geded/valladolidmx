@@ -12,7 +12,6 @@
  */
 import { PublicShell } from "@/components/discovery";
 import { DestinoCard } from "@/components/cards/DestinoCard";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA, TOURISM_REGIONS } from "@/config/regions";
 import type { Destination } from "@/types/territory";
 
@@ -26,8 +25,8 @@ export interface RegionSurfaceProps {
 export function RegionSurface({ regionSlug, destinations }: RegionSurfaceProps = {}) {
   const region = TOURISM_REGIONS.find((r) => r.slug === regionSlug) ?? ORIENTE_MAYA;
   const fromDb = (destinations ?? []).filter((d) => d.region_slug === region.slug);
-  const destinos =
-    fromDb.length > 0 ? fromDb : DESTINOS_MOCK.filter((d) => d.region_slug === region.slug);
+  // Lote 3B — Sólo destinos publicados en CMS; sin fixture de respaldo.
+  const destinos = fromDb;
   return (
     <PublicShell
       eyebrow="Región turística"

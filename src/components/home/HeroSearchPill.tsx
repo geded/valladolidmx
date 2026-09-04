@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, MapPin, Compass, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
 import { CATEGORIAS_MOCK } from "@/mocks/categorias";
 import { cn } from "@/lib/utils";
 
@@ -21,12 +21,6 @@ interface Option {
   name: string;
   hint?: string;
 }
-
-const DESTINO_OPTIONS: Option[] = DESTINOS_MOCK.map((d) => ({
-  slug: d.slug,
-  name: d.name,
-  hint: d.tagline,
-}));
 
 const CATEGORIA_OPTIONS: Option[] = CATEGORIAS_MOCK.map((c) => ({
   slug: c.slug,
@@ -54,6 +48,13 @@ export function HeroSearchPill({
   maxWidth = "xl",
 }: HeroSearchPillProps) {
   const navigate = useNavigate();
+  // Lote 3B — Los destinos del buscador provienen del CMS publicado.
+  const { data: publishedDestinations } = usePublishedDestinations();
+  const destinoOptions: Option[] = (publishedDestinations ?? []).map((d) => ({
+    slug: d.slug,
+    name: d.name,
+    ...(d.tagline ? { hint: d.tagline } : {}),
+  }));
   const [destino, setDestino] = useState<Option | null>(null);
   const [categoria, setCategoria] = useState<Option | null>(null);
   const [openDestino, setOpenDestino] = useState(false);
@@ -139,7 +140,7 @@ export function HeroSearchPill({
           </PopoverTrigger>
           <PopoverContent align="start" className="w-72 p-1.5">
             <OptionList
-              options={DESTINO_OPTIONS}
+              options={destinoOptions}
               selected={destino?.slug}
               onSelect={(opt) => {
                 setDestino(opt);

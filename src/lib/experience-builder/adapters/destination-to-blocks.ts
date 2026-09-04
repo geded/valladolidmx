@@ -25,7 +25,7 @@ import type {
   ExperienceMapDTO,
   ExperienceMapPoint,
 } from "@/lib/experience-builder/blocks/experience-map/contract";
-import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
+import { buildDestinationBadgeItems } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
 import {
   emptyAttribution,
@@ -212,28 +212,9 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
  * plantillas; el registry autoriza).
  * ------------------------------------------------------------------ */
 export function destinationToBadgeItems(d: DestinationBlockInput): InstitutionalBadgeItem[] {
-  const items: InstitutionalBadgeItem[] = [];
-  const slug = d.slug.toLowerCase();
-  if ((PUEBLOS_MAGICOS_AUTORIZADOS as readonly string[]).includes(slug)) {
-    items.push({
-      kind: "pueblo-magico",
-      slug: `pueblo-magico:${slug}`,
-      source: "destination",
-    });
-  }
-  items.push({
-    kind: "oriente-maya",
-    slug: `oriente-maya:${slug}`,
-    source: "destination",
-  });
-  if (slug === "valladolid") {
-    items.push({
-      kind: "despierta-en-valladolid",
-      slug: `despierta:${slug}`,
-      source: "destination",
-    });
-  }
-  return items;
+  // Lote 3B — La autorización vive exclusivamente en el registry
+  // institucional. Aquí no hay listas ni condicionales por slug.
+  return buildDestinationBadgeItems(d.slug) as InstitutionalBadgeItem[];
 }
 
 /* ------------------------------------------------------------------ *

@@ -111,6 +111,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 40,
     group: "identity",
     tooltip: "Programa oficial Despierta en Valladolid",
+    restrictedSlugs: ["valladolid"],
     verificationMode: "registry",
   },
   award: {
@@ -228,4 +229,48 @@ export function isBadgeEligible(
     if (new Date(item.expiresAt).getTime() <= now.getTime()) return false;
   }
   return true;
+}
+
+/* ------------------------------------------------------------------ *
+ * Lote 3B — Fuente institucional única para destinos.
+ *
+ * Ninguna superficie, plantilla ni adaptador decide por sí misma qué
+ * distintivos corresponden a un destino: todos consumen este helper, que
+ * resuelve la autorización exclusivamente desde el registry
+ * (`restrictedSlugs`). Prohibidos los condicionales por slug fuera de
+ * este módulo (Institutional Badges Rule).
+ * ------------------------------------------------------------------ */
+
+/** Orden institucional de los distintivos aplicables a un destino. */
+const DESTINATION_BADGE_KINDS: BadgeKind[] = [
+  "pueblo-magico",
+  "oriente-maya",
+  "despierta-en-valladolid",
+];
+
+export interface DestinationBadgeItem {
+  kind: BadgeKind;
+  slug: string;
+  source: "destination";
+}
+
+/**
+ * Distintivos institucionales autorizados para un destino, en orden de
+ * prioridad del registry. Devuelve `[]` para un slug vacío.
+ */
+export function buildDestinationBadgeItems(subjectSlug: string): DestinationBadgeItem[] {
+  const slug = subjectSlug.trim().toLowerCase();
+  if (!slug) return [];
+  return DESTINATION_BADGE_KINDS.filter(
+    (kind) =>
+      isBadgeAuthorized(kind, slug) &&
+      getBadgeRegistryEntry(kind).verificationMode !== "disabled",
+  )
+    .sort((a, b) => getBadgeRegistryEntry(a).priority - getBadgeRegistryEntry(b).priority)
+    .map((kind) => ({ kind, slug: `${kind}:${slug}`, source: "destination" as const }));
+}
+
+/** Autorización Pueblo Mágico — único punto de verdad para toda la plataforma. */
+export function isPuebloMagicoDestination(subjectSlug: string): boolean {
+  return isBadgeAuthorized("pueblo-magico", subjectSlug);
 }
