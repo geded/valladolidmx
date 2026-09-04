@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export interface FilterOptionVM {
@@ -172,7 +172,7 @@ export function ExperienceFiltersBar({
           )}
         >
           <header className="flex items-center justify-between border-b border-border px-5 py-4">
-            <h2 className="text-base font-semibold">Filtros</h2>
+            <SheetTitle className="text-base font-semibold">Filtros</SheetTitle>
             {total > 0 ? (
               <button
                 type="button"
