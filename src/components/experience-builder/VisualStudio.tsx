@@ -1320,8 +1320,14 @@ function PageVisualEditor({
     if (saveStatus === "saving")
       return "Hay cambios locales sin guardar. Espera a que termine el guardado.";
     if (saveStatus === "error") return "El último guardado falló. Resuélvelo antes de publicar.";
-    if (!draftHash || !page.draft_hash || draftHash !== page.draft_hash)
+    // La firma del servidor (`draft_hash`) se calcula sobre el texto jsonb de
+    // Postgres y no es comparable byte a byte con una firma calculada en el
+    // navegador. Para decidir "hay cambios locales sin guardar" comparamos la
+    // misma canonicalización a ambos lados: el árbol en pantalla contra el
+    // último árbol efectivamente persistido en esta sesión.
+    if (canonicalizeClient(tree) !== savedSignatureRef.current)
       return "Hay cambios locales sin guardar. Guarda antes de publicar o programar.";
+
     if (page.workflow_state !== "approved")
       return "La composición debe estar en estado aprobado antes de publicar o programar.";
     if (!page.approved_snapshot_hash || page.draft_hash !== page.approved_snapshot_hash)
