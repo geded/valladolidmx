@@ -707,6 +707,17 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      // Lote 3C — Rutas / Itinerarios editoriales (CMS-first).
+      id: "cms.rutas",
+      workspaceId: "cms",
+      label: "Rutas e itinerarios",
+      icon: MapIcon,
+      to: "/cms/rutas",
+      group: "contenido",
+      order: 6,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.categorias",
       workspaceId: "cms",
       label: "Categorías",

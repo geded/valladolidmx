@@ -13,6 +13,7 @@ const KIND_LABEL: Record<AnonymousItemKind, string> = {
   product: "Experiencia",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
   promotion: "Promoción",
   custom: "Idea",
 };

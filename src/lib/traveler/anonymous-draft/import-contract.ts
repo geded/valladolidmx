@@ -4,7 +4,13 @@ import { ANON_LIMITS } from "./limits";
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-export type AnonymousImportItemKind = "destination" | "business" | "product" | "event" | "note";
+export type AnonymousImportItemKind =
+  | "destination"
+  | "business"
+  | "product"
+  | "event"
+  | "note"
+  | "route";
 export type AnonymousImportFavoriteKind = "business" | "product" | "promotion";
 
 export interface AnonymousImportItem {
