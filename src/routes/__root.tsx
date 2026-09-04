@@ -81,6 +81,11 @@ import { SITE } from "@/config/site";
 import { ACTIVE_BRAND, ACTIVE_BRAND_THEME_STYLE } from "@/config/brand";
 import { BrandProvider, brandSettingsQueryOptions } from "@/lib/brand/brand-context";
 import { BRAND_SETTINGS_DEFAULTS } from "@/lib/brand/brand-settings.functions";
+import {
+  institutionalAuthorityQueryOptions,
+  useInstitutionalAuthority,
+} from "@/lib/institutional/institutional-context";
+
 
 import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
