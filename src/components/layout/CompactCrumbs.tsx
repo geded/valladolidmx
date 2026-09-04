@@ -13,9 +13,10 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRight, Home, MoreHorizontal } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { BreadcrumbCrumb } from "@/types/territory";
+import { ORIENTE_MAYA } from "@/config/regions";
 
 /** Ruta canónica de un destino: `/oriente-maya/{slug}` (sin más segmentos). */
-const DESTINATION_HREF = /^\/[^/]+\/[^/]+$/;
+const DESTINATION_HREF = new RegExp(`^/${ORIENTE_MAYA.slug}/[^/]+$`);
 
 /**
  * Ancla que permanece visible en móvil. Preferencia semántica: la miga
