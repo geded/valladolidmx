@@ -244,40 +244,37 @@ export function DestinationsAtlasSurface({
         {section(
           "alux",
           <section aria-label={`${ACTIVE_BRAND.conciergeName}, concierge IA`} className="space-y-3">
-            <TourismAluxPanel
-              title={content.alux.title}
-              description={content.alux.description}
-              task="Ayúdame a elegir destinos del Oriente Maya y convertirlos en una ruta real."
-              compact
+            <PremiumAluxBar
+              question={content.alux.title}
+              selectedParty={party}
+              onSelectParty={(value) => {
+                const option = PARTY_OPTIONS.find((o) => o.value === value);
+                if (!option) return;
+                setParty(value);
+                void trip.setTravelerCount(
+                  value === "familiar"
+                    ? { adults: 2, children: 2 }
+                    : { adults: option.partySize, children: 0 },
+                );
+              }}
+              onContinue={() => askAlux()}
             />
-            <div className="rounded-3xl border border-border bg-card p-4 shadow-soft">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {content.alux.description}
+              </p>
               <ChipRow
                 legend="Intereses"
                 options={content.alux.interests}
                 value={selectedInterest}
                 onChange={setSelectedInterest}
+                className="mt-3"
               />
               <ChipRow
                 legend="Tiempo disponible"
                 options={content.alux.durations}
                 value={selectedDuration}
                 onChange={setSelectedDuration}
-                className="mt-3"
-              />
-              <ChipRow
-                legend="Compañía"
-                options={PARTY_OPTIONS.map((option) => option.label)}
-                value={PARTY_OPTIONS.find((o) => o.value === party)?.label ?? null}
-                onChange={(label) => {
-                  const option = PARTY_OPTIONS.find((o) => o.label === label);
-                  if (!option) return;
-                  setParty(option.value);
-                  void trip.setTravelerCount(
-                    option.value === "familiar"
-                      ? { adults: 2, children: 2 }
-                      : { adults: option.partySize, children: 0 },
-                  );
-                }}
                 className="mt-3"
               />
               <Button
@@ -290,6 +287,7 @@ export function DestinationsAtlasSurface({
             </div>
           </section>,
         )}
+
 
         {featured
           ? section(
