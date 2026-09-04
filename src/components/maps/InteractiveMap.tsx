@@ -236,12 +236,14 @@ function getMarkerColors(): { bg: string; fg: string; stroke: string } {
   return { bg, fg, stroke: "#123e2f" };
 }
 
-function markerIconDataUri(letter: string): string {
+function markerIconDataUri(letter: string, selected = false): string {
   const { bg, fg, stroke } = getMarkerColors();
+  const body = selected ? stroke : bg;
+  const ring = selected ? bg : stroke;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48">
-    <path d="M20 2C10.6 2 3 9.6 3 19c0 12.4 17 27 17 27s17-14.6 17-27C37 9.6 29.4 2 20 2Z" fill="${bg}" stroke="${stroke}" stroke-width="2.5"/>
-    <circle cx="20" cy="19" r="10" fill="${stroke}" opacity=".92"/>
-    <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${fg}">${letter}</text>
+    <path d="M20 2C10.6 2 3 9.6 3 19c0 12.4 17 27 17 27s17-14.6 17-27C37 9.6 29.4 2 20 2Z" fill="${body}" stroke="${ring}" stroke-width="2.5"/>
+    <circle cx="20" cy="19" r="10" fill="${ring}" opacity=".92"/>
+    <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${selected ? stroke : fg}">${letter}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
