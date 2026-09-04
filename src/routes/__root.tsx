@@ -314,11 +314,13 @@ function RootComponent() {
     }
   }, []);
 
+  // Lote 3B · C — Mantiene la autoridad institucional del CMS sincronizada.
+  useInstitutionalAuthority();
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <BrandProvider>
-
         <AuthProvider>
           {!isAppShellRoute ? <SkipLink /> : null}
           {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
