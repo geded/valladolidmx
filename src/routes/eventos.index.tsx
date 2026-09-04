@@ -72,7 +72,7 @@ function EventosPage() {
   const label = destino ? (dto.destinationLabel ?? destinationLabel(destino)) : null;
   const crumbs = [{ label: "Eventos", to: "/eventos" }, ...(label ? [{ label }] : [])];
   return (
-    <PublicShell crumbs={crumbs} contextDeclaration={buildEventosContext(destino ?? undefined)} useContextCrumbs>
+    <PublicShell crumbs={crumbs} contextDeclaration={buildEventosContext(destino ?? undefined)} useContextCrumbs compactCrumbsOnMobile>
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         showAddToTrip

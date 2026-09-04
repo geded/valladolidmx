@@ -83,7 +83,7 @@ function HotelesRoute() {
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
   return (
-    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
+    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs compactCrumbsOnMobile>
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}

@@ -425,6 +425,7 @@ export function BusinessSurface({
     <PublicShell
       crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: b.display_name }]}
       useContextCrumbs
+      compactCrumbsOnMobile
     >
       {activePremium ? (
         <>

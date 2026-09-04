@@ -90,7 +90,7 @@ function CasasRoute() {
   ];
   const destinoFacet = buildDestinationFacet([...dto.items]);
   return (
-    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
+    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs compactCrumbsOnMobile>
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         facets={destino || !destinoFacet ? [] : [destinoFacet]}

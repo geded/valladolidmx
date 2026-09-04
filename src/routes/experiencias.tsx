@@ -89,6 +89,7 @@ function ExperienciasRoute() {
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
       useContextCrumbs={!humanTema || !!destino}
+      compactCrumbsOnMobile
     >
       <ListingPremiumSurfaceFromDTO
         dto={dto}

@@ -168,6 +168,7 @@ export function ProductSurface({
         { label: p.name },
       ]}
       useContextCrumbs
+      compactCrumbsOnMobile
     >
       {activeContract ? (
         <PremiumHero
