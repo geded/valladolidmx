@@ -585,7 +585,7 @@ export function DestinationsAtlasSurface({
                   <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-primary">
                     {route.duration}
                   </p>
-                  <h3 className="mt-1 font-serif text-xl">{route.title}</h3>
+                  <h3 className="mt-1 font-display text-xl">{route.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{route.description}</p>
                   <ul className="mt-3 flex flex-wrap gap-2 text-xs text-foreground">
                     {route.stops.map((stop) => (
@@ -631,7 +631,7 @@ export function DestinationsAtlasSurface({
                   <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-primary">
                     {item.label}
                   </p>
-                  <h3 className="mt-1 font-serif text-lg">{item.title}</h3>
+                  <h3 className="mt-1 font-display text-lg">{item.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
                 </button>
               ))}
@@ -645,7 +645,7 @@ export function DestinationsAtlasSurface({
             aria-labelledby="atlas-cta"
             className="rounded-3xl border border-border bg-secondary p-5 text-secondary-foreground shadow-soft sm:p-7"
           >
-            <h2 id="atlas-cta" className="font-serif text-2xl sm:text-3xl">
+            <h2 id="atlas-cta" className="font-display text-2xl sm:text-3xl">
               {content.finalCta.title}
             </h2>
             <p className="mt-2 max-w-2xl text-sm sm:text-base">{content.finalCta.description}</p>
