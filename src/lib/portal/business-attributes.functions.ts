@@ -36,32 +36,36 @@ async function readEditorDTO(
   const { data: business, error: businessError } = await supabase
     .from("businesses")
     .select(
-      "id, status, filter_attributes, business_categories!businesses_primary_category_id_fkey(slug)",
+      "id, status, filter_attributes, business_categories!businesses_primary_category_id_fkey(slug,listing_family_key)",
     )
     .eq("id", businessId)
     .is("deleted_at", null)
     .single();
   if (businessError || !business)
     throw new Error(`get_business_attributes_failed:${businessError?.message ?? "not_found"}`);
+  // Lote 3C — la familia proviene del CMS (`business_categories.listing_family_key`).
+  // Las listas de slugs quedan sólo como fallback fail-safe.
   const categorySlug = business.business_categories?.slug ?? null;
   const normalizedCategory = String(categorySlug).toLowerCase();
-  const family = ["hotel", "hoteles", "hospedaje", "hospedajes"].includes(normalizedCategory)
-    ? "hoteles"
-    : ["restaurante", "restaurantes", "gastronomia", "gastronomía"].includes(
-          normalizedCategory,
-        )
-      ? "restaurantes"
-      : [
-            "casa-de-vacaciones",
-            "casas-de-vacaciones",
-            "casas-vacacionales",
-            "villas",
-            "renta-vacacional",
-            "rentas-vacacionales",
-            "casas",
-          ].includes(normalizedCategory)
-        ? "casas-de-vacaciones"
-        : null;
+  const administeredFamily = business.business_categories?.listing_family_key ?? null;
+  const family: string | null =
+    typeof administeredFamily === "string" && administeredFamily.trim()
+      ? administeredFamily.trim()
+      : ["hotel", "hoteles", "hospedaje", "hospedajes"].includes(normalizedCategory)
+        ? "hoteles"
+        : ["restaurante", "restaurantes", "gastronomia", "gastronomía"].includes(normalizedCategory)
+          ? "restaurantes"
+          : [
+                "casa-de-vacaciones",
+                "casas-de-vacaciones",
+                "casas-vacacionales",
+                "villas",
+                "renta-vacacional",
+                "rentas-vacacionales",
+                "casas",
+              ].includes(normalizedCategory)
+            ? "casas-de-vacaciones"
+            : null;
   if (!family) {
     return { businessId, family: null, editable: false, values: {}, definitions: [] };
   }
