@@ -106,7 +106,7 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
                 ) : null}
                 {event.destination_name ? (
                   <span className="rounded-full border border-[#ded7c9] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[#667067]">
-                    {event.destination_name} · Oriente Maya
+                    {event.destination_name} · Oriente Maya de Yucatán
                   </span>
                 ) : null}
               </div>
@@ -172,7 +172,7 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
           <TourismAluxPanel
             title="¿Qué fechas estarás en la región?"
             description="Alux combinará este evento con lugares, mesas y experiencias cercanas sin romper el ritmo de tu viaje."
-            task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya.`}
+            task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya de Yucatán.`}
             prompts={["Este fin de semana", "Ya estoy aquí", "En pareja", "En familia", "Con amigos"]}
             compact
           />

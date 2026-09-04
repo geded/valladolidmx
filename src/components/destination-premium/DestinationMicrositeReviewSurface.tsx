@@ -42,7 +42,7 @@ const places = [
 const stories = [
   { title: "La ciudad que despierta temprano", eyebrow: "Crónica", image: media.calle },
   { title: "El agua bajo nuestros pasos", eyebrow: "Raíces", image: media.cenote },
-  { title: "Cocinar el Oriente Maya", eyebrow: "Sabores", image: media.comedor },
+  { title: "Cocinar el Oriente Maya de Yucatán", eyebrow: "Sabores", image: media.comedor },
 ];
 
 export function DestinationMicrositeReviewSurface() {
@@ -149,7 +149,7 @@ function Hero() {
       <Container className="relative flex min-h-[34rem] items-end pb-9 pt-24 sm:min-h-[38rem] sm:pb-12 lg:min-h-[680px] lg:pb-14 lg:pt-32">
         <div className="max-w-[43rem]">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f2b84b]">
-            Pueblo Mágico · Oriente Maya
+            Pueblo Mágico · Oriente Maya de Yucatán
           </p>
           <h1 className="mt-3 font-serif text-5xl leading-[0.94] tracking-[-0.045em] sm:text-6xl lg:mt-4 lg:text-[6.25rem]">
             Valladolid
@@ -214,7 +214,7 @@ function DestinationIntro() {
     <section className="grid gap-4 rounded-[1.5rem] border border-black/10 bg-white p-5 shadow-sm sm:p-7 lg:grid-cols-[.95fr_1.05fr] lg:gap-7 lg:rounded-[2rem] lg:p-10">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#b65d2f]">
-          El corazón del Oriente Maya
+          El corazón del Oriente Maya de Yucatán
         </p>
         <h2 className="mt-2 font-serif text-3xl leading-tight tracking-tight sm:text-4xl lg:mt-3 lg:text-5xl">
           Una ciudad para quedarse. Un territorio para descubrir.
