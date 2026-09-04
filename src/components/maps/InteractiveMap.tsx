@@ -228,7 +228,12 @@ export function InteractiveMap({
       setError("Google Maps browser key no configurada.");
       return;
     }
+    /* Dominio no autorizado por la clave: mensaje propio, sin tarjeta de Google. */
+    (window as unknown as { gm_authFailure?: () => void }).gm_authFailure = () => {
+      setError("El mapa no está disponible en este dominio de revisión.");
+    };
     let cancelled = false;
+
     loadGoogleMapsScript(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
