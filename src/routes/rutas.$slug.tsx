@@ -9,6 +9,7 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicRoute } from "@/lib/routes-editorial/route-public-reads.functions";
+import { ORIENTE_MAYA } from "@/config/regions";
 import { RoutePremiumSurface } from "@/components/routes-premium/RoutePremiumSurface";
 import {
   ContextEngineProvider,
