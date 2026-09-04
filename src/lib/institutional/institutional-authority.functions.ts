@@ -41,6 +41,20 @@ export const getInstitutionalAuthoritySettings = createServerFn({ method: "GET" 
   },
 );
 
+export const getInstitutionalAuthorityAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<InstitutionalAuthority | null> => {
+    await assertAdmin(context as unknown as Parameters<typeof assertAdmin>[0]);
+    const { data, error } = await context.supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", INSTITUTIONAL_AUTHORITY_KEY)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) return null;
+    return normalizeInstitutionalAuthority(data.value);
+  });
+
 async function assertAdmin(context: {
   supabase: {
     rpc: (
