@@ -143,6 +143,17 @@ function demoDestination(): DestinationSurfaceContextValue {
 /** Producto demo estable — evita "Producto no disponible" en Studio. */
 function demoProduct(): MarketplaceProductDetail {
   return {
+    duration_minutes: null,
+    capacity: null,
+    direct_sale: {
+      enabled: false,
+      price_amount: null,
+      price_currency: null,
+      min_lead_hours: null,
+      max_quantity: null,
+      cancellation_policy: null,
+      terms: null,
+    },
     id: "demo-product",
     slug: "producto-demo",
     name: "Producto demo · Valladolid.mx",

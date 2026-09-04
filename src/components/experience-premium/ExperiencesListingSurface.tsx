@@ -343,10 +343,17 @@ function ExperienceListCard({ vm }: { vm: TourismCardVM }) {
     priceAmount: vm.priceAmount,
     priceCurrency: vm.priceCurrency,
   });
+  /* Duración publicada (eje `duracion`); se omite si no hay dato. */
+  const durationLabel = vm.filterAttributes?.duracion?.[0]?.label ?? null;
   return (
     <div className="flex flex-col gap-2">
       <PremiumCompactRow item={toShowcaseItem(vm)} />
       <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        {durationLabel ? (
+          <span className="rounded-pill border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
+            {durationLabel}
+          </span>
+        ) : null}
         {commerce.priceLabel ? (
           <span className="text-xs text-muted-foreground">Desde {commerce.priceLabel}</span>
         ) : (
