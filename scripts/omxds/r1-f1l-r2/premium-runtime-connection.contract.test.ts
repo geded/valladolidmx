@@ -35,9 +35,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     // misma familia visual que Home Premium). Las capacidades exigidas siguen
     // siendo las mismas: paginación de 8, Alux oficial, mapa oficial y Mi Viaje.
     const route = read("src/routes/oriente-maya/index.tsx");
-    const surface = read(
-      "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
-    );
+    const surface = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
     const publicReads = read("src/lib/cms/public-reads.functions.ts");
 
     expect(route).toContain("RegionDestinationsPremiumSurface");
@@ -51,7 +49,6 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(surface).toContain("InteractiveMap");
     expect(publicReads).toContain("highlights, latitude, longitude");
   });
-
 
   test("los listados conservan una sola autoridad con DTO real, mapa, Alux y Mi Viaje", () => {
     const route = read("src/routes/hoteles.tsx");

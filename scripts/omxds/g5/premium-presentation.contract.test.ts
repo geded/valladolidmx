@@ -49,8 +49,6 @@ const TERRITORIAL_LABEL_EXCEPTIONS = new Set([
   "g4-event-premium-preview.tsx",
 ]);
 
-
-
 for (const preview of previews) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
   const delegate = PRESENTATION_DELEGATED[preview];
@@ -75,7 +73,6 @@ for (const preview of previews) {
   }
 }
 
-
 for (const preview of previews.filter((name) => name !== "g4-home-premium-preview.tsx")) {
   const source = readFileSync(resolve("src/routes/lovable", preview), "utf8");
   // G8-E · una preview puede delegar todo su JSX en la autoridad visual
@@ -85,6 +82,5 @@ for (const preview of previews.filter((name) => name !== "g4-home-premium-previe
   assert.match(source, /PremiumTerritorialBreadcrumb|PremiumSurface|PublicShell/);
   assert.doesNotMatch(source, /aria-label="Ruta territorial"/);
 }
-
 
 console.log("G5 premium presentation contract: PASS");
