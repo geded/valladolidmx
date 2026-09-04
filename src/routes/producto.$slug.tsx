@@ -1,3 +1,6 @@
+import { ExperiencePremiumSurface } from "@/components/experience-premium/ExperiencePremiumSurface";
+import { buildExperienceVMFromProduct } from "@/components/experience-premium/experience-premium-vm";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 /**
  * /producto/$slug — Ficha pública SSR de un producto (US-R3 · Sub-ola 2.3a).
  *
