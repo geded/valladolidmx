@@ -733,30 +733,11 @@ function FilterChip({
   );
 }
 
-function DestinationImage({
-  destination,
-  className,
-}: {
-  destination: Destination;
-  className?: string;
-}) {
-  if (!destination.image_url) {
-    return (
-      <div className={cn("grid place-items-center bg-muted text-selva/50", className)}>
-        <Compass className="size-8" />
-      </div>
-    );
-  }
-  return (
-    <img
-      src={destination.image_url}
-      alt={destination.name}
-      loading="lazy"
-      className={className}
-    />
-  );
-}
-
+/**
+ * Tarjeta del Atlas — misma geometría, radios y tipografía que las tarjetas
+ * del Home (fila compacta y tarjeta vertical). Añade sólo lo propio del
+ * atlas: distintivo Pueblo Mágico, cercanía administrada y Mi Viaje.
+ */
 function AtlasCard({
   destination,
   proximity,
@@ -780,9 +761,9 @@ function AtlasCard({
       onFocus={onFocus}
       onClick={onFocus}
       className={cn(
-        "group flex min-w-0 overflow-hidden rounded-2xl border bg-card shadow-soft",
-        active ? "border-primary" : "border-border",
-        layout === "row" ? "grid grid-cols-[7.5rem_1fr] sm:grid-cols-[11rem_1fr]" : "flex-col",
+        "group flex min-w-0 overflow-hidden rounded-2xl border bg-card",
+        active ? "border-primary shadow-elevated" : "border-border",
+        layout === "row" ? "grid grid-cols-[7rem_1fr] sm:grid-cols-[10rem_1fr]" : "flex-col",
       )}
     >
       <Link
@@ -791,8 +772,9 @@ function AtlasCard({
         className={cn("relative block overflow-hidden bg-muted", layout === "card" && "h-44")}
         aria-label={`Descubrir ${destination.name}`}
       >
-        <DestinationImage
-          destination={destination}
+        <EditorialMediaFrame
+          media={destinationMedia(destination)}
+          label={destination.name}
           className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
         {magic ? (
@@ -801,13 +783,17 @@ function AtlasCard({
           </span>
         ) : null}
       </Link>
-      <div className="flex min-w-0 flex-col p-3 sm:p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-primary">{type}</p>
-        <h3 className="mt-1 font-serif text-lg sm:text-xl">
+      <div className="flex min-w-0 flex-col p-4">
+        <p className="text-[10px] font-semibold uppercase text-primary">{type}</p>
+        <h3 className="mt-1 font-display text-xl">
           <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }}>
             {destination.name}
           </Link>
         </h3>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+          {destination.tagline}
+        </p>
+
         <p className="mt-1 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
           {destination.tagline}
         </p>
