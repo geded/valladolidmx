@@ -156,6 +156,16 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+/**
+ * Lote 3B · C — Sincroniza la autoridad institucional administrada en el
+ * CMS con el store sincrónico que consultan los distintivos. No pinta
+ * nada: cero impacto visual.
+ */
+function InstitutionalAuthoritySync() {
+  useInstitutionalAuthority();
+  return null;
+}
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async ({ context }) => {
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
@@ -314,13 +324,11 @@ function RootComponent() {
     }
   }, []);
 
-  // Lote 3B · C — Mantiene la autoridad institucional del CMS sincronizada.
-  useInstitutionalAuthority();
-
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <BrandProvider>
+        <InstitutionalAuthoritySync />
         <AuthProvider>
           {!isAppShellRoute ? <SkipLink /> : null}
           {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
