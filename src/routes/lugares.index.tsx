@@ -14,7 +14,10 @@ import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { useDestinationLabel } from "@/lib/destinations/destination-labels";
+import {
+  publishedDestinationsQueryOptions,
+  useDestinationLabel,
+} from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
 /** Contexto territorial: el destino se hereda o se declara, nunca se pide. */
@@ -63,7 +66,7 @@ export const Route = createFileRoute("/lugares/")({
         "Cenotes, conventos, zonas arqueológicas, calles y rincones que cuentan el Oriente Maya.",
       path: "/lugares",
     }),
-  loader: async ({ deps }) => {
+  loader: async ({ deps, context }) => {
     const destino = deps.destino ?? null;
     const [dto, regional] = await Promise.all([
       getPublicListing({ data: { family: "lugares", destino } }),

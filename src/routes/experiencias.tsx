@@ -4,7 +4,10 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getExperiencesListing } from "@/lib/experiences/experience-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { useDestinationLabel } from "@/lib/destinations/destination-labels";
+import {
+  publishedDestinationsQueryOptions,
+  useDestinationLabel,
+} from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ExperiencesListingSurface } from "@/components/experience-premium/ExperiencesListingSurface";
 
@@ -55,7 +58,7 @@ export const Route = createFileRoute("/experiencias")({
     ...(typeof search.tema === "string" ? { tema: search.tema } : {}),
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps }) => await getExperiencesListing({
+  loader: async ({ deps, context }) => await getExperiencesListing({
     data: { destino: deps.destino ?? null },
   }),
   head: () =>

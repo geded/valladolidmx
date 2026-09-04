@@ -12,7 +12,10 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { useDestinationLabel } from "@/lib/destinations/destination-labels";
+import {
+  publishedDestinationsQueryOptions,
+  useDestinationLabel,
+} from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
@@ -65,7 +68,7 @@ export const Route = createFileRoute("/casas-de-vacaciones")({
     destino: typeof search.destino === "string" ? search.destino : undefined,
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps }) => ({
+  loader: async ({ deps, context }) => ({
     dto: await getPublicListing({
       data: { family: "casas-de-vacaciones", destino: deps.destino ?? null },
     }),
