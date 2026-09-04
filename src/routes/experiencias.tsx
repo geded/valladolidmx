@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
+import { getExperiencesListing } from "@/lib/experiences/experience-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
@@ -56,10 +56,8 @@ export const Route = createFileRoute("/experiencias")({
     ...(typeof search.tema === "string" ? { tema: search.tema } : {}),
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps }) => ({
-    dto: await getPublicListing({
-      data: { family: "experiencias", destino: deps.destino ?? null },
-    }),
+  loader: async ({ deps }) => await getExperiencesListing({
+    data: { destino: deps.destino ?? null },
   }),
   head: () =>
     buildPublicHead({
@@ -72,7 +70,7 @@ export const Route = createFileRoute("/experiencias")({
 });
 
 function ExperienciasRoute() {
-  const { dto } = Route.useLoaderData();
+  const { dto, axes, valueLabels } = Route.useLoaderData();
   const { destino, tema } = Route.useSearch();
   const humanTema = tema ? tema.replace(/-/g, " ") : null;
   const contextDeclaration = buildExperienciasContext(destino);
@@ -90,7 +88,11 @@ function ExperienciasRoute() {
       useContextCrumbs={!humanTema || !!destino}
       compactCrumbsOnMobile
     >
-      <ExperiencesListingSurface dto={heroDto} />
+      <ExperiencesListingSurface
+        dto={heroDto}
+        attributeAxes={axes}
+        attributeValueLabels={valueLabels}
+      />
     </PublicShell>
   );
 }
