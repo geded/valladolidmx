@@ -664,27 +664,8 @@ export function DestinationsAtlasSurface({
   );
 }
 
-function SectionHead({
-  kicker,
-  title,
-  description,
-  id,
-}: {
-  kicker: string;
-  title: string;
-  description?: string;
-  id: string;
-}) {
-  return (
-    <header className="max-w-3xl">
-      <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-primary">{kicker}</p>
-      <h2 id={id} className="mt-1 font-serif text-2xl sm:text-3xl">
-        {title}
-      </h2>
-      {description ? <p className="mt-2 text-sm text-muted-foreground">{description}</p> : null}
-    </header>
-  );
-}
+const SectionHead = PremiumSectionHead;
+
 
 function ChipRow({
   legend,
