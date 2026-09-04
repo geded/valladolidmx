@@ -130,6 +130,8 @@ export function FloatingTravelPlanDock() {
   });
 
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { locale: rawLocale } = useTranslation();
   const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(rawLocale)
     ? (rawLocale as AluxKbLocale)
