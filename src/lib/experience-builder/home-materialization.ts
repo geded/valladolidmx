@@ -119,7 +119,7 @@ export function materializeHomePremiumConfig(current: Cfg): Cfg {
     );
   }
 
-  return out;
+  return stripNonCanonicalHrefs(out);
 }
 
 export const HOME_MATERIALIZATION_MEDIA_KEYS = MEDIA_KEYS;
