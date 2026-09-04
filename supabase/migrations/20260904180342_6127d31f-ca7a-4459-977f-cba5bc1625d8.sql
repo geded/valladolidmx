@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.enforce_reserved_business_fields() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.enforce_reserved_product_fields() FROM PUBLIC, anon, authenticated;
