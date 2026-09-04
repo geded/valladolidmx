@@ -191,6 +191,17 @@ function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
   });
 }
 
+export interface InteractiveMapMarker {
+  lat: number;
+  lng: number;
+  title?: string;
+  href?: string | null;
+  /** Identificador estable (slug) para sincronizar tarjeta ↔ marcador. */
+  key?: string;
+  /** Posición 1..n dentro del recorrido seleccionado. */
+  order?: number | null;
+}
+
 export interface InteractiveMapProps {
   lat: number;
   lng: number;
@@ -198,9 +209,17 @@ export interface InteractiveMapProps {
   markerTitle?: string;
   className?: string;
   /** Pines adicionales para renderizar (visitas territoriales). */
-  markers?: Array<{ lat: number; lng: number; title?: string; href?: string | null }>;
+  markers?: InteractiveMapMarker[];
   /** Conecta los pines, en su orden, siguiendo carreteras reales. */
   connectByRoad?: boolean;
+  /** Paradas ordenadas del recorrido; dibuja la ruta si hay 2 o más. */
+  routeStops?: Array<{ lat: number; lng: number; key?: string }>;
+  /** Pide al proveedor el orden óptimo de paradas intermedias. */
+  optimizeRoute?: boolean;
+  /** Reporta la capacidad real usada y el bloqueo exacto del proveedor. */
+  onRouteStatus?: (status: MapRouteStatus) => void;
+  /** Selección de un marcador desde el mapa. */
+  onMarkerSelect?: (key: string) => void;
 }
 
 function labelForIndex(i: number) {
