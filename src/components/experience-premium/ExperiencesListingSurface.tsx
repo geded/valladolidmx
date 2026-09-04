@@ -41,8 +41,23 @@ const INTENT_PROMPTS = [
 interface FacetGroup {
   id: string;
   label: string;
+  /** Eje sin respaldo en el contrato CMS: se rotula como capacidad DEMO. */
+  demo: boolean;
   options: { value: string; label: string; count: number }[];
-  extract: (vm: TourismCardVM) => string | null;
+  values: (vm: TourismCardVM) => string[];
+}
+
+/** Eje de filtro basado en `filterAttributes` (mismo contrato del CMS). */
+export interface ExperienceAttributeAxis {
+  readonly key: string;
+  readonly label: string;
+  /** true cuando el eje aún no existe en `tourism_attribute_definitions`. */
+  readonly demo?: boolean;
+}
+
+function humanizeValue(value: string): string {
+  const text = value.replace(/-/g, " ").trim();
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function toShowcaseItem(vm: TourismCardVM): PremiumShowcaseItem {
@@ -57,23 +72,60 @@ function toShowcaseItem(vm: TourismCardVM): PremiumShowcaseItem {
   };
 }
 
-function buildFacets(items: readonly TourismCardVM[]): FacetGroup[] {
-  const axes: { id: string; label: string; extract: (vm: TourismCardVM) => string | null }[] = [
-    { id: "destino", label: "Destino", extract: (vm) => vm.territorialContext },
-    { id: "tipo", label: "Tipo de experiencia", extract: (vm) => vm.eyebrow ?? null },
-    { id: "operador", label: "Operador", extract: (vm) => vm.businessName },
+function attributeValues(vm: TourismCardVM, key: string): string[] {
+  const raw = vm.filterAttributes?.[key];
+  if (!raw) return [];
+  return Array.isArray(raw) ? raw : [raw];
+}
+
+function buildFacets(
+  items: readonly TourismCardVM[],
+  attributeAxes: readonly ExperienceAttributeAxis[],
+  valueLabels: Record<string, string>,
+): FacetGroup[] {
+  const axes: Omit<FacetGroup, "options">[] = [
+    {
+      id: "destino",
+      label: "Destino",
+      demo: false,
+      values: (vm) => (vm.territorialContext ? [vm.territorialContext] : []),
+    },
+    {
+      id: "tipo",
+      label: "Tipo de experiencia",
+      demo: false,
+      values: (vm) => (vm.eyebrow ? [vm.eyebrow] : []),
+    },
+    {
+      id: "operador",
+      label: "Operador",
+      demo: false,
+      values: (vm) => (vm.businessName ? [vm.businessName] : []),
+    },
+    ...attributeAxes.map((axis) => ({
+      id: axis.key,
+      label: axis.label,
+      demo: axis.demo === true,
+      values: (vm: TourismCardVM) => attributeValues(vm, axis.key),
+    })),
   ];
   return axes
     .map((axis) => {
       const counts = new Map<string, number>();
       for (const vm of items) {
-        const value = axis.extract(vm)?.trim();
-        if (!value) continue;
-        counts.set(value, (counts.get(value) ?? 0) + 1);
+        for (const value of axis.values(vm)) {
+          const clean = value.trim();
+          if (!clean) continue;
+          counts.set(clean, (counts.get(clean) ?? 0) + 1);
+        }
       }
       const options = [...counts.entries()]
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-        .map(([value, count]) => ({ value, label: value, count }));
+        .map(([value, count]) => ({
+          value,
+          label: valueLabels[value] ?? humanizeValue(value),
+          count,
+        }));
       return { ...axis, options };
     })
     .filter((facet) => facet.options.length > 1);
