@@ -1,0 +1,301 @@
+/**
+ * `ExperiencesListingSurface` — listado maestro de Experiencias.
+ *
+ * Autoridad visual: Home Premium aprobado. Reutiliza EXACTAMENTE las
+ * piezas compartidas ya extraídas del Home (`PremiumEditorialHero`,
+ * `PremiumAluxBar`, `PremiumSectionHead`, `PremiumShowcaseGrid`,
+ * `PremiumCompactRow`). No introduce hero, tarjetas ni tokens nuevos.
+ *
+ * Datos: exclusivamente el DTO público real (`PublicListingDTO`). Los
+ * filtros se derivan de valores realmente publicados en el CMS; si un
+ * eje no tiene datos, no se muestra. Nada inventado.
+ */
+import { useMemo, useState } from "react";
+
+import {
+  PremiumAluxBar,
+  PremiumCompactRow,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+  PremiumShowcaseGrid,
+  type PremiumShowcaseItem,
+} from "@/components/home-premium/shared/PremiumShowcase";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
+import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import type { PartyComposition } from "@/lib/traveler/party-composition";
+import { resolveExperienceCommerce } from "@/lib/experiences/experience-commerce";
+import { cn } from "@/lib/utils";
+
+const INTENT_PROMPTS = [
+  "Cultura maya",
+  "Cenotes y naturaleza",
+  "Con guía local",
+  "En familia",
+  "Medio día",
+] as const;
+
+interface FacetGroup {
+  id: string;
+  label: string;
+  options: { value: string; label: string; count: number }[];
+  extract: (vm: TourismCardVM) => string | null;
+}
+
+function toShowcaseItem(vm: TourismCardVM): PremiumShowcaseItem {
+  return {
+    key: vm.id,
+    name: vm.name,
+    note: vm.tagline ?? vm.businessName ?? "Experiencia publicada en el Oriente Maya",
+    media: vm.mediaUrl ? { url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name } : null,
+    to: vm.href ?? "/experiencias",
+    kicker: "Experiencia",
+    meta: vm.territorialContext,
+  };
+}
+
+function buildFacets(items: readonly TourismCardVM[]): FacetGroup[] {
+  const axes: { id: string; label: string; extract: (vm: TourismCardVM) => string | null }[] = [
+    { id: "destino", label: "Destino", extract: (vm) => vm.territorialContext },
+    { id: "tipo", label: "Tipo de experiencia", extract: (vm) => vm.eyebrow ?? null },
+    { id: "operador", label: "Operador", extract: (vm) => vm.businessName },
+  ];
+  return axes
+    .map((axis) => {
+      const counts = new Map<string, number>();
+      for (const vm of items) {
+        const value = axis.extract(vm)?.trim();
+        if (!value) continue;
+        counts.set(value, (counts.get(value) ?? 0) + 1);
+      }
+      const options = [...counts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .map(([value, count]) => ({ value, label: value, count }));
+      return { ...axis, options };
+    })
+    .filter((facet) => facet.options.length > 1);
+}
+
+export interface ExperiencesListingSurfaceProps {
+  dto: PublicListingDTO;
+  /** Aviso de superficie de revisión interna (preview noindex). */
+  reviewNotice?: string | null;
+  className?: string;
+}
+
+export function ExperiencesListingSurface({
+  dto,
+  reviewNotice = null,
+  className,
+}: ExperiencesListingSurfaceProps) {
+  const [query, setQuery] = useState("");
+  const [party, setParty] = useState<PartyComposition | null>(null);
+  const [active, setActive] = useState<Record<string, string | null>>({});
+
+  const items = dto.items;
+  const facets = useMemo(() => buildFacets(items), [items]);
+
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return items.filter((vm) => {
+      const matchesQuery =
+        !needle ||
+        [vm.name, vm.tagline, vm.businessName, vm.territorialContext]
+          .filter(Boolean)
+          .some((value) => (value as string).toLowerCase().includes(needle));
+      if (!matchesQuery) return false;
+      return facets.every((facet) => {
+        const selected = active[facet.id];
+        if (!selected) return true;
+        return facet.extract(vm) === selected;
+      });
+    });
+  }, [items, facets, active, query]);
+
+  const featured = filtered.slice(0, 4).map(toShowcaseItem);
+  const rest = filtered.slice(4);
+
+  const askAlux = (preference?: string) =>
+    openAluxFloating({
+      reason: "manual",
+      hint: buildAluxStageAwareHint(
+        "Ayúdame a elegir experiencias reales publicadas en el Oriente Maya.",
+        [preference, party ? `Viajo ${party}` : null].filter(Boolean).join(" · ") || undefined,
+      ),
+    });
+
+  const heroMedia = items.find((item) => item.mediaUrl);
+
+  return (
+    <div className={cn("space-y-8", className)}>
+      {reviewNotice ? (
+        <p className="rounded-pill border border-dashed border-border bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
+          {reviewNotice}
+        </p>
+      ) : null}
+
+      <PremiumEditorialHero
+        eyebrow={dto.hero.eyebrow}
+        title={dto.hero.title}
+        subtitle={dto.hero.subtitle}
+        media={
+          heroMedia?.mediaUrl
+            ? { url: heroMedia.mediaUrl, alt: heroMedia.mediaAlt ?? dto.hero.title }
+            : null
+        }
+        caption={dto.destinationLabel ? `Experiencias en ${dto.destinationLabel}` : undefined}
+        searchSlot={
+          <label className="block">
+            <span className="sr-only">¿Qué experiencia quieres vivir?</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="¿Qué experiencia quieres vivir?"
+              className="min-h-11 w-full rounded-pill border border-border bg-background px-5 text-sm"
+            />
+          </label>
+        }
+      />
+
+      <PremiumAluxBar
+        question="¿Qué quieres vivir en el Oriente Maya?"
+        selectedParty={party}
+        onSelectParty={(value) => {
+          setParty(value);
+          askAlux();
+        }}
+        onContinue={() => askAlux()}
+      />
+
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Intereses sugeridos">
+        {INTENT_PROMPTS.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => askAlux(prompt)}
+            className="min-h-11 rounded-pill border border-border bg-background px-4 text-sm"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+
+      {facets.length > 0 ? (
+        <section aria-label="Filtros publicados" className="space-y-3">
+          {facets.map((facet) => (
+            <div key={facet.id} className="flex snap-x items-center gap-2 overflow-x-auto pb-1">
+              <span className="shrink-0 text-[11px] font-semibold uppercase text-muted-foreground">
+                {facet.label}
+              </span>
+              {facet.options.map((option) => {
+                const selected = active[facet.id] === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() =>
+                      setActive((current) => ({
+                        ...current,
+                        [facet.id]: selected ? null : option.value,
+                      }))
+                    }
+                    className={cn(
+                      "min-h-11 shrink-0 snap-start rounded-pill border px-4 text-sm",
+                      selected
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-background",
+                    )}
+                  >
+                    {option.label}
+                    <span className="ml-1 text-xs text-muted-foreground">{option.count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      {filtered.length === 0 ? (
+        <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+          {query || Object.values(active).some(Boolean)
+            ? "Ninguna experiencia publicada coincide con esos filtros."
+            : dto.emptyMessage}
+        </p>
+      ) : (
+        <>
+          <section aria-labelledby="experiencias-destacadas">
+            <PremiumSectionHead
+              id="experiencias-destacadas"
+              kicker="Empieza por aquí"
+              title="Experiencias publicadas del Oriente Maya"
+              description="Vivencias con guías, cocineros y comunidades verificadas por Valladolid.mx."
+            />
+            <PremiumShowcaseGrid
+              items={featured}
+              featuredKicker="Experiencia"
+              detailLabel="Ver experiencia"
+            />
+          </section>
+
+          {rest.length > 0 ? (
+            <section aria-labelledby="experiencias-todas">
+              <PremiumSectionHead
+                id="experiencias-todas"
+                kicker="Todas las experiencias"
+                title={`${filtered.length} experiencias publicadas`}
+              />
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {rest.map((vm) => (
+                  <ExperienceListCard key={vm.id} vm={vm} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
+function ExperienceListCard({ vm }: { vm: TourismCardVM }) {
+  const eligibility = evaluateTripEligibility({
+    kind: "product",
+    targetId: vm.id,
+    title: vm.name,
+  });
+  /* Capacidad comercial real: el listado nunca muestra "Reservar" sin
+     acreditación; el precio sólo aparece si está publicado. */
+  const commerce = resolveExperienceCommerce({
+    conversionMode: null,
+    acceptsOnlinePayment: false,
+    priceAmount: vm.priceAmount,
+    priceCurrency: vm.priceCurrency,
+  });
+  return (
+    <div className="flex flex-col gap-2">
+      <PremiumCompactRow item={toShowcaseItem(vm)} />
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        {commerce.priceLabel ? (
+          <span className="text-xs text-muted-foreground">Desde {commerce.priceLabel}</span>
+        ) : (
+          <span className="text-xs text-muted-foreground">Precio no publicado</span>
+        )}
+        {eligibility.eligible ? (
+          <AddToTravelPlanButton
+            kind="product"
+            targetId={vm.id}
+            title={vm.name}
+            subtitle={vm.businessName ?? undefined}
+            imageUrl={vm.mediaUrl}
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+}
