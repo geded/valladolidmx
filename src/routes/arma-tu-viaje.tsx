@@ -29,6 +29,25 @@ export const Route = createFileRoute("/arma-tu-viaje")({
   component: AYVPage,
 });
 
+/**
+ * Lote 3C · Cierre — Fallback seguro: una composición publicada sin
+ * bloques renderizables NO puede dejar la página vacía. En ese caso
+ * servimos la superficie oficial `TripPlannerSurface`.
+ */
+function hasRenderableBlocks(tree: unknown): boolean {
+  const root = (tree as { root?: { children?: unknown[] } } | null)?.root;
+  const children = Array.isArray(root?.children) ? root!.children! : [];
+  const stack = [...children];
+  let count = 0;
+  while (stack.length) {
+    const node = stack.pop() as { type?: string; children?: unknown[] } | null;
+    if (!node || typeof node !== "object") continue;
+    if (typeof node.type === "string" && node.type.trim()) count += 1;
+    if (Array.isArray(node.children)) stack.push(...node.children);
+  }
+  return count > 0;
+}
+
 function AYVPage() {
   const { composition } = Route.useLoaderData();
   return (
@@ -38,7 +57,11 @@ function AYVPage() {
       description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
       crumbs={[{ label: "Arma tu Viaje" }]}
     >
-      {composition ? <CompositionRenderer tree={composition.snapshot} /> : <TripPlannerSurface />}
+      {composition && hasRenderableBlocks(composition.snapshot) ? (
+        <CompositionRenderer tree={composition.snapshot} />
+      ) : (
+        <TripPlannerSurface />
+      )}
     </PublicShell>
   );
 }

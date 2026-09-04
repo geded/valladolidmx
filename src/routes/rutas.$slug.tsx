@@ -39,14 +39,48 @@ function buildRouteContext(route: EditorialRouteDetailDTO): RouteContextDeclarat
         },
       ]
     : [];
+  // Lote 3C · cierre — Alux recibe los IDs y slugs reales de la ruta:
+  // destinos relacionados y paradas navegables publicadas.
+  const relatedDestinations = route.destinationSlugs
+    .filter((slug) => slug && slug !== originSlug)
+    .map((slug) => ({
+      kind: "destination" as const,
+      slug,
+      label: slug.replace(/-/g, " "),
+      href: `/oriente-maya/${slug}`,
+    }));
+  const relatedStops = route.stops
+    .filter((stop) => Boolean(stop.href))
+    .map((stop) => ({
+      kind: "custom" as const,
+      slug: stop.id,
+      label: stop.title,
+      href: stop.href!,
+      meta: {
+        entityKind: stop.entityKind,
+        entityId: stop.entityId,
+        dayNumber: stop.dayNumber,
+        position: stop.position,
+      },
+    }));
+
   return defineRouteContext({
     current: {
       kind: "route",
       slug: route.slug,
       label: route.name,
       href: `/rutas/${route.slug}`,
+      meta: {
+        routeId: route.id,
+        interests: route.interests,
+        audiences: route.audiences,
+        seasons: route.seasons,
+        destinationSlugs: route.destinationSlugs,
+        originDestinationSlug: originSlug,
+      },
     },
     ancestors: explicitAncestors,
+    related: [...relatedDestinations, ...relatedStops],
     inherit: explicitAncestors.length ? [] : ["region", "destination"],
     canonical: `/rutas/${route.slug}`,
     kindDefaults: [{ kind: "site_section", label: "Rutas", href: "/rutas" }],

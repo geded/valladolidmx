@@ -130,6 +130,8 @@ export function FloatingTravelPlanDock() {
   });
 
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { locale: rawLocale } = useTranslation();
   const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(rawLocale)
     ? (rawLocale as AluxKbLocale)
@@ -147,6 +149,11 @@ export function FloatingTravelPlanDock() {
       narration.reset();
     });
   }, [enabled, q, confirmedQ]);
+
+  // El dock depende de estado local del navegador (borrador anónimo /
+  // sesión). Antes de hidratar no renderizamos nada para que el markup
+  // del servidor y el del cliente coincidan.
+  if (!mounted) return null;
 
   if (isHiddenRoute) return null;
 
