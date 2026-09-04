@@ -30,21 +30,28 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
   });
 
   test("la portada regional usa el catálogo premium de hasta veinte destinos", () => {
+    // Lote 1 · contrato actualizado: la portada regional adoptó la autoridad
+    // visual aprobada del Atlas de Destinos (`RegionDestinationsPremiumSurface`,
+    // misma familia visual que Home Premium). Las capacidades exigidas siguen
+    // siendo las mismas: paginación de 8, Alux oficial, mapa oficial y Mi Viaje.
     const route = read("src/routes/oriente-maya/index.tsx");
-    const surface = read("src/components/destination-premium/DestinationPremiumSurface.tsx");
+    const surface = read(
+      "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+    );
     const publicReads = read("src/lib/cms/public-reads.functions.ts");
 
-    expect(route).toContain("DestinationPremiumSurface");
-    expect(route).toContain("buildRegionPremiumRuntime");
-    expect(route).toContain('data-destination-template="premium-g4"');
-    expect(surface).toContain("setVisible(8)");
+    expect(route).toContain("RegionDestinationsPremiumSurface");
+    expect(route).toContain("listPublishedDestinations");
+    expect(route).toContain('data-region-template="premium-approved"');
+    expect(surface).toContain("const PAGE_SIZE = 8");
+    expect(surface).toContain("setVisible(PAGE_SIZE)");
     expect(surface).toContain("Mostrar más destinos");
-    expect(surface).toContain('content.slug === "oriente-maya"');
-    expect(surface).toContain("AluxDestinationGuide");
-    expect(surface).toContain("La cercanía y ubicación sólo se consideran");
-    expect(surface).toContain("ExperienceMapBlock");
+    expect(surface).toContain("TourismAluxPanel");
+    expect(surface).toContain("AddToTravelPlanButton");
+    expect(surface).toContain("InteractiveMap");
     expect(publicReads).toContain("highlights, latitude, longitude");
   });
+
 
   test("los listados conservan una sola autoridad con DTO real, mapa, Alux y Mi Viaje", () => {
     const route = read("src/routes/hoteles.tsx");
