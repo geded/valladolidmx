@@ -1232,8 +1232,10 @@ function PageVisualEditor({
         if (cancelled || !detail) return;
         setPage(detail);
         skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(detail.current_draft);
         setTree(detail.current_draft);
         resetHistory();
+
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
       }
