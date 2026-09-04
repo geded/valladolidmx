@@ -37,7 +37,8 @@ interface GMarker {
     title?: string;
     label?: unknown;
     icon?: unknown;
-  }): unknown;
+    zIndex?: number;
+  }): { addListener: (event: string, handler: () => void) => void };
 }
 interface GSize {
   new (width: number, height: number): unknown;
@@ -47,6 +48,9 @@ interface GPoint {
 }
 interface GLatLngBounds {
   new (): { extend: (position: LatLng) => void };
+}
+interface GPolyline {
+  new (opts: Record<string, unknown>): { setMap: (map: unknown) => void };
 }
 interface GDirectionsService {
   new (): {
@@ -66,11 +70,25 @@ interface GoogleMapsNamespace {
     Size: GSize;
     Point: GPoint;
     LatLngBounds: GLatLngBounds;
+    Polyline: GPolyline;
     DirectionsService: GDirectionsService;
     DirectionsRenderer: GDirectionsRenderer;
     TravelMode: { DRIVING: string };
     DirectionsStatus: { OK: string };
   };
+}
+
+/** Resultado de la capa de ruta, reportado a la superficie consumidora. */
+export interface MapRouteStatus {
+  /** `directions` = geometría vial real; `approximate` = línea entre coordenadas CMS. */
+  mode: "directions" | "approximate" | "none";
+  /** Estado devuelto por el proveedor cuando falla (bloqueo exacto). */
+  providerStatus?: string;
+  /** Sólo cuando `mode === "directions"`: métricas reales del proveedor. */
+  distanceMeters?: number;
+  durationSeconds?: number;
+  /** Orden optimizado devuelto por el proveedor (índices de waypoints). */
+  waypointOrder?: number[];
 }
 
 declare global {
@@ -173,6 +191,17 @@ function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
   });
 }
 
+export interface InteractiveMapMarker {
+  lat: number;
+  lng: number;
+  title?: string;
+  href?: string | null;
+  /** Identificador estable (slug) para sincronizar tarjeta ↔ marcador. */
+  key?: string;
+  /** Posición 1..n dentro del recorrido seleccionado. */
+  order?: number | null;
+}
+
 export interface InteractiveMapProps {
   lat: number;
   lng: number;
@@ -180,9 +209,17 @@ export interface InteractiveMapProps {
   markerTitle?: string;
   className?: string;
   /** Pines adicionales para renderizar (visitas territoriales). */
-  markers?: Array<{ lat: number; lng: number; title?: string; href?: string | null }>;
+  markers?: InteractiveMapMarker[];
   /** Conecta los pines, en su orden, siguiendo carreteras reales. */
   connectByRoad?: boolean;
+  /** Paradas ordenadas del recorrido; dibuja la ruta si hay 2 o más. */
+  routeStops?: Array<{ lat: number; lng: number; key?: string }>;
+  /** Pide al proveedor el orden óptimo de paradas intermedias. */
+  optimizeRoute?: boolean;
+  /** Reporta la capacidad real usada y el bloqueo exacto del proveedor. */
+  onRouteStatus?: (status: MapRouteStatus) => void;
+  /** Selección de un marcador desde el mapa. */
+  onMarkerSelect?: (key: string) => void;
 }
 
 function labelForIndex(i: number) {
@@ -199,12 +236,14 @@ function getMarkerColors(): { bg: string; fg: string; stroke: string } {
   return { bg, fg, stroke: "#123e2f" };
 }
 
-function markerIconDataUri(letter: string): string {
+function markerIconDataUri(letter: string, selected = false): string {
   const { bg, fg, stroke } = getMarkerColors();
+  const body = selected ? stroke : bg;
+  const ring = selected ? bg : stroke;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48">
-    <path d="M20 2C10.6 2 3 9.6 3 19c0 12.4 17 27 17 27s17-14.6 17-27C37 9.6 29.4 2 20 2Z" fill="${bg}" stroke="${stroke}" stroke-width="2.5"/>
-    <circle cx="20" cy="19" r="10" fill="${stroke}" opacity=".92"/>
-    <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${fg}">${letter}</text>
+    <path d="M20 2C10.6 2 3 9.6 3 19c0 12.4 17 27 17 27s17-14.6 17-27C37 9.6 29.4 2 20 2Z" fill="${body}" stroke="${ring}" stroke-width="2.5"/>
+    <circle cx="20" cy="19" r="10" fill="${ring}" opacity=".92"/>
+    <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${selected ? stroke : fg}">${letter}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
@@ -217,10 +256,18 @@ export function InteractiveMap({
   className,
   markers,
   connectByRoad = false,
+  routeStops,
+  optimizeRoute = false,
+  onRouteStatus,
+  onMarkerSelect,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const routeStatusRef = useRef(onRouteStatus);
+  const markerSelectRef = useRef(onMarkerSelect);
+  routeStatusRef.current = onRouteStatus;
+  markerSelectRef.current = onMarkerSelect;
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
@@ -249,24 +296,33 @@ export function InteractiveMap({
           fullscreenControl: true,
           gestureHandling: "cooperative",
         });
-        const list = markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
+        const list: InteractiveMapMarker[] =
+          markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
         const bounds = new google.maps.LatLngBounds();
         list.forEach((m, i) => {
-          const letter = labelForIndex(i);
-          new google.maps.Marker({
+          const selected = typeof m.order === "number" && m.order > 0;
+          const label = selected ? String(m.order) : labelForIndex(i);
+          const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map,
-            title: `${letter} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            title: `${label} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            zIndex: selected ? 20 : 10,
             icon: {
-              url: markerIconDataUri(letter),
+              url: markerIconDataUri(label, selected),
               scaledSize: new google.maps.Size(40, 48),
               anchor: new google.maps.Point(20, 48),
             },
           });
+          if (m.key) {
+            marker.addListener("click", () => markerSelectRef.current?.(m.key as string));
+          }
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
         if (list.length > 1) map.fitBounds(bounds, 88);
-        if (connectByRoad && list.length > 1) {
+
+        /* Capa de ruta: sólo con la capacidad real del proveedor. */
+        const stops = routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
+        if (stops.length > 1) {
           const directions = new google.maps.DirectionsService();
           const renderer = new google.maps.DirectionsRenderer({
             map,
@@ -280,23 +336,59 @@ export function InteractiveMap({
           });
           directions.route(
             {
-              origin: { lat: list[0].lat, lng: list[0].lng },
-              destination: { lat: list[list.length - 1].lat, lng: list[list.length - 1].lng },
-              waypoints: list.slice(1, -1).map((point) => ({
+              origin: { lat: stops[0].lat, lng: stops[0].lng },
+              destination: { lat: stops[stops.length - 1].lat, lng: stops[stops.length - 1].lng },
+              waypoints: stops.slice(1, -1).map((point) => ({
                 location: { lat: point.lat, lng: point.lng },
                 stopover: true,
               })),
               travelMode: google.maps.TravelMode.DRIVING,
-              optimizeWaypoints: false,
+              optimizeWaypoints: optimizeRoute,
             },
             (result, status) => {
+              if (cancelled) return;
               if (status === google.maps.DirectionsStatus.OK && result) {
                 renderer.setDirections(result);
-              } else {
-                map.fitBounds(bounds, 88);
+                const route = (
+                  result as {
+                    routes?: Array<{
+                      waypoint_order?: number[];
+                      legs?: Array<{
+                        distance?: { value?: number };
+                        duration?: { value?: number };
+                      }>;
+                    }>;
+                  }
+                ).routes?.[0];
+                const legs = route?.legs ?? [];
+                routeStatusRef.current?.({
+                  mode: "directions",
+                  distanceMeters: legs.reduce((s, l) => s + (l.distance?.value ?? 0), 0),
+                  durationSeconds: legs.reduce((s, l) => s + (l.duration?.value ?? 0), 0),
+                  waypointOrder: route?.waypoint_order,
+                });
+                return;
               }
+              /* Sin Directions: línea aproximada derivada de coordenadas CMS. */
+              new google.maps.Polyline({
+                map,
+                path: stops.map((s) => ({ lat: s.lat, lng: s.lng })),
+                strokeColor: "#c88a17",
+                strokeOpacity: 0,
+                icons: [
+                  {
+                    icon: { path: "M 0,-1 0,1", strokeOpacity: 0.9, scale: 3 },
+                    offset: "0",
+                    repeat: "14px",
+                  },
+                ],
+              });
+              map.fitBounds(bounds, 88);
+              routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
             },
           );
+        } else {
+          routeStatusRef.current?.({ mode: "none" });
         }
         setReady(true);
       })
@@ -306,7 +398,8 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, zoom, markerTitle, markers, connectByRoad]);
+  }, [lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+
 
   if (error) {
     return (

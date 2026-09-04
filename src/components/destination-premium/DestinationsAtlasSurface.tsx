@@ -8,9 +8,22 @@
  * del Home y los mismos tokens. Header, footer, breadcrumb y botón flotante
  * viven en el shell global.
  */
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, List, Map as MapIcon, MapPin, Search, Sparkles } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  ExternalLink,
+  List,
+  Map as MapIcon,
+  MapPin,
+  Plus,
+  Search,
+  Sparkles,
+  Wand2,
+  X,
+} from "lucide-react";
+import type { MapRouteStatus } from "@/components/maps/InteractiveMap";
 
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { Container } from "@/components/layout/Container";
@@ -176,10 +189,108 @@ export function DestinationsAtlasSurface({
     return [...configured, ...byDiversity, ...rest].slice(0, 3);
   }, [content.startHere.companionSlugs, list, featured?.slug]);
 
-  const mapped = filtered.filter(
-    (d) => typeof d.latitude === "number" && typeof d.longitude === "number",
+  const mapped = useMemo(
+    () => filtered.filter((d) => typeof d.latitude === "number" && typeof d.longitude === "number"),
+    [filtered],
   );
   const activeDestination = mapped.find((d) => d.slug === active) ?? null;
+
+  /* ---------------- Recorrido: selección múltiple tarjeta ↔ marcador ------------- */
+  const [stopSlugs, setStopSlugs] = useState<string[]>([]);
+  const [routeStatus, setRouteStatus] = useState<MapRouteStatus | null>(null);
+  const [optimizeRoute, setOptimizeRoute] = useState(false);
+
+  const toggleStop = useCallback((slug: string) => {
+    setStopSlugs((current) =>
+      current.includes(slug) ? current.filter((s) => s !== slug) : [...current, slug],
+    );
+    setOptimizeRoute(false);
+  }, []);
+
+  const stops = useMemo(
+    () =>
+      stopSlugs
+        .map((slug) => destinations.find((d) => d.slug === slug))
+        .filter(
+          (d): d is Destination =>
+            Boolean(d) && typeof d?.latitude === "number" && typeof d?.longitude === "number",
+        ),
+    [stopSlugs, destinations],
+  );
+
+  const mapMarkers = useMemo(
+    () =>
+      mapped.map((destination) => ({
+        lat: destination.latitude as number,
+        lng: destination.longitude as number,
+        title: destination.name,
+        href: `/oriente-maya/${destination.slug}`,
+        key: destination.slug,
+        order: stopSlugs.indexOf(destination.slug) + 1 || null,
+      })),
+    [mapped, stopSlugs],
+  );
+
+  const routeStops = useMemo(
+    () =>
+      stops.length > 1
+        ? stops.map((d) => ({
+            lat: d.latitude as number,
+            lng: d.longitude as number,
+            key: d.slug,
+          }))
+        : undefined,
+    [stops],
+  );
+
+  const handleRouteStatus = useCallback(
+    (status: MapRouteStatus) => {
+      setRouteStatus(status);
+      if (status.mode === "directions" && status.waypointOrder?.length) {
+        setStopSlugs((current) => {
+          if (current.length < 3) return current;
+          const middle = current.slice(1, -1);
+          const reordered = [
+            current[0],
+            ...status.waypointOrder!.map((i) => middle[i]).filter(Boolean),
+            current[current.length - 1],
+          ];
+          return reordered.join("|") === current.join("|") ? current : reordered;
+        });
+        setOptimizeRoute(false);
+      }
+    },
+    [],
+  );
+
+  const handleMarkerSelect = useCallback(
+    (slug: string) => {
+      setActive(slug);
+      toggleStop(slug);
+    },
+    [toggleStop],
+  );
+
+  const googleMapsRouteUrl = useMemo(() => {
+    if (stops.length < 2) return null;
+    const coord = (d: Destination) => `${d.latitude},${d.longitude}`;
+    const params = new URLSearchParams({
+      api: "1",
+      origin: coord(stops[0]),
+      destination: coord(stops[stops.length - 1]),
+      travelmode: "driving",
+    });
+    const waypoints = stops.slice(1, -1).map(coord).join("|");
+    if (waypoints) params.set("waypoints", waypoints);
+    return `https://www.google.com/maps/dir/?${params.toString()}`;
+  }, [stops]);
+
+  const routeMetrics =
+    routeStatus?.mode === "directions" && routeStatus.distanceMeters && routeStatus.durationSeconds
+      ? `${Math.round(routeStatus.distanceMeters / 1000)} km · ${Math.round(
+          routeStatus.durationSeconds / 60,
+        )} min en auto`
+      : null;
 
   const askAlux = (extra?: string) => {
     const preference = [
@@ -396,6 +507,8 @@ export function DestinationsAtlasSurface({
                     layout="row"
                     active={active === destination.slug}
                     onFocus={() => setActive(destination.slug)}
+                    stopOrder={stopSlugs.indexOf(destination.slug) + 1 || null}
+                    onToggleStop={() => toggleStop(destination.slug)}
                   />
                 ))}
                 {!filtered.length ? (
@@ -419,13 +532,12 @@ export function DestinationsAtlasSurface({
                       lng={activeDestination?.longitude ?? -88.2011}
                       zoom={activeDestination ? 11 : 8}
                       markerTitle={activeDestination?.name ?? "Oriente Maya"}
-                      markers={mapped.map((destination) => ({
-                        lat: destination.latitude as number,
-                        lng: destination.longitude as number,
-                        title: destination.name,
-                        href: `/oriente-maya/${destination.slug}`,
-                      }))}
-                      className="h-[22rem] w-full rounded-2xl lg:h-[30rem]"
+                      markers={mapMarkers}
+                      routeStops={routeStops}
+                      optimizeRoute={optimizeRoute}
+                      onRouteStatus={handleRouteStatus}
+                      onMarkerSelect={handleMarkerSelect}
+                      className="h-[26rem] w-full rounded-2xl lg:h-[30rem]"
                     />
                   </Suspense>
                 ) : (
@@ -433,24 +545,162 @@ export function DestinationsAtlasSurface({
                     El mapa aparecerá cuando los destinos tengan coordenadas verificadas en CMS.
                   </div>
                 )}
-                {/* Panel inferior de ruta (móvil): destino enfocado en el mapa. */}
-                {(() => {
-                  const target = activeDestination ?? mapped[0] ?? null;
-                  if (!target) return null;
-                  const info = proximityOf(target);
-                  return (
-                    <div className="mt-3 lg:hidden">
-                      <PremiumCompactRow
-                        item={toShowcaseItem(target, info ? formatProximity(info) : null)}
-                        active
-                      />
-                    </div>
-                  );
-                })()}
 
+                {/* Tarjetas deslizables bajo el mapa (móvil): añadir/quitar paradas. */}
+                {mapped.length ? (
+                  <div
+                    className="mt-3 flex snap-x gap-3 overflow-x-auto pb-1 lg:hidden"
+                    aria-label="Destinos del mapa"
+                  >
+                    {mapped.slice(0, 8).map((destination) => {
+                      const order = stopSlugs.indexOf(destination.slug) + 1 || null;
+                      const info = proximityOf(destination);
+                      return (
+                        <div
+                          key={destination.slug}
+                          className="w-[15rem] shrink-0 snap-start space-y-2"
+                          onFocus={() => setActive(destination.slug)}
+                        >
+                          <PremiumCompactRow
+                            item={toShowcaseItem(destination, info ? formatProximity(info) : null)}
+                            active={active === destination.slug}
+                            onFocus={() => setActive(destination.slug)}
+                          />
+                          <Button
+                            type="button"
+                            variant={order ? "default" : "outline"}
+                            className="min-h-11 w-full rounded-pill"
+                            aria-pressed={Boolean(order)}
+                            onClick={() => toggleStop(destination.slug)}
+                          >
+                            {order ? (
+                              <>
+                                <Check className="mr-2 size-4" aria-hidden /> Parada {order}
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="mr-2 size-4" aria-hidden /> Agregar
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
+                {/* Panel de recorrido: orden de paradas y acciones canónicas. */}
+                {stops.length ? (
+                  <div id="atlas-ruta" className="mt-3 rounded-2xl border border-border p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="font-display text-lg">Tu recorrido</h3>
+                      <span className="text-xs text-muted-foreground">
+                        {stops.length} {stops.length === 1 ? "destino" : "destinos"}
+                      </span>
+                    </div>
+                    {routeMetrics ? (
+                      <p className="mt-1 text-xs text-muted-foreground">{routeMetrics}</p>
+                    ) : null}
+                    {routeStatus?.mode === "approximate" ? (
+                      <p className="mt-1 rounded-xl bg-muted p-2 text-xs text-muted-foreground">
+                        Trazo aproximado entre coordenadas del CMS: el servicio de rutas por
+                        carretera no está autorizado en este entorno
+                        {routeStatus.providerStatus ? ` (${routeStatus.providerStatus})` : ""}. No
+                        mostramos kilometraje ni tiempos de carretera.
+                      </p>
+                    ) : null}
+                    <ol className="mt-3 space-y-2">
+                      {stops.map((destination, index) => (
+                        <li
+                          key={destination.slug}
+                          className="flex min-w-0 items-center gap-2 rounded-xl bg-secondary/60 p-2"
+                        >
+                          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-selva text-xs font-semibold text-selva-foreground">
+                            {index + 1}
+                          </span>
+                          <span className="min-w-0 flex-1 truncate text-sm">{destination.name}</span>
+                          <AddToTravelPlanButton
+                            kind="destination"
+                            targetId={destination.id}
+                            title={destination.name}
+                            slug={destination.slug}
+                            imageUrl={destination.image_url ?? null}
+                            subtitle={destination.tagline}
+                            eligibilityMode="legacy"
+                            className="min-h-11 rounded-pill"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => toggleStop(destination.slug)}
+                            aria-label={`Quitar ${destination.name} del recorrido`}
+                            className="grid size-11 shrink-0 place-items-center rounded-full border border-border"
+                          >
+                            <X className="size-4" aria-hidden />
+                          </button>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      {routeStatus?.mode === "directions" && stops.length > 2 ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="min-h-11 rounded-pill"
+                          onClick={() => setOptimizeRoute(true)}
+                        >
+                          <Wand2 className="mr-2 size-4" aria-hidden /> Optimizar recorrido
+                        </Button>
+                      ) : null}
+                      {googleMapsRouteUrl ? (
+                        <Button asChild variant="secondary" className="min-h-11 rounded-pill">
+                          <a href={googleMapsRouteUrl} target="_blank" rel="noreferrer">
+                            <ExternalLink className="mr-2 size-4" aria-hidden /> Abrir en Google Maps
+                          </a>
+                        </Button>
+                      ) : null}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="min-h-11 rounded-pill"
+                        onClick={() =>
+                          askAlux(`Recorrido propuesto: ${stops.map((d) => d.name).join(" · ")}`)
+                        }
+                      >
+                        <Sparkles className="mr-2 size-4" aria-hidden /> Revisar con{" "}
+                        {ACTIVE_BRAND.conciergeName}
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      {ACTIVE_BRAND.conciergeName} puede sugerir paradas; tú confirmas cada destino
+                      antes de guardarlo en Mi Viaje.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Toca un marcador o “Agregar” para armar un recorrido con varios destinos.
+                  </p>
+                )}
               </div>
 
             </div>
+
+            {/* Barra inferior móvil: acceso rápido al recorrido en curso. */}
+            {stops.length ? (
+              <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+                <Button
+                  type="button"
+                  className="min-h-11 w-full rounded-pill"
+                  onClick={() => {
+                    setMobileView("mapa");
+                    document
+                      .getElementById("atlas-ruta")
+                      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }}
+                >
+                  Ver ruta · {stops.length} {stops.length === 1 ? "destino" : "destinos"}
+                </Button>
+              </div>
+            ) : null}
           </section>,
         )}
 
@@ -776,12 +1026,17 @@ function AtlasCard({
   layout,
   active = false,
   onFocus,
+  stopOrder = null,
+  onToggleStop,
 }: {
   destination: Destination;
   proximity: ProximityInfo | null;
   layout: "card" | "row";
   active?: boolean;
   onFocus?: () => void;
+  /** Posición dentro del recorrido seleccionado (1..n) o `null`. */
+  stopOrder?: number | null;
+  onToggleStop?: () => void;
 }) {
   const type = TERRITORY_TYPE_LABELS[classifyTerritoryType(destination)];
   const magic = PUEBLOS_MAGICOS.has(destination.slug);
@@ -825,10 +1080,6 @@ function AtlasCard({
         <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
           {destination.tagline}
         </p>
-
-        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
-          {destination.tagline}
-        </p>
         {proximityLabel ? (
           <p className="mt-2 inline-flex items-center gap-1 text-xs text-foreground">
             <MapPin className="size-3.5 text-selva" /> {proximityLabel}
@@ -845,6 +1096,28 @@ function AtlasCard({
               Descubrir
             </Link>
           </Button>
+          {onToggleStop ? (
+            <Button
+              type="button"
+              variant={stopOrder ? "default" : "outline"}
+              aria-pressed={Boolean(stopOrder)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleStop();
+              }}
+              className="min-h-11 rounded-pill"
+            >
+              {stopOrder ? (
+                <>
+                  <Check className="mr-2 size-4" aria-hidden /> Parada {stopOrder}
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 size-4" aria-hidden /> Agregar al recorrido
+                </>
+              )}
+            </Button>
+          ) : null}
           <AddToTravelPlanButton
             kind="destination"
             targetId={destination.id}

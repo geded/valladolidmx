@@ -131,24 +131,24 @@ export function PremiumAluxBar({
       aria-labelledby="alux-title"
       className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
     >
-      <div className="grid min-h-20 items-center gap-3 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
-        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-white/20 sm:pr-3 lg:h-24">
+      <div className="grid min-w-0 items-center gap-3 px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:border-r sm:border-white/20 sm:pr-4">
           <img
             src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
             alt={ACTIVE_BRAND.conciergeName}
-            className="h-14 w-14 shrink-0 object-contain lg:h-20 lg:w-20"
+            className="size-12 shrink-0 object-contain lg:size-16"
           />
-          <div>
-            <h2 id="alux-title" className="font-display text-xl">
+          <div className="min-w-0">
+            <h2 id="alux-title" className="truncate font-display text-lg lg:text-xl">
               {ACTIVE_BRAND.conciergeName}
             </h2>
             <p className="text-xs text-white/70">Tu concierge IA</p>
           </div>
         </div>
-        <div>
-          <p className="font-display text-lg lg:text-xl">{question}</p>
+        <div className="min-w-0">
+          <p className="font-display text-base leading-snug lg:text-xl">{question}</p>
           <div
-            className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
+            className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
             role="group"
             aria-label="Composición del viaje"
           >
@@ -159,7 +159,7 @@ export function PremiumAluxBar({
                 size="sm"
                 variant={selectedParty === option.value ? "default" : "secondary"}
                 onClick={() => onSelectParty(option.value)}
-                className="min-h-9 rounded-pill"
+                className="min-h-11 shrink-0 snap-start rounded-pill"
               >
                 {option.label}
               </Button>
@@ -169,7 +169,7 @@ export function PremiumAluxBar({
         <Button
           type="button"
           onClick={onContinue}
-          className="size-11 rounded-full p-0"
+          className="size-11 shrink-0 self-center rounded-full p-0"
           aria-label={continueLabel}
         >
           <ChevronRight className="size-5" />
