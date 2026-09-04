@@ -434,19 +434,20 @@ export function DestinationsAtlasSurface({
                   </div>
                 )}
                 {/* Panel inferior de ruta (móvil): destino enfocado en el mapa. */}
-                <div className="mt-3 lg:hidden">
-                  <PremiumCompactRow
-                    item={toShowcaseItem(
-                      activeDestination ?? mapped[0] ?? list[0]!,
-                      (() => {
-                        const target = activeDestination ?? mapped[0] ?? list[0];
-                        const info = target ? proximityOf(target) : null;
-                        return info ? formatProximity(info) : null;
-                      })(),
-                    )}
-                    active
-                  />
-                </div>
+                {(() => {
+                  const target = activeDestination ?? mapped[0] ?? null;
+                  if (!target) return null;
+                  const info = proximityOf(target);
+                  return (
+                    <div className="mt-3 lg:hidden">
+                      <PremiumCompactRow
+                        item={toShowcaseItem(target, info ? formatProximity(info) : null)}
+                        active
+                      />
+                    </div>
+                  );
+                })()}
+
               </div>
 
             </div>
