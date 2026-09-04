@@ -42,12 +42,30 @@ const rowsOf = (value: unknown): Row[] =>
   Array.isArray(value) ? value.filter((r): r is Row => Boolean(r) && typeof r === "object") : [];
 
 /**
+ * La política editorial (`editorial-builder-policy`) sólo admite rutas
+ * internas canónicas en cualquier clave `*href*`. Un ancla como `#mapa`
+ * es descartada por el resolutor (no genera enlace), así que materializarla
+ * bloquearía el guardado en el Studio sin aportar nada: se omite.
+ */
+const isCanonicalHref = (value: unknown): value is string =>
+  typeof value === "string" && value.startsWith("/") && !value.includes("?") && !value.includes("#");
+
+function stripNonCanonicalHrefs(row: Row): Row {
+  const out: Row = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (/href/i.test(k) && !isCanonicalHref(v)) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
+/**
  * Une la fila por defecto (texto/enlace acreditado) con la fila vigente del
  * snapshot: cualquier clave presente hoy gana, incluidas las decisiones de
  * medios explícitamente vacías.
  */
 function mergeRow(defaultRow: Row | undefined, currentRow: Row): Row {
-  const base: Row = { ...(defaultRow ?? {}) };
+  const base: Row = { ...stripNonCanonicalHrefs(defaultRow ?? {}) };
   for (const [k, v] of Object.entries(currentRow)) base[k] = v;
   // Una fila vigente que declara `media_url` conserva también su `media_alt`
   // vigente aunque sea ausente: la ausencia no debe reintroducir el default.
@@ -56,6 +74,7 @@ function mergeRow(defaultRow: Row | undefined, currentRow: Row): Row {
   }
   return base;
 }
+
 
 export function materializeHomePremiumConfig(current: Cfg): Cfg {
   const defaults = homePremiumG4DefaultConfig() as Cfg;
