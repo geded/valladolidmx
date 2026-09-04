@@ -643,22 +643,38 @@ export function DestinationsAtlasSurface({
           "final_cta",
           <section
             aria-labelledby="atlas-cta"
-            className="rounded-3xl border border-border bg-secondary p-5 text-secondary-foreground shadow-soft sm:p-7"
+            className="overflow-hidden rounded-3xl bg-selva text-selva-foreground"
           >
-            <h2 id="atlas-cta" className="font-display text-2xl sm:text-3xl">
-              {content.finalCta.title}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm sm:text-base">{content.finalCta.description}</p>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-              <Button type="button" className="min-h-11 rounded-pill" onClick={() => askAlux()}>
-                <Sparkles className="mr-2 size-4" /> {content.finalCta.primaryLabel}
-              </Button>
-              <Button asChild variant="outline" className="min-h-11 rounded-pill">
-                <Link to="/mi-viaje">{content.finalCta.secondaryLabel}</Link>
-              </Button>
+            <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <div className="flex items-center gap-2 text-primary">
+                  <Sparkles className="size-5" aria-hidden />
+                  <p className="text-xs font-semibold uppercase">{ACTIVE_BRAND.conciergeName}</p>
+                </div>
+                <h2 id="atlas-cta" className="mt-3 font-display text-3xl sm:text-4xl">
+                  {content.finalCta.title}
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-selva-foreground/80">
+                  {content.finalCta.description}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+                <Button
+                  type="button"
+                  size="lg"
+                  className="min-h-12 rounded-pill"
+                  onClick={() => askAlux()}
+                >
+                  <Sparkles className="mr-2 size-4" aria-hidden /> {content.finalCta.primaryLabel}
+                </Button>
+                <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
+                  <Link to="/mi-viaje">{content.finalCta.secondaryLabel}</Link>
+                </Button>
+              </div>
             </div>
           </section>,
         )}
+
       </Container>
     </div>
   );
