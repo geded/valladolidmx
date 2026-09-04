@@ -114,11 +114,20 @@ export function AluxFloatingTrigger() {
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const queryClient = useQueryClient();
-  // Sólo confiamos en el contexto territorial cuando la ruta actual
-  // pertenece al árbol `/oriente-maya/*`. En cualquier otra superficie
-  // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
-  // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
-  const contextIsRelevant = pathname.startsWith("/oriente-maya/");
+  // Confiamos en el contexto territorial cuando la ruta pertenece al
+  // árbol canónico `/oriente-maya/*` y —Lote 3C · cierre— también en las
+  // superficies canónicas que DECLARAN su propio contexto vivo
+  // (`/rutas`, `/rutas/$slug`, `/casas-de-vacaciones`). En esas rutas sólo
+  // se acepta contexto `live` (declarado por la ruta), nunca rehidratado
+  // de sesión, para no arrastrar el destino de un recorrido anterior.
+  // En cualquier otra superficie el Sheet abre en "modo descubrimiento".
+  const isCanonicalTree = pathname.startsWith("/oriente-maya/");
+  const declaresOwnContext =
+    pathname === "/rutas" ||
+    pathname.startsWith("/rutas/") ||
+    pathname.startsWith("/casas-de-vacaciones");
+  const contextIsRelevant =
+    isCanonicalTree || (declaresOwnContext && rawCtx.origin === "live" && rawCtx.hasContext);
   const ctx: AluxContext = useMemo(
     () =>
       contextIsRelevant
