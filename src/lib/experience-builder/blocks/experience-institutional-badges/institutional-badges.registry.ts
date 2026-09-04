@@ -22,6 +22,8 @@ import {
   Star,
   type LucideIcon,
 } from "lucide-react";
+import { getAuthorizedSlugs } from "@/lib/institutional/institutional-authority";
+
 
 export const BADGE_KINDS = [
   "pueblo-magico",
