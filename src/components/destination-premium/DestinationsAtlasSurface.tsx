@@ -8,9 +8,22 @@
  * del Home y los mismos tokens. Header, footer, breadcrumb y botón flotante
  * viven en el shell global.
  */
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, List, Map as MapIcon, MapPin, Search, Sparkles } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  ExternalLink,
+  List,
+  Map as MapIcon,
+  MapPin,
+  Plus,
+  Search,
+  Sparkles,
+  Wand2,
+  X,
+} from "lucide-react";
+import type { MapRouteStatus } from "@/components/maps/InteractiveMap";
 
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { Container } from "@/components/layout/Container";
