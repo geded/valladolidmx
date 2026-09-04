@@ -14,7 +14,6 @@ import {
   touristDestinationJsonLd,
   ORIENTE_MAYA_PLACE_ID,
 } from "@/lib/discovery/seo";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import { stableIndexableImageUrl } from "@/lib/media/stable-public-url";
@@ -63,9 +62,6 @@ function buildDestinationContext(slug: string, displayName: string): RouteContex
 
 export const Route = createFileRoute("/oriente-maya/$destino/")({
   loader: async ({ params }) => {
-    const mock = DESTINOS_MOCK.find(
-      (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
-    );
     const [
       db,
       related,
@@ -84,14 +80,14 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       getEvaluationLotSlugs().catch(() => null),
       resolveHomePremiumRealContent().catch(() => null),
     ]);
-    if (!mock && !db) throw notFound();
+    if (!db) throw notFound();
     const dest = {
       slug: params.destino,
-      name: db?.name ?? mock?.name ?? params.destino,
-      tagline: db?.tagline ?? mock?.tagline ?? "",
-      hero_palette: (db?.hero_palette ?? mock?.hero_palette ?? "territorio") as
+      name: db?.name ?? params.destino,
+      tagline: db?.tagline ?? "",
+      hero_palette: (db?.hero_palette ?? "territorio") as
         "territorio" | "selva" | "cenote" | "atardecer",
-      highlights: (db?.highlights?.length ? db.highlights : (mock?.highlights ?? [])) as string[],
+      highlights: (db?.highlights ?? []) as string[],
     };
     const premiumEnabled = premiumEligibility?.eligible === true;
     // 19.23 — Fuente estable para OG/JSON-LD (proxy canónico), nunca una

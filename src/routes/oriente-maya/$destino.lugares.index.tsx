@@ -13,14 +13,10 @@ import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { humanizeDestinationSlug } from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
-function destinationLabel(slug: string): string {
-  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
-}
-
-function buildContext(destino: string): RouteContextDeclaration {
+function buildContext(destino: string, label: string): RouteContextDeclaration {
   return defineRouteContext({
     current: {
       kind: "category",
@@ -38,7 +34,7 @@ function buildContext(destino: string): RouteContextDeclaration {
       {
         kind: "destination" as const,
         slug: destino,
-        label: destinationLabel(destino),
+        label,
         href: `/oriente-maya/${destino}`,
       },
     ],
@@ -59,18 +55,20 @@ export const Route = createFileRoute("/oriente-maya/$destino/lugares/")({
     );
     return { dto, nearby, destino };
   },
-  head: ({ params }) =>
-    buildPublicHead({
-      title: `Lugares y sitios de interés en ${destinationLabel(params.destino)} · ${SITE.name}`,
-      description: `Cenotes, conventos y sitios emblemáticos de ${destinationLabel(params.destino)}, Oriente Maya.`,
+  head: ({ params, loaderData }) => {
+    const label = loaderData?.dto.destinationLabel ?? humanizeDestinationSlug(params.destino);
+    return buildPublicHead({
+      title: `Lugares y sitios de interés en ${label} · ${SITE.name}`,
+      description: `Cenotes, conventos y sitios emblemáticos de ${label}, Oriente Maya.`,
       path: `/oriente-maya/${params.destino}/lugares`,
-    }),
+    });
+  },
   component: LugaresDestinoPage,
 });
 
 function LugaresDestinoPage() {
   const { dto, nearby, destino } = Route.useLoaderData();
-  const label = dto.destinationLabel ?? destinationLabel(destino);
+  const label = dto.destinationLabel ?? humanizeDestinationSlug(destino);
   return (
     <PublicShell
       crumbs={[
@@ -78,7 +76,7 @@ function LugaresDestinoPage() {
         { label, to: `/oriente-maya/${destino}` },
         { label: "Lugares y sitios de interés" },
       ]}
-      contextDeclaration={buildContext(destino)}
+      contextDeclaration={buildContext(destino, label)}
       useContextCrumbs
       compactCrumbsOnMobile
     >

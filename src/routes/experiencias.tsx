@@ -4,15 +4,11 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getExperiencesListing } from "@/lib/experiences/experience-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { useDestinationLabel } from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ExperiencesListingSurface } from "@/components/experience-premium/ExperiencesListingSurface";
 
 const CATEGORY_SLUGS = new Set(["experiencias", "experiencias-tours", "tours"]);
-
-function destinationLabel(slug: string): string {
-  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
-}
 
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).
@@ -20,7 +16,10 @@ function destinationLabel(slug: string): string {
  * (no es una entidad territorial ni una categoría). Sigue reflejándose
  * únicamente en el breadcrumb legacy como etiqueta hoja.
  */
-function buildExperienciasContext(destino: string | undefined): RouteContextDeclaration {
+function buildExperienciasContext(
+  destino: string | undefined,
+  destinationLabel: (slug: string) => string,
+): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
         {
@@ -70,10 +69,11 @@ export const Route = createFileRoute("/experiencias")({
 });
 
 function ExperienciasRoute() {
+  const destinationLabel = useDestinationLabel();
   const { dto, axes, valueLabels } = Route.useLoaderData();
   const { destino, tema } = Route.useSearch();
   const humanTema = tema ? tema.replace(/-/g, " ") : null;
-  const contextDeclaration = buildExperienciasContext(destino);
+  const contextDeclaration = buildExperienciasContext(destino, destinationLabel);
   const legacyCrumbs = [
     { label: "Experiencias", to: "/experiencias" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),

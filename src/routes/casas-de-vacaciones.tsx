@@ -12,7 +12,7 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { useDestinationLabel } from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
@@ -26,12 +26,11 @@ const CATEGORY_SLUGS = new Set([
   "casas",
 ]);
 
-function destinationLabel(slug: string): string {
-  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
-}
-
 /** H-02 · I5 — Declaración de contexto (patrón I4). */
-function buildCasasContext(destino: string | undefined): RouteContextDeclaration {
+function buildCasasContext(
+  destino: string | undefined,
+  destinationLabel: (slug: string) => string,
+): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
         {
@@ -81,9 +80,10 @@ export const Route = createFileRoute("/casas-de-vacaciones")({
 });
 
 function CasasRoute() {
+  const destinationLabel = useDestinationLabel();
   const { dto } = Route.useLoaderData();
   const { destino } = Route.useSearch();
-  const contextDeclaration = buildCasasContext(destino);
+  const contextDeclaration = buildCasasContext(destino, destinationLabel);
   const legacyCrumbs = [
     { label: "Casas de vacaciones", to: "/casas-de-vacaciones" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),

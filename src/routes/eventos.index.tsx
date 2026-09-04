@@ -5,15 +5,14 @@ import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { useDestinationLabel } from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
-function destinationLabel(slug: string): string {
-  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
-}
-
 /** Contexto territorial: el destino se hereda o se declara, nunca se pide. */
-function buildEventosContext(destino: string | undefined): RouteContextDeclaration {
+function buildEventosContext(
+  destino: string | undefined,
+  destinationLabel: (slug: string) => string,
+): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
         {
@@ -68,11 +67,12 @@ export const Route = createFileRoute("/eventos/")({
 });
 
 function EventosPage() {
+  const destinationLabel = useDestinationLabel();
   const { dto, nearby, destino } = Route.useLoaderData();
   const label = destino ? (dto.destinationLabel ?? destinationLabel(destino)) : null;
   const crumbs = [{ label: "Eventos", to: "/eventos" }, ...(label ? [{ label }] : [])];
   return (
-    <PublicShell crumbs={crumbs} contextDeclaration={buildEventosContext(destino ?? undefined)} useContextCrumbs compactCrumbsOnMobile>
+    <PublicShell crumbs={crumbs} contextDeclaration={buildEventosContext(destino ?? undefined, destinationLabel)} useContextCrumbs compactCrumbsOnMobile>
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         showAddToTrip

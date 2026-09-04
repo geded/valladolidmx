@@ -22,6 +22,7 @@ import {
   homePremiumG4DefaultConfig,
 } from "@/components/home-premium/home-premium-config";
 import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
+import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -70,7 +71,12 @@ export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
     // ante cualquier error, garantizando que la Home siempre cargue.
-    const published = await context.queryClient.ensureQueryData(publishedHomeQuery);
+    const [published] = await Promise.all([
+      context.queryClient.ensureQueryData(publishedHomeQuery),
+      // Lote 3B — Destinos reales de CMS disponibles en SSR: la Home ya no
+      // depende del fixture `DESTINOS_MOCK` para pintar la sección.
+      context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []),
+    ]);
     return {
       seo: published?.snapshot?.chrome?.seo ?? null,
       fallbackImage: published?.snapshot ? (pickFirstMediaUrl(published.snapshot) ?? null) : null,
