@@ -5656,6 +5656,7 @@ export type Database = {
           direct_sale_terms: string | null
           duration_minutes: number | null
           eligible_for_ems_campaigns: boolean
+          filter_attributes: Json
           generates_commission: boolean
           id: string
           is_demo_seed: boolean
@@ -5699,6 +5700,7 @@ export type Database = {
           direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
+          filter_attributes?: Json
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
@@ -5742,6 +5744,7 @@ export type Database = {
           direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
+          filter_attributes?: Json
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
