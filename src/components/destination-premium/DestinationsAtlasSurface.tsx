@@ -1,18 +1,28 @@
 /**
  * G8 · Atlas de Destinos del Oriente Maya — plantilla maestra responsive.
  *
- * Reutiliza el sistema aprobado: PremiumHero (misma familia del Home),
- * TourismAluxPanel + dock global, tarjetas con AddToTravelPlanButton,
- * InteractiveMap territorial, tokens y marca configurable. No define
- * header, footer ni botón flotante propios: viven en el shell global.
+ * Autoridad visual: el Home Premium aprobado. Esta superficie NO define
+ * diseño propio: consume las piezas extraídas en
+ * `@/components/home-premium/shared/PremiumShowcase` (hero editorial, head de
+ * sección, barra de Alux, bloque Destinos y fila compacta), el `Container`
+ * del Home y los mismos tokens. Header, footer, breadcrumb y botón flotante
+ * viven en el shell global.
  */
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Compass, List, Map as MapIcon, MapPin, Search, Sparkles } from "lucide-react";
+import { ChevronRight, List, Map as MapIcon, MapPin, Search, Sparkles } from "lucide-react";
 
-import { PremiumHero } from "@/components/premium/PremiumHero";
-import { TourismAluxPanel, buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { Container } from "@/components/layout/Container";
+import {
+  PremiumAluxBar,
+  PremiumCompactRow,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+  PremiumShowcaseGrid,
+  type PremiumShowcaseItem,
+} from "@/components/home-premium/shared/PremiumShowcase";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +53,26 @@ import {
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((m) => ({ default: m.InteractiveMap })),
 );
+
+/** Medio del destino en el contrato editorial compartido. */
+function destinationMedia(destination: Destination) {
+  return destination.image_url ? { url: destination.image_url, alt: destination.name } : null;
+}
+
+/** Adaptador único destino → tarjeta compartida del Home. */
+function toShowcaseItem(destination: Destination, meta?: string | null): PremiumShowcaseItem {
+  return {
+    key: destination.slug,
+    name: destination.name,
+    note: destination.tagline,
+    media: destinationMedia(destination),
+    to: "/oriente-maya/$destino",
+    params: { destino: destination.slug },
+    kicker: TERRITORY_TYPE_LABELS[classifyTerritoryType(destination)],
+    meta: meta ?? null,
+  };
+}
+
 
 export interface DestinationsAtlasSurfaceProps {
   destinations: readonly Destination[];
