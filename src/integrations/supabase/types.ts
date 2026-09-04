@@ -828,6 +828,7 @@ export type Database = {
           description: string | null
           icon: string | null
           id: string
+          listing_family_key: string | null
           metadata: Json
           name: string
           parent_id: string | null
@@ -845,6 +846,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          listing_family_key?: string | null
           metadata?: Json
           name: string
           parent_id?: string | null
@@ -862,6 +864,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          listing_family_key?: string | null
           metadata?: Json
           name?: string
           parent_id?: string | null
