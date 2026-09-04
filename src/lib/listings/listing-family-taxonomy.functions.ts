@@ -16,6 +16,17 @@ import { isListingFamilyId, type ListingFamilyId } from "./listing-public-contra
 
 export type ListingFamilyTaxonomy = Partial<Record<ListingFamilyId, string[]>>;
 
+/**
+ * Lote 3C · corrección final — `available` distingue "el CMS no declara
+ * membresía" (lista vacía autoritativa) de "no se pudo leer el CMS"
+ * (fallback fail-safe). Un fallback nunca inventa membresía de familia.
+ */
+export interface ListingFamilyTaxonomyResult {
+  readonly available: boolean;
+  readonly taxonomy: ListingFamilyTaxonomy;
+}
+
+
 function publicClient() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
