@@ -20,6 +20,7 @@ import {
   type ListingFamilyId,
   type PublicListingDTO,
 } from "./listing-public-contract";
+import { getListingFamilyTaxonomy } from "./listing-family-taxonomy.functions";
 
 export interface GetPublicListingInput {
   family: ListingFamilyId;
