@@ -135,12 +135,18 @@ export interface ExperiencesListingSurfaceProps {
   dto: PublicListingDTO;
   /** Aviso de superficie de revisión interna (preview noindex). */
   reviewNotice?: string | null;
+  /** Ejes de filtro adicionales leídos de `filterAttributes`. */
+  attributeAxes?: readonly ExperienceAttributeAxis[];
+  /** Etiquetas legibles de los valores de atributo. */
+  attributeValueLabels?: Record<string, string>;
   className?: string;
 }
 
 export function ExperiencesListingSurface({
   dto,
   reviewNotice = null,
+  attributeAxes = [],
+  attributeValueLabels = {},
   className,
 }: ExperiencesListingSurfaceProps) {
   const [query, setQuery] = useState("");
@@ -148,7 +154,10 @@ export function ExperiencesListingSurface({
   const [active, setActive] = useState<Record<string, string | null>>({});
 
   const items = dto.items;
-  const facets = useMemo(() => buildFacets(items), [items]);
+  const facets = useMemo(
+    () => buildFacets(items, attributeAxes, attributeValueLabels),
+    [items, attributeAxes, attributeValueLabels],
+  );
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -162,7 +171,7 @@ export function ExperiencesListingSurface({
       return facets.every((facet) => {
         const selected = active[facet.id];
         if (!selected) return true;
-        return facet.extract(vm) === selected;
+        return facet.values(vm).includes(selected);
       });
     });
   }, [items, facets, active, query]);
