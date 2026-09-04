@@ -238,29 +238,6 @@ export function ExperiencesListingSurface({
         }
       />
 
-      <PremiumAluxBar
-        question="¿Qué quieres vivir en el Oriente Maya?"
-        selectedParty={party}
-        onSelectParty={(value) => {
-          setParty(value);
-          askAlux();
-        }}
-        onContinue={() => askAlux()}
-      />
-
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Intereses sugeridos">
-        {INTENT_PROMPTS.map((prompt) => (
-          <button
-            key={prompt}
-            type="button"
-            onClick={() => askAlux(prompt)}
-            className="min-h-11 rounded-pill border border-border bg-background px-4 text-sm"
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
-
       <ExperienceFiltersBar
         groups={facets.map((facet) => ({
           id: facet.id,
@@ -272,6 +249,8 @@ export function ExperiencesListingSurface({
         onClear={() => setActive({})}
         resultCount={filtered.length}
       />
+
+
 
 
       {filtered.length === 0 ? (
