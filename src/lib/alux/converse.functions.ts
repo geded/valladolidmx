@@ -270,45 +270,47 @@ export const aluxConverse = createServerFn({ method: "POST" })
       }
     }
 
-    let rateLimited = false;
-    try {
-      const { data: rate } = await supabaseAdmin.rpc("alux_public_check_rate", {
-        _ip_hash: ipHash,
-        _hour_limit: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
-        _day_limit: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
-      });
-      const row = Array.isArray(rate) ? rate[0] : rate;
-      rateLimited = Boolean(row && (row as { allowed?: boolean }).allowed === false);
-    } catch {
-      rateLimited = false;
-    }
-
     // ── 2. Cliente público (RLS anon) para recuperación ─────────────────
     const sb = createClient(process.env["SUPABASE_URL"]!, process.env["SUPABASE_PUBLISHABLE_KEY"]!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // ── 3. Sesión (memoria M3 existente) — lectura del resumen previo ───
-    const sessionUpsert = await supabaseAdmin
-      .from("alux_public_sessions")
-      .upsert(
-        {
-          session_key: data.sessionKey,
-          ip_hash: ipHash,
-          user_agent: headers.get("user-agent")?.slice(0, 300) ?? null,
-          last_seen_at: new Date().toISOString(),
-          ...(userId ? { traveler_user_id: userId } : {}),
-        },
-        { onConflict: "session_key" },
-      )
-      .select("id, message_count, summary, last_destination_slug")
-      .maybeSingle();
+    // ── 3. Rate-limit + sesión (memoria M3) + destinos publicados, en paralelo ──
+    const phases: Record<string, number> = {};
+    const tPrep = Date.now();
+    const [rateRes, sessionUpsert, knownProbe] = await Promise.all([
+      supabaseAdmin
+        .rpc("alux_public_check_rate", {
+          _ip_hash: ipHash,
+          _hour_limit: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
+          _day_limit: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
+        })
+        .then((r) => r.data as unknown)
+        .catch(() => null),
+      supabaseAdmin
+        .from("alux_public_sessions")
+        .upsert(
+          {
+            session_key: data.sessionKey,
+            ip_hash: ipHash,
+            user_agent: headers.get("user-agent")?.slice(0, 300) ?? null,
+            last_seen_at: new Date().toISOString(),
+            ...(userId ? { traveler_user_id: userId } : {}),
+          },
+          { onConflict: "session_key" },
+        )
+        .select("id, message_count, summary, last_destination_slug")
+        .maybeSingle(),
+      sb.from("destinations").select("slug").eq("status", "published").is("deleted_at", null).limit(40),
+    ]);
+    const rateRow = Array.isArray(rateRes) ? rateRes[0] : rateRes;
+    const rateLimited = Boolean(rateRow && (rateRow as { allowed?: boolean }).allowed === false);
     const session = (sessionUpsert.data ?? null) as
       | { id: string; message_count: number | null; summary: string | null; last_destination_slug: string | null }
       | null;
+    phases["prep"] = Date.now() - tPrep;
 
     // ── 4. Destino efectivo + intención determinística ──────────────────
-    const knownProbe = await sb.from("destinations").select("slug").eq("status", "published").is("deleted_at", null).limit(40);
     const knownSlugs = ((knownProbe.data ?? []) as Array<{ slug: string }>).map((r) => r.slug);
     const baseIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
     const mentioned = baseIntent.mentionedDestinationSlugs;
@@ -323,11 +325,16 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const intent = intentFromUnderstood(baseIntent, understood);
     const extraDestinationSlugs = mentioned.filter((s) => s !== destinationSlug);
 
-    // ── 5. Recuperación CMS-first ───────────────────────────────────────
+    // ── 5. Recuperación CMS-first (ajustes de Alux se cargan en paralelo) ──
+    const tRetrieval = Date.now();
+    const settingsPromise = import("./settings.functions")
+      .then((m) => m.resolveAluxSettingsServer(supabaseAdmin))
+      .catch(() => null);
     const retrieved = await retrieval.retrieveConverseCandidates(sb, {
       destinationSlug,
       extraDestinationSlugs,
     });
+    phases["retrieval"] = Date.now() - tRetrieval;
 
     // Distancias sólo con consentimiento explícito (coords presentes).
     const candidates: readonly AluxConverseCandidate[] = data.coords
