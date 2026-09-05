@@ -396,9 +396,19 @@ export function buildSeoLandingComposition(input: BuildSeoLandingInput): Composi
     },
   };
 
+  // La imagen social se administra desde la Portada (slot `hero`) y viaja al
+  // `chrome.seo` que consume la vista pública `/p/$slug`.
+  const heroCfg = (input.slots.hero ?? {}) as Record<string, unknown>;
+  const ogImage = typeof heroCfg["ogImageUrl"] === "string" ? heroCfg["ogImageUrl"].trim() : "";
+
   return {
     root: { children },
-    chrome: { seo: { landing: chrome as unknown as Record<string, never> } as never },
+    chrome: {
+      seo: {
+        landing: chrome as unknown as Record<string, never>,
+        ...(ogImage ? { og_image: ogImage } : {}),
+      } as never,
+    },
   };
 }
 

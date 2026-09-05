@@ -30,6 +30,8 @@ export interface SeoLandingHeroVM {
   readonly promise: string | null;
   readonly description: string | null;
   readonly media: SeoLandingMedia | null;
+  /** Portada alternativa para viewport móvil (opcional, administrable). */
+  readonly mobileMedia: SeoLandingMedia | null;
   readonly primary: { label: string; href: string } | null;
   readonly secondaryLabel: string | null;
   readonly saveLabel: string | null;
@@ -88,6 +90,9 @@ export interface SeoLandingTerritoryVM {
   readonly media: SeoLandingMedia | null;
 }
 
+/** Áreas del cuerpo editorial cuyo orden es administrable desde el CMS. */
+export type SeoLandingBodySection = "intro" | "offers" | "info" | "territory";
+
 export interface SeoLandingSurfaceVM {
   readonly hero: SeoLandingHeroVM;
   readonly trust: readonly SeoLandingTrustItem[];
@@ -98,6 +103,8 @@ export interface SeoLandingSurfaceVM {
   readonly territory: SeoLandingTerritoryVM | null;
   readonly gallery: readonly SeoLandingMedia[];
   readonly alux: { heading: string; body: string | null; ctaLabel: string } | null;
+  /** Orden administrable de las áreas del cuerpo editorial. */
+  readonly sections: readonly SeoLandingBodySection[];
 }
 
 type Cfg = Record<string, unknown>;
@@ -199,6 +206,7 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
     promise: str(heroCfg["promise"]),
     description: str(heroCfg["description"]),
     media: media(heroCfg),
+    mobileMedia: media(heroCfg, "mediaMobileUrl", "mediaMobileAlt"),
     primary:
       navigate && str(navigate["href"])
         ? { label: str(navigate["label"]) ?? "Ver ficha completa", href: str(navigate["href"])! }
@@ -337,5 +345,21 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
       }
     : null;
 
-  return { hero, trust, intro, features, offers, info, territory, gallery, alux };
+  // Orden administrable: cada slot puede declarar `order` desde el CMS.
+  const present: { key: SeoLandingBodySection; order: number; on: boolean }[] = [
+    {
+      key: "intro",
+      order: num(introCfg?.["order"]) ?? 1,
+      on: Boolean(intro) || features.length > 0,
+    },
+    { key: "offers", order: num(offersCfg?.["order"]) ?? 2, on: Boolean(offers) },
+    { key: "info", order: num(infoCfg?.["order"]) ?? 3, on: Boolean(info) },
+    { key: "territory", order: num(mapCfg?.["order"]) ?? 4, on: Boolean(territory) },
+  ];
+  const sections = present
+    .filter((s) => s.on)
+    .sort((a, b) => a.order - b.order)
+    .map((s) => s.key);
+
+  return { hero, trust, intro, features, offers, info, territory, gallery, alux, sections };
 }

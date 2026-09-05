@@ -148,7 +148,7 @@ function ColumnHeading({ children, id }: { children: React.ReactNode; id?: strin
 }
 
 export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
-  const { hero, trust, intro, features, offers, info, territory, gallery, alux } = vm;
+  const { hero, trust, intro, features, offers, info, territory, gallery, alux, sections } = vm;
   const featured = offers?.items[0] ?? null;
   const restOffers = offers?.items.slice(1) ?? [];
 
@@ -164,14 +164,20 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
         >
           {hero.media ? (
             <div className="relative order-1 min-w-0 lg:order-2">
-              <img
-                src={hero.media.url}
-                alt={hero.media.alt}
-                loading="eager"
-                fetchPriority="high"
-                style={focalStyle(hero.media)}
-                className="h-56 w-full object-cover sm:h-72 lg:h-full lg:min-h-[24rem]"
-              />
+              <picture>
+                {hero.mobileMedia ? (
+                  <source media="(max-width: 639px)" srcSet={hero.mobileMedia.url} />
+                ) : null}
+                <img
+                  src={hero.media.url}
+                  alt={hero.media.alt}
+                  loading="eager"
+                  fetchPriority="high"
+                  style={focalStyle(hero.mobileMedia ?? hero.media)}
+                  className="h-56 w-full object-cover sm:h-72 lg:h-full lg:min-h-[24rem]"
+                />
+              </picture>
+
               {hero.saveLabel ? (
                 <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-pill bg-background/85 px-3 py-1.5 text-xs font-medium text-foreground shadow-soft backdrop-blur">
                   <Heart className="size-3.5" aria-hidden />
@@ -270,7 +276,11 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
           <div className="grid items-start gap-6 sm:grid-cols-2 sm:gap-x-0 sm:divide-x sm:divide-border lg:grid-cols-[22fr_31fr_20fr_22fr]">
             {/* 3.1 · Por qué es extraordinario */}
             {intro || features.length > 0 ? (
-              <section aria-labelledby="landing-intro" className="min-w-0 sm:px-5 sm:first:pl-0">
+              <section
+                aria-labelledby="landing-intro"
+                style={{ order: sections.indexOf("intro") }}
+                className="min-w-0 sm:px-5 sm:first:pl-0"
+              >
                 <ColumnHeading id="landing-intro">
                   {intro?.heading ?? "Por qué es extraordinario"}
                 </ColumnHeading>
@@ -312,7 +322,11 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
             {/* 3.2 · Experiencias destacadas */}
             {offers ? (
-              <section aria-labelledby="landing-offers" className="min-w-0 sm:px-5">
+              <section
+                aria-labelledby="landing-offers"
+                style={{ order: sections.indexOf("offers") }}
+                className="min-w-0 sm:px-5"
+              >
                 <ColumnHeading id="landing-offers">{offers.heading}</ColumnHeading>
                 <span aria-hidden className="mt-2 block h-px w-10 bg-primary/50" />
                 {featured ? <FeaturedOffer item={featured} /> : null}
@@ -346,7 +360,11 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
             {/* 3.3 · Información para tu visita */}
             {info ? (
-              <section aria-labelledby="landing-info" className="min-w-0 sm:px-5">
+              <section
+                aria-labelledby="landing-info"
+                style={{ order: sections.indexOf("info") }}
+                className="min-w-0 sm:px-5"
+              >
                 <ColumnHeading id="landing-info">{info.heading}</ColumnHeading>
                 <span aria-hidden className="mt-2 block h-px w-10 bg-primary/50" />
                 <dl className="mt-3 divide-y divide-border">
@@ -369,7 +387,11 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
             {/* 3.4 · Contexto territorial */}
             {territory ? (
-              <section aria-labelledby="landing-territory" className="min-w-0 sm:px-5 sm:last:pr-0">
+              <section
+                aria-labelledby="landing-territory"
+                style={{ order: sections.indexOf("territory") }}
+                className="min-w-0 sm:px-5 sm:last:pr-0"
+              >
                 <ColumnHeading id="landing-territory">{territory.heading}</ColumnHeading>
                 <span aria-hidden className="mt-2 block h-px w-10 bg-primary/50" />
                 {territory.media ? (
