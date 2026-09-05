@@ -948,13 +948,13 @@ function MapSection({
             {content.mapa.description}
           </p>
         </div>
-        <div className="rounded-xl bg-muted p-4">
-          <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
-          <p className="mt-1 font-display text-lg">{route?.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {route?.duration} · {route?.stops} paradas
-          </p>
-        </div>
+        {route ? (
+          <div className="rounded-xl bg-muted p-4">
+            <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
+            <p className="mt-1 font-display text-lg">{route.title}</p>
+            <p className="text-xs text-muted-foreground">{describeRoute(route, false)}</p>
+          </div>
+        ) : null}
       </div>
       <div className="max-h-[18rem] overflow-hidden rounded-2xl sm:max-h-[25rem] lg:max-h-none">
         <ExperienceMapBlock
