@@ -118,10 +118,13 @@ export function TourismChipRow({
       aria-label={label}
       data-omxds-chip-row={behavior}
       className={cn(
-        "flex min-w-0 gap-2",
+        "flex min-w-0 gap-1.5",
         behavior === "wrap"
           ? "flex-wrap"
-          : "-mx-1 snap-x snap-mandatory overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0",
+          : // Lote 3G.1 · una sola tira desplazable en móvil, con degradado
+            // discreto al borde derecho que insinúa que hay más opciones.
+            "-mx-1 snap-x snap-mandatory overflow-x-auto px-1 py-0.5 [scrollbar-width:none] [-webkit-mask-image:linear-gradient(to_right,black_86%,transparent)] [mask-image:linear-gradient(to_right,black_86%,transparent)] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[-webkit-mask-image:none] sm:[mask-image:none]",
+
         className,
       )}
     >
