@@ -37,8 +37,8 @@ const BASE =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
 const SIZES: Record<TourismChipSize, string> = {
-  // 40 px en escritorio denso; 44 px reales desde tablet hacia abajo.
-  sm: "min-h-11 md:min-h-10",
+  // 44 px reales en móvil y tablet; 40 px sólo en escritorio denso (lg+).
+  sm: "min-h-11 lg:min-h-10",
   md: "min-h-11",
 };
 
