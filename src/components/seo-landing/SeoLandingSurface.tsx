@@ -181,7 +181,6 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   /** Columna que absorbe a Alux: la última del cuerpo editorial. */
   const aluxColumn = sections.length > 0 ? sections[sections.length - 1] : null;
 
-
   return (
     <div className="pb-8">
       {/* ── 1 · Hero dividido premium (42 / 58) ───────────────────── */}
@@ -311,7 +310,6 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
               sections.length === 2 && "lg:grid-cols-[45fr_47fr]",
             )}
           >
-
             {/* 3.1 · Por qué es extraordinario */}
             {intro || features.length > 0 ? (
               <section
@@ -498,7 +496,6 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
       {/* ── 4 · Banda Alux (sólo si no hay cuerpo editorial que la absorba) ── */}
       {alux && !aluxColumn ? (
-
         <div className={cn(SHELL, "mt-6 sm:mt-8")}>
           <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 sm:flex-row sm:items-center sm:gap-5 sm:px-6">
             <AluxMark
