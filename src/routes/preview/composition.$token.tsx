@@ -16,6 +16,7 @@ import { CompositionRenderer } from "@/lib/experience-builder/composition-render
 import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
 import { buildDemoContext } from "@/lib/experience-builder/dynamic-variables";
 import { buildPublicHead } from "@/lib/discovery/seo";
+import { PublicShell } from "@/components/discovery";
 
 export const Route = createFileRoute("/preview/composition/$token")({
   head: ({ params }) =>
@@ -87,7 +88,14 @@ function PreviewCompositionView() {
     );
   }
 
-  const rendered = <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />;
+  /* 3I.1 · Paridad pública: la vista previa usa el mismo `PublicShell` que
+     `/p/$slug`, de modo que header, navegación territorial, tipografía y
+     espaciado sean idénticos a la superficie publicada. */
+  const rendered = (
+    <PublicShell>
+      <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />
+    </PublicShell>
+  );
   return (
     <div className="min-h-screen">
       <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
