@@ -141,10 +141,10 @@ async function loadEntity(
   if (!data) throw new Error("seo_landing_entity_not_found");
   const dest = data.destination_id
     ? await supabase
-            .from("destinations")
-            .select("slug, name")
-            .eq("id", data.destination_id)
-            .maybeSingle()
+        .from("destinations")
+        .select("slug, name")
+        .eq("id", data.destination_id)
+        .maybeSingle()
     : { data: null };
   return {
     id: data.id,
@@ -191,7 +191,8 @@ async function loadEntityMedia(
   entityType: SeoLandingEntityType,
   entity: EntitySnapshot,
 ): Promise<RealMediaItem[]> {
-  const select = "role, sort_order, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
+  const select =
+    "role, sort_order, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
   const query =
     entityType === "business"
       ? supabase.from("business_media").select(select).eq("business_id", entity.id)
@@ -264,8 +265,6 @@ async function buildRealSlots(
       heading: "Galería",
       items: gallery.map((m) => ({ url: m.url, alt: m.alt })),
     };
-
-
 
   const canonical = canonicalEntityUrl(entityType, entity);
   if (canonical) {
