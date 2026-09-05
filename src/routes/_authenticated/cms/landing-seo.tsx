@@ -27,10 +27,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/cms/landing-seo")({
   head: () => ({
-    meta: [
-      { title: "Landing SEO · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Landing SEO · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: LandingSeoPage,
 });
@@ -90,7 +87,7 @@ function LandingSeoPage() {
     onError: () => toast.error("No fue posible crear la Landing SEO."),
   });
 
-  const rows = list.data?.rows ?? [];
+  const rows = useMemo(() => list.data?.rows ?? [], [list.data]);
   const destinations = useMemo(
     () => [...new Set(rows.map((r) => r.destinationSlug).filter(Boolean))] as string[],
     [rows],
