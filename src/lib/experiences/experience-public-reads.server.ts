@@ -209,7 +209,7 @@ export async function listExperiencesListing(
     ? [...deps.statuses]
     : ["published"];
 
-  const [productsRes, definitions] = await Promise.all([
+  const [productsRes, definitions, destinationRes] = await Promise.all([
     client
       .from("products")
       .select(
@@ -220,8 +220,22 @@ export async function listExperiencesListing(
       .is("deleted_at", null)
       .order("name", { ascending: true }),
     loadExperienceAttributeCatalog(client),
+    // Nombre real del destino filtrado (CMS), incluso cuando el listado está
+    // vacío: nunca se muestra el slug crudo como si fuera el nombre.
+    destino
+      ? client
+          .from("destinations")
+          .select("slug, name")
+          .eq("slug", destino)
+          .is("deleted_at", null)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
   ]);
   if (productsRes.error) throw new Error(`experiences_listing_failed:${productsRes.error.message}`);
+  const destinationName =
+    destinationRes && !destinationRes.error && destinationRes.data
+      ? String((destinationRes.data as Row).name)
+      : null;
 
   const products = (productsRes.data ?? []) as Row[];
   const valueLabels = catalogValueLabels(definitions);
