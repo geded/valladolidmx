@@ -108,7 +108,6 @@ export function toEditorialParagraphs(body: string | null): SeoLandingEditorialB
     .filter((block) => block.text.length > 0);
 }
 
-
 function slotIdOf(node: CompositionNode): string {
   const parts = node.id.split("-");
   return parts[parts.length - 1] ?? "";

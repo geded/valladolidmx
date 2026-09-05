@@ -214,7 +214,6 @@ export function CompositionRenderer({
   );
 }
 
-
 interface RenderNodeProps {
   node: CompositionNode;
   studio: boolean;

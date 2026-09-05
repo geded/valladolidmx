@@ -447,7 +447,6 @@ async function buildRealSlots(
       items: gallery.map((m) => ({ url: m.url, alt: m.alt })),
     };
 
-
   const canonical = canonicalEntityUrl(entityType, entity);
   if (canonical) {
     /* `add-to-trip` exige referencia canónica de entidad (fail-closed del
