@@ -247,7 +247,6 @@ export function PremiumShowcaseGrid({
         <article className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
           <EditorialMediaFrame
             media={featured.media}
-            label={featured.name}
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div
