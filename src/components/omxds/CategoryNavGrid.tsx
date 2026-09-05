@@ -5,13 +5,17 @@
  * en las superficies adoptadas (S1, S2, S3, S8, S9). Ninguna plantilla
  * define su propio grid de categorías.
  *
- * Responsive gobernado:
- *  - móvil  : 2 columnas
- *  - tablet : 4 columnas
+ * Responsive gobernado (Lote 3G · sistema compacto):
+ *  - móvil  : rail horizontal con snap (evita la columna vertical pesada
+ *             y los "huérfanos" de la última fila). `mobileLayout="grid"`
+ *             conserva la rejilla de 2 columnas donde se necesite.
+ *  - tablet : 3 columnas (sm) → 4 columnas (md), simétricas
  *  - escritorio: la plantilla puede pasar `desktopColumnsClassName`
+ *  - alturas compactas: tarjeta de 1 línea de icono + hasta 2 de etiqueta
  *  - touch target mínimo 44×44 px · etiquetas máximo dos líneas
  *  - cero overflow horizontal (min-w-0 + truncado a 2 líneas)
  */
+
 import type { ReactNode } from "react";
 import { isRegisteredCategory } from "@/lib/omxds/category-icon-registry";
 import { TourismCategoryIcon } from "./TourismCategoryIcon";
