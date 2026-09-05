@@ -294,10 +294,21 @@ const clampStrOrNull = (max: number) =>
   z
     .preprocess((v) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null), z.string().max(max).nullable())
     .catch(null);
+/**
+ * Recorta un arreglo elemento a elemento: los items inválidos se descartan
+ * individualmente y NUNCA invalidan el arreglo completo.
+ */
 const clampArr = <T extends z.ZodTypeAny>(item: T, max: number) =>
   z
-    .preprocess((v) => (Array.isArray(v) ? v.slice(0, max) : []), z.array(item).max(max))
+    .preprocess(
+      (v) =>
+        Array.isArray(v)
+          ? v.map((entry) => item.safeParse(entry)).filter((r) => r.success).map((r) => r.data).slice(0, max)
+          : [],
+      z.array(item).max(max),
+    )
     .catch([] as z.infer<T>[]);
+
 const numOrNull = (min: number, max: number, int = false) =>
   z
     .preprocess(
@@ -443,8 +454,11 @@ const INJECTION_PATTERNS: readonly RegExp[] = [
 /** Marca si un texto (usuario o CMS) contiene un intento de alterar instrucciones. */
 export function detectInjectionAttempt(text: string): boolean {
   if (!text) return false;
-  return INJECTION_PATTERNS.some((re) => re.test(text));
+  // Se evalúa el texto original y su forma sin acentos: "agrégalo" ≡ "agregalo".
+  const folded = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return INJECTION_PATTERNS.some((re) => re.test(text) || re.test(folded));
 }
+
 
 /**
  * Sanea texto proveniente del CMS antes de exponerlo al modelo:
