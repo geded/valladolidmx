@@ -387,7 +387,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               setStatus("idle");
               setLiveNote("Conversación reiniciada.");
             }}
-            className="ml-auto inline-flex min-h-8 items-center gap-1 rounded-full px-2 text-[10px] font-medium normal-case tracking-normal text-muted-foreground hover:text-foreground"
+            className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-full px-2 text-[10px] font-medium normal-case tracking-normal text-muted-foreground hover:text-foreground"
           >
             <RotateCcw className="size-3" aria-hidden />
             Nueva conversación
@@ -470,7 +470,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                 setStatus("idle");
                 void send(lastFailed.content);
               }}
-              className="ml-auto inline-flex min-h-9 items-center gap-1 rounded-full border border-border bg-background px-3 text-[12px] font-medium hover:bg-muted"
+              className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-background px-3 text-[12px] font-medium hover:bg-muted"
             >
               <RotateCcw className="size-3" aria-hidden />
               Reintentar
@@ -487,7 +487,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               key={s}
               type="button"
               onClick={() => void send(s)}
-              className="inline-flex min-h-9 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+              className="inline-flex min-h-11 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
             >
               {s}
             </button>
@@ -614,7 +614,7 @@ function AssistantTurn({
                 key={q}
                 type="button"
                 onClick={() => onAsk(q)}
-                className="inline-flex min-h-9 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-left text-[12px] font-medium text-primary hover:bg-primary/10"
+                className="inline-flex min-h-11 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-left text-[12px] font-medium text-primary hover:bg-primary/10"
               >
                 {q}
               </button>
@@ -679,7 +679,7 @@ function AssistantTurn({
                 type="button"
                 disabled={applyingOrder}
                 onClick={() => onApplyOrder(res.reorderProposal!.orderedKeys)}
-                className="mt-2 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary bg-primary/10 px-3 text-[12px] font-medium text-primary hover:bg-primary/15 disabled:opacity-60"
+                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary/10 px-3 text-[12px] font-medium text-primary hover:bg-primary/15 disabled:opacity-60"
               >
                 {applyingOrder ? (
                   <Loader2 className="size-3.5 animate-spin" aria-hidden />
@@ -797,7 +797,7 @@ function RecommendationCard({
             subtitle={rec.subtitle ?? rec.destinationLabel ?? null}
             imageUrl={rec.imageUrl}
             eligibilityMode="legacy"
-            className="min-h-9"
+            className="min-h-11"
           />
         ) : null}
         {canRemove ? (
@@ -810,7 +810,7 @@ function RecommendationCard({
                   onRemove(rec);
                   setConfirmRemove(false);
                 }}
-                className="inline-flex min-h-9 items-center gap-1 rounded-full border border-destructive/40 bg-destructive/5 px-3 text-[12px] font-medium text-destructive hover:bg-destructive/10 disabled:opacity-60"
+                className="inline-flex min-h-11 items-center gap-1 rounded-full border border-destructive/40 bg-destructive/5 px-3 text-[12px] font-medium text-destructive hover:bg-destructive/10 disabled:opacity-60"
               >
                 {removing ? (
                   <Loader2 className="size-3.5 animate-spin" aria-hidden />
@@ -822,7 +822,7 @@ function RecommendationCard({
               <button
                 type="button"
                 onClick={() => setConfirmRemove(false)}
-                className="inline-flex min-h-9 items-center rounded-full border border-border px-3 text-[12px] font-medium text-foreground hover:bg-muted"
+                className="inline-flex min-h-11 items-center rounded-full border border-border px-3 text-[12px] font-medium text-foreground hover:bg-muted"
               >
                 Cancelar
               </button>
@@ -831,7 +831,7 @@ function RecommendationCard({
             <button
               type="button"
               onClick={() => setConfirmRemove(true)}
-              className="inline-flex min-h-9 items-center gap-1 rounded-full border border-border px-3 text-[12px] font-medium text-foreground hover:bg-muted"
+              className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-3 text-[12px] font-medium text-foreground hover:bg-muted"
             >
               <Trash2 className="size-3.5" aria-hidden />
               Quitar de Mi Viaje
