@@ -292,7 +292,6 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
   );
 }
 
-
 function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
   useHeroAutoplay(content.hero.slides.length, setIndex);
@@ -334,7 +333,6 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
 }
 
 const SectionHead = PremiumSectionHead;
-
 
 function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
@@ -385,7 +383,6 @@ function AluxPlanner({
   };
   return (
     <PremiumAluxBar
-
       question="¿Cómo viajas hoy?"
       selectedParty={selectedParty}
       onSelectParty={onSelectParty}
@@ -393,7 +390,6 @@ function AluxPlanner({
     />
   );
 }
-
 
 function RoutesSection({
   content,
@@ -904,6 +900,25 @@ function EditorialSection({
   );
 }
 
+/**
+ * Lote 3L · Resumen de ruta sólo con los datos realmente presentes en el CMS
+ * (título · duración · N paradas). Devuelve "" cuando no hay ruta o ningún
+ * dato confirmado, para que ninguna superficie imprima "undefined".
+ */
+function describeRoute(
+  route: HomePremiumContent["rutas"]["items"][number] | undefined,
+  withTitle = true,
+): string {
+  if (!route) return "";
+  const parts: string[] = [];
+  if (withTitle && route.title?.trim()) parts.push(route.title.trim());
+  if (route.duration?.trim()) parts.push(route.duration.trim());
+  if (Number.isFinite(route.stops) && route.stops > 0) {
+    parts.push(`${route.stops} ${route.stops === 1 ? "parada" : "paradas"}`);
+  }
+  return parts.join(" · ");
+}
+
 function MapSection({
   content,
   selectedRoute,
@@ -948,13 +963,13 @@ function MapSection({
             {content.mapa.description}
           </p>
         </div>
-        <div className="rounded-xl bg-muted p-4">
-          <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
-          <p className="mt-1 font-display text-lg">{route?.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {route?.duration} · {route?.stops} paradas
-          </p>
-        </div>
+        {route ? (
+          <div className="rounded-xl bg-muted p-4">
+            <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
+            <p className="mt-1 font-display text-lg">{route.title}</p>
+            <p className="text-xs text-muted-foreground">{describeRoute(route, false)}</p>
+          </div>
+        ) : null}
       </div>
       <div className="max-h-[18rem] overflow-hidden rounded-2xl sm:max-h-[25rem] lg:max-h-none">
         <ExperienceMapBlock
@@ -983,12 +998,17 @@ function TravelPlanClose({
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
   // Lote 3G.2 · Mi Viaje pasa a ayuda contextual secundaria mediante la
   // autoridad compartida TravelPlanBand (sólo presentación).
+  // Lote 3L · sin rutas publicadas en el CMS `route` es undefined: se omite el
+  // prefijo en vez de imprimir "undefined · undefined · undefined paradas".
+  const routeSummary = describeRoute(route);
+  const aluxNote =
+    "Alux puede ajustar el orden según tus intereses sin crear otro modelo de itinerario.";
   return (
     <TravelPlanBand
       titleId="home-travel-plan"
       eyebrow={content.travelPlan.eyebrow}
       title={content.travelPlan.title}
-      summary={`${route?.title} · ${route?.duration} · ${route?.stops} paradas. Alux puede ajustar el orden según tus intereses sin crear otro modelo de itinerario.`}
+      summary={routeSummary ? `${routeSummary}. ${aluxNote}` : aluxNote}
       primary={{
         label: added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel,
         onClick: onAdd,

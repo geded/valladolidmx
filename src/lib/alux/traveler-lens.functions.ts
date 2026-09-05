@@ -356,15 +356,16 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
       shared_notes: [],
     };
     try {
-      const rpc = (
-        context.supabase as unknown as {
-          rpc: (
-            name: string,
-            args: Record<string, unknown>,
-          ) => Promise<{ data: unknown; error: unknown }>;
-        }
-      ).rpc;
-      const { data: cRaw } = await rpc("alux_get_concierge_context_for_user", {
+      // Lote 3L: la llamada debe conservar `this` del cliente; desanclar `.rpc`
+      // lanzaba "Cannot read properties of undefined (reading 'rest')" y el
+      // catch silencioso dejaba siempre vacío el contexto concierge.
+      const rpcClient = context.supabase as unknown as {
+        rpc: (
+          name: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: unknown }>;
+      };
+      const { data: cRaw } = await rpcClient.rpc("alux_get_concierge_context_for_user", {
         _user_id: context.userId,
       });
       if (cRaw && typeof cRaw === "object") {
