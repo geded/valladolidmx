@@ -19,12 +19,14 @@
 - [x] Lote 3A · Remediación P0 de RLS: `businesses_perm_write`/`products_perm_write`/`promotions_perm_write` restringidas a personal interno + disparadores `enforce_reserved_business_fields`/`enforce_reserved_product_fields` (publicación, verificación, `published_at`, `can_self_publish`, `visibility_level` reservados). 22/22 PASS con cuenta temporal eliminada; typecheck, build y 756/756. Informe: `docs/governance/audit/2026-09-04-LOTE-3A-REMEDIACION-P0-RLS-v1.0.md`. Lote 3B NO iniciado.
 
 ## Lote 3C · Cierre definitivo (2026-09-04)
+
 - [x] /arma-tu-viaje: fallback seguro a TripPlannerSurface cuando la composición publicada no tiene bloques.
 - [x] Alux: contexto canónico también en /rutas, /rutas/$slug y /casas-de-vacaciones.
 - [ ] Pruebas autenticadas de roles business_owner y concierge con cuentas temporales (crear, probar, eliminar).
 - [ ] Validación final: typecheck, build, pruebas, RLS, QA responsive 1440/834/430/390 e informe con matriz.
 
 ## Lote 3E · Confianza de datos públicos y Experiencias CMS-first (2026-09-05)
+
 - [x] 3E.1 Home/superficies públicas sin `@/mocks/*` (Categorías, Empresas, Reseñas, Rutas, buscador del Hero, registro de vistas previas del Constructor) → lecturas CMS + estados vacíos honestos.
 - [x] 3E.2 Experiencias fuente única `products` (`product_type=experiencia`): lector público sin service role, sólo publicados; revisión interna autenticada para `in_review`; `experience-demo-dataset.ts` fuera de toda lectura pública.
 - [x] 3E.3 Migración aditiva/reversible: eje `tipo_experiencia` en `tourism_attribute_definitions/_options` (familia `experiencias`); relocalizar `metadata.category_label` de registros DEMO.
@@ -41,6 +43,7 @@
 - [x] Lote 3M-A.2 · Simulación controlada y verificación **exclusivamente en vista previa**: módulo `cron-dry-run.server.ts` (cabecera `x-cron-dry-run` evaluada sólo tras autorizar; guardián de sólo lectura que bloquea escrituras, `enqueue_email` y toda RPC fuera de las 4 funciones `STABLE` de selección; respuesta sólo con contadores y `dry_run:true`), 27 pruebas nuevas (`scripts/cron/cron-dry-run.test.ts`, 71/71 en `scripts/cron/`), prueba manual de los tres ganchos contra vista previa (secreto+dry-run → 200 `dry_run:true` con cero envíos; clave pública / secreto incorrecto / sin credencial → 401) y comparación antes/después sin una sola mutación. Typecheck · suite **896/896** · build · Route Inventory 247 · escaneo de secretos limpio. **Producción sin modificar** (sigue aceptando `apikey`, transición intacta) y **jobs 84/86/89 intactos**, sin ejecución manual. Informe `docs/governance/audit/2026-09-05-LOTE-3M-A2-SIMULACION-CONTROLADA-EN-PREVIEW-v1.0.md`.
 - [ ] Lote 3M-A · Parte 3 (tras publicar): quitar la cabecera heredada (`cron_hooks_invoke(..., false)`) y confirmar 200 en los tres jobs.
 - [ ] Job 86 (`visibility-notifications-daily`) · **todavía no observado en vivo**: próximo tic 2026-09-06 13:15 UTC; criterio = `job_run_details` `succeeded` + `net._http_response` 200 `{"ok":true,…}` con cero envíos.
-- [ ] Deuda de formato preexistente y ajena a los cron hooks en `src/routes/lovable/*`, `src/routes/rutas*`, `src/routes/restaurantes.tsx`, `src/routes/oriente-maya/$destino.index.tsx` (lint gate en FAIL desde antes del lote).
+- [x] Lote 3M-B · Remediación mecánica del lint gate en el alcance autorizado (`src/routes/lovable/*`, `src/routes/rutas*`, `src/routes/restaurantes.tsx`, `src/routes/oriente-maya/$destino.index.tsx`): 76 errores `prettier/prettier` → 0 mediante autofix limitado a 8 archivos exactos; `git diff -w` vacío y comparativa DOM antes/después idéntica en 8 rutas (status, texto, enlaces, `h1`, overflow). Typecheck · suite 896/896 · build · Route Inventory 247 · smoke 1440/834/430/390 · escaneo de secretos limpio. Informe `docs/governance/audit/2026-09-06-LOTE-3M-B-LINT-GATE-REMEDIATION-v1.0.md`.
+- [ ] `bun run lint` completo **sigue en FAIL**: 51 buckets de deuda preexistente **fuera del alcance autorizado** (49 archivos; 464 errores / 75 avisos). 47 son `prettier/prettier` mecánicos; 4 exigen decisión semántica (`no-explicit-any` y `<parser>` en `src/lib/routes-editorial/route-public-reads.server.ts`; `react-refresh/only-export-components` en `TourismAluxPanel.tsx`, `CompactCrumbs.tsx`, `brand-context.tsx`). Requiere autorización del Founder para un lote 3M-B.2.
 - [ ] Carril B · siguiente candidato: migrar `eb-process-scheduled-publish` (job 54, falla 401 desde antes) al mismo `handleCronHook` + `cron_hooks_invoke`.
 - Lote 3H o siguiente: a la espera de autorización del Founder.

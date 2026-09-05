@@ -86,7 +86,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       name: db?.name ?? params.destino,
       tagline: db?.tagline ?? "",
       hero_palette: (db?.hero_palette ?? "territorio") as
-        "territorio" | "selva" | "cenote" | "atardecer",
+        | "territorio"
+        | "selva"
+        | "cenote"
+        | "atardecer",
       highlights: (db?.highlights ?? []) as string[],
     };
     const premiumEnabled = premiumEligibility?.eligible === true;

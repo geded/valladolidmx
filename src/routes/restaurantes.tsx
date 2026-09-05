@@ -11,7 +11,6 @@ import {
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
-
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).
  * `canonical` siempre `/restaurantes` (SEO intacto).
@@ -58,13 +57,11 @@ export const Route = createFileRoute("/restaurantes")({
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps, context }) => {
     // Lote 3B — Nombres de destino reales disponibles en SSR.
-    await context.queryClient
-      .ensureQueryData(publishedDestinationsQueryOptions)
-      .catch(() => []);
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
     return {
-    dto: await getPublicListing({
-      data: { family: "restaurantes", destino: deps.destino ?? null },
-    }),
+      dto: await getPublicListing({
+        data: { family: "restaurantes", destino: deps.destino ?? null },
+      }),
     };
   },
   head: () =>
@@ -86,7 +83,12 @@ function RestaurantesRoute() {
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
   return (
-    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs compactCrumbsOnMobile>
+    <PublicShell
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs
+      compactCrumbsOnMobile
+    >
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
