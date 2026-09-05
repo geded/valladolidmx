@@ -564,48 +564,12 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
   };
 }
 
-function TerritorialBreadcrumb({
-  profile,
-  destinationLabel = "Valladolid",
-  destinationSlug = "valladolid",
-  omitDestination = false,
-}: {
-  profile: ListingProfile;
-  /** Destino real del listado contextual; por defecto conserva Valladolid. */
-  destinationLabel?: string;
-  destinationSlug?: string;
-  /** Listados regionales sin destino fijo omiten el nivel de destino. */
-  omitDestination?: boolean;
-}) {
-  return (
-    <nav
-      aria-label="Ubicación territorial"
-      className="flex min-h-12 items-center gap-2 overflow-x-auto whitespace-nowrap py-3 text-xs text-[#6a726c]"
-    >
-      <a
-        href="/"
-        aria-label="Inicio"
-        className="grid size-8 shrink-0 place-items-center rounded-full border border-[#ded7c9] bg-white"
-      >
-        <Home className="size-3.5" aria-hidden />
-      </a>
-      <ChevronRight className="size-3 shrink-0" aria-hidden />
-      <a href="/oriente-maya" className="hover:text-[#0d4b38]">
-        Oriente Maya
-      </a>
-      {!omitDestination ? (
-        <>
-          <ChevronRight className="size-3 shrink-0" aria-hidden />
-          <a href={`/oriente-maya/${destinationSlug}`} className="hover:text-[#0d4b38]">
-            {destinationLabel}
-          </a>
-        </>
-      ) : null}
-      <ChevronRight className="size-3 shrink-0" aria-hidden />
-      <span className="font-semibold text-[#17251f]">{profile.breadcrumb}</span>
-    </nav>
-  );
-}
+/**
+ * 3H · El rastro territorial es responsabilidad única de
+ * `BreadcrumbTerritorial` en `PublicShell` (compacto, contextual y con
+ * tokens del sistema). Esta superficie ya no renderiza uno paralelo.
+ */
+
 
 function ListingIntro({ profile }: { profile: ListingProfile }) {
   const Icon =
