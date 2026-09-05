@@ -138,36 +138,39 @@ export function PremiumAluxBar({
       ref={ref}
       aria-labelledby="alux-title"
       data-alux-embedded="bar"
-      className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
+      className="overflow-hidden rounded-2xl border border-selva/25 bg-selva/[0.06] text-foreground shadow-none"
     >
-      {/* Lote 3G · módulo compacto: menos altura y menos peso visual,
-          misma presencia de marca. Los chips nunca se recortan. */}
-      <div className="grid min-w-0 items-center gap-3 px-4 py-3.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-5 lg:px-5 lg:py-4">
-        <div className="flex min-w-0 items-center gap-2.5 lg:border-r lg:border-white/20 lg:pr-5">
+      {/* Lote 3G.1 · ayuda contextual secundaria: superficie clara con acento
+          de marca, una sola banda en escritorio y tarjeta breve en móvil.
+          Alux no compite con el territorio ni con las imágenes. */}
+      <div className="grid min-w-0 items-center gap-2.5 border-l-2 border-selva/70 px-3.5 py-3 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4 lg:px-4 lg:py-2.5">
+        <div className="flex min-w-0 items-center gap-2 lg:pr-3">
           <img
             src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
             alt={brand.conciergeName}
-            className="size-10 shrink-0 object-contain lg:size-12"
+            className="size-7 shrink-0 object-contain lg:size-8"
           />
           <div className="min-w-0">
-            <h2 id="alux-title" className="truncate font-display text-base lg:text-lg">
+            <h2 id="alux-title" className="truncate font-display text-sm leading-tight text-selva">
               {brand.conciergeName}
             </h2>
-            <p className="text-[11px] text-white/70">Tu concierge IA</p>
+            <p className="text-[10.5px] leading-tight text-muted-foreground">Concierge IA</p>
           </div>
         </div>
         <div className="min-w-0">
-          <p className="font-display text-[15px] leading-snug lg:text-lg">{question}</p>
+          <p className="line-clamp-1 max-w-2xl text-[13px] font-medium leading-snug text-foreground">
+            {question}
+          </p>
           <TourismChipRow
             label="Composición del viaje"
-            behavior="wrap"
-            className="mt-2.5 gap-2"
+            behavior="rail"
+            className="mt-1.5 lg:mt-1"
           >
             {PARTY_OPTIONS.map((option) => (
               <TourismChip
                 key={option.value}
-                scheme="onDark"
-                size="sm"
+                scheme="surface"
+                size="xs"
                 selected={selectedParty === option.value}
                 onClick={() => onSelectParty(option.value)}
               >
@@ -179,16 +182,18 @@ export function PremiumAluxBar({
         <Button
           type="button"
           onClick={onContinue}
-          variant="secondary"
-          className="min-h-11 w-full shrink-0 justify-center gap-2 self-center rounded-pill px-5 lg:w-auto"
+          variant="outline"
+          size="sm"
+          className="relative h-9 w-auto shrink-0 justify-self-start gap-1.5 self-center rounded-pill border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva hover:bg-selva/10 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
         >
-          <Compass className="size-4" aria-hidden />
+          <Compass className="size-3.5" aria-hidden />
           {resolvedContinueLabel}
         </Button>
       </div>
     </section>
   );
 }
+
 
 
 /* ------------------------------------------------------------------ *
