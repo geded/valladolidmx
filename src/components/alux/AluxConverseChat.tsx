@@ -762,7 +762,6 @@ function RecommendationCard({
       <a
         href={rec.href}
         className="mt-1 inline-flex min-h-11 items-center gap-1 py-1 text-sm font-semibold text-foreground hover:underline"
-
       >
         {rec.title}
         <ArrowRight className="size-3.5" aria-hidden />
