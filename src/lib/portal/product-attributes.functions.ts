@@ -137,18 +137,10 @@ export const updateProductAttributes = createServerFn({ method: "POST" })
     const editor = await readEditorDTO(supabase, product);
     if (!editor.editable) throw new Error("attributes_not_supported_for_product_type");
 
-    const cleaned: TourismFilterAttributes = {};
+    // Sólo valores del catálogo, con la forma de cada eje; lo no confirmado
+    // se omite (nunca se completa).
+    const cleaned = coerceAttributesToDefinitions(data.values, editor.definitions);
     for (const definition of editor.definitions) {
-      const raw = data.values[definition.key];
-      const allowed = new Set(definition.options.map((option) => option.value));
-      if (definition.inputType === "single") {
-        if (typeof raw === "string" && allowed.has(raw)) cleaned[definition.key] = raw;
-      } else {
-        const values = Array.isArray(raw)
-          ? Array.from(new Set(raw.filter((value) => allowed.has(value))))
-          : [];
-        if (values.length) cleaned[definition.key] = values;
-      }
       if (definition.required && !(definition.key in cleaned))
         throw new Error(`required_attribute:${definition.key}`);
     }
