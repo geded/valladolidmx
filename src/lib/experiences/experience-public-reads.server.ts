@@ -289,8 +289,13 @@ export async function listExperiencesListing(
     .filter((item) => !destino || item.destinationSlug === destino);
 
   const destinationLabel = destino
-    ? ((items[0] as { territorialContext: string | null } | undefined)?.territorialContext ??
-      destino.replace(/-/g, " "))
+    ? (destinationName ??
+      (items[0] as { territorialContext: string | null } | undefined)?.territorialContext ??
+      destino
+        .split("-")
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" "))
     : null;
 
   const dto: PublicListingDTO = {
