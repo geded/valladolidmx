@@ -191,7 +191,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
               {hero.title}
             </h1>
             {hero.typeLine ? (
-              <p className="font-serif text-lg leading-snug text-accent-foreground sm:text-xl">
+              <p className="font-serif text-lg leading-snug text-foreground/70 sm:text-xl">
                 {hero.typeLine}
               </p>
             ) : null}
