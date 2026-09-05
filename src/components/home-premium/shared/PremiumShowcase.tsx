@@ -226,9 +226,10 @@ export function PremiumShowcaseGrid({
             onClick={() => onOpen?.(item.key)}
             className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
           >
+            {/* Tarjeta con título superpuesto: el marcador neutral F1L no
+                repite el nombre para evitar el doble rótulo sin fotografía. */}
             <EditorialMediaFrame
               media={item.media}
-              label={item.name}
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
