@@ -74,11 +74,11 @@ Ruta TanStack (12 líneas)  →  handleCronHook(request, runJob)
 | h | Anónimo no puede invocar las funciones nuevas por Data API | **PASS** | `cron_hooks_get_secret`, `cron_hooks_bootstrap_secret`, `cron_hooks_invoke` → HTTP 401 `42501 permission denied` |
 | i | `cron_hooks_invoke` lee Vault y emite la petición | **PASS** | Sondeo con ruta inexistente `/api/public/hooks/l3ma-probe` → request 2960 → `404` del sitio publicado (ningún job ejecutado) |
 | j | Jobs reapuntados conservando `jobid`, horario, base y usuario | **PASS** | `cron.job`: 84 `17 * * * *`, 86 `15 13 * * *`, 89 `15 * * * *`, comando `SELECT public.cron_hooks_invoke('/api/public/hooks/<job>', true);` |
-| k | Primer tic real tras el reapunte responde como antes (200) | Ver §6 | `net._http_response` tras 16:15 / 16:17 UTC |
+| k | Primer tic real tras el reapunte responde como antes (200) | **PASS** (89 y 84) · **NO VERIFICADO** (86, diario 13:15 UTC; mismo invocador) | §9 |
 | l | El paquete del navegador no contiene `CRON_HOOKS_SECRET`, `x-cron-secret`, `cron_hooks_invoke`, `handleCronHook` ni `SUPABASE_SERVICE_ROLE_KEY` | **PASS** | `rg` sobre `dist/client` → 0 coincidencias |
 | m | Ningún archivo del cambio ni migración contiene un valor de 64 caracteres | **PASS** | Escaneo del diff y de las dos migraciones → 0 |
 | n | Typecheck · ESLint · Suite · Build · Route Inventory | **PASS** | `tsgo` limpio · ESLint limpio tras `--fix` · **869/869** (825 + 44 nuevas) · `bun run build` OK · 247 rutas |
-| o | QA responsive 1440/834/430/390 | Ver §6 | Sin cambios de UI en este lote; smoke de no regresión |
+| o | QA responsive 1440/834/430/390 | **PASS** | Sin cambios de UI en este lote. Smoke de no regresión en `/` y `/oriente-maya/valladolid`: desbordamiento horizontal 0, un `main` y un `h1` por página en los 4 anchos; único mensaje de consola = restricción de referer de Google Maps en `localhost` (preexistente, documentada en 3F-Preflight). |
 
 ## 5. Rollback (sin secretos)
 
@@ -113,9 +113,18 @@ Las funciones `cron_hooks_*` y el secreto en Vault pueden permanecer (inertes) o
 
 ## 8. Confirmación de rama
 
-- Commits del lote en `integration/lovable-valladolidmx` (auto-confirmados por la plataforma; ver §9 para el HEAD final).
-- Árbol de trabajo limpio al cierre.
+- Trabajo exclusivamente sobre `integration/lovable-valladolidmx`; la plataforma confirma los cambios automáticamente en su rama de edición y los integra en la rama de trabajo (sin ramas manuales, PR ni merge por parte del agente).
+- HEAD al cierre: `2af04cdb841d4b6a8aaa1b5009eb8b0c0be23f93` · árbol de trabajo limpio (0 archivos pendientes) · base de la rama de integración al inicio del lote: `2a372e24fbb759a17b4ab6efeeeae391c43c083b`.
+- Sin publicar, sin desplegar, sin tocar `main`.
 
-## 9. Evidencia en vivo del primer tic y HEAD final
+## 9. Evidencia en vivo del primer tic
 
-_(completado al cierre, ver abajo)_
+Ambos jobs horarios ya dispararon por el nuevo invocador (con la cabecera de transición) contra el despliegue publicado, con el mismo comportamiento que antes del lote (200, cero envíos reales):
+
+| Job | Tic (UTC) | `cron.job_run_details` | `net._http_response` |
+| --- | --- | --- | --- |
+| 89 · `trip-journey-emails-hourly` | 2026-09-05 16:15:00 | `succeeded` | id 2964 · **200** · `{"ok":true,"results":{"t14":{"sent":0,…},"t3":{…},"welcome":{…},"post":{…}}}` |
+| 84 · `coupon-review-reminders-hourly` | 2026-09-05 16:17:00 | `succeeded` | id 2965 · **200** · `{"ok":true,"reminder_1":0,"reminder_2":0,"failed":0,"suppressed":0}` |
+| 86 · `visibility-notifications-daily` | próximo 2026-09-06 13:15:00 | — | NO VERIFICADO en vivo (mismo `cron_hooks_invoke`, misma ruta; cubierto por las pruebas d/j) |
+
+Los `401` que aparecen a `:00/:05/:10/:15` en `net._http_response` corresponden al job 54 (`eb-process-scheduled-publish`), fuera de alcance y con fallo preexistente (§6.4).
