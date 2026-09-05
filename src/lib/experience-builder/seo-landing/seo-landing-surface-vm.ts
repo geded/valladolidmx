@@ -62,7 +62,7 @@ export interface SeoLandingTerritoryVM {
 export interface SeoLandingSurfaceVM {
   readonly hero: SeoLandingHeroVM;
   readonly trust: readonly SeoLandingTrustItem[];
-  readonly intro: { heading: string; paragraphs: readonly string[] } | null;
+  readonly intro: { heading: string; blocks: readonly SeoLandingEditorialBlock[] } | null;
   readonly features: readonly { id: string; label: string }[];
   readonly offers: { heading: string; items: readonly SeoLandingOfferItem[] } | null;
   readonly info: { heading: string; items: readonly SeoLandingInfoItem[] } | null;
@@ -172,7 +172,7 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
     introParagraphs.length > 0
       ? {
           heading: str(introCfg?.["title"]) ?? "Por qué es extraordinario",
-          paragraphs: introParagraphs,
+          blocks: introParagraphs,
         }
       : null;
 

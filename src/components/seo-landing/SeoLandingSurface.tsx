@@ -71,7 +71,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
           "relative isolate flex items-end overflow-hidden",
           hero.media
             ? "min-h-[62vh] sm:min-h-[70vh]"
-            : "min-h-[42vh] bg-[linear-gradient(140deg,var(--color-selva),var(--color-cenote))]",
+            : "min-h-[38vh] bg-[linear-gradient(140deg,var(--color-selva),var(--color-cenote))]",
         )}
       >
         {hero.media ? (
@@ -156,9 +156,18 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                   {intro.heading}
                 </h2>
                 <div className="mt-4 space-y-4 text-pretty text-[15px] leading-7 text-muted-foreground sm:text-base sm:leading-8">
-                  {intro.paragraphs.map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
+                  {intro.blocks.map((block, i) =>
+                    block.kind === "heading" ? (
+                      <h3
+                        key={i}
+                        className="pt-2 font-serif text-lg leading-snug text-foreground sm:text-xl"
+                      >
+                        {block.text}
+                      </h3>
+                    ) : (
+                      <p key={i}>{block.text}</p>
+                    ),
+                  )}
                 </div>
               </section>
             ) : null}
