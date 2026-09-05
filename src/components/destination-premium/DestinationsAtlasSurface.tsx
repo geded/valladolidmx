@@ -26,6 +26,7 @@ import {
 import type { MapRouteStatus } from "@/components/maps/InteractiveMap";
 
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { Container } from "@/components/layout/Container";
 import {
   PremiumAluxBar,
@@ -907,38 +908,14 @@ export function DestinationsAtlasSurface({
 
         {section(
           "final_cta",
-          <section
-            aria-labelledby="atlas-cta"
-            className="overflow-hidden rounded-3xl bg-selva text-selva-foreground"
-          >
-            <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div>
-                <div className="flex items-center gap-2 text-primary">
-                  <Sparkles className="size-5" aria-hidden />
-                  <p className="text-xs font-semibold uppercase">{ACTIVE_BRAND.conciergeName}</p>
-                </div>
-                <h2 id="atlas-cta" className="mt-3 font-display text-3xl sm:text-4xl">
-                  {content.finalCta.title}
-                </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-selva-foreground/80">
-                  {content.finalCta.description}
-                </p>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                <Button
-                  type="button"
-                  size="lg"
-                  className="min-h-12 rounded-pill"
-                  onClick={() => askAlux()}
-                >
-                  <Sparkles className="mr-2 size-4" aria-hidden /> {content.finalCta.primaryLabel}
-                </Button>
-                <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
-                  <Link to="/mi-viaje">{content.finalCta.secondaryLabel}</Link>
-                </Button>
-              </div>
-            </div>
-          </section>,
+          <TravelPlanBand
+            titleId="atlas-cta"
+            eyebrow={ACTIVE_BRAND.conciergeName}
+            title={content.finalCta.title}
+            summary={content.finalCta.description}
+            primary={{ label: content.finalCta.primaryLabel, onClick: () => askAlux() }}
+            secondary={{ label: content.finalCta.secondaryLabel, to: "/mi-viaje" }}
+          />,
         )}
 
       </Container>

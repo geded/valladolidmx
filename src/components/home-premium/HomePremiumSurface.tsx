@@ -38,6 +38,7 @@ import {
   PremiumSectionHead,
   PremiumShowcaseGrid,
 } from "./shared/PremiumShowcase";
+import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
 
 import { openAluxFloating } from "@/lib/alux/floating-bus";
@@ -980,34 +981,20 @@ function TravelPlanClose({
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
+  // Lote 3G.2 · Mi Viaje pasa a ayuda contextual secundaria mediante la
+  // autoridad compartida TravelPlanBand (sólo presentación).
   return (
-    <section className="overflow-hidden rounded-3xl bg-selva text-selva-foreground">
-      <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div>
-          <div className="flex items-center gap-2 text-primary">
-            <Sparkles className="size-5" aria-hidden />
-            <p className="text-xs font-semibold uppercase">{content.travelPlan.eyebrow}</p>
-          </div>
-          <h2 className="mt-3 font-display text-3xl sm:text-4xl">{content.travelPlan.title}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-selva-foreground/80">
-            {route?.title} · {route?.duration} · {route?.stops} paradas. Alux puede ajustar el orden
-            según tus intereses sin crear otro modelo de itinerario.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-          <Button type="button" size="lg" onClick={onAdd} className="min-h-12 rounded-pill">
-            {added ? (
-              <Check className="mr-2 size-4" aria-hidden />
-            ) : (
-              <Compass className="mr-2 size-4" aria-hidden />
-            )}
-            {added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel}
-          </Button>
-          <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
-            <Link to="/alux">{content.travelPlan.ctaAluxLabel}</Link>
-          </Button>
-        </div>
-      </div>
-    </section>
+    <TravelPlanBand
+      titleId="home-travel-plan"
+      eyebrow={content.travelPlan.eyebrow}
+      title={content.travelPlan.title}
+      summary={`${route?.title} · ${route?.duration} · ${route?.stops} paradas. Alux puede ajustar el orden según tus intereses sin crear otro modelo de itinerario.`}
+      primary={{
+        label: added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel,
+        onClick: onAdd,
+        done: added,
+      }}
+      secondary={{ label: content.travelPlan.ctaAluxLabel, to: "/alux" }}
+    />
   );
 }
