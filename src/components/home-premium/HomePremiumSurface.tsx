@@ -38,6 +38,7 @@ import {
   PremiumSectionHead,
   PremiumShowcaseGrid,
 } from "./shared/PremiumShowcase";
+import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
 
 import { openAluxFloating } from "@/lib/alux/floating-bus";
