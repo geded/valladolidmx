@@ -125,3 +125,20 @@ apuntando a la ficha real. Datos demo retenidos conforme a la Demo Pack Policy.
    (requiere autorización para ampliar el CHECK a `archived`).
 2. Revisión del resto de superficies del Experience Builder que escriban por tabla
    en lugar de RPC (heredado de 3I).
+
+## 10. Pasada visual final (post-QA)
+
+- El cuerpo editorial ahora distingue subtítulos (`##`) y los renderiza como
+  encabezados serif jerarquizados; el resto se mantiene como párrafo.
+- Hero sin imagen reducido a `min-h-[38vh]` para evitar bandas vacías (Zazil).
+- Padding inferior de la superficie ajustado (`pb-6`) para eliminar el hueco
+  previo al footer del `PublicShell`.
+- Recaptura completa 12/12 sin desbordes, 1 `<main>`, 1 `<h1>`, 0 imágenes
+  rotas, 0 errores de consola en 1440/834/430/390.
+- Pruebas negativas autenticadas re-ejecutadas contra la RPC endurecida:
+  familia distinta → `seo_metadata_requires_landing`; ID inexistente →
+  `composition not found`; robots inválido → `invalid_robots_directive`;
+  anónimo → `permission denied`; borrador landing legítimo → aceptado.
+  Caso "landing publicada" permanece **NO VERIFICADO en runtime** (no existe
+  ninguna landing publicada y está prohibido publicar); la guarda está presente
+  en el cuerpo de la función.
