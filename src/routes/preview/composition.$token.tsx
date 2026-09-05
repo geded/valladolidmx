@@ -93,7 +93,11 @@ function PreviewCompositionView() {
      espaciado sean idénticos a la superficie publicada. */
   const rendered = (
     <PublicShell>
-      <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />
+      <CompositionRenderer
+        tree={payload.tree}
+        pageType={payload.page_type}
+        variableContext={buildDemoContext()}
+      />
     </PublicShell>
   );
   return (
