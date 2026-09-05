@@ -30,6 +30,8 @@ export interface SeoLandingHeroVM {
   readonly promise: string | null;
   readonly description: string | null;
   readonly media: SeoLandingMedia | null;
+  /** Portada alternativa para viewport móvil (opcional, administrable). */
+  readonly mobileMedia: SeoLandingMedia | null;
   readonly primary: { label: string; href: string } | null;
   readonly secondaryLabel: string | null;
   readonly saveLabel: string | null;
@@ -87,6 +89,9 @@ export interface SeoLandingTerritoryVM {
   readonly href: string | null;
   readonly media: SeoLandingMedia | null;
 }
+
+/** Áreas del cuerpo editorial cuyo orden es administrable desde el CMS. */
+export type SeoLandingBodySection = "intro" | "offers" | "info" | "territory";
 
 export interface SeoLandingSurfaceVM {
   readonly hero: SeoLandingHeroVM;
