@@ -37,6 +37,21 @@ export interface SeoLandingMediaOption {
   readonly url: string;
   readonly alt: string;
   readonly role: string;
+  /** Origen legible: entidad canónica o Biblioteca de Medios. */
+  readonly source: "entidad" | "biblioteca";
+  /** Estado de acreditación mostrado junto a la miniatura. */
+  readonly accreditation: string;
+  /** Activo conceptual temporal (IA / demo): no apto para producción. */
+  readonly demo: boolean;
+  readonly credit: string | null;
+}
+
+/** Metadatos SEO de la landing, administrables desde el CMS. */
+export interface SeoLandingSeoModel {
+  readonly title: string;
+  readonly description: string;
+  readonly canonical: string;
+  readonly robots: string;
 }
 
 export interface SeoLandingEditorModel {
@@ -51,6 +66,8 @@ export interface SeoLandingEditorModel {
   readonly slots: Record<string, SeoLandingSlotJson>;
   /** Medios acreditados de la entidad de origen, seleccionables como hero. */
   readonly mediaOptions: readonly SeoLandingMediaOption[];
+  /** SEO persistido en `page_compositions` (borrador · noindex por defecto). */
+  readonly seo: SeoLandingSeoModel;
 }
 
 function slotIdOf(nodeId: string): string {
@@ -66,16 +83,37 @@ function prefixOf(nodeId: string): string {
 async function loadMediaOptions(supabase: Db, entityRef: string | null) {
   const items: SeoLandingMediaOption[] = [];
   const seen = new Set<string>();
-  const push = (id: string, url: string | null, alt: string, role: string) => {
+  const push = (
+    id: string,
+    url: string | null,
+    alt: string,
+    role: string,
+    source: "entidad" | "biblioteca",
+    demo: boolean,
+    credit: string | null,
+  ) => {
     if (!url || !alt || seen.has(url)) return;
     seen.add(url);
-    items.push({ id, url, alt, role });
+    items.push({
+      id,
+      url,
+      alt,
+      role,
+      source,
+      demo,
+      credit,
+      accreditation: demo
+        ? "Demo IA · uso conceptual temporal"
+        : source === "entidad"
+          ? "Acreditado en la entidad"
+          : "Biblioteca de Medios",
+    });
   };
 
   const [kind, id] = (entityRef ?? "").split(":");
   if (kind && id) {
     const select =
-      "role, sort_order, media_asset_id, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
+      "role, sort_order, media_asset_id, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text, credit, is_demo_seed )";
     const query =
       kind === "business"
         ? supabase.from("business_media").select(select).eq("business_id", id)
@@ -89,12 +127,17 @@ async function loadMediaOptions(supabase: Db, entityRef: string | null) {
           storage_bucket?: string | null;
           storage_path?: string | null;
           alt_text?: string | null;
+          credit?: string | null;
+          is_demo_seed?: boolean | null;
         } | null;
         push(
           String(row.media_asset_id),
           toStablePublicMediaUrl(asset?.storage_bucket, asset?.storage_path),
           (asset?.alt_text ?? "").trim(),
           String(row.role ?? "gallery"),
+          "entidad",
+          asset?.is_demo_seed === true,
+          (asset?.credit ?? "").trim() || null,
         );
       }
     }
@@ -104,7 +147,7 @@ async function loadMediaOptions(supabase: Db, entityRef: string | null) {
   // entidad de origen aún no tenga fotografía asociada, sin tocar su ficha.
   const { data: library } = await supabase
     .from("media_assets")
-    .select("id, storage_bucket, storage_path, alt_text, is_demo_seed")
+    .select("id, storage_bucket, storage_path, alt_text, is_demo_seed, credit, demo_seed_batch")
     .eq("storage_bucket", "studio-media")
     .not("alt_text", "is", null)
     .order("created_at", { ascending: false })
@@ -114,7 +157,10 @@ async function loadMediaOptions(supabase: Db, entityRef: string | null) {
       String(asset.id),
       toStablePublicMediaUrl(asset.storage_bucket, asset.storage_path),
       (asset.alt_text ?? "").trim(),
-      asset.is_demo_seed ? "biblioteca · demo" : "biblioteca",
+      (asset.demo_seed_batch ?? "biblioteca").trim() || "biblioteca",
+      "biblioteca",
+      asset.is_demo_seed === true,
+      (asset.credit ?? "").trim() || null,
     );
   }
 
@@ -128,7 +174,9 @@ export const getSeoLandingEditorModel = createServerFn({ method: "GET" })
     const supabase = context.supabase as Db;
     const { data: row, error } = await supabase
       .from("page_compositions")
-      .select("id, slug, title, status, published_at, current_draft")
+      .select(
+        "id, slug, title, status, published_at, current_draft, description, canonical_override, robots_directive",
+      )
       .eq("id", data.compositionId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -153,12 +201,23 @@ export const getSeoLandingEditorModel = createServerFn({ method: "GET" })
       idPrefix,
       slots,
       mediaOptions: await loadMediaOptions(supabase, chrome?.entityRef ?? null),
+      seo: {
+        title: row.title ?? "",
+        description: row.description ?? "",
+        canonical: row.canonical_override ?? "",
+        // Piloto en borrador: sin directiva explícita se asume no indexable.
+        robots: row.robots_directive ?? "noindex,nofollow",
+      },
     };
   });
 
 export const saveSeoLandingEditorModel = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: { compositionId: string; slots: Record<string, SeoLandingSlotJson | null> }) => data,
+    (data: {
+      compositionId: string;
+      slots: Record<string, SeoLandingSlotJson | null>;
+      seo?: SeoLandingSeoModel;
+    }) => data,
   )
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<{ saved: true; populatedSlots: string[] }> => {
@@ -192,6 +251,21 @@ export const saveSeoLandingEditorModel = createServerFn({ method: "POST" })
       _tree: tree as never,
     });
     if (saveError) throw new Error(saveError.message);
+
+    // SEO: columnas gobernadas de la composición (nunca la entidad de origen).
+    if (data.seo) {
+      const robots = data.seo.robots.trim() || "noindex,nofollow";
+      const { error: seoError } = await supabase
+        .from("page_compositions")
+        .update({
+          title: data.seo.title.trim() || row.id,
+          description: data.seo.description.trim() || null,
+          canonical_override: data.seo.canonical.trim() || null,
+          robots_directive: robots,
+        })
+        .eq("id", data.compositionId);
+      if (seoError) throw new Error(seoError.message);
+    }
 
     const populated =
       (
