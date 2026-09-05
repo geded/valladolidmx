@@ -66,13 +66,19 @@ function humanizeValue(value: string): string {
 }
 
 function toShowcaseItem(vm: TourismCardVM): PremiumShowcaseItem {
+  /* Kicker con datos reales: el tipo de experiencia capturado en el CMS
+     (eje `tipo_experiencia`); "Experiencia" sólo cuando no hay dato. En la
+     superficie de revisión interna el distintivo DEMO tiene prioridad. */
+  const reviewBadge = (vm.badges ?? [])
+    .map((badge) => (typeof badge === "string" ? badge : badge.label))
+    .find((label) => /DEMO/i.test(label));
   return {
     key: vm.id,
     name: vm.name,
     note: vm.tagline ?? vm.businessName ?? "Experiencia publicada en el Oriente Maya",
     media: vm.mediaUrl ? { url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name } : null,
     to: vm.href ?? "/experiencias",
-    kicker: "Experiencia",
+    kicker: reviewBadge ?? vm.eyebrow ?? "Experiencia",
     meta: vm.territorialContext,
   };
 }
