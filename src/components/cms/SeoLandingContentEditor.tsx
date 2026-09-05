@@ -598,12 +598,12 @@ export function SeoLandingContentEditor({
         onToggleHidden={() => toggleHidden("intro")}
       >
         <div className="grid gap-3">
-        <Select
-          label="Posición en el cuerpo editorial"
-          value={String(orderOf("intro"))}
-          options={ORDER_OPTIONS}
-          onChange={(v) => setSlot("intro", { order: Number(v) })}
-        />
+          <Select
+            label="Posición en el cuerpo editorial"
+            value={String(orderOf("intro"))}
+            options={ORDER_OPTIONS}
+            onChange={(v) => setSlot("intro", { order: Number(v) })}
+          />
           <Text
             label="Título"
             value={str(intro["title"])}
@@ -967,12 +967,12 @@ export function SeoLandingContentEditor({
         onToggleHidden={() => toggleHidden("map")}
       >
         <div className="grid gap-3 sm:grid-cols-2">
-        <Select
-          label="Posición en el cuerpo editorial"
-          value={String(orderOf("map"))}
-          options={ORDER_OPTIONS}
-          onChange={(v) => setSlot("map", { order: Number(v) })}
-        />
+          <Select
+            label="Posición en el cuerpo editorial"
+            value={String(orderOf("map"))}
+            options={ORDER_OPTIONS}
+            onChange={(v) => setSlot("map", { order: Number(v) })}
+          />
           <Text
             label="Título"
             value={str(map["heading"])}
