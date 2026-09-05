@@ -6,11 +6,24 @@
  * Lote 3M-A: la lógica se extrajo verbatim de la ruta para que el gancho sea
  * `autorización → trabajo` y el trabajo pueda probarse con un cliente
  * simulado (0 envíos reales). La autorización vive en `cron-hook-auth.server`.
+ *
+ * Lote 3M-A.2: con `ctx.dryRun` se ejecuta la selección y el render pero no se
+ * crea token, ni se registra, ni se encola, ni se marca. Sólo contadores.
  */
 import * as React from "react";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
-import type { CronJobResult, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
+import type {
+  CronJobResult,
+  CronRunContext,
+  CronSupabase,
+} from "@/lib/cron/cron-hook-auth.server";
+import {
+  newDryRunStats,
+  previewCandidate,
+  recordDryRunOutcome,
+  type DryRunKindStats,
+} from "@/lib/cron/cron-dry-run.server";
 
 const SITE_NAME = "valladolidmx";
 const SENDER_DOMAIN = "notify.alux.travel";
