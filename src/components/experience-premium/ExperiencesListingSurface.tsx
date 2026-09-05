@@ -271,7 +271,11 @@ export function ExperiencesListingSurface({
             <PremiumSectionHead
               id="experiencias-destacadas"
               kicker="Empieza por aquí"
-              title="Experiencias publicadas del Oriente Maya"
+              title={
+                reviewNotice
+                  ? "Experiencias publicadas y en revisión del Oriente Maya"
+                  : "Experiencias publicadas del Oriente Maya"
+              }
               description="Vivencias con guías, cocineros y comunidades verificadas por Valladolid.mx."
             />
             <PremiumShowcaseGrid
@@ -286,7 +290,11 @@ export function ExperiencesListingSurface({
               <PremiumSectionHead
                 id="experiencias-todas"
                 kicker="Todas las experiencias"
-                title={`${filtered.length} experiencias publicadas`}
+                title={
+                  reviewNotice
+                    ? `${filtered.length} experiencias publicadas o en revisión`
+                    : `${filtered.length} experiencias publicadas`
+                }
               />
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {rest.map((vm) => (
