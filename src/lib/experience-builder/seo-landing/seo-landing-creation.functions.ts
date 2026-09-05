@@ -161,14 +161,62 @@ function canonicalEntityUrl(
     : null;
 }
 
-async function resolveMediaUrl(supabase: Db, mediaId: string | null): Promise<string | null> {
+interface RealMediaItem {
+  url: string;
+  alt: string;
+  role: string;
+}
+
+/**
+ * Medios reales acreditados de la entidad. La URL pública se construye
+ * exclusivamente con el contrato estable `toStablePublicMediaUrl`: si el
+ * activo no vive en el bucket gobernado, se omite (fail-closed) — nunca se
+ * arma una ruta a mano ni se firma una URL temporal.
+ */
+async function loadEntityMedia(
+  supabase: Db,
+  entityType: SeoLandingEntityType,
+  entity: EntitySnapshot,
+): Promise<RealMediaItem[]> {
+  const select = "role, sort_order, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
+  const query =
+    entityType === "business"
+      ? supabase.from("business_media").select(select).eq("business_id", entity.id)
+      : entityType === "product"
+        ? supabase.from("product_media").select(select).eq("product_id", entity.id)
+        : supabase.from("place_media").select(select).eq("place_id", entity.id);
+  const { data, error } = await query.order("sort_order", { ascending: true }).limit(12);
+  if (error) return [];
+  const items: RealMediaItem[] = [];
+  for (const row of data ?? []) {
+    const asset = row.media_assets as {
+      storage_bucket?: string | null;
+      storage_path?: string | null;
+      alt_text?: string | null;
+    } | null;
+    const url = toStablePublicMediaUrl(asset?.storage_bucket, asset?.storage_path);
+    if (!url) continue;
+    const alt = (asset?.alt_text ?? "").trim();
+    if (!alt) continue;
+    items.push({ url, alt, role: String(row.role ?? "gallery") });
+  }
+  return items;
+}
+
+async function resolveCoverUrl(
+  supabase: Db,
+  mediaId: string | null,
+): Promise<{ url: string; alt: string } | null> {
   if (!mediaId) return null;
   const { data } = await supabase
     .from("media_assets")
-    .select("storage_path")
+    .select("storage_bucket, storage_path, alt_text")
     .eq("id", mediaId)
     .maybeSingle();
-  return data?.storage_path ?? null;
+  const url = toStablePublicMediaUrl(data?.storage_bucket, data?.storage_path);
+  const alt = (data?.alt_text ?? "").trim();
+  if (!url || !alt) return null;
+  return { url, alt };
 }
 
 /** Slots reales: sin dato ⇒ sin slot (cero contenido inventado). */
@@ -177,18 +225,34 @@ async function buildRealSlots(
   entityType: SeoLandingEntityType,
   entity: EntitySnapshot,
 ): Promise<Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>>> {
-  const mediaUrl = await resolveMediaUrl(supabase, entity.coverMediaId);
+  const [cover, media] = await Promise.all([
+    resolveCoverUrl(supabase, entity.coverMediaId),
+    loadEntityMedia(supabase, entityType, entity),
+  ]);
+  const heroMedia = cover ?? media.find((m) => m.role === "cover") ?? media[0] ?? null;
+
   const hero: SeoLandingSlotConfig = { title: entity.title };
   if (entity.tagline) hero.description = entity.tagline;
-  if (entity.categorySlug) hero.eyebrow = entity.categorySlug;
-  if (mediaUrl) {
-    hero.mediaUrl = mediaUrl;
-    hero.mediaAlt = entity.title;
+  // Territorio primero: el eyebrow del hero identifica el destino real.
+  if (entity.destinationName) hero.eyebrow = entity.destinationName;
+  else if (entity.categorySlug) hero.eyebrow = entity.categorySlug;
+  if (heroMedia) {
+    hero.mediaUrl = heroMedia.url;
+    hero.mediaAlt = heroMedia.alt;
   }
 
   const slots: Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>> = { hero };
   if (entity.description?.trim())
-    slots.intro = { heading: "Por qué visitar", body: entity.description.trim() };
+    slots.intro = { title: "Por qué visitar", body: entity.description.trim() };
+
+  const gallery = media.filter((m) => m.url !== heroMedia?.url);
+  if (gallery.length > 0)
+    slots.gallery = {
+      heading: "Galería",
+      items: gallery.map((m) => ({ url: m.url, alt: m.alt })),
+    };
+
+
 
   const canonical = canonicalEntityUrl(entityType, entity);
   if (canonical)
