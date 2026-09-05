@@ -37,6 +37,10 @@ import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremi
 import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
 import { resolvePlacePremiumQ2d } from "@/components/place-premium/place-premium-config";
+import { SeoLandingSurface } from "@/components/seo-landing/SeoLandingSurface";
+import { readSeoLandingChrome } from "./seo-landing/seo-landing-template";
+import { buildSeoLandingSurfaceVM } from "./seo-landing/seo-landing-surface-vm";
+
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
