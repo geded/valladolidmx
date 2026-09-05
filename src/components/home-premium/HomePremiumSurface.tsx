@@ -983,12 +983,17 @@ function TravelPlanClose({
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
   // Lote 3G.2 · Mi Viaje pasa a ayuda contextual secundaria mediante la
   // autoridad compartida TravelPlanBand (sólo presentación).
+  // Lote 3L · sin rutas publicadas en el CMS `route` es undefined: se omite el
+  // prefijo en vez de imprimir "undefined · undefined · undefined paradas".
+  const routeSummary = describeRoute(route);
+  const aluxNote =
+    "Alux puede ajustar el orden según tus intereses sin crear otro modelo de itinerario.";
   return (
     <TravelPlanBand
       titleId="home-travel-plan"
       eyebrow={content.travelPlan.eyebrow}
       title={content.travelPlan.title}
-      summary={`${route?.title} · ${route?.duration} · ${route?.stops} paradas. Alux puede ajustar el orden según tus intereses sin crear otro modelo de itinerario.`}
+      summary={routeSummary ? `${routeSummary}. ${aluxNote}` : aluxNote}
       primary={{
         label: added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel,
         onClick: onAdd,
