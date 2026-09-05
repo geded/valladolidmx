@@ -193,7 +193,11 @@ export interface ProductReviewItem {
   language: string | null;
   visit_type: string | null;
   verified_source:
-    "verified_purchase" | "managed_visit" | "verified_visit" | "declared_visitor" | null;
+    | "verified_purchase"
+    | "managed_visit"
+    | "verified_visit"
+    | "declared_visitor"
+    | null;
   business_response: string | null;
   business_response_at: string | null;
 }
@@ -308,7 +312,6 @@ function resolveProductAttributes(
   }
   return out;
 }
-
 
 /**
  * getMarketplaceProductBySlug — Detalle público de un producto publicado.

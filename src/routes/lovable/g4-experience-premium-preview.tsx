@@ -194,7 +194,9 @@ function ReviewDetail({ slug }: { slug: string | null }) {
       </Notice>
     );
   } else if (!query.data) {
-    body = <Notice>No existe una experiencia publicada o en revisión con ese identificador.</Notice>;
+    body = (
+      <Notice>No existe una experiencia publicada o en revisión con ese identificador.</Notice>
+    );
   } else {
     const vm = { ...buildExperienceVMFromProduct(query.data), demoNotice: REVIEW_NOTICE };
     return <ExperienceSurface vm={vm} />;

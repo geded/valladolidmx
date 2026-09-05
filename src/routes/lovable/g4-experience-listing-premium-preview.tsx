@@ -30,9 +30,7 @@ const PUBLIC_NOTICE = "Superficie de revisión interna · lecturas CMS publicada
 export const Route = createFileRoute("/lovable/g4-experience-listing-premium-preview")({
   validateSearch: (search: Record<string, unknown>): { modo?: Modo; destino?: string } => ({
     ...(search.modo === "revision" ? { modo: "revision" as const } : {}),
-    ...(typeof search.destino === "string" && search.destino
-      ? { destino: search.destino }
-      : {}),
+    ...(typeof search.destino === "string" && search.destino ? { destino: search.destino } : {}),
   }),
   loaderDeps: ({ search }) => ({
     modo: (search.modo ?? "publicado") as Modo,
@@ -109,7 +107,10 @@ function ReviewListing({ destino }: { destino: string | null }) {
   if (loading || query.isPending) {
     if (!loading && !session) {
       return (
-        <p role="status" className="rounded-2xl border border-border p-6 text-sm text-muted-foreground">
+        <p
+          role="status"
+          className="rounded-2xl border border-border p-6 text-sm text-muted-foreground"
+        >
           Inicia sesión con una cuenta editorial para revisar los registros en revisión.
         </p>
       );

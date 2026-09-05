@@ -305,7 +305,9 @@ export async function listExperiencesListing(
     // El eje "Tipo de experiencia" ya se deriva del eyebrow en la superficie
     // (facet `tipo`); no se duplica como eje de atributo.
     axes: definitions
-      .filter((definition) => definition.filterable && definition.key !== EXPERIENCE_TYPE_ATTRIBUTE_KEY)
+      .filter(
+        (definition) => definition.filterable && definition.key !== EXPERIENCE_TYPE_ATTRIBUTE_KEY,
+      )
       .map((definition) => ({ key: definition.key, label: definition.label })),
     valueLabels,
   };
@@ -416,11 +418,13 @@ export async function readExperienceReviewDetail(
     capacity: row.capacity != null ? Number(row.capacity) : null,
     direct_sale: {
       enabled: Boolean(row.direct_sale_enabled),
-      price_amount: row.direct_sale_price_amount != null ? Number(row.direct_sale_price_amount) : null,
+      price_amount:
+        row.direct_sale_price_amount != null ? Number(row.direct_sale_price_amount) : null,
       price_currency: (row.direct_sale_currency as string | null) ?? null,
       min_lead_hours:
         row.direct_sale_min_lead_hours != null ? Number(row.direct_sale_min_lead_hours) : null,
-      max_quantity: row.direct_sale_max_quantity != null ? Number(row.direct_sale_max_quantity) : null,
+      max_quantity:
+        row.direct_sale_max_quantity != null ? Number(row.direct_sale_max_quantity) : null,
       cancellation_policy: (row.direct_sale_cancellation_policy as string | null) ?? null,
       terms: (row.direct_sale_terms as string | null) ?? null,
     },

@@ -41,7 +41,8 @@ function rel(file: string): string {
   return relative(ROOT, file).split(sep).join("/");
 }
 
-const IMPORT_RE = /(?:import|export)\s[^;]*?from\s*["']([^"']+)["']|import\(\s*["']([^"']+)["']\s*\)|require\(\s*["']([^"']+)["']\s*\)/g;
+const IMPORT_RE =
+  /(?:import|export)\s[^;]*?from\s*["']([^"']+)["']|import\(\s*["']([^"']+)["']\s*\)|require\(\s*["']([^"']+)["']\s*\)/g;
 
 function importsOf(file: string): string[] {
   const text = readFileSync(file, "utf8");
@@ -103,9 +104,7 @@ describe("Lote 3E · datos públicos CMS-first", () => {
 
   test("experience-demo-dataset ya no existe ni se importa", () => {
     expect(existsSync(join(SRC, "lib/experiences/experience-demo-dataset.ts"))).toBe(false);
-    const offenders = allSources
-      .filter((file) => importsDemoDataset(file).length > 0)
-      .map(rel);
+    const offenders = allSources.filter((file) => importsDemoDataset(file).length > 0).map(rel);
     expect(offenders).toEqual([]);
   });
 
@@ -127,14 +126,22 @@ describe("Lote 3E · datos públicos CMS-first", () => {
   });
 
   test("el lector público de Experiencias sólo admite registros publicados", () => {
-    const fn = readFileSync(join(SRC, "lib/experiences/experience-public-reads.functions.ts"), "utf8");
-    const server = readFileSync(join(SRC, "lib/experiences/experience-public-reads.server.ts"), "utf8");
+    const fn = readFileSync(
+      join(SRC, "lib/experiences/experience-public-reads.functions.ts"),
+      "utf8",
+    );
+    const server = readFileSync(
+      join(SRC, "lib/experiences/experience-public-reads.server.ts"),
+      "utf8",
+    );
     // La función pública no acepta estados editoriales desde el cliente.
     const publicBlock = fn.slice(
       fn.indexOf("export const getExperiencesListing"),
       fn.indexOf("export const getExperiencesReviewListing"),
     );
-    expect(publicBlock).not.toMatch(/in_review|statuses|includeInReview|service_role|supabaseAdmin/);
+    expect(publicBlock).not.toMatch(
+      /in_review|statuses|includeInReview|service_role|supabaseAdmin/,
+    );
     // El estado por defecto del lector es exclusivamente `published`.
     expect(server).toMatch(/:\s*\["published"\]/);
     // El lector de revisión exige rol editorial.

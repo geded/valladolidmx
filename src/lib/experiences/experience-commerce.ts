@@ -212,7 +212,8 @@ export function resolveExperienceCommerce(
       bookLabel: null,
       contactLabel: input.primaryActionLabel || "Ver disponibilidad en el sitio del operador",
       contactHref: input.externalUrl,
-      rationale: "El operador gestiona la reserva en su propio sitio; la plataforma no simula pago.",
+      rationale:
+        "El operador gestiona la reserva en su propio sitio; la plataforma no simula pago.",
     };
   }
 
