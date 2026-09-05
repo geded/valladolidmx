@@ -344,21 +344,29 @@ export function InteractiveMap({
         }
         setReady(true);
       })
-      .catch((e) => {
-        setError(e instanceof Error ? e.message : "No se pudo cargar el mapa");
+      .catch(() => {
+        setFailed(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+  }, [
+    shouldMount,
+    lat,
+    lng,
+    zoom,
+    markerTitle,
+    markers,
+    connectByRoad,
+    routeStops,
+    optimizeRoute,
+  ]);
 
-
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-border bg-muted p-6 text-sm text-muted-foreground">
-        {error}
-      </div>
-    );
+  if (failed) {
+    const points = (
+      markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }]
+    ).map((m) => ({ lat: m.lat, lng: m.lng, title: m.title ?? markerTitle ?? null }));
+    return <MapUnavailableFallback points={points} />;
   }
 
   return (
@@ -368,6 +376,8 @@ export function InteractiveMap({
       aria-label={markerTitle ? `Mapa de ${markerTitle}` : "Mapa interactivo"}
       role="img"
       data-ready={ready ? "true" : "false"}
+      data-map-mounted={shouldMount ? "true" : "false"}
     />
   );
+
 }
