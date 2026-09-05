@@ -54,10 +54,20 @@ export interface SeoLandingOfferItem {
   readonly tags: readonly string[];
 }
 
+export type SeoLandingInfoIcon =
+  | "clock"
+  | "calendar"
+  | "backpack"
+  | "accessibility"
+  | "leaf"
+  | "ticket"
+  | "info";
+
 export interface SeoLandingInfoItem {
   readonly id: string;
   readonly label: string;
   readonly value: string;
+  readonly icon: SeoLandingInfoIcon;
 }
 
 export interface SeoLandingFeatureItem {
@@ -151,6 +161,15 @@ function hidden(cfg: Cfg | null): boolean {
 
 const TRUST_ICONS = ["award", "badge", "star", "pin", "info"] as const;
 const FEATURE_ICONS = ["sparkles", "leaf", "clock", "users", "shield", "heart"] as const;
+const INFO_ICONS = [
+  "clock",
+  "calendar",
+  "backpack",
+  "accessibility",
+  "leaf",
+  "ticket",
+  "info",
+] as const;
 
 /** Construye el VM de la superficie a partir del árbol persistido. */
 export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfaceVM | null {
@@ -268,7 +287,11 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
     .map((item, i) => {
       const label = str(item["label"]);
       const value = str(item["value"]);
-      return label && value ? { id: str(item["id"]) ?? `info-${i}`, label, value } : null;
+      const iconRaw = str(item["icon"]);
+      const icon = (INFO_ICONS as readonly string[]).includes(iconRaw ?? "")
+        ? (iconRaw as SeoLandingInfoIcon)
+        : "info";
+      return label && value ? { id: str(item["id"]) ?? `info-${i}`, label, value, icon } : null;
     })
     .filter((v): v is SeoLandingInfoItem => v !== null);
   const info =

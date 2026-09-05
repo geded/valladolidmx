@@ -32,6 +32,15 @@ const chip =
 
 const TRUST_ICONS = ["badge", "award", "star", "pin", "info"] as const;
 const FEATURE_ICONS = ["sparkles", "leaf", "clock", "users", "shield", "heart"] as const;
+const INFO_ICONS = [
+  "clock",
+  "calendar",
+  "backpack",
+  "accessibility",
+  "leaf",
+  "ticket",
+  "info",
+] as const;
 
 function str(v: JsonValue | undefined): string {
   return typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
@@ -671,7 +680,19 @@ export function SeoLandingContentEditor({
         <ul className="mt-3 space-y-3">
           {infoRows.map((row, i) => (
             <li key={i} className="flex items-start gap-2 rounded-xl border border-border p-3">
-              <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
+              <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-3">
+                <Select
+                  label="Icono"
+                  value={str(row["icon"]) || "info"}
+                  options={INFO_ICONS.map((v) => ({ value: v, label: v }))}
+                  onChange={(v) =>
+                    setRows(
+                      "infoGrid",
+                      "items",
+                      infoRows.map((r, j) => (i === j ? { ...r, icon: v } : r)),
+                    )
+                  }
+                />
                 <Text
                   label="Dato"
                   value={str(row["label"])}
@@ -695,6 +716,7 @@ export function SeoLandingContentEditor({
                   }
                 />
               </div>
+
               <RowTools
                 index={i}
                 total={infoRows.length}
