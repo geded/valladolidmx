@@ -93,41 +93,51 @@ const VALLADOLID_MAP_STYLES = [
   { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#285e60" }] },
 ] as const;
 
-function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      reject(new Error("SSR"));
-      return;
-    }
-    if (window.google?.maps) {
-      resolve(window.google);
+/**
+ * Montaje condicional: el SDK sólo se descarga cuando el contenedor está
+ * realmente visible y con tamaño > 0. Evita pagar Maps JS dentro de paneles
+ * ocultos (`hidden`, `display:none`) o de tamaño cero en móvil y tablet.
+ */
+function useVisibleWithSize(ref: React.RefObject<HTMLDivElement | null>): boolean {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || visible) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
       return;
     }
 
-    // Registrar callback antes de crear el script.
-    window.__vmxGmapsCbList = window.__vmxGmapsCbList ?? [];
-    window.__vmxGmapsCbList.push(() => {
-      if (window.google?.maps) resolve(window.google);
-      else reject(new Error("Maps JS failed to load"));
-    });
-    window.vmxInitGoogleMaps = () => {
-      const list = window.__vmxGmapsCbList ?? [];
-      window.__vmxGmapsCbList = [];
-      list.forEach((cb) => cb());
+    const check = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) setVisible(true);
     };
 
-    if (document.getElementById(SCRIPT_ID)) return; // ya en carga
-    const s = document.createElement("script");
-    s.id = SCRIPT_ID;
-    s.async = true;
-    s.defer = true;
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-      apiKey,
-    )}&loading=async&callback=vmxInitGoogleMaps`;
-    s.onerror = () => reject(new Error("Google Maps script failed"));
-    document.head.appendChild(s);
-  });
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) check();
+      },
+      { rootMargin: "128px" },
+    );
+    io.observe(el);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => check());
+      ro.observe(el);
+    }
+    check();
+
+    return () => {
+      io.disconnect();
+      ro?.disconnect();
+    };
+  }, [ref, visible]);
+
+  return visible;
 }
+
 
 export interface InteractiveMapMarker {
   lat: number;
