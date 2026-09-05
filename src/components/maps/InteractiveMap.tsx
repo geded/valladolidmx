@@ -18,65 +18,12 @@
  * funciona; en custom domain requiere la key propia con referrers.
  */
 import { useEffect, useRef, useState } from "react";
-
-// Tipos mínimos locales para evitar depender de @types/google.maps.
-type LatLng = { lat: number; lng: number };
-interface GMap {
-  new (
-    el: HTMLElement,
-    opts: Record<string, unknown>,
-  ): {
-    fitBounds: (bounds: unknown, padding?: number) => void;
-    setZoom: (zoom: number) => void;
-  };
-}
-interface GMarker {
-  new (opts: {
-    position: LatLng;
-    map: unknown;
-    title?: string;
-    label?: unknown;
-    icon?: unknown;
-    zIndex?: number;
-  }): { addListener: (event: string, handler: () => void) => void };
-}
-interface GSize {
-  new (width: number, height: number): unknown;
-}
-interface GPoint {
-  new (x: number, y: number): unknown;
-}
-interface GLatLngBounds {
-  new (): { extend: (position: LatLng) => void };
-}
-interface GPolyline {
-  new (opts: Record<string, unknown>): { setMap: (map: unknown) => void };
-}
-interface GDirectionsService {
-  new (): {
-    route: (
-      request: Record<string, unknown>,
-      callback: (result: unknown, status: string) => void,
-    ) => void;
-  };
-}
-interface GDirectionsRenderer {
-  new (opts: Record<string, unknown>): { setDirections: (result: unknown) => void };
-}
-interface GoogleMapsNamespace {
-  maps: {
-    Map: GMap;
-    Marker: GMarker;
-    Size: GSize;
-    Point: GPoint;
-    LatLngBounds: GLatLngBounds;
-    Polyline: GPolyline;
-    DirectionsService: GDirectionsService;
-    DirectionsRenderer: GDirectionsRenderer;
-    TravelMode: { DRIVING: string };
-    DirectionsStatus: { OK: string };
-  };
-}
+import {
+  getGoogleMapsBrowserKey,
+  loadGoogleMaps,
+  subscribeGoogleMapsAuthFailure,
+} from "@/lib/maps/google-maps-loader";
+import { MapUnavailableFallback } from "./MapUnavailableFallback";
 
 /** Resultado de la capa de ruta, reportado a la superficie consumidora. */
 export interface MapRouteStatus {
@@ -91,15 +38,6 @@ export interface MapRouteStatus {
   waypointOrder?: number[];
 }
 
-declare global {
-  interface Window {
-    google?: GoogleMapsNamespace;
-    __vmxGmapsCbList?: Array<() => void>;
-    vmxInitGoogleMaps?: () => void;
-  }
-}
-
-const SCRIPT_ID = "vmx-google-maps-js";
 
 /**
  * Cartografía territorial Valladolid.mx.
