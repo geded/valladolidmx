@@ -56,10 +56,8 @@ export function makeFakeSupabase(opts: FakeSupabaseOptions = {}): FakeSupabase {
       },
       maybeSingle: async () => resolved(),
       single: async () => resolved(),
-      then: (
-        onFulfilled: (v: FakeResp) => unknown,
-        onRejected?: (e: unknown) => unknown,
-      ) => Promise.resolve<FakeResp>({ data: null, error: null }).then(onFulfilled, onRejected),
+      then: (onFulfilled: (v: FakeResp) => unknown, onRejected?: (e: unknown) => unknown) =>
+        Promise.resolve<FakeResp>({ data: null, error: null }).then(onFulfilled, onRejected),
     });
     return chain;
   };

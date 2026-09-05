@@ -138,7 +138,9 @@ export async function runTripJourneyEmails(supabase: CronSupabase): Promise<Cron
         const html = await render(element);
         const text = await render(element, { plainText: true });
         const subject =
-          typeof template.subject === "function" ? template.subject(templateData) : template.subject;
+          typeof template.subject === "function"
+            ? template.subject(templateData)
+            : template.subject;
 
         const messageId = crypto.randomUUID();
         const idempotencyKey = `trip-${step.kind}-${row.order_id}`;

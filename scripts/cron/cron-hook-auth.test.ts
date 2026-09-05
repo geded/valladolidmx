@@ -85,9 +85,9 @@ describe("isAuthorizedCronRequest · contrato", () => {
 
   it("b) rechaza la clave pública en `apikey` aunque coincida con el entorno", () => {
     const envWithPublishable = { ...env, SUPABASE_PUBLISHABLE_KEY: FAKE_PUBLISHABLE };
-    expect(isAuthorizedCronRequest(req("/x", { apikey: FAKE_PUBLISHABLE }), envWithPublishable)).toBe(
-      false,
-    );
+    expect(
+      isAuthorizedCronRequest(req("/x", { apikey: FAKE_PUBLISHABLE }), envWithPublishable),
+    ).toBe(false);
     // Ni siquiera si `apikey` lleva el propio secreto: la cabecera no es la canónica.
     expect(isAuthorizedCronRequest(req("/x", { apikey: TEST_SECRET }), env)).toBe(false);
   });
@@ -103,7 +103,9 @@ describe("isAuthorizedCronRequest · contrato", () => {
   });
 
   it("c) rechaza secreto incorrecto (misma longitud y distinta longitud)", () => {
-    expect(isAuthorizedCronRequest(req("/x", { [CRON_HOOK_HEADER]: WRONG_SECRET }), env)).toBe(false);
+    expect(isAuthorizedCronRequest(req("/x", { [CRON_HOOK_HEADER]: WRONG_SECRET }), env)).toBe(
+      false,
+    );
     expect(
       isAuthorizedCronRequest(req("/x", { [CRON_HOOK_HEADER]: TEST_SECRET.slice(0, 63) }), env),
     ).toBe(false);
@@ -193,7 +195,11 @@ describe("handleCronHook · pipeline", () => {
   it("el rechazo es uniforme: mismo código, cuerpo y cabeceras para todo motivo", async () => {
     const reference = cronUnauthorizedResponse();
     const refBody = await reference.text();
-    for (const r of [req("/x"), req("/x", { apikey: "x" }), req("/x", { [CRON_HOOK_HEADER]: "z" })]) {
+    for (const r of [
+      req("/x"),
+      req("/x", { apikey: "x" }),
+      req("/x", { [CRON_HOOK_HEADER]: "z" }),
+    ]) {
       const res = await handleCronHook(r, async () => ({ body: {} }), { env });
       expect(res.status).toBe(reference.status);
       expect(await res.text()).toBe(refBody);

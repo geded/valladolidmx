@@ -5,7 +5,11 @@
  * reales. Ningún destinatario real: sólo direcciones `example.com` (RFC 2606).
  */
 import { describe, expect, it, spyOn } from "bun:test";
-import { CRON_HOOK_HEADER, CRON_HOOK_SECRET_ENV, handleCronHook } from "../../src/lib/cron/cron-hook-auth.server";
+import {
+  CRON_HOOK_HEADER,
+  CRON_HOOK_SECRET_ENV,
+  handleCronHook,
+} from "../../src/lib/cron/cron-hook-auth.server";
 import { runTripJourneyEmails } from "../../src/lib/cron/jobs/trip-journey-emails.server";
 import { runCouponReviewReminders } from "../../src/lib/cron/jobs/coupon-review-reminders.server";
 import { runVisibilityNotifications } from "../../src/lib/cron/jobs/visibility-notifications.server";
@@ -304,7 +308,9 @@ describe("visibility-notifications · d) secreto correcto con transporte simulad
     expect(transport).toHaveLength(1);
     const payload = (transport[0].args as { payload: Record<string, unknown> }).payload;
     expect(payload.to).toBe("duena@example.com");
-    expect(payload.idempotency_key).toBe("visibility-expiring_7d-00000000-0000-4000-8000-0000000000e7");
+    expect(payload.idempotency_key).toBe(
+      "visibility-expiring_7d-00000000-0000-4000-8000-0000000000e7",
+    );
     const mark = fake.writes.find((w) => w.table === "business_visibility_grants");
     expect(mark).toBeDefined();
     expect(Object.keys(mark!.payload as object)).toEqual(["notified_expiring_7d_at"]);
