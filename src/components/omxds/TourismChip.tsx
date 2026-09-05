@@ -19,7 +19,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export type TourismChipScheme = "surface" | "onDark";
-export type TourismChipSize = "sm" | "md";
+export type TourismChipSize = "xs" | "sm" | "md";
 
 export interface TourismChipProps {
   children: ReactNode;
@@ -33,14 +33,26 @@ export interface TourismChipProps {
 }
 
 const BASE =
-  "inline-flex shrink-0 snap-start items-center justify-center whitespace-nowrap rounded-pill border px-3.5 text-[13px] font-medium leading-none transition-colors " +
+  "relative inline-flex shrink-0 snap-start items-center justify-center whitespace-nowrap rounded-pill border font-medium leading-none transition-colors " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
+/**
+ * Lote 3G.1 · el tamaño VISUAL de la píldora baja, pero el ÁREA TÁCTIL real
+ * se conserva ≥ 44 px extendiendo el objetivo con un pseudo-elemento
+ * (`after`) que no altera el ritmo vertical ni la altura del módulo.
+ */
+const TOUCH_EXTENSION =
+  "after:pointer-events-auto after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']";
+
 const SIZES: Record<TourismChipSize, string> = {
-  // 44 px reales en móvil y tablet; 40 px sólo en escritorio denso (lg+).
-  sm: "min-h-11 lg:min-h-10",
-  md: "min-h-11",
+  // 32 px visuales · 44 px táctiles reales (módulos de Alux, densidad alta).
+  xs: `min-h-8 px-3 text-[12.5px] ${TOUCH_EXTENSION}`,
+  // 36 px visuales · 44 px táctiles reales.
+  sm: `min-h-9 px-3.5 text-[13px] ${TOUCH_EXTENSION}`,
+  // 44 px reales, sin extensión.
+  md: "min-h-11 px-3.5 text-[13px]",
 };
+
 
 const SCHEMES: Record<TourismChipScheme, { idle: string; selected: string }> = {
   surface: {
