@@ -878,6 +878,18 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "bottom", "palette"],
       primary: true,
     },
+    {
+      /* LOTE 3I · sección central de Landing SEO (misma familia editorial,
+         mismo Experience Builder — sin editor paralelo). */
+      id: "cms.landing-seo",
+      workspaceId: "cms",
+      label: "Landing SEO",
+      icon: Sparkles,
+      to: "/cms/landing-seo",
+      group: "estudio",
+      order: 14,
+      surfaces: ["sidebar", "palette"],
+    },
   ],
   alux: {
     headline: "12 reseñas esperan moderación. 3 son urgentes.",
