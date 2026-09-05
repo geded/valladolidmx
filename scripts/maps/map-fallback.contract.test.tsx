@@ -34,8 +34,12 @@ describe("MapUnavailableFallback", () => {
   it("usa enlaces seguros a Google Maps", () => {
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
-    expect(html).toContain("https://www.google.com/maps/search/?api=1&amp;query=20.6896%2C-88.2019");
-    expect(html).toContain("https://www.google.com/maps/dir/?api=1&amp;destination=20.6896%2C-88.2019");
+    expect(html).toContain(
+      "https://www.google.com/maps/search/?api=1&amp;query=20.6896%2C-88.2019",
+    );
+    expect(html).toContain(
+      "https://www.google.com/maps/dir/?api=1&amp;destination=20.6896%2C-88.2019",
+    );
   });
 
   it("descarta coordenadas inválidas sin romper el bloque", () => {

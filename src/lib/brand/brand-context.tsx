@@ -25,6 +25,8 @@ import { ACTIVE_BRAND } from "@/config/brand";
 
 export const BRAND_SETTINGS_QUERY_KEY = ["brand", "identity"] as const;
 
+// Brand query primitives intentionally share this module with their provider.
+// eslint-disable-next-line react-refresh/only-export-components
 export const brandSettingsQueryOptions = queryOptions({
   queryKey: BRAND_SETTINGS_QUERY_KEY,
   queryFn: () => getBrandSettings(),
@@ -46,11 +48,13 @@ export function BrandProvider({ children }: { children: ReactNode }) {
 }
 
 /** Identidad de marca vigente. Fuera del provider devuelve el fallback. */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBrand(): BrandSettings {
   return useContext(BrandContext) ?? BRAND_SETTINGS_DEFAULTS;
 }
 
 /** Logotipo oficial vigente (activo existente; nunca uno inventado). */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBrandLogo(): { src: string; alt: string; width: number; height: number } {
   const brand = useBrand();
   return {

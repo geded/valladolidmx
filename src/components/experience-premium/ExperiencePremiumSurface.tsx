@@ -174,7 +174,6 @@ export function ExperiencePremiumSurface({
         </section>
       ) : null}
 
-
       {vm.gallery.length > 0 ? (
         <section aria-labelledby="experiencia-galeria">
           <PremiumSectionHead id="experiencia-galeria" kicker="Galería" title="Cómo se ve" />
@@ -190,7 +189,6 @@ export function ExperiencePremiumSurface({
           </div>
         </section>
       ) : null}
-
 
       {vm.includes.length > 0 || vm.excludes.length > 0 ? (
         <section aria-labelledby="experiencia-incluye">
@@ -291,7 +289,11 @@ export function ExperiencePremiumSurface({
 
       {vm.location ? (
         <section aria-labelledby="experiencia-ubicacion">
-          <PremiumSectionHead id="experiencia-ubicacion" kicker="Dónde" title="Ubicación y encuentro" />
+          <PremiumSectionHead
+            id="experiencia-ubicacion"
+            kicker="Dónde"
+            title="Ubicación y encuentro"
+          />
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="font-display text-lg">{vm.location.label}</p>
             {vm.location.address ? (
@@ -313,7 +315,11 @@ export function ExperiencePremiumSurface({
 
       {vm.policies.length > 0 ? (
         <section aria-labelledby="experiencia-politicas">
-          <PremiumSectionHead id="experiencia-politicas" kicker="Reglas" title="Políticas publicadas" />
+          <PremiumSectionHead
+            id="experiencia-politicas"
+            kicker="Reglas"
+            title="Políticas publicadas"
+          />
           <div className="grid gap-3 sm:grid-cols-2">
             {vm.policies.map((policy) => (
               <div key={policy.title} className="rounded-2xl border border-border bg-card p-4">

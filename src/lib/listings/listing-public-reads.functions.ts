@@ -25,7 +25,6 @@ import {
   type ListingFamilyTaxonomyResult,
 } from "./listing-family-taxonomy.functions";
 
-
 export interface GetPublicListingInput {
   family: ListingFamilyId;
   destino?: string | null;
@@ -55,7 +54,10 @@ export const getPublicListing = createServerFn({ method: "GET" })
       const [businesses, taxonomy] = await Promise.all([
         listMarketplaceBusinesses().catch(() => []),
         getListingFamilyTaxonomy().catch(
-          (): ListingFamilyTaxonomyResult => ({ available: false, taxonomy: {} }),
+          (): ListingFamilyTaxonomyResult => ({
+            available: false,
+            taxonomy: {},
+          }),
         ),
       ]);
       return buildPublicListing({
@@ -65,7 +67,6 @@ export const getPublicListing = createServerFn({ method: "GET" })
         categorySlugs: taxonomy.available ? (taxonomy.taxonomy[contract.id] ?? []) : undefined,
       });
     }
-
 
     if (contract.source === "events") {
       const events = await listPublishedEvents({

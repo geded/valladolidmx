@@ -11,7 +11,6 @@ import {
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
-
 /**
  * H-02 · I4 — Declaración de contexto de la categoría piloto.
  *
@@ -64,11 +63,9 @@ export const Route = createFileRoute("/hoteles")({
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps, context }) => {
     // Lote 3B — Nombres de destino reales disponibles en SSR.
-    await context.queryClient
-      .ensureQueryData(publishedDestinationsQueryOptions)
-      .catch(() => []);
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
     return {
-    dto: await getPublicListing({ data: { family: "hoteles", destino: deps.destino ?? null } }),
+      dto: await getPublicListing({ data: { family: "hoteles", destino: deps.destino ?? null } }),
     };
   },
   head: () =>
@@ -91,7 +88,12 @@ function HotelesRoute() {
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
   return (
-    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs compactCrumbsOnMobile>
+    <PublicShell
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs
+      compactCrumbsOnMobile
+    >
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}

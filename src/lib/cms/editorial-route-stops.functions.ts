@@ -132,9 +132,7 @@ export const saveRouteStopsCms = createServerFn({ method: "POST" })
       note: s.note,
       duration_minutes: s.durationMinutes,
     }));
-    const { error: insErr } = await context.supabase
-      .from("editorial_route_stops")
-      .insert(payload);
+    const { error: insErr } = await context.supabase.from("editorial_route_stops").insert(payload);
     if (insErr) throw insErr;
     return { count: payload.length };
   });

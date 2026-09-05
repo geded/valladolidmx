@@ -61,8 +61,17 @@ interface Axis {
 }
 
 const AXES: Axis[] = [
-  { id: "duracion", label: "Duración", valuesOf: (r) => (routeDurationLabel(r) ? [routeDurationLabel(r)!] : []) },
-  { id: "ritmo", label: "Ritmo", valuesOf: (r) => (r.pace ? [r.pace] : []), labelOf: (v) => routePaceLabel(v) ?? humanize(v) },
+  {
+    id: "duracion",
+    label: "Duración",
+    valuesOf: (r) => (routeDurationLabel(r) ? [routeDurationLabel(r)!] : []),
+  },
+  {
+    id: "ritmo",
+    label: "Ritmo",
+    valuesOf: (r) => (r.pace ? [r.pace] : []),
+    labelOf: (v) => routePaceLabel(v) ?? humanize(v),
+  },
   {
     id: "dificultad",
     label: "Dificultad",
@@ -96,8 +105,7 @@ export function RoutesListingSurface({
       AXES.map((axis) => {
         const counts = new Map<string, number>();
         for (const route of routes)
-          for (const value of axis.valuesOf(route))
-            counts.set(value, (counts.get(value) ?? 0) + 1);
+          for (const value of axis.valuesOf(route)) counts.set(value, (counts.get(value) ?? 0) + 1);
         return {
           id: axis.id,
           label: axis.label,

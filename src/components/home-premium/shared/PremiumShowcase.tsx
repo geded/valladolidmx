@@ -161,11 +161,7 @@ export function PremiumAluxBar({
           <p className="line-clamp-1 max-w-2xl text-[13px] font-medium leading-snug text-foreground">
             {question}
           </p>
-          <TourismChipRow
-            label="Composición del viaje"
-            behavior="rail"
-            className="mt-1.5 lg:mt-1"
-          >
+          <TourismChipRow label="Composición del viaje" behavior="rail" className="mt-1.5 lg:mt-1">
             {PARTY_OPTIONS.map((option) => (
               <TourismChip
                 key={option.value}
@@ -193,8 +189,6 @@ export function PremiumAluxBar({
     </section>
   );
 }
-
-
 
 /* ------------------------------------------------------------------ *
  * Bloque Destinos / Experiencias (tarjeta protagonista + 3 compactas)

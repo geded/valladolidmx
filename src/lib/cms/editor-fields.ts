@@ -44,8 +44,7 @@ export const CATEGORY_FIELDS: EditorField[] = [
       { value: "experiencias", label: "Experiencias" },
       { value: "casas-de-vacaciones", label: "Casas de vacaciones" },
     ],
-    helpText:
-      "Define en qué listado turístico público aparecen las empresas de esta categoría.",
+    helpText: "Define en qué listado turístico público aparecen las empresas de esta categoría.",
   },
 ];
 

@@ -43,7 +43,11 @@ import { Input } from "@/components/ui/input";
 import { ACTIVE_BRAND } from "@/config/brand";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
-import { PARTY_OPTIONS, compositionFromPartySize, type PartyComposition } from "@/lib/traveler/party-composition";
+import {
+  PARTY_OPTIONS,
+  compositionFromPartySize,
+  type PartyComposition,
+} from "@/lib/traveler/party-composition";
 import { cn } from "@/lib/utils";
 import type { Destination } from "@/types/territory";
 import {
@@ -86,7 +90,6 @@ function toShowcaseItem(destination: Destination, meta?: string | null): Premium
     meta: meta ?? null,
   };
 }
-
 
 export interface DestinationsAtlasSurfaceProps {
   destinations: readonly Destination[];
@@ -244,25 +247,22 @@ export function DestinationsAtlasSurface({
     [stops],
   );
 
-  const handleRouteStatus = useCallback(
-    (status: MapRouteStatus) => {
-      setRouteStatus(status);
-      if (status.mode === "directions" && status.waypointOrder?.length) {
-        setStopSlugs((current) => {
-          if (current.length < 3) return current;
-          const middle = current.slice(1, -1);
-          const reordered = [
-            current[0],
-            ...status.waypointOrder!.map((i) => middle[i]).filter(Boolean),
-            current[current.length - 1],
-          ];
-          return reordered.join("|") === current.join("|") ? current : reordered;
-        });
-        setOptimizeRoute(false);
-      }
-    },
-    [],
-  );
+  const handleRouteStatus = useCallback((status: MapRouteStatus) => {
+    setRouteStatus(status);
+    if (status.mode === "directions" && status.waypointOrder?.length) {
+      setStopSlugs((current) => {
+        if (current.length < 3) return current;
+        const middle = current.slice(1, -1);
+        const reordered = [
+          current[0],
+          ...status.waypointOrder!.map((i) => middle[i]).filter(Boolean),
+          current[current.length - 1],
+        ];
+        return reordered.join("|") === current.join("|") ? current : reordered;
+      });
+      setOptimizeRoute(false);
+    }
+  }, []);
 
   const handleMarkerSelect = useCallback(
     (slug: string) => {
@@ -343,7 +343,6 @@ export function DestinationsAtlasSurface({
         </Container>,
       )}
 
-
       <Container className="mt-6 space-y-10 sm:mt-8 sm:space-y-14">
         {fixtureNotice ? (
           <p className="rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
@@ -398,7 +397,6 @@ export function DestinationsAtlasSurface({
           </section>,
         )}
 
-
         {featured
           ? section(
               "start_here",
@@ -431,7 +429,11 @@ export function DestinationsAtlasSurface({
               title={content.explorer.title}
               description={content.explorer.description}
             />
-            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Origen de referencia">
+            <div
+              className="mt-4 flex flex-wrap gap-2"
+              role="group"
+              aria-label="Origen de referencia"
+            >
               {(
                 [
                   ["valladolid", content.explorer.originLabels.valladolid],
@@ -478,7 +480,11 @@ export function DestinationsAtlasSurface({
               </p>
             ) : null}
 
-            <div className="mt-4 flex gap-2 lg:hidden" role="group" aria-label="Vista del explorador">
+            <div
+              className="mt-4 flex gap-2 lg:hidden"
+              role="group"
+              aria-label="Vista del explorador"
+            >
               {(["lista", "mapa"] as const).map((view) => (
                 <button
                   key={view}
@@ -526,7 +532,9 @@ export function DestinationsAtlasSurface({
               >
                 {mapped.length ? (
                   <Suspense
-                    fallback={<div className="h-[22rem] animate-pulse rounded-2xl bg-muted lg:h-[30rem]" />}
+                    fallback={
+                      <div className="h-[22rem] animate-pulse rounded-2xl bg-muted lg:h-[30rem]" />
+                    }
                   >
                     <InteractiveMap
                       lat={activeDestination?.latitude ?? 20.6896}
@@ -619,7 +627,9 @@ export function DestinationsAtlasSurface({
                           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-selva text-xs font-semibold text-selva-foreground">
                             {index + 1}
                           </span>
-                          <span className="min-w-0 flex-1 truncate text-sm">{destination.name}</span>
+                          <span className="min-w-0 flex-1 truncate text-sm">
+                            {destination.name}
+                          </span>
                           <AddToTravelPlanButton
                             kind="destination"
                             targetId={destination.id}
@@ -655,7 +665,8 @@ export function DestinationsAtlasSurface({
                       {googleMapsRouteUrl ? (
                         <Button asChild variant="secondary" className="min-h-11 rounded-pill">
                           <a href={googleMapsRouteUrl} target="_blank" rel="noreferrer">
-                            <ExternalLink className="mr-2 size-4" aria-hidden /> Abrir en Google Maps
+                            <ExternalLink className="mr-2 size-4" aria-hidden /> Abrir en Google
+                            Maps
                           </a>
                         </Button>
                       ) : null}
@@ -682,7 +693,6 @@ export function DestinationsAtlasSurface({
                   </p>
                 )}
               </div>
-
             </div>
 
             {/* Barra inferior móvil: acceso rápido al recorrido en curso. */}
@@ -917,14 +927,12 @@ export function DestinationsAtlasSurface({
             secondary={{ label: content.finalCta.secondaryLabel, to: "/mi-viaje" }}
           />,
         )}
-
       </Container>
     </div>
   );
 }
 
 const SectionHead = PremiumSectionHead;
-
 
 function ChipRow({
   legend,

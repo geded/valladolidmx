@@ -50,7 +50,8 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
     <section className="rounded-xl border border-border bg-card p-5">
       <div className="max-w-2xl">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-          Características de {query.data.family === "restaurantes"
+          Características de{" "}
+          {query.data.family === "restaurantes"
             ? "restaurante"
             : query.data.family === "casas-de-vacaciones"
               ? "la casa de vacaciones"

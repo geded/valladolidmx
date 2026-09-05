@@ -168,7 +168,8 @@ const PROFILES: Record<SupportedFamily, FamilyProfile> = {
     family: "casas-de-vacaciones",
     eyebrow: "Estancias completas · Valladolid y Oriente Maya",
     title: "Casas para vivir Valladolid y descubrir el territorio",
-    subtitle: "Elige una casa para tu grupo y conviértela en punto de partida hacia cenotes, comunidades y pueblos del Oriente Maya.",
+    subtitle:
+      "Elige una casa para tu grupo y conviértela en punto de partida hacia cenotes, comunidades y pueblos del Oriente Maya.",
     aluxTitle: "¿Cómo quieres vivir tu estancia?",
     prompts: ["Viaje familiar", "En pareja", "Con amigos", "Con piscina", "Estancia larga"],
     primaryFilterLabel: "Tipo de propiedad",
@@ -219,7 +220,7 @@ function itemAttributes(item: TourismCardVM, profile: FamilyProfile): string[] {
       ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
       : profile.family === "casas-de-vacaciones"
         ? ["capacity", "bedrooms", "amenities", "stay_features", "traveler_profile"]
-      : ["services", "amenities", "accessibility", "traveler_profile"];
+        : ["services", "amenities", "accessibility", "traveler_profile"];
   const structured = keys
     .flatMap((key) => attributeValues(item.filterAttributes?.[key]))
     .map(humanizeAttributeValue);
@@ -425,7 +426,12 @@ function PremiumHero({
         cinematic ? "min-h-[38rem]" : "grid min-h-[31rem] lg:grid-cols-[1.08fr_.92fr]",
       )}
     >
-      <div className={cn("relative min-h-[20rem] overflow-hidden sm:min-h-[24rem]", cinematic && "absolute inset-0")}>
+      <div
+        className={cn(
+          "relative min-h-[20rem] overflow-hidden sm:min-h-[24rem]",
+          cinematic && "absolute inset-0",
+        )}
+      >
         <img src={hero.src} alt={hero.alt} className="absolute inset-0 size-full object-cover" />
         <div
           className={cn(

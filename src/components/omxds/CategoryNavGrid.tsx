@@ -139,12 +139,9 @@ export function CategoryNavGrid({
           <li
             key={item.slug}
             className={
-              isRail
-                ? "w-[6.75rem] min-w-0 shrink-0 snap-start sm:w-auto sm:shrink"
-                : "min-w-0"
+              isRail ? "w-[6.75rem] min-w-0 shrink-0 snap-start sm:w-auto sm:shrink" : "min-w-0"
             }
           >
-
             {mode === "navigate" && item.href ? (
               <a
                 href={item.href}

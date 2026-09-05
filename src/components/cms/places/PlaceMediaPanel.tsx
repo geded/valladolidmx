@@ -34,7 +34,11 @@ export interface PlaceMediaAsset {
   alt_text: string | null;
   review_state: string | null;
   status: string | null;
-  metadata?: { temporary_placeholder?: boolean; generated_ai?: boolean; ai_generated?: boolean } | null;
+  metadata?: {
+    temporary_placeholder?: boolean;
+    generated_ai?: boolean;
+    ai_generated?: boolean;
+  } | null;
   is_demo_seed?: boolean | null;
   demo_seed_batch?: string | null;
 }
@@ -42,7 +46,9 @@ export interface PlaceMediaAsset {
 /** Activo conceptual temporal generado con IA, pendiente de sustitución. */
 function isTemporaryAiAsset(asset: PlaceMediaAsset | undefined): boolean {
   const meta = asset?.metadata ?? {};
-  return meta.temporary_placeholder === true || meta.generated_ai === true || meta.ai_generated === true;
+  return (
+    meta.temporary_placeholder === true || meta.generated_ai === true || meta.ai_generated === true
+  );
 }
 
 interface Props {

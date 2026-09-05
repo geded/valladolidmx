@@ -81,7 +81,8 @@ export const updateInstitutionalAuthoritySettings = createServerFn({ method: "PO
     const { error } = await context.supabase.from("platform_settings").upsert(
       {
         key: INSTITUTIONAL_AUTHORITY_KEY,
-        value: data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
+        value:
+          data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
         is_public: true,
         description:
           "Autoridad institucional vigente: destinos que ostentan cada distintivo oficial.",

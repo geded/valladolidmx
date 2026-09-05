@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { getAuthorizedSlugs } from "@/lib/institutional/institutional-authority";
 
-
 export const BADGE_KINDS = [
   "pueblo-magico",
   "patrimonio",
@@ -207,7 +206,6 @@ export function isBadgeAuthorized(kind: BadgeKind, subjectSlug?: string): boolea
   return restricted.includes(subjectSlug.toLowerCase());
 }
 
-
 export interface BadgeEvidence {
   kind: BadgeKind;
   sourceOwner?: string;
@@ -277,8 +275,7 @@ export function buildDestinationBadgeItems(subjectSlug: string): DestinationBadg
   if (!slug) return [];
   return DESTINATION_BADGE_KINDS.filter(
     (kind) =>
-      isBadgeAuthorized(kind, slug) &&
-      getBadgeRegistryEntry(kind).verificationMode !== "disabled",
+      isBadgeAuthorized(kind, slug) && getBadgeRegistryEntry(kind).verificationMode !== "disabled",
   )
     .sort((a, b) => getBadgeRegistryEntry(a).priority - getBadgeRegistryEntry(b).priority)
     .map((kind) => ({ kind, slug: `${kind}:${slug}`, source: "destination" as const }));

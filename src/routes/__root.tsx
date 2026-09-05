@@ -86,7 +86,6 @@ import {
   useInstitutionalAuthority,
 } from "@/lib/institutional/institutional-context";
 
-
 import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
@@ -328,59 +327,58 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <BrandProvider>
-        <InstitutionalAuthoritySync />
-        <AuthProvider>
-          {!isAppShellRoute ? <SkipLink /> : null}
-          {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
-          {!isAppShellRoute ? (
-            <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
-          ) : null}
-          {!isAppShellRoute ? <OfflineBanner /> : null}
-          <SyncStatusBanner />
-          <UpdateBanner />
-          <Outlet />
-          {!isAppShellRoute ? (
-            <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />
-          ) : null}
-          {showPublicAlux ? (
+          <InstitutionalAuthoritySync />
+          <AuthProvider>
+            {!isAppShellRoute ? <SkipLink /> : null}
+            {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
+            {!isAppShellRoute ? (
+              <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
+            ) : null}
+            {!isAppShellRoute ? <OfflineBanner /> : null}
+            <SyncStatusBanner />
+            <UpdateBanner />
+            <Outlet />
+            {!isAppShellRoute ? (
+              <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />
+            ) : null}
+            {showPublicAlux ? (
+              <React.Suspense fallback={null}>
+                <AluxFloatingTrigger />
+              </React.Suspense>
+            ) : null}
             <React.Suspense fallback={null}>
-              <AluxFloatingTrigger />
+              <FloatingTravelPlanDock />
             </React.Suspense>
-          ) : null}
-          <React.Suspense fallback={null}>
-            <FloatingTravelPlanDock />
-          </React.Suspense>
-          <React.Suspense fallback={null}>
-            <AluxMemorySyncRunner />
-          </React.Suspense>
-          <React.Suspense fallback={null}>
-            <ConciergeProposalObserver />
-          </React.Suspense>
-          <LazyToasterHost />
-          {!isAppShellRoute ? (
             <React.Suspense fallback={null}>
-              <EditThisPageButton pathname={pathname} />
+              <AluxMemorySyncRunner />
             </React.Suspense>
-          ) : null}
-          {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
-          <ProtectedActionResumeRunner />
-          {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
-          <React.Suspense fallback={null}>
-            <SignInPromptSheet />
-          </React.Suspense>
-          <React.Suspense fallback={null}>
-            <AnonymousDraftImportRunner />
-          </React.Suspense>
-          {/*
+            <React.Suspense fallback={null}>
+              <ConciergeProposalObserver />
+            </React.Suspense>
+            <LazyToasterHost />
+            {!isAppShellRoute ? (
+              <React.Suspense fallback={null}>
+                <EditThisPageButton pathname={pathname} />
+              </React.Suspense>
+            ) : null}
+            {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
+            <ProtectedActionResumeRunner />
+            {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
+            <React.Suspense fallback={null}>
+              <SignInPromptSheet />
+            </React.Suspense>
+            <React.Suspense fallback={null}>
+              <AnonymousDraftImportRunner />
+            </React.Suspense>
+            {/*
           Navigation Blueprint · N3 — Único punto de suscripción global
           al Context Engine para persistir la cadena territorial en
           sessionStorage (deep-links, refresh, back/forward).
         */}
-          <GlobalNavigationSessionBridge />
-        </AuthProvider>
+            <GlobalNavigationSessionBridge />
+          </AuthProvider>
         </BrandProvider>
       </I18nProvider>
-
     </QueryClientProvider>
   );
 }

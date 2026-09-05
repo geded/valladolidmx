@@ -197,7 +197,6 @@ export function ExperiencesListingSurface({
       return { ...current, [groupId]: next };
     });
 
-
   const featured = filtered.slice(0, 4).map(toShowcaseItem);
   const rest = filtered.slice(4);
 
@@ -255,9 +254,6 @@ export function ExperiencesListingSurface({
         onClear={() => setActive({})}
         resultCount={filtered.length}
       />
-
-
-
 
       {filtered.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
@@ -331,7 +327,6 @@ export function ExperiencesListingSurface({
         ))}
       </div>
     </div>
-
   );
 }
 
@@ -357,7 +352,9 @@ function ExperienceListCard({
   });
   /* Duración publicada (eje `duracion`); se omite si no hay dato. */
   const durationRaw = attributeValues(vm, "duracion")[0] ?? null;
-  const durationLabel = durationRaw ? (valueLabels[durationRaw] ?? humanizeValue(durationRaw)) : null;
+  const durationLabel = durationRaw
+    ? (valueLabels[durationRaw] ?? humanizeValue(durationRaw))
+    : null;
   return (
     <div className="flex flex-col gap-2">
       <PremiumCompactRow item={toShowcaseItem(vm)} />

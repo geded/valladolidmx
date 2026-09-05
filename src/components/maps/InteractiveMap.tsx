@@ -38,7 +38,6 @@ export interface MapRouteStatus {
   waypointOrder?: number[];
 }
 
-
 /**
  * Cartografía territorial Valladolid.mx.
  * Conserva calles y referencias geográficas útiles, reduce ruido comercial
@@ -137,7 +136,6 @@ function useVisibleWithSize(ref: React.RefObject<HTMLDivElement | null>): boolea
 
   return visible;
 }
-
 
 export interface InteractiveMapMarker {
   lat: number;
@@ -273,7 +271,8 @@ export function InteractiveMap({
         if (list.length > 1) map.fitBounds(bounds, 88);
 
         /* Capa de ruta: sólo con la capacidad real del proveedor. */
-        const stops = routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
+        const stops =
+          routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
         if (stops.length > 1) {
           const directions = new google.maps.DirectionsService();
           const renderer = new google.maps.DirectionsRenderer({
@@ -350,17 +349,7 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [
-    shouldMount,
-    lat,
-    lng,
-    zoom,
-    markerTitle,
-    markers,
-    connectByRoad,
-    routeStops,
-    optimizeRoute,
-  ]);
+  }, [shouldMount, lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
 
   if (failed) {
     const points = (
@@ -379,5 +368,4 @@ export function InteractiveMap({
       data-map-mounted={shouldMount ? "true" : "false"}
     />
   );
-
 }

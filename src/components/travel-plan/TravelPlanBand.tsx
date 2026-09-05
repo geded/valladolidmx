@@ -67,10 +67,7 @@ export function TravelPlanBand({
           <Sparkles className="size-4" />
         </span>
         <div className="min-w-0">
-          <h2
-            id={titleId}
-            className="truncate font-display text-sm leading-tight text-foreground"
-          >
+          <h2 id={titleId} className="truncate font-display text-sm leading-tight text-foreground">
             {title}
           </h2>
           {eyebrow ? (

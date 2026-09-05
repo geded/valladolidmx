@@ -15,10 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
-import {
-  attributeValues,
-  humanizeAttributeValue,
-} from "@/lib/business-attributes/types";
+import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
@@ -40,7 +37,6 @@ interface ListingItem {
   startsAt?: string | null;
   source?: TourismCardVM;
 }
-
 
 interface NearbyItem {
   name: string;
@@ -430,7 +426,6 @@ function TerritorialListingBody({
   secondary: string;
   setSecondary: (v: string) => void;
 }) {
-
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
   const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
   const secondaryValues = useMemo(
@@ -444,9 +439,9 @@ function TerritorialListingBody({
       if (primary && item.type !== primary) return false;
       if (secondary && !item.tags.includes(secondary)) return false;
       if (!needle) return true;
-      return normalize([item.name, item.zone, item.copy, item.type, ...item.tags].join(" ")).includes(
-        needle,
-      );
+      return normalize(
+        [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
+      ).includes(needle);
     });
   }, [items, primary, query, secondary, zone]);
   return (
@@ -505,7 +500,11 @@ function TerritorialListingBody({
 }
 
 function normalize(value: string): string {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 function unique(values: string[]): string[] {
@@ -522,22 +521,36 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     profile.family === "eventos"
       ? "event_type"
       : profile.family === "lugares"
-      ? "place_type"
-      : profile.family === "restaurantes"
-      ? "cuisine_type"
-      : profile.family === "casas-de-vacaciones"
-        ? "property_type"
-        : "hotel_type";
+        ? "place_type"
+        : profile.family === "restaurantes"
+          ? "cuisine_type"
+          : profile.family === "casas-de-vacaciones"
+            ? "property_type"
+            : "hotel_type";
   const secondaryKeys =
     profile.family === "eventos"
       ? ["date_range", "audience", "accessibility", "venue_type", "admission_type"]
       : profile.family === "lugares"
-      ? ["experience_category", "admission_type", "accessibility", "amenities", "duration", "best_time"]
-      : profile.family === "restaurantes"
-      ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
-      : profile.family === "casas-de-vacaciones"
-        ? ["capacity", "bedrooms", "amenities", "stay_features", "traveler_profile", "price_level"]
-        : ["services", "amenities", "accessibility", "traveler_profile", "price_level"];
+        ? [
+            "experience_category",
+            "admission_type",
+            "accessibility",
+            "amenities",
+            "duration",
+            "best_time",
+          ]
+        : profile.family === "restaurantes"
+          ? ["dining_experience", "services", "dietary_options", "meal_period", "traveler_profile"]
+          : profile.family === "casas-de-vacaciones"
+            ? [
+                "capacity",
+                "bedrooms",
+                "amenities",
+                "stay_features",
+                "traveler_profile",
+                "price_level",
+              ]
+            : ["services", "amenities", "accessibility", "traveler_profile", "price_level"];
   const structuredType = attributeValues(item.filterAttributes?.[typeKey])[0];
   const structuredTags = secondaryKeys.flatMap((key) =>
     attributeValues(item.filterAttributes?.[key]).map(humanizeAttributeValue),
@@ -570,27 +583,24 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
  * tokens del sistema). Esta superficie ya no renderiza uno paralelo.
  */
 
-
 function ListingIntro({ profile }: { profile: ListingProfile }) {
   const Icon =
     profile.family === "eventos"
       ? CalendarDays
       : profile.family === "lugares"
-      ? Landmark
-      : profile.family === "restaurantes"
-      ? UtensilsCrossed
-      : profile.family === "casas-de-vacaciones"
-        ? Home
-        : BedDouble;
+        ? Landmark
+        : profile.family === "restaurantes"
+          ? UtensilsCrossed
+          : profile.family === "casas-de-vacaciones"
+            ? Home
+            : BedDouble;
   return (
     <header className="grid gap-5 border-y border-[#ded7c9] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
       <div className="max-w-3xl">
         <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[#ba641e]">
           <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
-        <h1 className="mt-3 font-display text-display-hero">
-          {profile.title}
-        </h1>
+        <h1 className="mt-3 font-display text-display-hero">{profile.title}</h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-[#5d685f] sm:text-lg">
           {profile.description}
         </p>
@@ -708,10 +718,14 @@ function Filters({
             >
               <option value="">{label}: todos</option>
               {options.map((option) => (
-                <option key={option} value={option}>{option}</option>
+                <option key={option} value={option}>
+                  {option}
+                </option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">⌄</span>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+              ⌄
+            </span>
           </label>
         ))}
         <button
@@ -790,7 +804,10 @@ function ListingCard({
         </div>
         <div className="mt-auto flex items-center gap-2 pt-3">
           {item.href ? (
-            <a href={item.href} className="inline-flex min-h-10 items-center rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
+            <a
+              href={item.href}
+              className="inline-flex min-h-10 items-center rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm"
+            >
               Ver {profile.itemLabel}
             </a>
           ) : (
@@ -958,7 +975,11 @@ function matchesDateRange(startsAt: string | null | undefined, range: EventDateR
     const monday = new Date(saturday.getTime() + 2 * 86400000);
     return date >= saturday && date < monday;
   }
-  const monthStart = new Date(now.getFullYear(), now.getMonth() + (range === "este-mes" ? 0 : 1), 1);
+  const monthStart = new Date(
+    now.getFullYear(),
+    now.getMonth() + (range === "este-mes" ? 0 : 1),
+    1,
+  );
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + (range === "este-mes" ? 1 : 2), 1);
   return date >= monthStart && date < monthEnd;
 }
@@ -1507,9 +1528,7 @@ function PlaceListingBody({
      destino tiene subzonas con registros reales. */
   const subzonas = useMemo(
     () =>
-      facetOptions("zone", "subzona", (item) =>
-        attrOf(item, "zone").map(humanizeAttributeValue),
-      ),
+      facetOptions("zone", "subzona", (item) => attrOf(item, "zone").map(humanizeAttributeValue)),
     [facetOptions],
   );
   useEffect(() => {
@@ -1613,28 +1632,29 @@ function PlaceListingBody({
           ]
             .filter((option) => option.value === "" || option.count > 0)
             .map((option) => {
-            const active = family === option.value;
-            return (
-              <button
-                key={option.value || "todos"}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setFamily(option.value)}
-                className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-                  active
-                    ? "border-[#0d4b38] bg-[#0d4b38] text-white"
-                    : "border-[#ded7c9] bg-white text-[#17251f]"
-                }`}
-              >
-                {option.label}
-                {typeof option.count === "number" ? (
-                  <span className={active ? "text-white/75" : "text-[#788078]"}>{option.count}</span>
-                ) : null}
-              </button>
-            );
-          })}
+              const active = family === option.value;
+              return (
+                <button
+                  key={option.value || "todos"}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setFamily(option.value)}
+                  className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                    active
+                      ? "border-[#0d4b38] bg-[#0d4b38] text-white"
+                      : "border-[#ded7c9] bg-white text-[#17251f]"
+                  }`}
+                >
+                  {option.label}
+                  {typeof option.count === "number" ? (
+                    <span className={active ? "text-white/75" : "text-[#788078]"}>
+                      {option.count}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
         </div>
-
 
         <section className="mt-3 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
           <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
@@ -1666,7 +1686,12 @@ function PlaceListingBody({
             )}
 
             {subzonas.length > 0 ? (
-              <FacetSelect label="Subzona" value={subzona} onChange={setSubzona} options={subzonas} />
+              <FacetSelect
+                label="Subzona"
+                value={subzona}
+                onChange={setSubzona}
+                options={subzonas}
+              />
             ) : null}
 
             {placeTypes.length > 0 ? (
@@ -1765,8 +1790,8 @@ function PlaceListingBody({
                   Lugares cerca de {lockedDestinationLabel}
                 </h2>
                 <p className="mt-1 text-sm text-[#667067]">
-                  Pertenecen a otros destinos por proximidad territorial: no son una
-                  subzona de {lockedDestinationLabel} y no cuentan en los resultados locales.
+                  Pertenecen a otros destinos por proximidad territorial: no son una subzona de{" "}
+                  {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>
                 <div className="mt-4 space-y-4">
                   {nearbyItems.slice(0, 6).map((card) => (

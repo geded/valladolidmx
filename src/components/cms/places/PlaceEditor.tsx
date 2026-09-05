@@ -631,10 +631,7 @@ export function PlaceEditor({ placeId }: Props) {
         title="Identidad y territorio"
         description="El tipo se cambia por endpoint gobernado; las categorías son autoridad de descubrimiento independiente."
       >
-        <PlaceField
-          name="attraction_family"
-          label="Familia de atractivo (Inventario Oriente Maya)"
-        >
+        <PlaceField name="attraction_family" label="Familia de atractivo (Inventario Oriente Maya)">
           {({ id }) => (
             <select
               id={id}
@@ -1032,7 +1029,9 @@ export function PlaceEditor({ placeId }: Props) {
         }
         value={
           (((place?.metadata as Record<string, unknown> | null)?.presentation_mode as
-            "editorial" | "cinematic" | undefined) ?? null) as "editorial" | "cinematic" | null
+            | "editorial"
+            | "cinematic"
+            | undefined) ?? null) as "editorial" | "cinematic" | null
         }
         hasApprovedCover={(() => {
           const rows = (det.media ?? []) as PlaceMediaRow[];

@@ -30,7 +30,12 @@ import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-po
 import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 
 export type SmartBlockJsonValue =
-  string | number | boolean | null | SmartBlockJsonValue[] | { [k: string]: SmartBlockJsonValue };
+  | string
+  | number
+  | boolean
+  | null
+  | SmartBlockJsonValue[]
+  | { [k: string]: SmartBlockJsonValue };
 
 export interface SmartBlockResolveResult {
   items: Array<Record<string, SmartBlockJsonValue>>;

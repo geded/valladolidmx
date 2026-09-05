@@ -65,7 +65,9 @@ export function coerceAttributesToDefinitions(
   const out: TourismFilterAttributes = {};
   for (const definition of definitions) {
     const allowed = new Set(definition.options.map((option) => option.value));
-    const candidates = attributeValues(values[definition.key]).filter((value) => allowed.has(value));
+    const candidates = attributeValues(values[definition.key]).filter((value) =>
+      allowed.has(value),
+    );
     if (!candidates.length) continue;
     if (definition.inputType === "single") out[definition.key] = candidates[0];
     else out[definition.key] = Array.from(new Set(candidates));

@@ -69,9 +69,7 @@ export function PremiumHero({
                 {vm.eyebrow}
               </p>
             ) : null}
-            <h1 className="relative mt-3 max-w-3xl font-serif text-display-hero">
-              {vm.title}
-            </h1>
+            <h1 className="relative mt-3 max-w-3xl font-serif text-display-hero">{vm.title}</h1>
             {vm.description ? (
               <p className="relative mt-5 max-w-2xl text-pretty text-base leading-7 text-white/85 sm:text-lg">
                 {vm.description}
@@ -97,7 +95,6 @@ export function PremiumHero({
         cinematic
           ? "min-h-[min(125vw,500px)] sm:min-h-[78svh]"
           : "min-h-[min(125vw,500px)] sm:min-h-[34rem] lg:min-h-[42rem]",
-
       )}
     >
       {vm.media ? (
@@ -201,7 +198,6 @@ export function PremiumHero({
               ) : null}
             </div>
           ) : null}
-
         </div>
       </div>
     </section>

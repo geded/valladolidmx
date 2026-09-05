@@ -97,7 +97,9 @@ function BrandSettingsPage() {
             <Input
               id={`brand-${field.key}`}
               value={form[field.key]}
-              onChange={(event) => setForm((prev) => ({ ...prev, [field.key]: event.target.value }))}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, [field.key]: event.target.value }))
+              }
               disabled={brandQ.isLoading || save.isPending}
             />
             <p className="text-xs text-muted-foreground">{field.hint}</p>

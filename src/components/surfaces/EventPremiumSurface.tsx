@@ -173,7 +173,13 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
             title="¿Qué fechas estarás en la región?"
             description="Alux combinará este evento con lugares, mesas y experiencias cercanas sin romper el ritmo de tu viaje."
             task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya de Yucatán.`}
-            prompts={["Este fin de semana", "Ya estoy aquí", "En pareja", "En familia", "Con amigos"]}
+            prompts={[
+              "Este fin de semana",
+              "Ya estoy aquí",
+              "En pareja",
+              "En familia",
+              "Con amigos",
+            ]}
             compact
           />
         </Container>

@@ -166,9 +166,7 @@ export function ExperienceFiltersBar({
           aria-label="Todos los filtros"
           className={cn(
             "flex flex-col gap-0 p-0",
-            isMobile
-              ? "max-h-[85vh] rounded-t-3xl"
-              : "w-full max-w-md sm:max-w-md",
+            isMobile ? "max-h-[85vh] rounded-t-3xl" : "w-full max-w-md sm:max-w-md",
           )}
         >
           <header className="flex items-center justify-between border-b border-border px-5 py-4">

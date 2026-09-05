@@ -285,7 +285,11 @@ export const getPlaceCms = createServerFn({ method: "POST" })
       alt_text: string | null;
       review_state: string | null;
       status: string | null;
-      metadata: { temporary_placeholder?: boolean; generated_ai?: boolean; ai_generated?: boolean } | null;
+      metadata: {
+        temporary_placeholder?: boolean;
+        generated_ai?: boolean;
+        ai_generated?: boolean;
+      } | null;
       is_demo_seed: boolean | null;
       demo_seed_batch: string | null;
     }> = [];
@@ -655,7 +659,11 @@ export const deletePlaceMediaAsset = createServerFn({ method: "POST" })
         .select("id, review_state, metadata")
         .eq("id", data.media_asset_id)
         .maybeSingle(),
-    ) as { id: string; review_state: string | null; metadata: Record<string, unknown> | null } | null;
+    ) as {
+      id: string;
+      review_state: string | null;
+      metadata: Record<string, unknown> | null;
+    } | null;
     if (!asset) throw new Error("media_asset_not_found");
     const meta = (asset.metadata ?? {}) as Record<string, unknown>;
     const temporary = meta.temporary_placeholder === true || meta.generated_ai === true;

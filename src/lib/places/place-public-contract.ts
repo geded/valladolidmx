@@ -16,10 +16,7 @@
  */
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
-import {
-  PLACE_ATTRACTION_FAMILY_LABELS,
-  type PlaceAttractionFamily,
-} from "./place-taxonomy";
+import { PLACE_ATTRACTION_FAMILY_LABELS, type PlaceAttractionFamily } from "./place-taxonomy";
 import {
   getPlacePremiumVariant,
   resolvePlacePresentation,
@@ -453,12 +450,13 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
               },
             ]
           : [],
-      directions: !isIntangible && dto.directions?.trim()
-        ? dto.directions
-            .split(/\n+/u)
-            .map((line) => line.trim())
-            .filter(Boolean)
-        : [],
+      directions:
+        !isIntangible && dto.directions?.trim()
+          ? dto.directions
+              .split(/\n+/u)
+              .map((line) => line.trim())
+              .filter(Boolean)
+          : [],
     },
     services: dto.amenities.map((label) => ({ key: label, label, hint: "" })),
     experiences: dto.products.map((item) => ({

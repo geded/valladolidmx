@@ -21,6 +21,8 @@ export interface TourismAluxPanelProps {
   selection?: AluxOpenSelection;
 }
 
+// Utility export is intentionally colocated with its canonical panel contract.
+// eslint-disable-next-line react-refresh/only-export-components
 export function buildAluxStageAwareHint(task: string, preference?: string): string {
   return [
     task,

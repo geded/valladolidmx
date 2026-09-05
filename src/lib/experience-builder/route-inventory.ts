@@ -207,7 +207,6 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     notes: "Preview interna de aprobación visual del listado de Experiencias.",
   },
   "src/routes/oriente-maya/index.tsx": {
-
     category: "studio",
     businessPriority: "critical",
     maturity: "L4",

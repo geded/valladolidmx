@@ -11,7 +11,13 @@ import type { Destination } from "@/types/territory";
 export type TerritoryType = "ciudad" | "pueblo" | "comunidad" | "costa" | "naturaleza";
 
 export const PUEBLOS_MAGICOS = new Set(["valladolid", "izamal", "espita"]);
-const COASTAL = new Set(["el-cuyo", "las-coloradas", "rio-lagartos", "san-felipe", "dzilam-de-bravo"]);
+const COASTAL = new Set([
+  "el-cuyo",
+  "las-coloradas",
+  "rio-lagartos",
+  "san-felipe",
+  "dzilam-de-bravo",
+]);
 const CITIES = new Set(["valladolid", "tizimin", "izamal"]);
 
 export const TERRITORY_TYPE_LABELS: Record<TerritoryType, string> = {

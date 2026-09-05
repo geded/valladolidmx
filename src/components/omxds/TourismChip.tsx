@@ -53,7 +53,6 @@ const SIZES: Record<TourismChipSize, string> = {
   md: "min-h-11 px-3.5 text-[13px]",
 };
 
-
 const SCHEMES: Record<TourismChipScheme, { idle: string; selected: string }> = {
   surface: {
     idle: "border-border bg-background text-foreground hover:border-primary/60 hover:bg-primary/5 focus-visible:ring-ring focus-visible:ring-offset-background",

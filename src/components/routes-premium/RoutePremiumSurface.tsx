@@ -129,9 +129,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           <div className="space-y-6">
             {days.map(([day, stops]) => (
               <div key={String(day)} className="space-y-3">
-                {day != null ? (
-                  <h3 className="font-display text-lg">Día {day}</h3>
-                ) : null}
+                {day != null ? <h3 className="font-display text-lg">Día {day}</h3> : null}
                 <ol className="space-y-3">
                   {stops.map((stop) => (
                     <li

@@ -43,7 +43,6 @@ interface Props {
   className?: string;
 }
 
-
 function crumbsFromContext(
   ctx: NonNullable<ReturnType<typeof useResolvedContext>>,
 ): readonly BreadcrumbCrumb[] {
@@ -76,9 +75,7 @@ export function BreadcrumbTerritorial({
       aria-label="Ruta territorial"
       className={cn("flex items-start justify-between gap-3 text-sm", className)}
     >
-      {compact ? (
-        <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
-      ) : null}
+      {compact ? <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} /> : null}
       {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
       <ol
         className={cn(
@@ -86,7 +83,6 @@ export function BreadcrumbTerritorial({
           compact ? "hidden sm:flex" : null,
         )}
       >
-
         <li className="flex shrink-0 items-center gap-1.5">
           <Link
             to="/"
@@ -122,7 +118,6 @@ export function BreadcrumbTerritorial({
                   {c.label}
                 </span>
               )}
-
             </li>
           );
         })}
@@ -134,10 +129,7 @@ export function BreadcrumbTerritorial({
         Blog, Contacto ni superficies sin ancla.
       */}
       <TerritorialSwitcherMount
-        className={cn(
-          "h-8 min-w-40 shrink-0 text-xs",
-          compact ? "hidden sm:flex" : null,
-        )}
+        className={cn("h-8 min-w-40 shrink-0 text-xs", compact ? "hidden sm:flex" : null)}
       />
     </nav>
   );

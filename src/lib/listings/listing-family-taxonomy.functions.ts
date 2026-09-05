@@ -26,7 +26,6 @@ export interface ListingFamilyTaxonomyResult {
   readonly taxonomy: ListingFamilyTaxonomy;
 }
 
-
 function publicClient() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -56,5 +55,4 @@ export const getListingFamilyTaxonomy = createServerFn({ method: "GET" }).handle
     }
     return { available: true, taxonomy };
   },
-
 );

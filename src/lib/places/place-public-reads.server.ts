@@ -8,11 +8,7 @@
  *  - el modo público exige `status = 'published'`;
  *  - nunca se completa un campo ausente con datos de otro lugar.
  */
-import type {
-  PublicPlaceCard,
-  PublicPlaceDTO,
-  PublicPlaceMediaDTO,
-} from "./place-public-contract";
+import type { PublicPlaceCard, PublicPlaceDTO, PublicPlaceMediaDTO } from "./place-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { resolvePlaceAttractionFamily } from "./place-taxonomy";
 
@@ -426,7 +422,11 @@ export async function readPublishedPlaceCards(
 
   const [destRes, typeRes, zoneRes, linkRes, authorityRes, mediaRes] = await Promise.all([
     destinationIds.length
-      ? sb.from("destinations").select("id, slug, name").in("id", destinationIds).is("deleted_at", null)
+      ? sb
+          .from("destinations")
+          .select("id, slug, name")
+          .in("id", destinationIds)
+          .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
     typeIds.length
       ? sb.from("place_types").select("id, slug, name, attraction_family").in("id", typeIds)
@@ -459,10 +459,7 @@ export async function readPublishedPlaceCards(
       { slug: t.slug, name: t.name, attraction_family: t.attraction_family },
     ]),
   );
-  const zoneById = new Map<
-    string,
-    { slug: string | null; name: string; destination_id: string }
-  >(
+  const zoneById = new Map<string, { slug: string | null; name: string; destination_id: string }>(
     ((zoneRes.data ?? []) as any[]).map((z) => [
       z.id,
       { slug: z.slug ?? null, name: z.name, destination_id: z.destination_id },
@@ -495,7 +492,8 @@ export async function readPublishedPlaceCards(
       .select("id, slug, name")
       .in("id", authorityKindIds)
       .eq("is_active", true);
-    for (const k of (kinds ?? []) as any[]) authorityKindById.set(k.id, { slug: k.slug, name: k.name });
+    for (const k of (kinds ?? []) as any[])
+      authorityKindById.set(k.id, { slug: k.slug, name: k.name });
   }
   const authorityKindsByPlace = new Map<string, string[]>();
   for (const link of authorityLinks) {
@@ -539,7 +537,11 @@ export async function readPublishedPlaceCards(
     for (const placeId of placeIds) {
       const own = mediaLinks
         .filter((l) => l.place_id === placeId)
-        .sort((a, b) => (a.role === "cover" ? -1 : 0) - (b.role === "cover" ? -1 : 0) || a.sort_order - b.sort_order);
+        .sort(
+          (a, b) =>
+            (a.role === "cover" ? -1 : 0) - (b.role === "cover" ? -1 : 0) ||
+            a.sort_order - b.sort_order,
+        );
       let url: string | null = null;
       for (const link of own) {
         const asset = assetById.get(link.media_asset_id);
@@ -582,7 +584,10 @@ export async function readPublishedPlaceCards(
     const amenities = strArray(p.amenities);
     const accessibility = accessibilityList(p.accessibility);
 
-    const attractionFamily = resolvePlaceAttractionFamily(p.attraction_family, type?.attraction_family);
+    const attractionFamily = resolvePlaceAttractionFamily(
+      p.attraction_family,
+      type?.attraction_family,
+    );
 
     const attrs: Record<string, string | string[]> = {};
     /* Clasificación principal del Inventario de Atractivos. */

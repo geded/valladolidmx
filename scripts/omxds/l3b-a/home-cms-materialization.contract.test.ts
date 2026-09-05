@@ -19,12 +19,7 @@ const CURRENT_CONFIG = {
   que_hacer_items: [{ media_url: "" }, { media_url: "" }, { media_url: "" }],
   servicios_stays: [{ media_url: "" }, { media_url: "" }],
   eventos_media_url: "",
-  experiencias_items: [
-    { media_url: "" },
-    { media_url: "" },
-    { media_url: "" },
-    { media_url: "" },
-  ],
+  experiencias_items: [{ media_url: "" }, { media_url: "" }, { media_url: "" }, { media_url: "" }],
 } as Record<string, unknown>;
 
 describe("Home CMS-first · materialización equivalente", () => {

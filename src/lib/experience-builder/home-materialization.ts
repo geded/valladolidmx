@@ -48,7 +48,10 @@ const rowsOf = (value: unknown): Row[] =>
  * bloquearía el guardado en el Studio sin aportar nada: se omite.
  */
 const isCanonicalHref = (value: unknown): value is string =>
-  typeof value === "string" && value.startsWith("/") && !value.includes("?") && !value.includes("#");
+  typeof value === "string" &&
+  value.startsWith("/") &&
+  !value.includes("?") &&
+  !value.includes("#");
 
 function stripNonCanonicalHrefs<T>(value: T): T {
   if (Array.isArray(value)) return value.map((v) => stripNonCanonicalHrefs(v)) as unknown as T;
@@ -62,7 +65,6 @@ function stripNonCanonicalHrefs<T>(value: T): T {
   }
   return value;
 }
-
 
 /**
  * Une la fila por defecto (texto/enlace acreditado) con la fila vigente del
@@ -80,7 +82,6 @@ function mergeRow(defaultRow: Row | undefined, currentRow: Row): Row {
   return base;
 }
 
-
 export function materializeHomePremiumConfig(current: Cfg): Cfg {
   const defaults = homePremiumG4DefaultConfig() as Cfg;
   const out: Cfg = stripNonCanonicalHrefs(defaults);
@@ -90,7 +91,6 @@ export function materializeHomePremiumConfig(current: Cfg): Cfg {
     if (LIST_KEYS.some((l) => l.key === k)) continue;
     out[k] = v;
   }
-
 
   // 2 · Colecciones: se materializa el texto por defecto sobre cada fila
   //     vigente, respetando índice, longitud y decisiones de medios.

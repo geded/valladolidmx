@@ -121,7 +121,8 @@ export const updateBrandSettings = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("platform_settings").upsert(
       {
         key: BRAND_SETTINGS_KEY,
-        value: data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
+        value:
+          data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
         is_public: true,
         description:
           "Identidad editorial de la marca activa (nombre, lema, promesa, concierge, logo).",

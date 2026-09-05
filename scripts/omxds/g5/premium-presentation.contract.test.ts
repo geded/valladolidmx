@@ -109,6 +109,4 @@ for (const preview of previews.filter((name) => name !== "g4-home-premium-previe
   assert.doesNotMatch(source, /aria-label="Ruta territorial"/);
 }
 
-
-
 console.log("G5 premium presentation contract: PASS");

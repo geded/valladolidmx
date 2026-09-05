@@ -23,6 +23,8 @@ const DESTINATION_HREF = new RegExp(`^/${ORIENTE_MAYA.slug}/[^/]+$`);
  * del destino. Si el Context Engine entrega otra jerarquía, se cae a la
  * posición (cadenas de 4+ migas → `length - 3`; de 3 → `length - 2`).
  */
+// Breadcrumb contract helpers are intentionally colocated with the component.
+// eslint-disable-next-line react-refresh/only-export-components
 export function resolveCompactAnchorIndex(
   crumbs: readonly BreadcrumbCrumb[],
   explicit?: number,
@@ -46,6 +48,7 @@ function clamp(value: number, lastIndex: number): number {
  * Sólo se compacta a partir de 4 niveles visibles (casita + 3 migas).
  * Cadenas cortas se renderizan completas y sin menú vacío.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function shouldCompactCrumbs(crumbs: readonly BreadcrumbCrumb[]): boolean {
   return crumbs.length > 2;
 }

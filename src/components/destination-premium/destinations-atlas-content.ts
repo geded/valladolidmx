@@ -237,7 +237,8 @@ export function resolveDestinationsAtlasContent(
   const alux = (input.alux ?? {}) as Record<string, unknown>;
   const startHere = (input.startHere ?? {}) as Record<string, unknown>;
   const grid = (input.grid ?? {}) as Record<string, unknown>;
-  const pageSize = typeof grid.pageSize === "number" && grid.pageSize > 0 ? grid.pageSize : base.grid.pageSize;
+  const pageSize =
+    typeof grid.pageSize === "number" && grid.pageSize > 0 ? grid.pageSize : base.grid.pageSize;
   return {
     ...base,
     hero: {

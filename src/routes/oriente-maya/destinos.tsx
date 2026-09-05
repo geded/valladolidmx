@@ -49,10 +49,7 @@ function DestinosAtlasPage() {
   return (
     <PublicShell
       variant="hero"
-      crumbs={[
-        { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
-        { label: "Destinos" },
-      ]}
+      crumbs={[{ label: ORIENTE_MAYA.name, to: "/oriente-maya" }, { label: "Destinos" }]}
       compactCrumbsOnMobile
     >
       <script

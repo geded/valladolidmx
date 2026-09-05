@@ -15,12 +15,27 @@ import type {
   EditorialRouteStopKind,
 } from "./route-public-contract";
 
-const PALETTES = new Set<EditorialRoutePalette>([
-  "territorio",
-  "selva",
-  "cenote",
-  "atardecer",
-]);
+const PALETTES = new Set<EditorialRoutePalette>(["territorio", "selva", "cenote", "atardecer"]);
+
+interface EditorialRouteRow {
+  id: string;
+  slug: string;
+  name: string;
+  summary?: string | null;
+  palette?: EditorialRoutePalette | null;
+  region_slug?: string | null;
+  duration_days?: number | null;
+  duration_hours?: number | null;
+  pace?: string | null;
+  difficulty?: string | null;
+  interests?: string[] | null;
+  audiences?: string[] | null;
+  seasons?: string[] | null;
+  destination_ids?: string[] | null;
+  origin_destination_id?: string | null;
+  cover_media_id?: string | null;
+  gallery_media_ids?: string[] | null;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
@@ -64,7 +79,9 @@ async function signMedia(
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("media_assets")
-    .select("id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state")
+    .select(
+      "id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state",
+    )
     .in("id", unique);
   const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
   for (const asset of (data ?? []) as Array<Record<string, unknown>>) {
@@ -84,9 +101,8 @@ async function signMedia(
   return out;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toCard(
-  row: Record<string, any>,
+  row: EditorialRouteRow,
   destinations: Map<string, { slug: string; name: string }>,
   cover: { url: string | null; alt: string | null } | undefined,
   stopCount: number,
@@ -99,7 +115,7 @@ function toCard(
     slug: row.slug,
     name: row.name,
     summary: (row.summary ?? "").trim(),
-    palette: PALETTES.has(row.palette) ? row.palette : "territorio",
+    palette: row.palette && PALETTES.has(row.palette) ? row.palette : "territorio",
     regionSlug: row.region_slug ?? "oriente-maya",
     durationDays: row.duration_days ?? null,
     durationHours: row.duration_hours ?? null,
@@ -158,7 +174,7 @@ export async function readPublishedRouteCards(input?: {
 
   const cards = rows.map((row) =>
     toCard(
-      row,
+      row as unknown as EditorialRouteRow,
       destinations,
       row.cover_media_id ? media.get(String(row.cover_media_id)) : undefined,
       counts.get(String(row.id)) ?? 0,
@@ -180,9 +196,7 @@ async function resolveStopHrefs(
   const idsOf = (kind: string) =>
     Array.from(
       new Set(
-        stops
-          .filter((s) => s.entity_kind === kind && s.entity_id)
-          .map((s) => String(s.entity_id)),
+        stops.filter((s) => s.entity_kind === kind && s.entity_id).map((s) => String(s.entity_id)),
       ),
     );
 
@@ -325,7 +339,7 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
   }));
 
   const card = toCard(
-    row,
+    row as unknown as EditorialRouteRow,
     destinations,
     row.cover_media_id ? media.get(String(row.cover_media_id)) : undefined,
     stops.length,

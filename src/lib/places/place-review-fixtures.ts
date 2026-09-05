@@ -76,7 +76,10 @@ export function withPlaceReviewFixtures(card: TourismCardVM): TourismCardVM {
   const current = (card.filterAttributes ?? {}) as Record<string, unknown>;
   const merged: Record<string, unknown> = { ...current };
   for (const [key, values] of Object.entries(extra)) {
-    if (merged[key] == null || (Array.isArray(merged[key]) && (merged[key] as unknown[]).length === 0)) {
+    if (
+      merged[key] == null ||
+      (Array.isArray(merged[key]) && (merged[key] as unknown[]).length === 0)
+    ) {
       merged[key] = values;
     }
   }
