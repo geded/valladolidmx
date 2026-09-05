@@ -451,8 +451,7 @@ function TerritorialListingBody({
   }, [items, primary, query, secondary, zone]);
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
-      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb profile={profile} />
+      <div className="w-full">
         <ListingIntro profile={profile} />
         <AluxBar profile={profile} />
         <Filters
@@ -1075,8 +1074,7 @@ function EventListingBody({
 
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
-      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb profile={profile} />
+      <div className="w-full">
         <ListingIntro
           profile={
             lockedDestinationLabel
@@ -1624,13 +1622,7 @@ function PlaceListingBody({
 
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
-      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb
-          profile={profile}
-          destinationLabel={lockedDestinationLabel ?? undefined}
-          destinationSlug={dto?.destinationSlug ?? undefined}
-          omitDestination={!locked}
-        />
+      <div className="w-full">
         <ListingIntro
           profile={
             lockedDestinationLabel
