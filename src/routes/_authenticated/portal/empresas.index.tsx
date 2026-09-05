@@ -19,6 +19,10 @@ function BusinessesIndex() {
   const canCreateBusiness = roles.some(
     (r) => r === "admin" || r === "super_admin" || r === "editor",
   );
+  // 3J.4 · El detalle comercial por empresa es una vista administrativa
+  // (`getAdminBusinessCommercialStatus` exige admin/super_admin). Mostrar el
+  // enlace a un propietario producía un callejón sin salida con "forbidden".
+  const canSeeCommercialDetail = roles.some((r) => r === "admin" || r === "super_admin");
   const {
     data: businesses = [],
     isLoading,
@@ -114,13 +118,22 @@ function BusinessesIndex() {
                   {b.role}
                 </td>
                 <td className="px-5 py-3 text-right">
-                  <Link
-                    to="/portal/empresas/$businessId"
-                    params={{ businessId: b.business_id }}
-                    className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
-                  >
-                    Ver detalle
-                  </Link>
+                  {canSeeCommercialDetail ? (
+                    <Link
+                      to="/portal/empresas/$businessId"
+                      params={{ businessId: b.business_id }}
+                      className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
+                    >
+                      Ver detalle
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/portal/ficha"
+                      className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
+                    >
+                      Editar ficha
+                    </Link>
+                  )}
                 </td>
               </tr>
             ))}
