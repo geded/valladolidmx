@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 import type { CompositionTree } from "../composition-tree";
 import {
   buildSeoLandingComposition,
@@ -55,6 +56,7 @@ interface EntitySnapshot {
   description: string | null;
   coverMediaId: string | null;
   destinationSlug: string | null;
+  destinationName: string | null;
   categorySlug: string | null;
 }
 
@@ -80,7 +82,11 @@ async function loadEntity(
     if (!data) throw new Error("seo_landing_entity_not_found");
     const [dest, cat] = await Promise.all([
       data.destination_id
-        ? supabase.from("destinations").select("slug").eq("id", data.destination_id).maybeSingle()
+        ? supabase
+            .from("destinations")
+            .select("slug, name")
+            .eq("id", data.destination_id)
+            .maybeSingle()
         : Promise.resolve({ data: null }),
       data.primary_category_id
         ? supabase
@@ -98,6 +104,7 @@ async function loadEntity(
       description: data.description,
       coverMediaId: data.cover_media_id,
       destinationSlug: dest?.data?.slug ?? null,
+      destinationName: dest?.data?.name ?? null,
       categorySlug: cat?.data?.slug ?? null,
     };
   }
@@ -119,6 +126,7 @@ async function loadEntity(
       description: data.description,
       coverMediaId: data.cover_media_id,
       destinationSlug: null,
+      destinationName: null,
       categorySlug: data.product_type ?? null,
     };
   }
@@ -132,7 +140,11 @@ async function loadEntity(
   if (error) throw new Error(error.message);
   if (!data) throw new Error("seo_landing_entity_not_found");
   const dest = data.destination_id
-    ? await supabase.from("destinations").select("slug").eq("id", data.destination_id).maybeSingle()
+    ? await supabase
+        .from("destinations")
+        .select("slug, name")
+        .eq("id", data.destination_id)
+        .maybeSingle()
     : { data: null };
   return {
     id: data.id,
@@ -142,6 +154,7 @@ async function loadEntity(
     description: data.description,
     coverMediaId: null,
     destinationSlug: dest?.data?.slug ?? null,
+    destinationName: dest?.data?.name ?? null,
     categorySlug: null,
   };
 }
@@ -161,14 +174,63 @@ function canonicalEntityUrl(
     : null;
 }
 
-async function resolveMediaUrl(supabase: Db, mediaId: string | null): Promise<string | null> {
+interface RealMediaItem {
+  url: string;
+  alt: string;
+  role: string;
+}
+
+/**
+ * Medios reales acreditados de la entidad. La URL pública se construye
+ * exclusivamente con el contrato estable `toStablePublicMediaUrl`: si el
+ * activo no vive en el bucket gobernado, se omite (fail-closed) — nunca se
+ * arma una ruta a mano ni se firma una URL temporal.
+ */
+async function loadEntityMedia(
+  supabase: Db,
+  entityType: SeoLandingEntityType,
+  entity: EntitySnapshot,
+): Promise<RealMediaItem[]> {
+  const select =
+    "role, sort_order, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
+  const query =
+    entityType === "business"
+      ? supabase.from("business_media").select(select).eq("business_id", entity.id)
+      : entityType === "product"
+        ? supabase.from("product_media").select(select).eq("product_id", entity.id)
+        : supabase.from("place_media").select(select).eq("place_id", entity.id);
+  const { data, error } = await query.order("sort_order", { ascending: true }).limit(12);
+  if (error) return [];
+  const items: RealMediaItem[] = [];
+  for (const row of data ?? []) {
+    const asset = row.media_assets as {
+      storage_bucket?: string | null;
+      storage_path?: string | null;
+      alt_text?: string | null;
+    } | null;
+    const url = toStablePublicMediaUrl(asset?.storage_bucket, asset?.storage_path);
+    if (!url) continue;
+    const alt = (asset?.alt_text ?? "").trim();
+    if (!alt) continue;
+    items.push({ url, alt, role: String(row.role ?? "gallery") });
+  }
+  return items;
+}
+
+async function resolveCoverUrl(
+  supabase: Db,
+  mediaId: string | null,
+): Promise<{ url: string; alt: string } | null> {
   if (!mediaId) return null;
   const { data } = await supabase
     .from("media_assets")
-    .select("storage_path")
+    .select("storage_bucket, storage_path, alt_text")
     .eq("id", mediaId)
     .maybeSingle();
-  return data?.storage_path ?? null;
+  const url = toStablePublicMediaUrl(data?.storage_bucket, data?.storage_path);
+  const alt = (data?.alt_text ?? "").trim();
+  if (!url || !alt) return null;
+  return { url, alt };
 }
 
 /** Slots reales: sin dato ⇒ sin slot (cero contenido inventado). */
@@ -177,27 +239,61 @@ async function buildRealSlots(
   entityType: SeoLandingEntityType,
   entity: EntitySnapshot,
 ): Promise<Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>>> {
-  const mediaUrl = await resolveMediaUrl(supabase, entity.coverMediaId);
+  const [cover, media] = await Promise.all([
+    resolveCoverUrl(supabase, entity.coverMediaId),
+    loadEntityMedia(supabase, entityType, entity),
+  ]);
+  const heroMedia = cover ?? media.find((m) => m.role === "cover") ?? media[0] ?? null;
+
   const hero: SeoLandingSlotConfig = { title: entity.title };
   if (entity.tagline) hero.description = entity.tagline;
-  if (entity.categorySlug) hero.eyebrow = entity.categorySlug;
-  if (mediaUrl) {
-    hero.mediaUrl = mediaUrl;
-    hero.mediaAlt = entity.title;
+  // Territorio primero: el eyebrow del hero identifica el destino real.
+  if (entity.destinationName) hero.eyebrow = entity.destinationName;
+  else if (entity.categorySlug) hero.eyebrow = entity.categorySlug;
+  if (heroMedia) {
+    hero.mediaUrl = heroMedia.url;
+    hero.mediaAlt = heroMedia.alt;
   }
 
   const slots: Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>> = { hero };
   if (entity.description?.trim())
-    slots.intro = { heading: "Por qué visitar", body: entity.description.trim() };
+    slots.intro = { title: "Por qué visitar", body: entity.description.trim() };
+
+  const gallery = media.filter((m) => m.url !== heroMedia?.url);
+  if (gallery.length > 0)
+    slots.gallery = {
+      heading: "Galería",
+      items: gallery.map((m) => ({ url: m.url, alt: m.alt })),
+    };
 
   const canonical = canonicalEntityUrl(entityType, entity);
-  if (canonical)
-    slots.ctaBar = {
-      actions: [
-        { id: "add-to-trip", action: "add-to-trip", label: "Agregar a Mi Viaje" },
-        { id: "view-entity", action: "navigate", label: "Ver ficha completa", href: canonical },
-      ],
-    };
+  if (canonical) {
+    /* `add-to-trip` exige referencia canónica de entidad (fail-closed del
+       contrato): sólo empresas y productos son representables hoy, por eso
+       en Lugares la acción se omite en lugar de inventarse. */
+    const actions: Array<Record<string, unknown>> = [];
+    if (entityType === "business" || entityType === "product")
+      actions.push({
+        action: "add-to-trip",
+        label: "Agregar a Mi Viaje",
+        emphasis: "secondary",
+        travelItem: {
+          kind: entityType,
+          targetId: entity.id,
+          title: entity.title,
+          slug: entity.slug,
+          ...(entity.tagline ? { subtitle: entity.tagline } : {}),
+          ...(heroMedia ? { imageUrl: heroMedia.url } : {}),
+        },
+      });
+    actions.push({
+      action: "navigate",
+      label: "Ver ficha completa",
+      href: canonical,
+      emphasis: "primary",
+    });
+    slots.ctaBar = { label: entity.title, actions };
+  }
   return slots;
 }
 
@@ -241,20 +337,36 @@ export const resolveSeoLandingForEntity = createServerFn({ method: "GET" })
   });
 
 export const createSeoLandingDraft = createServerFn({ method: "POST" })
-  .inputValidator((data: { entityType: SeoLandingEntityType; entityId: string }) => data)
+  .inputValidator(
+    (data: { entityType: SeoLandingEntityType; entityId: string; refresh?: boolean }) => data,
+  )
   .middleware([requireSupabaseAuth])
   .handler(
     async ({
       data,
       context,
-    }): Promise<{ id: string; slug: string; created: boolean; populatedSlots: string[] }> => {
+    }): Promise<{
+      id: string;
+      slug: string;
+      created: boolean;
+      refreshed: boolean;
+      populatedSlots: string[];
+    }> => {
       const supabase = context.supabase as Db;
       const ref = buildSeoLandingEntityRef(data.entityType, data.entityId);
 
       // 1 · Idempotencia: si ya existe, se devuelve la misma landing.
       const existing = await findExistingLanding(supabase, ref);
-      if (existing)
-        return { id: existing.id, slug: existing.slug, created: false, populatedSlots: [] };
+      if (existing && data.refresh !== true)
+        return {
+          id: existing.id,
+          slug: existing.slug,
+          created: false,
+          refreshed: false,
+          populatedSlots: [],
+        };
+      if (existing && (existing.status === "published" || existing.published_at))
+        throw new Error("seo_landing_refresh_requires_draft");
 
       // 2 · Datos reales de la entidad de origen.
       const entity = await loadEntity(supabase, data.entityType, data.entityId);
@@ -266,6 +378,34 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
         idPrefix: `landing-${data.entityType}-${entity.slug}`,
         slots,
       });
+      const seoPolicy = buildSeoLandingSeoPolicy(canonicalEntityUrl(data.entityType, entity));
+      const populatedSlots =
+        (tree.chrome as unknown as SeoChromeShape)?.seo?.landing?.populatedSlots ?? [];
+
+      /* 2b · Regeneración desde datos reales de un borrador existente.
+         Nunca duplica ni publica: reescribe el árbol y reafirma la política
+         SEO por las mismas RPC gobernadas. */
+      if (existing) {
+        const { error: reErr } = await supabase.rpc("eb_save_composition_draft", {
+          _id: existing.id,
+          _tree: tree as never,
+        });
+        if (reErr) throw new Error(reErr.message);
+        const { error: reMetaErr } = await supabase.rpc("eb_set_composition_seo_metadata", {
+          _id: existing.id,
+          _kind: "landing",
+          _canonical_override: seoPolicy.canonicalOverride ?? undefined,
+          _robots_directive: seoPolicy.robotsDirective,
+        });
+        if (reMetaErr) throw new Error(reMetaErr.message);
+        return {
+          id: existing.id,
+          slug: existing.slug,
+          created: false,
+          refreshed: true,
+          populatedSlots,
+        };
+      }
 
       // 3 · Creación del borrador (RPC gobernada: admin/editor).
       const { data: newId, error: createError } = await supabase.rpc("eb_create_composition", {
@@ -287,18 +427,15 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       });
       if (draftError) throw new Error(draftError.message);
 
-      const seo = buildSeoLandingSeoPolicy(canonicalEntityUrl(data.entityType, entity));
       const { error: metaError } = await supabase.rpc("eb_set_composition_seo_metadata", {
         _id: id,
         _kind: "landing",
-        _canonical_override: seo.canonicalOverride ?? undefined,
-        _robots_directive: seo.robotsDirective,
+        _canonical_override: seoPolicy.canonicalOverride ?? undefined,
+        _robots_directive: seoPolicy.robotsDirective,
       });
       if (metaError) throw new Error(metaError.message);
 
-      const populated =
-        (tree.chrome as unknown as SeoChromeShape)?.seo?.landing?.populatedSlots ?? [];
-      return { id, slug, created: true, populatedSlots: populated };
+      return { id, slug, created: true, refreshed: false, populatedSlots };
     },
   );
 
@@ -352,10 +489,10 @@ export const archiveLegacySeoLandingDrafts = createServerFn({ method: "POST" })
         continue;
       }
       if (row.status === "archived") continue;
-      const { error: upErr } = await supabase
-        .from("page_compositions")
-        .update({ status: "archived" })
-        .eq("id", row.id);
+      /* 3I.1 · Archivado por RPC gobernada (`eb_archive_composition`):
+         `authenticated` no tiene UPDATE directo sobre `page_compositions`.
+         La RPC valida rol editorial y existencia antes de escribir. */
+      const { error: upErr } = await supabase.rpc("eb_archive_composition", { _id: row.id });
       if (upErr) throw new Error(upErr.message);
       archived.push(row.slug);
     }

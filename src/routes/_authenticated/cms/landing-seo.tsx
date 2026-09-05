@@ -10,7 +10,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles, ExternalLink, Search } from "lucide-react";
+import { Sparkles, ExternalLink, Search, Eye, RefreshCw } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -19,6 +19,7 @@ import {
   type SeoLandingEntityType,
 } from "@/lib/experience-builder/seo-landing/seo-landing-creation";
 import { createSeoLandingDraft } from "@/lib/experience-builder/seo-landing/seo-landing-creation.functions";
+import { issueCompositionPreviewLink } from "@/lib/experience-builder/studio.functions";
 import {
   listSeoLandingsCms,
   searchSeoLandingEntities,
@@ -286,9 +287,44 @@ function LandingSeoPage() {
   );
 }
 
+const actionClass =
+  "inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-border px-3 py-1.5 text-xs font-medium ring-focus hover:bg-muted/60 disabled:opacity-60";
+
 function LandingCard({ row }: { row: SeoLandingAdminRow }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const published = row.status === "published" || Boolean(row.publishedAt);
+  const issueFn = useServerFn(issueCompositionPreviewLink);
+  const createFn = useServerFn(createSeoLandingDraft);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  /* 3I.1 · Vista previa interna (token efímero, ruta noindex existente). */
+  const preview = useMutation({
+    mutationFn: () => issueFn({ data: { composition_id: row.id } }),
+    onSuccess: (res) => {
+      const url = `${window.location.origin}/preview/composition/${res.token}`;
+      setPreviewUrl(url);
+      window.open(url, "_blank", "noopener");
+    },
+    onError: () => toast.error("No fue posible generar la vista previa."),
+  });
+
+  /* 3I.1 · Regeneración idempotente del borrador desde datos reales. */
+  const refresh = useMutation({
+    mutationFn: () =>
+      createFn({
+        data: {
+          entityType: row.entityType as SeoLandingEntityType,
+          entityId: row.entityId as string,
+          refresh: true,
+        },
+      }),
+    onSuccess: (res) => {
+      void queryClient.invalidateQueries({ queryKey: ["cms", "seo-landings"] });
+      toast.success(`Borrador regenerado con ${res.populatedSlots.length} secciones reales.`);
+    },
+    onError: () => toast.error("No fue posible regenerar el borrador."),
+  });
   return (
     <li className="rounded-2xl border border-border bg-card p-4 shadow-soft">
       <div className="flex items-start justify-between gap-3">
@@ -332,12 +368,39 @@ function LandingCard({ row }: { row: SeoLandingAdminRow }) {
               search: { page: row.id, mode: undefined, block: undefined },
             })
           }
-          className="inline-flex items-center gap-1.5 rounded-pill border border-border px-3 py-1.5 text-xs font-medium ring-focus hover:bg-muted/60"
+          className={actionClass}
         >
           <ExternalLink className="h-3.5 w-3.5" aria-hidden />
           Abrir en el Experience Builder
         </button>
+        <button
+          type="button"
+          disabled={preview.isPending}
+          onClick={() => preview.mutate()}
+          className={actionClass}
+        >
+          <Eye className="h-3.5 w-3.5" aria-hidden />
+          {preview.isPending ? "Generando…" : "Vista previa interna"}
+        </button>
+        {row.entityType && row.entityId && !published ? (
+          <button
+            type="button"
+            disabled={refresh.isPending}
+            onClick={() => refresh.mutate()}
+            className={actionClass}
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+            {refresh.isPending ? "Regenerando…" : "Regenerar desde datos reales"}
+          </button>
+        ) : null}
       </div>
+      {previewUrl ? (
+        <p className="mt-2 truncate text-xs">
+          <a href={previewUrl} target="_blank" rel="noreferrer" className="underline ring-focus">
+            {previewUrl}
+          </a>
+        </p>
+      ) : null}
     </li>
   );
 }
