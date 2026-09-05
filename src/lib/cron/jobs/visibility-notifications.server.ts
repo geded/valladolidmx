@@ -49,31 +49,33 @@ function kindMeta(kind: VisibilityKind): {
   };
 }
 
-/** Lista candidatos de cada tipo con los mismos tres RPC que la ejecución real. */
-async function listVisibilityCandidates(
+/**
+ * Recorre los tres listados en el mismo orden que la ejecución original
+ * (7d → 24h → vencidos), consultando cada RPC `STABLE` justo antes de procesar
+ * su lote. Compartido por la ejecución real y la simulación.
+ */
+async function forEachVisibilityBatch(
   supabase: CronSupabase,
   onError: (kind: VisibilityKind, error: unknown) => void,
-): Promise<Record<VisibilityKind, VisibilityGrantRow[]>> {
+  handle: (rows: VisibilityGrantRow[], kind: VisibilityKind) => Promise<void>,
+): Promise<void> {
   const { data: expiring7, error: e7 } = await supabase.rpc("list_visibility_grants_expiring", {
     _reminder: 7,
   });
   if (e7) onError("expiring_7d", e7);
+  await handle((expiring7 ?? []) as VisibilityGrantRow[], "expiring_7d");
 
   const { data: expiring1, error: e1 } = await supabase.rpc("list_visibility_grants_expiring", {
     _reminder: 1,
   });
   if (e1) onError("expiring_1d", e1);
+  await handle((expiring1 ?? []) as VisibilityGrantRow[], "expiring_1d");
 
   const { data: expired, error: ee } = await supabase.rpc(
     "list_visibility_grants_recently_expired",
   );
   if (ee) onError("expired", ee);
-
-  return {
-    expiring_7d: (expiring7 ?? []) as VisibilityGrantRow[],
-    expiring_1d: (expiring1 ?? []) as VisibilityGrantRow[],
-    expired: (expired ?? []) as VisibilityGrantRow[],
-  };
+  await handle((expired ?? []) as VisibilityGrantRow[], "expired");
 }
 
 /**
@@ -87,28 +89,29 @@ async function dryRunVisibilityNotifications(supabase: CronSupabase): Promise<Cr
     expired: newDryRunStats(),
   };
   const selection_errors: string[] = [];
-  const candidates = await listVisibilityCandidates(supabase, (kind) =>
-    selection_errors.push(kind),
-  );
 
-  for (const kind of Object.keys(candidates) as VisibilityKind[]) {
-    const { daysLeft, templateName } = kindMeta(kind);
-    for (const row of candidates[kind]) {
-      const outcome = await previewCandidate(supabase, {
-        email: row.recipient_email ?? "",
-        templateName,
-        templateData: {
-          recipientName: row.recipient_name ?? undefined,
-          businessName: row.business_name ?? undefined,
-          portalUrl: `${SITE.url}/portal/visibilidad`,
-          planName: row.plan_name,
-          expiresAt: row.expires_at,
-          daysLeft,
-        },
-      });
-      recordDryRunOutcome(results[kind], outcome);
-    }
-  }
+  await forEachVisibilityBatch(
+    supabase,
+    (kind) => selection_errors.push(kind),
+    async (rows, kind) => {
+      const { daysLeft, templateName } = kindMeta(kind);
+      for (const row of rows) {
+        const outcome = await previewCandidate(supabase, {
+          email: row.recipient_email ?? "",
+          templateName,
+          templateData: {
+            recipientName: row.recipient_name ?? undefined,
+            businessName: row.business_name ?? undefined,
+            portalUrl: `${SITE.url}/portal/visibilidad`,
+            planName: row.plan_name,
+            expiresAt: row.expires_at,
+            daysLeft,
+          },
+        });
+        recordDryRunOutcome(results[kind], outcome);
+      }
+    },
+  );
 
   return { body: { ok: selection_errors.length === 0, ...results, selection_errors } };
 }
@@ -160,12 +163,11 @@ export async function runVisibilityNotifications(
     }
   }
 
-  const candidates = await listVisibilityCandidates(supabase, (kind, error) =>
-    console.error(`list ${kind} failed`, error),
+  await forEachVisibilityBatch(
+    supabase,
+    (kind, error) => console.error(`list ${kind} failed`, error),
+    processBatch,
   );
-  await processBatch(candidates.expiring_7d, "expiring_7d");
-  await processBatch(candidates.expiring_1d, "expiring_1d");
-  await processBatch(candidates.expired, "expired");
 
   return { body: { ok: true, ...results } };
 }
