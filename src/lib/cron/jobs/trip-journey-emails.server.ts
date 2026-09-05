@@ -189,18 +189,8 @@ export async function runTripJourneyEmails(
           unsubToken = readBack?.token ?? newToken;
         }
 
-        const firstName = (row.traveler_name ?? "").trim().split(/\s+/)[0] || undefined;
-        const planUrl = `${PUBLIC_ORIGIN}/cuenta/mi-viaje`;
-        const templateData: Record<string, unknown> = {
-          travelerName: firstName,
-          folio: row.folio,
-          destinationName: row.destination_name || "el Oriente Maya",
-          startDateLabel: formatStartDate(row.start_date, row.traveler_locale),
-          partySize: row.party_size,
-          daysToTrip: row.days_to_trip ?? undefined,
-          planUrl,
-          reviewUrl: planUrl,
-        };
+        // Mismos datos de plantilla que la simulación (fuente única).
+        const templateData = buildTripTemplateData(row);
 
         const element = React.createElement(template.component, templateData);
         const html = await render(element);
