@@ -232,6 +232,16 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     functionalOwner: "Product",
     dependencies: ["route-inventory"],
   },
+  "src/routes/_authenticated/cms/landing-seo.tsx": {
+    category: "studio",
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+    functionalOwner: "Editorial",
+    dependencies: ["experience-builder", "seo-landing-template", "page_compositions"],
+    notes:
+      "LOTE 3I — sección central de Landing SEO: listar, filtrar y crear (idempotente). Edición siempre en el Experience Builder único.",
+  },
   "src/routes/_authenticated/cms/experience-builder.inventory.tsx": {
     category: "studio",
     businessPriority: "high",
@@ -492,6 +502,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/experience-builder.pages.tsx",
   "src/routes/_authenticated/cms/experience-builder.tsx",
   "src/routes/_authenticated/cms/experience-builder.inventory.tsx",
+  "src/routes/_authenticated/cms/landing-seo.tsx",
   "src/routes/_authenticated/cms/index.tsx",
   "src/routes/_authenticated/cms/lugares.$placeId.editar.tsx",
   "src/routes/_authenticated/cms/lugares.index.tsx",

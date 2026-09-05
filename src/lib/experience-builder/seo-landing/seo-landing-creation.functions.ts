@@ -277,19 +277,24 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       if (createError) throw new Error(createError.message);
       const id = String(newId);
 
-      // 4 · Metadatos: kind=landing, borrador, SEO anticanibalización.
+      /* 4 · Árbol y metadatos SEO mediante las RPC gobernadas del Experience
+         Builder. `authenticated` no tiene UPDATE directo sobre
+         `page_compositions` (LOTE 3I): toda escritura pasa por RPC con
+         verificación de rol y bitácora de contenido. */
+      const { error: draftError } = await supabase.rpc("eb_save_composition_draft", {
+        _id: id,
+        _tree: tree as never,
+      });
+      if (draftError) throw new Error(draftError.message);
+
       const seo = buildSeoLandingSeoPolicy(canonicalEntityUrl(data.entityType, entity));
-      const { error: updateError } = await supabase
-        .from("page_compositions")
-        .update({
-          kind: "landing",
-          status: "draft",
-          current_draft: tree as never,
-          canonical_override: seo.canonicalOverride,
-          robots_directive: seo.robotsDirective,
-        })
-        .eq("id", id);
-      if (updateError) throw new Error(updateError.message);
+      const { error: metaError } = await supabase.rpc("eb_set_composition_seo_metadata", {
+        _id: id,
+        _kind: "landing",
+        _canonical_override: seo.canonicalOverride ?? undefined,
+        _robots_directive: seo.robotsDirective,
+      });
+      if (metaError) throw new Error(metaError.message);
 
       const populated =
         (tree.chrome as unknown as SeoChromeShape)?.seo?.landing?.populatedSlots ?? [];
