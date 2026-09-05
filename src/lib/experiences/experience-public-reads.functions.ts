@@ -41,3 +41,20 @@ export const getExperiencesReviewListing = createServerFn({ method: "POST" })
       markDemo: true,
     });
   });
+
+export const getExperienceReviewDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { slug: unknown }) => {
+    const slug = typeof data?.slug === "string" ? data.slug.trim() : "";
+    if (!slug || slug.length > 200) throw new Error("invalid_slug");
+    return { slug };
+  })
+  .handler(async ({ data, context }) => {
+    const { data: allowed, error } = await context.supabase.rpc("is_editor_or_admin", {
+      _user_id: context.userId,
+    });
+    if (error) throw new Error(`role_check_failed:${error.message}`);
+    if (!allowed) throw new Error("forbidden");
+    const { readExperienceReviewDetail } = await import("./experience-public-reads.server");
+    return readExperienceReviewDetail(context.supabase, data.slug);
+  });
