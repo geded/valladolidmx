@@ -1,11 +1,14 @@
 /**
  * ProductEditor — Envuelve `EntityEditor` cargando el combo de empresas
- * y añadiendo paneles de portada y galería al pie del formulario.
+ * y añadiendo paneles de portada, galería y características turísticas
+ * (Lote 3E: mismo editor de atributos que el Portal Empresa, con autoridad
+ * editorial de admin/editor) al pie del formulario.
  */
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
+import { ProductAttributesPanel } from "@/components/cms/ProductAttributesPanel";
 import { ProductMediaPanels } from "@/components/cms/ProductMediaPanels";
 import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
