@@ -595,7 +595,7 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
           {profile.description}
         </p>
       </div>
-      <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#0d4b38] px-5 text-sm font-semibold text-[#0d4b38]">
+      <button className="inline-flex min-h-11 w-fit items-center justify-center gap-2 justify-self-start rounded-full border border-[#0d4b38] px-5 text-sm font-semibold text-[#0d4b38] transition hover:bg-[#0d4b38]/10 sm:justify-self-end">
         <Heart className="size-4" aria-hidden /> Ver mi viaje
       </button>
     </header>
