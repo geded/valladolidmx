@@ -143,7 +143,7 @@ export function PremiumAluxBar({
       {/* Lote 3G.1 · ayuda contextual secundaria: superficie clara con acento
           de marca, una sola banda en escritorio y tarjeta breve en móvil.
           Alux no compite con el territorio ni con las imágenes. */}
-      <div className="grid min-w-0 items-center gap-2.5 border-l-2 border-selva/70 px-3.5 py-3 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4 lg:px-4 lg:py-2.5">
+      <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-2 border-l-2 border-selva/70 px-3.5 py-2.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4 lg:px-4 lg:py-2.5">
         <div className="flex min-w-0 items-center gap-2 lg:pr-3">
           <img
             src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
@@ -157,7 +157,7 @@ export function PremiumAluxBar({
             <p className="text-[10.5px] leading-tight text-muted-foreground">Concierge IA</p>
           </div>
         </div>
-        <div className="min-w-0">
+        <div className="col-span-2 min-w-0 lg:col-span-1 lg:col-start-2 lg:row-start-1">
           <p className="line-clamp-1 max-w-2xl text-[13px] font-medium leading-snug text-foreground">
             {question}
           </p>
@@ -184,7 +184,7 @@ export function PremiumAluxBar({
           onClick={onContinue}
           variant="outline"
           size="sm"
-          className="relative h-9 w-auto shrink-0 justify-self-start gap-1.5 self-center rounded-pill border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva hover:bg-selva/10 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
+          className="relative col-start-2 row-start-1 h-9 w-auto shrink-0 justify-self-end gap-1.5 self-center rounded-pill lg:col-start-3 lg:justify-self-start border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva hover:bg-selva/10 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
         >
           <Compass className="size-3.5" aria-hidden />
           {resolvedContinueLabel}

@@ -72,8 +72,8 @@ export function TourismAluxPanel({
     >
       <div
         className={cn(
-          "grid min-w-0 gap-2.5",
-          variant === "bar" && "lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-4",
+          "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-2",
+          variant === "bar" && "lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4",
         )}
       >
         <div className="flex min-w-0 items-center gap-2 lg:pr-3">
@@ -88,7 +88,7 @@ export function TourismAluxPanel({
 
         {/* `min-w-0`: la fila de sugerencias hace scroll horizontal interno y
             no debe ensanchar la rejilla ni la página en móvil. */}
-        <div className="min-w-0">
+        <div className="col-span-2 min-w-0 lg:col-span-1 lg:col-start-2 lg:row-start-1">
           <p className="line-clamp-1 max-w-2xl text-[13px] font-medium leading-snug text-foreground">
             {title}
           </p>
@@ -109,7 +109,7 @@ export function TourismAluxPanel({
         <button
           type="button"
           onClick={() => ask()}
-          className="relative inline-flex h-9 w-auto shrink-0 items-center justify-center gap-1.5 justify-self-start rounded-pill border border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva transition-colors hover:bg-selva/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
+          className="relative col-start-2 row-start-1 inline-flex h-9 w-auto shrink-0 items-center justify-center gap-1.5 justify-self-end rounded-pill lg:col-start-3 lg:justify-self-start border border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva transition-colors hover:bg-selva/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
         >
           {variant === "card" ? (
             <Sparkles className="size-3.5" aria-hidden />
