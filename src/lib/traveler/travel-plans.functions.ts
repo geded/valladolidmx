@@ -43,7 +43,9 @@ export type TravelItemKind =
   | "event"
   | "note"
   /** Lote 3C — referencia privada a una ruta editorial publicada. */
-  | "route";
+  | "route"
+  /** Lote 3J.1 — lugar o atractivo del modelo territorial. */
+  | "place";
 
 /**
  * Whitelist activa. Ampliar aquí + en el ENUM de BD para admitir nuevos
@@ -57,6 +59,7 @@ const KNOWN_ITEM_KINDS: ReadonlySet<TravelItemKind> = new Set([
   "event",
   "note",
   "route",
+  "place",
 ]);
 
 export type TravelPlanStatus = "draft" | "active" | "shared_with_concierge" | "archived";

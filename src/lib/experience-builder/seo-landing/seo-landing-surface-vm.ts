@@ -13,6 +13,7 @@
  */
 import type { CompositionNode, CompositionTree } from "../composition-tree";
 import type { SeoLandingSlotId } from "./seo-landing-template";
+import { readSeoLandingChrome } from "./seo-landing-template";
 
 export interface SeoLandingMedia {
   readonly url: string;
@@ -103,6 +104,13 @@ export interface SeoLandingSurfaceVM {
   readonly territory: SeoLandingTerritoryVM | null;
   readonly gallery: readonly SeoLandingMedia[];
   readonly alux: { heading: string; body: string | null; ctaLabel: string } | null;
+  /**
+   * Lote 3J.1 · Referencia canónica de la entidad de origen (`kind:id`)
+   * declarada por el chrome de la plantilla. Se entrega tal cual a Alux.
+   */
+  readonly entityRef: string | null;
+  /** Destino territorial derivado del contexto ya capturado en el CMS. */
+  readonly destination: { slug: string | null; label: string | null } | null;
   /** Orden administrable de las áreas del cuerpo editorial. */
   readonly sections: readonly SeoLandingBodySection[];
 }
@@ -361,5 +369,26 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
     .sort((a, b) => a.order - b.order)
     .map((s) => s.key);
 
-  return { hero, trust, intro, features, offers, info, territory, gallery, alux, sections };
+  /* Lote 3J.1 · Contexto canónico para Alux. Nada inventado: `entityRef`
+     proviene del chrome persistido y el destino del bloque territorial. */
+  const entityRef = readSeoLandingChrome(tree)?.entityRef ?? null;
+  const destinationSlug = territoryHref?.match(/^\/oriente-maya\/([^/?#]+)/)?.[1] ?? null;
+  const destinationLabel = territory?.destinationName ?? null;
+  const destination =
+    destinationSlug || destinationLabel ? { slug: destinationSlug, label: destinationLabel } : null;
+
+  return {
+    hero,
+    trust,
+    intro,
+    features,
+    offers,
+    info,
+    territory,
+    gallery,
+    alux,
+    entityRef,
+    destination,
+    sections,
+  };
 }

@@ -24,7 +24,10 @@ import {
 } from "@/lib/places/place-public-contract";
 import { getPublicPlace, getPlacePreview } from "@/lib/places/place-public-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { bindPlaceRoute } from "@/lib/experience-builder/canonical-entity-binding";
+import { ContextEngineProvider } from "@/lib/context-engine";
+import { navigationContextToDeclaration, type NavigationContext } from "@/lib/navigation";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 
@@ -101,6 +104,41 @@ function PlaceRoute() {
     [dto],
   );
 
+  /* Lote 3J.1 · Patrón canónico: la ficha declara su contexto territorial vía
+     Navigation Contract, sin componer ancestros a mano. La familia `lugares`
+     ocupa el nivel de categoría del modelo canónico
+     `/oriente-maya/:destino/:categoria/:slug`. */
+  const declaration = useMemo(() => {
+    const ctx: NavigationContext = {
+      region: { kind: "region", slug: "oriente-maya", label: "Oriente Maya" },
+      destination: {
+        kind: "destination",
+        slug: destino,
+        label: dto?.destination.name,
+        region: "oriente-maya",
+      },
+      category: {
+        kind: "category",
+        slug: "lugares",
+        label: "Lugares y atractivos",
+        destination: destino,
+        region: "oriente-maya",
+      },
+      business: {
+        kind: "business",
+        slug,
+        label: dto?.name,
+        destination: destino,
+        category: "lugares",
+        region: "oriente-maya",
+      },
+    };
+    return navigationContextToDeclaration(ctx, {
+      ...(dto?.name ? { currentLabel: dto.name } : {}),
+      currentMeta: { family: "place", ...(dto?.id ? { entityRef: `place:${dto.id}` } : {}) },
+    });
+  }, [destino, slug, dto]);
+
   if (!dto || !projection) {
     if (preview.isLoading) {
       return <div className="min-h-[50vh]" aria-busy="true" />;
@@ -116,27 +154,47 @@ function PlaceRoute() {
   }));
 
   return (
-    <PublicShell crumbs={crumbs} variant="hero" compactCrumbsOnMobile>
-      <div className="bg-background">
-        <PlacePremiumSurface
-          content={projection.content}
-          presentation={projection.presentation}
-          variant={binding?.variant ?? projection.variant ?? undefined}
-          builderNotice={projection.resolution.builderNotice}
-          draftNotice={isDraft ? "Borrador · no publicado" : null}
-          showBreadcrumbs={false}
-          aluxSlot={
-            <TourismAluxPanel
-              title="¿Cuándo estarás en la región?"
-              description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
-              task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
-              prompts={projection.content.alux.prompts}
-              compact
-            />
-          }
-        />
-      </div>
-    </PublicShell>
+    <ContextEngineProvider declaration={declaration}>
+      <PublicShell crumbs={crumbs} variant="hero" compactCrumbsOnMobile>
+        <div className="bg-background">
+          <PlacePremiumSurface
+            content={projection.content}
+            presentation={projection.presentation}
+            variant={binding?.variant ?? projection.variant ?? undefined}
+            builderNotice={projection.resolution.builderNotice}
+            draftNotice={isDraft ? "Borrador · no publicado" : null}
+            showBreadcrumbs={false}
+            tripSlot={
+              <AddToTravelPlanButton
+                kind="place"
+                targetId={dto.id}
+                title={dto.name}
+                slug={slug}
+                subtitle={dto.destination.name}
+                variant="full"
+              />
+            }
+            aluxSlot={
+              <TourismAluxPanel
+                title="¿Cuándo estarás en la región?"
+                description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+                task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
+                prompts={projection.content.alux.prompts}
+                selection={{
+                  entityRef: `place:${dto.id}`,
+                  title: dto.name,
+                  destinationSlug: destino,
+                  destinationLabel: dto.destination.name,
+                  familySlug: "lugares",
+                  href: `/oriente-maya/${destino}/lugares/${slug}`,
+                }}
+                compact
+              />
+            }
+          />
+        </div>
+      </PublicShell>
+    </ContextEngineProvider>
   );
 }
 

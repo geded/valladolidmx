@@ -35,6 +35,8 @@ import {
   Users,
 } from "lucide-react";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type {
@@ -151,7 +153,34 @@ function ColumnHeading({ children, id }: { children: React.ReactNode; id?: strin
  * Panel de Alux dentro de la columna editorial. Ocupa el espacio residual de la
  * última área para cumplir la regla de "sin huecos en blanco" de la plantilla.
  */
-function AluxPanel({ alux }: { alux: NonNullable<SeoLandingSurfaceVM["alux"]> }) {
+/**
+ * Lote 3J.1 · El CTA abre el dock de Alux con la selección estructurada
+ * (entidad de origen, título y destino ya capturados en el CMS).
+ */
+function useAluxCta(vm: SeoLandingSurfaceVM) {
+  return () => {
+    openAluxFloating({
+      reason: "manual",
+      hint: buildAluxStageAwareHint(
+        `Ayúdame a integrar ${vm.hero.title} en mi viaje por el Oriente Maya.`,
+      ),
+      selection: {
+        ...(vm.entityRef ? { entityRef: vm.entityRef } : {}),
+        title: vm.hero.title,
+        ...(vm.destination?.slug ? { destinationSlug: vm.destination.slug } : {}),
+        ...(vm.destination?.label ? { destinationLabel: vm.destination.label } : {}),
+      },
+    });
+  };
+}
+
+function AluxPanel({
+  alux,
+  onAsk,
+}: {
+  alux: NonNullable<SeoLandingSurfaceVM["alux"]>;
+  onAsk: () => void;
+}) {
   return (
     <section
       aria-label="Alux"
@@ -166,10 +195,14 @@ function AluxPanel({ alux }: { alux: NonNullable<SeoLandingSurfaceVM["alux"]> })
           ) : null}
         </div>
       </div>
-      <span className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-pill border border-border bg-card px-4 text-[13px] font-semibold uppercase tracking-wide text-foreground">
+      <button
+        type="button"
+        onClick={onAsk}
+        className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-pill border border-border bg-card px-4 text-[13px] font-semibold uppercase tracking-wide text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-focus"
+      >
         {alux.ctaLabel}
         <Sparkles className="size-4 text-primary" aria-hidden />
-      </span>
+      </button>
     </section>
   );
 }
@@ -180,6 +213,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   const restOffers = offers?.items.slice(1) ?? [];
   /** Columna que absorbe a Alux: la última del cuerpo editorial. */
   const aluxColumn = sections.length > 0 ? sections[sections.length - 1] : null;
+  const askAlux = useAluxCta(vm);
 
   return (
     <div className="pb-8">
@@ -353,7 +387,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     ))}
                   </ul>
                 ) : null}
-                {alux && aluxColumn === "intro" ? <AluxPanel alux={alux} /> : null}
+                {alux && aluxColumn === "intro" ? <AluxPanel alux={alux} onAsk={askAlux} /> : null}
               </section>
             ) : null}
 
@@ -392,7 +426,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     ))}
                   </ul>
                 ) : null}
-                {alux && aluxColumn === "offers" ? <AluxPanel alux={alux} /> : null}
+                {alux && aluxColumn === "offers" ? <AluxPanel alux={alux} onAsk={askAlux} /> : null}
               </section>
             ) : null}
 
@@ -420,7 +454,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </div>
                   ))}
                 </dl>
-                {alux && aluxColumn === "info" ? <AluxPanel alux={alux} /> : null}
+                {alux && aluxColumn === "info" ? <AluxPanel alux={alux} onAsk={askAlux} /> : null}
               </section>
             ) : null}
 
@@ -487,7 +521,9 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </Link>
                   ) : null}
                 </div>
-                {alux && aluxColumn === "territory" ? <AluxPanel alux={alux} /> : null}
+                {alux && aluxColumn === "territory" ? (
+                  <AluxPanel alux={alux} onAsk={askAlux} />
+                ) : null}
               </section>
             ) : null}
           </div>
@@ -512,10 +548,14 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                 </p>
               ) : null}
             </div>
-            <span className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-pill border border-border bg-card px-5 text-[13px] font-semibold uppercase tracking-wide text-foreground">
+            <button
+              type="button"
+              onClick={askAlux}
+              className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-pill border border-border bg-card px-5 text-[13px] font-semibold uppercase tracking-wide text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-focus"
+            >
               {alux.ctaLabel}
               <Sparkles className="size-4 text-primary" aria-hidden />
-            </span>
+            </button>
           </section>
         </div>
       ) : null}

@@ -15,15 +15,7 @@
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
 import { useMemo, type ReactNode } from "react";
-import {
-  Accessibility,
-  CalendarDays,
-  Clock,
-  Compass,
-  Heart,
-  ImageOff,
-  Ticket,
-} from "lucide-react";
+import { Accessibility, CalendarDays, Clock, Compass, Heart, ImageOff, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -54,6 +46,8 @@ export interface PlacePremiumSurfaceProps {
    * ruta. La superficie sigue siendo render-only: sólo lo posiciona.
    */
   aluxSlot?: ReactNode;
+  /** Lote 3J.1 · Acción real de Mi Viaje (persistencia por ID canónico). */
+  tripSlot?: ReactNode;
   /**
    * G4-PLACES · cuando la ruta ya renderiza el breadcrumb territorial
    * compartido (`PublicShell`), la superficie no debe duplicarlo.
@@ -69,6 +63,7 @@ export function PlacePremiumSurface({
   builderNotice = null,
   draftNotice = null,
   aluxSlot = null,
+  tripSlot = null,
   showBreadcrumbs = true,
   className,
 }: PlacePremiumSurfaceProps) {
@@ -210,14 +205,9 @@ export function PlacePremiumSurface({
       ) : null}
       {hasGallery ? (
         <Container className="mt-8 sm:mt-12">
-          {cinematic ? (
-            <GalleryFilmstrip content={content} />
-          ) : (
-            <GalleryMosaic content={content} />
-          )}
+          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
         </Container>
       ) : null}
-
 
       {hasMap ? (
         <Container className="mt-10 sm:mt-16">
@@ -350,11 +340,14 @@ export function PlacePremiumSurface({
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {content.trip.description}
             </p>
-            <Button type="button" className="mt-5 min-h-11 rounded-pill">
-              {content.trip.actionLabel}
-            </Button>
+            {tripSlot ? (
+              <div className="mt-5">{tripSlot}</div>
+            ) : (
+              <Button type="button" className="mt-5 min-h-11 rounded-pill">
+                {content.trip.actionLabel}
+              </Button>
+            )}
           </section>
-
         </div>
       </Container>
 

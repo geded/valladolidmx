@@ -9413,6 +9413,7 @@ export type Database = {
         | "event"
         | "note"
         | "route"
+        | "place"
       travel_plan_source: "web" | "import" | "concierge" | "alux"
       travel_plan_status:
         | "draft"
@@ -9712,6 +9713,7 @@ export const Constants = {
         "event",
         "note",
         "route",
+        "place",
       ],
       travel_plan_source: ["web", "import", "concierge", "alux"],
       travel_plan_status: [

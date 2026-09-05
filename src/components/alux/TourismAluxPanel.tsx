@@ -5,7 +5,7 @@ import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
 import { useRegisterAluxEmbedded } from "@/lib/alux/embedded-presence";
 
 import { useBrand } from "@/lib/brand/brand-context";
-import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { openAluxFloating, type AluxOpenSelection } from "@/lib/alux/floating-bus";
 import { cn } from "@/lib/utils";
 import { AluxMark } from "./AluxMark";
 
@@ -17,6 +17,8 @@ export interface TourismAluxPanelProps {
   className?: string;
   variant?: "bar" | "card";
   compact?: boolean;
+  /** Lote 3J.1 · Selección estructurada que el dock consume tal cual. */
+  selection?: AluxOpenSelection;
 }
 
 export function buildAluxStageAwareHint(task: string, preference?: string): string {
@@ -41,6 +43,7 @@ export function TourismAluxPanel({
   className,
   variant = "bar",
   compact = false,
+  selection,
 }: TourismAluxPanelProps) {
   const brand = useBrand();
   const ref = useRef<HTMLElement | null>(null);
@@ -55,6 +58,7 @@ export function TourismAluxPanel({
     openAluxFloating({
       reason: "manual",
       hint: buildAluxStageAwareHint(task, preference),
+      ...(selection ? { selection } : {}),
     });
 
   return (
@@ -77,7 +81,13 @@ export function TourismAluxPanel({
         )}
       >
         <div className="flex min-w-0 items-center gap-2 lg:pr-3">
-          <AluxMark family="avatar" size={28} className="size-7 shrink-0 lg:size-8" decorative loading="eager" />
+          <AluxMark
+            family="avatar"
+            size={28}
+            className="size-7 shrink-0 lg:size-8"
+            decorative
+            loading="eager"
+          />
           <div className="min-w-0">
             <h2 className="truncate font-display text-sm leading-tight text-selva">
               {brand.conciergeName}
@@ -122,4 +132,3 @@ export function TourismAluxPanel({
     </section>
   );
 }
-
