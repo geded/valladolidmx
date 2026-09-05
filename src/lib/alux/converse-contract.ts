@@ -210,7 +210,9 @@ export const AluxConverseInputSchema = z.object({
     })
     .optional(),
   /** Sólo con consentimiento explícito de ubicación. */
-  coords: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).optional(),
+  coords: z
+    .object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) })
+    .optional(),
 });
 export type AluxConverseInput = z.infer<typeof AluxConverseInputSchema>;
 
@@ -292,7 +294,10 @@ const clampStr = (max: number) =>
   z.preprocess((v) => (typeof v === "string" ? v.trim().slice(0, max) : v), z.string().max(max));
 const clampStrOrNull = (max: number) =>
   z
-    .preprocess((v) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null), z.string().max(max).nullable())
+    .preprocess(
+      (v) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null),
+      z.string().max(max).nullable(),
+    )
     .catch(null);
 /**
  * Recorta un arreglo elemento a elemento: los items inválidos se descartan
@@ -303,7 +308,11 @@ const clampArr = <T extends z.ZodTypeAny>(item: T, max: number) =>
     .preprocess(
       (v) =>
         Array.isArray(v)
-          ? v.map((entry) => item.safeParse(entry)).filter((r) => r.success).map((r) => r.data).slice(0, max)
+          ? v
+              .map((entry) => item.safeParse(entry))
+              .filter((r) => r.success)
+              .map((r) => r.data)
+              .slice(0, max)
           : [],
       z.array(item).max(max),
     )
@@ -312,19 +321,26 @@ const clampArr = <T extends z.ZodTypeAny>(item: T, max: number) =>
 const numOrNull = (min: number, max: number, int = false) =>
   z
     .preprocess(
-      (v) => (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : v),
+      (v) =>
+        typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : v,
       (int ? z.number().int() : z.number()).min(min).max(max).nullable(),
     )
     .catch(null);
 
 const ModelStageSchema = z
-  .preprocess((v) => {
-    if (typeof v !== "string") return null;
-    const s = v.toLowerCase();
-    if (/(en[_ -]?regi|en el destino|on[_ -]?site|in[_ -]?region|ya (estoy|estamos)|during)/.test(s)) return "en_region";
-    if (/(plane|plann|antes|before|pre)/.test(s)) return "planeando";
-    return null;
-  }, z.enum(["planeando", "en_region"]).nullable())
+  .preprocess(
+    (v) => {
+      if (typeof v !== "string") return null;
+      const s = v.toLowerCase();
+      if (
+        /(en[_ -]?regi|en el destino|on[_ -]?site|in[_ -]?region|ya (estoy|estamos)|during)/.test(s)
+      )
+        return "en_region";
+      if (/(plane|plann|antes|before|pre)/.test(s)) return "planeando";
+      return null;
+    },
+    z.enum(["planeando", "en_region"]).nullable(),
+  )
   .catch(null);
 
 const ModelUnavailableItemSchema = z.object({
@@ -351,7 +367,9 @@ export const AluxModelOutputSchema = z.object({
       (v) =>
         Array.isArray(v)
           ? v
-              .filter((s) => s && typeof s === "object" && Array.isArray((s as { ids?: unknown }).ids))
+              .filter(
+                (s) => s && typeof s === "object" && Array.isArray((s as { ids?: unknown }).ids),
+              )
               .slice(0, 7)
           : null,
       z.array(z.object({ day: numOrNull(1, 14, true), ids: clampArr(clampStr(64), 6) })).nullable(),
@@ -393,7 +411,9 @@ export const AluxModelOutputSchema = z.object({
                 (u) =>
                   u &&
                   typeof u === "object" &&
-                  (ALUX_UNAVAILABLE_FACT_KINDS as readonly string[]).includes(String((u as { kind?: unknown }).kind)),
+                  (ALUX_UNAVAILABLE_FACT_KINDS as readonly string[]).includes(
+                    String((u as { kind?: unknown }).kind),
+                  ),
               )
               .slice(0, 8)
           : [],
@@ -459,7 +479,6 @@ export function detectInjectionAttempt(text: string): boolean {
   return INJECTION_PATTERNS.some((re) => re.test(text) || re.test(folded));
 }
 
-
 /**
  * Sanea texto proveniente del CMS antes de exponerlo al modelo:
  * quita caracteres de control, colapsa espacios, elimina líneas que
@@ -480,7 +499,10 @@ export function sanitizeCmsText(value: unknown, maxLen = 180): string {
 }
 
 /** Sanea el mensaje del explorador (se conserva el contenido; sólo se acota). */
-export function sanitizeUserText(value: unknown, maxLen: number = ALUX_CONVERSE_LIMITS.maxMessageChars): string {
+export function sanitizeUserText(
+  value: unknown,
+  maxLen: number = ALUX_CONVERSE_LIMITS.maxMessageChars,
+): string {
   if (typeof value !== "string") return "";
   const clean = value
     // eslint-disable-next-line no-control-regex
@@ -507,7 +529,10 @@ export function scrubModelText(text: string): { text: string; scrubbed: boolean 
   for (const re of LEAK_PATTERNS) {
     if (re.test(out)) {
       scrubbed = true;
-      out = out.replace(new RegExp(re.source, re.flags.includes("g") ? re.flags : `${re.flags}g`), "[omitido]");
+      out = out.replace(
+        new RegExp(re.source, re.flags.includes("g") ? re.flags : `${re.flags}g`),
+        "[omitido]",
+      );
     }
   }
   return { text: out.trim(), scrubbed };
@@ -540,19 +565,71 @@ export interface AluxTravelIntent {
 }
 
 const INTEREST_RULES: ReadonlyArray<{ tag: string; families: AluxConverseFamily[]; re: RegExp }> = [
-  { tag: "cultura-maya", families: ["lugar", "experiencia", "ruta"], re: /\b(cultura|maya|mayas|arqueolog\w*|zona arqueologica|piramide\w*|historia|historico|convento|iglesia|patrimonio|museo)\b/ },
-  { tag: "gastronomia", families: ["restaurante"], re: /\b(comer|comida|comidas|restaurante\w*|gastronom\w*|cochinita|antojito\w*|cena\w*|desayun\w*|almorzar|almuerzo|yucateca|cocina|mariscos|cafe)\b/ },
-  { tag: "naturaleza", families: ["lugar", "experiencia", "ruta"], re: /\b(cenote\w*|naturaleza|selva|aves|flamenco\w*|laguna|manglar\w*|ecoturis\w*|bicicleta|senderismo|kayak)\b/ },
-  { tag: "hospedaje", families: ["hotel", "casa"], re: /\b(hotel\w*|hospedaje|hospedar\w*|dormir|alojamiento|alojar\w*|villa|posada|habitacion\w*|donde quedarme|quedarnos)\b/ },
-  { tag: "casa-vacaciones", families: ["casa"], re: /\b(casa\w*( de vacaciones| completa| rural)?|renta\w* vacacional\w*|airbnb)\b/ },
-  { tag: "experiencias", families: ["experiencia"], re: /\b(tour\w*|experiencia\w*|taller\w*|caminata\w*|paseo\w*|recorrido guiado|guia|actividad\w*|nocturn\w*)\b/ },
-  { tag: "eventos", families: ["evento"], re: /\b(evento\w*|festival\w*|fiesta\w*|concierto\w*|feria\w*|vaqueria|cartelera|que hay hoy|esta noche)\b/ },
-  { tag: "rutas", families: ["ruta"], re: /\b(ruta\w*|itinerario\w*|recorrido\w*|circuito\w*|plan de viaje)\b/ },
-  { tag: "lugares", families: ["lugar"], re: /\b(lugar\w*|mirador\w*|parque\w*|plaza\w*|atractivo\w*|que visitar|que ver|sitio\w*)\b/ },
-  { tag: "artesania", families: ["experiencia", "evento"], re: /\b(artesan\w*|mercado\w*|bordado\w*|hamaca\w*|compras)\b/ },
-  { tag: "familia", families: [], re: /\b(familia\w*|ninos|ninas|hijos|hijas|bebe\w*|peques|pequenos)\b/ },
-  { tag: "pareja", families: [], re: /\b(pareja|romantic\w*|novia|novio|esposa|esposo|luna de miel|aniversario)\b/ },
-  { tag: "relax", families: ["hotel", "casa", "experiencia"], re: /\b(relaj\w*|descans\w*|tranquil\w*|spa)\b/ },
+  {
+    tag: "cultura-maya",
+    families: ["lugar", "experiencia", "ruta"],
+    re: /\b(cultura|maya|mayas|arqueolog\w*|zona arqueologica|piramide\w*|historia|historico|convento|iglesia|patrimonio|museo)\b/,
+  },
+  {
+    tag: "gastronomia",
+    families: ["restaurante"],
+    re: /\b(comer|comida|comidas|restaurante\w*|gastronom\w*|cochinita|antojito\w*|cena\w*|desayun\w*|almorzar|almuerzo|yucateca|cocina|mariscos|cafe)\b/,
+  },
+  {
+    tag: "naturaleza",
+    families: ["lugar", "experiencia", "ruta"],
+    re: /\b(cenote\w*|naturaleza|selva|aves|flamenco\w*|laguna|manglar\w*|ecoturis\w*|bicicleta|senderismo|kayak)\b/,
+  },
+  {
+    tag: "hospedaje",
+    families: ["hotel", "casa"],
+    re: /\b(hotel\w*|hospedaje|hospedar\w*|dormir|alojamiento|alojar\w*|villa|posada|habitacion\w*|donde quedarme|quedarnos)\b/,
+  },
+  {
+    tag: "casa-vacaciones",
+    families: ["casa"],
+    re: /\b(casa\w*( de vacaciones| completa| rural)?|renta\w* vacacional\w*|airbnb)\b/,
+  },
+  {
+    tag: "experiencias",
+    families: ["experiencia"],
+    re: /\b(tour\w*|experiencia\w*|taller\w*|caminata\w*|paseo\w*|recorrido guiado|guia|actividad\w*|nocturn\w*)\b/,
+  },
+  {
+    tag: "eventos",
+    families: ["evento"],
+    re: /\b(evento\w*|festival\w*|fiesta\w*|concierto\w*|feria\w*|vaqueria|cartelera|que hay hoy|esta noche)\b/,
+  },
+  {
+    tag: "rutas",
+    families: ["ruta"],
+    re: /\b(ruta\w*|itinerario\w*|recorrido\w*|circuito\w*|plan de viaje)\b/,
+  },
+  {
+    tag: "lugares",
+    families: ["lugar"],
+    re: /\b(lugar\w*|mirador\w*|parque\w*|plaza\w*|atractivo\w*|que visitar|que ver|sitio\w*)\b/,
+  },
+  {
+    tag: "artesania",
+    families: ["experiencia", "evento"],
+    re: /\b(artesan\w*|mercado\w*|bordado\w*|hamaca\w*|compras)\b/,
+  },
+  {
+    tag: "familia",
+    families: [],
+    re: /\b(familia\w*|ninos|ninas|hijos|hijas|bebe\w*|peques|pequenos)\b/,
+  },
+  {
+    tag: "pareja",
+    families: [],
+    re: /\b(pareja|romantic\w*|novia|novio|esposa|esposo|luna de miel|aniversario)\b/,
+  },
+  {
+    tag: "relax",
+    families: ["hotel", "casa", "experiencia"],
+    re: /\b(relaj\w*|descans\w*|tranquil\w*|spa)\b/,
+  },
 ];
 
 const DESTINATION_ALIASES: Record<string, string> = {
@@ -609,7 +686,9 @@ export function parseTravelIntent(
   else if (/\b(solo|sola|por mi cuenta)\b/.test(n)) company = "solo";
 
   let durationDays: number | null = null;
-  const durMatch = n.match(/\b(\d{1,2}|un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s+(dia|dias|noche|noches)\b/);
+  const durMatch = n.match(
+    /\b(\d{1,2}|un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s+(dia|dias|noche|noches)\b/,
+  );
   if (durMatch) {
     const raw = durMatch[1]!;
     const num = /^\d+$/.test(raw) ? Number(raw) : (NUMBER_WORDS[raw] ?? null);
@@ -617,28 +696,45 @@ export function parseTravelIntent(
   } else if (/\bfin de semana\b/.test(n)) durationDays = 2;
 
   let timeOfDay: AluxTravelIntent["timeOfDay"] = null;
-  if (/\b(manana|amanecer|temprano)\b/.test(n) && !/\bpasado manana\b/.test(n)) timeOfDay = "manana";
+  if (/\b(manana|amanecer|temprano)\b/.test(n) && !/\bpasado manana\b/.test(n))
+    timeOfDay = "manana";
   if (/\b(tarde|atardecer|mediodia)\b/.test(n)) timeOfDay = "tarde";
   if (/\b(noche|nocturn\w*|cenar)\b/.test(n)) timeOfDay = "noche";
 
   const wantsAccessibility =
-    /\b(silla de ruedas|accesib\w*|movilidad reducida|baston|andadera|sin escalones|rampa\w*|discapacidad)\b/.test(n);
-  const asksHours = /\b(horario\w*|abre\w*|abren|cierra\w*|cierran|a que hora|hora de apertura|hasta que hora)\b/.test(n);
-  const asksPrice = /\b(precio\w*|cuesta\w*|costo\w*|barato\w*|economic\w*|presupuesto|tarifa\w*|cuanto)\b/.test(n);
+    /\b(silla de ruedas|accesib\w*|movilidad reducida|baston|andadera|sin escalones|rampa\w*|discapacidad)\b/.test(
+      n,
+    );
+  const asksHours =
+    /\b(horario\w*|abre\w*|abren|cierra\w*|cierran|a que hora|hora de apertura|hasta que hora)\b/.test(
+      n,
+    );
+  const asksPrice =
+    /\b(precio\w*|cuesta\w*|costo\w*|barato\w*|economic\w*|presupuesto|tarifa\w*|cuanto)\b/.test(n);
   const asksReplan =
-    /\b(reorden\w*|reorganiz\w*|replanific\w*|cambia\w* el orden|otro orden|reacomod\w*|ajusta\w* el plan|mejor orden|optimiza\w*)\b/.test(n);
+    /\b(reorden\w*|reorganiz\w*|replanific\w*|cambia\w* el orden|otro orden|reacomod\w*|ajusta\w* el plan|mejor orden|optimiza\w*)\b/.test(
+      n,
+    );
   const asksRemove = /\b(quita\w*|elimina\w*|borra\w*|saca\w*|retira\w*)\b/.test(n);
 
   let stage: AluxTravelIntent["stage"] = null;
-  if (/\b(estoy en|estamos en|ya llegamos|ya estoy|ya estamos|aqui en|acabo de llegar)\b/.test(n)) stage = "en_region";
-  else if (/\b(voy a|vamos a|planeo|planeamos|quiero ir|queremos ir|viajar\w*|viajo|viajamos|visitar\w* pronto|proximo)\b/.test(n))
+  if (/\b(estoy en|estamos en|ya llegamos|ya estoy|ya estamos|aqui en|acabo de llegar)\b/.test(n))
+    stage = "en_region";
+  else if (
+    /\b(voy a|vamos a|planeo|planeamos|quiero ir|queremos ir|viajar\w*|viajo|viajamos|visitar\w* pronto|proximo)\b/.test(
+      n,
+    )
+  )
     stage = "planeando";
 
   const known = new Set((opts.knownDestinationSlugs ?? []).map((s) => s.toLowerCase()));
   const mentioned: string[] = [];
   for (const [alias, slug] of Object.entries(DESTINATION_ALIASES)) {
     if (known.size > 0 && !known.has(slug)) continue;
-    if (new RegExp(`\\b${alias.replace(/[-\s]/g, "[-\\s]")}\\b`).test(n) && !mentioned.includes(slug)) {
+    if (
+      new RegExp(`\\b${alias.replace(/[-\s]/g, "[-\\s]")}\\b`).test(n) &&
+      !mentioned.includes(slug)
+    ) {
       mentioned.push(slug);
     }
   }
@@ -685,5 +781,6 @@ export const ALUX_CONVERSE_COPY = {
   blockedNotice:
     "Puedo ayudarte con tu viaje por el Oriente Maya; no cambio mis reglas ni comparto información interna.",
   noCatalog: "Aún no hay publicaciones suficientes para recomendarte con certeza en este destino.",
-  askDestination: "¿A qué destino del Oriente Maya quieres ir? (Valladolid, Izamal, Espita, Uayma…)",
+  askDestination:
+    "¿A qué destino del Oriente Maya quieres ir? (Valladolid, Izamal, Espita, Uayma…)",
 } as const;
