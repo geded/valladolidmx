@@ -347,6 +347,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     ))}
                   </ul>
                 ) : null}
+                {alux && aluxColumn === "intro" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
 
@@ -385,6 +386,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     ))}
                   </ul>
                 ) : null}
+                {alux && aluxColumn === "offers" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
 
@@ -412,6 +414,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </div>
                   ))}
                 </dl>
+                {alux && aluxColumn === "info" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
 
@@ -478,6 +481,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </Link>
                   ) : null}
                 </div>
+                {alux && aluxColumn === "territory" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
           </div>
