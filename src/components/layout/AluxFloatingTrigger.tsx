@@ -522,7 +522,7 @@ export function AluxFloatingTrigger() {
           type="button"
           onClick={() => setOpen(true)}
           title={`Alux · ${triggerLabel}`}
-          className="pointer-events-auto group flex max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
+          className="pointer-events-auto group flex min-h-11 max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
           <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
             {/* Sistema visual canónico Alux IA (activo gobernado). */}

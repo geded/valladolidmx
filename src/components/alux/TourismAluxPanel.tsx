@@ -1,4 +1,8 @@
+import { useMemo, useRef } from "react";
 import { Compass, Sparkles } from "lucide-react";
+
+import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
+import { useRegisterAluxEmbedded } from "@/lib/alux/embedded-presence";
 
 import { useBrand } from "@/lib/brand/brand-context";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
@@ -39,6 +43,14 @@ export function TourismAluxPanel({
   compact = false,
 }: TourismAluxPanelProps) {
   const brand = useBrand();
+  const ref = useRef<HTMLElement | null>(null);
+  useRegisterAluxEmbedded(ref);
+  /* Lote 3G · sin pistas duplicadas: las sugerencias de la plantilla no
+     pueden repetir las dos pistas base (clave React duplicada). */
+  const chips = useMemo(
+    () => Array.from(new Set<string>(["Estoy planeando", "Ya estoy en la región", ...prompts])),
+    [prompts],
+  );
   const ask = (preference?: string) =>
     openAluxFloating({
       reason: "manual",
@@ -47,21 +59,23 @@ export function TourismAluxPanel({
 
   return (
     <section
+      ref={ref}
+      data-alux-embedded="panel"
       className={cn(
         "rounded-3xl border border-border bg-card shadow-soft",
-        compact ? "p-3 sm:p-4" : "p-4 sm:p-5",
+        compact ? "p-3 sm:p-3.5" : "p-3.5 sm:p-4.5",
         className,
       )}
       aria-label={`${brand.conciergeName}, concierge IA`}
     >
       <div
         className={cn(
-          "grid gap-4",
+          "grid gap-3.5",
           variant === "bar" && "lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center",
         )}
       >
         <div className="flex min-w-0 items-center gap-3">
-          <AluxMark family="avatar" size={44} className="shrink-0" decorative loading="eager" />
+          <AluxMark family="avatar" size={40} className="shrink-0" decorative loading="eager" />
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               {brand.conciergeName} · Concierge IA
@@ -69,7 +83,7 @@ export function TourismAluxPanel({
             <h2
               className={cn(
                 "mt-1 font-serif leading-tight text-foreground",
-                compact ? "text-xl" : "text-2xl",
+                compact ? "text-lg" : "text-xl lg:text-2xl",
               )}
             >
               {title}
@@ -81,27 +95,28 @@ export function TourismAluxPanel({
             no debe ensanchar la rejilla ni la página en móvil. */}
         <div className="min-w-0">
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
-          <div className="-mx-1 mt-3 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
-            {["Estoy planeando", "Ya estoy en la región", ...prompts].map((prompt) => (
-              <button
+          <TourismChipRow
+            label={`Pistas para ${brand.conciergeName}`}
+            behavior="rail"
+            className="mt-3"
+          >
+            {chips.map((prompt) => (
+              <TourismChip
                 key={prompt}
-                type="button"
+                scheme="surface"
+                size={compact ? "sm" : "md"}
                 onClick={() => ask(prompt)}
-                className={cn(
-                  "inline-flex shrink-0 snap-start items-center whitespace-nowrap rounded-full border border-border bg-background px-4 text-sm text-foreground transition-colors hover:border-primary hover:bg-primary/10",
-                  compact ? "min-h-9" : "min-h-11",
-                )}
               >
                 {prompt}
-              </button>
+              </TourismChip>
             ))}
-          </div>
+          </TourismChipRow>
         </div>
 
         <button
           type="button"
           onClick={() => ask()}
-          className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-selva px-5 text-sm font-semibold text-selva-foreground transition-opacity hover:opacity-90 lg:w-auto"
+          className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-pill bg-selva px-5 text-sm font-semibold text-selva-foreground transition-opacity hover:opacity-90 lg:w-auto"
         >
           {variant === "card" ? <Sparkles className="size-4" /> : <Compass className="size-4" />}
           Planear con {brand.conciergeName}

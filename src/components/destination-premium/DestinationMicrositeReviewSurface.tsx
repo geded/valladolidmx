@@ -47,7 +47,7 @@ const stories = [
 
 export function DestinationMicrositeReviewSurface() {
   return (
-    <main
+    <div
       data-content-policy="destination-first-nearby-fallback"
       className="bg-[#f7f3ea] pb-20 text-[#18221d]"
     >
@@ -132,7 +132,7 @@ export function DestinationMicrositeReviewSurface() {
       <Container className="mt-12">
         <TripClose />
       </Container>
-    </main>
+    </div>
   );
 }
 

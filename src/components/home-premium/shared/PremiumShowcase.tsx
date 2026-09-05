@@ -7,12 +7,14 @@
  * Home y el Atlas de Destinos consuman EXACTAMENTE el mismo markup, las
  * mismas proporciones y los mismos tokens. Prohibido reinterpretarlo.
  */
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Compass } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EditorialMediaFrame, type EditorialMedia } from "@/components/omxds/EditorialMediaFrame";
+import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
+import { useRegisterAluxEmbedded } from "@/lib/alux/embedded-presence";
 import { useBrand } from "@/lib/brand/brand-context";
 import { PARTY_OPTIONS, type PartyComposition } from "@/lib/traveler/party-composition";
 
@@ -128,60 +130,66 @@ export function PremiumAluxBar({
   continueLabel?: string;
 }) {
   const brand = useBrand();
-  const resolvedContinueLabel = continueLabel ?? `Continuar con ${brand.conciergeName}`;
+  const ref = useRef<HTMLElement | null>(null);
+  useRegisterAluxEmbedded(ref);
+  const resolvedContinueLabel = continueLabel ?? `Planear con ${brand.conciergeName}`;
   return (
-
     <section
+      ref={ref}
       aria-labelledby="alux-title"
+      data-alux-embedded="bar"
       className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
     >
-      <div className="grid min-w-0 items-center gap-3 px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-4">
-        <div className="flex min-w-0 items-center gap-2 sm:border-r sm:border-white/20 sm:pr-4">
+      {/* Lote 3G · módulo compacto: menos altura y menos peso visual,
+          misma presencia de marca. Los chips nunca se recortan. */}
+      <div className="grid min-w-0 items-center gap-3 px-4 py-3.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-5 lg:px-5 lg:py-4">
+        <div className="flex min-w-0 items-center gap-2.5 lg:border-r lg:border-white/20 lg:pr-5">
           <img
             src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
             alt={brand.conciergeName}
-            className="size-12 shrink-0 object-contain lg:size-16"
+            className="size-10 shrink-0 object-contain lg:size-12"
           />
           <div className="min-w-0">
-            <h2 id="alux-title" className="truncate font-display text-lg lg:text-xl">
+            <h2 id="alux-title" className="truncate font-display text-base lg:text-lg">
               {brand.conciergeName}
             </h2>
-            <p className="text-xs text-white/70">Tu concierge IA</p>
+            <p className="text-[11px] text-white/70">Tu concierge IA</p>
           </div>
         </div>
         <div className="min-w-0">
-          <p className="font-display text-base leading-snug lg:text-xl">{question}</p>
-          <div
-            className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
-            role="group"
-            aria-label="Composición del viaje"
+          <p className="font-display text-[15px] leading-snug lg:text-lg">{question}</p>
+          <TourismChipRow
+            label="Composición del viaje"
+            behavior="wrap"
+            className="mt-2.5 gap-2"
           >
             {PARTY_OPTIONS.map((option) => (
-              <Button
+              <TourismChip
                 key={option.value}
-                type="button"
+                scheme="onDark"
                 size="sm"
-                variant={selectedParty === option.value ? "default" : "secondary"}
+                selected={selectedParty === option.value}
                 onClick={() => onSelectParty(option.value)}
-                className="min-h-11 shrink-0 snap-start rounded-pill"
               >
                 {option.label}
-              </Button>
+              </TourismChip>
             ))}
-          </div>
+          </TourismChipRow>
         </div>
         <Button
           type="button"
           onClick={onContinue}
-          className="size-11 shrink-0 self-center rounded-full p-0"
-          aria-label={resolvedContinueLabel}
+          variant="secondary"
+          className="min-h-11 w-full shrink-0 justify-center gap-2 self-center rounded-pill px-5 lg:w-auto"
         >
-          <ChevronRight className="size-5" />
+          <Compass className="size-4" aria-hidden />
+          {resolvedContinueLabel}
         </Button>
       </div>
     </section>
   );
 }
+
 
 /* ------------------------------------------------------------------ *
  * Bloque Destinos / Experiencias (tarjeta protagonista + 3 compactas)

@@ -400,7 +400,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98] xl:hidden",
+          "inline-flex h-11 w-11 items-center justify-center rounded-md border transition-all active:scale-[0.98] xl:hidden",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",

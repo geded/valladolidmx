@@ -5,13 +5,17 @@
  * en las superficies adoptadas (S1, S2, S3, S8, S9). Ninguna plantilla
  * define su propio grid de categorías.
  *
- * Responsive gobernado:
- *  - móvil  : 2 columnas
- *  - tablet : 4 columnas
+ * Responsive gobernado (Lote 3G · sistema compacto):
+ *  - móvil  : rail horizontal con snap (evita la columna vertical pesada
+ *             y los "huérfanos" de la última fila). `mobileLayout="grid"`
+ *             conserva la rejilla de 2 columnas donde se necesite.
+ *  - tablet : 3 columnas (sm) → 4 columnas (md), simétricas
  *  - escritorio: la plantilla puede pasar `desktopColumnsClassName`
+ *  - alturas compactas: tarjeta de 1 línea de icono + hasta 2 de etiqueta
  *  - touch target mínimo 44×44 px · etiquetas máximo dos líneas
  *  - cero overflow horizontal (min-w-0 + truncado a 2 líneas)
  */
+
 import type { ReactNode } from "react";
 import { isRegisteredCategory } from "@/lib/omxds/category-icon-registry";
 import { TourismCategoryIcon } from "./TourismCategoryIcon";
@@ -35,6 +39,12 @@ export interface CategoryNavGridProps {
   onSelect?: (slug: string) => void;
   /** Escritorio gobernado por la plantilla (Tailwind classes `lg:*`). */
   desktopColumnsClassName?: string;
+  /**
+   * Comportamiento en móvil (< 640 px). `rail` (por defecto) evita la
+   * columna vertical pesada y los huecos huérfanos; `grid` conserva las
+   * dos columnas para superficies que lo necesiten.
+   */
+  mobileLayout?: "rail" | "grid";
   /** Acredita espacio para íconos de 56 px. */
   spaceCredited?: boolean;
   scheme?: "light" | "dark";
@@ -50,6 +60,7 @@ export function CategoryNavGrid({
   activeSlug = null,
   onSelect,
   desktopColumnsClassName = "lg:grid-cols-4",
+  mobileLayout = "rail",
   spaceCredited = false,
   scheme = "light",
   showCounts = true,
@@ -58,11 +69,18 @@ export function CategoryNavGrid({
 }: CategoryNavGridProps) {
   if (items.length === 0) return <>{emptySlot}</>;
 
+  const isRail = mobileLayout === "rail";
+
   return (
     <ul
       data-omxds-category-nav-grid
+      data-mobile-layout={mobileLayout}
       className={[
-        "grid w-full min-w-0 grid-cols-2 gap-3 md:grid-cols-4",
+        "w-full min-w-0 gap-2.5",
+        isRail
+          ? // Rail con snap en móvil; rejilla simétrica desde `sm`.
+            "-mx-1 flex snap-x snap-mandatory overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-4"
+          : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
         desktopColumnsClassName,
         className ?? "",
       ]
@@ -80,19 +98,20 @@ export function CategoryNavGrid({
                 variant={variant}
                 spaceCredited={spaceCredited}
                 scheme={scheme}
-                /* G8-E2 · OBS-G8E1-03 — glifo bordado 40 px en móvil,
-                   44 px en tablet y 48 px en escritorio, sin deformar. */
+                /* Lote 3G · glifo compacto: 32 px en móvil, 36 px en tablet
+                   y 40 px en escritorio, sin deformar ni robar altura. */
                 className={
                   variant === "standard"
-                    ? "size-10 shrink-0 object-contain md:size-11 lg:size-12"
+                    ? "size-8 shrink-0 object-contain md:size-9 lg:size-10"
                     : undefined
                 }
               />
             ) : null}
             <span className="min-w-0 text-center">
-              <span className="line-clamp-2 block text-sm font-medium leading-snug">
+              <span className="line-clamp-2 block text-[13px] font-medium leading-snug">
                 {item.label}
               </span>
+
               {showCounts && typeof item.count === "number" ? (
                 <span className="mt-0.5 block text-xs text-muted-foreground">
                   {item.countLabel ?? `${item.count} ${item.count === 1 ? "opción" : "opciones"}`}
@@ -104,9 +123,10 @@ export function CategoryNavGrid({
 
         // G6-S1-A · D-G6-02: el control real (enlace o botón) garantiza
         // 44×44 px reales, foco visible y activación por teclado nativa.
+        // Lote 3G: altura compacta (76–84 px) con padding simétrico.
         const cls = [
-          "flex min-h-[44px] min-w-[44px] w-full min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-3",
-          "transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "flex h-full min-h-[44px] min-w-[44px] w-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-2xl border px-2.5 py-2.5",
+          "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           isActive
             ? "border-primary/50 bg-primary/5"
             : "border-border/70 bg-card hover:border-border hover:bg-muted/40",
@@ -116,7 +136,15 @@ export function CategoryNavGrid({
           .join(" ");
 
         return (
-          <li key={item.slug} className="min-w-0">
+          <li
+            key={item.slug}
+            className={
+              isRail
+                ? "w-[6.75rem] min-w-0 shrink-0 snap-start sm:w-auto sm:shrink"
+                : "min-w-0"
+            }
+          >
+
             {mode === "navigate" && item.href ? (
               <a
                 href={item.href}
