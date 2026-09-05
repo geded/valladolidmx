@@ -147,10 +147,39 @@ function ColumnHeading({ children, id }: { children: React.ReactNode; id?: strin
   );
 }
 
+/**
+ * Panel de Alux dentro de la columna editorial. Ocupa el espacio residual de la
+ * última área para cumplir la regla de "sin huecos en blanco" de la plantilla.
+ */
+function AluxPanel({ alux }: { alux: NonNullable<SeoLandingSurfaceVM["alux"]> }) {
+  return (
+    <section
+      aria-label="Alux"
+      className="mt-5 rounded-2xl border border-border bg-surface p-4 first:mt-0"
+    >
+      <div className="flex items-start gap-3">
+        <AluxMark family="avatar" size={48} decorative className="size-11 shrink-0" />
+        <div className="min-w-0">
+          <p className="font-serif text-base leading-tight text-foreground">{alux.heading}</p>
+          {alux.body ? (
+            <p className="mt-1 text-[12.5px] leading-snug text-muted-foreground">{alux.body}</p>
+          ) : null}
+        </div>
+      </div>
+      <span className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-pill border border-border bg-card px-4 text-[13px] font-semibold uppercase tracking-wide text-foreground">
+        {alux.ctaLabel}
+        <Sparkles className="size-4 text-primary" aria-hidden />
+      </span>
+    </section>
+  );
+}
+
 export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   const { hero, trust, intro, features, offers, info, territory, gallery, alux, sections } = vm;
   const featured = offers?.items[0] ?? null;
   const restOffers = offers?.items.slice(1) ?? [];
+  /** Columna que absorbe a Alux: la última del cuerpo editorial. */
+  const aluxColumn = sections.length > 0 ? sections[sections.length - 1] : null;
 
   return (
     <div className="pb-8">
@@ -273,7 +302,14 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
       {/* ── 3 · Composición editorial horizontal de cuatro áreas ──── */}
       {intro || features.length > 0 || offers || info || territory ? (
         <div className={cn(SHELL, "mt-6 sm:mt-8")}>
-          <div className="grid items-start gap-6 sm:grid-cols-2 sm:gap-x-0 sm:divide-x sm:divide-border lg:grid-cols-[22fr_31fr_20fr_22fr]">
+          <div
+            className={cn(
+              "grid items-start gap-6 sm:grid-cols-2 sm:gap-x-0 sm:divide-x sm:divide-border",
+              sections.length >= 4 && "lg:grid-cols-[22fr_31fr_20fr_22fr]",
+              sections.length === 3 && "lg:grid-cols-[28fr_38fr_26fr]",
+              sections.length === 2 && "lg:grid-cols-[45fr_47fr]",
+            )}
+          >
             {/* 3.1 · Por qué es extraordinario */}
             {intro || features.length > 0 ? (
               <section
@@ -317,6 +353,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     ))}
                   </ul>
                 ) : null}
+                {alux && aluxColumn === "intro" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
 
@@ -355,6 +392,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     ))}
                   </ul>
                 ) : null}
+                {alux && aluxColumn === "offers" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
 
@@ -382,6 +420,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </div>
                   ))}
                 </dl>
+                {alux && aluxColumn === "info" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
 
@@ -448,14 +487,15 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </Link>
                   ) : null}
                 </div>
+                {alux && aluxColumn === "territory" ? <AluxPanel alux={alux} /> : null}
               </section>
             ) : null}
           </div>
         </div>
       ) : null}
 
-      {/* ── 4 · Banda Alux baja y horizontal ──────────────────────── */}
-      {alux ? (
+      {/* ── 4 · Banda Alux (sólo si no hay cuerpo editorial que la absorba) ── */}
+      {alux && !aluxColumn ? (
         <div className={cn(SHELL, "mt-6 sm:mt-8")}>
           <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 sm:flex-row sm:items-center sm:gap-5 sm:px-6">
             <AluxMark
