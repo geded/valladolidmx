@@ -11,9 +11,18 @@
  *  - Fail closed: sin secreto configurado (o demasiado corto) se rechaza todo.
  *  - Rechazo uniforme (401 "Unauthorized") sin revelar el motivo.
  *  - Ningún mensaje de error o excepción transporta el valor del secreto.
+ *
+ * Lote 3M-A.2: modo simulación (`x-cron-dry-run`) evaluado sólo tras la
+ * autorización; ver `cron-dry-run.server.ts`. Nunca sustituye al secreto.
  */
 import { timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  CRON_DRY_RUN_HEADER,
+  CronDryRunViolation,
+  createDryRunClient,
+  isDryRunRequest,
+} from "@/lib/cron/cron-dry-run.server";
 
 export const CRON_HOOK_HEADER = "x-cron-secret";
 export const CRON_HOOK_SECRET_ENV = "CRON_HOOKS_SECRET";
@@ -31,7 +40,16 @@ export interface CronJobResult {
   body: Record<string, unknown>;
 }
 
-export type CronJobRunner = (supabase: CronSupabase) => Promise<CronJobResult>;
+export interface CronRunContext {
+  /**
+   * `true` cuando la petición autorizada pidió simulación. El cliente recibido
+   * ya está envuelto en el guardián de sólo lectura; el trabajo debe omitir
+   * encolado, envío y marcas, y devolver únicamente contadores.
+   */
+  dryRun: boolean;
+}
+
+export type CronJobRunner = (supabase: CronSupabase, ctx: CronRunContext) => Promise<CronJobResult>;
 
 export interface CronHookDeps {
   /** Entorno a consultar (por defecto `process.env`). Inyectable en pruebas. */
@@ -76,8 +94,8 @@ export function cronUnauthorizedResponse(): Response {
 }
 
 /** Respuesta sanitizada de fallo interno: sin mensaje, sin pila, sin secreto. */
-export function cronFailureResponse(): Response {
-  return new Response(JSON.stringify({ ok: false }), {
+export function cronFailureResponse(extra: Record<string, unknown> = {}): Response {
+  return new Response(JSON.stringify({ ok: false, ...extra }), {
     status: 500,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
@@ -98,8 +116,11 @@ async function createServiceClient(env: EnvLike): Promise<CronSupabase> {
 
 /**
  * Pipeline común de los ganchos cron:
- *   autorización → cliente de servicio → trabajo → respuesta JSON.
+ *   autorización → (¿simulación?) → cliente de servicio → trabajo → respuesta JSON.
  * Cualquier excepción del trabajo se convierte en 500 sanitizado.
+ *
+ * La simulación se decide **después** de autorizar: una petición no autorizada
+ * con `x-cron-dry-run` recibe el mismo 401 uniforme y nunca crea el cliente.
  */
 export async function handleCronHook(
   request: Request,
@@ -109,20 +130,36 @@ export async function handleCronHook(
   const env = deps.env ?? process.env;
   if (!isAuthorizedCronRequest(request, env)) return cronUnauthorizedResponse();
 
+  const dryRun = isDryRunRequest(request);
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store",
+  };
+  if (dryRun) headers[CRON_DRY_RUN_HEADER] = "1";
+
   try {
-    const supabase = deps.createClient ? await deps.createClient() : await createServiceClient(env);
-    const result = await run(supabase);
-    return new Response(JSON.stringify(result.body), {
-      status: result.status ?? 200,
-      headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-    });
+    const service = deps.createClient ? await deps.createClient() : await createServiceClient(env);
+    const supabase = dryRun ? createDryRunClient(service) : service;
+    const result = await run(supabase, { dryRun });
+    const body = dryRun ? { ...result.body, dry_run: true } : result.body;
+    return new Response(JSON.stringify(body), { status: result.status ?? 200, headers });
   } catch (err) {
+    if (err instanceof CronDryRunViolation) {
+      // Un trabajo intentó escribir en simulación: el guardián lo detuvo antes
+      // de emitir la petición. Se registra sólo el objetivo (tabla/RPC), sin PII.
+      console.error("cron dry-run blocked a write", {
+        path: safePathname(request.url),
+        kind: err.kind,
+        target: err.target,
+      });
+      return cronFailureResponse({ dry_run: true, error: "write_blocked" });
+    }
     const message = err instanceof Error ? err.message : "unknown_error";
     console.error("cron hook failed", {
       path: safePathname(request.url),
       error: redactSecret(message, readCronHookSecret(env)),
     });
-    return cronFailureResponse();
+    return cronFailureResponse(dryRun ? { dry_run: true } : {});
   }
 }
 

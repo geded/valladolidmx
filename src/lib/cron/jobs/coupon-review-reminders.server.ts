@@ -6,11 +6,24 @@
  * Lote 3M-A: la lógica se extrajo verbatim de la ruta para que el gancho sea
  * `autorización → trabajo` y el trabajo pueda probarse con un cliente
  * simulado (0 envíos reales). La autorización vive en `cron-hook-auth.server`.
+ *
+ * Lote 3M-A.2: con `ctx.dryRun` se ejecuta la selección y el render pero no se
+ * crea token, ni se registra, ni se encola, ni se marca. Sólo contadores.
  */
 import * as React from "react";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
-import type { CronJobResult, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
+import type {
+  CronJobResult,
+  CronRunContext,
+  CronSupabase,
+} from "@/lib/cron/cron-hook-auth.server";
+import {
+  newDryRunStats,
+  previewCandidate,
+  recordDryRunOutcome,
+  type DryRunKindStats,
+} from "@/lib/cron/cron-dry-run.server";
 
 const SITE_NAME = "valladolidmx";
 const SENDER_DOMAIN = "notify.alux.travel";
@@ -39,7 +52,63 @@ function generateToken(): string {
     .join("");
 }
 
-export async function runCouponReviewReminders(supabase: CronSupabase): Promise<CronJobResult> {
+const REMINDER_WINDOWS: ReadonlyArray<{ number: 1 | 2; hoursMin: number; hoursMax: number }> = [
+  { number: 1, hoursMin: 46, hoursMax: 50 },
+  { number: 2, hoursMin: 24 * 6, hoursMax: 24 * 8 },
+];
+
+function buildCouponTemplateData(
+  row: CouponReminderRow,
+  reminderNumber: 1 | 2,
+): Record<string, unknown> {
+  return {
+    travelerName: row.traveler_first_name || undefined,
+    businessName: row.business_name,
+    reminderNumber,
+    reviewUrl: `${PUBLIC_ORIGIN}/resenar/negocio/${row.business_slug}`,
+  };
+}
+
+/**
+ * Simulación (Lote 3M-A.2): mismas ventanas y misma selección (RPC `STABLE`),
+ * misma supresión y mismo render; sin token, sin registro, sin cola, sin marca.
+ */
+async function dryRunCouponReviewReminders(supabase: CronSupabase): Promise<CronJobResult> {
+  const results: Record<string, DryRunKindStats> = {
+    reminder_1: newDryRunStats(),
+    reminder_2: newDryRunStats(),
+  };
+  const selection_errors: string[] = [];
+
+  for (const window of REMINDER_WINDOWS) {
+    const { data, error } = await supabase.rpc("get_coupons_needing_review_reminder", {
+      reminder_number: window.number,
+      hours_min: window.hoursMin,
+      hours_max: window.hoursMax,
+    });
+    if (error) {
+      selection_errors.push(`reminder_${window.number}`);
+      continue;
+    }
+    for (const row of (data ?? []) as CouponReminderRow[]) {
+      const outcome = await previewCandidate(supabase, {
+        email: row.recipient_email ?? "",
+        templateName: "coupon-review-reminder",
+        templateData: buildCouponTemplateData(row, window.number),
+      });
+      recordDryRunOutcome(results[`reminder_${window.number}`], outcome);
+    }
+  }
+
+  return { body: { ok: selection_errors.length === 0, ...results, selection_errors } };
+}
+
+export async function runCouponReviewReminders(
+  supabase: CronSupabase,
+  ctx: CronRunContext = { dryRun: false },
+): Promise<CronJobResult> {
+  if (ctx.dryRun) return dryRunCouponReviewReminders(supabase);
+
   const template = TEMPLATES["coupon-review-reminder"];
   if (!template) {
     return { status: 500, body: { ok: false, error: "template_not_found" } };
@@ -104,12 +173,8 @@ export async function runCouponReviewReminders(supabase: CronSupabase): Promise<
           unsubToken = readBack?.token ?? newToken;
         }
 
-        const templateData = {
-          travelerName: row.traveler_first_name || undefined,
-          businessName: row.business_name,
-          reminderNumber,
-          reviewUrl: `${PUBLIC_ORIGIN}/resenar/negocio/${row.business_slug}`,
-        };
+        // Mismos datos de plantilla que la simulación (fuente única).
+        const templateData = buildCouponTemplateData(row, reminderNumber);
         const element = React.createElement(template.component, templateData);
         const html = await render(element);
         const text = await render(element, { plainText: true });

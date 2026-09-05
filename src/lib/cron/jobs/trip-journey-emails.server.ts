@@ -7,11 +7,24 @@
  * Lote 3M-A: la lógica se extrajo verbatim de la ruta para que el gancho sea
  * `autorización → trabajo` y el trabajo pueda probarse con un cliente
  * simulado (0 envíos reales). La autorización vive en `cron-hook-auth.server`.
+ *
+ * Lote 3M-A.2: con `ctx.dryRun` se ejecuta la selección y el render pero no se
+ * crea token, ni se registra, ni se encola, ni se marca. Sólo contadores.
  */
 import * as React from "react";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
-import type { CronJobResult, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
+import type {
+  CronJobResult,
+  CronRunContext,
+  CronSupabase,
+} from "@/lib/cron/cron-hook-auth.server";
+import {
+  newDryRunStats,
+  previewCandidate,
+  recordDryRunOutcome,
+  type DryRunKindStats,
+} from "@/lib/cron/cron-dry-run.server";
 
 const SITE_NAME = "valladolidmx";
 const SENDER_DOMAIN = "notify.alux.travel";
@@ -60,7 +73,62 @@ function formatStartDate(iso: string | null, locale: string | null): string | un
   }
 }
 
-export async function runTripJourneyEmails(supabase: CronSupabase): Promise<CronJobResult> {
+function buildTripTemplateData(row: TripEmailRow): Record<string, unknown> {
+  const firstName = (row.traveler_name ?? "").trim().split(/\s+/)[0] || undefined;
+  const planUrl = `${PUBLIC_ORIGIN}/cuenta/mi-viaje`;
+  return {
+    travelerName: firstName,
+    folio: row.folio,
+    destinationName: row.destination_name || "el Oriente Maya",
+    startDateLabel: formatStartDate(row.start_date, row.traveler_locale),
+    partySize: row.party_size,
+    daysToTrip: row.days_to_trip ?? undefined,
+    planUrl,
+    reviewUrl: planUrl,
+  };
+}
+
+/**
+ * Simulación (Lote 3M-A.2): misma selección de candidatos (RPC `STABLE`),
+ * misma supresión y mismo render; sin token, sin registro, sin cola, sin marca.
+ * Devuelve sólo contadores por tipo.
+ */
+async function dryRunTripJourneyEmails(supabase: CronSupabase): Promise<CronJobResult> {
+  const results: Record<string, DryRunKindStats> = {
+    t14: newDryRunStats(),
+    t3: newDryRunStats(),
+    welcome: newDryRunStats(),
+    post: newDryRunStats(),
+  };
+  const selection_errors: string[] = [];
+
+  for (const step of TRIP_EMAIL_KINDS) {
+    const { data, error } = await supabase.rpc("get_orders_needing_trip_email", {
+      _kind: step.kind,
+    });
+    if (error) {
+      selection_errors.push(step.kind);
+      continue;
+    }
+    for (const row of (data ?? []) as TripEmailRow[]) {
+      const outcome = await previewCandidate(supabase, {
+        email: row.traveler_email ?? "",
+        templateName: step.template,
+        templateData: buildTripTemplateData(row),
+      });
+      recordDryRunOutcome(results[step.kind], outcome);
+    }
+  }
+
+  return { body: { ok: selection_errors.length === 0, results, selection_errors } };
+}
+
+export async function runTripJourneyEmails(
+  supabase: CronSupabase,
+  ctx: CronRunContext = { dryRun: false },
+): Promise<CronJobResult> {
+  if (ctx.dryRun) return dryRunTripJourneyEmails(supabase);
+
   const results: Record<string, { sent: number; failed: number; suppressed: number }> = {
     t14: { sent: 0, failed: 0, suppressed: 0 },
     t3: { sent: 0, failed: 0, suppressed: 0 },
@@ -121,18 +189,8 @@ export async function runTripJourneyEmails(supabase: CronSupabase): Promise<Cron
           unsubToken = readBack?.token ?? newToken;
         }
 
-        const firstName = (row.traveler_name ?? "").trim().split(/\s+/)[0] || undefined;
-        const planUrl = `${PUBLIC_ORIGIN}/cuenta/mi-viaje`;
-        const templateData: Record<string, unknown> = {
-          travelerName: firstName,
-          folio: row.folio,
-          destinationName: row.destination_name || "el Oriente Maya",
-          startDateLabel: formatStartDate(row.start_date, row.traveler_locale),
-          partySize: row.party_size,
-          daysToTrip: row.days_to_trip ?? undefined,
-          planUrl,
-          reviewUrl: planUrl,
-        };
+        // Mismos datos de plantilla que la simulación (fuente única).
+        const templateData = buildTripTemplateData(row);
 
         const element = React.createElement(template.component, templateData);
         const html = await render(element);
