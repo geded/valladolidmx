@@ -427,12 +427,11 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const modelCandidates = ranked.map((r) => r.candidate);
 
     // ── 8. Modelo IA (proveedor y ajustes ya configurados) ──────────────
-    const [{ generateText }, { createLovableAiGatewayProvider }, settingsMod] = await Promise.all([
+    const [{ generateText }, { createLovableAiGatewayProvider }, settings] = await Promise.all([
       import("ai"),
       import("@/lib/ai-gateway.server"),
-      import("./settings.functions"),
+      settingsPromise,
     ]);
-    const settings = await settingsMod.resolveAluxSettingsServer(supabaseAdmin).catch(() => null);
     const model = settings?.capability_overrides?.["converse"]?.model ?? settings?.default_model ?? DEFAULT_MODEL;
     const persona = settings?.capability_overrides?.["converse"]?.persona ?? settings?.persona ?? null;
     const guardrails = settings?.guardrails ?? null;
