@@ -233,15 +233,184 @@ async function resolveCoverUrl(
   return { url, alt };
 }
 
+/* ------------------------------------------------------------------ *
+ * 3I.1 · Regiones editoriales alimentadas SÓLO con datos reales.
+ * ------------------------------------------------------------------ */
+
+interface RealContextBundle {
+  trust: Array<Record<string, unknown>>;
+  offers: Array<Record<string, unknown>>;
+  info: Array<Record<string, unknown>>;
+  territory: Record<string, unknown> | null;
+}
+
+/** Contexto real de una EMPRESA: oferta publicada, contacto y ubicación. */
+async function loadBusinessContext(supabase: Db, entity: EntitySnapshot) {
+  const [products, contacts, locations, reviews] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id, slug, name, tagline, status")
+      .eq("business_id", entity.id)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(6),
+    supabase
+      .from("business_contacts")
+      .select("contact_type, value, is_public")
+      .eq("business_id", entity.id)
+      .is("deleted_at", null),
+    supabase
+      .from("business_locations")
+      .select("label, address_line1, address_line2, latitude, longitude, is_primary")
+      .eq("business_id", entity.id)
+      .is("deleted_at", null)
+      .order("is_primary", { ascending: false })
+      .limit(1),
+    supabase
+      .from("reviews")
+      .select("rating")
+      .eq("subject_kind", "business")
+      .eq("subject_id", entity.id)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(500),
+  ]);
+  return {
+    products: products.data ?? [],
+    contacts: (contacts.data ?? []).filter((c) => c.is_public !== false),
+    location: (locations.data ?? [])[0] ?? null,
+    reviews: reviews.data ?? [],
+  };
+}
+
+const CONTACT_LABELS: Record<string, string> = {
+  website: "Sitio web",
+  email: "Correo",
+  phone: "Teléfono",
+  whatsapp: "WhatsApp",
+};
+
+async function buildRealContext(
+  supabase: Db,
+  entityType: SeoLandingEntityType,
+  entity: EntitySnapshot,
+): Promise<RealContextBundle> {
+  const trust: Array<Record<string, unknown>> = [];
+  const offers: Array<Record<string, unknown>> = [];
+  const info: Array<Record<string, unknown>> = [];
+  let territory: Record<string, unknown> | null = null;
+
+  if (entity.destinationName)
+    trust.push({
+      id: "trust-destination",
+      label: entity.destinationName,
+      detail: "Oriente Maya",
+      icon: "pin",
+    });
+
+  if (entityType === "business") {
+    const ctx = await loadBusinessContext(supabase, entity);
+
+    for (const p of ctx.products) {
+      if (!p.name) continue;
+      offers.push({
+        id: p.id,
+        title: p.name,
+        ...(p.tagline ? { subtitle: p.tagline } : {}),
+        ...(entity.destinationSlug && entity.categorySlug
+          ? {
+              href: `/oriente-maya/${entity.destinationSlug}/${entity.categorySlug}/${entity.slug}/${p.slug}`,
+            }
+          : {}),
+      });
+    }
+    if (offers.length > 0)
+      trust.push({
+        id: "trust-offer",
+        label: `${offers.length} experiencia${offers.length === 1 ? "" : "s"} publicada${offers.length === 1 ? "" : "s"}`,
+        icon: "award",
+      });
+
+    const rated = ctx.reviews.filter((r) => typeof r.rating === "number");
+    if (rated.length > 0) {
+      const avg = rated.reduce((acc, r) => acc + Number(r.rating), 0) / rated.length;
+      trust.push({
+        id: "trust-reviews",
+        label: `${avg.toFixed(1)} de 5`,
+        detail: `${rated.length} reseña${rated.length === 1 ? "" : "s"} publicada${rated.length === 1 ? "" : "s"}`,
+        icon: "star",
+      });
+    }
+
+    for (const c of ctx.contacts) {
+      const label = CONTACT_LABELS[String(c.contact_type)];
+      if (!label || !c.value) continue;
+      info.push({ id: `contact-${c.contact_type}`, label, value: c.value });
+    }
+
+    const address = [ctx.location?.address_line1, ctx.location?.address_line2]
+      .filter((v) => typeof v === "string" && v.trim().length > 0)
+      .join(", ");
+    if (entity.destinationName || address)
+      territory = {
+        heading: "Dónde está",
+        ...(entity.destinationName ? { destinationName: entity.destinationName } : {}),
+        ...(address ? { address } : {}),
+        ...(ctx.location?.latitude != null ? { latitude: ctx.location.latitude } : {}),
+        ...(ctx.location?.longitude != null ? { longitude: ctx.location.longitude } : {}),
+        ...(entity.destinationSlug ? { href: `/oriente-maya/${entity.destinationSlug}` } : {}),
+      };
+  }
+
+  if (entityType === "place") {
+    const { data: place } = await supabase
+      .from("points_of_interest")
+      .select(
+        "visit_duration_minutes, best_time_to_visit, entry_fee_notes, address_line, latitude, longitude",
+      )
+      .eq("id", entity.id)
+      .maybeSingle();
+
+    if (place?.visit_duration_minutes)
+      info.push({
+        id: "info-duration",
+        label: "Duración sugerida",
+        value: `${place.visit_duration_minutes} minutos`,
+      });
+    if (place?.best_time_to_visit)
+      info.push({
+        id: "info-best-time",
+        label: "Mejor momento",
+        value: String(place.best_time_to_visit),
+      });
+    if (place?.entry_fee_notes)
+      info.push({ id: "info-fee", label: "Acceso", value: String(place.entry_fee_notes) });
+
+    const address = typeof place?.address_line === "string" ? place.address_line.trim() : "";
+    if (entity.destinationName || address)
+      territory = {
+        heading: "Dónde está",
+        ...(entity.destinationName ? { destinationName: entity.destinationName } : {}),
+        ...(address ? { address } : {}),
+        ...(place?.latitude != null ? { latitude: place.latitude } : {}),
+        ...(place?.longitude != null ? { longitude: place.longitude } : {}),
+        ...(entity.destinationSlug ? { href: `/oriente-maya/${entity.destinationSlug}` } : {}),
+      };
+  }
+
+  return { trust, offers, info, territory };
+}
+
 /** Slots reales: sin dato ⇒ sin slot (cero contenido inventado). */
 async function buildRealSlots(
   supabase: Db,
   entityType: SeoLandingEntityType,
   entity: EntitySnapshot,
 ): Promise<Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>>> {
-  const [cover, media] = await Promise.all([
+  const [cover, media, context] = await Promise.all([
     resolveCoverUrl(supabase, entity.coverMediaId),
     loadEntityMedia(supabase, entityType, entity),
+    buildRealContext(supabase, entityType, entity),
   ]);
   const heroMedia = cover ?? media.find((m) => m.role === "cover") ?? media[0] ?? null;
 
@@ -257,7 +426,19 @@ async function buildRealSlots(
 
   const slots: Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>> = { hero };
   if (entity.description?.trim())
-    slots.intro = { title: "Por qué visitar", body: entity.description.trim() };
+    slots.intro = { title: "Por qué es extraordinario", body: entity.description.trim() };
+
+  if (context.trust.length > 0) slots.badges = { items: context.trust };
+  if (context.offers.length > 0)
+    slots.offers = { heading: "Experiencias destacadas", items: context.offers };
+  if (context.info.length > 0)
+    slots.infoGrid = { heading: "Información para tu visita", items: context.info };
+  if (context.territory) slots.map = context.territory;
+  slots.aluxPlanner = {
+    heading: "Planea esta visita con Alux",
+    body: "Tu asistente del Oriente Maya organiza rutas, tiempos y cercanías.",
+    ctaLabel: "Planear mi ruta",
+  };
 
   const gallery = media.filter((m) => m.url !== heroMedia?.url);
   if (gallery.length > 0)

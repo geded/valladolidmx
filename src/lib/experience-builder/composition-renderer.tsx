@@ -37,6 +37,10 @@ import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremi
 import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
 import { resolvePlacePremiumQ2d } from "@/components/place-premium/place-premium-config";
+import { SeoLandingSurface } from "@/components/seo-landing/SeoLandingSurface";
+import { readSeoLandingChrome } from "./seo-landing/seo-landing-template";
+import { buildSeoLandingSurfaceVM } from "./seo-landing/seo-landing-surface-vm";
+
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
@@ -183,6 +187,13 @@ export function CompositionRenderer({
   wrap,
   variableContext,
 }: CompositionRendererProps): ReactNode {
+  /* LOTE 3I.1 · Familia `premium-seo-landing`: en producción la composición
+     se presenta con la superficie editorial compartida (maqueta autorizada).
+     En Studio se conserva el render bloque a bloque para poder editar. */
+  if (!studio && readSeoLandingChrome(tree)) {
+    const landingVm = buildSeoLandingSurfaceVM(tree);
+    if (landingVm) return <SeoLandingSurface vm={landingVm} />;
+  }
   return (
     <Fragment>
       {tree.root.children.map((node) => (
