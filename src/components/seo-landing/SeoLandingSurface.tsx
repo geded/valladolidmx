@@ -148,7 +148,7 @@ function ColumnHeading({ children, id }: { children: React.ReactNode; id?: strin
 }
 
 export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
-  const { hero, trust, intro, features, offers, info, territory, gallery, alux } = vm;
+  const { hero, trust, intro, features, offers, info, territory, gallery, alux, sections } = vm;
   const featured = offers?.items[0] ?? null;
   const restOffers = offers?.items.slice(1) ?? [];
 
