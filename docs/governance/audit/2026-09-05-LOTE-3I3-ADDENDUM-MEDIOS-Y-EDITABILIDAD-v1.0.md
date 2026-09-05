@@ -126,3 +126,79 @@ Cambio en `SeoLandingSurface`:
 
 Sin cambios de contrato ni de datos. Validado: typecheck, ESLint, 777/777
 pruebas, build y capturas 1440/834/430 sin desbordes ni imágenes rotas.
+
+## 9. Cierre documental · Aprobación visual del Founder (2026-09-05)
+
+El Founder revisó las vistas previas y declaró: «Ya muy parecido a la maqueta».
+Se registra como **APROBACIÓN VISUAL** de la estructura y el diseño actual de
+`premium-seo-landing`. A partir de este punto no se realizan más cambios
+visuales dentro del Lote 3I.3.
+
+### 9.1 QA explícita a 390 px (pendiente cerrado)
+
+Ejecutada con navegador real sobre las vistas previas vigentes, viewport
+390 × 1600, sin sesión (ruta pública por token).
+
+| Piloto | Overflow horizontal | `<main>` | `<h1>` | Imágenes rotas | Errores de consola |
+|---|---|---|---|---|---|
+| Zazil Tunich | 0 | 1 | 1 («Zazil Tunich») | 0 / 9 | 0 |
+| Chichén Itzá | 0 | 1 | 1 («Chichén Itzá») | 0 / 8 | 0 |
+| Cenote Suytun | 0 | 1 | 1 («Cenote Suytun») | 0 / 8 | 0 |
+
+- Sin recortes ni solapamientos: el único contenido que excede el ancho de la
+  ventana es la franja de confianza, contenida en su carril de desplazamiento
+  con `snap` y asomo intencional del siguiente elemento (patrón móvil
+  autorizado); el documento no desborda.
+- Targets táctiles: los llamados principales («Ver ficha completa», «Agregar a
+  Mi Viaje», «Guardar», «Ver Alux») miden ≥ 44 px de alto. Los enlaces de texto
+  en línea (navegación del pie y títulos de experiencias) mantienen altura
+  tipográfica con separación vertical ≥ 12 px; se documenta como observación
+  menor de accesibilidad, no como defecto de esta maqueta.
+- Capturas: `/tmp/browser/3i3qa/{zazil,chichen,suytun}-390.png`.
+
+### 9.2 Matriz final de aceptación 12/12
+
+| # | Criterio | Estado |
+|---|---|---|
+| 1 | Hero dividido 42/58 con tarjeta única y fotografía a sangre | ✅ |
+| 2 | Jerarquía editorial del hero (antetítulo, título, tipo·destino, promesa, descripción, CTAs) | ✅ |
+| 3 | «Guardar» discreto sobre la fotografía | ✅ |
+| 4 | Franja de confianza horizontal con divisores, sin tarjetas | ✅ |
+| 5 | Cuerpo editorial de 4 áreas simultáneas, sin huecos en blanco | ✅ |
+| 6 | Experiencia destacada con fotografía y texto sobre degradado | ✅ |
+| 7 | Información práctica como lista compacta con iconos administrables | ✅ |
+| 8 | Contexto territorial con medio, distancia y enlace al destino | ✅ |
+| 9 | Alux integrado en la última área editorial (banda inferior sólo como respaldo) | ✅ |
+| 10 | Media Library como única autoridad de activos (7 selectores en CMS) | ✅ |
+| 11 | Editabilidad total desde CMS + persistencia verificada y revertida | ✅ |
+| 12 | Tres pilotos completos en borrador `noindex,nofollow`, QA 1440/834/390 | ✅ |
+
+**Resultado: 12/12.**
+
+### 9.3 Validaciones de cierre
+
+`bunx tsgo --noEmit` limpio · `bun test` 777/777 (5297 aserciones) ·
+`bun run build` correcto · Route Inventory 247 rutas. Sin cambios de código
+funcional en este cierre.
+
+### 9.4 Vistas previas vigentes (caducan 2026-09-12)
+
+| Piloto | Enlace |
+|---|---|
+| Zazil Tunich | `/preview/composition/542f4892dc0711e385b44da3e45ce4673740fbc7398afb2651365f1e4a50b0c3` |
+| Chichén Itzá | `/preview/composition/d3c9fe8a7783c7fbd3142b7e680a2283416bc9418bbcac9658b2c6e173250ae4` |
+| Cenote Suytun | `/preview/composition/ae8a902b762cbe6f61956a9391cbe73519c0240e4bf68fab4c89724ffc1baaaf` |
+
+### 9.5 Estado del repositorio
+
+Rama `integration/lovable-valladolidmx` · commit final y HEAD remoto:
+`76b4837cca1d7e51cb0669d86cdeb064408183f8` — «Mantuvo Alux y la regla de sin
+huecos» (2026-09-05 06:58:49 +0000). Sin publicación, sin PR, sin merge a
+`main`, sin despliegue. Árbol de trabajo limpio salvo esta actualización
+documental.
+
+### 9.6 Retención
+
+Los activos y contenidos demo del lote `landing-demo-2026-09-05` se conservan
+administrables hasta instrucción literal del Founder: «Demo validada. Puedes
+eliminar los datos temporales.»
