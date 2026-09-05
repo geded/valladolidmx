@@ -10,7 +10,8 @@ import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles, ExternalLink, Search, Eye, RefreshCw } from "lucide-react";
+import { Sparkles, ExternalLink, Search, Eye, RefreshCw, PencilLine } from "lucide-react";
+import { SeoLandingContentEditor } from "@/components/cms/SeoLandingContentEditor";
 import { toast } from "@/lib/toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -297,6 +298,7 @@ function LandingCard({ row }: { row: SeoLandingAdminRow }) {
   const issueFn = useServerFn(issueCompositionPreviewLink);
   const createFn = useServerFn(createSeoLandingDraft);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
 
   /* 3I.1 · Vista previa interna (token efímero, ruta noindex existente). */
   const preview = useMutation({
@@ -382,6 +384,12 @@ function LandingCard({ row }: { row: SeoLandingAdminRow }) {
           <Eye className="h-3.5 w-3.5" aria-hidden />
           {preview.isPending ? "Generando…" : "Vista previa interna"}
         </button>
+        {!published ? (
+          <button type="button" onClick={() => setEditing((v) => !v)} className={actionClass}>
+            <PencilLine className="h-3.5 w-3.5" aria-hidden />
+            {editing ? "Cerrar contenido" : "Editar contenido"}
+          </button>
+        ) : null}
         {row.entityType && row.entityId && !published ? (
           <button
             type="button"
@@ -394,6 +402,9 @@ function LandingCard({ row }: { row: SeoLandingAdminRow }) {
           </button>
         ) : null}
       </div>
+      {editing ? (
+        <SeoLandingContentEditor compositionId={row.id} onClose={() => setEditing(false)} />
+      ) : null}
       {previewUrl ? (
         <p className="mt-2 truncate text-xs">
           <a href={previewUrl} target="_blank" rel="noreferrer" className="underline ring-focus">
