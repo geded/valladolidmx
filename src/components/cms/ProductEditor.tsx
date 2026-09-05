@@ -52,6 +52,7 @@ export function ProductEditor({ id }: Props) {
         entityId ? (
           <>
             <ProductMediaPanels productId={entityId} />
+            <ProductAttributesPanel productId={entityId} />
             <RelatedOverridesPanel entityType="product" entityId={entityId} />
             <SeoLandingAction entityType="product" entityId={entityId} />
           </>
