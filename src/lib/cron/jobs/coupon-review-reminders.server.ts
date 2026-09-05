@@ -173,12 +173,8 @@ export async function runCouponReviewReminders(
           unsubToken = readBack?.token ?? newToken;
         }
 
-        const templateData = {
-          travelerName: row.traveler_first_name || undefined,
-          businessName: row.business_name,
-          reminderNumber,
-          reviewUrl: `${PUBLIC_ORIGIN}/resenar/negocio/${row.business_slug}`,
-        };
+        // Mismos datos de plantilla que la simulación (fuente única).
+        const templateData = buildCouponTemplateData(row, reminderNumber);
         const element = React.createElement(template.component, templateData);
         const html = await render(element);
         const text = await render(element, { plainText: true });
