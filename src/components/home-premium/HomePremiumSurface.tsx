@@ -904,6 +904,25 @@ function EditorialSection({
   );
 }
 
+/**
+ * Lote 3L · Resumen de ruta sólo con los datos realmente presentes en el CMS
+ * (título · duración · N paradas). Devuelve "" cuando no hay ruta o ningún
+ * dato confirmado, para que ninguna superficie imprima "undefined".
+ */
+function describeRoute(
+  route: HomePremiumContent["rutas"]["items"][number] | undefined,
+  withTitle = true,
+): string {
+  if (!route) return "";
+  const parts: string[] = [];
+  if (withTitle && route.title?.trim()) parts.push(route.title.trim());
+  if (route.duration?.trim()) parts.push(route.duration.trim());
+  if (Number.isFinite(route.stops) && route.stops > 0) {
+    parts.push(`${route.stops} ${route.stops === 1 ? "parada" : "paradas"}`);
+  }
+  return parts.join(" · ");
+}
+
 function MapSection({
   content,
   selectedRoute,
