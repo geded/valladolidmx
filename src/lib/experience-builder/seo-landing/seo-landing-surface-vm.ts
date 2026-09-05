@@ -345,5 +345,21 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
       }
     : null;
 
-  return { hero, trust, intro, features, offers, info, territory, gallery, alux };
+  // Orden administrable: cada slot puede declarar `order` desde el CMS.
+  const present: { key: SeoLandingBodySection; order: number; on: boolean }[] = [
+    {
+      key: "intro",
+      order: num(introCfg?.["order"]) ?? 1,
+      on: Boolean(intro) || features.length > 0,
+    },
+    { key: "offers", order: num(offersCfg?.["order"]) ?? 2, on: Boolean(offers) },
+    { key: "info", order: num(infoCfg?.["order"]) ?? 3, on: Boolean(info) },
+    { key: "territory", order: num(mapCfg?.["order"]) ?? 4, on: Boolean(territory) },
+  ];
+  const sections = present
+    .filter((s) => s.on)
+    .sort((a, b) => a.order - b.order)
+    .map((s) => s.key);
+
+  return { hero, trust, intro, features, offers, info, territory, gallery, alux, sections };
 }
