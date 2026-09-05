@@ -657,7 +657,7 @@ export function AluxFloatingTrigger() {
           ) : null}
 
           {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
-          <AluxConverseChat
+          {false ? <AluxConverseChat
             region={ctx.region}
             destination={effectiveDestination}
             category={ctx.category}
@@ -667,7 +667,7 @@ export function AluxFloatingTrigger() {
             stage={unified.trip.stage}
             coords={geo.status === "granted" && geo.location ? geo.location : null}
             locale={locale}
-          />
+          /> : null}
 
 
 
