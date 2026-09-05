@@ -57,8 +57,7 @@ export interface ListExperiencesDeps {
   readonly markDemo?: boolean;
 }
 
-/** Atributo clave del eje "Tipo de experiencia" (Lote 3E, migración aditiva). */
-export const EXPERIENCE_TYPE_ATTRIBUTE_KEY = "tipo_experiencia" as const;
+export { EXPERIENCE_TYPE_ATTRIBUTE_KEY };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- proyecciones parciales.
 type Row = Record<string, any>;
