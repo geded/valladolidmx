@@ -83,9 +83,9 @@ export function createDryRunClient(
     });
 
   const realFrom = (real as unknown as { from: (t: string) => object }).from.bind(real);
-  const realRpc = (real as unknown as { rpc: (fn: string, ...rest: unknown[]) => unknown }).rpc.bind(
-    real,
-  );
+  const realRpc = (
+    real as unknown as { rpc: (fn: string, ...rest: unknown[]) => unknown }
+  ).rpc.bind(real);
 
   return new Proxy(real as unknown as object, {
     get(target, prop, receiver) {

@@ -14,11 +14,7 @@
  */
 import { sendVisibilityEmail } from "@/lib/visibility/visibility-notifications.server";
 import { SITE } from "@/config/site";
-import type {
-  CronJobResult,
-  CronRunContext,
-  CronSupabase,
-} from "@/lib/cron/cron-hook-auth.server";
+import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
 import {
   newDryRunStats,
   previewCandidate,

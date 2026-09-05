@@ -14,11 +14,7 @@
 import * as React from "react";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
-import type {
-  CronJobResult,
-  CronRunContext,
-  CronSupabase,
-} from "@/lib/cron/cron-hook-auth.server";
+import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
 import {
   newDryRunStats,
   previewCandidate,
