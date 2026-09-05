@@ -22,7 +22,10 @@ import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-enti
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 import { computeOpenNow } from "@/lib/business/open-now";
 import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
-import { loadAluxCanonicalCandidates, type AluxCanonicalCandidate } from "./canonical-catalog.server";
+import {
+  loadAluxCanonicalCandidates,
+  type AluxCanonicalCandidate,
+} from "./canonical-catalog.server";
 import {
   normalizeText,
   sanitizeCmsText,
@@ -83,7 +86,14 @@ function familyFromCategory(slug: string): AluxConverseFamily {
   if (s === "hoteles" || s === "hospedaje") return "hotel";
   if (s === "restaurantes" || s === "gastronomia") return "restaurante";
   if (s === "casas-de-vacaciones" || s === "casas de vacaciones") return "casa";
-  if (s === "experiencias" || s === "experiencias-tours" || s === "tours" || s === "cenotes" || s === "naturaleza" || s === "cultura")
+  if (
+    s === "experiencias" ||
+    s === "experiencias-tours" ||
+    s === "tours" ||
+    s === "cenotes" ||
+    s === "naturaleza" ||
+    s === "cultura"
+  )
     return "experiencia";
   return "otra";
 }
@@ -128,20 +138,34 @@ function formatWhen(iso: string | null | undefined): string | null {
 function money(amount: unknown, currency: unknown): string | null {
   const n = Number(amount);
   if (!Number.isFinite(n) || n <= 0) return null;
-  const cur = typeof currency === "string" && currency.length === 3 ? currency.toUpperCase() : "MXN";
+  const cur =
+    typeof currency === "string" && currency.length === 3 ? currency.toUpperCase() : "MXN";
   return `${n.toLocaleString("es-MX", { maximumFractionDigits: 0 })} ${cur}`;
 }
 
-type HourRow = { day_of_week: number; opens_at: string | null; closes_at: string | null; is_closed: boolean | null };
+type HourRow = {
+  day_of_week: number;
+  opens_at: string | null;
+  closes_at: string | null;
+  is_closed: boolean | null;
+};
 
-function openStateFrom(rows: HourRow[] | undefined): { state: "open" | "closed" | null; label: string | null } {
+function openStateFrom(rows: HourRow[] | undefined): {
+  state: "open" | "closed" | null;
+  label: string | null;
+} {
   if (!rows || rows.length === 0) return { state: null, label: null };
   const r = computeOpenNow(rows, { timezone: TZ });
   return { state: r.state === "unknown" ? null : r.state, label: r.label || null };
 }
 
 /** Hechos derivados de `filter_attributes` (atributos territoriales publicados). */
-function attributeFacts(raw: unknown): { facts: AluxConverseFact[]; tags: string[]; hasAccess: boolean; hasPrice: boolean } {
+function attributeFacts(raw: unknown): {
+  facts: AluxConverseFact[];
+  tags: string[];
+  hasAccess: boolean;
+  hasPrice: boolean;
+} {
   const facts: AluxConverseFact[] = [];
   const tags: string[] = [];
   let hasAccess = false;
@@ -159,14 +183,17 @@ function attributeFacts(raw: unknown): { facts: AluxConverseFact[]; tags: string
     hasPrice = true;
     tags.push(`precio-${normalizeText(a["price_level"])}`);
   }
-  if (typeof a["cuisine_type"] === "string") facts.push(fact(`Cocina: ${humanize(a["cuisine_type"])}`));
+  if (typeof a["cuisine_type"] === "string")
+    facts.push(fact(`Cocina: ${humanize(a["cuisine_type"])}`));
   const dietary = listOf(a["dietary_options"]);
   if (dietary.length) facts.push(fact(`Opciones: ${dietary.join(", ")}`));
   const meal = listOf(a["meal_period"]);
   if (meal.length) facts.push(fact(`Servicio: ${meal.join(", ")}`));
   if (typeof a["hotel_type"] === "string") facts.push(fact(`Tipo: ${humanize(a["hotel_type"])}`));
-  if (typeof a["property_type"] === "string") facts.push(fact(`Propiedad: ${humanize(a["property_type"])}`));
-  if (typeof a["capacity"] === "string") facts.push(fact(`Capacidad: ${humanize(a["capacity"])} personas`));
+  if (typeof a["property_type"] === "string")
+    facts.push(fact(`Propiedad: ${humanize(a["property_type"])}`));
+  if (typeof a["capacity"] === "string")
+    facts.push(fact(`Capacidad: ${humanize(a["capacity"])} personas`));
   const amen = listOf(a["amenities"], 5);
   if (amen.length) facts.push(fact(`Servicios: ${amen.join(", ")}`));
   const profile = listOf(a["traveler_profile"]);
@@ -184,7 +211,11 @@ async function loadBusinessesFor(
   destination: ConverseDestination,
   scope: AluxConverseScope,
   limit: number,
-): Promise<{ candidates: AluxConverseCandidate[]; ids: string[]; index: Map<string, { slug: string; categorySlug: string; name: string }> }> {
+): Promise<{
+  candidates: AluxConverseCandidate[];
+  ids: string[];
+  index: Map<string, { slug: string; categorySlug: string; name: string }>;
+}> {
   const { data, error } = await sb
     .from("businesses")
     .select(
@@ -215,14 +246,20 @@ async function loadBusinessesFor(
 
   const [hoursRes, locRes] = await Promise.all([
     ids.length
-      ? sb.from("business_hours").select("business_id, day_of_week, opens_at, closes_at, is_closed").in("business_id", ids)
+      ? sb
+          .from("business_hours")
+          .select("business_id, day_of_week, opens_at, closes_at, is_closed")
+          .in("business_id", ids)
       : Promise.resolve({ data: [] as unknown[] }),
     ids.length
-      ? sb.from("business_locations").select("business_id, latitude, longitude, is_primary").in("business_id", ids)
+      ? sb
+          .from("business_locations")
+          .select("business_id, latitude, longitude, is_primary")
+          .in("business_id", ids)
       : Promise.resolve({ data: [] as unknown[] }),
   ]);
   const hoursBy = new Map<string, HourRow[]>();
-  for (const h of ((hoursRes.data ?? []) as Array<Record<string, unknown>>)) {
+  for (const h of (hoursRes.data ?? []) as Array<Record<string, unknown>>) {
     const bid = String(h["business_id"]);
     const arr = hoursBy.get(bid) ?? [];
     arr.push({
@@ -234,12 +271,13 @@ async function loadBusinessesFor(
     hoursBy.set(bid, arr);
   }
   const coordsBy = new Map<string, { lat: number; lng: number }>();
-  for (const l of ((locRes.data ?? []) as Array<Record<string, unknown>>)) {
+  for (const l of (locRes.data ?? []) as Array<Record<string, unknown>>) {
     const bid = String(l["business_id"]);
     if (coordsBy.has(bid) && l["is_primary"] !== true) continue;
     const lat = Number(l["latitude"]);
     const lng = Number(l["longitude"]);
-    if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) coordsBy.set(bid, { lat, lng });
+    if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0))
+      coordsBy.set(bid, { lat, lng });
   }
 
   const index = new Map<string, { slug: string; categorySlug: string; name: string }>();
@@ -311,12 +349,17 @@ async function enrichCatalog(
           .in("id", placeIds)
       : Promise.resolve({ data: [] as unknown[] }),
     placeIds.length
-      ? sb.from("place_hours").select("place_id, day_of_week, opens_at, closes_at, is_closed").in("place_id", placeIds)
+      ? sb
+          .from("place_hours")
+          .select("place_id, day_of_week, opens_at, closes_at, is_closed")
+          .in("place_id", placeIds)
       : Promise.resolve({ data: [] as unknown[] }),
     productIds.length
       ? sb
           .from("products")
-          .select("id, business_id, product_type, price_amount, price_currency, duration_minutes, conversion_mode, filter_attributes")
+          .select(
+            "id, business_id, product_type, price_amount, price_currency, duration_minutes, conversion_mode, filter_attributes",
+          )
           .in("id", productIds)
       : Promise.resolve({ data: [] as unknown[] }),
     eventIds.length
@@ -324,9 +367,14 @@ async function enrichCatalog(
       : Promise.resolve({ data: [] as unknown[] }),
   ]);
 
-  const placeBy = new Map((placeRes.data ?? []).map((r) => [String((r as Record<string, unknown>)["id"]), r as Record<string, unknown>]));
+  const placeBy = new Map(
+    (placeRes.data ?? []).map((r) => [
+      String((r as Record<string, unknown>)["id"]),
+      r as Record<string, unknown>,
+    ]),
+  );
   const placeHoursBy = new Map<string, HourRow[]>();
-  for (const h of ((placeHoursRes.data ?? []) as Array<Record<string, unknown>>)) {
+  for (const h of (placeHoursRes.data ?? []) as Array<Record<string, unknown>>) {
     const pid = String(h["place_id"]);
     const arr = placeHoursBy.get(pid) ?? [];
     arr.push({
@@ -337,8 +385,18 @@ async function enrichCatalog(
     });
     placeHoursBy.set(pid, arr);
   }
-  const productBy = new Map((productRes.data ?? []).map((r) => [String((r as Record<string, unknown>)["id"]), r as Record<string, unknown>]));
-  const eventBy = new Map((eventRes.data ?? []).map((r) => [String((r as Record<string, unknown>)["id"]), r as Record<string, unknown>]));
+  const productBy = new Map(
+    (productRes.data ?? []).map((r) => [
+      String((r as Record<string, unknown>)["id"]),
+      r as Record<string, unknown>,
+    ]),
+  );
+  const eventBy = new Map(
+    (eventRes.data ?? []).map((r) => [
+      String((r as Record<string, unknown>)["id"]),
+      r as Record<string, unknown>,
+    ]),
+  );
 
   const out: AluxConverseCandidate[] = [];
   for (const c of catalog) {
@@ -367,7 +425,8 @@ async function enrichCatalog(
           facts.push(fact(`Mejor momento: ${sanitizeCmsText(p["best_time_to_visit"], 80)}`));
         const fee = money(p["price_from"], p["price_currency"]);
         if (fee) facts.push(fact(`Entrada desde ${fee}`));
-        else if (p["admission_kind"] === "free" || p["admission_kind"] === "gratuito") facts.push(fact("Entrada libre"));
+        else if (p["admission_kind"] === "free" || p["admission_kind"] === "gratuito")
+          facts.push(fact("Entrada libre"));
         else if (typeof p["entry_fee_notes"] === "string" && p["entry_fee_notes"])
           facts.push(fact(`Entrada: ${sanitizeCmsText(p["entry_fee_notes"], 80)}`));
         else unavailable.push("precio");
@@ -377,14 +436,17 @@ async function enrichCatalog(
           : access && typeof access === "object"
             ? Object.entries(access as Record<string, unknown>)
                 .filter(([, v]) => v === true || (typeof v === "string" && v.length > 0))
-                .map(([k, v]) => (typeof v === "string" ? `${humanize(k)}: ${humanize(v)}` : humanize(k)))
+                .map(([k, v]) =>
+                  typeof v === "string" ? `${humanize(k)}: ${humanize(v)}` : humanize(k),
+                )
                 .slice(0, 4)
             : [];
         if (accessList.length) {
           facts.push(fact(`Accesibilidad: ${accessList.join(", ")}`));
           tags.push("accesible");
         } else unavailable.push("accesibilidad");
-        if (typeof p["attraction_family"] === "string") tags.push(normalizeText(p["attraction_family"]));
+        if (typeof p["attraction_family"] === "string")
+          tags.push(normalizeText(p["attraction_family"]));
       } else {
         unavailable.push("precio", "accesibilidad", "duracion");
       }
@@ -424,7 +486,8 @@ async function enrichCatalog(
       if (when) facts.push(fact(`Fecha: ${when} (hora local)`));
       else unavailable.push("fechas");
       if (e) {
-        if (typeof e["venue_name"] === "string" && e["venue_name"]) facts.push(fact(`Sede: ${sanitizeCmsText(e["venue_name"], 60)}`));
+        if (typeof e["venue_name"] === "string" && e["venue_name"])
+          facts.push(fact(`Sede: ${sanitizeCmsText(e["venue_name"], 60)}`));
         if (e["is_free"] === true) facts.push(fact("Entrada libre"));
         else unavailable.push("precio");
       } else unavailable.push("precio");
@@ -453,7 +516,12 @@ async function enrichCatalog(
       summary: sanitizeCmsText(c.summary, 140) || null,
       facts,
       unavailable,
-      tags: [family, ...tagsForFamily(family), ...tags, ...(c.categorySlug ? [normalizeText(c.categorySlug)] : [])],
+      tags: [
+        family,
+        ...tagsForFamily(family),
+        ...tags,
+        ...(c.categorySlug ? [normalizeText(c.categorySlug)] : []),
+      ],
       planKind,
       imageUrl: null,
       subtitle,
@@ -473,7 +541,9 @@ async function loadRoutes(
 ): Promise<AluxConverseCandidate[]> {
   let q = sb
     .from("editorial_routes")
-    .select("id, slug, name, summary, duration_days, duration_hours, pace, difficulty, interests, audiences, destination_ids, origin_destination_id")
+    .select(
+      "id, slug, name, summary, duration_days, duration_hours, pace, difficulty, interests, audiences, destination_ids, origin_destination_id",
+    )
     .eq("status", "published")
     .is("deleted_at", null)
     .order("published_at", { ascending: false })
@@ -492,11 +562,14 @@ async function loadRoutes(
     const tags: string[] = [];
     const days = Number(r["duration_days"]);
     const hours = Number(r["duration_hours"]);
-    if (Number.isFinite(days) && days > 0) facts.push(fact(`Duración: ${days} día${days === 1 ? "" : "s"}`));
+    if (Number.isFinite(days) && days > 0)
+      facts.push(fact(`Duración: ${days} día${days === 1 ? "" : "s"}`));
     else if (Number.isFinite(hours) && hours > 0) facts.push(fact(`Duración: ${hours} h`));
     else unavailable.push("duracion");
-    if (typeof r["pace"] === "string" && r["pace"]) facts.push(fact(`Ritmo: ${humanize(r["pace"])}`));
-    if (typeof r["difficulty"] === "string" && r["difficulty"]) facts.push(fact(`Dificultad: ${humanize(r["difficulty"])}`));
+    if (typeof r["pace"] === "string" && r["pace"])
+      facts.push(fact(`Ritmo: ${humanize(r["pace"])}`));
+    if (typeof r["difficulty"] === "string" && r["difficulty"])
+      facts.push(fact(`Dificultad: ${humanize(r["difficulty"])}`));
     const interests = listOf(r["interests"], 4);
     if (interests.length) {
       facts.push(fact(`Intereses: ${interests.join(", ")}`));
@@ -507,11 +580,18 @@ async function loadRoutes(
       facts.push(fact(`Para: ${audiences.join(", ")}`));
       for (const a of audiences) tags.push(normalizeText(a));
     }
-    const destIds = Array.isArray(r["destination_ids"]) ? (r["destination_ids"] as unknown[]).map(String) : [];
-    const destNames = destIds.map((id) => byId.get(id)?.name).filter((n): n is string => Boolean(n));
+    const destIds = Array.isArray(r["destination_ids"])
+      ? (r["destination_ids"] as unknown[]).map(String)
+      : [];
+    const destNames = destIds
+      .map((id) => byId.get(id)?.name)
+      .filter((n): n is string => Boolean(n));
     if (destNames.length) facts.push(fact(`Destinos: ${destNames.slice(0, 4).join(", ")}`));
     unavailable.push("precio", "horario", "accesibilidad");
-    const origin = byId.get(String(r["origin_destination_id"] ?? "")) ?? (destIds.length ? byId.get(destIds[0]!) : undefined) ?? null;
+    const origin =
+      byId.get(String(r["origin_destination_id"] ?? "")) ??
+      (destIds.length ? byId.get(destIds[0]!) : undefined) ??
+      null;
     out.push({
       entityType: "route",
       entityId: String(r["id"]),
@@ -541,7 +621,10 @@ async function loadDestinationCandidates(
 ): Promise<AluxConverseCandidate[]> {
   const ids = destinations.map((d) => d.id);
   if (!ids.length) return [];
-  const { data } = await sb.from("destinations").select("id, slug, name, tagline, description, latitude, longitude").in("id", ids);
+  const { data } = await sb
+    .from("destinations")
+    .select("id, slug, name, tagline, description, latitude, longitude")
+    .in("id", ids);
   const out: AluxConverseCandidate[] = [];
   for (const r of (data ?? []) as Array<Record<string, unknown>>) {
     const slug = String(r["slug"] ?? "");
@@ -565,14 +648,21 @@ async function loadDestinationCandidates(
       destinationSlug: slug,
       destinationLabel: name,
       scope: "region",
-      summary: sanitizeCmsText((r["tagline"] as string | null) ?? (r["description"] as string | null), 140) || null,
+      summary:
+        sanitizeCmsText(
+          (r["tagline"] as string | null) ?? (r["description"] as string | null),
+          140,
+        ) || null,
       facts,
       unavailable: ["horario", "precio"],
       tags,
       planKind: "destination",
       imageUrl: null,
       subtitle: "Oriente Maya",
-      coords: Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0) ? { lat, lng } : null,
+      coords:
+        Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)
+          ? { lat, lng }
+          : null,
       openState: null,
     });
   }
@@ -634,7 +724,9 @@ export async function retrieveConverseCandidates(
     .is("deleted_at", null)
     .order("name", { ascending: true })
     .limit(40);
-  const knownDestinations: ConverseDestination[] = ((destRows ?? []) as Array<Record<string, unknown>>)
+  const knownDestinations: ConverseDestination[] = (
+    (destRows ?? []) as Array<Record<string, unknown>>
+  )
     .map((r) => ({ id: String(r["id"]), slug: String(r["slug"]), name: String(r["name"]) }))
     .filter((d) => d.id && d.slug && d.name);
   const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
@@ -671,12 +763,24 @@ export async function retrieveConverseCandidates(
       ...extraBundles.flatMap((b) => collect(b)),
       ...collect(destCandidates),
     ]);
-    return { candidates, destination, knownDestinations, familiesLoaded: Array.from(familiesLoaded), scope: "destination" };
+    return {
+      candidates,
+      destination,
+      knownDestinations,
+      familiesLoaded: Array.from(familiesLoaded),
+      scope: "destination",
+    };
   }
 
   // ── Región (Home / sin destino): destinos + rutas + muestra por destino ──
   if (knownDestinations.length === 0) {
-    return { candidates: [], destination: null, knownDestinations, familiesLoaded: [], scope: "none" };
+    return {
+      candidates: [],
+      destination: null,
+      knownDestinations,
+      familiesLoaded: [],
+      scope: "none",
+    };
   }
   // Muestra acotada por destino (empresas + catálogo) para poder proponer
   // un plan concreto desde la Home sin exceder el presupuesto de tokens.
@@ -691,5 +795,11 @@ export async function retrieveConverseCandidates(
     ...collect(routes),
     ...bundles.flatMap((b) => collect(b)),
   ]);
-  return { candidates, destination: null, knownDestinations, familiesLoaded: Array.from(familiesLoaded), scope: "region" };
+  return {
+    candidates,
+    destination: null,
+    knownDestinations,
+    familiesLoaded: Array.from(familiesLoaded),
+    scope: "region",
+  };
 }

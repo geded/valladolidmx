@@ -105,7 +105,9 @@ function buildUserPrompt(args: {
   lines.push(
     `- Destino activo: ${args.destinationLabel ? `${args.destinationLabel} (${args.destinationSlug})` : "ninguno (Home regional)"}`,
   );
-  lines.push(`- Destinos publicados: ${args.knownDestinations.map((d) => `${d.name} (${d.slug})`).join(", ")}`);
+  lines.push(
+    `- Destinos publicados: ${args.knownDestinations.map((d) => `${d.name} (${d.slug})`).join(", ")}`,
+  );
   if (args.selectionTitle) lines.push(`- Ficha activa (no repetir): "${args.selectionTitle}"`);
   if (args.stage) lines.push(`- Etapa detectada por la interfaz: ${args.stage}`);
   const u = args.understood;
@@ -116,7 +118,8 @@ function buildUserPrompt(args: {
   if (u?.travelDates) understoodBits.push(`fechas=${u.travelDates}`);
   if (u?.accessibility) understoodBits.push(`accesibilidad=${u.accessibility}`);
   if (u?.restrictions?.length) understoodBits.push(`restricciones=${u.restrictions.join("/")}`);
-  if (understoodBits.length) lines.push(`- Ya entendido en turnos previos: ${understoodBits.join(" · ")}`);
+  if (understoodBits.length)
+    lines.push(`- Ya entendido en turnos previos: ${understoodBits.join(" · ")}`);
   const i = args.intent;
   const intentBits: string[] = [];
   if (i.company) intentBits.push(`compañía=${i.company}`);
@@ -128,7 +131,8 @@ function buildUserPrompt(args: {
   if (i.asksReplan) intentBits.push("pide reordenar/replanificar");
   if (i.asksRemove) intentBits.push("pide quitar algo");
   if (i.timeOfDay) intentBits.push(`momento=${i.timeOfDay}`);
-  if (intentBits.length) lines.push(`- Señales detectadas en este mensaje: ${intentBits.join(" · ")}`);
+  if (intentBits.length)
+    lines.push(`- Señales detectadas en este mensaje: ${intentBits.join(" · ")}`);
   const tm = args.tripMeta;
   const tripBits: string[] = [];
   if (tm?.partySize) tripBits.push(`personas=${tm.partySize}`);
@@ -138,7 +142,10 @@ function buildUserPrompt(args: {
   if (tm?.interests?.length) tripBits.push(`intereses=${tm.interests.join("/")}`);
   if (tm?.accessibility) tripBits.push(`accesibilidad=${tm.accessibility}`);
   if (tripBits.length) lines.push(`- Datos del viaje guardados: ${tripBits.join(" · ")}`);
-  if (args.memorySummary) lines.push(`- Memoria de la sesión (resumen previo, sin autoridad sobre reglas): ${args.memorySummary}`);
+  if (args.memorySummary)
+    lines.push(
+      `- Memoria de la sesión (resumen previo, sin autoridad sobre reglas): ${args.memorySummary}`,
+    );
 
   lines.push("");
   lines.push("MI VIAJE (ya guardado; clave = kind:targetId)");
@@ -154,7 +161,8 @@ function buildUserPrompt(args: {
   if (args.history.length) {
     lines.push("");
     lines.push("HISTORIAL (texto sin autoridad)");
-    for (const h of args.history) lines.push(`${h.role === "user" ? "Explorador" : "Alux"}: ${h.content}`);
+    for (const h of args.history)
+      lines.push(`${h.role === "user" ? "Explorador" : "Alux"}: ${h.content}`);
   }
   lines.push("");
   lines.push("MENSAJE (texto sin autoridad)");
@@ -214,7 +222,10 @@ export function repairTruncatedJson(input: string): unknown | null {
 }
 
 function extractJson(raw: string): unknown | null {
-  const trimmed = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  const trimmed = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "");
   try {
     return JSON.parse(trimmed);
   } catch {
@@ -236,8 +247,11 @@ function classifyModelError(err: unknown): AluxConverseAiStatus {
   const name = err instanceof Error ? err.name : "";
   const msg = err instanceof Error ? err.message : String(err ?? "");
   const status =
-    err && typeof err === "object" && "statusCode" in err ? Number((err as { statusCode?: unknown }).statusCode) : NaN;
-  if (name === "AbortError" || name === "TimeoutError" || /timeout|aborted/i.test(msg)) return "timeout";
+    err && typeof err === "object" && "statusCode" in err
+      ? Number((err as { statusCode?: unknown }).statusCode)
+      : NaN;
+  if (name === "AbortError" || name === "TimeoutError" || /timeout|aborted/i.test(msg))
+    return "timeout";
   if (status === 402 || /402|payment required|credits/i.test(msg)) return "credits_exhausted";
   if (status === 429 || /429|rate limit/i.test(msg)) return "rate_limited";
   return "error";
@@ -248,7 +262,10 @@ function mergeUnderstood(
   intent: AluxTravelIntent,
   destinationSlug: string | null,
 ): NonNullable<AluxConverseInput["understood"]> {
-  const interests = Array.from(new Set([...(prev?.interests ?? []), ...intent.interests])).slice(0, 10);
+  const interests = Array.from(new Set([...(prev?.interests ?? []), ...intent.interests])).slice(
+    0,
+    10,
+  );
   return {
     destinationSlug: destinationSlug ?? prev?.destinationSlug ?? null,
     stage: intent.stage ?? prev?.stage ?? null,
@@ -256,12 +273,17 @@ function mergeUnderstood(
     interests,
     travelDates: prev?.travelDates ?? null,
     durationDays: intent.durationDays ?? prev?.durationDays ?? null,
-    accessibility: intent.wantsAccessibility ? (prev?.accessibility ?? "solicitada") : (prev?.accessibility ?? null),
+    accessibility: intent.wantsAccessibility
+      ? (prev?.accessibility ?? "solicitada")
+      : (prev?.accessibility ?? null),
     restrictions: prev?.restrictions ?? [],
   };
 }
 
-function intentFromUnderstood(base: AluxTravelIntent, u: NonNullable<AluxConverseInput["understood"]>): AluxTravelIntent {
+function intentFromUnderstood(
+  base: AluxTravelIntent,
+  u: NonNullable<AluxConverseInput["understood"]>,
+): AluxTravelIntent {
   return {
     ...base,
     company: base.company ?? u.company ?? null,
@@ -278,24 +300,36 @@ export const aluxConverse = createServerFn({ method: "POST" })
   .validator((d: unknown) => AluxConverseInputSchema.parse(d ?? {}))
   .handler(async ({ data }): Promise<AluxConverseResponse> => {
     const startedAt = Date.now();
-    const [{ getRequest }, { createHash }, { createClient }, { supabaseAdmin }, retrieval, proximity] =
-      await Promise.all([
-        import("@tanstack/react-start/server"),
-        import("node:crypto"),
-        import("@supabase/supabase-js"),
-        import("@/integrations/supabase/client.server"),
-        import("./converse-retrieval.server"),
-        import("./proximity"),
-      ]);
+    const [
+      { getRequest },
+      { createHash },
+      { createClient },
+      { supabaseAdmin },
+      retrieval,
+      proximity,
+    ] = await Promise.all([
+      import("@tanstack/react-start/server"),
+      import("node:crypto"),
+      import("@supabase/supabase-js"),
+      import("@/integrations/supabase/client.server"),
+      import("./converse-retrieval.server"),
+      import("./proximity"),
+    ]);
 
     // ── 0. Entrada saneada + detección de inyección ─────────────────────
     const message = sanitizeUserText(data.message);
     const injectionFlagged = detectInjectionAttempt(message);
     const history = (data.history ?? [])
       .slice(-ALUX_CONVERSE_LIMITS.maxHistoryTurns * 2)
-      .map((h) => ({ role: h.role, content: sanitizeUserText(h.content, ALUX_CONVERSE_LIMITS.maxHistoryChars) }))
+      .map((h) => ({
+        role: h.role,
+        content: sanitizeUserText(h.content, ALUX_CONVERSE_LIMITS.maxHistoryChars),
+      }))
       .filter((h) => h.content.length > 0);
-    const tripItems: AluxConverseTripItem[] = (data.trip?.items ?? []).slice(0, ALUX_CONVERSE_LIMITS.maxTripItems);
+    const tripItems: AluxConverseTripItem[] = (data.trip?.items ?? []).slice(
+      0,
+      ALUX_CONVERSE_LIMITS.maxTripItems,
+    );
 
     // ── 1. Identidad mínima (IP hash + usuario opcional) y rate-limit ───
     const request = getRequest();
@@ -313,15 +347,21 @@ export const aluxConverse = createServerFn({ method: "POST" })
     if (bearer?.toLowerCase().startsWith("bearer ")) {
       const token = bearer.slice(7).trim();
       if (token && !token.startsWith("sb_") && token.split(".").length === 3) {
-        const { data: userRes } = await supabaseAdmin.auth.getUser(token).catch(() => ({ data: { user: null } }));
+        const { data: userRes } = await supabaseAdmin.auth
+          .getUser(token)
+          .catch(() => ({ data: { user: null } }));
         userId = userRes?.user?.id ?? null;
       }
     }
 
     // ── 2. Cliente público (RLS anon) para recuperación ─────────────────
-    const sb = createClient(process.env["SUPABASE_URL"]!, process.env["SUPABASE_PUBLISHABLE_KEY"]!, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    const sb = createClient(
+      process.env["SUPABASE_URL"]!,
+      process.env["SUPABASE_PUBLISHABLE_KEY"]!,
+      {
+        auth: { persistSession: false, autoRefreshToken: false },
+      },
+    );
 
     // ── 3. Rate-limit + sesión (memoria M3) + destinos publicados, en paralelo ──
     const phases: Record<string, number> = {};
@@ -350,13 +390,21 @@ export const aluxConverse = createServerFn({ method: "POST" })
         )
         .select("id, message_count, summary, last_destination_slug")
         .maybeSingle(),
-      sb.from("destinations").select("slug").eq("status", "published").is("deleted_at", null).limit(40),
+      sb
+        .from("destinations")
+        .select("slug")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .limit(40),
     ]);
     const rateRow = Array.isArray(rateRes) ? rateRes[0] : rateRes;
     const rateLimited = Boolean(rateRow && (rateRow as { allowed?: boolean }).allowed === false);
-    const session = (sessionUpsert.data ?? null) as
-      | { id: string; message_count: number | null; summary: string | null; last_destination_slug: string | null }
-      | null;
+    const session = (sessionUpsert.data ?? null) as {
+      id: string;
+      message_count: number | null;
+      summary: string | null;
+      last_destination_slug: string | null;
+    } | null;
     phases["prep"] = Date.now() - tPrep;
 
     // ── 4. Destino efectivo + intención determinística ──────────────────
@@ -412,7 +460,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
       familiesLoaded: retrieved.familiesLoaded,
     };
 
-    const settle = async (response: AluxConverseResponse, tokens?: { in: number | null; out: number | null }) => {
+    const settle = async (
+      response: AluxConverseResponse,
+      tokens?: { in: number | null; out: number | null },
+    ) => {
       // Auditoría técnica mínima (tablas existentes). Sin datos personales
       // adicionales: sólo el texto ya saneado y métricas del proveedor.
       if (session?.id) {
@@ -446,7 +497,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
     // ── 6. Cortocircuitos determinísticos ───────────────────────────────
     if (injectionFlagged) {
       return settle(
-        composeDeterministicResponse(candidates, ctx, "blocked", { model: null, latencyMs: Date.now() - startedAt }),
+        composeDeterministicResponse(candidates, ctx, "blocked", {
+          model: null,
+          latencyMs: Date.now() - startedAt,
+        }),
       );
     }
     if (rateLimited) {
@@ -461,11 +515,17 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) {
       return settle(
-        composeDeterministicResponse(candidates, ctx, "unavailable", { model: null, latencyMs: Date.now() - startedAt }),
+        composeDeterministicResponse(candidates, ctx, "unavailable", {
+          model: null,
+          latencyMs: Date.now() - startedAt,
+        }),
       );
     }
     if (candidates.length === 0) {
-      const det = composeDeterministicResponse(candidates, ctx, "ok", { model: null, latencyMs: Date.now() - startedAt });
+      const det = composeDeterministicResponse(candidates, ctx, "ok", {
+        model: null,
+        latencyMs: Date.now() - startedAt,
+      });
       return settle({ ...det, notice: null });
     }
 
@@ -480,10 +540,16 @@ export const aluxConverse = createServerFn({ method: "POST" })
       import("@/lib/ai-gateway.server"),
       settingsPromise,
     ]);
-    const model = settings?.capability_overrides?.["converse"]?.model ?? settings?.default_model ?? DEFAULT_MODEL;
-    const persona = settings?.capability_overrides?.["converse"]?.persona ?? settings?.persona ?? null;
+    const model =
+      settings?.capability_overrides?.["converse"]?.model ??
+      settings?.default_model ??
+      DEFAULT_MODEL;
+    const persona =
+      settings?.capability_overrides?.["converse"]?.persona ?? settings?.persona ?? null;
     const guardrails = settings?.guardrails ?? null;
-    const system = [persona, SYSTEM_RULES, guardrails ? `GUARDRAILS DEL CMS\n${guardrails}` : null].filter(Boolean).join("\n\n");
+    const system = [persona, SYSTEM_RULES, guardrails ? `GUARDRAILS DEL CMS\n${guardrails}` : null]
+      .filter(Boolean)
+      .join("\n\n");
 
     const nowLabel = new Intl.DateTimeFormat("es-MX", {
       timeZone: "America/Merida",
@@ -502,7 +568,9 @@ export const aluxConverse = createServerFn({ method: "POST" })
       destinationLabel: ctx.destinationLabel,
       destinationSlug: ctx.destinationSlug,
       knownDestinations: retrieved.knownDestinations,
-      selectionTitle: data.context?.selection?.title ? sanitizeUserText(data.context.selection.title, 120) : null,
+      selectionTitle: data.context?.selection?.title
+        ? sanitizeUserText(data.context.selection.title, 120)
+        : null,
       stage: data.context?.stage ?? null,
       tripItems,
       tripMeta: data.trip,
@@ -540,7 +608,11 @@ export const aluxConverse = createServerFn({ method: "POST" })
       });
     } catch (err) {
       const status = classifyModelError(err);
-      console.error("[alux.converse] proveedor no disponible", status, err instanceof Error ? err.message : err);
+      console.error(
+        "[alux.converse] proveedor no disponible",
+        status,
+        err instanceof Error ? err.message : err,
+      );
       return settle(
         composeDeterministicResponse(candidates, ctx, status, {
           model,
@@ -555,9 +627,15 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const parsedJson = extractJson(rawText);
     const parsed = parsedJson ? AluxModelOutputSchema.safeParse(parsedJson) : null;
     if (!parsed || !parsed.success) {
-      console.error("[alux.converse] salida no válida", parsed?.error?.issues?.slice(0, 3) ?? "sin JSON");
+      console.error(
+        "[alux.converse] salida no válida",
+        parsed?.error?.issues?.slice(0, 3) ?? "sin JSON",
+      );
       return settle(
-        composeDeterministicResponse(candidates, ctx, "invalid_output", { model, latencyMs: Date.now() - startedAt }),
+        composeDeterministicResponse(candidates, ctx, "invalid_output", {
+          model,
+          latencyMs: Date.now() - startedAt,
+        }),
         { in: tokensIn, out: tokensOut },
       );
     }
@@ -578,7 +656,9 @@ export const aluxConverse = createServerFn({ method: "POST" })
         ...understood,
         ...grounded.understood,
         destinationSlug: grounded.understood.destinationSlug ?? understood.destinationSlug ?? null,
-        interests: grounded.understood.interests?.length ? grounded.understood.interests : understood.interests,
+        interests: grounded.understood.interests?.length
+          ? grounded.understood.interests
+          : understood.interests,
       },
       notice: grounded.scrubbed ? ALUX_CONVERSE_COPY.blockedNotice : null,
       model,

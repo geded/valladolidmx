@@ -206,7 +206,9 @@ export function rankConverseCandidates(
     scored.push({ candidate: c, score, reasons });
   }
 
-  scored.sort((a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title, "es"));
+  scored.sort(
+    (a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title, "es"),
+  );
 
   // Diversificación por familia (round-robin sobre familias con candidatos).
   const buckets = new Map<AluxConverseFamily, RankedCandidate[]>();
@@ -292,7 +294,8 @@ export function groundModelOutput(
       continue;
     }
     seen.add(key);
-    const reason = cleanLine(scrubModelText(r.reason ?? "").text, 200) || deterministicReason(c, ctx);
+    const reason =
+      cleanLine(scrubModelText(r.reason ?? "").text, 200) || deterministicReason(c, ctx);
     recommendations.push(toRecommendation(c, reason, ctx.tripItems, r.day ?? null));
     if (recommendations.length >= ALUX_CONVERSE_LIMITS.maxRecommendations) break;
   }
@@ -323,7 +326,9 @@ export function groundModelOutput(
   let reorderProposal: AluxConverseResponse["reorderProposal"] = null;
   if (output.reorder && output.reorder.orderedSavedKeys.length > 0) {
     const proposed = output.reorder.orderedSavedKeys.map((k) => k.trim());
-    const validKeys = ctx.tripItems.filter((i) => i.targetId).map((i) => tripItemKey(i.kind, i.targetId));
+    const validKeys = ctx.tripItems
+      .filter((i) => i.targetId)
+      .map((i) => tripItemKey(i.kind, i.targetId));
     const proposedSet = new Set(proposed);
     const isPermutation =
       proposed.length === validKeys.length &&
@@ -334,7 +339,8 @@ export function groundModelOutput(
       reorderProposal = {
         orderedKeys: proposed,
         rationale:
-          cleanLine(scrubModelText(output.reorder.rationale ?? "").text, 200) || "Orden propuesto por Alux.",
+          cleanLine(scrubModelText(output.reorder.rationale ?? "").text, 200) ||
+          "Orden propuesto por Alux.",
       };
     } else if (!isPermutation) {
       rejected += 1;
@@ -354,7 +360,9 @@ export function groundModelOutput(
     if (!confirmed.includes(line)) confirmed.push(line);
   }
 
-  const inferences = output.inferences.map((i) => cleanLine(scrubModelText(i).text, 160)).filter(Boolean);
+  const inferences = output.inferences
+    .map((i) => cleanLine(scrubModelText(i).text, 160))
+    .filter(Boolean);
 
   const unavailable: string[] = [];
   for (const u of output.unavailable) {
@@ -365,7 +373,9 @@ export function groundModelOutput(
       rejected += 1;
       continue;
     }
-    const line = owner ? `${label} no publicado en la ficha de ${owner.title}` : `${label} no disponible en el catálogo`;
+    const line = owner
+      ? `${label} no publicado en la ficha de ${owner.title}`
+      : `${label} no disponible en el catálogo`;
     if (!unavailable.includes(line)) unavailable.push(line);
   }
   // Complementa con lo que la recuperación ya sabe que falta para lo recomendado.
@@ -384,18 +394,31 @@ export function groundModelOutput(
 
   const understood: AluxConverseUnderstood = {
     destinationSlug:
-      output.understood.destinationSlug && ctx.knownDestinationSlugs.includes(output.understood.destinationSlug)
+      output.understood.destinationSlug &&
+      ctx.knownDestinationSlugs.includes(output.understood.destinationSlug)
         ? output.understood.destinationSlug
         : (ctx.destinationSlug ?? null),
     stage: output.understood.stage ?? ctx.intent.stage ?? null,
-    company: output.understood.company ? cleanLine(output.understood.company, 60) : (ctx.intent.company ?? null),
+    company: output.understood.company
+      ? cleanLine(output.understood.company, 60)
+      : (ctx.intent.company ?? null),
     interests: Array.from(
-      new Set([...output.understood.interests.map((i) => cleanLine(i, 60)).filter(Boolean), ...ctx.intent.interests]),
+      new Set([
+        ...output.understood.interests.map((i) => cleanLine(i, 60)).filter(Boolean),
+        ...ctx.intent.interests,
+      ]),
     ).slice(0, 10),
-    travelDates: output.understood.travelDates ? cleanLine(output.understood.travelDates, 80) : null,
+    travelDates: output.understood.travelDates
+      ? cleanLine(output.understood.travelDates, 80)
+      : null,
     durationDays: output.understood.durationDays ?? ctx.intent.durationDays ?? null,
-    accessibility: output.understood.accessibility ? cleanLine(output.understood.accessibility, 120) : null,
-    restrictions: output.understood.restrictions.map((r) => cleanLine(r, 80)).filter(Boolean).slice(0, 6),
+    accessibility: output.understood.accessibility
+      ? cleanLine(output.understood.accessibility, 120)
+      : null,
+    restrictions: output.understood.restrictions
+      .map((r) => cleanLine(r, 80))
+      .filter(Boolean)
+      .slice(0, 6),
   };
 
   const scrubbedText = scrubModelText(output.text);
@@ -422,7 +445,10 @@ export function groundModelOutput(
 
 /* ─────────────────────────── fallback determinístico ─────────────────────────── */
 
-export function deterministicReason(c: AluxConverseCandidate, ctx: Pick<GroundingContext, "intent">): string {
+export function deterministicReason(
+  c: AluxConverseCandidate,
+  ctx: Pick<GroundingContext, "intent">,
+): string {
   const where = c.destinationLabel ?? "el Oriente Maya";
   const fam = ALUX_FAMILY_LABEL[c.family];
   const bits: string[] = [];
@@ -430,15 +456,19 @@ export function deterministicReason(c: AluxConverseCandidate, ctx: Pick<Groundin
   else bits.push(`${fam} publicado en ${where}`);
   const firstFact = c.facts[0]?.text;
   if (firstFact) bits.push(firstFact);
-  if (ctx.intent.wantsAccessibility && c.tags.includes("accesible")) bits.push("con accesibilidad declarada");
+  if (ctx.intent.wantsAccessibility && c.tags.includes("accesible"))
+    bits.push("con accesibilidad declarada");
   return `${bits.join(" · ")}.`.slice(0, 200);
 }
 
 function summarizeIntent(intent: AluxTravelIntent): string {
   const parts: string[] = [];
-  if (intent.company) parts.push(`viaje ${intent.company === "solo" ? "en solitario" : `en ${intent.company}`}`);
-  if (intent.durationDays) parts.push(`${intent.durationDays} día${intent.durationDays === 1 ? "" : "s"}`);
-  if (intent.interests.length) parts.push(`interés en ${intent.interests.slice(0, 3).join(", ").replace(/-/g, " ")}`);
+  if (intent.company)
+    parts.push(`viaje ${intent.company === "solo" ? "en solitario" : `en ${intent.company}`}`);
+  if (intent.durationDays)
+    parts.push(`${intent.durationDays} día${intent.durationDays === 1 ? "" : "s"}`);
+  if (intent.interests.length)
+    parts.push(`interés en ${intent.interests.slice(0, 3).join(", ").replace(/-/g, " ")}`);
   if (intent.wantsAccessibility) parts.push("necesidades de accesibilidad");
   return parts.join(" · ");
 }
@@ -447,7 +477,12 @@ export function composeDeterministicResponse(
   candidates: readonly AluxConverseCandidate[],
   ctx: GroundingContext,
   status: AluxConverseAiStatus,
-  extra: { model: string | null; latencyMs: number; rateLimited?: boolean; candidateCount?: number } = {
+  extra: {
+    model: string | null;
+    latencyMs: number;
+    rateLimited?: boolean;
+    candidateCount?: number;
+  } = {
     model: null,
     latencyMs: 0,
   },
@@ -458,7 +493,10 @@ export function composeDeterministicResponse(
     toRecommendation(
       r.candidate,
       r.reasons.length > 0
-        ? `${deterministicReason(r.candidate, ctx).replace(/\.$/, "")} · ${r.reasons[0]}.`.slice(0, 200)
+        ? `${deterministicReason(r.candidate, ctx).replace(/\.$/, "")} · ${r.reasons[0]}.`.slice(
+            0,
+            200,
+          )
         : deterministicReason(r.candidate, ctx),
       ctx.tripItems,
       null,
@@ -472,7 +510,8 @@ export function composeDeterministicResponse(
   if (status === "blocked") {
     text = ALUX_CONVERSE_COPY.blockedNotice;
   } else if (!ctx.destinationSlug && ctx.retrievalScope !== "region") {
-    text = "Para recomendarte con certeza necesito saber a qué destino del Oriente Maya quieres ir.";
+    text =
+      "Para recomendarte con certeza necesito saber a qué destino del Oriente Maya quieres ir.";
     clarifying.push(ALUX_CONVERSE_COPY.askDestination);
   } else if (recommendations.length === 0) {
     text = where
@@ -523,7 +562,9 @@ export function composeDeterministicResponse(
     recommendations,
     sequence: null,
     reorderProposal: null,
-    confirmedFacts: recommendations.flatMap((r) => r.confirmedFacts.slice(0, 1).map((f) => `${r.title}: ${f}`)),
+    confirmedFacts: recommendations.flatMap((r) =>
+      r.confirmedFacts.slice(0, 1).map((f) => `${r.title}: ${f}`),
+    ),
     inferences: intentLine ? [`Entendí: ${intentLine}.`] : [],
     unavailableFacts: unavailable,
     understood: {
@@ -551,7 +592,8 @@ export function candidateToPromptLine(c: AluxConverseCandidate, index: number): 
     .map((f) => `${f.id}="${f.text}"`)
     .join(" · ");
   const missing = c.unavailable.length ? ` · sin dato: ${c.unavailable.join(", ")}` : "";
-  const scope = c.scope === "destination" ? "destino" : c.scope === "nearby" ? "CERCANÍA (rotular)" : "región";
+  const scope =
+    c.scope === "destination" ? "destino" : c.scope === "nearby" ? "CERCANÍA (rotular)" : "región";
   const saved = c.planKind ? "" : " · no se puede guardar";
   return `${index + 1}. id="${c.entityId}" tipo=${c.family} título="${c.title}" destino=${c.destinationSlug ?? "—"} alcance=${scope}${saved}${
     c.summary ? ` resumen="${c.summary}"` : ""

@@ -247,7 +247,10 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       const history = messages
         .filter((m) => !m.failed)
         .slice(-ALUX_CONVERSE_LIMITS.maxHistoryTurns * 2)
-        .map((m) => ({ role: m.role, content: m.content.slice(0, ALUX_CONVERSE_LIMITS.maxHistoryChars) }));
+        .map((m) => ({
+          role: m.role,
+          content: m.content.slice(0, ALUX_CONVERSE_LIMITS.maxHistoryChars),
+        }));
       setMessages((prev) => [...prev, userMsg]);
       setInput("");
       setStatus("thinking");
@@ -282,7 +285,10 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
             ...(props.coords ? { coords: props.coords } : {}),
           },
         });
-        setMessages((prev) => [...prev, { id: newId(), role: "assistant", content: res.text, response: res }]);
+        setMessages((prev) => [
+          ...prev,
+          { id: newId(), role: "assistant", content: res.text, response: res },
+        ]);
         setUnderstood(res.understood ?? {});
         setStatus("idle");
         setLiveNote(
@@ -292,9 +298,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         );
       } catch (err) {
         console.error("[alux.converse] fallo", err);
-        setMessages((prev) =>
-          prev.map((m) => (m.id === userMsg.id ? { ...m, failed: true } : m)),
-        );
+        setMessages((prev) => prev.map((m) => (m.id === userMsg.id ? { ...m, failed: true } : m)));
         setStatus("error");
         setLiveNote(ALUX_CONVERSE_COPY.errorNotice);
       } finally {
@@ -319,9 +323,12 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       return anon.removePlannedItem(rec.planKind as AnonymousItemKind, rec.entityId);
     },
     onSuccess: (removed, rec) => {
-      if (isAuthed) void queryClient.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
+      if (isAuthed)
+        void queryClient.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
       notifyPlanChanged("remove_item");
-      toast(removed ? "Quitado de Mi Viaje" : "Ya no estaba en Mi Viaje", { description: rec.title });
+      toast(removed ? "Quitado de Mi Viaje" : "Ya no estaba en Mi Viaje", {
+        description: rec.title,
+      });
       setLiveNote(`${rec.title} quitado de Mi Viaje.`);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Intenta de nuevo."),
@@ -332,7 +339,9 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
     mutationFn: async (orderedKeys: readonly string[]) => {
       if (!isAuthed || !active?.plan?.id) throw new Error("Inicia sesión para guardar el orden.");
       const byKey = new Map(
-        (active.items ?? []).filter((i) => i.target_id).map((i) => [tripItemKey(i.item_kind, i.target_id), i.id] as const),
+        (active.items ?? [])
+          .filter((i) => i.target_id)
+          .map((i) => [tripItemKey(i.item_kind, i.target_id), i.id] as const),
       );
       const ordered: string[] = [];
       for (const k of orderedKeys) {
@@ -345,7 +354,9 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
     onSuccess: (r) => {
       void queryClient.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
       notifyPlanChanged("reorder");
-      toast("Orden aplicado en Mi Viaje", { description: `${r.updated} elemento${r.updated === 1 ? "" : "s"} reordenado${r.updated === 1 ? "" : "s"}.` });
+      toast("Orden aplicado en Mi Viaje", {
+        description: `${r.updated} elemento${r.updated === 1 ? "" : "s"} reordenado${r.updated === 1 ? "" : "s"}.`,
+      });
       setLiveNote("Orden aplicado en Mi Viaje.");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo reordenar."),
@@ -353,10 +364,16 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
 
   const starters = props.starters ?? defaultStarters(props.destination?.label ?? null);
   const thinking = status === "thinking";
-  const titleById = useMemo(() => new Map(tripItems.map((i) => [tripItemKey(i.kind, i.targetId), i.title ?? ""])), [tripItems]);
+  const titleById = useMemo(
+    () => new Map(tripItems.map((i) => [tripItemKey(i.kind, i.targetId), i.title ?? ""])),
+    [tripItems],
+  );
 
   return (
-    <section aria-labelledby="alux-converse" className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+    <section
+      aria-labelledby="alux-converse"
+      className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+    >
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
         <MessageCircle className="size-3.5" aria-hidden />
         <span id="alux-converse">Conversa con Alux</span>
@@ -378,7 +395,8 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         ) : null}
       </div>
       <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-        Pregunta libre. Alux responde sólo con el catálogo publicado y te dice cuándo un dato no está disponible.
+        Pregunta libre. Alux responde sólo con el catálogo publicado y te dice cuándo un dato no
+        está disponible.
       </p>
 
       {/* Anuncios para lector de pantalla */}
@@ -404,7 +422,9 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               <p
                 className={[
                   "max-w-[88%] rounded-2xl rounded-br-md px-3 py-2 text-[13px] leading-snug",
-                  m.failed ? "border border-destructive/40 bg-destructive/5 text-foreground" : "bg-primary/10 text-foreground",
+                  m.failed
+                    ? "border border-destructive/40 bg-destructive/5 text-foreground"
+                    : "bg-primary/10 text-foreground",
                 ].join(" ")}
               >
                 {m.content}
@@ -437,7 +457,10 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         ) : null}
 
         {status === "error" && lastFailed ? (
-          <div role="alert" className="flex flex-wrap items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-[12px] text-foreground">
+          <div
+            role="alert"
+            className="flex flex-wrap items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-[12px] text-foreground"
+          >
             <AlertCircle className="size-3.5 text-destructive" aria-hidden />
             <span>{ALUX_CONVERSE_COPY.errorNotice}</span>
             <button
@@ -496,7 +519,11 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           }}
           rows={1}
           maxLength={ALUX_CONVERSE_LIMITS.maxMessageChars}
-          placeholder={props.destination?.label ? `Pregúntale a Alux sobre ${props.destination.label}…` : "¿Qué viaje tienes en mente?"}
+          placeholder={
+            props.destination?.label
+              ? `Pregúntale a Alux sobre ${props.destination.label}…`
+              : "¿Qué viaje tienes en mente?"
+          }
           disabled={thinking}
           className="min-h-11 flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] leading-snug text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-focus disabled:opacity-60"
         />
@@ -506,11 +533,16 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           aria-label="Enviar a Alux"
           className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
-          {thinking ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Send className="size-4" aria-hidden />}
+          {thinking ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+          ) : (
+            <Send className="size-4" aria-hidden />
+          )}
         </button>
       </form>
       <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
-        Alux propone; tú decides con un toque. No reserva ni inventa precios, horarios o disponibilidad.
+        Alux propone; tú decides con un toque. No reserva ni inventa precios, horarios o
+        disponibilidad.
       </p>
     </section>
   );
@@ -561,10 +593,15 @@ function AssistantTurn({
         <AluxMark family="avatar" size={20} decorative />
       </span>
       <div className="min-w-0 flex-1 space-y-2">
-        <p className="rounded-2xl rounded-tl-md bg-muted px-3 py-2 text-[13px] leading-snug text-foreground">{message.content}</p>
+        <p className="rounded-2xl rounded-tl-md bg-muted px-3 py-2 text-[13px] leading-snug text-foreground">
+          {message.content}
+        </p>
 
         {res?.notice ? (
-          <p role="status" className="flex items-start gap-1.5 rounded-xl border border-border bg-background/70 px-3 py-2 text-[11px] leading-snug text-muted-foreground">
+          <p
+            role="status"
+            className="flex items-start gap-1.5 rounded-xl border border-border bg-background/70 px-3 py-2 text-[11px] leading-snug text-muted-foreground"
+          >
             <AlertCircle className="mt-0.5 size-3 shrink-0" aria-hidden />
             {res.notice}
           </p>
@@ -591,7 +628,9 @@ function AssistantTurn({
               <RecommendationCard
                 key={`${rec.entityType}:${rec.entityId}`}
                 rec={rec}
-                inTrip={rec.planKind ? tripKeys.has(tripItemKey(rec.planKind, rec.entityId)) : false}
+                inTrip={
+                  rec.planKind ? tripKeys.has(tripItemKey(rec.planKind, rec.entityId)) : false
+                }
                 onRemove={onRemove}
                 removing={removing}
               />
@@ -609,11 +648,15 @@ function AssistantTurn({
               {res.sequence.map((step) => (
                 <li key={step.day} className="flex gap-2">
                   <span className="shrink-0 font-semibold">Día {step.day}</span>
-                  <span className="text-muted-foreground">{step.refs.map((r) => r.title).join(" → ")}</span>
+                  <span className="text-muted-foreground">
+                    {step.refs.map((r) => r.title).join(" → ")}
+                  </span>
                 </li>
               ))}
             </ol>
-            <p className="mt-1.5 text-[10px] text-muted-foreground">Es una propuesta, no una reserva.</p>
+            <p className="mt-1.5 text-[10px] text-muted-foreground">
+              Es una propuesta, no una reserva.
+            </p>
           </div>
         ) : null}
 
@@ -628,7 +671,9 @@ function AssistantTurn({
                 <li key={k}>{titleById.get(k) || k.split(":")[0]}</li>
               ))}
             </ol>
-            <p className="mt-1.5 text-[11px] text-muted-foreground">{res.reorderProposal.rationale}</p>
+            <p className="mt-1.5 text-[11px] text-muted-foreground">
+              {res.reorderProposal.rationale}
+            </p>
             {isAuthed ? (
               <button
                 type="button"
@@ -636,11 +681,17 @@ function AssistantTurn({
                 onClick={() => onApplyOrder(res.reorderProposal!.orderedKeys)}
                 className="mt-2 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary bg-primary/10 px-3 text-[12px] font-medium text-primary hover:bg-primary/15 disabled:opacity-60"
               >
-                {applyingOrder ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Check className="size-3.5" aria-hidden />}
+                {applyingOrder ? (
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                ) : (
+                  <Check className="size-3.5" aria-hidden />
+                )}
                 Aplicar este orden en Mi Viaje
               </button>
             ) : (
-              <p className="mt-2 text-[11px] text-muted-foreground">Crea tu cuenta para guardar el orden en Mi Viaje.</p>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                Crea tu cuenta para guardar el orden en Mi Viaje.
+              </p>
             )}
           </div>
         ) : null}
@@ -653,12 +704,14 @@ function AssistantTurn({
             <div className="mt-1.5 space-y-1.5">
               {res.inferences.length > 0 ? (
                 <p>
-                  <span className="font-semibold text-foreground">Inferencias:</span> {res.inferences.join(" ")}
+                  <span className="font-semibold text-foreground">Inferencias:</span>{" "}
+                  {res.inferences.join(" ")}
                 </p>
               ) : null}
               {res.unavailableFacts.length > 0 ? (
                 <p>
-                  <span className="font-semibold text-foreground">No disponible:</span> {res.unavailableFacts.join(" · ")}
+                  <span className="font-semibold text-foreground">No disponible:</span>{" "}
+                  {res.unavailableFacts.join(" · ")}
                 </p>
               ) : null}
             </div>
@@ -696,13 +749,20 @@ function RecommendationCard({
         {rec.destinationLabel ? <span aria-hidden>·</span> : null}
         {rec.destinationLabel ? <span>{rec.destinationLabel}</span> : null}
         {rec.scope === "nearby" ? (
-          <span className="rounded-full bg-warning/15 px-2 py-0.5 text-warning-foreground normal-case tracking-normal">Cercanía</span>
+          <span className="rounded-full bg-warning/15 px-2 py-0.5 text-warning-foreground normal-case tracking-normal">
+            Cercanía
+          </span>
         ) : null}
         {inTrip ? (
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary normal-case tracking-normal">En Mi Viaje</span>
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary normal-case tracking-normal">
+            En Mi Viaje
+          </span>
         ) : null}
       </div>
-      <a href={rec.href} className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline">
+      <a
+        href={rec.href}
+        className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
+      >
         {rec.title}
         <ArrowRight className="size-3.5" aria-hidden />
       </a>
@@ -714,14 +774,19 @@ function RecommendationCard({
       {rec.confirmedFacts.length > 0 ? (
         <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Datos confirmados">
           {rec.confirmedFacts.slice(0, 3).map((f) => (
-            <li key={f} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-foreground/80">
+            <li
+              key={f}
+              className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-foreground/80"
+            >
               {f}
             </li>
           ))}
         </ul>
       ) : null}
       {rec.unavailableFacts.length > 0 ? (
-        <p className="mt-1 text-[10px] text-muted-foreground">Sin dato publicado: {rec.unavailableFacts.slice(0, 3).join(", ").toLowerCase()}</p>
+        <p className="mt-1 text-[10px] text-muted-foreground">
+          Sin dato publicado: {rec.unavailableFacts.slice(0, 3).join(", ").toLowerCase()}
+        </p>
       ) : null}
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {canAdd && rec.planKind ? (
@@ -734,7 +799,6 @@ function RecommendationCard({
             eligibilityMode="legacy"
             className="min-h-9"
           />
-
         ) : null}
         {canRemove ? (
           confirmRemove ? (
@@ -748,7 +812,11 @@ function RecommendationCard({
                 }}
                 className="inline-flex min-h-9 items-center gap-1 rounded-full border border-destructive/40 bg-destructive/5 px-3 text-[12px] font-medium text-destructive hover:bg-destructive/10 disabled:opacity-60"
               >
-                {removing ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Trash2 className="size-3.5" aria-hidden />}
+                {removing ? (
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                ) : (
+                  <Trash2 className="size-3.5" aria-hidden />
+                )}
                 Sí, quitar
               </button>
               <button
@@ -770,7 +838,9 @@ function RecommendationCard({
             </button>
           )
         ) : null}
-        {!rec.planKind ? <span className="text-[10px] text-muted-foreground">Sólo consulta</span> : null}
+        {!rec.planKind ? (
+          <span className="text-[10px] text-muted-foreground">Sólo consulta</span>
+        ) : null}
       </div>
     </li>
   );
