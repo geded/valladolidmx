@@ -120,12 +120,12 @@ export function buildExperienceVMFromProduct(
     attributeLabels(EXPERIENCE_TYPE_ATTRIBUTE_KEY)[0] ??
     product.category_label ??
     (product.product_type ? humanize(product.product_type) : "Experiencia");
-  const languages = attributeLabels("idioma");
-  const accessibility = attributeLabels("accesibilidad");
-  const FACT_ATTRIBUTE_KEYS = new Set([
+  const languages = attributeLabels(EXPERIENCE_LANGUAGE_ATTRIBUTE_KEY);
+  const accessibility = attributeLabels(EXPERIENCE_ACCESSIBILITY_ATTRIBUTE_KEY);
+  const FACT_ATTRIBUTE_KEYS = new Set<string>([
     EXPERIENCE_TYPE_ATTRIBUTE_KEY,
-    "idioma",
-    "accesibilidad",
+    EXPERIENCE_LANGUAGE_ATTRIBUTE_KEY,
+    EXPERIENCE_ACCESSIBILITY_ATTRIBUTE_KEY,
   ]);
 
   const facts: ExperienceFactVM[] = [];
