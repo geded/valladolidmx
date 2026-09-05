@@ -127,5 +127,5 @@ Nota: `bunx vitest run` no es el corredor de esta suite — 58 archivos usan `bu
 ## 9. Confirmación de rama
 
 - Trabajo exclusivamente sobre `integration/lovable-valladolidmx`. Sin ramas manuales, PR ni merge.
-- Commit del lote y estado del árbol: ver §10 (bloque de cierre añadido tras confirmar).
+- Último commit del lote: `e21863b2d4d583bee30617734af850f8fd3dca38` · árbol de trabajo **limpio** (0 archivos pendientes) · rama de edición `edit/edt-6e9ef999-ab17-4412-99f1-9e5b52fc39ba` que la plataforma integra automáticamente en `integration/lovable-valladolidmx` (base previa del lote: `3be6b472880ba2644078a60ad3a7b0b7b018d7d5`).
 - Sin publicar, sin desplegar, sin tocar `main`.
