@@ -2,53 +2,22 @@
  * LocationPickerMap — Google Maps con marker DRAGGABLE + click-to-set.
  *
  * Reglas oficiales (google_maps knowledge):
- *  - loading=async + callback global.
+ *  - loading=async + callback global (vía el cargador único compartido).
  *  - Sin AdvancedMarker (no mapId).
- *  - Sólo se monta cuando el editor está en pantalla.
+ *  - Sólo se monta cuando el panel está visible y con tamaño real.
  *  - Usa exclusivamente `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY`.
  *
  * Emite `onChange({lat,lng})` en drag-end y en click sobre el mapa.
  */
 import { useEffect, useRef, useState } from "react";
+import {
+  getGoogleMapsBrowserKey,
+  loadGoogleMaps,
+  subscribeGoogleMapsAuthFailure,
+} from "@/lib/maps/google-maps-loader";
+import { MapUnavailableFallback } from "./MapUnavailableFallback";
 
 type LatLng = { lat: number; lng: number };
-// Nota: la declaración `global { Window }` vive en `InteractiveMap.tsx`.
-// Aquí usamos acceso dinámico para evitar colisión de tipos duplicados.
-
-const SCRIPT_ID = "vmx-google-maps-js";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function loadGoogleMapsScript(apiKey: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return reject(new Error("SSR"));
-    const w = window as unknown as {
-      google?: { maps?: unknown };
-      __vmxGmapsCbList?: Array<() => void>;
-      vmxInitGoogleMaps?: () => void;
-    };
-    if (w.google?.maps) return resolve(w.google);
-    window.__vmxGmapsCbList = window.__vmxGmapsCbList ?? [];
-    window.__vmxGmapsCbList.push(() => {
-      if (w.google?.maps) resolve(w.google);
-      else reject(new Error("Maps JS failed to load"));
-    });
-    window.vmxInitGoogleMaps = () => {
-      const list = window.__vmxGmapsCbList ?? [];
-      window.__vmxGmapsCbList = [];
-      list.forEach((cb) => cb());
-    };
-    if (document.getElementById(SCRIPT_ID)) return;
-    const s = document.createElement("script");
-    s.id = SCRIPT_ID;
-    s.async = true;
-    s.defer = true;
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-      apiKey,
-    )}&loading=async&callback=vmxInitGoogleMaps`;
-    s.onerror = () => reject(new Error("Google Maps script failed"));
-    document.head.appendChild(s);
-  });
-}
 
 export interface LocationPickerMapProps {
   lat: number;
@@ -66,27 +35,61 @@ export function LocationPickerMap({
   className,
 }: LocationPickerMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markerRef = useRef<any>(null);
+  const mapRef = useRef<{ setCenter: (p: LatLng) => void } | null>(null);
+  const markerRef = useRef<{ setPosition: (p: LatLng) => void } | null>(null);
   const onChangeRef = useRef(onChange);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
 
+  /* Fallo de autorización del proveedor: suscripción por instancia. */
+  useEffect(() => subscribeGoogleMapsAuthFailure(() => setFailed(true)), []);
+
+  /* Montaje condicional: nunca descargar el SDK en contenedores ocultos. */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || mounted) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setMounted(true);
+      return;
+    }
+    const check = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) setMounted(true);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) check();
+      },
+      { rootMargin: "128px" },
+    );
+    io.observe(el);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => check());
+      ro.observe(el);
+    }
+    check();
+    return () => {
+      io.disconnect();
+      ro?.disconnect();
+    };
+  }, [mounted]);
+
   // Inicialización única. Cambios posteriores de lat/lng actualizan
   // marker + centro sin recrear el mapa.
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
+    if (!mounted) return;
+    const apiKey = getGoogleMapsBrowserKey();
     if (!apiKey) {
-      setError("Google Maps browser key no configurada.");
+      setFailed(true);
       return;
     }
     let cancelled = false;
-    loadGoogleMapsScript(apiKey)
+    loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
         const map = new google.maps.Map(ref.current, {
@@ -103,24 +106,25 @@ export function LocationPickerMap({
           draggable: true,
           title: "Arrastra o toca el mapa para ubicar",
         });
-        marker.addListener("dragend", (e: { latLng: { lat: () => number; lng: () => number } }) => {
-          const p = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-          onChangeRef.current(p);
-        });
-        map.addListener("click", (e: { latLng: { lat: () => number; lng: () => number } }) => {
+        marker.addListener("dragend", ((e: {
+          latLng: { lat: () => number; lng: () => number };
+        }) => {
+          onChangeRef.current({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+        }) as never);
+        map.addListener("click", ((e: { latLng: { lat: () => number; lng: () => number } }) => {
           const p = { lat: e.latLng.lat(), lng: e.latLng.lng() };
           marker.setPosition(p);
           onChangeRef.current(p);
-        });
+        }) as never);
         mapRef.current = map;
         markerRef.current = marker;
       })
-      .catch((e) => setError(e instanceof Error ? e.message : "Mapa no disponible"));
+      .catch(() => setFailed(true));
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   // Sync externo: si el padre cambia lat/lng (geolocalización, geocoding),
   // reposicionamos marker + centro.
@@ -131,19 +135,17 @@ export function LocationPickerMap({
     }
   }, [lat, lng]);
 
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-border bg-muted p-6 text-sm text-muted-foreground">
-        {error}
-      </div>
-    );
+  if (failed) {
+    return <MapUnavailableFallback points={[{ lat, lng, title: "Ubicación seleccionada" }]} />;
   }
+
   return (
     <div
       ref={ref}
       className={className ?? "h-[360px] w-full rounded-2xl border border-border bg-muted"}
       role="application"
       aria-label="Selector de ubicación en el mapa"
+      data-map-mounted={mounted ? "true" : "false"}
     />
   );
 }

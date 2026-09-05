@@ -18,65 +18,12 @@
  * funciona; en custom domain requiere la key propia con referrers.
  */
 import { useEffect, useRef, useState } from "react";
-
-// Tipos mínimos locales para evitar depender de @types/google.maps.
-type LatLng = { lat: number; lng: number };
-interface GMap {
-  new (
-    el: HTMLElement,
-    opts: Record<string, unknown>,
-  ): {
-    fitBounds: (bounds: unknown, padding?: number) => void;
-    setZoom: (zoom: number) => void;
-  };
-}
-interface GMarker {
-  new (opts: {
-    position: LatLng;
-    map: unknown;
-    title?: string;
-    label?: unknown;
-    icon?: unknown;
-    zIndex?: number;
-  }): { addListener: (event: string, handler: () => void) => void };
-}
-interface GSize {
-  new (width: number, height: number): unknown;
-}
-interface GPoint {
-  new (x: number, y: number): unknown;
-}
-interface GLatLngBounds {
-  new (): { extend: (position: LatLng) => void };
-}
-interface GPolyline {
-  new (opts: Record<string, unknown>): { setMap: (map: unknown) => void };
-}
-interface GDirectionsService {
-  new (): {
-    route: (
-      request: Record<string, unknown>,
-      callback: (result: unknown, status: string) => void,
-    ) => void;
-  };
-}
-interface GDirectionsRenderer {
-  new (opts: Record<string, unknown>): { setDirections: (result: unknown) => void };
-}
-interface GoogleMapsNamespace {
-  maps: {
-    Map: GMap;
-    Marker: GMarker;
-    Size: GSize;
-    Point: GPoint;
-    LatLngBounds: GLatLngBounds;
-    Polyline: GPolyline;
-    DirectionsService: GDirectionsService;
-    DirectionsRenderer: GDirectionsRenderer;
-    TravelMode: { DRIVING: string };
-    DirectionsStatus: { OK: string };
-  };
-}
+import {
+  getGoogleMapsBrowserKey,
+  loadGoogleMaps,
+  subscribeGoogleMapsAuthFailure,
+} from "@/lib/maps/google-maps-loader";
+import { MapUnavailableFallback } from "./MapUnavailableFallback";
 
 /** Resultado de la capa de ruta, reportado a la superficie consumidora. */
 export interface MapRouteStatus {
@@ -91,15 +38,6 @@ export interface MapRouteStatus {
   waypointOrder?: number[];
 }
 
-declare global {
-  interface Window {
-    google?: GoogleMapsNamespace;
-    __vmxGmapsCbList?: Array<() => void>;
-    vmxInitGoogleMaps?: () => void;
-  }
-}
-
-const SCRIPT_ID = "vmx-google-maps-js";
 
 /**
  * Cartografía territorial Valladolid.mx.
@@ -155,41 +93,51 @@ const VALLADOLID_MAP_STYLES = [
   { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#285e60" }] },
 ] as const;
 
-function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      reject(new Error("SSR"));
-      return;
-    }
-    if (window.google?.maps) {
-      resolve(window.google);
+/**
+ * Montaje condicional: el SDK sólo se descarga cuando el contenedor está
+ * realmente visible y con tamaño > 0. Evita pagar Maps JS dentro de paneles
+ * ocultos (`hidden`, `display:none`) o de tamaño cero en móvil y tablet.
+ */
+function useVisibleWithSize(ref: React.RefObject<HTMLDivElement | null>): boolean {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || visible) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
       return;
     }
 
-    // Registrar callback antes de crear el script.
-    window.__vmxGmapsCbList = window.__vmxGmapsCbList ?? [];
-    window.__vmxGmapsCbList.push(() => {
-      if (window.google?.maps) resolve(window.google);
-      else reject(new Error("Maps JS failed to load"));
-    });
-    window.vmxInitGoogleMaps = () => {
-      const list = window.__vmxGmapsCbList ?? [];
-      window.__vmxGmapsCbList = [];
-      list.forEach((cb) => cb());
+    const check = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) setVisible(true);
     };
 
-    if (document.getElementById(SCRIPT_ID)) return; // ya en carga
-    const s = document.createElement("script");
-    s.id = SCRIPT_ID;
-    s.async = true;
-    s.defer = true;
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-      apiKey,
-    )}&loading=async&callback=vmxInitGoogleMaps`;
-    s.onerror = () => reject(new Error("Google Maps script failed"));
-    document.head.appendChild(s);
-  });
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) check();
+      },
+      { rootMargin: "128px" },
+    );
+    io.observe(el);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => check());
+      ro.observe(el);
+    }
+    check();
+
+    return () => {
+      io.disconnect();
+      ro?.disconnect();
+    };
+  }, [ref, visible]);
+
+  return visible;
 }
+
 
 export interface InteractiveMapMarker {
   lat: number;
@@ -262,28 +210,32 @@ export function InteractiveMap({
   onMarkerSelect,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
   const routeStatusRef = useRef(onRouteStatus);
   const markerSelectRef = useRef(onMarkerSelect);
   routeStatusRef.current = onRouteStatus;
   markerSelectRef.current = onMarkerSelect;
 
+  /* Sólo se descarga el SDK cuando el panel está visible y con tamaño real. */
+  const shouldMount = useVisibleWithSize(ref);
+
+  /* Fallo de autorización del proveedor: suscripción por instancia. */
+  useEffect(() => subscribeGoogleMapsAuthFailure(() => setFailed(true)), []);
+
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
+    if (!shouldMount) return;
+    const apiKey = getGoogleMapsBrowserKey();
     if (!apiKey) {
-      setError("Google Maps browser key no configurada.");
+      setFailed(true);
       return;
     }
-    /* Dominio no autorizado por la clave: mensaje propio, sin tarjeta de Google. */
-    (window as unknown as { gm_authFailure?: () => void }).gm_authFailure = () => {
-      setError("El mapa no está disponible en este dominio de revisión.");
-    };
     let cancelled = false;
 
-    loadGoogleMapsScript(apiKey)
+    loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
+
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
           zoom,
@@ -392,21 +344,29 @@ export function InteractiveMap({
         }
         setReady(true);
       })
-      .catch((e) => {
-        setError(e instanceof Error ? e.message : "No se pudo cargar el mapa");
+      .catch(() => {
+        setFailed(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+  }, [
+    shouldMount,
+    lat,
+    lng,
+    zoom,
+    markerTitle,
+    markers,
+    connectByRoad,
+    routeStops,
+    optimizeRoute,
+  ]);
 
-
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-border bg-muted p-6 text-sm text-muted-foreground">
-        {error}
-      </div>
-    );
+  if (failed) {
+    const points = (
+      markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }]
+    ).map((m) => ({ lat: m.lat, lng: m.lng, title: m.title ?? markerTitle ?? null }));
+    return <MapUnavailableFallback points={points} />;
   }
 
   return (
@@ -416,6 +376,8 @@ export function InteractiveMap({
       aria-label={markerTitle ? `Mapa de ${markerTitle}` : "Mapa interactivo"}
       role="img"
       data-ready={ready ? "true" : "false"}
+      data-map-mounted={shouldMount ? "true" : "false"}
     />
   );
+
 }
