@@ -103,6 +103,8 @@ export interface SeoLandingSurfaceVM {
   readonly territory: SeoLandingTerritoryVM | null;
   readonly gallery: readonly SeoLandingMedia[];
   readonly alux: { heading: string; body: string | null; ctaLabel: string } | null;
+  /** Orden administrable de las áreas del cuerpo editorial. */
+  readonly sections: readonly SeoLandingBodySection[];
 }
 
 type Cfg = Record<string, unknown>;
