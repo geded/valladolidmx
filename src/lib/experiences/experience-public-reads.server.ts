@@ -29,6 +29,14 @@ import {
   normalizeFilterAttributes,
   type TourismAttributeDefinition,
 } from "@/lib/business-attributes/types";
+import type {
+  MarketplaceProductDetail,
+  ProductAttributeItem,
+} from "@/lib/catalog/marketplace-reads.functions";
+import {
+  EXPERIENCE_ATTRIBUTE_FAMILY,
+  EXPERIENCE_TYPE_ATTRIBUTE_KEY,
+} from "@/lib/experiences/experience-attributes";
 
 export interface ExperienceAxisDTO {
   readonly key: string;
