@@ -84,10 +84,7 @@ function LandingSeoPage() {
         search: { page: res.id, mode: undefined, block: undefined },
       });
     },
-    onError: (error) => {
-      console.error("[seo-landing-create]", error);
-      toast.error(error instanceof Error ? error.message : "No fue posible crear la Landing SEO.");
-    },
+    onError: () => toast.error("No fue posible crear la Landing SEO."),
   });
 
   const rows = useMemo(() => list.data?.rows ?? [], [list.data]);
