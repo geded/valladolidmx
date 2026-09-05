@@ -18,6 +18,7 @@ import {
   saveSeoLandingEditorModel,
   type JsonValue,
   type SeoLandingMediaOption,
+  type SeoLandingSeoModel,
   type SeoLandingSlotJson,
 } from "@/lib/experience-builder/seo-landing/seo-landing-editor.functions";
 
@@ -166,6 +167,109 @@ function RowTools({
   );
 }
 
+/**
+ * Selector gobernado de activo visual: miniatura, texto alternativo, estado de
+ * acreditación, cambio, retiro y punto focal. Toda imagen proviene de la
+ * Biblioteca de Medios; nunca se escribe una URL a mano.
+ */
+function MediaField({
+  label,
+  hint,
+  options,
+  url,
+  alt,
+  focal,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  options: readonly SeoLandingMediaOption[];
+  url: string;
+  alt: string;
+  focal: string;
+  onChange: (next: { url: string; alt: string; focal: string }) => void;
+}) {
+  const selected = options.find((m) => m.url === url) ?? null;
+  const selectOptions = [
+    { value: "", label: "Sin activo seleccionado" },
+    ...options.map((m) => ({
+      value: m.url,
+      label: `${m.source} · ${m.role} · ${m.alt.slice(0, 40)}${m.demo ? " · demo" : ""}`,
+    })),
+  ];
+  return (
+    <div className="rounded-xl border border-border p-3">
+      <div className="flex items-start gap-3">
+        {url ? (
+          <img
+            src={url}
+            alt=""
+            className="size-16 shrink-0 rounded-lg border border-border object-cover"
+            style={focal ? { objectPosition: focal } : undefined}
+          />
+        ) : (
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground">
+            Sin foto
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-tight">{label}</p>
+          {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {selected
+              ? `${selected.accreditation}${selected.credit ? ` · ${selected.credit}` : ""}`
+              : "Sin activo acreditado"}
+          </p>
+          {selected?.demo ? (
+            <span className="mt-1 inline-flex rounded-pill border border-warning/40 bg-warning/10 px-2 py-0.5 text-[11px] text-warning-foreground">
+              Activo demo · reemplazable sin tocar código
+            </span>
+          ) : null}
+        </div>
+        {url ? (
+          <button
+            type="button"
+            className={chip}
+            onClick={() => onChange({ url: "", alt: "", focal: "" })}
+          >
+            Quitar
+          </button>
+        ) : null}
+      </div>
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        <Select
+          label="Cambiar activo"
+          value={url}
+          options={selectOptions}
+          onChange={(v) => {
+            const found = options.find((m) => m.url === v);
+            onChange({ url: v, alt: found?.alt ?? (v ? alt : ""), focal });
+          }}
+        />
+        <Text
+          label="Texto alternativo"
+          value={alt}
+          onChange={(v) => onChange({ url, alt: v, focal })}
+        />
+        <Text
+          label="Punto focal (ej. 50% 40%)"
+          value={focal}
+          onChange={(v) => onChange({ url, alt, focal: v })}
+        />
+      </div>
+    </div>
+  );
+}
+
+const EMPTY_SEO: SeoLandingSeoModel = {
+  title: "",
+  description: "",
+  canonical: "",
+  robots: "noindex,nofollow",
+};
+
+const ORDER_OPTIONS = [1, 2, 3, 4].map((n) => ({ value: String(n), label: `Posición ${n}` }));
+
 export function SeoLandingContentEditor({
   compositionId,
   onClose,
@@ -177,6 +281,7 @@ export function SeoLandingContentEditor({
   const loadFn = useServerFn(getSeoLandingEditorModel);
   const saveFn = useServerFn(saveSeoLandingEditorModel);
   const [slots, setSlots] = useState<Record<string, SeoLandingSlotJson> | null>(null);
+  const [seo, setSeo] = useState<SeoLandingSeoModel | null>(null);
 
   const model = useQuery({
     queryKey: ["cms", "seo-landing", "editor", compositionId],
@@ -184,7 +289,10 @@ export function SeoLandingContentEditor({
   });
 
   useEffect(() => {
-    if (model.data) setSlots(model.data.slots);
+    if (model.data) {
+      setSlots(model.data.slots);
+      setSeo(model.data.seo);
+    }
   }, [model.data]);
 
   const mediaOptions: readonly SeoLandingMediaOption[] = useMemo(
@@ -200,7 +308,8 @@ export function SeoLandingContentEditor({
   );
 
   const save = useMutation({
-    mutationFn: () => saveFn({ data: { compositionId, slots: slots ?? {} } }),
+    mutationFn: () =>
+      saveFn({ data: { compositionId, slots: slots ?? {}, seo: seo ?? undefined } }),
     onSuccess: (res) => {
       void queryClient.invalidateQueries({ queryKey: ["cms", "seo-landings"] });
       toast.success(`Contenido guardado (${res.populatedSlots.length} secciones con datos).`);
@@ -244,6 +353,23 @@ export function SeoLandingContentEditor({
   const infoGrid = get("infoGrid");
   const map = get("map");
   const alux = get("aluxPlanner");
+  const gallery = get("gallery");
+  const ctaBar = get("ctaBar");
+  const galleryRows = list(gallery["items"]);
+  const ctaRows = list(ctaBar["actions"]);
+  const DEFAULT_ORDER: Record<string, number> = { intro: 1, offers: 2, infoGrid: 3, map: 4 };
+  const orderOf = (slot: string) => {
+    const raw = get(slot)["order"];
+    return typeof raw === "number" && Number.isFinite(raw) ? raw : (DEFAULT_ORDER[slot] ?? 1);
+  };
+  const setCta = (action: string, patch: Row) => {
+    const exists = ctaRows.some((r) => r["action"] === action);
+    const next = exists
+      ? ctaRows.map((r) => (r["action"] === action ? { ...r, ...patch } : r))
+      : [...ctaRows, { action, ...patch }];
+    setRows("ctaBar", "actions", next);
+  };
+  const ctaOf = (action: string) => ctaRows.find((r) => r["action"] === action) ?? {};
   const trustRows = list(badges["items"]);
   const featureRows = list(features["items"]);
   const offerRows = list(offers["items"]);
@@ -307,25 +433,43 @@ export function SeoLandingContentEditor({
               onChange={(v) => setSlot("hero", { description: v })}
             />
           </div>
-          <Select
-            label="Fotografía (Medios de la entidad)"
-            value={str(hero["mediaUrl"])}
-            options={mediaSelect}
-            onChange={(v) => {
-              const found = mediaOptions.find((m) => m.url === v);
-              setSlot("hero", { mediaUrl: v, mediaAlt: found?.alt ?? str(hero["mediaAlt"]) });
-            }}
-          />
-          <Text
-            label="Texto alternativo"
-            value={str(hero["mediaAlt"])}
-            onChange={(v) => setSlot("hero", { mediaAlt: v })}
-          />
-          <Text
-            label="Punto focal (ej. 50% 40%)"
-            value={str(hero["mediaFocal"])}
-            onChange={(v) => setSlot("hero", { mediaFocal: v })}
-          />
+          <div className="grid gap-3 sm:col-span-2">
+            <MediaField
+              label="Fotografía de portada"
+              hint="Imagen protagonista del hero."
+              options={mediaOptions}
+              url={str(hero["mediaUrl"])}
+              alt={str(hero["mediaAlt"])}
+              focal={str(hero["mediaFocal"])}
+              onChange={(n) =>
+                setSlot("hero", { mediaUrl: n.url, mediaAlt: n.alt, mediaFocal: n.focal })
+              }
+            />
+            <MediaField
+              label="Portada alternativa en móvil"
+              hint="Opcional: se usa por debajo de 640 px."
+              options={mediaOptions}
+              url={str(hero["mediaMobileUrl"])}
+              alt={str(hero["mediaMobileAlt"])}
+              focal={str(hero["mediaMobileFocal"])}
+              onChange={(n) =>
+                setSlot("hero", {
+                  mediaMobileUrl: n.url,
+                  mediaMobileAlt: n.alt,
+                  mediaMobileFocal: n.focal,
+                })
+              }
+            />
+            <MediaField
+              label="Imagen social (OG)"
+              hint="Se usa al compartir la landing en redes y mensajería."
+              options={mediaOptions}
+              url={str(hero["ogImageUrl"])}
+              alt={str(hero["ogImageAlt"])}
+              focal=""
+              onChange={(n) => setSlot("hero", { ogImageUrl: n.url, ogImageAlt: n.alt })}
+            />
+          </div>
         </div>
       </Group>
 
@@ -454,6 +598,12 @@ export function SeoLandingContentEditor({
         onToggleHidden={() => toggleHidden("intro")}
       >
         <div className="grid gap-3">
+        <Select
+          label="Posición en el cuerpo editorial"
+          value={String(orderOf("intro"))}
+          options={ORDER_OPTIONS}
+          onChange={(v) => setSlot("intro", { order: Number(v) })}
+        />
           <Text
             label="Título"
             value={str(intro["title"])}
@@ -498,6 +648,21 @@ export function SeoLandingContentEditor({
                       "features",
                       "items",
                       featureRows.map((r, j) => (i === j ? { ...r, label: v } : r)),
+                    )
+                  }
+                />
+                <Select
+                  label="Visibilidad"
+                  value={row["hidden"] === true ? "hidden" : "visible"}
+                  options={[
+                    { value: "visible", label: "Visible" },
+                    { value: "hidden", label: "Oculto" },
+                  ]}
+                  onChange={(v) =>
+                    setRows(
+                      "features",
+                      "items",
+                      featureRows.map((r, j) => (i === j ? { ...r, hidden: v === "hidden" } : r)),
                     )
                   }
                 />
@@ -555,6 +720,13 @@ export function SeoLandingContentEditor({
           value={str(offers["heading"])}
           onChange={(v) => setSlot("offers", { heading: v })}
         />
+        <Select
+          label="Posición en el cuerpo editorial"
+          value={String(orderOf("offers"))}
+          options={ORDER_OPTIONS}
+          onChange={(v) => setSlot("offers", { order: Number(v) })}
+        />
+
         <ul className="mt-3 space-y-3">
           {offerRows.map((row, i) => (
             <li key={i} className="flex items-start gap-2 rounded-xl border border-border p-3">
@@ -604,20 +776,40 @@ export function SeoLandingContentEditor({
                   }
                 />
                 <Select
-                  label="Imagen (Medios)"
-                  value={str(row["imageUrl"])}
-                  options={mediaSelect}
-                  onChange={(v) => {
-                    const found = mediaOptions.find((m) => m.url === v);
+                  label="Visibilidad"
+                  value={row["hidden"] === true ? "hidden" : "visible"}
+                  options={[
+                    { value: "visible", label: "Visible" },
+                    { value: "hidden", label: "Oculta" },
+                  ]}
+                  onChange={(v) =>
                     setRows(
                       "offers",
                       "items",
-                      offerRows.map((r, j) =>
-                        i === j ? { ...r, imageUrl: v, imageAlt: found?.alt ?? "" } : r,
-                      ),
-                    );
-                  }}
+                      offerRows.map((r, j) => (i === j ? { ...r, hidden: v === "hidden" } : r)),
+                    )
+                  }
                 />
+                <div className="sm:col-span-2">
+                  <MediaField
+                    label="Portada de la experiencia"
+                    options={mediaOptions}
+                    url={str(row["imageUrl"])}
+                    alt={str(row["imageAlt"])}
+                    focal={str(row["imageFocal"])}
+                    onChange={(n) =>
+                      setRows(
+                        "offers",
+                        "items",
+                        offerRows.map((r, j) =>
+                          i === j
+                            ? { ...r, imageUrl: n.url, imageAlt: n.alt, imageFocal: n.focal }
+                            : r,
+                        ),
+                      )
+                    }
+                  />
+                </div>
                 <Text
                   label="Etiquetas (separadas por coma)"
                   value={(Array.isArray(row["tags"]) ? (row["tags"] as string[]) : []).join(", ")}
@@ -677,6 +869,13 @@ export function SeoLandingContentEditor({
           value={str(infoGrid["heading"])}
           onChange={(v) => setSlot("infoGrid", { heading: v })}
         />
+        <Select
+          label="Posición en el cuerpo editorial"
+          value={String(orderOf("infoGrid"))}
+          options={ORDER_OPTIONS}
+          onChange={(v) => setSlot("infoGrid", { order: Number(v) })}
+        />
+
         <ul className="mt-3 space-y-3">
           {infoRows.map((row, i) => (
             <li key={i} className="flex items-start gap-2 rounded-xl border border-border p-3">
@@ -712,6 +911,21 @@ export function SeoLandingContentEditor({
                       "infoGrid",
                       "items",
                       infoRows.map((r, j) => (i === j ? { ...r, value: v } : r)),
+                    )
+                  }
+                />
+                <Select
+                  label="Visibilidad"
+                  value={row["hidden"] === true ? "hidden" : "visible"}
+                  options={[
+                    { value: "visible", label: "Visible" },
+                    { value: "hidden", label: "Oculto" },
+                  ]}
+                  onChange={(v) =>
+                    setRows(
+                      "infoGrid",
+                      "items",
+                      infoRows.map((r, j) => (i === j ? { ...r, hidden: v === "hidden" } : r)),
                     )
                   }
                 />
@@ -753,6 +967,12 @@ export function SeoLandingContentEditor({
         onToggleHidden={() => toggleHidden("map")}
       >
         <div className="grid gap-3 sm:grid-cols-2">
+        <Select
+          label="Posición en el cuerpo editorial"
+          value={String(orderOf("map"))}
+          options={ORDER_OPTIONS}
+          onChange={(v) => setSlot("map", { order: Number(v) })}
+        />
           <Text
             label="Título"
             value={str(map["heading"])}
@@ -796,15 +1016,157 @@ export function SeoLandingContentEditor({
             value={str(map["href"])}
             onChange={(v) => setSlot("map", { href: v })}
           />
-          <Select
-            label="Imagen contextual (Medios)"
-            value={str(map["mediaUrl"])}
-            options={mediaSelect}
-            onChange={(v) => {
-              const found = mediaOptions.find((m) => m.url === v);
-              setSlot("map", { mediaUrl: v, mediaAlt: found?.alt ?? "" });
-            }}
+          <div className="sm:col-span-2">
+            <MediaField
+              label="Imagen o ilustración del contexto territorial"
+              options={mediaOptions}
+              url={str(map["mediaUrl"])}
+              alt={str(map["mediaAlt"])}
+              focal={str(map["mediaFocal"])}
+              onChange={(n) =>
+                setSlot("map", { mediaUrl: n.url, mediaAlt: n.alt, mediaFocal: n.focal })
+              }
+            />
+          </div>
+        </div>
+      </Group>
+
+      <Group
+        title="Galería complementaria"
+        hint="Hasta cuatro fotografías acreditadas bajo el cuerpo editorial."
+        hidden={gallery["hidden"] === true}
+        onToggleHidden={() => toggleHidden("gallery")}
+      >
+        <ul className="space-y-3">
+          {galleryRows.map((row, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <MediaField
+                  label={`Fotografía ${i + 1}`}
+                  options={mediaOptions}
+                  url={str(row["url"])}
+                  alt={str(row["alt"])}
+                  focal={str(row["focal"])}
+                  onChange={(n) =>
+                    setRows(
+                      "gallery",
+                      "items",
+                      galleryRows.map((r, j) =>
+                        i === j ? { ...r, url: n.url, alt: n.alt, focal: n.focal } : r,
+                      ),
+                    )
+                  }
+                />
+              </div>
+              <RowTools
+                index={i}
+                total={galleryRows.length}
+                onMove={(d) => setRows("gallery", "items", moveRow(galleryRows, i, d))}
+                onRemove={() =>
+                  setRows(
+                    "gallery",
+                    "items",
+                    galleryRows.filter((_, j) => j !== i),
+                  )
+                }
+              />
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          className={`${chip} mt-3`}
+          disabled={galleryRows.length >= 4}
+          onClick={() => setRows("gallery", "items", [...galleryRows, { url: "", alt: "" }])}
+        >
+          <Plus className="size-3.5" aria-hidden />
+          Añadir fotografía
+        </button>
+      </Group>
+
+      <Group
+        title="Acciones y llamados"
+        hint="Ficha completa, Mi Viaje y Guardar."
+        hidden={ctaBar["hidden"] === true}
+        onToggleHidden={() => toggleHidden("ctaBar")}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Text
+            label="Acción principal · texto"
+            value={str(ctaOf("navigate")["label"])}
+            onChange={(v) => setCta("navigate", { label: v, emphasis: "primary" })}
           />
+          <Text
+            label="Acción principal · enlace canónico"
+            value={str(ctaOf("navigate")["href"])}
+            onChange={(v) => setCta("navigate", { href: v, emphasis: "primary" })}
+          />
+          <Text
+            label="Agregar a Mi Viaje · texto"
+            value={str(ctaOf("add-to-trip")["label"])}
+            onChange={(v) => setCta("add-to-trip", { label: v, emphasis: "secondary" })}
+          />
+          <Text
+            label="Guardar · texto"
+            value={str(ctaOf("save")["label"])}
+            onChange={(v) => setCta("save", { label: v, emphasis: "ghost" })}
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {["navigate", "add-to-trip", "save"].map((action) =>
+            ctaRows.some((r) => r["action"] === action) ? (
+              <button
+                key={action}
+                type="button"
+                className={chip}
+                onClick={() =>
+                  setRows(
+                    "ctaBar",
+                    "actions",
+                    ctaRows.filter((r) => r["action"] !== action),
+                  )
+                }
+              >
+                <Trash2 className="size-3.5" aria-hidden />
+                Quitar {action}
+              </button>
+            ) : null,
+          )}
+        </div>
+      </Group>
+
+      <Group title="SEO y publicación" hint="El piloto permanece en borrador y no indexable.">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Text
+            label="Título SEO"
+            value={seo?.title ?? ""}
+            onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), title: v }))}
+          />
+          <Text
+            label="URL canónica"
+            value={seo?.canonical ?? ""}
+            onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), canonical: v }))}
+          />
+          <div className="sm:col-span-2">
+            <Text
+              label="Descripción SEO"
+              multiline
+              value={seo?.description ?? ""}
+              onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), description: v }))}
+            />
+          </div>
+          <Select
+            label="Indexación (robots)"
+            value={seo?.robots ?? "noindex,nofollow"}
+            options={[
+              { value: "noindex,nofollow", label: "No indexar (borrador)" },
+              { value: "index,follow", label: "Indexar" },
+            ]}
+            onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), robots: v }))}
+          />
+          <p className="self-end text-xs text-muted-foreground">
+            La imagen social (OG) se elige en Portada.
+          </p>
         </div>
       </Group>
 
