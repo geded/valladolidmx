@@ -43,8 +43,8 @@ export const ALUX_CONVERSE_LIMITS = {
   maxTripItems: 40,
   /** Timeout duro del proveedor (ms). */
   providerTimeoutMs: 9_000,
-  /** Tokens de salida máximos. */
-  maxOutputTokens: 1_100,
+  /** Tokens de salida máximos (incluye razonamiento del proveedor). */
+  maxOutputTokens: 2_400,
   /** Longitud máxima del texto de respuesta. */
   maxTextChars: 800,
   /** Historial conservado en el navegador (mensajes). */
