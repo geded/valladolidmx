@@ -113,7 +113,7 @@ export function RegionDestinationsPremiumSurface({
   const cinematic = presentation === "cinematic";
 
   return (
-    <main className="pb-20" data-region-destinations="premium-approved">
+    <div className="pb-20" data-region-destinations="premium-approved">
       <Container className="pt-5">
         <section
           className={cn(
@@ -343,7 +343,7 @@ export function RegionDestinationsPremiumSurface({
           </div>
         </section>
       </Container>
-    </main>
+    </div>
   );
 }
 

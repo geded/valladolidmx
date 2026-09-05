@@ -165,7 +165,7 @@ export function HomePremiumSurface({
 
   return (
     <>
-      <main data-home-presentation={heroVariant}>
+      <div data-home-presentation={heroVariant}>
         <Container className="pt-4 sm:pt-6">
           {heroVariant === "editorial" ? (
             <HeroEditorial content={content} />
@@ -221,7 +221,7 @@ export function HomePremiumSurface({
             onAdd={() => setAdded(true)}
           />
         </Container>
-      </main>
+      </div>
     </>
   );
 }

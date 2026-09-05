@@ -450,7 +450,7 @@ function TerritorialListingBody({
     });
   }, [items, primary, query, secondary, zone]);
   return (
-    <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+    <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
         <TerritorialBreadcrumb profile={profile} />
         <ListingIntro profile={profile} />
@@ -501,7 +501,7 @@ function TerritorialListingBody({
           <MapPanel profile={profile} />
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -1074,7 +1074,7 @@ function EventListingBody({
       : profile.resultsTitle;
 
   return (
-    <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+    <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
         <TerritorialBreadcrumb profile={profile} />
         <ListingIntro
@@ -1251,7 +1251,7 @@ function EventListingBody({
           />
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -1623,7 +1623,7 @@ function PlaceListingBody({
       : profile.resultsTitle;
 
   return (
-    <main className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+    <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
         <TerritorialBreadcrumb
           profile={profile}
@@ -1837,6 +1837,6 @@ function PlaceListingBody({
           />
         </div>
       </div>
-    </main>
+    </div>
   );
 }

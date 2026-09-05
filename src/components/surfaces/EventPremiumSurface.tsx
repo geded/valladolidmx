@@ -94,7 +94,7 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
 
   return (
     <PublicShell crumbs={crumbs} useContextCrumbs compactCrumbsOnMobile>
-      <main className="bg-[#f7f2e8] pb-16 text-[#17251f]">
+      <div className="bg-[#f7f2e8] pb-16 text-[#17251f]">
         <Container className="pt-4 sm:pt-6">
           <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-[#ded7c9] bg-white p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9">
             <div className="order-2 lg:order-1">
@@ -204,7 +204,7 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
             </section>
           </Container>
         ) : null}
-      </main>
+      </div>
     </PublicShell>
   );
 }
