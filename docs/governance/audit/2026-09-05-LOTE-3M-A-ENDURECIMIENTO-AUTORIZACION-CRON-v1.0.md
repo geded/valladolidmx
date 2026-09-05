@@ -114,7 +114,7 @@ Las funciones `cron_hooks_*` y el secreto en Vault pueden permanecer (inertes) o
 ## 8. Confirmación de rama
 
 - Trabajo exclusivamente sobre `integration/lovable-valladolidmx`; la plataforma confirma los cambios automáticamente en su rama de edición y los integra en la rama de trabajo (sin ramas manuales, PR ni merge por parte del agente).
-- HEAD al cierre: `2af04cdb841d4b6a8aaa1b5009eb8b0c0be23f93` · árbol de trabajo limpio (0 archivos pendientes) · base de la rama de integración al inicio del lote: `2a372e24fbb759a17b4ab6efeeeae391c43c083b`.
+- Último commit de código del lote: `2af04cdb841d4b6a8aaa1b5009eb8b0c0be23f93` (los commits posteriores sólo contienen este informe y `roadmap.md`) · árbol de trabajo limpio (0 archivos pendientes) · base de la rama de integración al inicio del lote: `2a372e24fbb759a17b4ab6efeeeae391c43c083b`.
 - Sin publicar, sin desplegar, sin tocar `main`.
 
 ## 9. Evidencia en vivo del primer tic
