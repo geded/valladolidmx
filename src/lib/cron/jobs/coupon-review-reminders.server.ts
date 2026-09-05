@@ -52,7 +52,63 @@ function generateToken(): string {
     .join("");
 }
 
-export async function runCouponReviewReminders(supabase: CronSupabase): Promise<CronJobResult> {
+const REMINDER_WINDOWS: ReadonlyArray<{ number: 1 | 2; hoursMin: number; hoursMax: number }> = [
+  { number: 1, hoursMin: 46, hoursMax: 50 },
+  { number: 2, hoursMin: 24 * 6, hoursMax: 24 * 8 },
+];
+
+function buildCouponTemplateData(
+  row: CouponReminderRow,
+  reminderNumber: 1 | 2,
+): Record<string, unknown> {
+  return {
+    travelerName: row.traveler_first_name || undefined,
+    businessName: row.business_name,
+    reminderNumber,
+    reviewUrl: `${PUBLIC_ORIGIN}/resenar/negocio/${row.business_slug}`,
+  };
+}
+
+/**
+ * Simulación (Lote 3M-A.2): mismas ventanas y misma selección (RPC `STABLE`),
+ * misma supresión y mismo render; sin token, sin registro, sin cola, sin marca.
+ */
+async function dryRunCouponReviewReminders(supabase: CronSupabase): Promise<CronJobResult> {
+  const results: Record<string, DryRunKindStats> = {
+    reminder_1: newDryRunStats(),
+    reminder_2: newDryRunStats(),
+  };
+  const selection_errors: string[] = [];
+
+  for (const window of REMINDER_WINDOWS) {
+    const { data, error } = await supabase.rpc("get_coupons_needing_review_reminder", {
+      reminder_number: window.number,
+      hours_min: window.hoursMin,
+      hours_max: window.hoursMax,
+    });
+    if (error) {
+      selection_errors.push(`reminder_${window.number}`);
+      continue;
+    }
+    for (const row of (data ?? []) as CouponReminderRow[]) {
+      const outcome = await previewCandidate(supabase, {
+        email: row.recipient_email ?? "",
+        templateName: "coupon-review-reminder",
+        templateData: buildCouponTemplateData(row, window.number),
+      });
+      recordDryRunOutcome(results[`reminder_${window.number}`], outcome);
+    }
+  }
+
+  return { body: { ok: selection_errors.length === 0, ...results, selection_errors } };
+}
+
+export async function runCouponReviewReminders(
+  supabase: CronSupabase,
+  ctx: CronRunContext = { dryRun: false },
+): Promise<CronJobResult> {
+  if (ctx.dryRun) return dryRunCouponReviewReminders(supabase);
+
   const template = TEMPLATES["coupon-review-reminder"];
   if (!template) {
     return { status: 500, body: { ok: false, error: "template_not_found" } };
