@@ -206,6 +206,7 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
     promise: str(heroCfg["promise"]),
     description: str(heroCfg["description"]),
     media: media(heroCfg),
+    mobileMedia: media(heroCfg, "mediaMobileUrl", "mediaMobileAlt"),
     primary:
       navigate && str(navigate["href"])
         ? { label: str(navigate["label"]) ?? "Ver ficha completa", href: str(navigate["href"])! }
