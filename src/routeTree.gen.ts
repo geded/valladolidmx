@@ -160,6 +160,7 @@ import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsMarcaRouteImport } from './routes/_authenticated/cms/marca'
+import { Route as AuthenticatedCmsLandingSeoRouteImport } from './routes/_authenticated/cms/landing-seo'
 import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
 import { Route as AuthenticatedCmsDistintivosRouteImport } from './routes/_authenticated/cms/distintivos'
 import { Route as AuthenticatedCmsDemoPackRouteImport } from './routes/_authenticated/cms/demo-pack'
@@ -1096,6 +1097,12 @@ const AuthenticatedCmsMarcaRoute = AuthenticatedCmsMarcaRouteImport.update({
   path: '/marca',
   getParentRoute: () => AuthenticatedCmsRoute,
 } as any)
+const AuthenticatedCmsLandingSeoRoute =
+  AuthenticatedCmsLandingSeoRouteImport.update({
+    id: '/landing-seo',
+    path: '/landing-seo',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsExperienceBuilderRoute =
   AuthenticatedCmsExperienceBuilderRouteImport.update({
     id: '/experience-builder',
@@ -1769,6 +1776,7 @@ export interface FileRoutesByFullPath {
   '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/cms/distintivos': typeof AuthenticatedCmsDistintivosRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
+  '/cms/landing-seo': typeof AuthenticatedCmsLandingSeoRoute
   '/cms/marca': typeof AuthenticatedCmsMarcaRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -2006,6 +2014,7 @@ export interface FileRoutesByTo {
   '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/cms/distintivos': typeof AuthenticatedCmsDistintivosRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
+  '/cms/landing-seo': typeof AuthenticatedCmsLandingSeoRoute
   '/cms/marca': typeof AuthenticatedCmsMarcaRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -2252,6 +2261,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/_authenticated/cms/distintivos': typeof AuthenticatedCmsDistintivosRoute
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
+  '/_authenticated/cms/landing-seo': typeof AuthenticatedCmsLandingSeoRoute
   '/_authenticated/cms/marca': typeof AuthenticatedCmsMarcaRoute
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -2500,6 +2510,7 @@ export interface FileRouteTypes {
     | '/cms/demo-pack'
     | '/cms/distintivos'
     | '/cms/experience-builder'
+    | '/cms/landing-seo'
     | '/cms/marca'
     | '/cms/media'
     | '/cms/observabilidad'
@@ -2737,6 +2748,7 @@ export interface FileRouteTypes {
     | '/cms/demo-pack'
     | '/cms/distintivos'
     | '/cms/experience-builder'
+    | '/cms/landing-seo'
     | '/cms/marca'
     | '/cms/media'
     | '/cms/observabilidad'
@@ -2982,6 +2994,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/demo-pack'
     | '/_authenticated/cms/distintivos'
     | '/_authenticated/cms/experience-builder'
+    | '/_authenticated/cms/landing-seo'
     | '/_authenticated/cms/marca'
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
@@ -4286,6 +4299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsMarcaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/landing-seo': {
+      id: '/_authenticated/cms/landing-seo'
+      path: '/landing-seo'
+      fullPath: '/cms/landing-seo'
+      preLoaderRoute: typeof AuthenticatedCmsLandingSeoRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/experience-builder': {
       id: '/_authenticated/cms/experience-builder'
       path: '/experience-builder'
@@ -5228,6 +5248,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsDemoPackRoute: typeof AuthenticatedCmsDemoPackRoute
   AuthenticatedCmsDistintivosRoute: typeof AuthenticatedCmsDistintivosRoute
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
+  AuthenticatedCmsLandingSeoRoute: typeof AuthenticatedCmsLandingSeoRoute
   AuthenticatedCmsMarcaRoute: typeof AuthenticatedCmsMarcaRoute
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
@@ -5283,6 +5304,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsDistintivosRoute: AuthenticatedCmsDistintivosRoute,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
+  AuthenticatedCmsLandingSeoRoute: AuthenticatedCmsLandingSeoRoute,
   AuthenticatedCmsMarcaRoute: AuthenticatedCmsMarcaRoute,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
