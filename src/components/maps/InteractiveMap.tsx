@@ -210,28 +210,32 @@ export function InteractiveMap({
   onMarkerSelect,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
   const routeStatusRef = useRef(onRouteStatus);
   const markerSelectRef = useRef(onMarkerSelect);
   routeStatusRef.current = onRouteStatus;
   markerSelectRef.current = onMarkerSelect;
 
+  /* Sólo se descarga el SDK cuando el panel está visible y con tamaño real. */
+  const shouldMount = useVisibleWithSize(ref);
+
+  /* Fallo de autorización del proveedor: suscripción por instancia. */
+  useEffect(() => subscribeGoogleMapsAuthFailure(() => setFailed(true)), []);
+
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
+    if (!shouldMount) return;
+    const apiKey = getGoogleMapsBrowserKey();
     if (!apiKey) {
-      setError("Google Maps browser key no configurada.");
+      setFailed(true);
       return;
     }
-    /* Dominio no autorizado por la clave: mensaje propio, sin tarjeta de Google. */
-    (window as unknown as { gm_authFailure?: () => void }).gm_authFailure = () => {
-      setError("El mapa no está disponible en este dominio de revisión.");
-    };
     let cancelled = false;
 
-    loadGoogleMapsScript(apiKey)
+    loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
+
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
           zoom,
