@@ -103,7 +103,12 @@ async function readEditorDTO(supabase: any, product: any): Promise<ProductAttrib
     productId: product.id,
     family,
     editable: true,
-    values: normalizeFilterAttributes(product.filter_attributes),
+    // Forma alineada al catálogo: ejes `single` como cadena aunque el registro
+    // los haya guardado como arreglo (sembrados DEMO), `multi` como arreglo.
+    values: coerceAttributesToDefinitions(
+      normalizeFilterAttributes(product.filter_attributes),
+      mapped,
+    ),
     definitions: mapped,
   };
 }
