@@ -480,15 +480,15 @@ export const aluxConverse = createServerFn({ method: "POST" })
       rawText = res.text ?? "";
       tokensIn = res.usage?.inputTokens ?? null;
       tokensOut = res.usage?.outputTokens ?? null;
-      // Auditoría técnica mínima (sin datos personales): latencia, cierre y tokens.
+      // Auditoría técnica mínima (sin datos personales): fases, cierre y tokens.
+      phases["model"] = Date.now() - t0;
       console.info("[alux.converse] modelo", {
         model,
-        ms: Date.now() - t0,
+        phases,
         finish: res.finishReason,
         tokensIn,
         tokensOut,
         rawChars: rawText.length,
-        head: rawText.slice(0, 240),
       });
     } catch (err) {
       const status = classifyModelError(err);
