@@ -197,8 +197,6 @@ export function googleMapsPlaceUrl(point: {
   title?: string | null;
 }): string {
   const query = `${point.lat},${point.lng}`;
-  const label = point.title ? `&query_place_id=` : "";
-  void label;
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
