@@ -49,6 +49,7 @@ import {
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
   createBusinessSurfaceContract,
   type BusinessSurfaceContractInput,
@@ -65,6 +66,7 @@ import {
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
 import { PremiumHero } from "@/components/premium";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
 /* ------------------------------------------------------------------ *
@@ -461,21 +463,51 @@ export function BusinessSurface({
           <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
             <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
+            <AddToTravelPlanButton
+              kind="business"
+              targetId={b.id}
+              title={b.display_name}
+              slug={b.slug}
+              {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+            />
           </div>
         </>
       ) : (
         <ExperienceHero
           dto={heroDto}
           headingLevel="h1"
-          headerActionsSlot={
-            <>
-              <ShareButton title={b.display_name} />
-              <FavoriteButton entityKind="business" entityId={b.id} />
-            </>
-          }
+          headerActionsSlot={null}
           extensionsSlot={null}
         />
       )}
+
+      {activePremium ? null : (
+        <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap justify-end gap-2 px-5 sm:px-8 lg:px-12">
+          <ShareButton title={b.display_name} />
+          <FavoriteButton entityKind="business" entityId={b.id} />
+          <AddToTravelPlanButton
+            kind="business"
+            targetId={b.id}
+            title={b.display_name}
+            slug={b.slug}
+            {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+          />
+        </div>
+      )}
+
+      <TourismAluxPanel
+        className="mx-auto mt-4 w-full max-w-7xl"
+        title={`Planear con ${b.display_name}`}
+        description="Alux te ayuda a integrar esta opción en tu viaje por el Oriente Maya."
+        task={`Ayúdame a integrar ${b.display_name} en mi viaje por el Oriente Maya.`}
+        selection={{
+          entityRef: `business:${b.id}`,
+          title: b.display_name,
+          ...(b.destination_slug ? { destinationSlug: b.destination_slug } : {}),
+          ...(b.destination_slug ? { destinationLabel: b.destination_slug } : {}),
+          ...(b.category_slug ? { familySlug: b.category_slug } : {}),
+        }}
+      />
 
       <AluxContextChip
         businessId={b.id}

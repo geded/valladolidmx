@@ -175,7 +175,16 @@ export function PlacePremiumSurface({
                 }
               : null,
             badges: content.identity.badges.map((label) => ({ label })),
-            primaryAction: { label: content.hero.primaryCta.label },
+            primaryAction: {
+              label: content.hero.primaryCta.label,
+              // 3J.2 · el CTA del hero delega SIEMPRE en la acción real de
+              // Mi Viaje (`tripSlot`); no duplica la lógica de persistencia.
+              onClick: () => {
+                document
+                  .getElementById("place-trip-action")
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              },
+            },
             secondaryAction: {
               label: content.hero.secondaryCta.label,
               href: content.hero.secondaryCta.href,
@@ -341,7 +350,9 @@ export function PlacePremiumSurface({
               {content.trip.description}
             </p>
             {tripSlot ? (
-              <div className="mt-5">{tripSlot}</div>
+              <div id="place-trip-action" className="mt-5">
+                {tripSlot}
+              </div>
             ) : (
               <Button type="button" className="mt-5 min-h-11 rounded-pill">
                 {content.trip.actionLabel}
