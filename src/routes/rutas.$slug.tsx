@@ -33,8 +33,7 @@ function buildRouteContext(route: EditorialRouteDetailDTO): RouteContextDeclarat
         {
           kind: "destination" as const,
           slug: originSlug,
-          label:
-            route.originDestinationLabel ?? originSlug.replace(/-/g, " "),
+          label: route.originDestinationLabel ?? originSlug.replace(/-/g, " "),
           href: `/oriente-maya/${originSlug}`,
         },
       ]
@@ -86,7 +85,6 @@ function buildRouteContext(route: EditorialRouteDetailDTO): RouteContextDeclarat
     kindDefaults: [{ kind: "site_section", label: "Rutas", href: "/rutas" }],
   });
 }
-
 
 export const Route = createFileRoute("/rutas/$slug")({
   loader: async ({ params }) => {

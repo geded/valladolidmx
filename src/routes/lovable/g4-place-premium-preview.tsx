@@ -48,10 +48,7 @@ function PlacePremiumPreview() {
      temporales (IA) aún no aprobadas para poder validar la composición
      visual. Las lecturas públicas siguen exigiendo activo aprobado. */
   const reviewPlace = useMemo<PublicPlaceDTO | null>(
-    () =>
-      place
-        ? { ...place, media: place.media.map((m) => ({ ...m, approved: true })) }
-        : null,
+    () => (place ? { ...place, media: place.media.map((m) => ({ ...m, approved: true })) } : null),
     [place],
   );
   const projection = useMemo(
@@ -66,8 +63,8 @@ function PlacePremiumPreview() {
         <h1 className="font-serif text-2xl sm:text-3xl">Lugar no disponible</h1>
         <p className="max-w-prose text-sm text-muted-foreground">
           No existe un lugar publicado con el slug “{lugar}” en Valladolid. Usa
-          `?lugar=convento-san-bernardino`, `?lugar=calzada-de-los-frailes`,
-          `?lugar=cenote-zaci`, `?lugar=cenote-suytun` o `?lugar=cenote-ik-kil`.
+          `?lugar=convento-san-bernardino`, `?lugar=calzada-de-los-frailes`, `?lugar=cenote-zaci`,
+          `?lugar=cenote-suytun` o `?lugar=cenote-ik-kil`.
         </p>
       </main>
     );

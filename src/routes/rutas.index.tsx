@@ -52,9 +52,7 @@ export const Route = createFileRoute("/rutas/")({
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps, context }) => {
-    await context.queryClient
-      .ensureQueryData(publishedDestinationsQueryOptions)
-      .catch(() => []);
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
     return {
       routes: await listPublicRoutes({ data: { destino: deps.destino ?? null } }),
     };

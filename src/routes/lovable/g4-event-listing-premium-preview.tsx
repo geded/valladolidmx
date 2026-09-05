@@ -63,7 +63,9 @@ function EventListingPremiumPreview() {
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         nearbyItems={nearby}
-        lockedDestinationLabel={estado === "valladolid" ? (dto.destinationLabel ?? "Valladolid") : null}
+        lockedDestinationLabel={
+          estado === "valladolid" ? (dto.destinationLabel ?? "Valladolid") : null
+        }
       />
     </PublicShell>
   );
