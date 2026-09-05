@@ -318,20 +318,36 @@ export const resolveSeoLandingForEntity = createServerFn({ method: "GET" })
   });
 
 export const createSeoLandingDraft = createServerFn({ method: "POST" })
-  .inputValidator((data: { entityType: SeoLandingEntityType; entityId: string }) => data)
+  .inputValidator(
+    (data: { entityType: SeoLandingEntityType; entityId: string; refresh?: boolean }) => data,
+  )
   .middleware([requireSupabaseAuth])
   .handler(
     async ({
       data,
       context,
-    }): Promise<{ id: string; slug: string; created: boolean; populatedSlots: string[] }> => {
+    }): Promise<{
+      id: string;
+      slug: string;
+      created: boolean;
+      refreshed: boolean;
+      populatedSlots: string[];
+    }> => {
       const supabase = context.supabase as Db;
       const ref = buildSeoLandingEntityRef(data.entityType, data.entityId);
 
       // 1 · Idempotencia: si ya existe, se devuelve la misma landing.
       const existing = await findExistingLanding(supabase, ref);
-      if (existing)
-        return { id: existing.id, slug: existing.slug, created: false, populatedSlots: [] };
+      if (existing && data.refresh !== true)
+        return {
+          id: existing.id,
+          slug: existing.slug,
+          created: false,
+          refreshed: false,
+          populatedSlots: [],
+        };
+      if (existing && (existing.status === "published" || existing.published_at))
+        throw new Error("seo_landing_refresh_requires_draft");
 
       // 2 · Datos reales de la entidad de origen.
       const entity = await loadEntity(supabase, data.entityType, data.entityId);
@@ -343,6 +359,34 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
         idPrefix: `landing-${data.entityType}-${entity.slug}`,
         slots,
       });
+      const seoPolicy = buildSeoLandingSeoPolicy(canonicalEntityUrl(data.entityType, entity));
+      const populatedSlots =
+        (tree.chrome as unknown as SeoChromeShape)?.seo?.landing?.populatedSlots ?? [];
+
+      /* 2b · Regeneración desde datos reales de un borrador existente.
+         Nunca duplica ni publica: reescribe el árbol y reafirma la política
+         SEO por las mismas RPC gobernadas. */
+      if (existing) {
+        const { error: reErr } = await supabase.rpc("eb_save_composition_draft", {
+          _id: existing.id,
+          _tree: tree as never,
+        });
+        if (reErr) throw new Error(reErr.message);
+        const { error: reMetaErr } = await supabase.rpc("eb_set_composition_seo_metadata", {
+          _id: existing.id,
+          _kind: "landing",
+          _canonical_override: seoPolicy.canonicalOverride ?? undefined,
+          _robots_directive: seoPolicy.robotsDirective,
+        });
+        if (reMetaErr) throw new Error(reMetaErr.message);
+        return {
+          id: existing.id,
+          slug: existing.slug,
+          created: false,
+          refreshed: true,
+          populatedSlots,
+        };
+      }
 
       // 3 · Creación del borrador (RPC gobernada: admin/editor).
       const { data: newId, error: createError } = await supabase.rpc("eb_create_composition", {
@@ -364,18 +408,15 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       });
       if (draftError) throw new Error(draftError.message);
 
-      const seo = buildSeoLandingSeoPolicy(canonicalEntityUrl(data.entityType, entity));
       const { error: metaError } = await supabase.rpc("eb_set_composition_seo_metadata", {
         _id: id,
         _kind: "landing",
-        _canonical_override: seo.canonicalOverride ?? undefined,
-        _robots_directive: seo.robotsDirective,
+        _canonical_override: seoPolicy.canonicalOverride ?? undefined,
+        _robots_directive: seoPolicy.robotsDirective,
       });
       if (metaError) throw new Error(metaError.message);
 
-      const populated =
-        (tree.chrome as unknown as SeoChromeShape)?.seo?.landing?.populatedSlots ?? [];
-      return { id, slug, created: true, populatedSlots: populated };
+      return { id, slug, created: true, refreshed: false, populatedSlots };
     },
   );
 
@@ -429,10 +470,10 @@ export const archiveLegacySeoLandingDrafts = createServerFn({ method: "POST" })
         continue;
       }
       if (row.status === "archived") continue;
-      const { error: upErr } = await supabase
-        .from("page_compositions")
-        .update({ status: "archived" })
-        .eq("id", row.id);
+      /* 3I.1 · Archivado por RPC gobernada (`eb_archive_composition`):
+         `authenticated` no tiene UPDATE directo sobre `page_compositions`.
+         La RPC valida rol editorial y existencia antes de escribir. */
+      const { error: upErr } = await supabase.rpc("eb_archive_composition", { _id: row.id });
       if (upErr) throw new Error(upErr.message);
       archived.push(row.slug);
     }
