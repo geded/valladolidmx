@@ -13,11 +13,14 @@ verificación end-to-end de resolución canónica y de sugerencias de Alux.
 
 ## 2. Cuentas demo
 
-| Rol | Correo | Contraseña | user_id |
+Credenciales temporales gestionadas fuera del repositorio. Ninguna contraseña
+se documenta, versiona ni registra.
+
+| Rol | Correo demo | ID abreviado | Vigencia / limpieza |
 | --- | --- | --- | --- |
-| Viajero | demo.traveler.3j3@valladolid.demo | Demo3J3!traveler | `d3330000-…-000000000001` |
-| Empresario | demo.owner.3j3@valladolid.demo | Demo3J3!owner | `d3330000-…-000000000002` |
-| Concierge | demo.concierge.3j3@valladolid.demo | Demo3J3!concierge | `d3330000-…-000000000003` |
+| Viajero | demo.traveler.3j3@valladolid.demo | `d3330000…0001` | hasta liberación del Founder |
+| Empresario | demo.owner.3j3@valladolid.demo | `d3330000…0002` | hasta liberación del Founder |
+| Concierge | demo.concierge.3j3@valladolid.demo | `d3330000…0003` | hasta liberación del Founder |
 
 Roles en `public.user_roles` (`business_owner`, `concierge`), ficha en
 `concierge_profiles`, y propiedad en `business_users` limitada a dos empresas
