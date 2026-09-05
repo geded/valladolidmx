@@ -8174,6 +8174,15 @@ export type Database = {
         Args: { _id: string; _notes?: string; _when: string }
         Returns: undefined
       }
+      eb_set_composition_seo_metadata: {
+        Args: {
+          _canonical_override?: string
+          _id: string
+          _kind?: Database["public"]["Enums"]["eb_page_kind"]
+          _robots_directive?: string
+        }
+        Returns: undefined
+      }
       eb_set_workflow_state: {
         Args: { _composition_id: string; _next_state: string; _notes?: string }
         Returns: Json
