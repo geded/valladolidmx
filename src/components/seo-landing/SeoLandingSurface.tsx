@@ -488,8 +488,9 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
         </div>
       ) : null}
 
-      {/* ── 4 · Banda Alux baja y horizontal ──────────────────────── */}
-      {alux ? (
+      {/* ── 4 · Banda Alux (sólo si no hay cuerpo editorial que la absorba) ── */}
+      {alux && !aluxColumn ? (
+
         <div className={cn(SHELL, "mt-6 sm:mt-8")}>
           <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 sm:flex-row sm:items-center sm:gap-5 sm:px-6">
             <AluxMark
