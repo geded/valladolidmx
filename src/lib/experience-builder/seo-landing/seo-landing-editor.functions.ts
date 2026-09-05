@@ -64,33 +64,63 @@ function prefixOf(nodeId: string): string {
 }
 
 async function loadMediaOptions(supabase: Db, entityRef: string | null) {
-  if (!entityRef) return [] as SeoLandingMediaOption[];
-  const [kind, id] = entityRef.split(":");
-  if (!kind || !id) return [];
-  const select =
-    "role, sort_order, media_asset_id, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
-  const query =
-    kind === "business"
-      ? supabase.from("business_media").select(select).eq("business_id", id)
-      : kind === "product"
-        ? supabase.from("product_media").select(select).eq("product_id", id)
-        : supabase.from("place_media").select(select).eq("place_id", id);
-  const { data, error } = await query.order("sort_order", { ascending: true }).limit(24);
-  if (error) return [];
   const items: SeoLandingMediaOption[] = [];
-  for (const row of data ?? []) {
-    const asset = row.media_assets as {
-      storage_bucket?: string | null;
-      storage_path?: string | null;
-      alt_text?: string | null;
-    } | null;
-    const url = toStablePublicMediaUrl(asset?.storage_bucket, asset?.storage_path);
-    const alt = (asset?.alt_text ?? "").trim();
-    if (!url || !alt) continue;
-    items.push({ id: String(row.media_asset_id), url, alt, role: String(row.role ?? "gallery") });
+  const seen = new Set<string>();
+  const push = (id: string, url: string | null, alt: string, role: string) => {
+    if (!url || !alt || seen.has(url)) return;
+    seen.add(url);
+    items.push({ id, url, alt, role });
+  };
+
+  const [kind, id] = (entityRef ?? "").split(":");
+  if (kind && id) {
+    const select =
+      "role, sort_order, media_asset_id, media_assets:media_asset_id ( storage_bucket, storage_path, alt_text )";
+    const query =
+      kind === "business"
+        ? supabase.from("business_media").select(select).eq("business_id", id)
+        : kind === "product"
+          ? supabase.from("product_media").select(select).eq("product_id", id)
+          : supabase.from("place_media").select(select).eq("place_id", id);
+    const { data, error } = await query.order("sort_order", { ascending: true }).limit(24);
+    if (!error) {
+      for (const row of data ?? []) {
+        const asset = row.media_assets as {
+          storage_bucket?: string | null;
+          storage_path?: string | null;
+          alt_text?: string | null;
+        } | null;
+        push(
+          String(row.media_asset_id),
+          toStablePublicMediaUrl(asset?.storage_bucket, asset?.storage_path),
+          (asset?.alt_text ?? "").trim(),
+          String(row.role ?? "gallery"),
+        );
+      }
+    }
   }
+
+  // Biblioteca de Medios gobernada: permite resolver una portada aunque la
+  // entidad de origen aún no tenga fotografía asociada, sin tocar su ficha.
+  const { data: library } = await supabase
+    .from("media_assets")
+    .select("id, storage_bucket, storage_path, alt_text, is_demo_seed")
+    .eq("storage_bucket", "studio-media")
+    .not("alt_text", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(60);
+  for (const asset of library ?? []) {
+    push(
+      String(asset.id),
+      toStablePublicMediaUrl(asset.storage_bucket, asset.storage_path),
+      (asset.alt_text ?? "").trim(),
+      asset.is_demo_seed ? "biblioteca · demo" : "biblioteca",
+    );
+  }
+
   return items;
 }
+
 
 export const getSeoLandingEditorModel = createServerFn({ method: "GET" })
   .inputValidator((data: { compositionId: string }) => data)
