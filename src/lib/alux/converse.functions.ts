@@ -166,6 +166,53 @@ function buildUserPrompt(args: {
 
 /* ─────────────────────────── utilidades servidor ─────────────────────────── */
 
+/**
+ * Repara un JSON truncado por límite de tokens: cierra la cadena abierta,
+ * elimina el último token incompleto (`"clave":`, coma colgante, valor a
+ * medias) y cierra los corchetes/llaves pendientes. Devuelve `null` si el
+ * resultado sigue sin ser JSON válido. Exportado para pruebas.
+ */
+export function repairTruncatedJson(input: string): unknown | null {
+  const start = input.indexOf("{");
+  if (start < 0) return null;
+  let s = input.slice(start);
+  // 1. Determinar si terminó dentro de una cadena.
+  let inStr = false;
+  let esc = false;
+  const stack: string[] = [];
+  for (const ch of s) {
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === "\\") esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === "{" || ch === "[") stack.push(ch);
+    else if (ch === "}" || ch === "]") stack.pop();
+  }
+  if (inStr) s += '"';
+  // 2. Eliminar restos incompletos al final (hasta 3 pasadas).
+  for (let i = 0; i < 3; i += 1) {
+    s = s.replace(/,\s*$/, "");
+    s = s.replace(/"[^"\\]*(?:\\.[^"\\]*)*"\s*:\s*$/, ""); // "clave": sin valor
+    s = s.replace(/:\s*-?\d*\.?\d*$/, ": null"); // número a medias
+    s = s.replace(/:\s*(?:t|tr|tru|f|fa|fal|fals|n|nu|nul)$/, ": null"); // literal a medias
+    s = s.replace(/,\s*$/, "");
+  }
+  // 3. Cerrar lo pendiente.
+  while (stack.length > 0) {
+    const open = stack.pop();
+    s = s.replace(/,\s*$/, "");
+    s += open === "{" ? "}" : "]";
+  }
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
 function extractJson(raw: string): unknown | null {
   const trimmed = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
   try {
@@ -179,10 +226,10 @@ function extractJson(raw: string): unknown | null {
     try {
       return JSON.parse(trimmed.slice(start, end + 1));
     } catch {
-      return null;
+      /* continúa con reparación */
     }
   }
-  return null;
+  return repairTruncatedJson(trimmed);
 }
 
 function classifyModelError(err: unknown): AluxConverseAiStatus {
