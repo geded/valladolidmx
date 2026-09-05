@@ -581,11 +581,52 @@ async function loadDestinationCandidates(
 
 /* ─────────────────────────── API ─────────────────────────── */
 
+/**
+ * Renumera los hechos citables por respuesta (`F1..Fn`) para que los ids
+ * sean únicos y compactos aunque la recuperación corra en paralelo o haya
+ * varias peticiones concurrentes compartiendo el contador del módulo.
+ */
+function renumberFacts(candidates: readonly AluxConverseCandidate[]): AluxConverseCandidate[] {
+  let n = 0;
+  return candidates.map((c) => ({
+    ...c,
+    facts: c.facts.map((f) => {
+      n += 1;
+      return { ...f, id: `F${n}` };
+    }),
+  }));
+}
+
+/** Cadena dependiente por destino: empresas → catálogo canónico → enriquecimiento. */
+async function loadDestinationBundle(
+  sb: SupabaseClient,
+  destination: ConverseDestination,
+  scope: AluxConverseScope,
+  limits: { businesses: number; perFamily: number },
+): Promise<AluxConverseCandidate[]> {
+  const biz = await loadBusinessesFor(sb, destination, scope, limits.businesses);
+  const catalog = await loadAluxCanonicalCandidates(sb, {
+    destinationId: destination.id,
+    destinationSlug: destination.slug,
+    publishedBusinessIds: biz.ids,
+    businessIndex: biz.index,
+    limitPerFamily: limits.perFamily,
+    includeDemoSeed: true,
+  });
+  const enriched = await enrichCatalog(
+    sb,
+    destination,
+    scope,
+    catalog.candidates.filter((c) => c.entityKind !== "destination"),
+    biz.index,
+  );
+  return [...biz.candidates, ...enriched];
+}
+
 export async function retrieveConverseCandidates(
   sb: SupabaseClient,
   input: ConverseRetrievalInput,
 ): Promise<ConverseRetrievalResult> {
-  factCounter = 0;
   const { data: destRows } = await sb
     .from("destinations")
     .select("id, slug, name")
@@ -600,60 +641,36 @@ export async function retrieveConverseCandidates(
 
   const destination = input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null;
   const familiesLoaded = new Set<string>();
-  const candidates: AluxConverseCandidate[] = [];
+  const collect = (list: readonly AluxConverseCandidate[]) => {
+    for (const c of list) familiesLoaded.add(c.entityType);
+    return list;
+  };
 
   if (destination) {
-    const biz = await loadBusinessesFor(sb, destination, "destination", 60);
-    candidates.push(...biz.candidates);
-    if (biz.candidates.length) familiesLoaded.add("business");
-    const catalog = await loadAluxCanonicalCandidates(sb, {
-      destinationId: destination.id,
-      destinationSlug: destination.slug,
-      publishedBusinessIds: biz.ids,
-      businessIndex: biz.index,
-      limitPerFamily: 10,
-      includeDemoSeed: true,
-    });
-    const own = catalog.candidates.filter((c) => c.entityKind !== "destination");
-    const enriched = await enrichCatalog(sb, destination, "destination", own, biz.index);
-    candidates.push(...enriched);
-    for (const c of enriched) familiesLoaded.add(c.entityType);
-    const routes = await loadRoutes(sb, knownDestinations, destination, "destination", 6);
-    candidates.push(...routes);
-    if (routes.length) familiesLoaded.add("route");
-
     // Cercanías rotuladas: sólo destinos mencionados explícitamente.
     const extras = (input.extraDestinationSlugs ?? [])
       .filter((s) => s !== destination.slug)
       .map((s) => bySlug.get(s))
       .filter((d): d is ConverseDestination => Boolean(d))
       .slice(0, 2);
-    for (const extra of extras) {
-      const eb = await loadBusinessesFor(sb, extra, "nearby", 12);
-      candidates.push(...eb.candidates);
-      const ec = await loadAluxCanonicalCandidates(sb, {
-        destinationId: extra.id,
-        destinationSlug: extra.slug,
-        publishedBusinessIds: eb.ids,
-        businessIndex: eb.index,
-        limitPerFamily: 4,
-        includeDemoSeed: true,
-      });
-      const enrichedExtra = await enrichCatalog(
-        sb,
-        extra,
-        "nearby",
-        ec.candidates.filter((c) => c.entityKind !== "destination"),
-        eb.index,
-      );
-      candidates.push(...enrichedExtra);
-      candidates.push(...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)));
-    }
     // Otros destinos publicados como opción de región (planear salidas).
     const others = knownDestinations.filter((d) => d.id !== destination.id).slice(0, 8);
-    const destCandidates = await loadDestinationCandidates(sb, others);
-    candidates.push(...destCandidates);
-    if (destCandidates.length) familiesLoaded.add("destination");
+
+    const [own, routes, destCandidates, ...extraBundles] = await Promise.all([
+      loadDestinationBundle(sb, destination, "destination", { businesses: 60, perFamily: 10 }),
+      loadRoutes(sb, knownDestinations, destination, "destination", 6),
+      loadDestinationCandidates(sb, others),
+      ...extras.map(async (extra) => [
+        ...(await loadDestinationBundle(sb, extra, "nearby", { businesses: 12, perFamily: 4 })),
+        ...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)),
+      ]),
+    ]);
+    const candidates = renumberFacts([
+      ...collect(own),
+      ...collect(routes),
+      ...extraBundles.flatMap((b) => collect(b)),
+      ...collect(destCandidates),
+    ]);
     return { candidates, destination, knownDestinations, familiesLoaded: Array.from(familiesLoaded), scope: "destination" };
   }
 
@@ -661,30 +678,18 @@ export async function retrieveConverseCandidates(
   if (knownDestinations.length === 0) {
     return { candidates: [], destination: null, knownDestinations, familiesLoaded: [], scope: "none" };
   }
-  const destCandidates = await loadDestinationCandidates(sb, knownDestinations);
-  candidates.push(...destCandidates);
-  if (destCandidates.length) familiesLoaded.add("destination");
-  const routes = await loadRoutes(sb, knownDestinations, null, "region", 8);
-  candidates.push(...routes);
-  if (routes.length) familiesLoaded.add("route");
   // Muestra acotada por destino (empresas + catálogo) para poder proponer
   // un plan concreto desde la Home sin exceder el presupuesto de tokens.
   const sample = knownDestinations.slice(0, 7);
-  for (const d of sample) {
-    const biz = await loadBusinessesFor(sb, d, "region", 8);
-    candidates.push(...biz.candidates);
-    if (biz.candidates.length) familiesLoaded.add("business");
-    const catalog = await loadAluxCanonicalCandidates(sb, {
-      destinationId: d.id,
-      destinationSlug: d.slug,
-      publishedBusinessIds: biz.ids,
-      businessIndex: biz.index,
-      limitPerFamily: 3,
-      includeDemoSeed: true,
-    });
-    const enriched = await enrichCatalog(sb, d, "region", catalog.candidates.filter((c) => c.entityKind !== "destination"), biz.index);
-    candidates.push(...enriched);
-    for (const c of enriched) familiesLoaded.add(c.entityType);
-  }
+  const [destCandidates, routes, ...bundles] = await Promise.all([
+    loadDestinationCandidates(sb, knownDestinations),
+    loadRoutes(sb, knownDestinations, null, "region", 8),
+    ...sample.map((d) => loadDestinationBundle(sb, d, "region", { businesses: 8, perFamily: 3 })),
+  ]);
+  const candidates = renumberFacts([
+    ...collect(destCandidates),
+    ...collect(routes),
+    ...bundles.flatMap((b) => collect(b)),
+  ]);
   return { candidates, destination: null, knownDestinations, familiesLoaded: Array.from(familiesLoaded), scope: "region" };
 }
