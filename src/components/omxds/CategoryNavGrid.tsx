@@ -125,7 +125,7 @@ export function CategoryNavGrid({
         // 44×44 px reales, foco visible y activación por teclado nativa.
         // Lote 3G: altura compacta (76–84 px) con padding simétrico.
         const cls = [
-          "flex h-full min-h-[68px] w-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-2xl border px-2.5 py-2.5",
+          "flex h-full min-h-[44px] w-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-2xl border px-2.5 py-2.5",
           "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           isActive
             ? "border-primary/50 bg-primary/5"
