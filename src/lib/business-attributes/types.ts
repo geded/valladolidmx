@@ -52,6 +52,27 @@ export function attributeValues(value: TourismAttributeValue | undefined): strin
   return Array.isArray(value) ? value : value ? [value] : [];
 }
 
+/**
+ * Ajusta la forma de cada valor al `inputType` de su definición: los ejes
+ * `single` se representan como cadena (si llegó un arreglo se toma el primer
+ * valor válido) y los `multi` como arreglo. Los valores fuera del catálogo se
+ * descartan. Sólo normaliza forma: nunca inventa ni completa valores.
+ */
+export function coerceAttributesToDefinitions(
+  values: TourismFilterAttributes,
+  definitions: TourismAttributeDefinition[],
+): TourismFilterAttributes {
+  const out: TourismFilterAttributes = {};
+  for (const definition of definitions) {
+    const allowed = new Set(definition.options.map((option) => option.value));
+    const candidates = attributeValues(values[definition.key]).filter((value) => allowed.has(value));
+    if (!candidates.length) continue;
+    if (definition.inputType === "single") out[definition.key] = candidates[0];
+    else out[definition.key] = Array.from(new Set(candidates));
+  }
+  return out;
+}
+
 export function humanizeAttributeValue(value: string): string {
   return value
     .split("-")
