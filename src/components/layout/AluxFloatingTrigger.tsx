@@ -88,6 +88,7 @@ import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
@@ -654,6 +655,21 @@ export function AluxFloatingTrigger() {
               ) : null}
             </section>
           ) : null}
+
+          {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
+          <AluxConverseChat
+            region={ctx.region}
+            destination={effectiveDestination}
+            category={ctx.category}
+            business={ctx.business}
+            product={ctx.product}
+            selection={selection}
+            stage={unified.trip.stage}
+            coords={geo.status === "granted" && geo.location ? geo.location : null}
+            locale={locale}
+          />
+
+
 
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
           {territory?.is_returning &&

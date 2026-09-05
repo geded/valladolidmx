@@ -50,7 +50,7 @@ import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
 
-export const ALUX_CANONICAL_CATALOG_VERSION = "1.2.0" as const;
+export const ALUX_CANONICAL_CATALOG_VERSION = "1.3.0" as const;
 
 /** Coordenada acreditada o `null`. Nunca aproxima ni inventa. */
 function accredit(lat: unknown, lng: unknown, source: CoordsSource): AccreditedCoords | null {
@@ -110,6 +110,13 @@ export interface LoadCanonicalCandidatesInput {
   /** Mapa businessId → { slug, categorySlug, name } de empresas publicadas. */
   readonly businessIndex: ReadonlyMap<string, { slug: string; categorySlug: string; name: string }>;
   readonly limitPerFamily?: number;
+  /**
+   * Lote 3K · Alux conversacional. Cuando es `true`, el corpus demo
+   * administrable (`is_demo_seed = true`, publicado y navegable) también es
+   * candidato. Por defecto `false`: conserva el filtro del piloto (F1H) para
+   * `aluxContextualSuggest` y cualquier otro consumidor existente.
+   */
+  readonly includeDemoSeed?: boolean;
 }
 
 export interface CanonicalCatalogResult {
@@ -137,6 +144,10 @@ export async function loadAluxCanonicalCandidates(
   input: LoadCanonicalCandidatesInput,
 ): Promise<CanonicalCatalogResult> {
   const limit = input.limitPerFamily ?? 12;
+  /** Filtro demo: piloto (excluye demo) o corpus completo publicado (3K). */
+  const demoFilter = input.includeDemoSeed
+    ? "is_demo_seed.is.null,is_demo_seed.eq.false,is_demo_seed.eq.true"
+    : PILOT_NON_DEMO_FILTER;
   const candidates: AluxCanonicalCandidate[] = [];
   const rejected: AluxRejectedCandidate[] = [];
   const familyReport: Record<string, { loaded: number; eligible: number; note: string }> = {};
@@ -171,7 +182,7 @@ export async function loadAluxCanonicalCandidates(
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
       .is("deleted_at", null)
-      .or(PILOT_NON_DEMO_FILTER)
+      .or(demoFilter)
       .order("name", { ascending: true })
       .limit(limit);
 
@@ -253,7 +264,7 @@ export async function loadAluxCanonicalCandidates(
       .in("business_id", input.publishedBusinessIds as string[])
       .eq("status", "published")
       .is("deleted_at", null)
-      .or(PILOT_NON_DEMO_FILTER)
+      .or(demoFilter)
       .order("name", { ascending: true })
       .limit(limit * 2);
 
@@ -353,7 +364,7 @@ export async function loadAluxCanonicalCandidates(
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
       .is("deleted_at", null)
-      .or(PILOT_NON_DEMO_FILTER)
+      .or(demoFilter)
       .order("starts_at", { ascending: true })
       .limit(limit);
 
@@ -415,7 +426,7 @@ export async function loadAluxCanonicalCandidates(
       .select("id, slug, name")
       .eq("status", "published")
       .is("deleted_at", null)
-      .or(PILOT_NON_DEMO_FILTER)
+      .or(demoFilter)
       .neq("id", input.destinationId)
       .order("name", { ascending: true })
       .limit(limit);
