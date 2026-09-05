@@ -732,7 +732,9 @@ function RecommendationCard({
             subtitle={rec.subtitle ?? rec.destinationLabel ?? null}
             imageUrl={rec.imageUrl}
             eligibilityMode="legacy"
+            className="min-h-9"
           />
+
         ) : null}
         {canRemove ? (
           confirmRemove ? (
