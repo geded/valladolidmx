@@ -108,3 +108,21 @@ Route Inventory 247 rutas · Capturas 1440/834/430 en los tres pilotos:
 Los activos y contenidos del lote `landing-demo-2026-09-05` permanecen hasta
 que el Founder indique literalmente: «Demo validada. Puedes eliminar los datos
 temporales.»
+
+## 8. Corrección de huecos en blanco (regla "sin espacios vacíos")
+
+Observación del Founder sobre las capturas: la última área del cuerpo editorial
+dejaba espacio en blanco y Alux quedaba relegado a una banda inferior.
+
+Cambio en `SeoLandingSurface`:
+
+- Alux se renderiza como panel vertical dentro de la última área del cuerpo
+  editorial (según el orden configurado en el CMS), absorbiendo el espacio
+  residual de esa columna.
+- La banda horizontal inferior sólo se conserva como respaldo cuando la landing
+  no tiene cuerpo editorial.
+- La retícula adapta su plantilla de columnas al número de áreas visibles
+  (4, 3 o 2), evitando columnas vacías.
+
+Sin cambios de contrato ni de datos. Validado: typecheck, ESLint, 777/777
+pruebas, build y capturas 1440/834/430 sin desbordes ni imágenes rotas.
