@@ -26,6 +26,7 @@ import {
 import type { MapRouteStatus } from "@/components/maps/InteractiveMap";
 
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { Container } from "@/components/layout/Container";
 import {
   PremiumAluxBar,
