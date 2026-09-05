@@ -625,7 +625,7 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
         <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[#ba641e]">
           <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
-        <h1 className="mt-3 font-display text-[2.4rem] leading-[.98] sm:text-5xl lg:text-6xl">
+        <h1 className="mt-3 font-display text-display-hero">
           {profile.title}
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-[#5d685f] sm:text-lg">

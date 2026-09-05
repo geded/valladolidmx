@@ -69,7 +69,7 @@ export function PremiumHero({
                 {vm.eyebrow}
               </p>
             ) : null}
-            <h1 className="relative mt-3 max-w-3xl text-balance font-serif text-4xl leading-[0.98] sm:text-5xl lg:text-6xl">
+            <h1 className="relative mt-3 max-w-3xl font-serif text-display-hero">
               {vm.title}
             </h1>
             {vm.description ? (
