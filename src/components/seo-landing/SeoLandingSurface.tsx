@@ -303,7 +303,15 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
       {/* ── 3 · Composición editorial horizontal de cuatro áreas ──── */}
       {intro || features.length > 0 || offers || info || territory ? (
         <div className={cn(SHELL, "mt-6 sm:mt-8")}>
-          <div className="grid items-start gap-6 sm:grid-cols-2 sm:gap-x-0 sm:divide-x sm:divide-border lg:grid-cols-[22fr_31fr_20fr_22fr]">
+          <div
+            className={cn(
+              "grid items-start gap-6 sm:grid-cols-2 sm:gap-x-0 sm:divide-x sm:divide-border",
+              sections.length >= 4 && "lg:grid-cols-[22fr_31fr_20fr_22fr]",
+              sections.length === 3 && "lg:grid-cols-[28fr_38fr_26fr]",
+              sections.length === 2 && "lg:grid-cols-[45fr_47fr]",
+            )}
+          >
+
             {/* 3.1 · Por qué es extraordinario */}
             {intro || features.length > 0 ? (
               <section
