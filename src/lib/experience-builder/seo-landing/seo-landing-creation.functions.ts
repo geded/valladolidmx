@@ -268,13 +268,33 @@ async function buildRealSlots(
 
 
   const canonical = canonicalEntityUrl(entityType, entity);
-  if (canonical)
-    slots.ctaBar = {
-      actions: [
-        { id: "add-to-trip", action: "add-to-trip", label: "Agregar a Mi Viaje" },
-        { id: "view-entity", action: "navigate", label: "Ver ficha completa", href: canonical },
-      ],
-    };
+  if (canonical) {
+    /* `add-to-trip` exige referencia canónica de entidad (fail-closed del
+       contrato): sólo empresas y productos son representables hoy, por eso
+       en Lugares la acción se omite en lugar de inventarse. */
+    const actions: Array<Record<string, unknown>> = [];
+    if (entityType === "business" || entityType === "product")
+      actions.push({
+        action: "add-to-trip",
+        label: "Agregar a Mi Viaje",
+        emphasis: "secondary",
+        travelItem: {
+          kind: entityType,
+          targetId: entity.id,
+          title: entity.title,
+          slug: entity.slug,
+          ...(entity.tagline ? { subtitle: entity.tagline } : {}),
+          ...(heroMedia ? { imageUrl: heroMedia.url } : {}),
+        },
+      });
+    actions.push({
+      action: "navigate",
+      label: "Ver ficha completa",
+      href: canonical,
+      emphasis: "primary",
+    });
+    slots.ctaBar = { label: entity.title, actions };
+  }
   return slots;
 }
 
