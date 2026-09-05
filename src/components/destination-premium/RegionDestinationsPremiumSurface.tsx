@@ -137,7 +137,7 @@ export function RegionDestinationsPremiumSurface({
             <p className="text-xs font-semibold uppercase tracking-[.19em] text-primary">
               {brand.tagline}
             </p>
-            <h1 className="mt-4 max-w-3xl text-balance font-serif text-4xl leading-[1.02] text-selva-foreground sm:text-5xl lg:text-6xl">
+            <h1 className="mt-4 max-w-3xl font-serif text-display-hero text-selva-foreground">
               Explora los destinos del Oriente Maya de Yucatán
             </h1>
             <div className="mt-5 h-1 w-20 rounded-full bg-primary" />

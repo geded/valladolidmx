@@ -451,8 +451,7 @@ function TerritorialListingBody({
   }, [items, primary, query, secondary, zone]);
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
-      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb profile={profile} />
+      <div className="w-full">
         <ListingIntro profile={profile} />
         <AluxBar profile={profile} />
         <Filters
@@ -565,48 +564,12 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
   };
 }
 
-function TerritorialBreadcrumb({
-  profile,
-  destinationLabel = "Valladolid",
-  destinationSlug = "valladolid",
-  omitDestination = false,
-}: {
-  profile: ListingProfile;
-  /** Destino real del listado contextual; por defecto conserva Valladolid. */
-  destinationLabel?: string;
-  destinationSlug?: string;
-  /** Listados regionales sin destino fijo omiten el nivel de destino. */
-  omitDestination?: boolean;
-}) {
-  return (
-    <nav
-      aria-label="Ubicación territorial"
-      className="flex min-h-12 items-center gap-2 overflow-x-auto whitespace-nowrap py-3 text-xs text-[#6a726c]"
-    >
-      <a
-        href="/"
-        aria-label="Inicio"
-        className="grid size-8 shrink-0 place-items-center rounded-full border border-[#ded7c9] bg-white"
-      >
-        <Home className="size-3.5" aria-hidden />
-      </a>
-      <ChevronRight className="size-3 shrink-0" aria-hidden />
-      <a href="/oriente-maya" className="hover:text-[#0d4b38]">
-        Oriente Maya
-      </a>
-      {!omitDestination ? (
-        <>
-          <ChevronRight className="size-3 shrink-0" aria-hidden />
-          <a href={`/oriente-maya/${destinationSlug}`} className="hover:text-[#0d4b38]">
-            {destinationLabel}
-          </a>
-        </>
-      ) : null}
-      <ChevronRight className="size-3 shrink-0" aria-hidden />
-      <span className="font-semibold text-[#17251f]">{profile.breadcrumb}</span>
-    </nav>
-  );
-}
+/**
+ * 3H · El rastro territorial es responsabilidad única de
+ * `BreadcrumbTerritorial` en `PublicShell` (compacto, contextual y con
+ * tokens del sistema). Esta superficie ya no renderiza uno paralelo.
+ */
+
 
 function ListingIntro({ profile }: { profile: ListingProfile }) {
   const Icon =
@@ -625,14 +588,14 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
         <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[#ba641e]">
           <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
-        <h1 className="mt-3 font-display text-[2.4rem] leading-[.98] sm:text-5xl lg:text-6xl">
+        <h1 className="mt-3 font-display text-display-hero">
           {profile.title}
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-[#5d685f] sm:text-lg">
           {profile.description}
         </p>
       </div>
-      <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#0d4b38] px-5 text-sm font-semibold text-[#0d4b38]">
+      <button className="inline-flex min-h-11 w-fit items-center justify-center gap-2 justify-self-start rounded-full border border-[#0d4b38] px-5 text-sm font-semibold text-[#0d4b38] transition hover:bg-[#0d4b38]/10 sm:justify-self-end">
         <Heart className="size-4" aria-hidden /> Ver mi viaje
       </button>
     </header>
@@ -641,33 +604,36 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
 
 function AluxBar({ profile }: { profile: ListingProfile }) {
   return (
-    <section className="mt-5 overflow-hidden rounded-2xl bg-[#073f31] text-white shadow-[0_12px_30px_rgba(7,63,49,.12)]">
-      <div className="grid gap-3 p-4 sm:grid-cols-[auto_1fr] sm:items-center sm:p-5 lg:grid-cols-[auto_1fr_auto]">
-        <div className="flex items-center gap-3">
+    <section
+      className="mt-5 overflow-hidden rounded-2xl border border-[#0d4b38]/20 bg-[#0d4b38]/[.06] text-[#17251f]"
+      aria-label="Alux, concierge IA"
+    >
+      <div className="grid gap-2.5 p-3 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-3 lg:grid-cols-[auto_1fr_auto]">
+        <div className="flex items-center gap-2.5">
           <img
             src="/brand/alux/webp/alux-ia-avatar-64.webp"
             alt="Alux"
-            className="size-12 object-contain"
+            className="size-8 shrink-0 object-contain"
           />
-          <div>
-            <p className="font-display text-lg leading-none">Alux</p>
-            <p className="mt-1 text-[11px] text-white/65">Tu concierge IA</p>
+          <div className="min-w-0">
+            <p className="font-display text-sm leading-none">Alux</p>
+            <p className="mt-0.5 text-[11px] text-[#5d685f]">Tu concierge IA</p>
           </div>
         </div>
-        <div className="min-w-0 sm:pl-3">
-          <p className="text-sm font-semibold sm:text-base">{profile.aluxQuestion}</p>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="min-w-0 sm:pl-2">
+          <p className="line-clamp-2 max-w-2xl text-sm font-semibold">{profile.aluxQuestion}</p>
+          <div className="mt-1.5 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {profile.aluxOptions.map((option) => (
               <button
                 key={option}
-                className="min-h-9 shrink-0 rounded-full border border-white/25 px-3 text-xs text-white/90"
+                className="relative h-8 shrink-0 rounded-full border border-[#0d4b38]/25 bg-white/70 px-3 text-xs font-medium text-[#17251f] transition hover:border-[#0d4b38]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
               >
                 {option}
               </button>
             ))}
           </div>
         </div>
-        <button className="hidden min-h-11 items-center gap-2 rounded-full bg-[#f3a61e] px-5 text-sm font-bold text-[#193126] lg:inline-flex">
+        <button className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38] transition hover:bg-[#0d4b38]/10 lg:inline-flex">
           Recomiéndame <Sparkles className="size-4" aria-hidden />
         </button>
       </div>
@@ -1075,8 +1041,7 @@ function EventListingBody({
 
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
-      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb profile={profile} />
+      <div className="w-full">
         <ListingIntro
           profile={
             lockedDestinationLabel
@@ -1624,13 +1589,7 @@ function PlaceListingBody({
 
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
-      <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-        <TerritorialBreadcrumb
-          profile={profile}
-          destinationLabel={lockedDestinationLabel ?? undefined}
-          destinationSlug={dto?.destinationSlug ?? undefined}
-          omitDestination={!locked}
-        />
+      <div className="w-full">
         <ListingIntro
           profile={
             lockedDestinationLabel

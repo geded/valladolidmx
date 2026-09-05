@@ -272,7 +272,7 @@ function HeroCopy({
   return (
     <div className={compact ? "" : "max-w-2xl"}>
       <DestinationIdentity content={content} />
-      <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+      <h1 className="mt-4 font-serif text-display-hero tracking-tight text-foreground">
         {content.hero.title}
       </h1>
       <p className="mt-3 text-lg text-foreground/80 sm:text-xl">{content.hero.subtitle}</p>

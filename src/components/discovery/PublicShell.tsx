@@ -141,7 +141,7 @@ function PublicShellBody({
                 {eyebrow}
               </p>
             ) : null}
-            {title ? <h1 className="text-balance text-4xl md:text-5xl">{title}</h1> : null}
+            {title ? <h1 className="text-display-hero">{title}</h1> : null}
             {description ? (
               <p className="mt-4 text-lg text-muted-foreground">{description}</p>
             ) : null}
