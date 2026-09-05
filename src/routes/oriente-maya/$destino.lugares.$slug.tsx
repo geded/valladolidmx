@@ -156,42 +156,42 @@ function PlaceRoute() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <PublicShell crumbs={crumbs} variant="hero" compactCrumbsOnMobile>
-      <div className="bg-background">
-        <PlacePremiumSurface
-          content={projection.content}
-          presentation={projection.presentation}
-          variant={binding?.variant ?? projection.variant ?? undefined}
-          builderNotice={projection.resolution.builderNotice}
-          draftNotice={isDraft ? "Borrador · no publicado" : null}
-          showBreadcrumbs={false}
-          tripSlot={
-            <AddToTravelPlanButton
-              kind="place"
-              targetId={dto.id}
-              title={dto.name}
-              slug={slug}
-              subtitle={dto.destination.name}
-              variant="full"
-            />
-          }
-          aluxSlot={
-            <TourismAluxPanel
-              title="¿Cuándo estarás en la región?"
-              description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
-              task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
-              prompts={projection.content.alux.prompts}
-              selection={{
-                entityRef: `place:${dto.id}`,
-                title: dto.name,
-                destinationSlug: destino,
-                destinationLabel: dto.destination.name,
-                familySlug: "lugares",
-                href: `/oriente-maya/${destino}/lugares/${slug}`,
-              }}
-              compact
-            />
-          }
-        />
+        <div className="bg-background">
+          <PlacePremiumSurface
+            content={projection.content}
+            presentation={projection.presentation}
+            variant={binding?.variant ?? projection.variant ?? undefined}
+            builderNotice={projection.resolution.builderNotice}
+            draftNotice={isDraft ? "Borrador · no publicado" : null}
+            showBreadcrumbs={false}
+            tripSlot={
+              <AddToTravelPlanButton
+                kind="place"
+                targetId={dto.id}
+                title={dto.name}
+                slug={slug}
+                subtitle={dto.destination.name}
+                variant="full"
+              />
+            }
+            aluxSlot={
+              <TourismAluxPanel
+                title="¿Cuándo estarás en la región?"
+                description={`Alux combina ${dto.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+                task={`Ayúdame a integrar ${dto.name} en mi viaje por el Oriente Maya.`}
+                prompts={projection.content.alux.prompts}
+                selection={{
+                  entityRef: `place:${dto.id}`,
+                  title: dto.name,
+                  destinationSlug: destino,
+                  destinationLabel: dto.destination.name,
+                  familySlug: "lugares",
+                  href: `/oriente-maya/${destino}/lugares/${slug}`,
+                }}
+                compact
+              />
+            }
+          />
         </div>
       </PublicShell>
     </ContextEngineProvider>

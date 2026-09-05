@@ -15,15 +15,7 @@
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
 import { useMemo, type ReactNode } from "react";
-import {
-  Accessibility,
-  CalendarDays,
-  Clock,
-  Compass,
-  Heart,
-  ImageOff,
-  Ticket,
-} from "lucide-react";
+import { Accessibility, CalendarDays, Clock, Compass, Heart, ImageOff, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -213,14 +205,9 @@ export function PlacePremiumSurface({
       ) : null}
       {hasGallery ? (
         <Container className="mt-8 sm:mt-12">
-          {cinematic ? (
-            <GalleryFilmstrip content={content} />
-          ) : (
-            <GalleryMosaic content={content} />
-          )}
+          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
         </Container>
       ) : null}
-
 
       {hasMap ? (
         <Container className="mt-10 sm:mt-16">
@@ -361,7 +348,6 @@ export function PlacePremiumSurface({
               </Button>
             )}
           </section>
-
         </div>
       </Container>
 

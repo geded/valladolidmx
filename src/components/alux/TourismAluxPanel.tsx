@@ -81,7 +81,13 @@ export function TourismAluxPanel({
         )}
       >
         <div className="flex min-w-0 items-center gap-2 lg:pr-3">
-          <AluxMark family="avatar" size={28} className="size-7 shrink-0 lg:size-8" decorative loading="eager" />
+          <AluxMark
+            family="avatar"
+            size={28}
+            className="size-7 shrink-0 lg:size-8"
+            decorative
+            loading="eager"
+          />
           <div className="min-w-0">
             <h2 className="truncate font-display text-sm leading-tight text-selva">
               {brand.conciergeName}
@@ -126,4 +132,3 @@ export function TourismAluxPanel({
     </section>
   );
 }
-

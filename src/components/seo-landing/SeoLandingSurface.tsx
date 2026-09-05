@@ -521,7 +521,9 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
                     </Link>
                   ) : null}
                 </div>
-                {alux && aluxColumn === "territory" ? <AluxPanel alux={alux} onAsk={askAlux} /> : null}
+                {alux && aluxColumn === "territory" ? (
+                  <AluxPanel alux={alux} onAsk={askAlux} />
+                ) : null}
               </section>
             ) : null}
           </div>
