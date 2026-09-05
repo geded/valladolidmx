@@ -43,6 +43,7 @@
 import { useContext } from "react";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { ProductActions } from "@/components/commerce/ProductActions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import {
@@ -107,6 +108,20 @@ export function BusinessHeaderBadgesBlock() {
           Verificado
         </span>
       ) : null}
+      <TourismAluxPanel
+        className="w-full"
+        compact
+        title={`Planear con ${b.display_name}`}
+        description="Alux te ayuda a integrar esta opción en tu viaje por el Oriente Maya."
+        task={`Ayúdame a integrar ${b.display_name} en mi viaje por el Oriente Maya.`}
+        selection={{
+          entityRef: `business:${b.id}`,
+          title: b.display_name,
+          ...(b.destination_slug ? { destinationSlug: b.destination_slug } : {}),
+          ...(b.destination_slug ? { destinationLabel: b.destination_slug } : {}),
+          ...(b.category_slug ? { familySlug: b.category_slug } : {}),
+        }}
+      />
     </div>
   );
 }
