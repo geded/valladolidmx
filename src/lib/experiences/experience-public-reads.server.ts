@@ -91,7 +91,7 @@ export async function loadExperienceAttributeCatalog(
     .select(
       "attribute_key, label, help_text, input_type, filter_group, filterable, required, sort_order, tourism_attribute_options(value,label,sort_order,active)",
     )
-    .eq("family_key", "experiencias")
+    .eq("family_key", EXPERIENCE_ATTRIBUTE_FAMILY)
     .eq("active", true)
     .order("sort_order", { ascending: true });
   if (error) throw new Error(`experience_attribute_catalog_failed:${error.message}`);
