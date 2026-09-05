@@ -81,24 +81,33 @@ function rows(value: unknown): Cfg[] {
   return Array.isArray(value) ? (value.filter((v) => v && typeof v === "object") as Cfg[]) : [];
 }
 
+export interface SeoLandingEditorialBlock {
+  readonly kind: "heading" | "paragraph";
+  readonly text: string;
+}
+
 /**
- * Limpia marcas Markdown residuales del texto fuente (`## Título`, `**`),
- * que el CMS almacena en algunos campos, y lo parte en párrafos legibles.
+ * Convierte el texto fuente del CMS (con marcas Markdown residuales como
+ * `## Título` o `**`) en bloques editoriales tipados: subtítulo o párrafo.
+ * Ninguna marca cruda llega a la superficie pública.
  */
-export function toEditorialParagraphs(body: string | null): string[] {
+export function toEditorialParagraphs(body: string | null): SeoLandingEditorialBlock[] {
   if (!body) return [];
   return body
     .replace(/\r/g, "")
-    .split(/\n{2,}|(?=##\s)/g)
-    .map((chunk) =>
-      chunk
+    .split(/\n{2,}|(?=#{1,6}\s)/g)
+    .map((raw) => {
+      const isHeading = /^#{1,6}\s/.test(raw.trim());
+      const text = raw
         .replace(/^#{1,6}\s*/g, "")
         .replace(/\*\*/g, "")
         .replace(/\s+/g, " ")
-        .trim(),
-    )
-    .filter((chunk) => chunk.length > 0);
+        .trim();
+      return { kind: (isHeading ? "heading" : "paragraph") as "heading" | "paragraph", text };
+    })
+    .filter((block) => block.text.length > 0);
 }
+
 
 function slotIdOf(node: CompositionNode): string {
   const parts = node.id.split("-");
