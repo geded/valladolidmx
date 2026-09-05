@@ -604,33 +604,36 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
 
 function AluxBar({ profile }: { profile: ListingProfile }) {
   return (
-    <section className="mt-5 overflow-hidden rounded-2xl bg-[#073f31] text-white shadow-[0_12px_30px_rgba(7,63,49,.12)]">
-      <div className="grid gap-3 p-4 sm:grid-cols-[auto_1fr] sm:items-center sm:p-5 lg:grid-cols-[auto_1fr_auto]">
-        <div className="flex items-center gap-3">
+    <section
+      className="mt-5 overflow-hidden rounded-2xl border border-[#0d4b38]/20 bg-[#0d4b38]/[.06] text-[#17251f]"
+      aria-label="Alux, concierge IA"
+    >
+      <div className="grid gap-2.5 p-3 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-3 lg:grid-cols-[auto_1fr_auto]">
+        <div className="flex items-center gap-2.5">
           <img
             src="/brand/alux/webp/alux-ia-avatar-64.webp"
             alt="Alux"
-            className="size-12 object-contain"
+            className="size-8 shrink-0 object-contain"
           />
-          <div>
-            <p className="font-display text-lg leading-none">Alux</p>
-            <p className="mt-1 text-[11px] text-white/65">Tu concierge IA</p>
+          <div className="min-w-0">
+            <p className="font-display text-sm leading-none">Alux</p>
+            <p className="mt-0.5 text-[11px] text-[#5d685f]">Tu concierge IA</p>
           </div>
         </div>
-        <div className="min-w-0 sm:pl-3">
-          <p className="text-sm font-semibold sm:text-base">{profile.aluxQuestion}</p>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="min-w-0 sm:pl-2">
+          <p className="line-clamp-2 max-w-2xl text-sm font-semibold">{profile.aluxQuestion}</p>
+          <div className="mt-1.5 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {profile.aluxOptions.map((option) => (
               <button
                 key={option}
-                className="min-h-9 shrink-0 rounded-full border border-white/25 px-3 text-xs text-white/90"
+                className="relative h-8 shrink-0 rounded-full border border-[#0d4b38]/25 bg-white/70 px-3 text-xs font-medium text-[#17251f] transition hover:border-[#0d4b38]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
               >
                 {option}
               </button>
             ))}
           </div>
         </div>
-        <button className="hidden min-h-11 items-center gap-2 rounded-full bg-[#f3a61e] px-5 text-sm font-bold text-[#193126] lg:inline-flex">
+        <button className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38] transition hover:bg-[#0d4b38]/10 lg:inline-flex">
           Recomiéndame <Sparkles className="size-4" aria-hidden />
         </button>
       </div>
