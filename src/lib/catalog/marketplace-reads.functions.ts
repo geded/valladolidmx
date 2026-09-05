@@ -16,6 +16,7 @@ import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 import { resolveMediaAlt, type MediaLocale } from "@/lib/media/resolve-alt";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 import {
+  attributeValues,
   normalizeFilterAttributes,
   type TourismFilterAttributes,
 } from "@/lib/business-attributes/types";
@@ -242,7 +243,72 @@ export interface MarketplaceProductDetail {
   reviews: ProductReviewItem[];
   review_stats: ProductReviewStats;
   faqs: ProductFaqItem[];
+  /**
+   * Lote 3E · Atributos turísticos administrables del producto
+   * (`products.filter_attributes`) resueltos contra el catálogo activo de la
+   * familia correspondiente (`tourism_attribute_definitions/_options`).
+   * Sólo se listan claves con valor real; los valores sin opción activa se
+   * omiten. Vacío cuando el producto no tiene atributos capturados.
+   */
+  attributes: ProductAttributeItem[];
+  /** Etiqueta editorial de tipo (`metadata.category_label`) si la empresa la capturó. */
+  category_label: string | null;
 }
+
+export interface ProductAttributeItem {
+  key: string;
+  label: string;
+  /** Grupo de filtro del catálogo (`zone|primary|secondary|profile|policy|commercial`). */
+  filter_group: string;
+  values: Array<{ value: string; label: string }>;
+}
+
+/** Familia del catálogo de atributos turísticos que gobierna cada tipo de producto. */
+const PRODUCT_TYPE_ATTRIBUTE_FAMILY: Record<string, string> = {
+  experiencia: "experiencias",
+  tour: "experiencias",
+  evento: "eventos",
+  hotel: "hoteles",
+  restaurante: "restaurantes",
+};
+
+/**
+ * Resuelve `products.filter_attributes` contra el catálogo activo. Sólo
+ * conserva claves definidas y valores con opción activa; nunca completa.
+ */
+function resolveProductAttributes(
+  raw: unknown,
+  definitions: Array<Record<string, unknown>>,
+): ProductAttributeItem[] {
+  const values = normalizeFilterAttributes(raw);
+  const out: ProductAttributeItem[] = [];
+  for (const definition of definitions) {
+    const key = String(definition.attribute_key ?? "");
+    if (!key) continue;
+    const selected = attributeValues(values[key]);
+    if (!selected.length) continue;
+    const options = ((definition.tourism_attribute_options ?? []) as Array<Record<string, unknown>>)
+      .filter((option) => option.active !== false)
+      .map((option) => ({
+        value: String(option.value),
+        label: String(option.label),
+        sort_order: Number(option.sort_order ?? 0),
+      }))
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const resolved = options
+      .filter((option) => selected.includes(option.value))
+      .map((option) => ({ value: option.value, label: option.label }));
+    if (!resolved.length) continue;
+    out.push({
+      key,
+      label: String(definition.label ?? key),
+      filter_group: String(definition.filter_group ?? "secondary"),
+      values: resolved,
+    });
+  }
+  return out;
+}
+
 
 /**
  * getMarketplaceProductBySlug — Detalle público de un producto publicado.
@@ -279,7 +345,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     const { data: prod, error } = await supabase
       .from("products")
       .select(
-        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms",
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -289,6 +355,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     if (!prod) return null;
 
     const businessId = prod.business_id as string;
+    const attributeFamily = PRODUCT_TYPE_ATTRIBUTE_FAMILY[String(prod.product_type)] ?? null;
 
     const [
       { data: biz, error: bErr },
@@ -299,6 +366,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       { data: reviews },
       { data: faqs },
       { data: relatedRows },
+      { data: attributeDefs },
     ] = await Promise.all([
       supabase
         .from("businesses")
@@ -378,10 +446,36 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .neq("id", prod.id)
         .order("name", { ascending: true })
         .limit(6),
+      // Lote 3E · catálogo activo de la familia del producto (RLS TO anon:
+      // `active = true`). Sin familia mapeada no se consulta.
+      attributeFamily
+        ? supabase
+            .from("tourism_attribute_definitions")
+            .select(
+              "attribute_key, label, filter_group, sort_order, tourism_attribute_options(value,label,sort_order,active)",
+            )
+            .eq("family_key", attributeFamily)
+            .eq("active", true)
+            .order("sort_order", { ascending: true })
+        : Promise.resolve({ data: null, error: null }),
     ]);
 
     if (bErr) throw new Error(`marketplace_product_biz_failed: ${bErr.message}`);
     if (mErr) throw new Error(`marketplace_product_media_failed: ${mErr.message}`);
+
+    const attributes = resolveProductAttributes(
+      (prod as { filter_attributes?: unknown }).filter_attributes,
+      (attributeDefs ?? []) as Array<Record<string, unknown>>,
+    );
+    const rawMetadata = (prod as { metadata?: unknown }).metadata;
+    const categoryLabelRaw =
+      rawMetadata && typeof rawMetadata === "object" && !Array.isArray(rawMetadata)
+        ? (rawMetadata as Record<string, unknown>).category_label
+        : null;
+    const categoryLabel =
+      typeof categoryLabelRaw === "string" && categoryLabelRaw.trim()
+        ? categoryLabelRaw.trim()
+        : null;
     if (!biz) return null;
 
     // Firma de URLs de media (bucket privado). Best-effort: si algún
@@ -643,6 +737,8 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         answer: (f.answer as string) ?? "",
         position: Number(f.position ?? 0),
       })),
+      attributes,
+      category_label: categoryLabel,
     };
   });
 

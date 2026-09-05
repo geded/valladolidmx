@@ -23,6 +23,7 @@ import {
 } from "@/components/home-premium/home-premium-config";
 import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
+import { homeFeaturedCategoriesQueryOptions } from "@/lib/cms/home-featured-categories-query";
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -76,6 +77,9 @@ export const Route = createFileRoute("/")({
       // Lote 3B — Destinos reales de CMS disponibles en SSR: la Home ya no
       // depende del fixture `DESTINOS_MOCK` para pintar la sección.
       context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []),
+      // Lote 3E — Categorías destacadas reales de CMS en SSR: el buscador del
+      // Hero y la sección de categorías ya no dependen de `CATEGORIAS_MOCK`.
+      context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
     ]);
     return {
       seo: published?.snapshot?.chrome?.seo ?? null,
