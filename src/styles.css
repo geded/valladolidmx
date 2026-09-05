@@ -364,7 +364,32 @@
   --ws-density-y: 1;
 }
 
+/**
+ * 3H · Escala editorial única de titular público. Autoridad: Home Premium
+ * (30px móvil → 53.6px desktop). Todas las superficies públicas la usan
+ * para que ningún hero domine sobre el territorio ni la fotografía.
+ */
+@utility text-display-hero {
+  font-size: clamp(1.875rem, 5.6vw, 3.35rem);
+  line-height: 1.03;
+  text-wrap: balance;
+}
+
+/** 3H · Área táctil real de 44px sin engordar la píldora visual. */
+@utility tap-safe {
+  position: relative;
+}
+@utility tap-safe-area {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
 @utility ws-shadow-card {
+
   box-shadow: var(--shadow-card);
 }
 @utility ws-shadow-raised {
