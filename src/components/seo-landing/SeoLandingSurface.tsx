@@ -64,7 +64,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   const hasAside = Boolean(info || territory);
 
   return (
-    <div className="pb-16">
+    <div className="pb-6">
       {/* ── 1 · Portada editorial ─────────────────────────────────── */}
       <section
         className={cn(
