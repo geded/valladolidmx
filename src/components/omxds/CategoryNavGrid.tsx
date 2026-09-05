@@ -39,6 +39,12 @@ export interface CategoryNavGridProps {
   onSelect?: (slug: string) => void;
   /** Escritorio gobernado por la plantilla (Tailwind classes `lg:*`). */
   desktopColumnsClassName?: string;
+  /**
+   * Comportamiento en móvil (< 640 px). `rail` (por defecto) evita la
+   * columna vertical pesada y los huecos huérfanos; `grid` conserva las
+   * dos columnas para superficies que lo necesiten.
+   */
+  mobileLayout?: "rail" | "grid";
   /** Acredita espacio para íconos de 56 px. */
   spaceCredited?: boolean;
   scheme?: "light" | "dark";
@@ -54,6 +60,7 @@ export function CategoryNavGrid({
   activeSlug = null,
   onSelect,
   desktopColumnsClassName = "lg:grid-cols-4",
+  mobileLayout = "rail",
   spaceCredited = false,
   scheme = "light",
   showCounts = true,
@@ -62,11 +69,18 @@ export function CategoryNavGrid({
 }: CategoryNavGridProps) {
   if (items.length === 0) return <>{emptySlot}</>;
 
+  const isRail = mobileLayout === "rail";
+
   return (
     <ul
       data-omxds-category-nav-grid
+      data-mobile-layout={mobileLayout}
       className={[
-        "grid w-full min-w-0 grid-cols-2 gap-3 md:grid-cols-4",
+        "w-full min-w-0 gap-2.5",
+        isRail
+          ? // Rail con snap en móvil; rejilla simétrica desde `sm`.
+            "-mx-1 flex snap-x snap-mandatory overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-4"
+          : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
         desktopColumnsClassName,
         className ?? "",
       ]
@@ -84,19 +98,20 @@ export function CategoryNavGrid({
                 variant={variant}
                 spaceCredited={spaceCredited}
                 scheme={scheme}
-                /* G8-E2 · OBS-G8E1-03 — glifo bordado 40 px en móvil,
-                   44 px en tablet y 48 px en escritorio, sin deformar. */
+                /* Lote 3G · glifo compacto: 32 px en móvil, 36 px en tablet
+                   y 40 px en escritorio, sin deformar ni robar altura. */
                 className={
                   variant === "standard"
-                    ? "size-10 shrink-0 object-contain md:size-11 lg:size-12"
+                    ? "size-8 shrink-0 object-contain md:size-9 lg:size-10"
                     : undefined
                 }
               />
             ) : null}
             <span className="min-w-0 text-center">
-              <span className="line-clamp-2 block text-sm font-medium leading-snug">
+              <span className="line-clamp-2 block text-[13px] font-medium leading-snug">
                 {item.label}
               </span>
+
               {showCounts && typeof item.count === "number" ? (
                 <span className="mt-0.5 block text-xs text-muted-foreground">
                   {item.countLabel ?? `${item.count} ${item.count === 1 ? "opción" : "opciones"}`}
