@@ -62,51 +62,44 @@ export function TourismAluxPanel({
       ref={ref}
       data-alux-embedded="panel"
       className={cn(
-        "rounded-3xl border border-border bg-card shadow-soft",
-        compact ? "p-3 sm:p-3.5" : "p-3.5 sm:p-4.5",
+        /* Lote 3G.1 · presencia secundaria: superficie clara con acento de
+           marca en lugar de una masa de color, altura y padding reducidos. */
+        "rounded-2xl border border-selva/25 border-l-2 border-l-selva/70 bg-selva/[0.06]",
+        compact ? "px-3 py-2.5" : "px-3.5 py-3",
         className,
       )}
       aria-label={`${brand.conciergeName}, concierge IA`}
     >
       <div
         className={cn(
-          "grid gap-3.5",
-          variant === "bar" && "lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center",
+          "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-2",
+          variant === "bar" && "lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4",
         )}
       >
-        <div className="flex min-w-0 items-center gap-3">
-          <AluxMark family="avatar" size={40} className="shrink-0" decorative loading="eager" />
+        <div className="flex min-w-0 items-center gap-2 lg:pr-3">
+          <AluxMark family="avatar" size={28} className="size-7 shrink-0 lg:size-8" decorative loading="eager" />
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-              {brand.conciergeName} · Concierge IA
-            </p>
-            <h2
-              className={cn(
-                "mt-1 font-serif leading-tight text-foreground",
-                compact ? "text-lg" : "text-xl lg:text-2xl",
-              )}
-            >
-              {title}
+            <h2 className="truncate font-display text-sm leading-tight text-selva">
+              {brand.conciergeName}
             </h2>
+            <p className="text-[10.5px] leading-tight text-muted-foreground">Concierge IA</p>
           </div>
         </div>
 
         {/* `min-w-0`: la fila de sugerencias hace scroll horizontal interno y
             no debe ensanchar la rejilla ni la página en móvil. */}
-        <div className="min-w-0">
-          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
+        <div className="col-span-2 min-w-0 lg:col-span-1 lg:col-start-2 lg:row-start-1">
+          <p className="line-clamp-1 max-w-2xl text-[13px] font-medium leading-snug text-foreground">
+            {title}
+          </p>
+          <p className="sr-only">{description}</p>
           <TourismChipRow
             label={`Pistas para ${brand.conciergeName}`}
             behavior="rail"
-            className="mt-3"
+            className="mt-1.5 lg:mt-1"
           >
             {chips.map((prompt) => (
-              <TourismChip
-                key={prompt}
-                scheme="surface"
-                size={compact ? "sm" : "md"}
-                onClick={() => ask(prompt)}
-              >
+              <TourismChip key={prompt} scheme="surface" size="xs" onClick={() => ask(prompt)}>
                 {prompt}
               </TourismChip>
             ))}
@@ -116,12 +109,17 @@ export function TourismAluxPanel({
         <button
           type="button"
           onClick={() => ask()}
-          className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-pill bg-selva px-5 text-sm font-semibold text-selva-foreground transition-opacity hover:opacity-90 lg:w-auto"
+          className="relative col-start-2 row-start-1 inline-flex h-9 w-auto shrink-0 items-center justify-center gap-1.5 justify-self-end rounded-pill lg:col-start-3 lg:justify-self-start border border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva transition-colors hover:bg-selva/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
         >
-          {variant === "card" ? <Sparkles className="size-4" /> : <Compass className="size-4" />}
+          {variant === "card" ? (
+            <Sparkles className="size-3.5" aria-hidden />
+          ) : (
+            <Compass className="size-3.5" aria-hidden />
+          )}
           Planear con {brand.conciergeName}
         </button>
       </div>
     </section>
   );
 }
+
