@@ -291,7 +291,7 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       const { error: metaError } = await supabase.rpc("eb_set_composition_seo_metadata", {
         _id: id,
         _kind: "landing",
-        _canonical_override: seo.canonicalOverride,
+        _canonical_override: seo.canonicalOverride ?? undefined,
         _robots_directive: seo.robotsDirective,
       });
       if (metaError) throw new Error(metaError.message);
