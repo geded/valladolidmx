@@ -375,19 +375,6 @@
   text-wrap: balance;
 }
 
-/** 3H · Área táctil real de 44px sin engordar la píldora visual. */
-@utility tap-safe {
-  position: relative;
-}
-@utility tap-safe-area {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  top: 50%;
-  height: 44px;
-  transform: translateY(-50%);
-}
-
 @utility ws-shadow-card {
 
   box-shadow: var(--shadow-card);
