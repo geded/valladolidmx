@@ -176,23 +176,21 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
 
   const offersCfg = get("offers");
   const offerItems: SeoLandingOfferItem[] = rows(offersCfg?.["items"])
-    .map((item, i) => {
+    .map((item, i): SeoLandingOfferItem | null => {
       const t = str(item["title"]);
       if (!t) return null;
+      const rawTags = Array.isArray(item["tags"]) ? (item["tags"] as unknown[]) : [];
       return {
         id: str(item["id"]) ?? `offer-${i}`,
         title: t,
         subtitle: str(item["subtitle"]),
         href: str(item["href"]),
         media: media(item, "imageUrl", "imageAlt"),
-        tags: rows(item["tags"]).length
-          ? []
-          : Array.isArray(item["tags"])
-            ? (item["tags"] as unknown[]).map((x) => str(x)).filter((x): x is string => !!x)
-            : [],
+        tags: rawTags.map((x) => str(x)).filter((x): x is string => x !== null),
       };
     })
     .filter((v): v is SeoLandingOfferItem => v !== null);
+
   const offers =
     offerItems.length > 0
       ? { heading: str(offersCfg?.["heading"]) ?? "Experiencias destacadas", items: offerItems }
