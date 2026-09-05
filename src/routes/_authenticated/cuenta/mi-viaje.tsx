@@ -24,6 +24,7 @@ import {
   Users,
   Calendar,
   MapPin,
+  Landmark,
   Building2,
   ShoppingBag,
   Ticket,
@@ -160,6 +161,7 @@ const KIND_META: Record<
   event: { label: "Eventos", icon: Ticket },
   note: { label: "Notas", icon: StickyNote },
   route: { label: "Rutas", icon: RouteIcon },
+  place: { label: "Lugares", icon: Landmark },
 };
 const KIND_ORDER: TravelItemKind[] = ["destination", "business", "product", "event", "note"];
 
@@ -1794,6 +1796,7 @@ function PlanItemsSection({
       product: [],
       event: [],
       note: [],
+      place: [],
       route: [],
     };
     for (const it of data.items) g[it.item_kind]?.push(it);

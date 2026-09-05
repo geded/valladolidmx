@@ -31,6 +31,8 @@ export const AnonymousItemKindSchema = z.enum([
   "event",
   "note",
   "route",
+  // Lote 3J.1 — lugar o atractivo (paridad con el ENUM de Travel Plan).
+  "place",
   // Compatibilidad de lectura con la cola local anterior. Al importar se
   // normalizan a los contratos canónicos de Travel Plan.
   "promotion",
@@ -92,6 +94,15 @@ export const AnonymousTravelDraftSchema = z.object({
       children: z.number().int().min(0).max(20).optional(),
     })
     .optional(),
+  /**
+   * Lote 3J.1 · Ampliación ADITIVA sobre campos canónicos ya existentes en
+   * el perfil de viajero (`interests`, `accessibility_needs`) y en la
+   * duración declarada del viaje. Todos opcionales: un borrador previo sigue
+   * validando sin migración.
+   */
+  interests: z.array(z.string().min(1).max(60)).max(16).optional(),
+  tripDurationDays: z.number().int().min(1).max(60).optional(),
+  accessibilityNeeds: z.string().min(1).max(300).optional(),
 });
 export type AnonymousTravelDraft = z.infer<typeof AnonymousTravelDraftSchema>;
 

@@ -24,6 +24,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRight,
   Building2,
+  Landmark,
   Luggage,
   MapPin,
   Route as RouteIcon,
@@ -72,6 +73,7 @@ const KIND_ICON: Record<TravelItemKind, React.ComponentType<{ className?: string
   event: Ticket,
   note: StickyNote,
   route: RouteIcon,
+  place: Landmark,
 };
 
 const KIND_LABEL: Record<TravelItemKind, string> = {
@@ -81,6 +83,7 @@ const KIND_LABEL: Record<TravelItemKind, string> = {
   event: "Evento",
   note: "Nota",
   route: "Ruta",
+  place: "Lugar",
 };
 
 const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?: string }>> = {
@@ -90,6 +93,7 @@ const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?
   event: Ticket,
   note: StickyNote,
   route: RouteIcon,
+  place: Landmark,
   promotion: Ticket,
   custom: StickyNote,
 };
@@ -101,6 +105,7 @@ const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
   event: "Evento",
   note: "Nota",
   route: "Ruta",
+  place: "Lugar",
   promotion: "Promoción",
   custom: "Idea",
 };

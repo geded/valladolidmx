@@ -10,7 +10,9 @@ export type AnonymousImportItemKind =
   | "product"
   | "event"
   | "note"
-  | "route";
+  | "route"
+  /** Lote 3J.1 — lugar o atractivo (paridad con el ENUM de Travel Plan). */
+  | "place";
 export type AnonymousImportFavoriteKind = "business" | "product" | "promotion";
 
 export interface AnonymousImportItem {

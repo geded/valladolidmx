@@ -54,6 +54,8 @@ export interface PlacePremiumSurfaceProps {
    * ruta. La superficie sigue siendo render-only: sólo lo posiciona.
    */
   aluxSlot?: ReactNode;
+  /** Lote 3J.1 · Acción real de Mi Viaje (persistencia por ID canónico). */
+  tripSlot?: ReactNode;
   /**
    * G4-PLACES · cuando la ruta ya renderiza el breadcrumb territorial
    * compartido (`PublicShell`), la superficie no debe duplicarlo.
@@ -69,6 +71,7 @@ export function PlacePremiumSurface({
   builderNotice = null,
   draftNotice = null,
   aluxSlot = null,
+  tripSlot = null,
   showBreadcrumbs = true,
   className,
 }: PlacePremiumSurfaceProps) {
@@ -350,9 +353,13 @@ export function PlacePremiumSurface({
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {content.trip.description}
             </p>
-            <Button type="button" className="mt-5 min-h-11 rounded-pill">
-              {content.trip.actionLabel}
-            </Button>
+            {tripSlot ? (
+              <div className="mt-5">{tripSlot}</div>
+            ) : (
+              <Button type="button" className="mt-5 min-h-11 rounded-pill">
+                {content.trip.actionLabel}
+              </Button>
+            )}
           </section>
 
         </div>
