@@ -183,6 +183,13 @@ export function CompositionRenderer({
   wrap,
   variableContext,
 }: CompositionRendererProps): ReactNode {
+  /* LOTE 3I.1 · Familia `premium-seo-landing`: en producción la composición
+     se presenta con la superficie editorial compartida (maqueta autorizada).
+     En Studio se conserva el render bloque a bloque para poder editar. */
+  if (!studio && readSeoLandingChrome(tree)) {
+    const landingVm = buildSeoLandingSurfaceVM(tree);
+    if (landingVm) return <SeoLandingSurface vm={landingVm} />;
+  }
   return (
     <Fragment>
       {tree.root.children.map((node) => (
@@ -202,6 +209,7 @@ export function CompositionRenderer({
     </Fragment>
   );
 }
+
 
 interface RenderNodeProps {
   node: CompositionNode;
