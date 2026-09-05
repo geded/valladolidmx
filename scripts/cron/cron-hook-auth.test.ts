@@ -324,7 +324,8 @@ describe("rutas reales · sólo rechazo (nunca se crea el cliente de servicio)",
       });
 
       it("contrato de fuente: sin `apikey`, sin clave pública, sin bearer, sin secreto heredado", () => {
-        const source = readFileSync(join(process.cwd(), route.file), "utf8");
+        // Se evalúa el código, no la documentación: se descartan comentarios.
+        const source = stripComments(readFileSync(join(process.cwd(), route.file), "utf8"));
         expect(source).toContain("handleCronHook(");
         expect(source).not.toMatch(/apikey/i);
         expect(source).not.toContain("SUPABASE_PUBLISHABLE_KEY");
@@ -336,13 +337,19 @@ describe("rutas reales · sólo rechazo (nunca se crea el cliente de servicio)",
   }
 
   it("el módulo de autorización no lee `apikey`, bearer ni parámetros de URL", () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/lib/cron/cron-hook-auth.server.ts"),
-      "utf8",
+    const source = stripComments(
+      readFileSync(join(process.cwd(), "src/lib/cron/cron-hook-auth.server.ts"), "utf8"),
     );
     expect(source).not.toMatch(/headers\.get\(\s*["']apikey["']/i);
     expect(source).not.toMatch(/headers\.get\(\s*["']authorization["']/i);
     expect(source).not.toMatch(/searchParams/);
     expect(source).not.toContain("SUPABASE_PUBLISHABLE_KEY");
+    // La única cabecera consultada es la canónica.
+    const headerReads = source.match(/headers\.get\(([^)]*)\)/g) ?? [];
+    expect(headerReads).toEqual(["headers.get(CRON_HOOK_HEADER)"]);
   });
 });
+
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
