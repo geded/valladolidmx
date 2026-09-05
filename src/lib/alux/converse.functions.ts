@@ -275,7 +275,7 @@ function intentFromUnderstood(base: AluxTravelIntent, u: NonNullable<AluxConvers
 /* ─────────────────────────── server function ─────────────────────────── */
 
 export const aluxConverse = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => AluxConverseInputSchema.parse(d ?? {}))
+  .validator((d: unknown) => AluxConverseInputSchema.parse(d ?? {}))
   .handler(async ({ data }): Promise<AluxConverseResponse> => {
     const startedAt = Date.now();
     const [{ getRequest }, { createHash }, { createClient }, { supabaseAdmin }, retrieval, proximity] =
