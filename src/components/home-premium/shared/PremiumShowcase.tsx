@@ -7,12 +7,14 @@
  * Home y el Atlas de Destinos consuman EXACTAMENTE el mismo markup, las
  * mismas proporciones y los mismos tokens. Prohibido reinterpretarlo.
  */
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Compass } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EditorialMediaFrame, type EditorialMedia } from "@/components/omxds/EditorialMediaFrame";
+import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
+import { useRegisterAluxEmbedded } from "@/lib/alux/embedded-presence";
 import { useBrand } from "@/lib/brand/brand-context";
 import { PARTY_OPTIONS, type PartyComposition } from "@/lib/traveler/party-composition";
 
