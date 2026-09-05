@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 import type { CompositionTree } from "../composition-tree";
 import {
   buildSeoLandingComposition,
@@ -55,6 +56,7 @@ interface EntitySnapshot {
   description: string | null;
   coverMediaId: string | null;
   destinationSlug: string | null;
+  destinationName: string | null;
   categorySlug: string | null;
 }
 
@@ -80,7 +82,11 @@ async function loadEntity(
     if (!data) throw new Error("seo_landing_entity_not_found");
     const [dest, cat] = await Promise.all([
       data.destination_id
-        ? supabase.from("destinations").select("slug").eq("id", data.destination_id).maybeSingle()
+        ? supabase
+            .from("destinations")
+            .select("slug, name")
+            .eq("id", data.destination_id)
+            .maybeSingle()
         : Promise.resolve({ data: null }),
       data.primary_category_id
         ? supabase
@@ -98,6 +104,7 @@ async function loadEntity(
       description: data.description,
       coverMediaId: data.cover_media_id,
       destinationSlug: dest?.data?.slug ?? null,
+      destinationName: dest?.data?.name ?? null,
       categorySlug: cat?.data?.slug ?? null,
     };
   }
@@ -119,6 +126,7 @@ async function loadEntity(
       description: data.description,
       coverMediaId: data.cover_media_id,
       destinationSlug: null,
+      destinationName: null,
       categorySlug: data.product_type ?? null,
     };
   }
@@ -132,7 +140,11 @@ async function loadEntity(
   if (error) throw new Error(error.message);
   if (!data) throw new Error("seo_landing_entity_not_found");
   const dest = data.destination_id
-    ? await supabase.from("destinations").select("slug").eq("id", data.destination_id).maybeSingle()
+    ? await supabase
+            .from("destinations")
+            .select("slug, name")
+            .eq("id", data.destination_id)
+            .maybeSingle()
     : { data: null };
   return {
     id: data.id,
@@ -142,6 +154,7 @@ async function loadEntity(
     description: data.description,
     coverMediaId: null,
     destinationSlug: dest?.data?.slug ?? null,
+    destinationName: dest?.data?.name ?? null,
     categorySlug: null,
   };
 }
