@@ -40,7 +40,7 @@ import {
   getPublicDestinationBySlug,
   getDestinationRelated,
 } from "@/lib/destinations/public-reads.functions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 
 /** Candidato ligero para poblar el selector "Vista previa con…". */
@@ -200,6 +200,8 @@ function demoProduct(): MarketplaceProductDetail {
       distribution: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
     },
     faqs: [],
+    attributes: [],
+    category_label: null,
   };
 }
 
@@ -361,17 +363,27 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
    * destinos publicados de Oriente Maya y los inyecta en
    * `DestinationSurfaceProvider` (db + related). Los bloques
    * `vmx.experience.*` renderizan datos reales en el canvas.
+   *
+   * Lote 3E — Los candidatos provienen del CMS (`destinations`
+   * publicados), no del fixture `DESTINOS_MOCK`.
    */
   {
     kind: "destination",
     label: "Vista previa con destino",
     placeholder: "Selecciona un destino…",
     async loadCandidates() {
-      return DESTINOS_MOCK.filter((d) => d.region_slug === ORIENTE_MAYA.slug).map((d) => ({
-        slug: d.slug,
-        label: d.name,
-        secondary: "Oriente Maya",
-      }));
+      try {
+        const rows = await listPublishedDestinations();
+        return rows
+          .filter((d) => !d.region_slug || d.region_slug === ORIENTE_MAYA.slug)
+          .map((d) => ({
+            slug: d.slug,
+            label: d.name,
+            secondary: ORIENTE_MAYA.name,
+          }));
+      } catch {
+        return [];
+      }
     },
     async loadDetail(slug) {
       try {

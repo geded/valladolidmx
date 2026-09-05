@@ -11,6 +11,11 @@ import {
   resolveExperienceCommerce,
   type ExperienceCommerceDecision,
 } from "@/lib/experiences/experience-commerce";
+import {
+  EXPERIENCE_ACCESSIBILITY_ATTRIBUTE_KEY,
+  EXPERIENCE_LANGUAGE_ATTRIBUTE_KEY,
+  EXPERIENCE_TYPE_ATTRIBUTE_KEY,
+} from "@/lib/experiences/experience-attributes";
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 
 export interface ExperienceMediaVM {
@@ -106,8 +111,25 @@ export function buildExperienceVMFromProduct(
         })
       : null;
 
+  // Lote 3E · atributos turísticos administrables (catálogo `experiencias`).
+  // Cada eje sólo aparece si la empresa lo capturó; nada se completa.
+  const attributes = product.attributes ?? [];
+  const attributeLabels = (key: string): string[] =>
+    attributes.find((item) => item.key === key)?.values.map((value) => value.label) ?? [];
+  const typeLabel =
+    attributeLabels(EXPERIENCE_TYPE_ATTRIBUTE_KEY)[0] ??
+    product.category_label ??
+    (product.product_type ? humanize(product.product_type) : "Experiencia");
+  const languages = attributeLabels(EXPERIENCE_LANGUAGE_ATTRIBUTE_KEY);
+  const accessibility = attributeLabels(EXPERIENCE_ACCESSIBILITY_ATTRIBUTE_KEY);
+  const FACT_ATTRIBUTE_KEYS = new Set<string>([
+    EXPERIENCE_TYPE_ATTRIBUTE_KEY,
+    EXPERIENCE_LANGUAGE_ATTRIBUTE_KEY,
+    EXPERIENCE_ACCESSIBILITY_ATTRIBUTE_KEY,
+  ]);
+
   const facts: ExperienceFactVM[] = [];
-  if (product.product_type) facts.push({ label: "Tipo", value: humanize(product.product_type) });
+  facts.push({ label: "Tipo", value: typeLabel });
   if (destinationSlug) facts.push({ label: "Destino", value: humanize(destinationSlug) });
   if (product.business.primary_location?.label) {
     facts.push({ label: "Punto de encuentro", value: product.business.primary_location.label });
@@ -125,6 +147,15 @@ export function buildExperienceVMFromProduct(
   }
   if (product.capacity && product.capacity > 0) {
     facts.push({ label: "Grupo", value: `Hasta ${product.capacity} personas` });
+  }
+  for (const attribute of attributes) {
+    if (FACT_ATTRIBUTE_KEYS.has(attribute.key)) continue;
+    // "Duración" real (minutos) tiene prioridad sobre el rango del catálogo.
+    if (attribute.key === "duracion" && facts.some((fact) => fact.label === "Duración")) continue;
+    facts.push({
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
+    });
   }
 
   const policies: ExperienceListSectionVM[] = [];
@@ -176,7 +207,7 @@ export function buildExperienceVMFromProduct(
     id: product.id,
     slug: product.slug,
     name: product.name,
-    eyebrow: product.product_type ? humanize(product.product_type) : "Experiencia",
+    eyebrow: typeLabel,
     tagline: product.tagline || null,
     description: product.description || "",
     operatorName: product.business.display_name,
@@ -193,8 +224,8 @@ export function buildExperienceVMFromProduct(
     excludes: [],
     itinerary: [],
     requirements: [],
-    languages: [],
-    accessibility: [],
+    languages,
+    accessibility,
     policies,
     location,
     rating:

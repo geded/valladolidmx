@@ -7,13 +7,17 @@
  *   /oriente-maya/:destino/:categoria
  * Si sólo se elige destino → /oriente-maya/:destino
  * Si sólo categoría (sin destino) → /oriente-maya (con hint futura).
+ *
+ * Lote 3E — Las categorías provienen del CMS (`business_categories`
+ * publicadas y destacadas en Home); sin resultado, el selector muestra su
+ * estado vacío honesto. Nunca un fixture en ejecución pública.
  */
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, MapPin, Compass, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
-import { CATEGORIAS_MOCK } from "@/mocks/categorias";
+import { useHomeFeaturedCategories } from "@/lib/cms/home-featured-categories-query";
 import { cn } from "@/lib/utils";
 
 interface Option {
@@ -21,12 +25,6 @@ interface Option {
   name: string;
   hint?: string;
 }
-
-const CATEGORIA_OPTIONS: Option[] = CATEGORIAS_MOCK.map((c) => ({
-  slug: c.slug,
-  name: c.name,
-  hint: c.description,
-}));
 
 export interface HeroSearchPillProps {
   destinoLabel?: string;
@@ -54,6 +52,13 @@ export function HeroSearchPill({
     slug: d.slug,
     name: d.name,
     ...(d.tagline ? { hint: d.tagline } : {}),
+  }));
+  // Lote 3E — Las categorías del buscador provienen del CMS publicado.
+  const { data: publishedCategories } = useHomeFeaturedCategories();
+  const categoriaOptions: Option[] = (publishedCategories ?? []).map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    ...(c.description ? { hint: c.description } : {}),
   }));
   const [destino, setDestino] = useState<Option | null>(null);
   const [categoria, setCategoria] = useState<Option | null>(null);
@@ -188,7 +193,7 @@ export function HeroSearchPill({
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-1.5">
             <OptionList
-              options={CATEGORIA_OPTIONS}
+              options={categoriaOptions}
               selected={categoria?.slug}
               onSelect={(opt) => {
                 setCategoria(opt);

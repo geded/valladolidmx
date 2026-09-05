@@ -465,5 +465,9 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
         answer: (f.answer as string) ?? "",
         position: Number(f.position ?? 0),
       })),
+      // Vista previa del Portal: los atributos se editan en su propio panel;
+      // aquí no se resuelven (la ficha pública sí los proyecta).
+      attributes: [],
+      category_label: null,
     };
   });

@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
+  coerceAttributesToDefinitions,
   normalizeFilterAttributes,
   type TourismAttributeDefinition,
   type TourismFilterAttributes,
@@ -38,6 +39,13 @@ async function loadProduct(supabase: any, productId: string) {
   return data;
 }
 
+/**
+ * Acceso: miembro activo de la empresa con el rol mínimo (Portal Empresa) o
+ * personal editorial interno (CMS: admin/editor). Ambas comprobaciones corren
+ * con la sesión de la persona; la escritura final sigue sujeta a RLS y a los
+ * disparadores de campos reservados (Lote 3A): este editor sólo toca
+ * `filter_attributes`, nunca publicación, verificación ni posicionamiento.
+ */
 async function assertAccess(
   supabase: any,
   userId: string,
@@ -50,7 +58,12 @@ async function assertAccess(
     _min_role: role,
   });
   if (error) throw new Error(`access_check_failed: ${error.message}`);
-  if (!data) throw new Error("forbidden_business_access");
+  if (data) return;
+  const { data: editorial, error: editorialError } = await supabase.rpc("is_editor_or_admin", {
+    _user_id: userId,
+  });
+  if (editorialError) throw new Error(`access_check_failed: ${editorialError.message}`);
+  if (!editorial) throw new Error("forbidden_business_access");
 }
 
 async function readEditorDTO(supabase: any, product: any): Promise<ProductAttributeEditorDTO> {
@@ -91,7 +104,12 @@ async function readEditorDTO(supabase: any, product: any): Promise<ProductAttrib
     productId: product.id,
     family,
     editable: true,
-    values: normalizeFilterAttributes(product.filter_attributes),
+    // Forma alineada al catálogo: ejes `single` como cadena aunque el registro
+    // los haya guardado como arreglo (sembrados DEMO), `multi` como arreglo.
+    values: coerceAttributesToDefinitions(
+      normalizeFilterAttributes(product.filter_attributes),
+      mapped,
+    ),
     definitions: mapped,
   };
 }
@@ -119,18 +137,10 @@ export const updateProductAttributes = createServerFn({ method: "POST" })
     const editor = await readEditorDTO(supabase, product);
     if (!editor.editable) throw new Error("attributes_not_supported_for_product_type");
 
-    const cleaned: TourismFilterAttributes = {};
+    // Sólo valores del catálogo, con la forma de cada eje; lo no confirmado
+    // se omite (nunca se completa).
+    const cleaned = coerceAttributesToDefinitions(data.values, editor.definitions);
     for (const definition of editor.definitions) {
-      const raw = data.values[definition.key];
-      const allowed = new Set(definition.options.map((option) => option.value));
-      if (definition.inputType === "single") {
-        if (typeof raw === "string" && allowed.has(raw)) cleaned[definition.key] = raw;
-      } else {
-        const values = Array.isArray(raw)
-          ? Array.from(new Set(raw.filter((value) => allowed.has(value))))
-          : [];
-        if (values.length) cleaned[definition.key] = values;
-      }
       if (definition.required && !(definition.key in cleaned))
         throw new Error(`required_attribute:${definition.key}`);
     }
