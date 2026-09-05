@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
+  coerceAttributesToDefinitions,
   normalizeFilterAttributes,
   type TourismAttributeDefinition,
   type TourismFilterAttributes,
