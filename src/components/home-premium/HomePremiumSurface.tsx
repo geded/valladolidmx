@@ -292,7 +292,6 @@ function HeroEditorial({ content }: { content: HomePremiumContent }) {
   );
 }
 
-
 function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
   useHeroAutoplay(content.hero.slides.length, setIndex);
@@ -334,7 +333,6 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
 }
 
 const SectionHead = PremiumSectionHead;
-
 
 function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
@@ -385,7 +383,6 @@ function AluxPlanner({
   };
   return (
     <PremiumAluxBar
-
       question="¿Cómo viajas hoy?"
       selectedParty={selectedParty}
       onSelectParty={onSelectParty}
@@ -393,7 +390,6 @@ function AluxPlanner({
     />
   );
 }
-
 
 function RoutesSection({
   content,
