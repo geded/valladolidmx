@@ -11,6 +11,11 @@ import {
   resolveExperienceCommerce,
   type ExperienceCommerceDecision,
 } from "@/lib/experiences/experience-commerce";
+import {
+  EXPERIENCE_ACCESSIBILITY_ATTRIBUTE_KEY,
+  EXPERIENCE_LANGUAGE_ATTRIBUTE_KEY,
+  EXPERIENCE_TYPE_ATTRIBUTE_KEY,
+} from "@/lib/experiences/experience-attributes";
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 
 export interface ExperienceMediaVM {
