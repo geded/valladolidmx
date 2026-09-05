@@ -73,10 +73,12 @@ export const Route = createFileRoute("/lovable/g4-experience-premium-preview")({
       }
     }
     const listing = await getExperiencesListing({ data: {} }).catch(() => null);
-    const available: AvailableItem[] = (listing?.dto.items ?? []).map((item) => ({
-      slug: item.href.replace(/^\/producto\//, ""),
-      name: item.name,
-    }));
+    const available: AvailableItem[] = (listing?.dto.items ?? [])
+      .filter((item) => typeof item.href === "string" && item.href.startsWith("/producto/"))
+      .map((item) => ({
+        slug: String(item.href).replace(/^\/producto\//, ""),
+        name: item.name,
+      }));
     return { modo: deps.modo, slug: deps.slug, vm: null, available };
   },
   component: ExperiencePremiumPreview,
