@@ -279,12 +279,13 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const phases: Record<string, number> = {};
     const tPrep = Date.now();
     const [rateRes, sessionUpsert, knownProbe] = await Promise.all([
-      supabaseAdmin
-        .rpc("alux_public_check_rate", {
+      Promise.resolve(
+        supabaseAdmin.rpc("alux_public_check_rate", {
           _ip_hash: ipHash,
           _hour_limit: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
           _day_limit: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
-        })
+        }),
+      )
         .then((r) => r.data as unknown)
         .catch(() => null),
       supabaseAdmin
