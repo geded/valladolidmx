@@ -419,6 +419,15 @@ async function buildRealSlots(
   // Territorio primero: el eyebrow del hero identifica el destino real.
   if (entity.destinationName) hero.eyebrow = entity.destinationName;
   else if (entity.categorySlug) hero.eyebrow = entity.categorySlug;
+  /* 3I.2 · Línea de identidad "tipo · destino" con datos reales; sin
+     categoría ni destino capturados, la línea simplemente no existe. */
+  const typeLine = [
+    entity.categorySlug ? entity.categorySlug.replace(/-/g, " ") : null,
+    entity.destinationName,
+  ]
+    .filter((v): v is string => Boolean(v))
+    .join(" · ");
+  if (typeLine) hero.typeLine = typeLine;
   if (heroMedia) {
     hero.mediaUrl = heroMedia.url;
     hero.mediaAlt = heroMedia.alt;
