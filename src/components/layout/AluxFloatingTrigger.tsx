@@ -150,7 +150,6 @@ export function AluxFloatingTrigger() {
   );
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
-  useEffect(() => { (window as unknown as Record<string, unknown>).__aluxOpen = setOpen; (window as unknown as Record<string, unknown>).__aluxOpenState = open; });
 
   /* Lote 3J.1 · La selección estructurada que entrega la superficie invocante
      se conserva mientras el dock está abierto y se consume como contexto vivo
