@@ -38,6 +38,13 @@ async function loadProduct(supabase: any, productId: string) {
   return data;
 }
 
+/**
+ * Acceso: miembro activo de la empresa con el rol mínimo (Portal Empresa) o
+ * personal editorial interno (CMS: admin/editor). Ambas comprobaciones corren
+ * con la sesión de la persona; la escritura final sigue sujeta a RLS y a los
+ * disparadores de campos reservados (Lote 3A): este editor sólo toca
+ * `filter_attributes`, nunca publicación, verificación ni posicionamiento.
+ */
 async function assertAccess(
   supabase: any,
   userId: string,
@@ -50,7 +57,12 @@ async function assertAccess(
     _min_role: role,
   });
   if (error) throw new Error(`access_check_failed: ${error.message}`);
-  if (!data) throw new Error("forbidden_business_access");
+  if (data) return;
+  const { data: editorial, error: editorialError } = await supabase.rpc("is_editor_or_admin", {
+    _user_id: userId,
+  });
+  if (editorialError) throw new Error(`access_check_failed: ${editorialError.message}`);
+  if (!editorial) throw new Error("forbidden_business_access");
 }
 
 async function readEditorDTO(supabase: any, product: any): Promise<ProductAttributeEditorDTO> {
