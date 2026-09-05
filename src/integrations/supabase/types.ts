@@ -7983,6 +7983,12 @@ export type Database = {
             }
             Returns: string
           }
+      cron_hooks_bootstrap_secret: { Args: { _value: string }; Returns: Json }
+      cron_hooks_get_secret: { Args: never; Returns: string }
+      cron_hooks_invoke: {
+        Args: { _include_legacy_apikey?: boolean; _path: string }
+        Returns: number
+      }
       dearmor: { Args: { "": string }; Returns: string }
       delete_business_product_faq: {
         Args: { _faq_id: string }
