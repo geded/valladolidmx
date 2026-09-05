@@ -147,10 +147,40 @@ function ColumnHeading({ children, id }: { children: React.ReactNode; id?: strin
   );
 }
 
+/**
+ * Panel de Alux dentro de la columna editorial. Ocupa el espacio residual de la
+ * última área para cumplir la regla de "sin huecos en blanco" de la plantilla.
+ */
+function AluxPanel({ alux }: { alux: NonNullable<SeoLandingSurfaceVM["alux"]> }) {
+  return (
+    <section
+      aria-label="Alux"
+      className="mt-5 rounded-2xl border border-border bg-surface p-4 first:mt-0"
+    >
+      <div className="flex items-start gap-3">
+        <AluxMark family="avatar" size={48} decorative className="size-11 shrink-0" />
+        <div className="min-w-0">
+          <p className="font-serif text-base leading-tight text-foreground">{alux.heading}</p>
+          {alux.body ? (
+            <p className="mt-1 text-[12.5px] leading-snug text-muted-foreground">{alux.body}</p>
+          ) : null}
+        </div>
+      </div>
+      <span className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-pill border border-border bg-card px-4 text-[13px] font-semibold uppercase tracking-wide text-foreground">
+        {alux.ctaLabel}
+        <Sparkles className="size-4 text-primary" aria-hidden />
+      </span>
+    </section>
+  );
+}
+
 export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   const { hero, trust, intro, features, offers, info, territory, gallery, alux, sections } = vm;
   const featured = offers?.items[0] ?? null;
   const restOffers = offers?.items.slice(1) ?? [];
+  /** Columna que absorbe a Alux: la última del cuerpo editorial. */
+  const aluxColumn = sections.length > 0 ? sections[sections.length - 1] : null;
+
 
   return (
     <div className="pb-8">
