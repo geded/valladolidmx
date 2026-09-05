@@ -164,14 +164,20 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
         >
           {hero.media ? (
             <div className="relative order-1 min-w-0 lg:order-2">
-              <img
-                src={hero.media.url}
-                alt={hero.media.alt}
-                loading="eager"
-                fetchPriority="high"
-                style={focalStyle(hero.media)}
-                className="h-56 w-full object-cover sm:h-72 lg:h-full lg:min-h-[24rem]"
-              />
+              <picture>
+                {hero.mobileMedia ? (
+                  <source media="(max-width: 639px)" srcSet={hero.mobileMedia.url} />
+                ) : null}
+                <img
+                  src={hero.media.url}
+                  alt={hero.media.alt}
+                  loading="eager"
+                  fetchPriority="high"
+                  style={focalStyle(hero.mobileMedia ?? hero.media)}
+                  className="h-56 w-full object-cover sm:h-72 lg:h-full lg:min-h-[24rem]"
+                />
+              </picture>
+
               {hero.saveLabel ? (
                 <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-pill bg-background/85 px-3 py-1.5 text-xs font-medium text-foreground shadow-soft backdrop-blur">
                   <Heart className="size-3.5" aria-hidden />
