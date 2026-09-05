@@ -315,9 +315,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
               <section aria-labelledby="landing-offers" className="min-w-0 sm:px-5">
                 <ColumnHeading id="landing-offers">{offers.heading}</ColumnHeading>
                 <span aria-hidden className="mt-2 block h-px w-10 bg-primary/50" />
-                {featured ? (
-                  <FeaturedOffer item={featured} />
-                ) : null}
+                {featured ? <FeaturedOffer item={featured} /> : null}
                 {restOffers.length > 0 ? (
                   <ul className="mt-3 space-y-2">
                     {restOffers.slice(0, 3).map((item) => (

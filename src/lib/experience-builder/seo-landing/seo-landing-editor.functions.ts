@@ -121,7 +121,6 @@ async function loadMediaOptions(supabase: Db, entityRef: string | null) {
   return items;
 }
 
-
 export const getSeoLandingEditorModel = createServerFn({ method: "GET" })
   .inputValidator((data: { compositionId: string }) => data)
   .middleware([requireSupabaseAuth])

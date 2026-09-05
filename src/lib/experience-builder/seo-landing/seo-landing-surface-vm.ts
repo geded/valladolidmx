@@ -70,7 +70,6 @@ export interface SeoLandingInfoItem {
   readonly icon: SeoLandingInfoIcon;
 }
 
-
 export interface SeoLandingFeatureItem {
   readonly id: string;
   readonly label: string;
@@ -171,7 +170,6 @@ const INFO_ICONS = [
   "ticket",
   "info",
 ] as const;
-
 
 /** Construye el VM de la superficie a partir del árbol persistido. */
 export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfaceVM | null {
@@ -294,7 +292,6 @@ export function buildSeoLandingSurfaceVM(tree: CompositionTree): SeoLandingSurfa
         ? (iconRaw as SeoLandingInfoIcon)
         : "info";
       return label && value ? { id: str(item["id"]) ?? `info-${i}`, label, value, icon } : null;
-
     })
     .filter((v): v is SeoLandingInfoItem => v !== null);
   const info =
