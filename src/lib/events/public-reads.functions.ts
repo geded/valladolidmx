@@ -11,6 +11,10 @@
  * seguras del esquema vigente de `events` (sin nuevas columnas).
  */
 import { createServerFn } from "@tanstack/react-start";
+import {
+  normalizeFilterAttributes,
+  type TourismFilterAttributes,
+} from "@/lib/business-attributes/types";
 
 export interface PublicEventCard {
   id: string;
@@ -22,8 +26,19 @@ export interface PublicEventCard {
   venue_name: string | null;
   is_free: boolean;
   destination_slug: string | null;
+  destination_name: string | null;
   cover_url: string | null;
+  /**
+   * Atributos estructurados administrables (event_type, audience,
+   * admission_type, time_of_day, venue_type, accessibility,
+   * reservation_required). Vacío cuando el CMS no los capturó: nunca se
+   * infieren ni se inventan.
+   */
+  filter_attributes: TourismFilterAttributes;
+  latitude: number | null;
+  longitude: number | null;
 }
+
 
 export interface PublicEventDetail extends PublicEventCard {
   body: string | null;
@@ -73,7 +88,7 @@ function isSlug(s: unknown): s is string {
 }
 
 const SELECT_CARD =
-  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id, cover_media_id, destinations:destination_id ( slug ), media_assets:cover_media_id ( storage_bucket, storage_path )";
+  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, filter_attributes, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
 
 type CardRow = {
   id: string;
@@ -84,9 +99,15 @@ type CardRow = {
   ends_at: string | null;
   venue_name: string | null;
   is_free: boolean;
+  filter_attributes?: unknown;
   destination_id: string | null;
   cover_media_id: string | null;
-  destinations?: { slug?: string | null } | null;
+  destinations?: {
+    slug?: string | null;
+    name?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
   media_assets?: { storage_bucket?: string | null; storage_path?: string | null } | null;
 };
 
@@ -102,12 +123,17 @@ async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEven
       venue_name: r.venue_name ?? null,
       is_free: Boolean(r.is_free),
       destination_slug: r.destinations?.slug ?? null,
+      destination_name: r.destinations?.name ?? null,
+      filter_attributes: normalizeFilterAttributes(r.filter_attributes),
+      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
+      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
       cover_url: withCover
         ? await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path)
         : null,
     })),
   );
 }
+
 
 export const listPublishedEvents = createServerFn({ method: "GET" })
   .inputValidator(
@@ -272,8 +298,9 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("events")
       .select(
-        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name ), media_assets:cover_media_id ( storage_bucket, storage_path ), businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
+        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, filter_attributes, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path ), businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
       )
+
       .eq("slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
@@ -312,7 +339,11 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       ? (biz!.business_categories?.slug ?? null)
       : null;
     return {
+      filter_attributes: normalizeFilterAttributes(r.filter_attributes),
+      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
+      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
       id: r.id,
+
       slug: r.slug,
       title: r.title,
       summary: r.summary ?? null,

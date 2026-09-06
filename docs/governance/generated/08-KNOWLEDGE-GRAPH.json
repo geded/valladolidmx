@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-31T00:00:00.000Z",
+  "generated_at": "2026-09-06T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "b71a9a158aeee017c124a5f6963a35c649e3f798f9a7e346a4edbe709a52dc81"
+      "source_sha256": "68362f80afb649d256a81fcaa02a466546f405814dfbbcb3c262aff672e88a15"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -16081,6 +16081,975 @@
       "path": "docs/governance/product-authorizations/PCA-2026-060.json",
       "source": "docs/governance/product-authorizations/PCA-2026-060.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-060.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md"
+    },
+    {
+      "id": "ART:src/lib/business-attributes/types.ts",
+      "type": "artifact",
+      "path": "src/lib/business-attributes/types.ts",
+      "source": "src/lib/business-attributes/types.ts",
+      "evidence": "src/lib/business-attributes/types.ts"
+    },
+    {
+      "id": "ART:src/lib/portal/business-attributes.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/portal/business-attributes.functions.ts",
+      "source": "src/lib/portal/business-attributes.functions.ts",
+      "evidence": "src/lib/portal/business-attributes.functions.ts"
+    },
+    {
+      "id": "ART:src/components/cms/BusinessAttributesPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/BusinessAttributesPanel.tsx",
+      "source": "src/components/cms/BusinessAttributesPanel.tsx",
+      "evidence": "src/components/cms/BusinessAttributesPanel.tsx"
+    },
+    {
+      "id": "ART:src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "source": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "evidence": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-f/territorial-filter-attributes.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-f/territorial-filter-attributes.contract.test.ts",
+      "source": "scripts/omxds/r1-f/territorial-filter-attributes.contract.test.ts",
+      "evidence": "scripts/omxds/r1-f/territorial-filter-attributes.contract.test.ts"
+    },
+    {
+      "id": "ART:.lovable/plan.md",
+      "type": "artifact",
+      "path": ".lovable/plan.md",
+      "source": ".lovable/plan.md",
+      "evidence": ".lovable/plan.md"
+    },
+    {
+      "id": "ART:public/brand/institutional/manifest.json",
+      "type": "artifact",
+      "path": "public/brand/institutional/manifest.json",
+      "source": "public/brand/institutional/manifest.json",
+      "evidence": "public/brand/institutional/manifest.json"
+    },
+    {
+      "id": "ART:public/brand/institutional/pueblos-magicos-oficial.webp",
+      "type": "artifact",
+      "path": "public/brand/institutional/pueblos-magicos-oficial.webp",
+      "source": "public/brand/institutional/pueblos-magicos-oficial.webp",
+      "evidence": "public/brand/institutional/pueblos-magicos-oficial.webp"
+    },
+    {
+      "id": "ART:public/media/preview-generated/hoteles-hero-manifest.json",
+      "type": "artifact",
+      "path": "public/media/preview-generated/hoteles-hero-manifest.json",
+      "source": "public/media/preview-generated/hoteles-hero-manifest.json",
+      "evidence": "public/media/preview-generated/hoteles-hero-manifest.json"
+    },
+    {
+      "id": "ART:public/media/preview-generated/manifest.json",
+      "type": "artifact",
+      "path": "public/media/preview-generated/manifest.json",
+      "source": "public/media/preview-generated/manifest.json",
+      "evidence": "public/media/preview-generated/manifest.json"
+    },
+    {
+      "id": "ART:public/media/preview-generated/oriente-maya-hero-manifest.json",
+      "type": "artifact",
+      "path": "public/media/preview-generated/oriente-maya-hero-manifest.json",
+      "source": "public/media/preview-generated/oriente-maya-hero-manifest.json",
+      "evidence": "public/media/preview-generated/oriente-maya-hero-manifest.json"
+    },
+    {
+      "id": "ART:public/media/preview-generated/restaurantes-media-manifest.json",
+      "type": "artifact",
+      "path": "public/media/preview-generated/restaurantes-media-manifest.json",
+      "source": "public/media/preview-generated/restaurantes-media-manifest.json",
+      "evidence": "public/media/preview-generated/restaurantes-media-manifest.json"
+    },
+    {
+      "id": "ART:scripts/cron/cron-dry-run.test.ts",
+      "type": "artifact",
+      "path": "scripts/cron/cron-dry-run.test.ts",
+      "source": "scripts/cron/cron-dry-run.test.ts",
+      "evidence": "scripts/cron/cron-dry-run.test.ts"
+    },
+    {
+      "id": "ART:scripts/cron/cron-hook-auth.test.ts",
+      "type": "artifact",
+      "path": "scripts/cron/cron-hook-auth.test.ts",
+      "source": "scripts/cron/cron-hook-auth.test.ts",
+      "evidence": "scripts/cron/cron-hook-auth.test.ts"
+    },
+    {
+      "id": "ART:scripts/cron/cron-jobs-isolation.test.ts",
+      "type": "artifact",
+      "path": "scripts/cron/cron-jobs-isolation.test.ts",
+      "source": "scripts/cron/cron-jobs-isolation.test.ts",
+      "evidence": "scripts/cron/cron-jobs-isolation.test.ts"
+    },
+    {
+      "id": "ART:scripts/cron/fake-supabase.ts",
+      "type": "artifact",
+      "path": "scripts/cron/fake-supabase.ts",
+      "source": "scripts/cron/fake-supabase.ts",
+      "evidence": "scripts/cron/fake-supabase.ts"
+    },
+    {
+      "id": "ART:scripts/experiences/experience-commerce.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/experiences/experience-commerce.contract.test.ts",
+      "source": "scripts/experiences/experience-commerce.contract.test.ts",
+      "evidence": "scripts/experiences/experience-commerce.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/experiences/public-data-sources.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/experiences/public-data-sources.contract.test.ts",
+      "source": "scripts/experiences/public-data-sources.contract.test.ts",
+      "evidence": "scripts/experiences/public-data-sources.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/maps/google-maps-loader.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/maps/google-maps-loader.contract.test.ts",
+      "source": "scripts/maps/google-maps-loader.contract.test.ts",
+      "evidence": "scripts/maps/google-maps-loader.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/maps/map-fallback.contract.test.tsx",
+      "type": "artifact",
+      "path": "scripts/maps/map-fallback.contract.test.tsx",
+      "source": "scripts/maps/map-fallback.contract.test.tsx",
+      "evidence": "scripts/maps/map-fallback.contract.test.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/l3b-a/emit-home-config.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/l3b-a/emit-home-config.ts",
+      "source": "scripts/omxds/l3b-a/emit-home-config.ts",
+      "evidence": "scripts/omxds/l3b-a/emit-home-config.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts",
+      "source": "scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts",
+      "evidence": "scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/l3k/alux-converse.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/l3k/alux-converse.contract.test.ts",
+      "source": "scripts/omxds/l3k/alux-converse.contract.test.ts",
+      "evidence": "scripts/omxds/l3k/alux-converse.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/l3k/alux-converse.grounding.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/l3k/alux-converse.grounding.test.ts",
+      "source": "scripts/omxds/l3k/alux-converse.grounding.test.ts",
+      "evidence": "scripts/omxds/l3k/alux-converse.grounding.test.ts"
+    },
+    {
+      "id": "ART:src/components/alux/AluxConverseChat.tsx",
+      "type": "artifact",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "source": "src/components/alux/AluxConverseChat.tsx",
+      "evidence": "src/components/alux/AluxConverseChat.tsx"
+    },
+    {
+      "id": "ART:src/components/alux/TourismAluxPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/alux/TourismAluxPanel.tsx",
+      "source": "src/components/alux/TourismAluxPanel.tsx",
+      "evidence": "src/components/alux/TourismAluxPanel.tsx"
+    },
+    {
+      "id": "ART:src/components/cms/EditorialRouteEditor.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/EditorialRouteEditor.tsx",
+      "source": "src/components/cms/EditorialRouteEditor.tsx",
+      "evidence": "src/components/cms/EditorialRouteEditor.tsx"
+    },
+    {
+      "id": "ART:src/components/cms/EditorialRouteStopsPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/EditorialRouteStopsPanel.tsx",
+      "source": "src/components/cms/EditorialRouteStopsPanel.tsx",
+      "evidence": "src/components/cms/EditorialRouteStopsPanel.tsx"
+    },
+    {
+      "id": "ART:src/components/cms/EventAttributesPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/EventAttributesPanel.tsx",
+      "source": "src/components/cms/EventAttributesPanel.tsx",
+      "evidence": "src/components/cms/EventAttributesPanel.tsx"
+    },
+    {
+      "id": "ART:src/components/cms/EventEditor.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/EventEditor.tsx",
+      "source": "src/components/cms/EventEditor.tsx",
+      "evidence": "src/components/cms/EventEditor.tsx"
+    },
+    {
+      "id": "ART:src/components/cms/ProductAttributesPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/ProductAttributesPanel.tsx",
+      "source": "src/components/cms/ProductAttributesPanel.tsx",
+      "evidence": "src/components/cms/ProductAttributesPanel.tsx"
+    },
+    {
+      "id": "ART:src/components/cms/SeoLandingContentEditor.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/SeoLandingContentEditor.tsx",
+      "source": "src/components/cms/SeoLandingContentEditor.tsx",
+      "evidence": "src/components/cms/SeoLandingContentEditor.tsx"
+    },
+    {
+      "id": "ART:src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+      "source": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+      "evidence": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/destination-premium/DestinationsAtlasSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/destination-premium/DestinationsAtlasSurface.tsx",
+      "source": "src/components/destination-premium/DestinationsAtlasSurface.tsx",
+      "evidence": "src/components/destination-premium/DestinationsAtlasSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "source": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "evidence": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/destination-premium/destinations-atlas-content.ts",
+      "type": "artifact",
+      "path": "src/components/destination-premium/destinations-atlas-content.ts",
+      "source": "src/components/destination-premium/destinations-atlas-content.ts",
+      "evidence": "src/components/destination-premium/destinations-atlas-content.ts"
+    },
+    {
+      "id": "ART:src/components/experience-premium/ExperienceFiltersBar.tsx",
+      "type": "artifact",
+      "path": "src/components/experience-premium/ExperienceFiltersBar.tsx",
+      "source": "src/components/experience-premium/ExperienceFiltersBar.tsx",
+      "evidence": "src/components/experience-premium/ExperienceFiltersBar.tsx"
+    },
+    {
+      "id": "ART:src/components/experience-premium/ExperiencePremiumSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/experience-premium/ExperiencePremiumSurface.tsx",
+      "source": "src/components/experience-premium/ExperiencePremiumSurface.tsx",
+      "evidence": "src/components/experience-premium/ExperiencePremiumSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/experience-premium/ExperiencesListingSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/experience-premium/ExperiencesListingSurface.tsx",
+      "source": "src/components/experience-premium/ExperiencesListingSurface.tsx",
+      "evidence": "src/components/experience-premium/ExperiencesListingSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/experience-premium/experience-premium-vm.ts",
+      "type": "artifact",
+      "path": "src/components/experience-premium/experience-premium-vm.ts",
+      "source": "src/components/experience-premium/experience-premium-vm.ts",
+      "evidence": "src/components/experience-premium/experience-premium-vm.ts"
+    },
+    {
+      "id": "ART:src/components/home-premium/shared/PremiumShowcase.tsx",
+      "type": "artifact",
+      "path": "src/components/home-premium/shared/PremiumShowcase.tsx",
+      "source": "src/components/home-premium/shared/PremiumShowcase.tsx",
+      "evidence": "src/components/home-premium/shared/PremiumShowcase.tsx"
+    },
+    {
+      "id": "ART:src/components/layout/CompactCrumbs.tsx",
+      "type": "artifact",
+      "path": "src/components/layout/CompactCrumbs.tsx",
+      "source": "src/components/layout/CompactCrumbs.tsx",
+      "evidence": "src/components/layout/CompactCrumbs.tsx"
+    },
+    {
+      "id": "ART:src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "source": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "evidence": "src/components/listing-premium/TerritorialListingReviewSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/maps/MapUnavailableFallback.tsx",
+      "type": "artifact",
+      "path": "src/components/maps/MapUnavailableFallback.tsx",
+      "source": "src/components/maps/MapUnavailableFallback.tsx",
+      "evidence": "src/components/maps/MapUnavailableFallback.tsx"
+    },
+    {
+      "id": "ART:src/components/omxds/TourismChip.tsx",
+      "type": "artifact",
+      "path": "src/components/omxds/TourismChip.tsx",
+      "source": "src/components/omxds/TourismChip.tsx",
+      "evidence": "src/components/omxds/TourismChip.tsx"
+    },
+    {
+      "id": "ART:src/components/routes-premium/RoutePremiumSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/routes-premium/RoutePremiumSurface.tsx",
+      "source": "src/components/routes-premium/RoutePremiumSurface.tsx",
+      "evidence": "src/components/routes-premium/RoutePremiumSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/routes-premium/RoutesListingSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/routes-premium/RoutesListingSurface.tsx",
+      "source": "src/components/routes-premium/RoutesListingSurface.tsx",
+      "evidence": "src/components/routes-premium/RoutesListingSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/seo-landing/SeoLandingSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/seo-landing/SeoLandingSurface.tsx",
+      "source": "src/components/seo-landing/SeoLandingSurface.tsx",
+      "evidence": "src/components/seo-landing/SeoLandingSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/surfaces/EventPremiumSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/surfaces/EventPremiumSurface.tsx",
+      "source": "src/components/surfaces/EventPremiumSurface.tsx",
+      "evidence": "src/components/surfaces/EventPremiumSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/travel-plan/TravelPlanBand.tsx",
+      "type": "artifact",
+      "path": "src/components/travel-plan/TravelPlanBand.tsx",
+      "source": "src/components/travel-plan/TravelPlanBand.tsx",
+      "evidence": "src/components/travel-plan/TravelPlanBand.tsx"
+    },
+    {
+      "id": "ART:src/config/brand.ts",
+      "type": "artifact",
+      "path": "src/config/brand.ts",
+      "source": "src/config/brand.ts",
+      "evidence": "src/config/brand.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/converse-contract.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/converse-contract.ts",
+      "source": "src/lib/alux/converse-contract.ts",
+      "evidence": "src/lib/alux/converse-contract.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/converse-grounding.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/converse-grounding.ts",
+      "source": "src/lib/alux/converse-grounding.ts",
+      "evidence": "src/lib/alux/converse-grounding.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/converse-retrieval.server.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/converse-retrieval.server.ts",
+      "source": "src/lib/alux/converse-retrieval.server.ts",
+      "evidence": "src/lib/alux/converse-retrieval.server.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/converse.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/converse.functions.ts",
+      "source": "src/lib/alux/converse.functions.ts",
+      "evidence": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/embedded-presence.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/embedded-presence.ts",
+      "source": "src/lib/alux/embedded-presence.ts",
+      "evidence": "src/lib/alux/embedded-presence.ts"
+    },
+    {
+      "id": "ART:src/lib/brand/brand-context.tsx",
+      "type": "artifact",
+      "path": "src/lib/brand/brand-context.tsx",
+      "source": "src/lib/brand/brand-context.tsx",
+      "evidence": "src/lib/brand/brand-context.tsx"
+    },
+    {
+      "id": "ART:src/lib/brand/brand-settings.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/brand/brand-settings.functions.ts",
+      "source": "src/lib/brand/brand-settings.functions.ts",
+      "evidence": "src/lib/brand/brand-settings.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/cms/editorial-route-stops.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/cms/editorial-route-stops.functions.ts",
+      "source": "src/lib/cms/editorial-route-stops.functions.ts",
+      "evidence": "src/lib/cms/editorial-route-stops.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/cms/event-attributes.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/cms/event-attributes.functions.ts",
+      "source": "src/lib/cms/event-attributes.functions.ts",
+      "evidence": "src/lib/cms/event-attributes.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/cms/home-featured-categories-query.ts",
+      "type": "artifact",
+      "path": "src/lib/cms/home-featured-categories-query.ts",
+      "source": "src/lib/cms/home-featured-categories-query.ts",
+      "evidence": "src/lib/cms/home-featured-categories-query.ts"
+    },
+    {
+      "id": "ART:src/lib/cron/cron-dry-run.server.ts",
+      "type": "artifact",
+      "path": "src/lib/cron/cron-dry-run.server.ts",
+      "source": "src/lib/cron/cron-dry-run.server.ts",
+      "evidence": "src/lib/cron/cron-dry-run.server.ts"
+    },
+    {
+      "id": "ART:src/lib/cron/cron-hook-auth.server.ts",
+      "type": "artifact",
+      "path": "src/lib/cron/cron-hook-auth.server.ts",
+      "source": "src/lib/cron/cron-hook-auth.server.ts",
+      "evidence": "src/lib/cron/cron-hook-auth.server.ts"
+    },
+    {
+      "id": "ART:src/lib/cron/jobs/coupon-review-reminders.server.ts",
+      "type": "artifact",
+      "path": "src/lib/cron/jobs/coupon-review-reminders.server.ts",
+      "source": "src/lib/cron/jobs/coupon-review-reminders.server.ts",
+      "evidence": "src/lib/cron/jobs/coupon-review-reminders.server.ts"
+    },
+    {
+      "id": "ART:src/lib/cron/jobs/trip-journey-emails.server.ts",
+      "type": "artifact",
+      "path": "src/lib/cron/jobs/trip-journey-emails.server.ts",
+      "source": "src/lib/cron/jobs/trip-journey-emails.server.ts",
+      "evidence": "src/lib/cron/jobs/trip-journey-emails.server.ts"
+    },
+    {
+      "id": "ART:src/lib/cron/jobs/visibility-notifications.server.ts",
+      "type": "artifact",
+      "path": "src/lib/cron/jobs/visibility-notifications.server.ts",
+      "source": "src/lib/cron/jobs/visibility-notifications.server.ts",
+      "evidence": "src/lib/cron/jobs/visibility-notifications.server.ts"
+    },
+    {
+      "id": "ART:src/lib/destinations/atlas-taxonomy.ts",
+      "type": "artifact",
+      "path": "src/lib/destinations/atlas-taxonomy.ts",
+      "source": "src/lib/destinations/atlas-taxonomy.ts",
+      "evidence": "src/lib/destinations/atlas-taxonomy.ts"
+    },
+    {
+      "id": "ART:src/lib/destinations/destination-labels.ts",
+      "type": "artifact",
+      "path": "src/lib/destinations/destination-labels.ts",
+      "source": "src/lib/destinations/destination-labels.ts",
+      "evidence": "src/lib/destinations/destination-labels.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/home-materialization.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/home-materialization.ts",
+      "source": "src/lib/experience-builder/home-materialization.ts",
+      "evidence": "src/lib/experience-builder/home-materialization.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts",
+      "source": "src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts",
+      "evidence": "src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "source": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "evidence": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts",
+      "source": "src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts",
+      "evidence": "src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts"
+    },
+    {
+      "id": "ART:src/lib/experiences/experience-attributes.ts",
+      "type": "artifact",
+      "path": "src/lib/experiences/experience-attributes.ts",
+      "source": "src/lib/experiences/experience-attributes.ts",
+      "evidence": "src/lib/experiences/experience-attributes.ts"
+    },
+    {
+      "id": "ART:src/lib/experiences/experience-commerce.ts",
+      "type": "artifact",
+      "path": "src/lib/experiences/experience-commerce.ts",
+      "source": "src/lib/experiences/experience-commerce.ts",
+      "evidence": "src/lib/experiences/experience-commerce.ts"
+    },
+    {
+      "id": "ART:src/lib/experiences/experience-public-reads.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/experiences/experience-public-reads.functions.ts",
+      "source": "src/lib/experiences/experience-public-reads.functions.ts",
+      "evidence": "src/lib/experiences/experience-public-reads.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/experiences/experience-public-reads.server.ts",
+      "type": "artifact",
+      "path": "src/lib/experiences/experience-public-reads.server.ts",
+      "source": "src/lib/experiences/experience-public-reads.server.ts",
+      "evidence": "src/lib/experiences/experience-public-reads.server.ts"
+    },
+    {
+      "id": "ART:src/lib/institutional/institutional-authority.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/institutional/institutional-authority.functions.ts",
+      "source": "src/lib/institutional/institutional-authority.functions.ts",
+      "evidence": "src/lib/institutional/institutional-authority.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/institutional/institutional-authority.ts",
+      "type": "artifact",
+      "path": "src/lib/institutional/institutional-authority.ts",
+      "source": "src/lib/institutional/institutional-authority.ts",
+      "evidence": "src/lib/institutional/institutional-authority.ts"
+    },
+    {
+      "id": "ART:src/lib/institutional/institutional-context.ts",
+      "type": "artifact",
+      "path": "src/lib/institutional/institutional-context.ts",
+      "source": "src/lib/institutional/institutional-context.ts",
+      "evidence": "src/lib/institutional/institutional-context.ts"
+    },
+    {
+      "id": "ART:src/lib/listings/listing-family-taxonomy.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/listings/listing-family-taxonomy.functions.ts",
+      "source": "src/lib/listings/listing-family-taxonomy.functions.ts",
+      "evidence": "src/lib/listings/listing-family-taxonomy.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/maps/google-maps-loader.ts",
+      "type": "artifact",
+      "path": "src/lib/maps/google-maps-loader.ts",
+      "source": "src/lib/maps/google-maps-loader.ts",
+      "evidence": "src/lib/maps/google-maps-loader.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-review-fixtures.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-review-fixtures.ts",
+      "source": "src/lib/places/place-review-fixtures.ts",
+      "evidence": "src/lib/places/place-review-fixtures.ts"
+    },
+    {
+      "id": "ART:src/lib/portal/product-attributes.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/portal/product-attributes.functions.ts",
+      "source": "src/lib/portal/product-attributes.functions.ts",
+      "evidence": "src/lib/portal/product-attributes.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/routes-editorial/route-public-contract.ts",
+      "type": "artifact",
+      "path": "src/lib/routes-editorial/route-public-contract.ts",
+      "source": "src/lib/routes-editorial/route-public-contract.ts",
+      "evidence": "src/lib/routes-editorial/route-public-contract.ts"
+    },
+    {
+      "id": "ART:src/lib/routes-editorial/route-public-reads.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/routes-editorial/route-public-reads.functions.ts",
+      "source": "src/lib/routes-editorial/route-public-reads.functions.ts",
+      "evidence": "src/lib/routes-editorial/route-public-reads.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/routes-editorial/route-public-reads.server.ts",
+      "type": "artifact",
+      "path": "src/lib/routes-editorial/route-public-reads.server.ts",
+      "source": "src/lib/routes-editorial/route-public-reads.server.ts",
+      "evidence": "src/lib/routes-editorial/route-public-reads.server.ts"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/distintivos.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/distintivos.tsx",
+      "source": "src/routes/_authenticated/cms/distintivos.tsx",
+      "evidence": "src/routes/_authenticated/cms/distintivos.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/eventos.$eventId.editar.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx",
+      "source": "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx",
+      "evidence": "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/eventos.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/eventos.index.tsx",
+      "source": "src/routes/_authenticated/cms/eventos.index.tsx",
+      "evidence": "src/routes/_authenticated/cms/eventos.index.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/eventos.nuevo.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/eventos.nuevo.tsx",
+      "source": "src/routes/_authenticated/cms/eventos.nuevo.tsx",
+      "evidence": "src/routes/_authenticated/cms/eventos.nuevo.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/landing-seo.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/landing-seo.tsx",
+      "source": "src/routes/_authenticated/cms/landing-seo.tsx",
+      "evidence": "src/routes/_authenticated/cms/landing-seo.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/marca.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/marca.tsx",
+      "source": "src/routes/_authenticated/cms/marca.tsx",
+      "evidence": "src/routes/_authenticated/cms/marca.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/rutas.$id.editar.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/rutas.$id.editar.tsx",
+      "source": "src/routes/_authenticated/cms/rutas.$id.editar.tsx",
+      "evidence": "src/routes/_authenticated/cms/rutas.$id.editar.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/rutas.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/rutas.index.tsx",
+      "source": "src/routes/_authenticated/cms/rutas.index.tsx",
+      "evidence": "src/routes/_authenticated/cms/rutas.index.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/rutas.nueva.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/rutas.nueva.tsx",
+      "source": "src/routes/_authenticated/cms/rutas.nueva.tsx",
+      "evidence": "src/routes/_authenticated/cms/rutas.nueva.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/founder-home-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/founder-home-premium-preview.tsx",
+      "source": "src/routes/lovable/founder-home-premium-preview.tsx",
+      "evidence": "src/routes/lovable/founder-home-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/founder-zazil-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/founder-zazil-premium-preview.tsx",
+      "source": "src/routes/lovable/founder-zazil-premium-preview.tsx",
+      "evidence": "src/routes/lovable/founder-zazil-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-destination-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-destination-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-destination-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-destination-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-event-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-event-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-event-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-event-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-event-profile-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-event-profile-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-event-profile-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-event-profile-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-experience-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-experience-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-experience-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-experience-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-place-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-place-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-place-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-place-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-place-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-place-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-place-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-place-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-restaurant-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-restaurant-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-restaurant-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-restaurant-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/territorial-listing-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/territorial-listing-premium-preview.tsx",
+      "source": "src/routes/lovable/territorial-listing-premium-preview.tsx",
+      "evidence": "src/routes/lovable/territorial-listing-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lugares.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/lugares.index.tsx",
+      "source": "src/routes/lugares.index.tsx",
+      "evidence": "src/routes/lugares.index.tsx"
+    },
+    {
+      "id": "ART:src/routes/lugares.tsx",
+      "type": "artifact",
+      "path": "src/routes/lugares.tsx",
+      "source": "src/routes/lugares.tsx",
+      "evidence": "src/routes/lugares.tsx"
+    },
+    {
+      "id": "ART:src/routes/oriente-maya/$destino.lugares.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/oriente-maya/$destino.lugares.index.tsx",
+      "source": "src/routes/oriente-maya/$destino.lugares.index.tsx",
+      "evidence": "src/routes/oriente-maya/$destino.lugares.index.tsx"
+    },
+    {
+      "id": "ART:src/routes/oriente-maya/destinos.tsx",
+      "type": "artifact",
+      "path": "src/routes/oriente-maya/destinos.tsx",
+      "source": "src/routes/oriente-maya/destinos.tsx",
+      "evidence": "src/routes/oriente-maya/destinos.tsx"
+    },
+    {
+      "id": "ART:src/routes/rutas.$slug.tsx",
+      "type": "artifact",
+      "path": "src/routes/rutas.$slug.tsx",
+      "source": "src/routes/rutas.$slug.tsx",
+      "evidence": "src/routes/rutas.$slug.tsx"
+    },
+    {
+      "id": "ART:src/routes/rutas.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/rutas.index.tsx",
+      "source": "src/routes/rutas.index.tsx",
+      "evidence": "src/routes/rutas.index.tsx"
+    },
+    {
+      "id": "ART:supabase/migrations/20260902213000_territorial_filter_attributes_v1.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260902213000_territorial_filter_attributes_v1.sql",
+      "source": "supabase/migrations/20260902213000_territorial_filter_attributes_v1.sql",
+      "evidence": "supabase/migrations/20260902213000_territorial_filter_attributes_v1.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903013000_restaurant_filter_attributes_v1.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903013000_restaurant_filter_attributes_v1.sql",
+      "source": "supabase/migrations/20260903013000_restaurant_filter_attributes_v1.sql",
+      "evidence": "supabase/migrations/20260903013000_restaurant_filter_attributes_v1.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903023000_vacation_rental_filter_attributes_v1.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903023000_vacation_rental_filter_attributes_v1.sql",
+      "source": "supabase/migrations/20260903023000_vacation_rental_filter_attributes_v1.sql",
+      "evidence": "supabase/migrations/20260903023000_vacation_rental_filter_attributes_v1.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903023210_d025074d-1e5b-4028-bd27-79d21d6f1494.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903023210_d025074d-1e5b-4028-bd27-79d21d6f1494.sql",
+      "source": "supabase/migrations/20260903023210_d025074d-1e5b-4028-bd27-79d21d6f1494.sql",
+      "evidence": "supabase/migrations/20260903023210_d025074d-1e5b-4028-bd27-79d21d6f1494.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903023402_5887500b-f861-4dca-b469-14761fb35dfa.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903023402_5887500b-f861-4dca-b469-14761fb35dfa.sql",
+      "source": "supabase/migrations/20260903023402_5887500b-f861-4dca-b469-14761fb35dfa.sql",
+      "evidence": "supabase/migrations/20260903023402_5887500b-f861-4dca-b469-14761fb35dfa.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903023452_51e50763-f3fe-4328-8c5d-81968761dd35.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903023452_51e50763-f3fe-4328-8c5d-81968761dd35.sql",
+      "source": "supabase/migrations/20260903023452_51e50763-f3fe-4328-8c5d-81968761dd35.sql",
+      "evidence": "supabase/migrations/20260903023452_51e50763-f3fe-4328-8c5d-81968761dd35.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903034214_0b6169be-6b33-47e9-9d15-c33eb963e67e.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903034214_0b6169be-6b33-47e9-9d15-c33eb963e67e.sql",
+      "source": "supabase/migrations/20260903034214_0b6169be-6b33-47e9-9d15-c33eb963e67e.sql",
+      "evidence": "supabase/migrations/20260903034214_0b6169be-6b33-47e9-9d15-c33eb963e67e.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903041734_c548c58f-2fde-44e0-bb29-bda6486d8099.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903041734_c548c58f-2fde-44e0-bb29-bda6486d8099.sql",
+      "source": "supabase/migrations/20260903041734_c548c58f-2fde-44e0-bb29-bda6486d8099.sql",
+      "evidence": "supabase/migrations/20260903041734_c548c58f-2fde-44e0-bb29-bda6486d8099.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260903052909_52a07676-0238-49c2-9c04-55d31f283242.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260903052909_52a07676-0238-49c2-9c04-55d31f283242.sql",
+      "source": "supabase/migrations/20260903052909_52a07676-0238-49c2-9c04-55d31f283242.sql",
+      "evidence": "supabase/migrations/20260903052909_52a07676-0238-49c2-9c04-55d31f283242.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904040225_44900315-3f2a-4e3e-9dbb-6840437596fe.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904040225_44900315-3f2a-4e3e-9dbb-6840437596fe.sql",
+      "source": "supabase/migrations/20260904040225_44900315-3f2a-4e3e-9dbb-6840437596fe.sql",
+      "evidence": "supabase/migrations/20260904040225_44900315-3f2a-4e3e-9dbb-6840437596fe.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904180305_7f8dbe90-b282-481c-a338-931b4203d613.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904180305_7f8dbe90-b282-481c-a338-931b4203d613.sql",
+      "source": "supabase/migrations/20260904180305_7f8dbe90-b282-481c-a338-931b4203d613.sql",
+      "evidence": "supabase/migrations/20260904180305_7f8dbe90-b282-481c-a338-931b4203d613.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904180342_6127d31f-ca7a-4459-977f-cba5bc1625d8.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904180342_6127d31f-ca7a-4459-977f-cba5bc1625d8.sql",
+      "source": "supabase/migrations/20260904180342_6127d31f-ca7a-4459-977f-cba5bc1625d8.sql",
+      "evidence": "supabase/migrations/20260904180342_6127d31f-ca7a-4459-977f-cba5bc1625d8.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904202715_903e54d3-627a-43d1-aa7d-9ffa13ee9f3d.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904202715_903e54d3-627a-43d1-aa7d-9ffa13ee9f3d.sql",
+      "source": "supabase/migrations/20260904202715_903e54d3-627a-43d1-aa7d-9ffa13ee9f3d.sql",
+      "evidence": "supabase/migrations/20260904202715_903e54d3-627a-43d1-aa7d-9ffa13ee9f3d.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904202925_95ea4e5f-d57e-4871-8f60-f84277478a7f.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904202925_95ea4e5f-d57e-4871-8f60-f84277478a7f.sql",
+      "source": "supabase/migrations/20260904202925_95ea4e5f-d57e-4871-8f60-f84277478a7f.sql",
+      "evidence": "supabase/migrations/20260904202925_95ea4e5f-d57e-4871-8f60-f84277478a7f.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904204522_dbb2d65f-4d06-4a99-97d3-68b318098fc9.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904204522_dbb2d65f-4d06-4a99-97d3-68b318098fc9.sql",
+      "source": "supabase/migrations/20260904204522_dbb2d65f-4d06-4a99-97d3-68b318098fc9.sql",
+      "evidence": "supabase/migrations/20260904204522_dbb2d65f-4d06-4a99-97d3-68b318098fc9.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260904235111_27691f06-473f-447a-a329-ebfd2efbbe5d.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260904235111_27691f06-473f-447a-a329-ebfd2efbbe5d.sql",
+      "source": "supabase/migrations/20260904235111_27691f06-473f-447a-a329-ebfd2efbbe5d.sql",
+      "evidence": "supabase/migrations/20260904235111_27691f06-473f-447a-a329-ebfd2efbbe5d.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905041253_f40eaa60-c5b0-4398-8da6-e0b60a0e3548.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905041253_f40eaa60-c5b0-4398-8da6-e0b60a0e3548.sql",
+      "source": "supabase/migrations/20260905041253_f40eaa60-c5b0-4398-8da6-e0b60a0e3548.sql",
+      "evidence": "supabase/migrations/20260905041253_f40eaa60-c5b0-4398-8da6-e0b60a0e3548.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905043129_25b05aba-f5d5-4f74-9456-ed3318fa6e27.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905043129_25b05aba-f5d5-4f74-9456-ed3318fa6e27.sql",
+      "source": "supabase/migrations/20260905043129_25b05aba-f5d5-4f74-9456-ed3318fa6e27.sql",
+      "evidence": "supabase/migrations/20260905043129_25b05aba-f5d5-4f74-9456-ed3318fa6e27.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905045131_7d1af729-9397-43c5-9766-8f06a339de4c.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905045131_7d1af729-9397-43c5-9766-8f06a339de4c.sql",
+      "source": "supabase/migrations/20260905045131_7d1af729-9397-43c5-9766-8f06a339de4c.sql",
+      "evidence": "supabase/migrations/20260905045131_7d1af729-9397-43c5-9766-8f06a339de4c.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905075128_c1c82970-0069-458b-bdea-541ef6d106bf.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905075128_c1c82970-0069-458b-bdea-541ef6d106bf.sql",
+      "source": "supabase/migrations/20260905075128_c1c82970-0069-458b-bdea-541ef6d106bf.sql",
+      "evidence": "supabase/migrations/20260905075128_c1c82970-0069-458b-bdea-541ef6d106bf.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905152540_00ab0ebb-3b72-4200-a342-7554d341e89f.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905152540_00ab0ebb-3b72-4200-a342-7554d341e89f.sql",
+      "source": "supabase/migrations/20260905152540_00ab0ebb-3b72-4200-a342-7554d341e89f.sql",
+      "evidence": "supabase/migrations/20260905152540_00ab0ebb-3b72-4200-a342-7554d341e89f.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905155935_708e7f7e-128e-4604-8073-9184ab67aac3.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905155935_708e7f7e-128e-4604-8073-9184ab67aac3.sql",
+      "source": "supabase/migrations/20260905155935_708e7f7e-128e-4604-8073-9184ab67aac3.sql",
+      "evidence": "supabase/migrations/20260905155935_708e7f7e-128e-4604-8073-9184ab67aac3.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260905160336_a1afc767-42c9-430e-a786-41d1190beb16.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260905160336_a1afc767-42c9-430e-a786-41d1190beb16.sql",
+      "source": "supabase/migrations/20260905160336_a1afc767-42c9-430e-a786-41d1190beb16.sql",
+      "evidence": "supabase/migrations/20260905160336_a1afc767-42c9-430e-a786-41d1190beb16.sql"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-064.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-064.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-064.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-064.json"
+    },
+    {
+      "id": "ART:supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
+      "source": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
+      "evidence": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql"
     }
   ],
   "edges": [
@@ -48234,6 +49203,1425 @@
       "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
       "verified_at": "2026-08-31",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/business-attributes/types.ts:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "origin": "ART:src/lib/business-attributes/types.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md § Implementación",
+      "source_row": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/portal/business-attributes.functions.ts:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "origin": "ART:src/lib/portal/business-attributes.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md § Implementación",
+      "source_row": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/BusinessAttributesPanel.tsx:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "origin": "ART:src/components/cms/BusinessAttributesPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md § Implementación",
+      "source_row": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/BusinessEditor.tsx:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "origin": "ART:src/components/cms/BusinessEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md § Implementación",
+      "source_row": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/listing-premium/PremiumDiscoveryListingSurface.tsx:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "origin": "ART:src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md § Implementación",
+      "source_row": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/r1-f/territorial-filter-attributes.contract.test.ts:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "origin": "ART:scripts/omxds/r1-f/territorial-filter-attributes.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "evidence": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md § Implementación",
+      "source_row": "docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "verified_at": "2026-09-06",
+      "origin": "DOC:docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.84 · docs/blueprint/20.01-TERRITORIAL-FILTER-ATTRIBUTES-V1.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:.lovable/plan.md:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:.lovable/plan.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:public/brand/institutional/manifest.json:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:public/brand/institutional/manifest.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:public/brand/institutional/pueblos-magicos-oficial.webp:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:public/brand/institutional/pueblos-magicos-oficial.webp",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:public/media/preview-generated/hoteles-hero-manifest.json:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:public/media/preview-generated/hoteles-hero-manifest.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:public/media/preview-generated/manifest.json:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:public/media/preview-generated/manifest.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:public/media/preview-generated/oriente-maya-hero-manifest.json:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:public/media/preview-generated/oriente-maya-hero-manifest.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:public/media/preview-generated/restaurantes-media-manifest.json:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:public/media/preview-generated/restaurantes-media-manifest.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/cron/cron-dry-run.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/cron/cron-dry-run.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/cron/cron-hook-auth.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/cron/cron-hook-auth.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/cron/cron-jobs-isolation.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/cron/cron-jobs-isolation.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/cron/fake-supabase.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/cron/fake-supabase.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/experiences/experience-commerce.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/experiences/experience-commerce.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/experiences/public-data-sources.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/experiences/public-data-sources.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/maps/google-maps-loader.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/maps/google-maps-loader.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/maps/map-fallback.contract.test.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/maps/map-fallback.contract.test.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/l3b-a/emit-home-config.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/omxds/l3b-a/emit-home-config.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/l3k/alux-converse.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/omxds/l3k/alux-converse.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/l3k/alux-converse.grounding.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/omxds/l3k/alux-converse.grounding.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/alux/AluxConverseChat.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/alux/AluxConverseChat.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/alux/TourismAluxPanel.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/alux/TourismAluxPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/EditorialRouteEditor.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/cms/EditorialRouteEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/EditorialRouteStopsPanel.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/cms/EditorialRouteStopsPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/EventAttributesPanel.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/cms/EventAttributesPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/EventEditor.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/cms/EventEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/ProductAttributesPanel.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/cms/ProductAttributesPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/SeoLandingContentEditor.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/cms/SeoLandingContentEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/destination-premium/DestinationMicrositeReviewSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/destination-premium/DestinationsAtlasSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/destination-premium/DestinationsAtlasSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/destination-premium/RegionDestinationsPremiumSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/destination-premium/destinations-atlas-content.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/destination-premium/destinations-atlas-content.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-premium/ExperienceFiltersBar.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/experience-premium/ExperienceFiltersBar.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-premium/ExperiencePremiumSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/experience-premium/ExperiencePremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-premium/ExperiencesListingSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/experience-premium/ExperiencesListingSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-premium/experience-premium-vm.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/experience-premium/experience-premium-vm.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/home-premium/shared/PremiumShowcase.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/home-premium/shared/PremiumShowcase.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/layout/CompactCrumbs.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/layout/CompactCrumbs.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/listing-premium/TerritorialListingReviewSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/maps/MapUnavailableFallback.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/maps/MapUnavailableFallback.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/omxds/TourismChip.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/omxds/TourismChip.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/routes-premium/RoutePremiumSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/routes-premium/RoutePremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/routes-premium/RoutesListingSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/routes-premium/RoutesListingSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/seo-landing/SeoLandingSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/seo-landing/SeoLandingSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/surfaces/EventPremiumSurface.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/surfaces/EventPremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/travel-plan/TravelPlanBand.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/travel-plan/TravelPlanBand.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/config/brand.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/config/brand.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/converse-contract.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/alux/converse-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/converse-grounding.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/alux/converse-grounding.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/converse-retrieval.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/alux/converse-retrieval.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/converse.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/alux/converse.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/embedded-presence.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/alux/embedded-presence.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/brand/brand-context.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/brand/brand-context.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/brand/brand-settings.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/brand/brand-settings.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cms/editorial-route-stops.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cms/editorial-route-stops.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cms/event-attributes.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cms/event-attributes.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cms/home-featured-categories-query.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cms/home-featured-categories-query.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cron/cron-dry-run.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cron/cron-dry-run.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cron/cron-hook-auth.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cron/cron-hook-auth.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cron/jobs/coupon-review-reminders.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cron/jobs/coupon-review-reminders.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cron/jobs/trip-journey-emails.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cron/jobs/trip-journey-emails.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/cron/jobs/visibility-notifications.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/cron/jobs/visibility-notifications.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/destinations/atlas-taxonomy.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/destinations/atlas-taxonomy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/destinations/destination-labels.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/destinations/destination-labels.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/home-materialization.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/home-materialization.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experiences/experience-attributes.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experiences/experience-attributes.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experiences/experience-commerce.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experiences/experience-commerce.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experiences/experience-public-reads.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experiences/experience-public-reads.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experiences/experience-public-reads.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/experiences/experience-public-reads.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/institutional/institutional-authority.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/institutional/institutional-authority.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/institutional/institutional-authority.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/institutional/institutional-authority.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/institutional/institutional-context.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/institutional/institutional-context.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/listings/listing-family-taxonomy.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/listings/listing-family-taxonomy.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/maps/google-maps-loader.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/maps/google-maps-loader.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/places/place-review-fixtures.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/places/place-review-fixtures.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/portal/product-attributes.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/portal/product-attributes.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/routes-editorial/route-public-contract.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/routes-editorial/route-public-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/routes-editorial/route-public-reads.functions.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/routes-editorial/route-public-reads.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/routes-editorial/route-public-reads.server.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/lib/routes-editorial/route-public-reads.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/distintivos.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/distintivos.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/eventos.$eventId.editar.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/eventos.$eventId.editar.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/eventos.index.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/eventos.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/eventos.nuevo.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/eventos.nuevo.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/landing-seo.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/landing-seo.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/marca.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/marca.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/rutas.$id.editar.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/rutas.$id.editar.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/rutas.index.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/rutas.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/rutas.nueva.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/rutas.nueva.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/founder-home-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/founder-home-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/founder-zazil-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/founder-zazil-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-destination-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-destination-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-event-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-event-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-event-profile-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-event-profile-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-experience-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-experience-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-place-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-place-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-place-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-place-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-restaurant-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-restaurant-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/territorial-listing-premium-preview.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lovable/territorial-listing-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lugares.index.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lugares.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lugares.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/lugares.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.lugares.index.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.lugares.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/oriente-maya/destinos.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/destinos.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/rutas.$slug.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/rutas.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/rutas.index.tsx:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/routes/rutas.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260902213000_territorial_filter_attributes_v1.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260902213000_territorial_filter_attributes_v1.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903013000_restaurant_filter_attributes_v1.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903013000_restaurant_filter_attributes_v1.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903023000_vacation_rental_filter_attributes_v1.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903023000_vacation_rental_filter_attributes_v1.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903023210_d025074d-1e5b-4028-bd27-79d21d6f1494.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903023210_d025074d-1e5b-4028-bd27-79d21d6f1494.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903023402_5887500b-f861-4dca-b469-14761fb35dfa.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903023402_5887500b-f861-4dca-b469-14761fb35dfa.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903023452_51e50763-f3fe-4328-8c5d-81968761dd35.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903023452_51e50763-f3fe-4328-8c5d-81968761dd35.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903034214_0b6169be-6b33-47e9-9d15-c33eb963e67e.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903034214_0b6169be-6b33-47e9-9d15-c33eb963e67e.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903041734_c548c58f-2fde-44e0-bb29-bda6486d8099.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903041734_c548c58f-2fde-44e0-bb29-bda6486d8099.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260903052909_52a07676-0238-49c2-9c04-55d31f283242.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260903052909_52a07676-0238-49c2-9c04-55d31f283242.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904040225_44900315-3f2a-4e3e-9dbb-6840437596fe.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904040225_44900315-3f2a-4e3e-9dbb-6840437596fe.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904180305_7f8dbe90-b282-481c-a338-931b4203d613.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904180305_7f8dbe90-b282-481c-a338-931b4203d613.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904180342_6127d31f-ca7a-4459-977f-cba5bc1625d8.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904180342_6127d31f-ca7a-4459-977f-cba5bc1625d8.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904202715_903e54d3-627a-43d1-aa7d-9ffa13ee9f3d.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904202715_903e54d3-627a-43d1-aa7d-9ffa13ee9f3d.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904202925_95ea4e5f-d57e-4871-8f60-f84277478a7f.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904202925_95ea4e5f-d57e-4871-8f60-f84277478a7f.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904204522_dbb2d65f-4d06-4a99-97d3-68b318098fc9.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904204522_dbb2d65f-4d06-4a99-97d3-68b318098fc9.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260904235111_27691f06-473f-447a-a329-ebfd2efbbe5d.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260904235111_27691f06-473f-447a-a329-ebfd2efbbe5d.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905041253_f40eaa60-c5b0-4398-8da6-e0b60a0e3548.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905041253_f40eaa60-c5b0-4398-8da6-e0b60a0e3548.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905043129_25b05aba-f5d5-4f74-9456-ed3318fa6e27.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905043129_25b05aba-f5d5-4f74-9456-ed3318fa6e27.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905045131_7d1af729-9397-43c5-9766-8f06a339de4c.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905045131_7d1af729-9397-43c5-9766-8f06a339de4c.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905075128_c1c82970-0069-458b-bdea-541ef6d106bf.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905075128_c1c82970-0069-458b-bdea-541ef6d106bf.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905152540_00ab0ebb-3b72-4200-a342-7554d341e89f.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905152540_00ab0ebb-3b72-4200-a342-7554d341e89f.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905155935_708e7f7e-128e-4604-8073-9184ab67aac3.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905155935_708e7f7e-128e-4604-8073-9184ab67aac3.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260905160336_a1afc767-42c9-430e-a786-41d1190beb16.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260905160336_a1afc767-42c9-430e-a786-41d1190beb16.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-064.json:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-064.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/r1-cl/seo-landing-creation.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-cl/seo-landing-creation.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/home-premium/home-premium-real.ts:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:src/components/home-premium/home-premium-real.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "origin": "ART:supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+      "verified_at": "2026-08-30",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     }
   ],

@@ -24,8 +24,10 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRight,
   Building2,
+  Landmark,
   Luggage,
   MapPin,
+  Route as RouteIcon,
   ShoppingBag,
   Sparkles,
   StickyNote,
@@ -70,6 +72,8 @@ const KIND_ICON: Record<TravelItemKind, React.ComponentType<{ className?: string
   product: ShoppingBag,
   event: Ticket,
   note: StickyNote,
+  route: RouteIcon,
+  place: Landmark,
 };
 
 const KIND_LABEL: Record<TravelItemKind, string> = {
@@ -78,6 +82,8 @@ const KIND_LABEL: Record<TravelItemKind, string> = {
   product: "Producto",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
+  place: "Lugar",
 };
 
 const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?: string }>> = {
@@ -86,6 +92,8 @@ const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?
   product: ShoppingBag,
   event: Ticket,
   note: StickyNote,
+  route: RouteIcon,
+  place: Landmark,
   promotion: Ticket,
   custom: StickyNote,
 };
@@ -96,6 +104,8 @@ const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
   product: "Experiencia",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
+  place: "Lugar",
   promotion: "Promoción",
   custom: "Idea",
 };
@@ -125,6 +135,8 @@ export function FloatingTravelPlanDock() {
   });
 
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { locale: rawLocale } = useTranslation();
   const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(rawLocale)
     ? (rawLocale as AluxKbLocale)
@@ -142,6 +154,11 @@ export function FloatingTravelPlanDock() {
       narration.reset();
     });
   }, [enabled, q, confirmedQ]);
+
+  // El dock depende de estado local del navegador (borrador anónimo /
+  // sesión). Antes de hidratar no renderizamos nada para que el markup
+  // del servidor y el del cliente coincidan.
+  if (!mounted) return null;
 
   if (isHiddenRoute) return null;
 

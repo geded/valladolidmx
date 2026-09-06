@@ -8,8 +8,9 @@
  *  - el modo público exige `status = 'published'`;
  *  - nunca se completa un campo ausente con datos de otro lugar.
  */
-import type { PublicPlaceDTO, PublicPlaceMediaDTO } from "./place-public-contract";
+import type { PublicPlaceCard, PublicPlaceDTO, PublicPlaceMediaDTO } from "./place-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import { resolvePlaceAttractionFamily } from "./place-taxonomy";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -126,7 +127,7 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
         "place_type_id, destination_id, destination_zone_id, latitude, longitude, address_line, " +
         "directions, admission_kind, entry_fee_notes, price_from, price_to, price_currency, " +
         "visit_duration_minutes, best_time_to_visit, accessibility, amenities, contact_phone, " +
-        "contact_whatsapp, contact_email, contact_website, social_links, metadata",
+        "contact_whatsapp, contact_email, contact_website, social_links, metadata, attraction_family",
     )
     .eq("slug", input.placeSlug)
     .is("deleted_at", null)
@@ -137,22 +138,26 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
   if (place.destination_id !== destination.id) return null;
   if (!input.allowUnpublished && place.status !== "published") return null;
 
-  let zone: { id: string; name: string } | null = null;
+  let zone: { id: string; slug: string | null; name: string } | null = null;
   if (place.destination_zone_id) {
     const { data: zoneRow } = await sb
       .from("destination_zones")
-      .select("id, name, destination_id")
+      .select("id, slug, name, destination_id")
       .eq("id", place.destination_zone_id)
       .is("deleted_at", null)
       .maybeSingle();
     // La zona sólo se muestra si pertenece al mismo destino.
     if (zoneRow && zoneRow.destination_id === destination.id)
-      zone = { id: zoneRow.id, name: zoneRow.name };
+      zone = { id: zoneRow.id, slug: (zoneRow as any).slug ?? null, name: zoneRow.name };
   }
 
   const [typeRes, catRes, hoursRes, authRes, prodRes, evtRes, seoRes] = await Promise.all([
     place.place_type_id
-      ? sb.from("place_types").select("slug, name").eq("id", place.place_type_id).maybeSingle()
+      ? sb
+          .from("place_types")
+          .select("slug, name, attraction_family")
+          .eq("id", place.place_type_id)
+          .maybeSingle()
       : Promise.resolve({ data: null }),
     sb.from("place_category_links").select("category_id").eq("place_id", place.id),
     sb
@@ -292,6 +297,11 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
     status: place.status,
     typeSlug: typeRes.data?.slug ?? null,
     typeLabel: typeRes.data?.name ?? null,
+    /* Adenda documental: familia principal (override de ficha → tipo). */
+    attractionFamily: resolvePlaceAttractionFamily(
+      (place as any).attraction_family,
+      typeRes.data?.attraction_family,
+    ),
     destination: { slug: destination.slug, name: destination.name },
     zone,
     regionLabel: REGION_LABEL,
@@ -353,4 +363,272 @@ export async function assertPlacePreviewStaff(client: any, userId: string): Prom
     _permission_key: "poi.write",
   });
   if (granular.error || granular.data !== true) throw new Error("forbidden");
+}
+
+/* ------------------------------------------------------------------ *
+ * G4-PLACES · Lectura de tarjetas del listado territorial de Lugares.
+ *
+ * Sólo lecturas reales de `points_of_interest` + catálogos relacionados.
+ * Fail-closed: únicamente `status='published'` y `deleted_at IS NULL`.
+ * Los atributos de filtro se derivan EXCLUSIVAMENTE de columnas reales;
+ * un campo sin captura simplemente no aparece.
+ * ------------------------------------------------------------------ */
+
+function durationFilterBucket(minutes: number): string {
+  if (minutes <= 60) return "hasta-1-hora";
+  if (minutes <= 120) return "1-2-horas";
+  if (minutes <= 240) return "media-jornada";
+  return "dia-completo";
+}
+
+export async function readPublishedPlaceCards(
+  input: { destinationSlug?: string | null; previewMedia?: boolean } = {},
+): Promise<PublicPlaceCard[]> {
+  const sb = await anonClient();
+
+  let destinationId: string | null = null;
+  if (input.destinationSlug) {
+    const { data: destination } = await sb
+      .from("destinations")
+      .select("id")
+      .eq("slug", input.destinationSlug)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (!destination) return [];
+    destinationId = destination.id as string;
+  }
+
+  let query = sb
+    .from("points_of_interest")
+    .select(
+      "id, slug, name, short_description, place_type_id, destination_id, destination_zone_id, " +
+        "latitude, longitude, admission_kind, price_from, price_to, price_currency, " +
+        "visit_duration_minutes, best_time_to_visit, amenities, accessibility, attraction_family",
+    )
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .order("name");
+  if (destinationId) query = query.eq("destination_id", destinationId);
+  const { data: rows } = await query;
+  const places = (rows ?? []) as any[];
+  if (places.length === 0) return [];
+
+  const placeIds = places.map((p) => p.id as string);
+  const uniq = (values: unknown[]) =>
+    Array.from(new Set(values.filter((v): v is string => typeof v === "string" && !!v)));
+  const destinationIds = uniq(places.map((p) => p.destination_id));
+  const typeIds = uniq(places.map((p) => p.place_type_id));
+  const zoneIds = uniq(places.map((p) => p.destination_zone_id));
+
+  const [destRes, typeRes, zoneRes, linkRes, authorityRes, mediaRes] = await Promise.all([
+    destinationIds.length
+      ? sb
+          .from("destinations")
+          .select("id, slug, name")
+          .in("id", destinationIds)
+          .is("deleted_at", null)
+      : Promise.resolve({ data: [] }),
+    typeIds.length
+      ? sb.from("place_types").select("id, slug, name, attraction_family").in("id", typeIds)
+      : Promise.resolve({ data: [] }),
+    zoneIds.length
+      ? sb
+          .from("destination_zones")
+          .select("id, slug, name, destination_id")
+          .in("id", zoneIds)
+          .is("deleted_at", null)
+      : Promise.resolve({ data: [] }),
+    sb.from("place_category_links").select("place_id, category_id").in("place_id", placeIds),
+    sb
+      .from("place_authorities")
+      .select("place_id, authority_kind_id, is_primary")
+      .in("place_id", placeIds),
+    sb
+      .from("place_media")
+      .select("place_id, media_asset_id, role, sort_order")
+      .in("place_id", placeIds)
+      .order("sort_order"),
+  ]);
+
+  const destById = new Map<string, { slug: string; name: string }>(
+    ((destRes.data ?? []) as any[]).map((d) => [d.id, { slug: d.slug, name: d.name }]),
+  );
+  const typeById = new Map<string, { slug: string; name: string; attraction_family?: string }>(
+    ((typeRes.data ?? []) as any[]).map((t) => [
+      t.id,
+      { slug: t.slug, name: t.name, attraction_family: t.attraction_family },
+    ]),
+  );
+  const zoneById = new Map<string, { slug: string | null; name: string; destination_id: string }>(
+    ((zoneRes.data ?? []) as any[]).map((z) => [
+      z.id,
+      { slug: z.slug ?? null, name: z.name, destination_id: z.destination_id },
+    ]),
+  );
+
+  const links = (linkRes.data ?? []) as Array<{ place_id: string; category_id: string }>;
+  const categoryIds = uniq(links.map((l) => l.category_id));
+  const catById = new Map<string, { slug: string; name: string }>();
+  if (categoryIds.length) {
+    const { data: cats } = await sb
+      .from("place_categories")
+      .select("id, slug, name")
+      .in("id", categoryIds);
+    for (const c of (cats ?? []) as any[]) catById.set(c.id, { slug: c.slug, name: c.name });
+  }
+  /* Naturaleza o gestión del lugar (Adenda 3.3): se deriva EXCLUSIVAMENTE de
+     las relaciones reales place_authorities → place_authority_kinds. Nunca se
+     infiere "sitio público" por el nombre, el tipo o la fotografía. */
+  const authorityLinks = (authorityRes.data ?? []) as Array<{
+    place_id: string;
+    authority_kind_id: string;
+    is_primary: boolean | null;
+  }>;
+  const authorityKindIds = uniq(authorityLinks.map((l) => l.authority_kind_id));
+  const authorityKindById = new Map<string, { slug: string; name: string }>();
+  if (authorityKindIds.length) {
+    const { data: kinds } = await sb
+      .from("place_authority_kinds")
+      .select("id, slug, name")
+      .in("id", authorityKindIds)
+      .eq("is_active", true);
+    for (const k of (kinds ?? []) as any[])
+      authorityKindById.set(k.id, { slug: k.slug, name: k.name });
+  }
+  const authorityKindsByPlace = new Map<string, string[]>();
+  for (const link of authorityLinks) {
+    const kind = authorityKindById.get(link.authority_kind_id);
+    if (!kind) continue;
+    const list = authorityKindsByPlace.get(link.place_id) ?? [];
+    if (!list.includes(kind.name)) list.push(kind.name);
+    authorityKindsByPlace.set(link.place_id, list);
+  }
+
+  const categoriesByPlace = new Map<string, Array<{ slug: string; name: string }>>();
+  for (const link of links) {
+    const cat = catById.get(link.category_id);
+    if (!cat) continue;
+    const list = categoriesByPlace.get(link.place_id) ?? [];
+    list.push(cat);
+    categoriesByPlace.set(link.place_id, list);
+  }
+
+  /* Portada gobernada del propio lugar: sólo activos aprobados y no IA.
+     Nunca se hereda un medio de otro lugar/destino (política de medios). */
+  const mediaLinks = (mediaRes.data ?? []) as Array<{
+    place_id: string;
+    media_asset_id: string;
+    role: string;
+    sort_order: number;
+  }>;
+  const assetIds = uniq(mediaLinks.map((l) => l.media_asset_id));
+  const assetById = new Map<string, any>();
+  if (assetIds.length) {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: assets } = await supabaseAdmin
+      .from("media_assets")
+      .select("id, storage_bucket, storage_path, review_state, metadata")
+      .in("id", assetIds);
+    for (const a of (assets ?? []) as any[]) assetById.set(a.id, a);
+  }
+  const coverUrlByPlace = new Map<string, string | null>();
+  if (assetIds.length) {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    for (const placeId of placeIds) {
+      const own = mediaLinks
+        .filter((l) => l.place_id === placeId)
+        .sort(
+          (a, b) =>
+            (a.role === "cover" ? -1 : 0) - (b.role === "cover" ? -1 : 0) ||
+            a.sort_order - b.sort_order,
+        );
+      let url: string | null = null;
+      for (const link of own) {
+        const asset = assetById.get(link.media_asset_id);
+        if (!asset) continue;
+        /* Superficies de revisión interna (/lovable/*) pueden mostrar activos
+           conceptuales temporales; las lecturas públicas nunca. */
+        if (!input.previewMedia) {
+          if (asset.review_state !== "approved") continue;
+          if ((asset.metadata as Record<string, unknown> | null)?.ai_generated === true) continue;
+        }
+        if (!asset.storage_bucket || !asset.storage_path) continue;
+        const { data: signed } = await supabaseAdmin.storage
+          .from(asset.storage_bucket)
+          .createSignedUrl(asset.storage_path, 60 * 60);
+        url = signed?.signedUrl ?? null;
+        if (url) break;
+      }
+      coverUrlByPlace.set(placeId, url);
+    }
+  }
+
+  /* Fail-closed territorial: un lugar sólo es públicamente navegable si su
+     destino también es público (RLS anon: destinos published y no
+     eliminados). Sin destino resoluble no existe URL canónica
+     /oriente-maya/:destino/lugares/:slug → el lugar NO se lista. */
+  const navigablePlaces = places.filter(
+    (p) => typeof p.destination_id === "string" && destById.has(p.destination_id),
+  );
+
+  return navigablePlaces.map((p) => {
+    const destination = destById.get(p.destination_id) ?? null;
+    const type = p.place_type_id ? (typeById.get(p.place_type_id) ?? null) : null;
+    const zoneRow = p.destination_zone_id ? (zoneById.get(p.destination_zone_id) ?? null) : null;
+    /* Fail-closed territorial: la zona sólo se expone si pertenece al
+       destino del propio lugar. */
+    const belongsToDestination = Boolean(zoneRow && zoneRow.destination_id === p.destination_id);
+    const zone = belongsToDestination ? (zoneRow as { name: string }).name : null;
+    const zoneSlug = belongsToDestination ? ((zoneRow as any).slug ?? null) : null;
+    const categories = categoriesByPlace.get(p.id) ?? [];
+    const amenities = strArray(p.amenities);
+    const accessibility = accessibilityList(p.accessibility);
+
+    const attractionFamily = resolvePlaceAttractionFamily(
+      p.attraction_family,
+      type?.attraction_family,
+    );
+
+    const attrs: Record<string, string | string[]> = {};
+    /* Clasificación principal del Inventario de Atractivos. */
+    attrs.attraction_family = [attractionFamily];
+    if (type) attrs.place_type = [type.slug];
+    if (categories.length) attrs.experience_category = categories.map((c) => c.slug);
+    if (p.admission_kind) attrs.admission_type = [p.admission_kind];
+    if (zone) attrs.zone = [zone];
+    if (accessibility.length) attrs.accessibility = accessibility;
+    if (amenities.length) attrs.amenities = amenities;
+    if (p.visit_duration_minutes != null)
+      attrs.duration = [durationFilterBucket(Number(p.visit_duration_minutes))];
+    if (p.best_time_to_visit) attrs.best_time = [String(p.best_time_to_visit)];
+    const authorityKinds = authorityKindsByPlace.get(p.id) ?? [];
+    if (authorityKinds.length) attrs.authority_kind = authorityKinds;
+
+    return {
+      id: p.id,
+      slug: p.slug,
+      name: p.name,
+      short_description: p.short_description ?? null,
+      type_slug: type?.slug ?? null,
+      type_label: type?.name ?? null,
+      attraction_family: attractionFamily,
+      destination_slug: destination?.slug ?? null,
+      destination_name: destination?.name ?? null,
+      zone_name: zone,
+      zone_slug: zoneSlug,
+      latitude: p.latitude != null ? Number(p.latitude) : null,
+      longitude: p.longitude != null ? Number(p.longitude) : null,
+      admission_kind: p.admission_kind ?? null,
+      price_from: p.price_from != null ? Number(p.price_from) : null,
+      price_to: p.price_to != null ? Number(p.price_to) : null,
+      price_currency: p.price_currency ?? null,
+      visit_duration_minutes: p.visit_duration_minutes ?? null,
+      best_time_to_visit: p.best_time_to_visit ?? null,
+      amenities,
+      accessibility,
+      categories,
+      cover_url: coverUrlByPlace.get(p.id) ?? null,
+      filter_attributes: attrs,
+    } satisfies PublicPlaceCard;
+  });
 }

@@ -15,8 +15,7 @@
  *    (`keepSectionsWithRealData`), nunca se sustituyen por fixtures.
  *  - `place` delega íntegramente en `premium-entity-place` (seis variantes
  *    aprobadas); este módulo NO redefine su diseño ni sus medios.
- *  - `vacation_rental` se conserva en el resolutor técnico pero jamás se
- *    autoasigna: su preset tiene `autoAssign=false` y resuelve a estándar.
+ *  - `vacation_rental` usa su preset aprobado y conserva semántica propia.
  *  - Cero publicación, cero migraciones, cero rutas nuevas.
  */
 import {
@@ -57,7 +56,7 @@ export const CANONICAL_ROUTE_BINDING_MATRIX = [
     entityType: "business",
     families: ["hotel", "restaurant", "vacation_rental"],
     surfaceComponent: "BusinessSurface",
-    notes: "vacation_rental permanece fail-closed (autoAssign=false).",
+    notes: "vacation_rental usa el preset premium aprobado de propiedad completa.",
   },
   {
     routePattern: ROUTE_PRODUCT,

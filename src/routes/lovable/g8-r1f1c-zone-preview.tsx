@@ -95,6 +95,7 @@ function ZonePreview() {
             { label: ZONE.destination },
             { label: ZONE.name },
           ]}
+          compactOnMobile
         />
         <div className="mt-4">
           <PremiumPresentationControl value={presentation} onChange={setPresentation} />

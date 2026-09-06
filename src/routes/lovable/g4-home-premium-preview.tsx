@@ -27,11 +27,13 @@ import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import {
-  HomePremiumFooter,
-  HomePremiumHeader,
   HomePremiumRibbon,
   HomePremiumSurface,
 } from "@/components/home-premium/HomePremiumSurface";
+import {
+  HOME_PREMIUM_G4_CONTENT,
+  type HomePremiumContent,
+} from "@/components/home-premium/home-premium-content";
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PremiumPresentationControl } from "@/components/premium";
@@ -63,7 +65,8 @@ export const Route = createFileRoute("/lovable/g4-home-premium-preview")({
   component: G4HomePremiumPreview,
 });
 
-const GOVERNED = "/api/public/studio-media/governed/v1p1c";
+const OFFICIAL_MEDIA_ORIGIN = "https://valladolidmx.lovable.app";
+const GOVERNED = `${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/governed/v1p1c`;
 const MEDIA = {
   plaza: {
     url: `${GOVERNED}/destination-gallery-1.jpg`,
@@ -88,6 +91,25 @@ const MEDIA = {
   cenote: {
     url: `${GOVERNED}/experience-cover.jpg`,
     alt: "Cenote de aguas turquesa dentro de una caverna de piedra caliza",
+  },
+} as const;
+
+const HOME_DESTINATION_MEDIA = {
+  valladolid: {
+    url: `${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/conceptual-preview/2026-09-01/home-valladolid-editorial-preview.webp`,
+    alt: "Templo de San Servacio y centro histórico de Valladolid al atardecer",
+  },
+  izamal: {
+    url: `${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/conceptual-preview/2026-09-01/home-izamal-editorial-preview.webp`,
+    alt: "Arquerías y convento amarillo de Izamal",
+  },
+  espita: {
+    url: `${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/conceptual-preview/2026-09-01/home-espita-editorial-preview.webp`,
+    alt: "Iglesia histórica y plaza arbolada de Espita",
+  },
+  temozon: {
+    url: `${OFFICIAL_MEDIA_ORIGIN}/api/public/studio-media/conceptual-preview/2026-09-01/home-temozon-editorial-preview.webp`,
+    alt: "Cocina tradicional y artesanía de Temozón",
   },
 } as const;
 
@@ -289,7 +311,7 @@ const EDITORIAL = [
 const MAP_DTO: ExperienceMapDTO = {
   variant: "multi",
   heading: "Paradas de la ruta en el territorio",
-  center: { lat: 20.72, lng: -88.3, zoom: 10 },
+  center: { lat: 20.84, lng: -88.58, zoom: 9 },
   points: [
     {
       id: "valladolid",
@@ -298,7 +320,7 @@ const MAP_DTO: ExperienceMapDTO = {
       lng: -88.2018,
       title: "Valladolid",
       subtitle: "Inicio sugerido · Capital Turística del Oriente Maya de Yucatán",
-      href: null,
+      href: "/oriente-maya/valladolid",
       thumbUrl: null,
       badge: null,
       priceLabel: null,
@@ -309,8 +331,8 @@ const MAP_DTO: ExperienceMapDTO = {
       lat: 21.0117,
       lng: -88.3061,
       title: "Espita",
-      subtitle: "Segunda parada · demo visual",
-      href: null,
+      subtitle: "Pueblo Mágico · arquitectura y vida comunitaria",
+      href: "/oriente-maya/espita",
       thumbUrl: null,
       badge: null,
       priceLabel: null,
@@ -321,8 +343,8 @@ const MAP_DTO: ExperienceMapDTO = {
       lat: 20.9308,
       lng: -89.0175,
       title: "Izamal",
-      subtitle: "Tercera parada · demo visual",
-      href: null,
+      subtitle: "Pueblo Mágico · patrimonio de la ciudad amarilla",
+      href: "/oriente-maya/izamal",
       thumbUrl: null,
       badge: null,
       priceLabel: null,
@@ -333,10 +355,81 @@ const MAP_DTO: ExperienceMapDTO = {
     showDirections: false,
     clustering: false,
     syncList: false,
-    staticFallback: true,
-    allowInteractiveToggle: true,
+    staticFallback: false,
+    allowInteractiveToggle: false,
   },
   emptyMessage: null,
+};
+
+// eslint-disable-next-line react-refresh/only-export-components -- Preview content is intentionally colocated with its route.
+export const HOME_PREMIUM_PREVIEW_CONTENT: HomePremiumContent = {
+  ...HOME_PREMIUM_G4_CONTENT,
+  hero: {
+    ...HOME_PREMIUM_G4_CONTENT.hero,
+    slides: [
+      { media: HOME_DESTINATION_MEDIA.valladolid, caption: "Centro histórico de Valladolid" },
+      { media: MEDIA.cenote, caption: "Cenotes del Oriente Maya de Yucatán" },
+    ],
+  },
+  destinos: {
+    ...HOME_PREMIUM_G4_CONTENT.destinos,
+    items: [
+      {
+        name: "Valladolid",
+        note: "Capital turística · punto de partida",
+        media: HOME_DESTINATION_MEDIA.valladolid,
+        puebloMagico: true,
+        href: "/oriente-maya/valladolid",
+      },
+      {
+        name: "Izamal",
+        note: "Ciudad amarilla · patrimonio vivo",
+        media: HOME_DESTINATION_MEDIA.izamal,
+        puebloMagico: true,
+        href: "/oriente-maya/izamal",
+      },
+      {
+        name: "Espita",
+        note: "Arquitectura y ritmo de pueblo",
+        media: HOME_DESTINATION_MEDIA.espita,
+        puebloMagico: true,
+        href: "/oriente-maya/espita",
+      },
+      {
+        name: "Temozón",
+        note: "Gastronomía, artesanía y comunidad",
+        media: HOME_DESTINATION_MEDIA.temozon,
+        puebloMagico: false,
+        href: "/oriente-maya/temozon",
+      },
+    ],
+  },
+  rutas: {
+    ...HOME_PREMIUM_G4_CONTENT.rutas,
+    items: ROUTES.map((route) => ({ ...route, sequence: [...route.sequence] })),
+  },
+  experiencias: {
+    ...HOME_PREMIUM_G4_CONTENT.experiencias,
+    items: EXPERIENCES.map((item, index) => ({
+      ...item,
+      href: index === 0 ? "/experiencias" : "/que-hacer",
+    })),
+  },
+  servicios: {
+    ...HOME_PREMIUM_G4_CONTENT.servicios,
+    stays: STAYS.map((item) => ({ ...item, href: "/hoteles" })),
+    food: FOOD.map((item) => ({ ...item, href: "/restaurantes" })),
+  },
+  eventos: {
+    ...HOME_PREMIUM_G4_CONTENT.eventos,
+    media: MEDIA.plaza,
+    items: EVENTS.map((item) => ({ ...item, href: "/eventos" })),
+  },
+  queHacer: {
+    ...HOME_PREMIUM_G4_CONTENT.queHacer,
+    items: EDITORIAL.map((item) => ({ ...item, href: "/que-hacer" })),
+  },
+  mapa: { ...HOME_PREMIUM_G4_CONTENT.mapa, dto: MAP_DTO },
 };
 
 const SECTION_LABELS: Record<SectionKey, string> = {
@@ -352,8 +445,8 @@ const SECTION_LABELS: Record<SectionKey, string> = {
 
 const DEFAULT_ORDER: SectionKey[] = [
   "destinos",
-  "pueblosMagicos",
   "rutas",
+  "pueblosMagicos",
   "experiencias",
   "servicios",
   "eventos",
@@ -395,21 +488,20 @@ function G4HomePremiumPreview() {
   });
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background pb-20">
+    <div
+      className="min-h-screen overflow-x-clip bg-background"
+      data-premium-direction={tuning.direction}
+    >
       <HomePremiumRibbon />
-      <HomePremiumHeader />
-      <G7IntegratedFixture />
       {/* G8-D · autoridad visual única: la preview consume la misma superficie
           que el renderer del Experience Builder. */}
       <HomePremiumSurface
+        content={HOME_PREMIUM_PREVIEW_CONTENT}
         heroVariant={tuning.heroVariant}
         layout={tuning.layout}
         sections={tuning.sections}
         order={tuning.order}
       />
-      <Container className="mt-8">
-        <HomePremiumFooter />
-      </Container>
       <TuningPanel value={tuning} onChange={setTuning} />
     </div>
   );
@@ -458,7 +550,7 @@ function TuningPanel({
           <div className="mt-4 space-y-4">
             <PremiumPresentationControl
               value={value.direction}
-              onChange={(next) => set("direction", next)}
+              onChange={(next) => onChange({ ...value, direction: next, heroVariant: next })}
             />
             <OptionGroup
               title="Hero"

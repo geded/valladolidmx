@@ -20,7 +20,14 @@ import {
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
 
-export type FieldType = "text" | "textarea" | "number" | "select" | "tags";
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "number"
+  | "select"
+  | "tags"
+  | "datetime"
+  | "boolean";
 
 export interface EditorField {
   name: string;
@@ -108,6 +115,14 @@ export function EntityEditor(props: Props) {
         const v = (detail.data as Record<string, unknown>)[f.name];
         if (v === null || v === undefined) {
           next[f.name] = "";
+        } else if (f.type === "datetime") {
+          // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
+          const date = new Date(String(v));
+          next[f.name] = Number.isNaN(date.getTime())
+            ? ""
+            : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
         } else if (Array.isArray(v)) {
           next[f.name] = v.join("\n");
         } else {
@@ -126,10 +141,15 @@ export function EntityEditor(props: Props) {
       for (const f of fields) {
         const raw = values[f.name];
         if (raw === "" || raw === undefined) {
-          payload[f.name] = null;
+          payload[f.name] = f.type === "boolean" ? false : null;
           continue;
         }
-        if (f.type === "number") {
+        if (f.type === "boolean") {
+          payload[f.name] = raw === "true";
+        } else if (f.type === "datetime") {
+          const date = new Date(raw);
+          payload[f.name] = Number.isNaN(date.getTime()) ? null : date.toISOString();
+        } else if (f.type === "number") {
           payload[f.name] = Number(raw);
         } else if (f.type === "tags") {
           payload[f.name] = raw
@@ -355,6 +375,15 @@ function FieldInput(props: { field: EditorField; value: string; onChange: (v: st
           onChange={(e) => onChange(e.target.value)}
           className={common}
         />
+      ) : field.type === "boolean" ? (
+        <select
+          value={value || "false"}
+          onChange={(e) => onChange(e.target.value)}
+          className={common}
+        >
+          <option value="false">No</option>
+          <option value="true">Sí</option>
+        </select>
       ) : field.type === "select" ? (
         <select
           required={field.required}
@@ -372,7 +401,13 @@ function FieldInput(props: { field: EditorField; value: string; onChange: (v: st
       ) : (
         <input
           required={field.required}
-          type={field.type === "number" ? "number" : "text"}
+          type={
+            field.type === "number"
+              ? "number"
+              : field.type === "datetime"
+                ? "datetime-local"
+                : "text"
+          }
           value={value}
           placeholder={field.placeholder}
           onChange={(e) => onChange(e.target.value)}

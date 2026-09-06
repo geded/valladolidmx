@@ -32,7 +32,11 @@ export function KitGallery({ vm }: { vm: GalleryVM }) {
         />
       )}
       {items.length > 0 ? (
-        <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:px-0">
+        <ul
+          className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:px-0"
+          tabIndex={0}
+          aria-label="Galería"
+        >
           {items.map((m, i) => (
             <li
               key={m.id ?? `${m.url}-${i}`}

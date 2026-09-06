@@ -5,11 +5,14 @@
  * manual y ordenada de rutas, límite de elementos y visibilidad de
  * paradas. Sin configuración, el comportamiento es idéntico al histórico
  * (rutas publicadas, orden del servidor, sin paradas).
+ *
+ * Lote 3E — CMS-first: sólo rutas editoriales publicadas. Sin resultado se
+ * muestra un estado vacío honesto; nunca rutas ficticias.
  */
 import { Container } from "@/components/layout/Container";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { RutaCard } from "@/components/cards/RutaCard";
-import { RUTAS_MOCK } from "@/mocks/rutas";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n/context";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -27,13 +30,13 @@ function readSlugList(raw: unknown): string[] {
 export function RutasSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
   const fetchRoutes = useServerFn(listPublishedRoutes);
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["home", "rutas", "published"],
     queryFn: () => fetchRoutes(),
-    initialData: RUTAS_MOCK as readonly SuggestedRoute[],
     staleTime: 5 * 60 * 1000,
+    retry: false,
   });
-  const available: readonly SuggestedRoute[] = data && data.length > 0 ? data : RUTAS_MOCK;
+  const available: readonly SuggestedRoute[] = data ?? [];
 
   const source = typeof config?.source === "string" ? config.source : "auto";
   const selected = readSlugList(config?.route_slugs);
@@ -72,32 +75,50 @@ export function RutasSection({ config }: { config?: Record<string, unknown> } = 
     <section id="rutas" className="@container py-20 @3xl:py-28">
       <Container>
         <SectionHeader title={title} subtitle={subtitle} />
-        <div
-          data-home-grid="rutas"
-          data-rutas-source={source}
-          className={`grid grid-cols-1 gap-6 ${gridCols}`}
-        >
-          {routes.map((r) => (
-            <div key={r.id} className="flex min-w-0 flex-col gap-2">
-              <RutaCard route={r} />
-              {showStops && r.destination_slugs.length > 0 ? (
-                <ul
-                  data-rutas-stops
-                  className="flex flex-wrap gap-1.5 px-1 text-xs text-muted-foreground"
-                >
-                  {r.destination_slugs.map((slug) => (
-                    <li
-                      key={slug}
-                      className="rounded-pill border border-border/60 px-2 py-0.5 capitalize"
-                    >
-                      {slug.replace(/-/g, " ")}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ))}
-        </div>
+        {isPending ? (
+          <div
+            data-home-grid="rutas"
+            data-rutas-source={source}
+            data-state="loading"
+            aria-busy="true"
+            className={`grid grid-cols-1 gap-6 ${gridCols}`}
+          >
+            {Array.from({ length: 3 }, (_, index) => (
+              <Skeleton key={index} className="h-64 rounded-2xl" />
+            ))}
+          </div>
+        ) : routes.length === 0 ? (
+          <p data-home-empty="rutas" role="status" className="text-sm text-muted-foreground">
+            Aún no hay rutas publicadas.
+          </p>
+        ) : (
+          <div
+            data-home-grid="rutas"
+            data-rutas-source={source}
+            className={`grid grid-cols-1 gap-6 ${gridCols}`}
+          >
+            {routes.map((r) => (
+              <div key={r.id} className="flex min-w-0 flex-col gap-2">
+                <RutaCard route={r} />
+                {showStops && r.destination_slugs.length > 0 ? (
+                  <ul
+                    data-rutas-stops
+                    className="flex flex-wrap gap-1.5 px-1 text-xs text-muted-foreground"
+                  >
+                    {r.destination_slugs.map((slug) => (
+                      <li
+                        key={slug}
+                        className="rounded-pill border border-border/60 px-2 py-0.5 capitalize"
+                      >
+                        {slug.replace(/-/g, " ")}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
       </Container>
     </section>
   );

@@ -10,6 +10,11 @@
  * `/api/public/studio-media/governed/v1p1c/*`. Sin URLs firmadas.
  */
 
+import {
+  PUEBLOS_MAGICOS_AUTORIZADOS,
+  isPuebloMagicoDestination,
+} from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
+
 export interface DestinationPremiumMedia {
   /** Cadena vacía representa marcador Editorial neutral; nunca una imagen sustituta. */
   url: string;
@@ -110,10 +115,13 @@ export const DESTINATION_PREMIUM_SECTION_ORDER: DestinationPremiumSectionKey[] =
   "nearby",
 ];
 
-/** Destinos con estado editorial Pueblo Mágico reconocido. */
-export const PUEBLOS_MAGICOS = ["valladolid", "izamal", "espita"] as const;
-export const isPuebloMagico = (slug: string): boolean =>
-  (PUEBLOS_MAGICOS as readonly string[]).includes(slug);
+/**
+ * Lote 3B — Pueblo Mágico deja de tener lista propia: la autoridad es el
+ * Institutional Badges Registry (`restrictedSlugs`). Se conservan los
+ * nombres exportados para no romper consumidores existentes.
+ */
+export const PUEBLOS_MAGICOS = PUEBLOS_MAGICOS_AUTORIZADOS;
+export const isPuebloMagico = (slug: string): boolean => isPuebloMagicoDestination(slug);
 
 const GOVERNED = "/api/public/studio-media/governed/v1p1c";
 

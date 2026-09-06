@@ -26,6 +26,9 @@ const EDITABLE_TABLES = [
   "business_categories",
   "businesses",
   "products",
+  "events",
+  // Lote 3C — Rutas / Itinerarios editoriales (CMS-first).
+  "editorial_routes",
 ] as const;
 type EditableTable = (typeof EDITABLE_TABLES)[number];
 
@@ -42,6 +45,8 @@ const TABLE_TO_ENTITY_KIND: Record<
   | "business_category"
   | "business"
   | "product"
+  | "event"
+  | "route"
 > = {
   tourism_regions: "tourism_region",
   destinations: "destination",
@@ -49,6 +54,8 @@ const TABLE_TO_ENTITY_KIND: Record<
   business_categories: "business_category",
   businesses: "business",
   products: "product",
+  events: "event",
+  editorial_routes: "route",
 };
 
 const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
@@ -102,6 +109,45 @@ const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
     "capacity",
     "cover_media_id",
     "metadata",
+  ],
+  // Eventos (circuito funcional de EVENTOS). Los atributos estructurados
+  // (`filter_attributes`) se administran con su panel dedicado, nunca por
+  // payload libre.
+  events: [
+    "destination_id",
+    "business_id",
+    "slug",
+    "title",
+    "summary",
+    "body",
+    "starts_at",
+    "ends_at",
+    "venue_name",
+    "is_free",
+    "external_url",
+    "cover_media_id",
+  ],
+  // Rutas editoriales. `status` y `published_at` sólo se mueven vía
+  // `transitionEntityStatus`; las paradas tienen su propio endpoint.
+  editorial_routes: [
+    "slug",
+    "name",
+    "summary",
+    "body",
+    "region_slug",
+    "origin_destination_id",
+    "destination_ids",
+    "zone_ids",
+    "duration_days",
+    "duration_hours",
+    "pace",
+    "difficulty",
+    "interests",
+    "audiences",
+    "seasons",
+    "palette",
+    "cover_media_id",
+    "gallery_media_ids",
   ],
 };
 

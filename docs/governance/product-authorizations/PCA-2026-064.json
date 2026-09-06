@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-064",
+  "title": "PR #60 · Cierre exacto de tres bloqueos P1",
+  "status": "Approved",
+  "branch": "integration/lovable-valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir exclusivamente los tres P1 del PR #60: persistencia SEO mediante RPC gobernada ampliada, exclusión de medios conceptuales del fallback público de Home y rate-limit de Alux fail-closed. Incluye una migración aditiva mínima sin modificar datos existentes y las pruebas, tipos y proyecciones Governance estrictamente necesarias. No autoriza ejecutar o desplegar la migración ni desplegar el sistema.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts",
+      "sha256": "fc7ff0709c606f8c77557d9269b82d04206ae707d0cf34f61d8fd19aa0ff2688",
+      "authority": "Founder PR #60 · exact P1 closure · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts",
+      "sha256": "d7c64418e7ec19e6559c9e7eb7fdc93235582ff2c4976354132f1ad5b9756f85",
+      "authority": "Founder PR #60 · exact P1 closure · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "sha256": "e69e984829b860cbc766930321251388f82286b31add80be531d08de08a79ea0",
+      "authority": "Founder PR #60 · exact P1 closure · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
+      "sha256": "c5a1d55cc58cf9ef9a1839a4d7ad7d826aac33f951917e454581b2a91307221f",
+      "authority": "Founder PR #60 · exact P1 closure · 2026-09-06"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun test scripts/omxds/l3k/alux-converse.contract.test.ts scripts/omxds/r1-cl/seo-landing-creation.contract.test.ts scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "bun scripts/governance/validate-full-suite.mjs --base=f8390e5d2c25af5b9b30c3534a9a08ce151646de"
+  ]
+}

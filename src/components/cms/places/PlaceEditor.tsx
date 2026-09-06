@@ -23,7 +23,11 @@ import {
   transitionPlaceStatus,
   updatePlaceCms,
 } from "@/lib/places/places-cms.functions";
-import { PLACE_ADMISSION_KINDS } from "@/lib/places/place-taxonomy";
+import {
+  PLACE_ADMISSION_KINDS,
+  PLACE_ATTRACTION_FAMILIES,
+  PLACE_ATTRACTION_FAMILY_LABELS,
+} from "@/lib/places/place-taxonomy";
 import {
   ZONE_DESTINATION_MISMATCH,
   ZONE_DESTINATION_MISMATCH_MESSAGE,
@@ -208,11 +212,13 @@ export function PlaceEditor({ placeId }: Props) {
   const [values, setValues] = useState<Values>({});
   const [zoneId, setZoneId] = useState("");
   const [admission, setAdmission] = useState("");
+  const [attractionFamily, setAttractionFamily] = useState("");
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
   const [duration, setDuration] = useState("");
   const [highlights, setHighlights] = useState("");
   const [amenities, setAmenities] = useState("");
+  const [accessibility, setAccessibility] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
@@ -225,6 +231,7 @@ export function PlaceEditor({ placeId }: Props) {
     setValues(next);
     setZoneId((place.destination_zone_id as string | null) ?? "");
     setAdmission((place.admission_kind as string | null) ?? "");
+    setAttractionFamily((place.attraction_family as string | null) ?? "");
     setPriceFrom(
       place.price_from === null || place.price_from === undefined ? "" : String(place.price_from),
     );
@@ -238,6 +245,16 @@ export function PlaceEditor({ placeId }: Props) {
     );
     setHighlights(Array.isArray(place.highlights) ? (place.highlights as string[]).join("\n") : "");
     setAmenities(Array.isArray(place.amenities) ? (place.amenities as string[]).join("\n") : "");
+    /* Accesibilidad real capturada como lista de rasgos declarados. */
+    const acc = place.accessibility as Record<string, unknown> | null;
+    setAccessibility(
+      acc && typeof acc === "object"
+        ? Object.entries(acc)
+            .filter(([, v]) => v === true || (typeof v === "string" && v.trim().length > 0))
+            .map(([k, v]) => (typeof v === "string" ? `${k}: ${v}` : k))
+            .join("\n")
+        : "",
+    );
     setLatitude(
       place.latitude === null || place.latitude === undefined ? "" : String(place.latitude),
     );
@@ -299,11 +316,22 @@ export function PlaceEditor({ placeId }: Props) {
       contact_website: text("contact_website"),
       price_currency: (values.price_currency || "MXN").trim().toUpperCase(),
       admission_kind: admission ? (admission as (typeof PLACE_ADMISSION_KINDS)[number]) : null,
+      attraction_family: attractionFamily
+        ? (attractionFamily as (typeof PLACE_ATTRACTION_FAMILIES)[number])
+        : null,
       price_from: priceFrom === "" ? null : Number(priceFrom),
       price_to: priceTo === "" ? null : Number(priceTo),
       visit_duration_minutes: duration === "" ? null : Number(duration),
       highlights: list(highlights),
       amenities: list(amenities),
+      accessibility: Object.fromEntries(
+        list(accessibility).map((line) => {
+          const [key, ...rest] = line.split(":");
+          const label = (key ?? "").trim();
+          const value = rest.join(":").trim();
+          return [label, value.length ? value : true];
+        }),
+      ) as Record<string, unknown>,
     };
   };
 
@@ -385,7 +413,7 @@ export function PlaceEditor({ placeId }: Props) {
       <section className="mx-auto w-full max-w-3xl space-y-5">
         <header className="border-b border-border pb-4">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            Lugares y atractivos
+            Lugares y sitios de interés
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">Nuevo lugar o atractivo</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -461,7 +489,7 @@ export function PlaceEditor({ placeId }: Props) {
           </PlaceField>
           <PlaceField
             name="new-zone"
-            label="Zona del destino (opcional)"
+            label="Subzona del destino (opcional)"
             help={
               !newPlace.destination_id
                 ? "Elige primero un destino para ver sus zonas."
@@ -574,7 +602,7 @@ export function PlaceEditor({ placeId }: Props) {
       <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            Lugares y atractivos
+            Lugares y sitios de interés
           </p>
           <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight">
             {String(place.name)}
@@ -603,6 +631,23 @@ export function PlaceEditor({ placeId }: Props) {
         title="Identidad y territorio"
         description="El tipo se cambia por endpoint gobernado; las categorías son autoridad de descubrimiento independiente."
       >
+        <PlaceField name="attraction_family" label="Familia de atractivo (Inventario Oriente Maya)">
+          {({ id }) => (
+            <select
+              id={id}
+              className={inputClass}
+              value={attractionFamily}
+              onChange={(e) => setAttractionFamily(e.target.value)}
+            >
+              <option value="">Heredar del tipo</option>
+              {PLACE_ATTRACTION_FAMILIES.map((f) => (
+                <option key={f} value={f}>
+                  {PLACE_ATTRACTION_FAMILY_LABELS[f]}
+                </option>
+              ))}
+            </select>
+          )}
+        </PlaceField>
         <PlaceField name="type" label="Tipo de lugar">
           {({ id }) => (
             <select
@@ -622,11 +667,11 @@ export function PlaceEditor({ placeId }: Props) {
         </PlaceField>
         <PlaceField
           name="zone"
-          label="Zona territorial (opcional)"
+          label="Subzona del destino (opcional)"
           help={
             editZones.length === 0
-              ? "Este destino todavía no tiene zonas registradas. Puedes guardar el lugar sin zona."
-              : "Sólo se listan zonas activas del destino de este lugar."
+              ? "Este destino todavía no tiene subzonas registradas. Puedes guardar el lugar sin subzona."
+              : "Jerarquía territorial: Oriente Maya > Destino > Subzona > Lugar. Sólo se listan subzonas activas del destino de este lugar."
           }
         >
           {({ id, describedBy }) => (
@@ -789,8 +834,8 @@ export function PlaceEditor({ placeId }: Props) {
         </PlaceField>
         <PlaceField
           name="amenities"
-          label="Servicios y accesibilidad"
-          help="Una amenidad por línea (estacionamiento, rampa, sanitarios…)."
+          label="Servicios"
+          help="Un servicio por línea (estacionamiento, sanitarios, guardarropa…)."
         >
           {({ id }) => (
             <textarea
@@ -798,6 +843,20 @@ export function PlaceEditor({ placeId }: Props) {
               className={textareaClass}
               value={amenities}
               onChange={(e) => setAmenities(e.target.value)}
+            />
+          )}
+        </PlaceField>
+        <PlaceField
+          name="accessibility"
+          label="Accesibilidad"
+          help="Un rasgo por línea (rampa, sendero firme, escaleras empinadas). Puedes usar «rasgo: detalle». Déjalo vacío si no hay dato verificado."
+        >
+          {({ id }) => (
+            <textarea
+              id={id}
+              className={textareaClass}
+              value={accessibility}
+              onChange={(e) => setAccessibility(e.target.value)}
             />
           )}
         </PlaceField>

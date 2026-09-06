@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "path": "/brand/institutional/pueblos-magicos-oficial.webp",
+      "name": "Pueblos Mágicos de México",
+      "source": "https://turismo.edomex.gob.mx/sites/turismo.edomex.gob.mx/files/images/%C3%8DCONO_PMs.png",
+      "authority": "Secretaría de Cultura y Turismo del Estado de México",
+      "usage": "identificación institucional del programa"
+    }
+  ]
+}

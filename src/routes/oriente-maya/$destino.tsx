@@ -14,10 +14,13 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 type DestinationSearch = {
   explora?: string;
+  presentacion?: "cinematografica";
 };
 
 export const Route = createFileRoute("/oriente-maya/$destino")({
-  validateSearch: (search: Record<string, unknown>): DestinationSearch =>
-    typeof search.explora === "string" ? { explora: search.explora } : {},
+  validateSearch: (search: Record<string, unknown>): DestinationSearch => ({
+    explora: typeof search.explora === "string" ? search.explora : undefined,
+    presentacion: search.presentacion === "cinematografica" ? "cinematografica" : undefined,
+  }),
   component: () => <Outlet />,
 });

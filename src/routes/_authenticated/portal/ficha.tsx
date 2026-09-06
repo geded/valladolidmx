@@ -15,6 +15,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
+import { BusinessAttributesPanel } from "@/components/cms/BusinessAttributesPanel";
 import {
   getBusinessCard,
   listBusinessAuditLog,
@@ -295,6 +296,7 @@ function FichaPage() {
         </p>
       </section>
 
+      {businessId ? <BusinessAttributesPanel businessId={businessId} /> : null}
       <AuditSection loading={auditQuery.isLoading} entries={auditQuery.data ?? []} />
     </div>
   );

@@ -15,12 +15,14 @@
  *  - `object-contain`, sin cambios de layout (width/height explícitos).
  */
 
+import { ACTIVE_BRAND } from "@/config/brand";
+
 export type AluxMarkFamily = "full" | "avatar";
 
 const FULL_SIZES = [96, 128, 192, 256, 384, 512] as const;
 const AVATAR_SIZES = [32, 40, 44, 48, 64, 80, 96, 128, 192] as const;
 
-export const ALUX_ACCESSIBLE_NAME = "Alux, concierge IA de Valladolid.mx";
+export const ALUX_ACCESSIBLE_NAME = `${ACTIVE_BRAND.conciergeName}, concierge IA de ${ACTIVE_BRAND.name}`;
 
 function nearest(sizes: readonly number[], size: number): number {
   return sizes.reduce((best, s) => (Math.abs(s - size) < Math.abs(best - size) ? s : best));

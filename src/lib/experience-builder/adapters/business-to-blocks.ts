@@ -122,6 +122,24 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     value: b.verified ? "Verificado" : "Publicado",
     tone: b.verified ? "primary" : "default",
   });
+  const attributeLabels: Record<string, string> = {
+    property_type: "Tipo de propiedad",
+    capacity: "Capacidad",
+    bedrooms: "Dormitorios",
+    amenities: "Amenidades",
+    stay_features: "Características",
+  };
+  for (const [key, label] of Object.entries(attributeLabels)) {
+    const raw = b.filter_attributes?.[key];
+    const values = Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : [];
+    if (!values.length) continue;
+    items.push({
+      iconKey: key === "capacity" ? "users" : key === "bedrooms" ? "bed" : "home",
+      label,
+      value: values.map((value) => value.replace(/-/g, " ")).join(" · "),
+      tone: "default",
+    });
+  }
   if (items.length === 0) return null;
   return {
     variant: "cards",

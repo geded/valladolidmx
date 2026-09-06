@@ -36,7 +36,16 @@ import {
  * Kinds soportados HOY por la BD (ENUM `travel_item_kind`). El contrato de
  * las funciones es `string`; la validación vive en `KNOWN_ITEM_KINDS`.
  */
-export type TravelItemKind = "destination" | "business" | "product" | "event" | "note";
+export type TravelItemKind =
+  | "destination"
+  | "business"
+  | "product"
+  | "event"
+  | "note"
+  /** Lote 3C — referencia privada a una ruta editorial publicada. */
+  | "route"
+  /** Lote 3J.1 — lugar o atractivo del modelo territorial. */
+  | "place";
 
 /**
  * Whitelist activa. Ampliar aquí + en el ENUM de BD para admitir nuevos
@@ -49,6 +58,8 @@ const KNOWN_ITEM_KINDS: ReadonlySet<TravelItemKind> = new Set([
   "product",
   "event",
   "note",
+  "route",
+  "place",
 ]);
 
 export type TravelPlanStatus = "draft" | "active" | "shared_with_concierge" | "archived";

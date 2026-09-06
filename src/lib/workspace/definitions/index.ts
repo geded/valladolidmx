@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
 import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, CalendarDays } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -687,6 +687,16 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.eventos",
+      workspaceId: "cms",
+      label: "Eventos",
+      icon: CalendarDays,
+      to: "/cms/eventos",
+      group: "territorio",
+      order: 5,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.zonas",
       workspaceId: "cms",
       label: "Zonas",
@@ -694,6 +704,17 @@ const cms: WorkspaceDefinition = {
       to: "/cms/zonas",
       group: "territorio",
       order: 4,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
+      // Lote 3C — Rutas / Itinerarios editoriales (CMS-first).
+      id: "cms.rutas",
+      workspaceId: "cms",
+      label: "Rutas e itinerarios",
+      icon: MapIcon,
+      to: "/cms/rutas",
+      group: "contenido",
+      order: 6,
       surfaces: ["sidebar", "palette"],
     },
     {
@@ -709,7 +730,7 @@ const cms: WorkspaceDefinition = {
     {
       id: "cms.lugares",
       workspaceId: "cms",
-      label: "Lugares y atractivos",
+      label: "Lugares y sitios de interés",
       icon: MapPin,
       to: "/cms/lugares",
       group: "territorio",
@@ -856,6 +877,18 @@ const cms: WorkspaceDefinition = {
       order: 13,
       surfaces: ["sidebar", "bottom", "palette"],
       primary: true,
+    },
+    {
+      /* LOTE 3I · sección central de Landing SEO (misma familia editorial,
+         mismo Experience Builder — sin editor paralelo). */
+      id: "cms.landing-seo",
+      workspaceId: "cms",
+      label: "Landing SEO",
+      icon: Sparkles,
+      to: "/cms/landing-seo",
+      group: "estudio",
+      order: 14,
+      surfaces: ["sidebar", "palette"],
     },
   ],
   alux: {

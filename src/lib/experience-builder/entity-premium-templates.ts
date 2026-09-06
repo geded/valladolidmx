@@ -232,11 +232,10 @@ export const ENTITY_PREMIUM_TEMPLATE_PRESETS: readonly EntityPremiumTemplatePres
       "nightly_price",
     ],
     presetRoles: ["founder", "admin"],
-    fallback: "standard_surface",
+    fallback: "premium_media_fallback",
     version: "1.0.0",
-    // Pendiente de aceptación visual Founder (preview interna noindex).
-    status: "pendiente_aceptacion_founder",
-    autoAssign: false,
+    status: "aprobada",
+    autoAssign: true,
     pageKinds: ["business"],
   },
   {

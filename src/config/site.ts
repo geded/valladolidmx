@@ -15,6 +15,8 @@
  * migran en PRs posteriores).
  */
 
+import { ACTIVE_BRAND } from "@/config/brand";
+
 /** Dominio público canónico (host, sin protocolo). */
 const PUBLIC_DOMAIN = "quehacerenvalladolid.com";
 /** URL pública canónica (con protocolo, sin trailing slash). */
@@ -33,8 +35,8 @@ export function absoluteUrl(path: string = "/"): string {
 }
 
 export const SITE = {
-  name: "Valladolid.mx",
-  tagline: "Oriente Maya de Yucatán",
+  name: ACTIVE_BRAND.name,
+  tagline: ACTIVE_BRAND.tagline,
   domain: PUBLIC_DOMAIN,
   url: PUBLIC_URL,
   default_description:

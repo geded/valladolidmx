@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { buildRegionPremiumRuntime } from "../../../src/components/destination-premium/region-premium-runtime";
+import { buildDestinationPremiumRuntime } from "../../../src/components/destination-premium/destination-premium-runtime";
 import { HOME_PREMIUM_G4_CONTENT } from "../../../src/components/home-premium/home-premium-content";
 import { mergeHomeRealContent } from "../../../src/components/home-premium/home-premium-real";
 
@@ -28,10 +29,45 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     ]);
   });
 
-  test("la portada regional no presenta destinos como selector de servicios", () => {
+  test("la portada regional usa el catálogo premium de hasta veinte destinos", () => {
+    // Lote 1 · contrato actualizado: la portada regional adoptó la autoridad
+    // visual aprobada del Atlas de Destinos (`RegionDestinationsPremiumSurface`,
+    // misma familia visual que Home Premium). Las capacidades exigidas siguen
+    // siendo las mismas: paginación de 8, Alux oficial, mapa oficial y Mi Viaje.
     const route = read("src/routes/oriente-maya/index.tsx");
-    expect(route).toContain("services: false");
-    expect(route).toContain('data-destination-template="premium-g4"');
+    const surface = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
+    const publicReads = read("src/lib/cms/public-reads.functions.ts");
+
+    expect(route).toContain("RegionDestinationsPremiumSurface");
+    expect(route).toContain("listPublishedDestinations");
+    expect(route).toContain('data-region-template="premium-approved"');
+    expect(surface).toContain("const PAGE_SIZE = 8");
+    expect(surface).toContain("setVisible(PAGE_SIZE)");
+    expect(surface).toContain("Mostrar más destinos");
+    expect(surface).toContain("TourismAluxPanel");
+    expect(surface).toContain("AddToTravelPlanButton");
+    expect(surface).toContain("InteractiveMap");
+    expect(publicReads).toContain("highlights, latitude, longitude");
+  });
+
+  test("los listados conservan una sola autoridad con DTO real, mapa, Alux y Mi Viaje", () => {
+    const route = read("src/routes/hoteles.tsx");
+    const restaurantRoute = read("src/routes/restaurantes.tsx");
+    const wrapper = read("src/components/listing-premium/ListingPremiumSurface.tsx");
+    const surface = read("src/components/surfaces/TourismListingSurface.tsx");
+    const adapter = read("src/lib/experience-builder/adapters/tourism-listing-adapters.ts");
+
+    expect(route).toContain("ListingPremiumSurfaceFromDTO");
+    expect(restaurantRoute).toContain("ListingPremiumSurfaceFromDTO");
+    expect(route).toContain("getPublicListing");
+    expect(wrapper).toContain("buildDestinationFacet");
+    expect(wrapper).toContain("InteractiveMap");
+    expect(surface).toContain("TourismCardRow");
+    expect(surface).toContain("AddToTravelPlanButton");
+    expect(surface).toContain("openAluxFloating");
+    expect(surface).toContain('to="/arma-tu-viaje"');
+    expect(surface).not.toContain("RequestConciergeButton");
+    expect(adapter).toContain("mediaUrl: b.cover_url ?? null");
   });
 
   test("la autoridad visual conserva los enlaces del mapa y de las tarjetas", () => {
@@ -39,6 +75,52 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(surface).toContain("href: p.href ?? null");
     expect(surface).toContain("d.href ? (");
     expect(surface).toContain("to={d.href}");
+  });
+
+  test("el destino Premium consume continuidad territorial real y excluye su propia ruta", () => {
+    const content = buildDestinationPremiumRuntime({
+      id: "destination:valladolid",
+      destination: {
+        slug: "valladolid",
+        name: "Valladolid",
+        tagline: "Capital turística",
+        description: "Punto de partida del Oriente Maya.",
+        highlights: [],
+        hero_palette: "territorio",
+        hero_url: null,
+        latitude: 20.6896,
+        longitude: -88.2011,
+      },
+      media: [],
+      mapPoints: [],
+      nearbyDestinations: [
+        {
+          title: "Valladolid",
+          subtitle: "Capital turística",
+          href: "/oriente-maya/valladolid",
+          mediaUrl: "",
+        },
+        {
+          title: "Izamal",
+          subtitle: "Ciudad amarilla",
+          href: "/oriente-maya/izamal",
+          mediaUrl: "/media/izamal.webp",
+        },
+      ],
+    });
+
+    expect(content.nearby.items.map((item) => item.href)).toEqual(["/oriente-maya/izamal"]);
+    expect(content.nearby.items[0]?.media.url).toBe("/media/izamal.webp");
+  });
+
+  test("Pueblo Mágico usa la marca institucional acreditada", () => {
+    const registry = read(
+      "src/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry.ts",
+    );
+    expect(registry).toContain('markSrc: "/brand/institutional/pueblos-magicos-oficial.webp"');
+    expect(read("public/brand/institutional/manifest.json")).toContain(
+      "Secretaría de Cultura y Turismo del Estado de México",
+    );
   });
 
   test("la siembra de medios es acreditada, reversible y nunca se ejecuta implícitamente", () => {
@@ -116,6 +198,24 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(merged.hero.slides[0]?.media.url).toBe(mediaUrl);
     expect(merged.rutas.items[0]?.media.url).toBe(mediaUrl);
     expect(merged.destinos.items[0]?.media.url).toBe(mediaUrl);
+  });
+
+  test("la Home pública nunca usa medios conceptuales como fallback", () => {
+    const withoutRealCorpus = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, undefined);
+    expect(withoutRealCorpus.hero.slides.every((slide) => slide.media.url === "")).toBe(true);
+    expect(withoutRealCorpus.eventos.media.url).toBe("");
+
+    const emptyRealCorpus = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
+      destinos: [],
+      experiencias: [],
+      stays: [],
+      food: [],
+      eventos: [],
+      rutas: [],
+      mapPoints: [],
+    });
+    expect(emptyRealCorpus.hero.slides).toEqual([]);
+    expect(JSON.stringify(emptyRealCorpus)).not.toContain("conceptual-preview");
   });
 
   test("los medios de Home usan el proxy estable y no dependen de service role", () => {

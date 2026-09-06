@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-056-ADDENDUM-ZZ-PR60-006",
+  "status": "Approved",
+  "parent": "PCA-2026-056",
+  "blueprint": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-06 para la reconciliación documental cerrada del Product Change Authorization Gate del PR #60. Este addendum reconoce exclusivamente una revisión preexistente mediante parent PCA, operación, ruta, SHA-256 anterior y SHA-256 actual; no modifica el archivo, no amplía permisos y no acepta revisiones futuras.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/DestinationSurface.tsx",
+    "previous_sha256": "05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71",
+    "current_sha256": "4dd81bbfb907aa3c0b557fa72ac44d8420b84b7e1099c18dc9b066e44d163b33",
+    "semantic_change": "Revisión exacta preexistente en integration/lovable-valladolidmx, reconciliada documentalmente para el PR #60 sin modificar el archivo protegido.",
+    "authority": "Autorización Founder PR #60 · reconciliación exacta I3-A · 2026-09-06"
+  },
+  "invariants": [
+    "Sin modificación del archivo protegido",
+    "Sin comodines ni aceptación de futuros SHA-256",
+    "Sin despliegue, datos, pagos, reservaciones, mapas, cron, secretos ni RLS"
+  ],
+  "recorded_at": "2026-09-06"
+}

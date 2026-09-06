@@ -67,6 +67,12 @@ export function buildRightsMetadata(r: MediaRightsInput) {
       conceptual: r.nature !== "documentary",
       rights_confirmed: true,
     },
+    lifecycle: {
+      temporary: aiGenerated,
+      production_eligible: !aiGenerated,
+      replacement_required: aiGenerated,
+      usage: aiGenerated ? "preview_only" : "production_candidate",
+    },
     focal: { x: clamp01(r.focalX ?? 0.5), y: clamp01(r.focalY ?? 0.5) },
   };
 }

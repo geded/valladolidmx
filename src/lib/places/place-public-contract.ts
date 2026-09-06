@@ -15,6 +15,8 @@
  *    ausencia la superficie cae a Editorial (regla fail-closed Q2D-A).
  */
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
+import { PLACE_ATTRACTION_FAMILY_LABELS, type PlaceAttractionFamily } from "./place-taxonomy";
 import {
   getPlacePremiumVariant,
   resolvePlacePresentation,
@@ -65,8 +67,19 @@ export interface PublicPlaceDTO {
   status: string;
   typeSlug: string | null;
   typeLabel: string | null;
+  /**
+   * Adenda documental · Inventario de Atractivos Turísticos del Oriente Maya.
+   * Clasificación PRINCIPAL en dos familias (tangible|intangible). El tipo y
+   * las categorías siguen siendo niveles subordinados.
+   */
+  attractionFamily: PlaceAttractionFamily;
   destination: { slug: string; name: string };
-  zone: { id: string; name: string } | null;
+  /**
+   * Subzona del destino (jerarquía canónica Región > Destino > Subzona >
+   * Lugar). Opcional: sólo existe cuando el dato real la declara y pertenece
+   * al mismo destino. Nunca se infiere ni se sustituye por el centro.
+   */
+  zone: { id: string; slug: string | null; name: string } | null;
   regionLabel: string;
   description: string | null;
   shortDescription: string | null;
@@ -100,6 +113,46 @@ export interface PublicPlaceDTO {
   /** Dirección persistida por el administrador (`metadata.presentation_mode`). */
   presentationMode: PremiumPresentation | null;
   seo: { title: string | null; description: string | null } | null;
+}
+
+/**
+ * G4-PLACES · Tarjeta pública del listado territorial de Lugares.
+ * Proyección ligera de `points_of_interest` (sólo lecturas reales):
+ * los campos no capturados llegan en `null`/`[]` y se omiten en la UI.
+ */
+export interface PublicPlaceCard {
+  id: string;
+  slug: string;
+  name: string;
+  short_description: string | null;
+  type_slug: string | null;
+  type_label: string | null;
+  /** Familia documental principal (tangible|intangible). */
+  attraction_family: PlaceAttractionFamily;
+  destination_slug: string | null;
+  destination_name: string | null;
+  zone_name: string | null;
+  /** Slug de la subzona, para filtrado y deep-links del listado. */
+  zone_slug: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  admission_kind: string | null;
+  price_from: number | null;
+  price_to: number | null;
+  price_currency: string | null;
+  visit_duration_minutes: number | null;
+  best_time_to_visit: string | null;
+  amenities: string[];
+  accessibility: string[];
+  categories: Array<{ slug: string; name: string }>;
+  /** Portada gobernada y aprobada del propio lugar; nunca medios ajenos. */
+  cover_url: string | null;
+  /**
+   * Atributos estructurados derivados EXCLUSIVAMENTE de columnas reales
+   * (place_type, experience_category, admission_type, zone, accessibility,
+   * amenities, duration, best_time). Vacío cuando no hay captura.
+   */
+  filter_attributes: TourismFilterAttributes;
 }
 
 /* ───────────────────────────────  JSON-LD  ─────────────────────────────── */
@@ -179,15 +232,26 @@ export function findApprovedCover(
 /* ─────────────────────────────  Territorio  ────────────────────────────── */
 
 export function buildPlaceBreadcrumbs(dto: PublicPlaceDTO) {
+  // Jerarquía canónica: Inicio > Oriente Maya > Destino > Subzona (si existe)
+  // > Lugares y sitios de interés > Lugar. Sin subzona real ese nivel se omite
+  // por completo: jamás se muestra vacío ni se inventa una.
   const crumbs: { label: string; href?: string }[] = [
     { label: "Inicio", href: "/" },
     { label: "Oriente Maya", href: "/oriente-maya" },
     { label: dto.destination.name, href: `/oriente-maya/${dto.destination.slug}` },
   ];
-  // La zona sólo aparece si pertenece al destino resuelto (fail-closed en
-  // el servidor: `zone` llega en `null` cuando no es compatible).
-  if (dto.zone) crumbs.push({ label: dto.zone.name });
-  crumbs.push({ label: dto.name });
+  if (dto.zone?.name) {
+    // La subzona no tiene ruta propia: se muestra como nivel territorial real
+    // sin enlace inventado.
+    crumbs.push({ label: dto.zone.name });
+  }
+  crumbs.push(
+    {
+      label: "Lugares y sitios de interés",
+      href: `/oriente-maya/${dto.destination.slug}/lugares`,
+    },
+    { label: dto.name },
+  );
   return crumbs;
 }
 
@@ -255,6 +319,12 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
   });
 
   const typeLabel = dto.typeLabel ?? variantDef?.label ?? "Lugar y atractivo";
+  /* Adenda documental: un atractivo INTANGIBLE (fiesta, tradición, saber,
+     expresión cultural) no se fuerza a una ficha física. Se omiten dirección,
+     mapa, horarios, admisión y precio; se priorizan descripción cultural,
+     comunidad/territorio, temporalidad y recomendaciones responsables. */
+  const isIntangible = dto.attractionFamily === "intangible";
+  const familyLabel = PLACE_ATTRACTION_FAMILY_LABELS[dto.attractionFamily];
   const placeholderLabel = `Fotografía pendiente · ${dto.name}`;
 
   const supporting = dto.media
@@ -267,14 +337,16 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     .map((m) => toSurfaceMedia(m, placeholderLabel));
 
   const facts: PlacePremiumContent["essentials"]["facts"] = [];
-  if (dto.admissionKind)
+  /* La familia es METADATA declarada, nunca un selector visual de estilo. */
+  facts.push({ key: "attraction-family", label: "Familia de atractivo", value: familyLabel });
+  if (!isIntangible && dto.admissionKind)
     facts.push({
       key: "admission",
       label: "Admisión",
       value: ADMISSION_LABELS[dto.admissionKind] ?? dto.admissionKind,
       hint: dto.entryFeeNotes?.trim() || undefined,
     });
-  const price = priceLabel(dto);
+  const price = isIntangible ? null : priceLabel(dto);
   if (price) facts.push({ key: "price", label: "Precio", value: price });
   if (dto.visitDurationMinutes)
     facts.push({
@@ -284,10 +356,14 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     });
   if (dto.bestTimeToVisit)
     facts.push({ key: "best-time", label: "Mejor momento", value: dto.bestTimeToVisit });
-  for (const line of formatPlaceHours(dto.hours)) {
-    facts.push({ key: `hours-${line}`, label: "Horario", value: line });
+  if (!isIntangible) {
+    for (const line of formatPlaceHours(dto.hours)) {
+      facts.push({ key: `hours-${line}`, label: "Horario", value: line });
+    }
+    if (dto.addressLine) facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
   }
-  if (dto.addressLine) facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
+  /* Comunidad y territorio: relevante sobre todo para intangibles. */
+  if (dto.zone) facts.push({ key: "zone", label: "Subzona del destino", value: dto.zone.name });
   if (dto.contact.website)
     facts.push({ key: "website", label: "Sitio web", value: dto.contact.website });
   if (dto.contact.phone) facts.push({ key: "phone", label: "Teléfono", value: dto.contact.phone });
@@ -324,6 +400,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
       subtitle: dto.shortDescription?.trim() || "",
       typeLabel,
       destinationLabel: dto.destination.name,
+      zoneLabel: dto.zone?.name ?? null,
       regionLabel: dto.regionLabel,
       badges: dto.categories.map((c) => c.name),
     },
@@ -331,7 +408,9 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
       cover: toSurfaceMedia(cover, placeholderLabel),
       supporting,
       primaryCta: { label: "Agregar a Mi Viaje" },
-      secondaryCta: { label: "Cómo llegar", href: "#mapa-lugar" },
+      secondaryCta: isIntangible
+        ? { label: "Ver galería", href: "#galeria-lugar" }
+        : { label: "Cómo llegar", href: "#mapa-lugar" },
     },
     intro: {
       kicker: "La historia",
@@ -358,7 +437,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
       heading: "Ubicación y cómo llegar",
       center: { lat: dto.latitude ?? 0, lng: dto.longitude ?? 0, zoom: 13 },
       points:
-        dto.latitude != null && dto.longitude != null
+        !isIntangible && dto.latitude != null && dto.longitude != null
           ? [
               {
                 id: dto.id,
@@ -371,12 +450,13 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
               },
             ]
           : [],
-      directions: dto.directions?.trim()
-        ? dto.directions
-            .split(/\n+/u)
-            .map((line) => line.trim())
-            .filter(Boolean)
-        : [],
+      directions:
+        !isIntangible && dto.directions?.trim()
+          ? dto.directions
+              .split(/\n+/u)
+              .map((line) => line.trim())
+              .filter(Boolean)
+          : [],
     },
     services: dto.amenities.map((label) => ({ key: label, label, hint: "" })),
     experiences: dto.products.map((item) => ({
@@ -402,8 +482,13 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     },
     alux: {
       title: "Pregúntale a Alux",
-      description: "Tu copiloto de viaje resuelve horarios, traslados y combinaciones cercanas.",
-      prompts: [`¿Cómo llego a ${dto.name}?`, `¿Qué hago cerca de ${dto.destination.name}?`],
+      description:
+        "Tu concierge IA te ayuda a decidir cuándo ir, cuánto tiempo dedicar y qué combinar cerca.",
+      prompts: [
+        `¿Cuándo es mejor visitar ${dto.name}?`,
+        `¿Cuánto tiempo necesito en ${dto.name}?`,
+        `Combínalo con experiencias y eventos cerca de ${dto.destination.name}`,
+      ],
       actionLabel: "Abrir Alux",
     },
   };

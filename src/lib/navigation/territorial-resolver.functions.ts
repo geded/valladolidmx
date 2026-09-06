@@ -21,6 +21,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { normalizeRouteSlug, routeSlugEquals } from "./canonical-paths";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,199}$/;
 
@@ -61,8 +62,19 @@ export interface TerritorialResolution {
     | "product_out_of_business";
 }
 
-function validSlug(v: string | null | undefined): v is string {
-  return typeof v === "string" && SLUG_RE.test(v);
+/**
+ * 3J.4 · Los segmentos se validan sobre su forma normalizada de ruta. Un
+ * slug institucional con mayúsculas (dato preexistente que no se muta)
+ * sigue siendo una ruta válida; la normalización vive aquí, en la capa de
+ * resolución, nunca en la base de datos.
+ */
+function validSlug(v: string | null | undefined): boolean {
+  return typeof v === "string" && SLUG_RE.test(normalizeRouteSlug(v));
+}
+
+function normalizedOrNull(v: string | null | undefined): string | null {
+  const n = normalizeRouteSlug(v);
+  return n.length > 0 ? n : null;
 }
 
 export const resolveTerritorialPath = createServerFn({ method: "GET" })
@@ -73,10 +85,10 @@ export const resolveTerritorialPath = createServerFn({ method: "GET" })
     if (input.empresa != null && !validSlug(input.empresa)) throw new Error("invalid_empresa");
     if (input.producto != null && !validSlug(input.producto)) throw new Error("invalid_producto");
     return {
-      destino: input.destino,
-      categoria: input.categoria ?? null,
-      empresa: input.empresa ?? null,
-      producto: input.producto ?? null,
+      destino: normalizeRouteSlug(input.destino),
+      categoria: normalizedOrNull(input.categoria),
+      empresa: normalizedOrNull(input.empresa),
+      producto: normalizedOrNull(input.producto),
     };
   })
   .handler(async ({ data }): Promise<TerritorialResolution> => {
@@ -99,14 +111,19 @@ export const resolveTerritorialPath = createServerFn({ method: "GET" })
     out.destination = { slug: dest.slug as string, label: dest.name as string };
 
     // 2) Categoría (opcional)
+    // 3J.4 · Búsqueda insensible a mayúsculas: el slug institucional puede
+    // conservar capitalización histórica y no se modifica.
     if (data.categoria) {
       const { data: cat } = await sb
         .from("business_categories")
         .select("slug, name")
-        .eq("slug", data.categoria)
+        .ilike("slug", data.categoria)
         .maybeSingle();
       if (!cat) return { ...out, reason: "category_not_found" };
-      out.category = { slug: cat.slug as string, label: cat.name as string };
+      out.category = {
+        slug: normalizeRouteSlug(cat.slug as string),
+        label: cat.name as string,
+      };
     }
 
     // 3) Empresa (opcional; exige categoría)
@@ -124,7 +141,10 @@ export const resolveTerritorialPath = createServerFn({ method: "GET" })
       if (!biz) return { ...out, reason: "business_not_found" };
       const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
       const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
-      if (destSlug !== out.destination.slug || catSlug !== out.category.slug) {
+      if (
+        !routeSlugEquals(destSlug as string | null, out.destination.slug) ||
+        !routeSlugEquals(catSlug as string | null, out.category.slug)
+      ) {
         return { ...out, reason: "business_out_of_territory" };
       }
       out.business = {

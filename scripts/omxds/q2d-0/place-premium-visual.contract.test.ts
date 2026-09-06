@@ -79,11 +79,14 @@ describe("G8-Q2D-0 · propuesta visual", () => {
     expect(surface).toContain("PremiumTerritorialBreadcrumb");
   });
 
+  /* El hero dejó de tener variante propia: la ficha de Lugar usa la misma
+     familia `PremiumHero` aprobada para hotel y restaurante. Las direcciones
+     visuales sólo modulan intro, esenciales y galería. */
   test("ofrece dos direcciones reales que cambian el DOM", () => {
     expect(surface).toContain("data-place-presentation");
     expect(surface).toContain("cinematic");
-    expect(surface).toContain("HeroEditorial");
     expect(surface).toContain("PremiumHero");
+    expect(surface).not.toContain("HeroEditorial");
     expect(surface).toContain("GalleryFilmstrip");
     expect(surface).toContain("GalleryMosaic");
   });

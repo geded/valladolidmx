@@ -25,7 +25,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import type {
   PublicDestinationDTO,
@@ -59,9 +58,11 @@ import {
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { hasForbiddenDestinationMedia } from "@/lib/destinations/public-media-policy";
 import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
-import { buildDestinationPremiumRuntime } from "@/components/destination-premium/destination-premium-runtime";
+import {
+  buildDestinationPremiumRuntime,
+  type DestinationPremiumNearbySource,
+} from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -83,6 +84,8 @@ export interface DestinationSurfaceContextValue {
   galleryUrls?: string[];
   /** G8-F1D — atribución acreditada por medio (ALT, caption, crédito). */
   galleryMedia?: PublicMediaAttribution[];
+  /** Destinos publicados del corpus real para continuidad territorial. */
+  nearbyDestinations?: DestinationPremiumNearbySource[];
 }
 
 export const DestinationSurfaceContext = createContext<DestinationSurfaceContextValue | null>(null);
@@ -94,11 +97,12 @@ export function DestinationSurfaceProvider({
   mapPoints,
   galleryUrls,
   galleryMedia,
+  nearbyDestinations,
   children,
 }: DestinationSurfaceContextValue & { children: React.ReactNode }) {
   return (
     <DestinationSurfaceContext.Provider
-      value={{ db, related, slug, mapPoints, galleryUrls, galleryMedia }}
+      value={{ db, related, slug, mapPoints, galleryUrls, galleryMedia, nearbyDestinations }}
     >
       {children}
     </DestinationSurfaceContext.Provider>
@@ -122,6 +126,8 @@ export interface DestinationSurfaceProps {
   galleryUrls?: string[];
   /** G8-F1D — atribución acreditada de los medios (ALT, caption, crédito). */
   galleryMedia?: PublicMediaAttribution[];
+  /** Destinos publicados del corpus real para continuidad territorial. */
+  nearbyDestinations?: DestinationPremiumNearbySource[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
   /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
@@ -182,8 +188,7 @@ export function buildDestinationSurfaceContract(
 }
 
 export interface DestinationSurfaceContractBoundaryProps extends DestinationSurfaceProps {
-  enabled: boolean;
-  legacy: ReactNode;
+  presentation?: "editorial" | "cinematic";
 }
 
 function PremiumRelatedCollection({ service, name }: { service: string; name: string }) {
@@ -243,8 +248,6 @@ function withoutUnaccreditedRelatedMedia(
 }
 
 export function DestinationSurfaceContractBoundary({
-  enabled,
-  legacy,
   destinationSlug,
   dbData,
   related,
@@ -252,26 +255,31 @@ export function DestinationSurfaceContractBoundary({
   galleryUrls,
   galleryMedia,
   premiumEnabled,
+  presentation = "editorial",
+  nearbyDestinations,
 }: DestinationSurfaceContractBoundaryProps) {
-  if (destinationSlug && dbData && isF1kDestination(destinationSlug)) {
+  // Lote 3B — La ficha de destino se sirve exclusivamente desde CMS.
+  const premiumDestination = dbData ?? null;
+  if (destinationSlug && premiumDestination) {
     const accreditedMedia = (galleryMedia ?? []).filter(
       (item) => !hasForbiddenDestinationMedia(item),
     );
     const safeRelated = withoutUnaccreditedRelatedMedia(related);
     const content = buildDestinationPremiumRuntime({
       id: `destination:${destinationSlug}`,
-      destination: dbData,
+      destination: premiumDestination,
       media: accreditedMedia,
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
+      nearbyDestinations,
     });
     return (
       <div
         data-omxds-visual-foundations="enabled"
         data-destination-template="premium-g4"
-        data-destination-presentation={premiumEnabled ? "cinematic" : "editorial"}
+        data-destination-presentation={presentation}
       >
         <DestinationSurfaceProvider
-          db={dbData}
+          db={dbData ?? null}
           related={safeRelated}
           slug={destinationSlug}
           mapPoints={mapPoints}
@@ -279,63 +287,33 @@ export function DestinationSurfaceContractBoundary({
           galleryMedia={accreditedMedia}
         >
           <DestinationPremiumSurface
+            showBreadcrumbs={false}
             content={content}
-            heroVariant={premiumEnabled ? "cinematic" : "editorial"}
+            heroVariant={presentation}
             sections={{ gallery: accreditedMedia.length > 0 }}
             heroAction={
-              dbData.id ? (
+              premiumDestination.id ? (
                 <AddToTravelPlanButton
                   kind="destination"
-                  targetId={dbData.id}
-                  title={dbData.name}
+                  targetId={premiumDestination.id}
+                  title={premiumDestination.name}
                   slug={destinationSlug}
                   imageUrl={content.hero.cover.url || null}
-                  subtitle={dbData.tagline}
+                  subtitle={premiumDestination.tagline}
                   variant="full"
                   eligibilityMode="legacy"
                 />
               ) : null
             }
             renderServicePreview={(service) => (
-              <PremiumRelatedCollection service={service.key} name={dbData.name} />
+              <PremiumRelatedCollection service={service.key} name={premiumDestination.name} />
             )}
           />
         </DestinationSurfaceProvider>
       </div>
     );
   }
-  if (!enabled || !destinationSlug) return legacy;
-
-  const mock = DESTINOS_MOCK.find(
-    (destination) =>
-      destination.slug === destinationSlug && destination.region_slug === ORIENTE_MAYA.slug,
-  );
-  if (!dbData && !mock) return legacy;
-
-  const input = toDestinationBlockInput(dbData, mock ?? null, {
-    slug: destinationSlug,
-    regionSlug: ORIENTE_MAYA.slug,
-    regionName: ORIENTE_MAYA.name,
-    counts: destinationRelatedCounts(related),
-    galleryUrls: galleryUrls ?? [],
-    mediaAttribution: galleryMedia ?? [],
-    mapPoints: mapPoints ?? [],
-  });
-  const surfaceContract = buildDestinationSurfaceContract(input);
-  if (!surfaceContract) return legacy;
-
-  return (
-    <DestinationSurface
-      destinationSlug={destinationSlug}
-      dbData={dbData}
-      related={related}
-      mapPoints={mapPoints}
-      galleryUrls={galleryUrls}
-      galleryMedia={galleryMedia}
-      surfaceContract={surfaceContract}
-      premiumEnabled={premiumEnabled}
-    />
-  );
+  return null;
 }
 
 export function DestinationSurface({
@@ -358,11 +336,7 @@ export function DestinationSurface({
   const effectiveMapPoints = mapPoints ?? ctx?.mapPoints ?? [];
   const effectiveGalleryUrls = galleryUrls ?? ctx?.galleryUrls ?? [];
   const effectiveGalleryMedia = galleryMedia ?? ctx?.galleryMedia ?? [];
-  const mock = slug
-    ? DESTINOS_MOCK.find((d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug)
-    : undefined;
-
-  if (!db && !mock) {
+  if (!db) {
     return (
       <PublicShell
         title="Destino no disponible"
@@ -373,7 +347,7 @@ export function DestinationSurface({
     );
   }
 
-  const input = toDestinationBlockInput(db, mock ?? null, {
+  const input = toDestinationBlockInput(db, null, {
     slug: slug ?? "",
     regionSlug: ORIENTE_MAYA.slug,
     regionName: ORIENTE_MAYA.name,

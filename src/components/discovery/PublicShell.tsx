@@ -43,6 +43,10 @@ export interface PublicShellProps {
    * Default `false`: la prop `crumbs` sigue siendo la fuente.
    */
   useContextCrumbs?: boolean;
+  /** Progressive disclosure del breadcrumb en móvil (≤639px). */
+  compactCrumbsOnMobile?: boolean;
+  /** Conserva la presentación del título cuando el contenido ya aporta el único h1. */
+  titleAsText?: boolean;
 }
 
 export function PublicShell({
@@ -55,6 +59,8 @@ export function PublicShell({
   children,
   contextDeclaration,
   useContextCrumbs = false,
+  compactCrumbsOnMobile = false,
+  titleAsText = false,
 }: PublicShellProps) {
   const body = (
     <PublicShellBody
@@ -65,6 +71,8 @@ export function PublicShell({
       variant={variant}
       className={className}
       useContextCrumbs={useContextCrumbs}
+      compactCrumbsOnMobile={compactCrumbsOnMobile}
+      titleAsText={titleAsText}
     >
       {children}
     </PublicShellBody>
@@ -84,6 +92,8 @@ interface PublicShellBodyProps {
   variant: PublicShellVariant;
   className?: string;
   useContextCrumbs: boolean;
+  compactCrumbsOnMobile?: boolean;
+  titleAsText: boolean;
   children: ReactNode;
 }
 
@@ -95,11 +105,31 @@ function PublicShellBody({
   variant,
   className,
   useContextCrumbs,
+  compactCrumbsOnMobile = false,
+  titleAsText,
   children,
 }: PublicShellBodyProps) {
-  if (variant === "minimal" || variant === "hero") {
+  if (variant === "minimal") {
     return (
       <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
+        {children}
+      </main>
+    );
+  }
+
+  if (variant === "hero") {
+    const hasCrumbs = useContextCrumbs || Boolean(crumbs && crumbs.length > 0);
+    return (
+      <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
+        {hasCrumbs ? (
+          <Container className="py-3">
+            <BreadcrumbTerritorial
+              crumbs={crumbs}
+              useContextCrumbs={useContextCrumbs}
+              compactOnMobile={compactCrumbsOnMobile}
+            />
+          </Container>
+        ) : null}
         {children}
       </main>
     );
@@ -112,7 +142,11 @@ function PublicShellBody({
     <main id="main" tabIndex={-1} className={cn("pb-24 pt-8 md:pt-12", className)}>
       <Container>
         {hasCrumbs ? (
-          <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} />
+          <BreadcrumbTerritorial
+            crumbs={crumbs}
+            useContextCrumbs={useContextCrumbs}
+            compactOnMobile={compactCrumbsOnMobile}
+          />
         ) : null}
         {hasHeader ? (
           <header className={cn("max-w-3xl", hasCrumbs ? "mt-6" : null)}>
@@ -121,7 +155,13 @@ function PublicShellBody({
                 {eyebrow}
               </p>
             ) : null}
-            {title ? <h1 className="text-balance text-4xl md:text-5xl">{title}</h1> : null}
+            {title ? (
+              titleAsText ? (
+                <p className="text-display-hero">{title}</p>
+              ) : (
+                <h1 className="text-display-hero">{title}</h1>
+              )
+            ) : null}
             {description ? (
               <p className="mt-4 text-lg text-muted-foreground">{description}</p>
             ) : null}

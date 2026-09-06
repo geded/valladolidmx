@@ -682,7 +682,12 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           venue_name: (e.venue_name as string | null) ?? null,
           is_free: Boolean(e.is_free),
           destination_slug: dest.slug,
+          destination_name: null,
+          filter_attributes: {},
+          latitude: null,
+          longitude: null,
           cover_url: null,
+
         }));
       if (pinnedIds.event.length > 0) {
         const byId = new Map(grouped.eventos.map((c) => [c.id, c] as const));

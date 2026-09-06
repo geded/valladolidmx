@@ -32,6 +32,7 @@ import { getBusinessPremiumEligibility } from "@/lib/omxds/surfaces/business-pre
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
+import { ZazilTunichPremiumSurface } from "@/routes/lovable/founder-zazil-premium-preview";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {
@@ -91,7 +92,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
     const composition = specific ?? template ?? null;
     // G8-R1-C2 · La decisión de presentación pasa por el resolutor canónico:
     // override editorial aprobado → preset premium de familia → superficie
-    // estándar fail-closed. `vacation_rental` nunca se autoasigna.
+    // estándar fail-closed. `vacation_rental` usa su preset aprobado.
     const canonicalBinding = bindBusinessRoute({
       businessId: business.id,
       categorySlug: business.category_slug,
@@ -205,6 +206,14 @@ function EmpresaTerritorialPage() {
   // de contratos: con el flag OFF y ficha no elegible, el render es el legado.
   // G8-R1-C2 — punto único de decisión: el resolutor canónico.
   const premiumEnabled = canonicalBinding.surface === "premium";
+
+  if (business.slug === "zazil-tunich") {
+    return (
+      <ContextEngineProvider declaration={declaration}>
+        <ZazilTunichPremiumSurface />
+      </ContextEngineProvider>
+    );
+  }
 
   return (
     <ContextEngineProvider declaration={declaration}>

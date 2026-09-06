@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "scope": "hotel-listing-preview-fallback",
+  "policy": {
+    "aiGenerated": true,
+    "conceptual": true,
+    "temporary": true,
+    "documentary": false,
+    "productionEligible": false,
+    "replacement": "Reemplazar por medios acreditados del hotel o del destino antes de producción."
+  },
+  "assets": [
+    {
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-colonial-v1.webp",
+      "theme": "hotel-colonial"
+    },
+    {
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-campo-v1.webp",
+      "theme": "campo-y-siembra"
+    },
+    {
+      "path": "/api/public/studio-media/conceptual-preview/2026-09-01/hoteles-hero-costa-v1.webp",
+      "theme": "costa-y-playa"
+    }
+  ]
+}

@@ -21,6 +21,7 @@
  */
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
 
 /* ------------------------------------------------------------------ *
  * View Model — común a toda la Biblioteca Turística.
@@ -32,6 +33,7 @@ export type TourismEntityKind =
   | "restaurant"
   | "experience"
   | "event"
+  | "place"
   | "destination"
   | "landing"
   | "promotion"
@@ -47,6 +49,7 @@ export const TOURISM_ENTITY_LABEL: Record<TourismEntityKind, string> = {
   restaurant: "Restaurante",
   experience: "Experiencia",
   event: "Evento",
+  place: "Lugar",
   destination: "Destino",
   landing: "Landing",
   promotion: "Promoción",
@@ -96,6 +99,11 @@ export interface TourismCardVM {
   /** Distintivos institucionales oficiales (Pueblo Mágico, etc.). */
   institutionalBadges: TourismCardBadge[];
   dateLabel: string | null;
+  /** Fecha ISO real de inicio (eventos). Permite filtros por rango. */
+  startsAt?: string | null;
+  /** Fecha ISO real de fin (eventos). */
+  endsAt?: string | null;
+
   availabilityLabel: string | null;
   priceAmount: number | null;
   priceCurrency: string | null;
@@ -104,6 +112,8 @@ export interface TourismCardVM {
   secondaryAction: TourismCardAction | null;
   /** Explainable-by-default: motivo por el que aparece esta card. */
   rationale?: string | null;
+  /** Valores editoriales confirmados; las ausencias nunca se infieren. */
+  filterAttributes?: TourismFilterAttributes;
 }
 
 export interface TourismCardCapabilities {
@@ -274,6 +284,7 @@ function MediaPlaceholder({ kind }: { kind: TourismEntityKind | null }) {
     restaurant: "from-warning/40 via-primary/10 to-destructive/10",
     experience: "from-primary/40 via-warning/20 to-success/10",
     event: "from-destructive/20 via-warning/30 to-primary/20",
+    place: "from-success/20 via-info/10 to-primary/20",
     destination: "from-info/30 via-success/10 to-warning/20",
     landing: "from-primary/20 via-muted to-warning/20",
     promotion: "from-warning/40 via-destructive/10 to-primary/20",

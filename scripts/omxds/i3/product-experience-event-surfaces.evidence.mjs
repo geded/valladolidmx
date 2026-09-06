@@ -14,10 +14,7 @@ const productRoutePath = "src/routes/producto.$slug.tsx";
 const territorialProductRoutePath =
   "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx";
 const eventRoutePath = "src/routes/eventos.$slug.tsx";
-const existingConsumers = [
-  "src/routes/oriente-maya/$destino.index.tsx",
-  "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
-];
+const existingConsumers = ["src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"];
 const newConsumers = [productRoutePath, territorialProductRoutePath, eventRoutePath];
 const allowed = new Set([
   "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
@@ -54,6 +51,30 @@ for (const file of allowed)
 const reconciliationAuthorization = JSON.parse(
   readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
 );
+const exactReconciliationAddenda = [
+  "PCA-2026-056-ADDENDUM-ZZ-PR60-008.json",
+  "PCA-2026-056-ADDENDUM-ZZ-PR60-009.json",
+  "PCA-2026-056-ADDENDUM-ZZ-PR60-010.json",
+  "PCA-2026-056-ADDENDUM-ZZ-PR60-011.json",
+  "PCA-2026-059-ADDENDUM-ZZ-PR60-064.json",
+].map((file) => JSON.parse(readFileSync(join("docs/governance/addenda", file), "utf8")));
+function hasApprovedExactRevision(path, sha256) {
+  return (
+    [reconciliationAuthorization].some(
+      (authorization) =>
+        authorization.status === "Approved" &&
+        (authorization.acknowledged_revisions ?? []).some(
+          (entry) => entry.path === path && entry.sha256 === sha256,
+        ),
+    ) ||
+    exactReconciliationAddenda.some(
+      (addendum) =>
+        addendum.status === "Approved" &&
+        addendum.supersedes_acknowledged_revision?.path === path &&
+        addendum.supersedes_acknowledged_revision?.current_sha256 === sha256,
+    )
+  );
+}
 assert.equal(reconciliationAuthorization.status, "Approved");
 assert.ok(
   (reconciliationAuthorization.required_feature_flags ?? []).includes(
@@ -61,9 +82,9 @@ assert.ok(
   ),
 );
 const acknowledgedConsumerRevisions = new Map([
-  [productRoutePath, "b9c1ba9a015ec4d0974a1a57dd6ac03905d162d998073c9fee197420d8044b3f"],
+  [productRoutePath, "75696bf3b99860d749c4346f78af2439616e1ef74d66f1ef7740f32d980bbd18"],
   [territorialProductRoutePath, "2dd89fb8ab9a6e6ba42307ba0a45dfe3f424c1d436d96b91182e5255ac008dbb"],
-  [eventRoutePath, "1ce68f037ab27c43d79b4abba1ac7d1c3f4927378595268e8fd1feae6efdd4f0"],
+  [eventRoutePath, "4c8d3f3c2203f6792ee70e44a617cdbeab05d3933d6892cbfb1c33d3f5d6fda6"],
 ]);
 
 for (const file of [
@@ -87,17 +108,15 @@ for (const file of [
     `I3-C consumer changed after exact acknowledgment: ${file}`,
   );
   assert.ok(
-    (reconciliationAuthorization.acknowledged_revisions ?? []).some(
-      (entry) => entry.path === file && entry.sha256 === expectedDigest,
-    ),
-    `PCA-2026-056 does not acknowledge the exact I3-C consumer revision: ${file}`,
+    hasApprovedExactRevision(file, expectedDigest),
+    `Approved reconciliation does not acknowledge the exact I3-C consumer revision: ${file}`,
   );
 }
 
 const acknowledgedSurfaceRevisions = new Map([
   [
     "src/components/surfaces/ProductSurface.tsx",
-    "f9f70fae41023133c79bcce5bcf750f6b79c666e296eb8f84b5f1d4f0147e55a",
+    "760941acd8b439e7b110d8324c62c82ef652ea7e8999542396c140df492c5bda",
   ],
   [
     "src/components/surfaces/EventSurface.tsx",
@@ -151,7 +170,7 @@ assert.match(territorialProductRoute, /ProductSurfaceContractBoundary/);
 assert.match(territorialProductRoute, /legacy=\{<ProductSurface \/>\}/);
 const eventRoute = readFileSync(eventRoutePath, "utf8");
 assert.match(eventRoute, /EventSurfaceContractBoundary/);
-assert.match(eventRoute, /<EventSurface event=\{event\} \/>/);
+assert.match(eventRoute, /legacy=\{<EventPremiumSurface event=\{event\} \/>\}/);
 
 const productSurface = readFileSync("src/components/surfaces/ProductSurface.tsx", "utf8");
 assert.match(productSurface, /ProductSurfaceContractBoundary/);
@@ -262,7 +281,7 @@ const acknowledgedProtectedRevisions = new Map([
   ],
   [
     "src/lib/experience-builder/composition-renderer.tsx",
-    "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+    "ef0e4749f83c8c83a99c3da17acc04eacaa06cf338fb3b34f6d8e1f453d83262",
   ],
   [
     "src/lib/catalog/product-related.functions.ts",
@@ -270,7 +289,7 @@ const acknowledgedProtectedRevisions = new Map([
   ],
   [
     "src/lib/events/public-reads.functions.ts",
-    "c40ae17d1aa9697de5ad8c1c492b43472454ffe695339fa3d7e8689ab2fef7a6",
+    "799f7046ea6ae11a9d155c17fe332e08f515b574040ff26e4422015a1c4c79a7",
   ],
 ]);
 for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
@@ -284,10 +303,8 @@ for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
     `I3-C protected artifact changed after exact acknowledgment: ${protectedPath}`,
   );
   assert.ok(
-    (reconciliationAuthorization.acknowledged_revisions ?? []).some(
-      (entry) => entry.path === protectedPath && entry.sha256 === expectedDigest,
-    ),
-    `PCA-2026-056 does not acknowledge the exact I3-C revision: ${protectedPath}`,
+    hasApprovedExactRevision(protectedPath, expectedDigest),
+    `Approved reconciliation does not acknowledge the exact I3-C revision: ${protectedPath}`,
   );
 }
 // 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por

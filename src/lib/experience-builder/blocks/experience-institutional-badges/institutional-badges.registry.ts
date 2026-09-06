@@ -22,6 +22,7 @@ import {
   Star,
   type LucideIcon,
 } from "lucide-react";
+import { getAuthorizedSlugs } from "@/lib/institutional/institutional-authority";
 
 export const BADGE_KINDS = [
   "pueblo-magico",
@@ -42,6 +43,9 @@ export interface BadgeRegistryEntry {
   label: string;
   shortLabel: string;
   icon: LucideIcon;
+  /** Marca institucional acreditada. Cuando existe, sustituye al glifo genérico. */
+  markSrc?: string;
+  markAlt?: string;
   /** Nombre del token semántico (sin el prefijo `--color-`). */
   colorToken: string;
   /** Prioridad institucional — orden fijo, no configurable. */
@@ -68,6 +72,8 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     label: "Pueblo Mágico",
     shortLabel: "P. Mágico",
     icon: Sparkles,
+    markSrc: "/brand/institutional/pueblos-magicos-oficial.webp",
+    markAlt: "Pueblos Mágicos de México",
     colorToken: "badge-pueblo-magico",
     priority: 10,
     group: "identity",
@@ -106,6 +112,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 40,
     group: "identity",
     tooltip: "Programa oficial Despierta en Valladolid",
+    restrictedSlugs: ["valladolid"],
     verificationMode: "registry",
   },
   award: {
@@ -180,12 +187,23 @@ export function getBadgeRegistryEntry(kind: BadgeKind): BadgeRegistryEntry {
   return INSTITUTIONAL_BADGE_REGISTRY[kind] ?? INSTITUTIONAL_BADGE_REGISTRY.custom;
 }
 
-/** Autorización institucional (§12: `pueblo-magico` sólo en destinos autorizados). */
+/**
+ * Autorización institucional (§12: `pueblo-magico` sólo en destinos
+ * autorizados).
+ *
+ * Lote 3B · C — La autoridad vigente la administra el CMS
+ * (`institutional.badges.authority`). El registry conserva
+ * `restrictedSlugs` únicamente como FALLBACK seguro para cuando el CMS
+ * todavía no se pronuncia sobre ese distintivo. Sigue prohibido añadir
+ * condicionales por slug fuera de este punto.
+ */
 export function isBadgeAuthorized(kind: BadgeKind, subjectSlug?: string): boolean {
   const entry = getBadgeRegistryEntry(kind);
-  if (!entry.restrictedSlugs) return true;
+  const managed = getAuthorizedSlugs(kind);
+  const restricted = managed ?? entry.restrictedSlugs;
+  if (!restricted) return true;
   if (!subjectSlug) return false;
-  return entry.restrictedSlugs.includes(subjectSlug.toLowerCase());
+  return restricted.includes(subjectSlug.toLowerCase());
 }
 
 export interface BadgeEvidence {
@@ -223,4 +241,47 @@ export function isBadgeEligible(
     if (new Date(item.expiresAt).getTime() <= now.getTime()) return false;
   }
   return true;
+}
+
+/* ------------------------------------------------------------------ *
+ * Lote 3B — Fuente institucional única para destinos.
+ *
+ * Ninguna superficie, plantilla ni adaptador decide por sí misma qué
+ * distintivos corresponden a un destino: todos consumen este helper, que
+ * resuelve la autorización exclusivamente desde el registry
+ * (`restrictedSlugs`). Prohibidos los condicionales por slug fuera de
+ * este módulo (Institutional Badges Rule).
+ * ------------------------------------------------------------------ */
+
+/** Orden institucional de los distintivos aplicables a un destino. */
+const DESTINATION_BADGE_KINDS: BadgeKind[] = [
+  "pueblo-magico",
+  "oriente-maya",
+  "despierta-en-valladolid",
+];
+
+export interface DestinationBadgeItem {
+  kind: BadgeKind;
+  slug: string;
+  source: "destination";
+}
+
+/**
+ * Distintivos institucionales autorizados para un destino, en orden de
+ * prioridad del registry. Devuelve `[]` para un slug vacío.
+ */
+export function buildDestinationBadgeItems(subjectSlug: string): DestinationBadgeItem[] {
+  const slug = subjectSlug.trim().toLowerCase();
+  if (!slug) return [];
+  return DESTINATION_BADGE_KINDS.filter(
+    (kind) =>
+      isBadgeAuthorized(kind, slug) && getBadgeRegistryEntry(kind).verificationMode !== "disabled",
+  )
+    .sort((a, b) => getBadgeRegistryEntry(a).priority - getBadgeRegistryEntry(b).priority)
+    .map((kind) => ({ kind, slug: `${kind}:${slug}`, source: "destination" as const }));
+}
+
+/** Autorización Pueblo Mágico — único punto de verdad para toda la plataforma. */
+export function isPuebloMagicoDestination(subjectSlug: string): boolean {
+  return isBadgeAuthorized("pueblo-magico", subjectSlug);
 }

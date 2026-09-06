@@ -49,12 +49,14 @@ import {
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
   createBusinessSurfaceContract,
   type BusinessSurfaceContractInput,
 } from "@/lib/omxds/surfaces/business-surface.contract";
 import { adaptHotelSurfaceContract } from "@/lib/omxds/surfaces/hotel-surface.adapter";
 import { adaptRestaurantSurfaceContract } from "@/lib/omxds/surfaces/restaurant-surface.adapter";
+import { adaptVacationRentalSurfaceContract } from "@/lib/omxds/surfaces/vacation-rental-surface.adapter";
 import {
   isOmxdsSurfaceContract,
   type OmxdsSurfaceContract,
@@ -64,6 +66,7 @@ import {
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
 import { PremiumHero } from "@/components/premium";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
 /* ------------------------------------------------------------------ *
@@ -164,6 +167,21 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
     productsHeading: "Servicios",
     productsEmpty: "Sin servicios publicados.",
   },
+  "casas-de-vacaciones": {
+    eyebrow: "Casa de vacaciones",
+    productsHeading: "Estancias y servicios",
+    productsEmpty: "Sin opciones de estancia publicadas.",
+  },
+  "casas-vacacionales": {
+    eyebrow: "Casa de vacaciones",
+    productsHeading: "Estancias y servicios",
+    productsEmpty: "Sin opciones de estancia publicadas.",
+  },
+  villas: {
+    eyebrow: "Villa",
+    productsHeading: "Estancias y servicios",
+    productsEmpty: "Sin opciones de estancia publicadas.",
+  },
 };
 
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
@@ -227,8 +245,22 @@ export function BusinessSurfaceContractBoundary({
   if (!enabled || !business) return legacy;
 
   const input = businessToSurfaceContractInput(business, related);
-  const verticalContract =
-    adaptHotelSurfaceContract(input) ?? adaptRestaurantSurfaceContract(input);
+  // Lote 3C · corrección final — la familia declarada en CMS
+  // (`business_categories.listing_family_key`) manda sobre cualquier slug.
+  // Sólo cuando el CMS no la declara se conserva la heurística previa.
+  const cmsFamily = business.category_family_key ?? null;
+  const verticalContract = cmsFamily
+    ? cmsFamily === "hoteles"
+      ? adaptHotelSurfaceContract(input)
+      : cmsFamily === "restaurantes"
+        ? adaptRestaurantSurfaceContract(input)
+        : cmsFamily === "casas-de-vacaciones"
+          ? adaptVacationRentalSurfaceContract({ ...input, categorySlug: "casas-de-vacaciones" })
+          : null
+    : (adaptHotelSurfaceContract(input) ??
+      adaptRestaurantSurfaceContract(input) ??
+      adaptVacationRentalSurfaceContract(input));
+
   if (verticalContract)
     return (
       <BusinessSurface
@@ -407,6 +439,7 @@ export function BusinessSurface({
     <PublicShell
       crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: b.display_name }]}
       useContextCrumbs
+      compactCrumbsOnMobile
     >
       {activePremium ? (
         <>
@@ -430,21 +463,51 @@ export function BusinessSurface({
           <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
             <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
+            <AddToTravelPlanButton
+              kind="business"
+              targetId={b.id}
+              title={b.display_name}
+              slug={b.slug}
+              {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+            />
           </div>
         </>
       ) : (
         <ExperienceHero
           dto={heroDto}
           headingLevel="h1"
-          headerActionsSlot={
-            <>
-              <ShareButton title={b.display_name} />
-              <FavoriteButton entityKind="business" entityId={b.id} />
-            </>
-          }
+          headerActionsSlot={null}
           extensionsSlot={null}
         />
       )}
+
+      {activePremium ? null : (
+        <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap justify-end gap-2 px-5 sm:px-8 lg:px-12">
+          <ShareButton title={b.display_name} />
+          <FavoriteButton entityKind="business" entityId={b.id} />
+          <AddToTravelPlanButton
+            kind="business"
+            targetId={b.id}
+            title={b.display_name}
+            slug={b.slug}
+            {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+          />
+        </div>
+      )}
+
+      <TourismAluxPanel
+        className="mx-auto mt-4 w-full max-w-7xl"
+        title={`Planear con ${b.display_name}`}
+        description="Alux te ayuda a integrar esta opción en tu viaje por el Oriente Maya."
+        task={`Ayúdame a integrar ${b.display_name} en mi viaje por el Oriente Maya.`}
+        selection={{
+          entityRef: `business:${b.id}`,
+          title: b.display_name,
+          ...(b.destination_slug ? { destinationSlug: b.destination_slug } : {}),
+          ...(b.destination_slug ? { destinationLabel: b.destination_slug } : {}),
+          ...(b.category_slug ? { familySlug: b.category_slug } : {}),
+        }}
+      />
 
       <AluxContextChip
         businessId={b.id}

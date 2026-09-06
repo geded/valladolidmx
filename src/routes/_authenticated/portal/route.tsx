@@ -84,9 +84,9 @@ function PortalLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <main className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-sm text-muted-foreground">Cargando Portal…</p>
-      </div>
+      </main>
     );
   }
 
@@ -193,7 +193,7 @@ function formatRole(role: PortalBusinessSummary["role"]): string {
 
 function PortalShellMessage({ title, body }: { title: string; body: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
           Portal Empresarial
@@ -207,6 +207,6 @@ function PortalShellMessage({ title, body }: { title: string; body: string }) {
           Volver al inicio
         </Link>
       </div>
-    </div>
+    </main>
   );
 }

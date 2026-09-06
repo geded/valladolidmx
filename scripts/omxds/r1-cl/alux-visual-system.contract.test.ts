@@ -299,8 +299,8 @@ describe("Integración transversal · inventario real de familias", () => {
     expect(mounts.length).toBe(0);
   });
 
-  test("las 11 familias productivas declaran dock único y cero duplicación", () => {
-    expect(ALUX_SURFACE_INVENTORY.length).toBe(11);
+  test("las 12 familias productivas declaran dock único y cero duplicación", () => {
+    expect(ALUX_SURFACE_INVENTORY.length).toBe(12);
     for (const r of ALUX_SURFACE_INVENTORY) {
       expect(r.globalDock).toBe(true);
       expect(r.duplication).toBe("none");
@@ -309,9 +309,9 @@ describe("Integración transversal · inventario real de familias", () => {
     }
   });
 
-  test("Casa de vacaciones permanece sin autoasignación productiva", () => {
-    expect(ALUX_SURFACE_WITHHELD.some((f) => f.includes("vacation_rental"))).toBe(true);
-    expect(ALUX_SURFACE_INVENTORY.some((r) => /vacaciones/i.test(r.family))).toBe(false);
+  test("Casa de vacaciones usa la presencia transversal aprobada", () => {
+    expect(ALUX_SURFACE_WITHHELD.some((f) => f.includes("vacation_rental"))).toBe(false);
+    expect(ALUX_SURFACE_INVENTORY.some((r) => /vacaciones/i.test(r.family))).toBe(true);
   });
 
   test("invariantes de presencia", () => {

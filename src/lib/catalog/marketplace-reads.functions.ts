@@ -15,6 +15,11 @@ import type { Database } from "@/integrations/supabase/types";
 import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 import { resolveMediaAlt, type MediaLocale } from "@/lib/media/resolve-alt";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import {
+  attributeValues,
+  normalizeFilterAttributes,
+  type TourismFilterAttributes,
+} from "@/lib/business-attributes/types";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -47,6 +52,8 @@ export interface MarketplaceBusinessCard {
   /** Ola 7.8 · Spotlight manual del Founder. */
   spotlight_headline?: string | null;
   spotlight_boost?: number;
+  /** Atributos confirmados y administrables usados por filtros territoriales. */
+  filter_attributes?: TourismFilterAttributes;
 }
 
 export interface MarketplaceProductCard {
@@ -84,6 +91,12 @@ export interface MarketplacePromotionCard {
 
 export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   description: string;
+  /**
+   * Lote 3C — familia de listado declarada en CMS
+   * (`business_categories.listing_family_key`). Autoridad única para elegir
+   * la superficie vertical de la ficha; `null` = el CMS no la declara.
+   */
+  category_family_key?: string | null;
   /** Plan comercial contratado. Resuelto vía Catálogo Central de Planes. */
   plan_tier: "free" | "starter" | "pro" | "premium";
   products: MarketplaceProductCard[];
@@ -212,6 +225,20 @@ export interface MarketplaceProductDetail {
   accepts_online_payment: boolean;
   requires_availability: boolean;
   visibility_level: string;
+  /** Duración publicada por la empresa (minutos). */
+  duration_minutes: number | null;
+  /** Aforo máximo publicado. */
+  capacity: number | null;
+  /** Contrato operativo de venta directa (CV4.1). Sin él no hay "Reservar". */
+  direct_sale: {
+    enabled: boolean;
+    price_amount: number | null;
+    price_currency: string | null;
+    min_lead_hours: number | null;
+    max_quantity: number | null;
+    cancellation_policy: string | null;
+    terms: string | null;
+  };
   cover_url: string | null;
   media: ProductMediaItem[];
   business: ProductBusinessContext;
@@ -220,6 +247,70 @@ export interface MarketplaceProductDetail {
   reviews: ProductReviewItem[];
   review_stats: ProductReviewStats;
   faqs: ProductFaqItem[];
+  /**
+   * Lote 3E · Atributos turísticos administrables del producto
+   * (`products.filter_attributes`) resueltos contra el catálogo activo de la
+   * familia correspondiente (`tourism_attribute_definitions/_options`).
+   * Sólo se listan claves con valor real; los valores sin opción activa se
+   * omiten. Vacío cuando el producto no tiene atributos capturados.
+   */
+  attributes: ProductAttributeItem[];
+  /** Etiqueta editorial de tipo (`metadata.category_label`) si la empresa la capturó. */
+  category_label: string | null;
+}
+
+export interface ProductAttributeItem {
+  key: string;
+  label: string;
+  /** Grupo de filtro del catálogo (`zone|primary|secondary|profile|policy|commercial`). */
+  filter_group: string;
+  values: Array<{ value: string; label: string }>;
+}
+
+/** Familia del catálogo de atributos turísticos que gobierna cada tipo de producto. */
+const PRODUCT_TYPE_ATTRIBUTE_FAMILY: Record<string, string> = {
+  experiencia: "experiencias",
+  tour: "experiencias",
+  evento: "eventos",
+  hotel: "hoteles",
+  restaurante: "restaurantes",
+};
+
+/**
+ * Resuelve `products.filter_attributes` contra el catálogo activo. Sólo
+ * conserva claves definidas y valores con opción activa; nunca completa.
+ */
+function resolveProductAttributes(
+  raw: unknown,
+  definitions: Array<Record<string, unknown>>,
+): ProductAttributeItem[] {
+  const values = normalizeFilterAttributes(raw);
+  const out: ProductAttributeItem[] = [];
+  for (const definition of definitions) {
+    const key = String(definition.attribute_key ?? "");
+    if (!key) continue;
+    const selected = attributeValues(values[key]);
+    if (!selected.length) continue;
+    const options = ((definition.tourism_attribute_options ?? []) as Array<Record<string, unknown>>)
+      .filter((option) => option.active !== false)
+      .map((option) => ({
+        value: String(option.value),
+        label: String(option.label),
+        sort_order: Number(option.sort_order ?? 0),
+      }))
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const resolved = options
+      .filter((option) => selected.includes(option.value))
+      .map((option) => ({ value: option.value, label: option.label }));
+    if (!resolved.length) continue;
+    out.push({
+      key,
+      label: String(definition.label ?? key),
+      filter_group: String(definition.filter_group ?? "secondary"),
+      values: resolved,
+    });
+  }
+  return out;
 }
 
 /**
@@ -257,7 +348,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     const { data: prod, error } = await supabase
       .from("products")
       .select(
-        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id",
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -267,6 +358,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     if (!prod) return null;
 
     const businessId = prod.business_id as string;
+    const attributeFamily = PRODUCT_TYPE_ATTRIBUTE_FAMILY[String(prod.product_type)] ?? null;
 
     const [
       { data: biz, error: bErr },
@@ -277,6 +369,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       { data: reviews },
       { data: faqs },
       { data: relatedRows },
+      { data: attributeDefs },
     ] = await Promise.all([
       supabase
         .from("businesses")
@@ -356,10 +449,36 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .neq("id", prod.id)
         .order("name", { ascending: true })
         .limit(6),
+      // Lote 3E · catálogo activo de la familia del producto (RLS TO anon:
+      // `active = true`). Sin familia mapeada no se consulta.
+      attributeFamily
+        ? supabase
+            .from("tourism_attribute_definitions")
+            .select(
+              "attribute_key, label, filter_group, sort_order, tourism_attribute_options(value,label,sort_order,active)",
+            )
+            .eq("family_key", attributeFamily)
+            .eq("active", true)
+            .order("sort_order", { ascending: true })
+        : Promise.resolve({ data: null, error: null }),
     ]);
 
     if (bErr) throw new Error(`marketplace_product_biz_failed: ${bErr.message}`);
     if (mErr) throw new Error(`marketplace_product_media_failed: ${mErr.message}`);
+
+    const attributes = resolveProductAttributes(
+      (prod as { filter_attributes?: unknown }).filter_attributes,
+      (attributeDefs ?? []) as Array<Record<string, unknown>>,
+    );
+    const rawMetadata = (prod as { metadata?: unknown }).metadata;
+    const categoryLabelRaw =
+      rawMetadata && typeof rawMetadata === "object" && !Array.isArray(rawMetadata)
+        ? (rawMetadata as Record<string, unknown>).category_label
+        : null;
+    const categoryLabel =
+      typeof categoryLabelRaw === "string" && categoryLabelRaw.trim()
+        ? categoryLabelRaw.trim()
+        : null;
     if (!biz) return null;
 
     // Firma de URLs de media (bucket privado). Best-effort: si algún
@@ -524,6 +643,35 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       accepts_online_payment: Boolean((prod as Record<string, unknown>).accepts_online_payment),
       requires_availability: Boolean((prod as Record<string, unknown>).requires_availability),
       visibility_level: String((prod as Record<string, unknown>).visibility_level ?? "standard"),
+      duration_minutes:
+        (prod as Record<string, unknown>).duration_minutes != null
+          ? Number((prod as Record<string, unknown>).duration_minutes)
+          : null,
+      capacity:
+        (prod as Record<string, unknown>).capacity != null
+          ? Number((prod as Record<string, unknown>).capacity)
+          : null,
+      direct_sale: {
+        enabled: Boolean((prod as Record<string, unknown>).direct_sale_enabled),
+        price_amount:
+          (prod as Record<string, unknown>).direct_sale_price_amount != null
+            ? Number((prod as Record<string, unknown>).direct_sale_price_amount)
+            : null,
+        price_currency:
+          ((prod as Record<string, unknown>).direct_sale_currency as string | null) ?? null,
+        min_lead_hours:
+          (prod as Record<string, unknown>).direct_sale_min_lead_hours != null
+            ? Number((prod as Record<string, unknown>).direct_sale_min_lead_hours)
+            : null,
+        max_quantity:
+          (prod as Record<string, unknown>).direct_sale_max_quantity != null
+            ? Number((prod as Record<string, unknown>).direct_sale_max_quantity)
+            : null,
+        cancellation_policy:
+          ((prod as Record<string, unknown>).direct_sale_cancellation_policy as string | null) ??
+          null,
+        terms: ((prod as Record<string, unknown>).direct_sale_terms as string | null) ?? null,
+      },
       cover_url: cover?.url ?? null,
       media,
       business: {
@@ -592,6 +740,8 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         answer: (f.answer as string) ?? "",
         position: Number(f.position ?? 0),
       })),
+      attributes,
+      category_label: categoryLabel,
     };
   });
 
@@ -612,19 +762,36 @@ export interface MarketplaceSearchInput {
 export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handler(
   async (): Promise<MarketplaceBusinessCard[]> => {
     const supabase = publicClient();
-    const { data, error } = await supabase
+    const selectWithAttributes =
+      "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
+    const legacySelect =
+      "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
+    const primaryResult = await supabase
       .from("businesses")
-      .select(
-        "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )",
-      )
+      .select(selectWithAttributes)
       .eq("status", "published")
       .is("deleted_at", null)
       // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
       .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(120);
+    let data: unknown[] | null = primaryResult.data;
+    let error = primaryResult.error;
+    if (error && /filter_attributes|column .* does not exist/i.test(error.message)) {
+      const legacyResult = await supabase
+        .from("businesses")
+        .select(legacySelect)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
+        .order("display_name", { ascending: true })
+        .limit(120);
+      data = legacyResult.data;
+      error = legacyResult.error;
+    }
     if (error) throw new Error(`marketplace_businesses_failed: ${error.message}`);
-    const rows: MarketplaceBusinessCard[] = (data ?? []).map((row) => {
+    const rows: MarketplaceBusinessCard[] = (data ?? []).map((rawRow) => {
+      const row = rawRow as Record<string, unknown>;
       const dest = (row.destinations as { slug?: unknown } | null)?.slug;
       const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
       const locs = (
@@ -637,16 +804,19 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       const rawLng = primary ? (primary as { longitude?: unknown }).longitude : null;
       const rawAddr = primary ? (primary as { address_line1?: unknown }).address_line1 : null;
       return {
-        id: row.id,
-        slug: row.slug,
-        display_name: row.display_name,
-        tagline: row.tagline ?? "",
+        id: String(row.id),
+        slug: String(row.slug),
+        display_name: String(row.display_name),
+        tagline: typeof row.tagline === "string" ? row.tagline : "",
         verified: Boolean(row.verified),
         destination_slug: typeof dest === "string" ? dest : "",
         category_slug: typeof cat === "string" ? cat : "",
         latitude: rawLat == null ? null : Number(rawLat),
         longitude: rawLng == null ? null : Number(rawLng),
         address_line1: typeof rawAddr === "string" ? rawAddr : null,
+        filter_attributes: normalizeFilterAttributes(
+          (row as { filter_attributes?: unknown }).filter_attributes,
+        ),
       };
     });
 
@@ -736,19 +906,33 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
   })
   .handler(async ({ data }): Promise<MarketplaceBusinessDetail | null> => {
     const supabase = publicClient();
-    const { data: biz, error } = await supabase
+    const detailSelect =
+      "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug, listing_family_key )";
+    const legacyDetailSelect =
+      "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )";
+    const primaryBusinessResult = await supabase
       .from("businesses")
-      .select(
-        "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
-      )
+      .select(detailSelect)
       .eq("slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
       // G8-R1-F1I-R1 · lectura de FICHA DIRECTA: no se aplica elegibilidad
       // pública (la ruta sigue respondiendo 200 con `noindex, nofollow`).
       // La elegibilidad sólo gobierna superficies de descubrimiento.
-
       .maybeSingle();
+    let biz: Record<string, unknown> | null = primaryBusinessResult.data;
+    let error = primaryBusinessResult.error;
+    if (error && /filter_attributes|column .* does not exist/i.test(error.message)) {
+      const legacyResult = await supabase
+        .from("businesses")
+        .select(legacyDetailSelect)
+        .eq("slug", data.slug)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle();
+      biz = legacyResult.data;
+      error = legacyResult.error;
+    }
     if (error) throw new Error(`marketplace_business_failed: ${error.message}`);
     if (!biz) return null;
 
@@ -759,7 +943,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           .select(
             "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
           )
-          .eq("business_id", biz.id)
+          .eq("business_id", String(biz.id))
           .eq("status", "published")
           .is("deleted_at", null)
           .order("name", { ascending: true })
@@ -769,7 +953,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           .select(
             "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
           )
-          .eq("business_id", biz.id)
+          .eq("business_id", String(biz.id))
           .eq("status", "published")
           .is("deleted_at", null)
           .order("ends_at", { ascending: true, nullsFirst: false })
@@ -779,7 +963,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           .select(
             "label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at",
           )
-          .eq("business_id", biz.id)
+          .eq("business_id", String(biz.id))
           .is("deleted_at", null)
           .order("is_primary", { ascending: false })
           .limit(1),
@@ -789,6 +973,9 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
+    // Lote 3C — familia de listado declarada en CMS (autoridad única).
+    const catFamily = (biz.business_categories as { listing_family_key?: unknown } | null)
+      ?.listing_family_key;
     const planTier = resolveBusinessPlanTier(
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
@@ -814,16 +1001,18 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       : null;
 
     return {
-      id: biz.id,
-      slug: biz.slug,
-      display_name: biz.display_name,
-      tagline: biz.tagline ?? "",
-      description: biz.description ?? "",
+      id: String(biz.id),
+      slug: String(biz.slug),
+      display_name: String(biz.display_name),
+      tagline: typeof biz.tagline === "string" ? biz.tagline : "",
+      description: typeof biz.description === "string" ? biz.description : "",
       primary_location: detailPrimaryLocation,
       provenance: "published",
       verified: Boolean(biz.verified),
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
+      category_family_key: typeof catFamily === "string" && catFamily.trim() ? catFamily : null,
+      filter_attributes: normalizeFilterAttributes(biz.filter_attributes),
       plan_tier: planTier,
       products: (products ?? []).map((p) => ({
         id: p.id,
@@ -833,8 +1022,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         product_type: String(p.product_type),
         price_amount: p.price_amount,
         price_currency: p.price_currency,
-        business_slug: biz.slug,
-        business_name: biz.display_name,
+        business_slug: String(biz.slug),
+        business_name: String(biz.display_name),
         conversion_mode: String((p as Record<string, unknown>).conversion_mode ?? "informacion"),
         primary_action_label:
           ((p as Record<string, unknown>).primary_action_label as string | null) ?? null,
@@ -854,8 +1043,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         discount_percent: p.discount_percent !== null ? Number(p.discount_percent) : null,
         starts_at: p.starts_at,
         ends_at: p.ends_at,
-        business_slug: biz.slug,
-        business_name: biz.display_name,
+        business_slug: String(biz.slug),
+        business_name: String(biz.display_name),
       })),
     };
   });

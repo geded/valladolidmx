@@ -388,6 +388,17 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
       price_amount: prod.price_amount !== null ? Number(prod.price_amount) : null,
       price_currency: String(prod.price_currency ?? "MXN"),
       conversion_mode: String(prod.conversion_mode ?? "informacion"),
+      duration_minutes: null,
+      capacity: null,
+      direct_sale: {
+        enabled: false,
+        price_amount: null,
+        price_currency: null,
+        min_lead_hours: null,
+        max_quantity: null,
+        cancellation_policy: null,
+        terms: null,
+      },
       primary_action_label: (prod.primary_action_label as string | null) ?? null,
       secondary_action_mode: (prod.secondary_action_mode as string | null) ?? null,
       secondary_action_label: (prod.secondary_action_label as string | null) ?? null,
@@ -454,5 +465,9 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
         answer: (f.answer as string) ?? "",
         position: Number(f.position ?? 0),
       })),
+      // Vista previa del Portal: los atributos se editan en su propio panel;
+      // aquí no se resuelven (la ficha pública sí los proyecta).
+      attributes: [],
+      category_label: null,
     };
   });

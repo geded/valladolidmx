@@ -1,0 +1,1 @@
+ALTER TYPE public.travel_item_kind ADD VALUE IF NOT EXISTS 'route';

@@ -14,23 +14,29 @@
  */
 import type { MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import type { PublicPlaceCard } from "@/lib/places/place-public-contract";
 import type { Destination } from "@/types/territory";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import {
   businessToTourismCard,
   eventToTourismCard,
+  placeToTourismCard,
   destinationToTourismCard,
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { ORIENTE_MAYA } from "@/config/regions";
 
-export const LISTING_PUBLIC_CONTRACT_VERSION = "1.0.0" as const;
-export const LISTING_PUBLIC_CONTRACT_EFFECTIVE_DATE = "2026-08-28" as const;
+/* v1.1.0 · G4-PLACES — se incorpora la familia `lugares` (fuente real
+   `points_of_interest`) como séptima familia del contrato. Cambio aditivo:
+   las seis familias originales conservan copys, fuentes y semántica. */
+export const LISTING_PUBLIC_CONTRACT_VERSION = "1.1.0" as const;
+export const LISTING_PUBLIC_CONTRACT_EFFECTIVE_DATE = "2026-09-14" as const;
 
 export const LISTING_FAMILY_IDS = [
   "hoteles",
   "restaurantes",
   "experiencias",
   "eventos",
+  "lugares",
   "casas-de-vacaciones",
   "que-hacer",
 ] as const;
@@ -38,7 +44,7 @@ export const LISTING_FAMILY_IDS = [
 export type ListingFamilyId = (typeof LISTING_FAMILY_IDS)[number];
 
 /** Origen productivo real de cada familia. Nunca "fixture". */
-export type ListingSource = "businesses" | "events" | "editorial";
+export type ListingSource = "businesses" | "events" | "places" | "editorial";
 
 export interface ListingFamilyContract {
   readonly id: ListingFamilyId;
@@ -127,6 +133,22 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     emptyMessage:
       "Aún no hay eventos publicados. Estamos armando el calendario de fiestas, festivales y celebraciones.",
   },
+  lugares: {
+    id: "lugares",
+    label: "Lugares y sitios de interés",
+    route: "/lugares",
+    source: "places",
+    categorySlugs: [],
+    forcedCategorySlug: null,
+    hero: {
+      eyebrow: "Qué visitar",
+      title: "Lugares y sitios de interés",
+      subtitle:
+        "Cenotes, conventos, zonas arqueológicas, calles y rincones que cuentan el Oriente Maya.",
+    },
+    emptyMessage:
+      "Aún no hay lugares publicados. Estamos documentando cenotes, conventos y sitios emblemáticos del Oriente Maya.",
+  },
   "casas-de-vacaciones": {
     id: "casas-de-vacaciones",
     label: "Casas de vacaciones",
@@ -186,7 +208,8 @@ export interface PublicListingDTO {
   readonly route: string;
   readonly source: ListingSource;
   /** Trazabilidad probatoria: siempre lecturas reales. */
-  readonly provenance: "real_reads";
+  /** `demo_preview` sólo en superficies internas `/lovable/*` (noindex). */
+  readonly provenance: "real_reads" | "demo_preview";
   readonly hero: {
     readonly eyebrow: string;
     readonly title: string;
@@ -202,6 +225,7 @@ export interface PublicListingDTO {
 export interface ListingFeedInput {
   readonly businesses?: readonly MarketplaceBusinessCard[];
   readonly events?: readonly PublicEventCard[];
+  readonly places?: readonly PublicPlaceCard[];
   readonly destinations?: readonly Destination[];
 }
 
@@ -209,6 +233,12 @@ export interface BuildPublicListingInput extends ListingFeedInput {
   readonly family: unknown;
   readonly destino?: string | null;
   readonly destinationLabelOf?: (slug: string) => string;
+  /**
+   * Lote 3C — Autoridad CMS-first: slugs de categoría administrados desde
+   * `business_categories.listing_family_key`. Cuando llega, sustituye a la
+   * lista declarada en el contrato (que queda como fallback fail-safe).
+   */
+  readonly categorySlugs?: readonly string[];
 }
 
 function humanize(slug: string): string {
@@ -225,12 +255,15 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
   const labelOf = input.destinationLabelOf ?? humanize;
   const destinationLabel = destino ? labelOf(destino) : null;
 
-  const allowed = new Set(contract.categorySlugs);
+  const allowed = new Set(
+    (input.categorySlugs ?? contract.categorySlugs).map((slug) => slug.trim().toLowerCase()),
+  );
+
   let items: TourismCardVM[] = [];
 
   if (contract.source === "businesses") {
     items = (input.businesses ?? [])
-      .filter((b) => allowed.has(b.category_slug))
+      .filter((b) => allowed.has(b.category_slug.trim().toLowerCase()))
       .filter((b) => !destino || b.destination_slug === destino)
       .map((b) =>
         businessToTourismCard(b, {
@@ -243,6 +276,10 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
     items = (input.events ?? [])
       .filter((e) => !destino || e.destination_slug === destino)
       .map(eventToTourismCard);
+  } else if (contract.source === "places") {
+    items = (input.places ?? [])
+      .filter((p) => !destino || p.destination_slug === destino)
+      .map(placeToTourismCard);
   } else {
     items = [
       ...(input.destinations ?? []).map(destinationToTourismCard),
@@ -256,7 +293,9 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
       : contract.hero.title;
 
   const emptyMessage =
-    destino && contract.source === "businesses" && contract.destinoAwareEmptyMessage !== false
+    destino &&
+    (contract.source === "businesses" || contract.source === "places") &&
+    contract.destinoAwareEmptyMessage !== false
       ? `Aún no hay ${contract.label.toLowerCase()} publicados en ${destinationLabel}.`
       : contract.emptyMessage;
 

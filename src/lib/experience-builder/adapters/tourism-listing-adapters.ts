@@ -13,6 +13,7 @@ import type {
   MarketplacePromotionCard,
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import type { PublicPlaceCard } from "@/lib/places/place-public-contract";
 import type { Destination } from "@/types/territory";
 import type {
   TourismCardVM,
@@ -61,7 +62,7 @@ function categoryToEntityKind(categorySlug: string | null | undefined): TourismE
       "casas",
     ].includes(s)
   )
-    return "hotel";
+    return "business";
   return "business";
 }
 
@@ -143,8 +144,11 @@ export function businessToTourismCard(
     href,
     tagline: b.tagline || null,
     businessName: null,
-    mediaUrl: null,
-    mediaAlt: null,
+    // La lectura pública ya resolvió la portada oficial mediante
+    // business_media → media_assets. El adaptador no debe descartarla:
+    // es la misma autoridad gobernada que consumen ficha, mapa y Mi Viaje.
+    mediaUrl: b.cover_url ?? null,
+    mediaAlt: b.cover_url ? b.display_name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
     coordinates:
@@ -162,6 +166,7 @@ export function businessToTourismCard(
     priceHint: null,
     primaryAction: null,
     secondaryAction: null,
+    filterAttributes: b.filter_attributes,
   };
 }
 
@@ -182,7 +187,7 @@ function formatDate(iso: string | null | undefined): string | null {
 }
 
 export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
-  const destinationLabel = humanizeSlug(e.destination_slug);
+  const destinationLabel = e.destination_name || humanizeSlug(e.destination_slug);
   const dateLabel = formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
   return {
     id: e.id,
@@ -196,17 +201,59 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
     mediaAlt: e.title,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
+    coordinates:
+      e.latitude != null && e.longitude != null ? { lat: e.latitude, lng: e.longitude } : null,
     territorialContext: null,
     highlights: [],
     badges: e.is_free ? [{ label: "Entrada libre", tone: "success" }] : [],
     institutionalBadges: institutionalBadgesForDestination(e.destination_slug),
     dateLabel,
+    startsAt: e.starts_at,
+    endsAt: e.ends_at,
     availabilityLabel: null,
     priceAmount: null,
     priceCurrency: null,
     priceHint: null,
     primaryAction: null,
     secondaryAction: null,
+    filterAttributes: e.filter_attributes ?? {},
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Place (points_of_interest) → TourismCardVM
+ * ------------------------------------------------------------------ */
+export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
+  const destinationLabel = p.destination_name || humanizeSlug(p.destination_slug);
+  return {
+    id: p.id,
+    entityKind: "place",
+    eyebrow: p.type_label ?? "Lugar y sitio de interés",
+    name: p.name,
+    href: p.destination_slug ? `/oriente-maya/${p.destination_slug}/lugares/${p.slug}` : null,
+    tagline: p.short_description || null,
+    businessName: null,
+    // Portada gobernada del propio lugar (aprobada, no IA); sin medio
+    // acreditado la tarjeta muestra el marcador neutral, nunca otra imagen.
+    mediaUrl: p.cover_url || null,
+    mediaAlt: p.cover_url ? p.name : null,
+    rating: null,
+    location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
+    coordinates:
+      p.latitude != null && p.longitude != null ? { lat: p.latitude, lng: p.longitude } : null,
+    territorialContext: "Oriente Maya",
+    highlights: [],
+    badges:
+      p.admission_kind === "gratuito" ? [{ label: "Entrada libre", tone: "success" }] : [],
+    institutionalBadges: institutionalBadgesForDestination(p.destination_slug),
+    dateLabel: null,
+    availabilityLabel: null,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: null,
+    secondaryAction: null,
+    filterAttributes: p.filter_attributes ?? {},
   };
 }
 

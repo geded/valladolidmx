@@ -17,13 +17,39 @@ import type { HomePremiumContent, HomePremiumSectionKey } from "./home-premium-c
 type Card = HomeRealContent["destinos"][number];
 
 const mediaOf = (card: Card) => ({ url: card.mediaUrl, alt: card.title });
+const withoutMedia = <T extends { media: { url: string; alt: string } }>(item: T): T => ({
+  ...item,
+  media: { ...item.media, url: "" },
+});
+
+/** El runtime público nunca usa medios del preset como fallback acreditado. */
+function withoutPresetMedia(content: HomePremiumContent): HomePremiumContent {
+  return {
+    ...content,
+    hero: {
+      ...content.hero,
+      slides: content.hero.slides.map((slide) => withoutMedia(slide)),
+    },
+    destinos: { ...content.destinos, items: content.destinos.items.map(withoutMedia) },
+    rutas: { ...content.rutas, items: content.rutas.items.map(withoutMedia) },
+    experiencias: { ...content.experiencias, items: content.experiencias.items.map(withoutMedia) },
+    servicios: {
+      ...content.servicios,
+      stays: content.servicios.stays.map(withoutMedia),
+      food: content.servicios.food.map(withoutMedia),
+    },
+    eventos: { ...content.eventos, media: { ...content.eventos.media, url: "" } },
+    queHacer: { ...content.queHacer, items: content.queHacer.items.map(withoutMedia) },
+  };
+}
 
 /** Fusiona el corpus real sobre el contenido editorial resuelto del bloque. */
 export function mergeHomeRealContent(
   content: HomePremiumContent,
   real: HomeRealContent | undefined,
 ): HomePremiumContent {
-  if (!real) return content;
+  const safeContent = withoutPresetMedia(content);
+  if (!real) return safeContent;
 
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
   const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
@@ -34,13 +60,13 @@ export function mergeHomeRealContent(
   }));
 
   return {
-    ...content,
+    ...safeContent,
     hero: {
-      ...content.hero,
-      slides: realHeroSlides.length > 0 ? realHeroSlides : content.hero.slides,
+      ...safeContent.hero,
+      slides: realHeroSlides,
     },
     destinos: {
-      ...content.destinos,
+      ...safeContent.destinos,
       items: real.destinos.map((card) => ({
         name: card.title,
         note: card.subtitle,
@@ -50,7 +76,7 @@ export function mergeHomeRealContent(
       })),
     },
     rutas: {
-      ...content.rutas,
+      ...safeContent.rutas,
       items: real.rutas.map((route) => {
         const cover = route.sequence
           .map((title) => destinationByTitle.get(title))
@@ -62,7 +88,7 @@ export function mergeHomeRealContent(
       }),
     },
     experiencias: {
-      ...content.experiencias,
+      ...safeContent.experiencias,
       items: real.experiencias.map((card) => ({
         title: card.title,
         category: card.category,
@@ -72,7 +98,7 @@ export function mergeHomeRealContent(
       })),
     },
     servicios: {
-      ...content.servicios,
+      ...safeContent.servicios,
       stays: real.stays.map((card) => ({
         title: card.title,
         destination: card.category,
@@ -91,10 +117,8 @@ export function mergeHomeRealContent(
       })),
     },
     eventos: {
-      ...content.eventos,
-      media: firstEventWithMedia
-        ? mediaOf(firstEventWithMedia)
-        : { url: "", alt: content.eventos.media.alt },
+      ...safeContent.eventos,
+      media: firstEventWithMedia ? mediaOf(firstEventWithMedia) : safeContent.eventos.media,
       items: real.eventos.map((card) => ({
         day: card.day,
         title: card.title,
@@ -104,9 +128,9 @@ export function mergeHomeRealContent(
       })),
     },
     mapa: {
-      ...content.mapa,
+      ...safeContent.mapa,
       dto: {
-        ...content.mapa.dto,
+        ...safeContent.mapa.dto,
         points: real.mapPoints.map((point) => ({
           id: point.id,
           kind: point.kind,

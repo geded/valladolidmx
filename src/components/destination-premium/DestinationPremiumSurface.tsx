@@ -14,7 +14,7 @@
  *  - Iconografía de categorías exclusivamente con `CategoryNavGrid`
  *    (glifos bordados G6, fail-closed).
  *  - "Tours" no es categoría pública: subtipo interno de Experiencias.
- *  - Pueblo Mágico sólo como estado editorial en texto.
+ *  - Pueblo Mágico sólo desde el registro y la marca institucional acreditada.
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
 import { useMemo, useState, type ReactNode } from "react";
@@ -27,6 +27,7 @@ import {
   Hotel,
   Images,
   Map as MapIcon,
+  Search,
   Sparkles,
   Tag,
   UtensilsCrossed,
@@ -38,8 +39,10 @@ import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
+import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import {
   DESTINATION_PREMIUM_G4_CONTENT,
   DESTINATION_PREMIUM_SECTION_ORDER,
@@ -54,6 +57,11 @@ export type DestinationHeroVariant = "editorial" | "cinematic";
 export type DestinationGalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
 
 export interface DestinationPremiumSurfaceProps {
+  /**
+   * Cuando el shell público ya emite la ruta territorial, la superficie
+   * no debe duplicarla. Default `true` (Studio y previews aislados).
+   */
+  showBreadcrumbs?: boolean;
   content?: DestinationPremiumContent;
   heroVariant?: DestinationHeroVariant;
   galleryLayout?: DestinationGalleryLayout;
@@ -78,6 +86,7 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
 };
 
 export function DestinationPremiumSurface({
+  showBreadcrumbs = true,
   content = DESTINATION_PREMIUM_G4_CONTENT,
   heroVariant = "editorial",
   galleryLayout = "mosaico",
@@ -129,9 +138,11 @@ export function DestinationPremiumSurface({
 
   return (
     <div className={cn("pb-24", className)}>
-      <Container className="pt-6">
-        <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-      </Container>
+      {showBreadcrumbs ? (
+        <Container className="pt-6">
+          <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} compactOnMobile />
+        </Container>
+      ) : null}
 
       {DESTINATION_PREMIUM_SECTION_ORDER.map((key) => {
         if (!visible(key)) return null;
@@ -148,13 +159,18 @@ export function DestinationPremiumSurface({
             );
           case "services":
             return (
-              <Container key={key} className="mt-12">
-                <ServiciosStrip
-                  content={content}
-                  active={activeService}
-                  onSelect={setActiveService}
-                />
-              </Container>
+              <div key={key}>
+                <Container className="mt-8">
+                  <AluxDestinationGuide content={content} />
+                </Container>
+                <Container className="mt-8">
+                  <ServiciosStrip
+                    content={content}
+                    active={activeService}
+                    onSelect={setActiveService}
+                  />
+                </Container>
+              </div>
             );
           case "descubre":
             return (
@@ -198,15 +214,49 @@ export function DestinationPremiumSurface({
   );
 }
 
+function AluxDestinationGuide({ content }: { content: DestinationPremiumContent }) {
+  return (
+    <TourismAluxPanel
+      title={`Explora ${content.hero.title} según tu momento`}
+      description="Cuéntame si estás planeando venir o si ya estás aquí. Usaré fechas, compañía y guardados; la ubicación sólo cuando estés en la región y la autorices."
+      task={`Ayúdame a explorar ${content.hero.title} usando el contexto real de Mi Viaje.`}
+      prompts={["Estoy planeando", "Ya estoy aquí", "Viajo en pareja", "Viajo en familia"]}
+    />
+  );
+}
+
 /* ------------------------------------------------------------------ */
 
-function EditorialStatus({ content }: { content: DestinationPremiumContent }) {
-  if (!content.hero.statusBadge || !isPuebloMagico(content.slug)) return null;
+function DestinationIdentity({ content }: { content: DestinationPremiumContent }) {
+  const items = [
+    ...(content.hero.statusBadge && isPuebloMagico(content.slug)
+      ? [
+          {
+            kind: "pueblo-magico" as const,
+            slug: `pueblo-magico:${content.slug}`,
+            source: "destination" as const,
+          },
+        ]
+      : []),
+    {
+      kind: "oriente-maya" as const,
+      slug: `oriente-maya:${content.slug}`,
+      source: "destination" as const,
+    },
+  ];
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-      {content.hero.statusBadge}
-      <span className="sr-only">(estado editorial provisional en texto; sin logotipo oficial)</span>
-    </span>
+    <InstitutionalBadgesBlock
+      config={{
+        source: "destination",
+        subjectSlug: content.slug,
+        variant: "soft",
+        size: "md",
+        layout: "strip",
+        items,
+        ariaLabel: `Identidad institucional de ${content.hero.title}`,
+        capabilities: { showLabel: true, showTooltip: true, mobileVisibleMax: 3 },
+      }}
+    />
   );
 }
 
@@ -221,13 +271,8 @@ function HeroCopy({
 }) {
   return (
     <div className={compact ? "" : "max-w-2xl"}>
-      <div className="flex flex-wrap items-center gap-2">
-        <EditorialStatus content={content} />
-        <span className="rounded-pill border border-border bg-background/70 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          {content.hero.regionBadge}
-        </span>
-      </div>
-      <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+      <DestinationIdentity content={content} />
+      <h1 className="mt-4 font-serif text-display-hero tracking-tight text-foreground">
         {content.hero.title}
       </h1>
       <p className="mt-3 text-lg text-foreground/80 sm:text-xl">{content.hero.subtitle}</p>
@@ -429,7 +474,11 @@ function GaleriaEditorial({
       ) : null}
 
       {layout === "carrusel" ? (
-        <ul className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
+        <ul
+          className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2"
+          tabIndex={0}
+          aria-label="Galería del destino"
+        >
           {items.map((m, i) => (
             <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
               <img
@@ -534,7 +583,16 @@ function ServicioPreview({
 }
 
 function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
+  const regionalCatalog = content.slug === "oriente-maya";
+  const [query, setQuery] = useState("");
+  const [visible, setVisible] = useState(8);
   if (content.nearby.items.length === 0) return null;
+  const filtered = content.nearby.items.filter((item) => {
+    const needle = query.trim().toLocaleLowerCase("es-MX");
+    if (!needle) return true;
+    return `${item.name} ${item.tagline}`.toLocaleLowerCase("es-MX").includes(needle);
+  });
+  const shown = regionalCatalog ? filtered.slice(0, visible) : filtered;
   return (
     <section aria-labelledby="cerca-del-destino">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -544,8 +602,26 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
         {content.nearby.title}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{content.nearby.description}</p>
+      {regionalCatalog ? (
+        <div className="relative mt-5 max-w-xl">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setVisible(8);
+            }}
+            placeholder="Buscar destino, costa, cenote o cultura"
+            className="min-h-12 w-full rounded-pill border border-border bg-background pl-11 pr-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+      ) : null}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {content.nearby.items.map((d) => {
+        {shown.map((d) => {
           const card = (
             <article
               key={d.slug}
@@ -566,10 +642,12 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
               <div className="p-4">
                 <h3 className="font-serif text-lg">{d.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
-                <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
-                  <MapIcon className="size-3.5" aria-hidden />
-                  {d.distance}
-                </p>
+                {d.distance ? (
+                  <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
+                    <MapIcon className="size-3.5" aria-hidden />
+                    {d.distance}
+                  </p>
+                ) : null}
               </div>
             </article>
           );
@@ -586,6 +664,23 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
           );
         })}
       </div>
+      {regionalCatalog && shown.length < filtered.length ? (
+        <div className="mt-6 flex justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-pill"
+            onClick={() => setVisible((count) => count + 8)}
+          >
+            Mostrar más destinos
+          </Button>
+        </div>
+      ) : null}
+      {regionalCatalog && filtered.length === 0 ? (
+        <p className="mt-6 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          No encontramos destinos con esa búsqueda. Prueba con otra palabra.
+        </p>
+      ) : null}
     </section>
   );
 }

@@ -6,7 +6,7 @@
  * consumen la preview G4, el fixture de validación, el canvas de Studio y el
  * renderer público. Prohibido mantener una copia aproximada por superficie.
  */
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -26,9 +26,30 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { HeroSearchPill } from "@/components/home/HeroSearchPill";
+import { ACTIVE_BRAND } from "@/config/brand";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import {
+  PremiumAluxBar,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+  PremiumShowcaseGrid,
+} from "./shared/PremiumShowcase";
+import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
+
+import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import { recordAluxSignal } from "@/lib/alux/memory-store";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
+import {
+  PARTY_OPTIONS,
+  compositionFromPartySize,
+  type PartyComposition,
+} from "@/lib/traveler/party-composition";
 import {
   HOME_PREMIUM_DEFAULT_ORDER,
   HOME_PREMIUM_G4_CONTENT,
@@ -59,13 +80,54 @@ export function HomePremiumSurface({
   sections,
   order = HOME_PREMIUM_DEFAULT_ORDER,
 }: HomePremiumSurfaceProps) {
+  const cinematic = heroVariant === "cinematic";
   const routes = content.rutas.items;
   const [selectedRoute, setSelectedRoute] = useState<string>(routes[0]?.id ?? "");
   const [selectedPrompt, setSelectedPrompt] = useState(content.alux.prompts[0] ?? "");
+  const anonymousTrip = useAnonymousTrip();
+  const [selectedParty, setSelectedParty] = useState<PartyComposition | null>(null);
   const [added, setAdded] = useState(false);
   const [openedMicrosite, setOpenedMicrosite] = useState<string | null>(null);
 
+  useEffect(() => {
+    const count = anonymousTrip.trip?.travelerCount;
+    if (!count || selectedParty) return;
+    setSelectedParty(
+      (count.children ?? 0) > 0
+        ? "familiar"
+        : compositionFromPartySize(count.adults + (count.children ?? 0)),
+    );
+  }, [anonymousTrip.trip?.travelerCount, selectedParty]);
+
+  const selectParty = (party: PartyComposition) => {
+    const option = PARTY_OPTIONS.find((item) => item.value === party);
+    if (!option) return;
+    setSelectedParty(party);
+    void anonymousTrip.setTravelerCount(
+      party === "familiar" ? { adults: 2, children: 2 } : { adults: option.partySize, children: 0 },
+    );
+  };
+
+  const selectPrompt = (prompt: string) => {
+    setSelectedPrompt(prompt);
+    const keyByPrompt: Record<string, string> = {
+      "Tengo medio día": "medio-dia",
+      "Quiero cenotes y gastronomía": "cenotes-gastronomia",
+      "Busco cultura viva": "cultura-viva",
+      "Viajo en pareja": "romantico",
+    };
+    recordAluxSignal({
+      kind: "category_explored",
+      key: keyByPrompt[prompt] ?? prompt.toLocaleLowerCase("es-MX").replace(/\s+/g, "-"),
+      at: Date.now(),
+      purpose: "personalization",
+    });
+  };
+
   const enabled = (key: HomePremiumSectionKey) => sections?.[key] !== false;
+  // Editorial y cinematográfica son variantes visuales del mismo sistema.
+  // Nunca cambian jerarquía, orden ni geometría entre sí.
+  const presentationOrder: HomePremiumSectionKey[] = order;
 
   const renderSection = (key: HomePremiumSectionKey) => {
     if (key === "destinos")
@@ -73,6 +135,7 @@ export function HomePremiumSurface({
         <DestinationsSection
           content={content}
           layout={layout}
+          cinematic={cinematic}
           opened={openedMicrosite}
           onOpen={setOpenedMicrosite}
         />
@@ -93,16 +156,17 @@ export function HomePremiumSurface({
           onAdd={() => setAdded(true)}
         />
       );
-    if (key === "experiencias") return <ExperiencesSection content={content} layout={layout} />;
+    if (key === "experiencias")
+      return <ExperiencesSection content={content} layout={layout} cinematic={cinematic} />;
     if (key === "servicios") return <ServicesSection content={content} />;
     if (key === "eventos") return <EventsSection content={content} />;
-    if (key === "queHacer") return <EditorialSection content={content} />;
+    if (key === "queHacer") return <EditorialSection content={content} cinematic={cinematic} />;
     return <MapSection content={content} selectedRoute={selectedRoute} />;
   };
 
   return (
     <>
-      <main>
+      <div data-home-presentation={heroVariant}>
         <Container className="pt-4 sm:pt-6">
           {heroVariant === "editorial" ? (
             <HeroEditorial content={content} />
@@ -115,7 +179,7 @@ export function HomePremiumSurface({
           {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
           <section
             aria-label={content.categorias.heading}
-            className="rounded-2xl border border-border bg-card p-4 sm:p-5"
+            className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
           >
             <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
             <CategoryNavGrid
@@ -132,7 +196,9 @@ export function HomePremiumSurface({
           <AluxPlanner
             content={content}
             selectedPrompt={selectedPrompt}
-            onSelectPrompt={setSelectedPrompt}
+            onSelectPrompt={selectPrompt}
+            selectedParty={selectedParty}
+            onSelectParty={selectParty}
             selectedRoute={selectedRoute}
             onSelectRoute={setSelectedRoute}
             added={added}
@@ -140,15 +206,15 @@ export function HomePremiumSurface({
           />
         </Container>
 
-        {order.map((key) =>
+        {presentationOrder.map((key) =>
           enabled(key) ? (
-            <Container key={key} className="mt-10 sm:mt-12">
-              {renderSection(key)}
+            <Container key={key} className="mt-8 lg:mt-12">
+              <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
             </Container>
           ) : null,
         )}
 
-        <Container className="mt-10 sm:mt-12">
+        <Container className="mt-8 lg:mt-12">
           <TravelPlanClose
             content={content}
             selectedRoute={selectedRoute}
@@ -156,7 +222,7 @@ export function HomePremiumSurface({
             onAdd={() => setAdded(true)}
           />
         </Container>
-      </main>
+      </div>
     </>
   );
 }
@@ -175,166 +241,64 @@ export function HomePremiumRibbon({ label }: { label?: string }) {
 }
 
 export function HomePremiumHeader() {
-  return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-      <Container className="flex min-h-16 items-center justify-between gap-4 py-2">
-        <Link to="/" className="flex min-w-0 items-center gap-2">
-          <span className="truncate font-display text-lg font-semibold">Valladolid.mx</span>
-          <span className="hidden text-[10px] uppercase text-muted-foreground sm:inline">
-            Oriente Maya de Yucatán
-          </span>
-        </Link>
-        <nav
-          aria-label="Navegación de la vista previa"
-          className="hidden items-center gap-1 lg:flex"
-        >
-          {[
-            ["#rutas", "Rutas"],
-            ["#destinos", "Destinos"],
-            ["#experiencias", "Experiencias"],
-            ["#mapa", "Mapa"],
-          ].map(([href, label]) => (
-            <a
-              key={href}
-              href={href}
-              className="rounded-pill px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-        <Button asChild size="sm" className="rounded-pill">
-          <Link to="/arma-tu-viaje">Arma tu viaje</Link>
-        </Button>
-      </Container>
-    </header>
-  );
+  return <SiteHeader variant="solid" />;
 }
 
 export function HomePremiumFooter() {
-  return (
-    <footer className="border-t border-border py-7">
-      <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
-        <div>
-          <p className="font-display text-xl">Valladolid.mx</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Continuidad territorial: Valladolid · Espita · Izamal · Oriente Maya de Yucatán.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-          <Link to="/oriente-maya">Territorio</Link>
-          <Link to="/experiencias">Experiencias</Link>
-          <Link to="/arma-tu-viaje">Travel Plan</Link>
-          <Link to="/alux">Alux</Link>
-        </div>
-      </div>
-    </footer>
-  );
+  return <SiteFooter />;
 }
 
 /* ------------------------------------------------------------------ *
  * Piezas compartidas
  * ------------------------------------------------------------------ */
 
-function HeroSlideControl({
-  content,
-  index,
-  onChange,
-  inverted = false,
-}: {
-  content: HomePremiumContent;
-  index: number;
-  onChange: (value: number) => void;
-  inverted?: boolean;
-}) {
-  const slides = content.hero.slides;
+function HeroSearch() {
   return (
-    <div className="flex flex-wrap items-center gap-2" aria-label="Seleccionar imagen del hero">
-      {slides.map((slide, itemIndex) => (
-        <Button
-          key={slide.caption}
-          type="button"
-          size="sm"
-          variant={itemIndex === index ? "default" : "outline"}
-          onClick={() => onChange(itemIndex)}
-          aria-pressed={itemIndex === index}
-          className={cn(
-            "min-h-11 rounded-pill px-4",
-            inverted &&
-              itemIndex !== index &&
-              "border-primary-foreground/50 bg-foreground/40 text-primary-foreground hover:bg-foreground/60",
-          )}
-        >
-          {itemIndex + 1} de {slides.length}
-        </Button>
-      ))}
-      <span
-        className={cn("text-xs", inverted ? "text-primary-foreground/85" : "text-muted-foreground")}
-      >
-        {slides[index]?.caption}
-      </span>
-    </div>
+    <HeroSearchPill
+      destinoLabel="Destino"
+      destinoPlaceholder="¿A dónde quieres ir?"
+      categoriaLabel="Categoría"
+      categoriaPlaceholder="¿Qué quieres descubrir?"
+      submitLabel="Buscar"
+      maxWidth="full"
+    />
   );
 }
 
-function HeroActions({ content }: { content: HomePremiumContent }) {
-  return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <Button asChild size="lg" className="min-h-12 rounded-pill">
-        <Link to={content.hero.primaryCta.to}>
-          {content.hero.primaryCta.label} <ArrowRight className="ml-2 size-4" aria-hidden />
-        </Link>
-      </Button>
-      <Button asChild size="lg" variant="outline" className="min-h-12 rounded-pill">
-        <Link to={content.hero.secondaryCta.to}>{content.hero.secondaryCta.label}</Link>
-      </Button>
-    </div>
-  );
+function useHeroAutoplay(slides: number, setIndex: Dispatch<SetStateAction<number>>) {
+  useEffect(() => {
+    if (slides < 2 || typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setIndex((current: number) => (current + 1) % slides);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [setIndex, slides]);
 }
 
 function HeroEditorial({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
+  useHeroAutoplay(content.hero.slides.length, setIndex);
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
-    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
-        <div className="flex flex-col justify-center bg-card p-6 sm:p-9 lg:p-12">
-          <p className="text-xs font-semibold uppercase text-primary">{content.hero.eyebrow}</p>
-          <h1 className="mt-3 text-balance font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            {content.hero.title}
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-            {content.hero.subtitle}
-          </p>
-          <div className="mt-7">
-            <HeroActions content={content} />
-          </div>
-          <div className="mt-7 border-t border-border pt-5">
-            <HeroSlideControl content={content} index={index} onChange={setIndex} />
-          </div>
-        </div>
-        <figure className="relative min-h-[22rem] overflow-hidden lg:min-h-[38rem]">
-          <EditorialMediaFrame
-            media={slide.media}
-            label={content.hero.title}
-            loading="eager"
-            className="absolute inset-0 size-full object-cover"
-          />
-          <figcaption className="absolute bottom-4 left-4 rounded-md bg-foreground/85 px-3 py-2 text-xs text-background">
-            {slide.caption}
-          </figcaption>
-        </figure>
-      </div>
-    </section>
+    <PremiumEditorialHero
+      eyebrow={content.hero.eyebrow}
+      title={content.hero.title}
+      subtitle={content.hero.subtitle}
+      media={slide.media}
+      caption={slide.caption}
+      searchSlot={<HeroSearch />}
+    />
   );
 }
 
 function HeroCinematic({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
+  useHeroAutoplay(content.hero.slides.length, setIndex);
   const slide = content.hero.slides[index] ?? content.hero.slides[0];
   return (
     <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="relative min-h-[28rem] sm:min-h-[36rem]">
+      <div className="relative min-h-[23rem] sm:min-h-[28rem] lg:min-h-[32rem]">
         <EditorialMediaFrame
           media={slide.media}
           label={content.hero.title}
@@ -345,57 +309,30 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
           aria-hidden
         />
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+        <span className="absolute right-4 top-4 rounded-md bg-black/65 px-3 py-1.5 text-xs text-[#f7f3ea] backdrop-blur-sm">
+          {slide.caption}
+        </span>
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">Oriente Maya de Yucatán</p>
-          <h1 className="mt-3 max-w-4xl text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-6xl">
+          <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-[#f7f3ea] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-[3.35rem]">
             {content.hero.title}
           </h1>
-          <div className="mt-5">
-            <HeroSlideControl content={content} index={index} onChange={setIndex} inverted />
-          </div>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            {ACTIVE_BRAND.discoveryPromise}
+          </p>
         </div>
       </div>
-      <div className="grid gap-5 bg-card p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+      <div className="grid gap-4 bg-card p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+        <p className="max-w-2xl text-[0.95rem] leading-6 text-muted-foreground">
           {content.hero.subtitle}
         </p>
-        <HeroActions content={content} />
+        <HeroSearch />
       </div>
     </section>
   );
 }
 
-function SectionHead({
-  kicker,
-  title,
-  description,
-  action,
-}: {
-  kicker: string;
-  title: string;
-  description?: string;
-  action?: string;
-}) {
-  return (
-    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="max-w-3xl">
-        <p className="text-xs font-semibold uppercase text-primary">{kicker}</p>
-        <h2 className="mt-2 text-balance font-display text-3xl sm:text-4xl">{title}</h2>
-        {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      {action ? (
-        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
-          {action}
-          <ChevronRight className="size-4" aria-hidden />
-        </span>
-      ) : null}
-    </div>
-  );
-}
+const SectionHead = PremiumSectionHead;
 
 function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
@@ -410,6 +347,8 @@ function AluxPlanner({
   content,
   selectedPrompt,
   onSelectPrompt,
+  selectedParty,
+  onSelectParty,
   selectedRoute,
   onSelectRoute,
   added,
@@ -418,6 +357,8 @@ function AluxPlanner({
   content: HomePremiumContent;
   selectedPrompt: string;
   onSelectPrompt: (value: string) => void;
+  selectedParty: PartyComposition | null;
+  onSelectParty: (value: PartyComposition) => void;
   selectedRoute: string;
   onSelectRoute: (value: string) => void;
   added: boolean;
@@ -425,84 +366,28 @@ function AluxPlanner({
 }) {
   const routes = content.rutas.items;
   const suggested = routes.find((route) => route.id === selectedRoute) ?? routes[0];
+  const openAlux = () => {
+    if (!suggested) return;
+    onSelectRoute(suggested.id);
+    openAluxFloating({
+      reason: "manual",
+      hint: buildAluxStageAwareHint(
+        `Ayúdame a convertir esta propuesta en un viaje real. Ruta sugerida: ${suggested.title}. ${suggested.description}`,
+        `${selectedPrompt}. ${
+          selectedParty
+            ? `Composición del viaje: ${PARTY_OPTIONS.find((item) => item.value === selectedParty)?.label}.`
+            : ""
+        }`,
+      ),
+    });
+  };
   return (
-    <section
-      aria-labelledby="alux-title"
-      className="overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-soft"
-    >
-      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
-        <div className="bg-selva p-6 text-selva-foreground sm:p-8">
-          <div className="flex items-center gap-2">
-            <Sparkles className="size-5 text-primary" aria-hidden />
-            <p className="text-xs font-semibold uppercase">{content.alux.eyebrow}</p>
-          </div>
-          <h2 id="alux-title" className="mt-3 font-display text-3xl">
-            {content.alux.heading}
-          </h2>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-selva-foreground/80">
-            {content.alux.description}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {content.alux.prompts.map((prompt) => (
-              <Button
-                key={prompt}
-                type="button"
-                size="sm"
-                variant={selectedPrompt === prompt ? "default" : "secondary"}
-                onClick={() => onSelectPrompt(prompt)}
-                className="min-h-11 rounded-pill whitespace-normal text-left"
-              >
-                {prompt}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <div className="p-6 sm:p-8" aria-live="polite">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs text-muted-foreground">
-              Propuesta construida sobre destinos publicados
-            </span>
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Para “{selectedPrompt}”, empezaría por:
-          </p>
-          <h3 className="mt-1 font-display text-2xl">{suggested?.title}</h3>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <Stat icon={<Clock3 />} label={suggested?.duration ?? ""} />
-            <Stat icon={<MapPin />} label={`${suggested?.stops ?? 0} paradas`} />
-            <Stat icon={<RouteIcon />} label="Orden sugerido" />
-          </div>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Propongo iniciar en el centro, continuar por la parada que requiere más luz de día y
-            cerrar cerca de opciones de comida. La distancia y tiempos reales se confirmarían con
-            datos acreditados.
-          </p>
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Button
-              type="button"
-              onClick={() => suggested && onSelectRoute(suggested.id)}
-              className="min-h-11 rounded-pill"
-            >
-              <MessageCircle className="mr-2 size-4" aria-hidden />
-              Personalizar con Alux
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onAdd}
-              className="min-h-11 rounded-pill"
-            >
-              {added ? (
-                <Check className="mr-2 size-4" aria-hidden />
-              ) : (
-                <Compass className="mr-2 size-4" aria-hidden />
-              )}
-              {added ? "Ruta agregada" : "Agregar ruta a mi viaje"}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <PremiumAluxBar
+      question="¿Cómo viajas hoy?"
+      selectedParty={selectedParty}
+      onSelectParty={onSelectParty}
+      onContinue={openAlux}
+    />
   );
 }
 
@@ -525,7 +410,11 @@ function RoutesSection({
         description={content.rutas.description}
         action={content.rutas.action}
       />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div
+        className="grid grid-flow-col auto-cols-[84%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31.5%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0"
+        tabIndex={0}
+        aria-label="Rutas recomendadas"
+      >
         {content.rutas.items.map((route: HomePremiumRoute) => {
           const active = route.id === selectedRoute;
           return (
@@ -556,9 +445,14 @@ function RoutesSection({
                   </p>
                 </div>
               </div>
-              <div className="p-4">
-                <p className="text-sm leading-relaxed text-muted-foreground">{route.description}</p>
-                <ol className="mt-4 space-y-2" aria-label={`Paradas de ${route.title}`}>
+              <div className="p-3 lg:p-4">
+                <p className="hidden text-sm leading-relaxed text-muted-foreground lg:block">
+                  {route.description}
+                </p>
+                <ol
+                  className="mt-4 hidden space-y-2 lg:block"
+                  aria-label={`Paradas de ${route.title}`}
+                >
                   {route.sequence.map((stop, index) => (
                     <li key={stop} className="flex items-center gap-3 text-sm">
                       <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary font-semibold">
@@ -571,7 +465,7 @@ function RoutesSection({
                     </li>
                   ))}
                 </ol>
-                <div className="mt-5 grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 lg:mt-5">
                   <Button
                     type="button"
                     variant={active ? "default" : "outline"}
@@ -604,14 +498,19 @@ function RoutesSection({
 function DestinationsSection({
   content,
   layout,
+  cinematic,
   opened,
   onOpen,
 }: {
   content: HomePremiumContent;
   layout: HomePremiumLayout;
+  cinematic: boolean;
   opened: string | null;
   onOpen: (value: string) => void;
 }) {
+  const items = content.destinos.items;
+  const featured = items[0];
+  if (!featured) return null;
   return (
     <section id="destinos" aria-labelledby="destinations-title">
       <SectionHead
@@ -620,64 +519,17 @@ function DestinationsSection({
         description={content.destinos.description}
         action={content.destinos.action}
       />
-      <div
-        className={cn(
-          "grid gap-3",
-          layout === "cuadricula"
-            ? "sm:grid-cols-2"
-            : layout === "carrusel"
-              ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[32%]"
-              : "sm:grid-cols-2 lg:grid-cols-4",
-        )}
-      >
-        {content.destinos.items.map((destination, index) => {
-          const wide = layout === "asimetrica" && index === 0;
-          return (
-            <article
-              key={destination.name}
-              className={cn(
-                "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
-                wide && "sm:col-span-2 lg:col-span-2",
-              )}
-            >
-              <div className="relative">
-                <EditorialMediaFrame
-                  media={destination.media}
-                  label={destination.name}
-                  className={cn(
-                    "w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]",
-                    wide ? "aspect-[16/9]" : "aspect-[4/3]",
-                  )}
-                />
-                <span className="absolute left-3 top-3 rounded-pill bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-card-foreground shadow-soft">
-                  {destination.puebloMagico ? "Pueblo Mágico" : "Destino"}
-                </span>
-              </div>
-              <div className="flex flex-1 flex-col p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-display text-2xl">{destination.name}</h3>
-                  {destination.puebloMagico ? (
-                    <span className="rounded-pill border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
-                      Pueblo Mágico
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  {destination.note}
-                </p>
-                {destination.href ? (
-                  <Button asChild variant="outline" className="mt-4 min-h-11 rounded-pill">
-                    <Link to={destination.href} onClick={() => onOpen(destination.name)}>
-                      <Landmark className="mr-2 size-4" aria-hidden />
-                      Ver micrositio
-                    </Link>
-                  </Button>
-                ) : null}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+      <PremiumShowcaseGrid
+        items={items.slice(0, 4).map((destination) => ({
+          key: destination.name,
+          name: destination.name,
+          note: destination.note,
+          media: destination.media,
+          to: destination.href ?? "/destinos",
+        }))}
+        onOpen={onOpen}
+      />
+
       <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
         {content.destinos.disclaimer}
       </p>
@@ -701,36 +553,34 @@ function PueblosMagicosSection({
         description={content.pueblosMagicos.description}
         action={content.pueblosMagicos.action}
       />
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div
+        className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0"
+        tabIndex={0}
+        aria-label="Pueblos Mágicos"
+      >
         {pueblos.map((pueblo) => (
           <article
             key={pueblo.name}
-            className="flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3"
+            className="group relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
           >
             <EditorialMediaFrame
               media={pueblo.media}
-              className="size-20 shrink-0 rounded-xl object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="min-w-0">
-              <span className="rounded-pill border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
-                Pueblo Mágico
-              </span>
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent"
+              aria-hidden
+            />
+            <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+              <p className="text-[10px] font-semibold uppercase text-primary">Pueblo Mágico</p>
               <h3 className="mt-1 font-display text-xl">{pueblo.name}</h3>
-              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                {pueblo.note}
-              </p>
+              <p className="mt-1 line-clamp-1 text-xs text-white/80">{pueblo.note}</p>
+              <span className="mt-2 inline-flex items-center text-xs font-semibold">
+                Descubrir <ChevronRight className="size-3" />
+              </span>
             </div>
           </article>
         ))}
-      </div>
-      <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {content.pueblosMagicos.badgeNote}
-        </p>
-        <Button type="button" onClick={onCreateRoute} className="min-h-11 rounded-pill">
-          <RouteIcon className="mr-2 size-4" aria-hidden />
-          {content.pueblosMagicos.ctaLabel}
-        </Button>
       </div>
     </section>
   );
@@ -739,9 +589,11 @@ function PueblosMagicosSection({
 function ExperiencesSection({
   content,
   layout,
+  cinematic,
 }: {
   content: HomePremiumContent;
   layout: HomePremiumLayout;
+  cinematic: boolean;
 }) {
   const items = content.experiencias.items;
   const featured = items[0];
@@ -755,33 +607,91 @@ function ExperiencesSection({
         action={content.experiencias.action}
       />
       <div
+        className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden"
+        tabIndex={0}
+        aria-label="Experiencias recomendadas"
+      >
+        {items.map((item) =>
+          item.href ? (
+            <Link
+              key={item.title}
+              to={item.href}
+              className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white sm:w-[46%]"
+            >
+              <EditorialMediaFrame
+                media={item.media}
+                label={item.title}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+                <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
+                <h3 className="mt-1 font-display text-2xl">{item.title}</h3>
+                <p className="mt-1 line-clamp-1 text-xs text-white/75">{item.summary}</p>
+              </div>
+            </Link>
+          ) : null,
+        )}
+      </div>
+      <div
         className={cn(
-          "grid gap-4",
+          "hidden gap-4 lg:grid lg:h-[30rem]",
           layout === "carrusel"
             ? "grid-flow-col auto-cols-[86%] overflow-x-auto pb-2 sm:auto-cols-[48%]"
             : "lg:grid-cols-[1.2fr_1fr]",
         )}
       >
-        <article className="overflow-hidden rounded-2xl border border-border bg-card">
+        <article
+          className={cn(
+            "h-full overflow-hidden rounded-2xl border border-border bg-card",
+            cinematic && "relative border-0 bg-[#071814] text-white shadow-elevated",
+          )}
+        >
           <EditorialMediaFrame
             media={featured.media}
             label={featured.title}
-            className="aspect-[16/9] w-full object-cover"
+            className={cn(
+              "aspect-[16/9] w-full object-cover",
+              cinematic && "absolute inset-0 h-full",
+            )}
           />
-          <div className="p-5">
+          {cinematic ? (
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
+              aria-hidden
+            />
+          ) : null}
+          <div className={cn("p-5", cinematic && "absolute inset-x-0 bottom-0 z-10")}>
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-muted-foreground">{featured.category}</span>
+              <span className={cn("text-xs text-muted-foreground", cinematic && "text-white/75")}>
+                {featured.category}
+              </span>
             </div>
             <h3 className="mt-3 font-display text-3xl">{featured.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{featured.summary}</p>
+            <p
+              className={cn(
+                "mt-2 text-sm leading-relaxed text-muted-foreground",
+                cinematic && "text-white/80",
+              )}
+            >
+              {featured.summary}
+            </p>
             {featured.href ? (
-              <Button asChild variant="outline" className="mt-4 min-h-11 rounded-pill">
+              <Button
+                asChild
+                variant="outline"
+                className={cn(
+                  "mt-4 min-h-11 rounded-pill",
+                  cinematic &&
+                    "border-white/45 bg-black/25 text-white hover:bg-white hover:text-[#071814]",
+                )}
+              >
                 <Link to={featured.href}>Explorar experiencia</Link>
               </Button>
             ) : null}
           </div>
         </article>
-        <div className="grid gap-3">
+        <div className="grid min-h-0 grid-rows-3 gap-3">
           {items.slice(1).map((item: HomePremiumExperience) => (
             <CompactMediaRow key={item.title} item={item} />
           ))}
@@ -806,7 +716,7 @@ function CompactMediaRow({
   return (
     <Link
       to={item.href}
-      className="grid min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr]"
+      className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
     >
       <EditorialMediaFrame
         media={item.media}
@@ -835,7 +745,7 @@ function ServicesSection({ content }: { content: HomePremiumContent }) {
         title={content.servicios.title}
         description={content.servicios.description}
       />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2 lg:gap-6">
         <ServiceColumn
           icon={<Hotel />}
           title={content.servicios.staysTitle}
@@ -870,19 +780,21 @@ function ServiceColumn({
         {items.map((item) => (
           <article
             key={item.title}
-            className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[11rem_1fr]"
+            className="grid grid-cols-[6rem_1fr] overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-[11rem_1fr]"
           >
             <EditorialMediaFrame
               media={item.media}
               label={item.title}
-              className="h-full min-h-40 w-full object-cover"
+              className="h-full min-h-28 w-full object-cover lg:min-h-40"
             />
             <div className="min-w-0 p-4">
               <p className="text-[10px] font-semibold uppercase text-primary">
                 {item.destination} · {item.category}
               </p>
               <h4 className="mt-1 font-display text-xl">{item.title}</h4>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{item.summary}</p>
+              <p className="mt-2 hidden text-xs leading-relaxed text-muted-foreground lg:block">
+                {item.summary}
+              </p>
               {item.href ? (
                 <Button asChild variant="link" className="mt-2 h-auto min-h-11 p-0">
                   <Link to={item.href}>
@@ -904,26 +816,26 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
       aria-labelledby="events-title"
       className="rounded-3xl border border-border bg-card p-5 sm:p-8"
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,34%)_1fr]">
+      <div className="grid gap-5 md:grid-cols-[minmax(0,34%)_1fr] lg:gap-6">
         <div>
           <p className="text-xs font-semibold uppercase text-primary">{content.eventos.kicker}</p>
           <h2 id="events-title" className="mt-2 font-display text-3xl">
             {content.eventos.title}
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {content.eventos.description}
           </p>
           <EditorialMediaFrame
             media={content.eventos.media}
             label={content.eventos.title}
-            className="mt-5 aspect-[16/10] w-full rounded-2xl object-cover"
+            className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
           />
         </div>
         <ol className="divide-y divide-border border-y border-border">
           {content.eventos.items.map((event, index) => (
             <li
               key={event.title}
-              className="grid gap-3 py-5 sm:grid-cols-[3rem_1fr_auto] sm:items-center"
+              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 py-3 lg:grid-cols-[3rem_1fr_auto] lg:py-5"
             >
               <span className="grid size-10 place-items-center rounded-full bg-secondary font-display text-lg">
                 {index + 1}
@@ -933,14 +845,14 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                   {event.day} · {event.type}
                 </p>
                 <h3 className="mt-1 font-display text-xl">{event.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{event.detail}</p>
+                <p className="mt-1 hidden text-sm text-muted-foreground lg:block">{event.detail}</p>
               </div>
               {event.href ? (
                 <Button
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="min-h-11 justify-self-start rounded-pill sm:justify-self-end"
+                  className="hidden min-h-11 justify-self-start rounded-pill lg:inline-flex lg:justify-self-end"
                 >
                   <Link to={event.href}>Ver agenda</Link>
                 </Button>
@@ -953,7 +865,13 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
   );
 }
 
-function EditorialSection({ content }: { content: HomePremiumContent }) {
+function EditorialSection({
+  content,
+  cinematic,
+}: {
+  content: HomePremiumContent;
+  cinematic: boolean;
+}) {
   return (
     <section aria-labelledby="editorial-title">
       <SectionHead
@@ -962,24 +880,33 @@ function EditorialSection({ content }: { content: HomePremiumContent }) {
         description={content.queHacer.description}
         action={content.queHacer.action}
       />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div
+        className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0"
+        tabIndex={0}
+        aria-label="Qué hacer en el territorio"
+      >
         {content.queHacer.items.map((item: HomePremiumEditorial) =>
           item.href ? (
             <Link
               key={item.title}
               to={item.href}
-              className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block"
+              className="relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
             >
               <EditorialMediaFrame
                 media={item.media}
                 label={item.title}
-                className="h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto"
+                className="absolute inset-0 h-full w-full object-cover"
               />
-
-              <div className="p-4">
+              <div
+                className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"
+                aria-hidden
+              />
+              <div className="absolute inset-x-0 bottom-0 z-10 p-4">
                 <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
                 <h3 className="mt-1 font-display text-xl">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/80">
+                  {item.body}
+                </p>
               </div>
             </Link>
           ) : null,
@@ -987,6 +914,25 @@ function EditorialSection({ content }: { content: HomePremiumContent }) {
       </div>
     </section>
   );
+}
+
+/**
+ * Lote 3L · Resumen de ruta sólo con los datos realmente presentes en el CMS
+ * (título · duración · N paradas). Devuelve "" cuando no hay ruta o ningún
+ * dato confirmado, para que ninguna superficie imprima "undefined".
+ */
+function describeRoute(
+  route: HomePremiumContent["rutas"]["items"][number] | undefined,
+  withTitle = true,
+): string {
+  if (!route) return "";
+  const parts: string[] = [];
+  if (withTitle && route.title?.trim()) parts.push(route.title.trim());
+  if (route.duration?.trim()) parts.push(route.duration.trim());
+  if (Number.isFinite(route.stops) && route.stops > 0) {
+    parts.push(`${route.stops} ${route.stops === 1 ? "parada" : "paradas"}`);
+  }
+  return parts.join(" · ");
 }
 
 function MapSection({
@@ -998,6 +944,25 @@ function MapSection({
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
+  const normalizeLabel = (value: string) =>
+    value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLocaleLowerCase("es-MX");
+  const pointByTitle = new Map(
+    content.mapa.dto.points
+      .filter((point) => point.kind === "destination")
+      .map((point) => [normalizeLabel(point.title), point]),
+  );
+  const routePoints = (route?.sequence ?? [])
+    .map((title) => pointByTitle.get(normalizeLabel(title)))
+    .filter((point): point is NonNullable<typeof point> => Boolean(point));
+  const mapDto = {
+    ...content.mapa.dto,
+    center: null,
+    points: routePoints.length >= 2 ? routePoints : content.mapa.dto.points,
+  };
   return (
     <section
       id="mapa"
@@ -1014,15 +979,22 @@ function MapSection({
             {content.mapa.description}
           </p>
         </div>
-        <div className="rounded-xl bg-muted p-4">
-          <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
-          <p className="mt-1 font-display text-lg">{route?.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {route?.duration} · {route?.stops} paradas
-          </p>
-        </div>
+        {route ? (
+          <div className="rounded-xl bg-muted p-4">
+            <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
+            <p className="mt-1 font-display text-lg">{route.title}</p>
+            <p className="text-xs text-muted-foreground">{describeRoute(route, false)}</p>
+          </div>
+        ) : null}
       </div>
-      <ExperienceMapBlock dto={content.mapa.dto} />
+      <div className="max-h-[18rem] overflow-hidden rounded-2xl sm:max-h-[25rem] lg:max-h-none">
+        <ExperienceMapBlock
+          dto={mapDto}
+          interactiveOnly
+          immersive
+          connectByRoad={routePoints.length >= 2}
+        />
+      </div>
     </section>
   );
 }
@@ -1040,34 +1012,25 @@ function TravelPlanClose({
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
+  // Lote 3G.2 · Mi Viaje pasa a ayuda contextual secundaria mediante la
+  // autoridad compartida TravelPlanBand (sólo presentación).
+  // Lote 3L · sin rutas publicadas en el CMS `route` es undefined: se omite el
+  // prefijo en vez de imprimir "undefined · undefined · undefined paradas".
+  const routeSummary = describeRoute(route);
+  const aluxNote =
+    "Alux puede ajustar el orden según tus intereses sin crear otro modelo de itinerario.";
   return (
-    <section className="overflow-hidden rounded-3xl bg-selva text-selva-foreground">
-      <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div>
-          <div className="flex items-center gap-2 text-primary">
-            <Sparkles className="size-5" aria-hidden />
-            <p className="text-xs font-semibold uppercase">{content.travelPlan.eyebrow}</p>
-          </div>
-          <h2 className="mt-3 font-display text-3xl sm:text-4xl">{content.travelPlan.title}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-selva-foreground/80">
-            {route?.title} · {route?.duration} · {route?.stops} paradas. Alux puede ajustar el orden
-            según tus intereses sin crear otro modelo de itinerario.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-          <Button type="button" size="lg" onClick={onAdd} className="min-h-12 rounded-pill">
-            {added ? (
-              <Check className="mr-2 size-4" aria-hidden />
-            ) : (
-              <Compass className="mr-2 size-4" aria-hidden />
-            )}
-            {added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel}
-          </Button>
-          <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
-            <Link to="/alux">{content.travelPlan.ctaAluxLabel}</Link>
-          </Button>
-        </div>
-      </div>
-    </section>
+    <TravelPlanBand
+      titleId="home-travel-plan"
+      eyebrow={content.travelPlan.eyebrow}
+      title={content.travelPlan.title}
+      summary={routeSummary ? `${routeSummary}. ${aluxNote}` : aluxNote}
+      primary={{
+        label: added ? content.travelPlan.ctaAddedLabel : content.travelPlan.ctaAddLabel,
+        onClick: onAdd,
+        done: added,
+      }}
+      secondary={{ label: content.travelPlan.ctaAluxLabel, to: "/alux" }}
+    />
   );
 }

@@ -11,8 +11,11 @@
  *    se aplica una sombra suave para legibilidad, sin recolorear.
  */
 import { cn } from "@/lib/utils";
-import { SITE } from "@/config/site";
-import logoUrl from "@/assets/brand/logo.png";
+// Lote 3B · B — El logotipo y el nombre accesible se resuelven desde
+// `brand.identity` (CMS). `ACTIVE_BRAND` queda como fallback seguro
+// dentro del propio hook; aquí no se referencia directamente.
+import { useBrandLogo } from "@/lib/brand/brand-context";
+
 
 interface Props {
   tone?: "dark" | "light";
@@ -34,12 +37,14 @@ export function BrandLogo({
   size = "md",
   className,
 }: Props) {
+  const logo = useBrandLogo();
   return (
     <img
-      src={logoUrl}
-      alt={SITE.name}
-      width={470}
-      height={159}
+      src={logo.src}
+      alt={logo.alt}
+      width={logo.width}
+      height={logo.height}
+
       className={cn(
         "w-auto select-none",
         SIZE_MAP[size],

@@ -81,6 +81,8 @@ const KIND_LABEL: Record<SharedPlanItem["item_kind"], string> = {
   product: "Experiencia",
   event: "Evento",
   note: "Nota",
+  route: "Ruta",
+  place: "Lugar",
 };
 
 function KindIcon({ kind }: { kind: SharedPlanItem["item_kind"] }) {
@@ -145,15 +147,17 @@ function SharedPlanView({ data }: { data: SharedPlanView }) {
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
             {range ? (
               <div className="inline-flex items-center gap-1.5">
-                <CalendarDays className="size-4" aria-hidden />
-                <dt className="sr-only">Fechas</dt>
+                <dt className="sr-only">
+                  <CalendarDays className="size-4" aria-hidden /> Fechas
+                </dt>
                 <dd>{range}</dd>
               </div>
             ) : null}
             {plan.party_size ? (
               <div className="inline-flex items-center gap-1.5">
-                <Users className="size-4" aria-hidden />
-                <dt className="sr-only">Personas</dt>
+                <dt className="sr-only">
+                  <Users className="size-4" aria-hidden /> Personas
+                </dt>
                 <dd>
                   {plan.party_size} persona{plan.party_size === 1 ? "" : "s"}
                 </dd>

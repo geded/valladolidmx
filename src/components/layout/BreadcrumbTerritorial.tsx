@@ -9,10 +9,12 @@
  */
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Home } from "lucide-react";
+
 import type { BreadcrumbCrumb } from "@/types/territory";
 import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 import { TerritorialSwitcherMount } from "@/components/navigation/TerritorialSwitcherMount";
+import { CompactCrumbs, shouldCompactCrumbs } from "@/components/layout/CompactCrumbs";
 
 interface Props {
   /**
@@ -27,6 +29,17 @@ interface Props {
    * usan como migas. Si no hay contexto disponible, cae a `crumbs`.
    */
   useContextCrumbs?: boolean;
+  /**
+   * Progressive disclosure en móvil (≤639px): sólo se muestran casita,
+   * la miga ancla (por defecto el destino) y la miga actual truncada.
+   * Los niveles intermedios se agrupan en un menú accesible.
+   */
+  compactOnMobile?: boolean;
+  /**
+   * Índice (dentro de `crumbs`) de la miga que permanece visible en
+   * móvil. Default: `crumbs.length - 3` (destino en rutas canónicas).
+   */
+  mobileAnchorIndex?: number;
   className?: string;
 }
 
@@ -41,20 +54,36 @@ function crumbsFromContext(
   }));
 }
 
-export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, className }: Props) {
+export function BreadcrumbTerritorial({
+  crumbs,
+  useContextCrumbs = false,
+  compactOnMobile = false,
+  mobileAnchorIndex,
+  className,
+}: Props) {
   const ctx = useResolvedContext();
   const effectiveCrumbs: readonly BreadcrumbCrumb[] =
     useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);
 
   if (effectiveCrumbs.length === 0) return null;
 
+  // Cadenas cortas (≤3 niveles con la casita) se renderizan completas.
+  const compact = compactOnMobile && shouldCompactCrumbs(effectiveCrumbs);
+
   return (
     <nav
       aria-label="Ruta territorial"
-      className={cn("flex flex-wrap items-start justify-between gap-3 text-sm", className)}
+      className={cn("flex items-start justify-between gap-3 text-sm", className)}
     >
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li className="flex items-center gap-1.5">
+      {compact ? <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} /> : null}
+      {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
+      <ol
+        className={cn(
+          "flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
+          compact ? "hidden sm:flex" : null,
+        )}
+      >
+        <li className="flex shrink-0 items-center gap-1.5">
           <Link
             to="/"
             className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
@@ -66,8 +95,9 @@ export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, classN
         {effectiveCrumbs.map((c, i) => {
           const isLast = i === effectiveCrumbs.length - 1;
           return (
-            <li key={`${c.label}-${i}`} className="flex items-center gap-1.5">
-              <ChevronRight className="size-3.5 opacity-50" aria-hidden />
+            <li key={`${c.label}-${i}`} className="flex min-w-0 shrink-0 items-center gap-1.5">
+              <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+
               {c.to && !isLast ? (
                 <Link
                   to={c.to}
@@ -79,7 +109,11 @@ export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, classN
               ) : (
                 <span
                   aria-current={isLast ? "page" : undefined}
-                  className={cn(isLast ? "font-medium text-foreground" : "")}
+                  className={cn(
+                    "block truncate",
+                    // El nombre actual puede truncarse en móvil.
+                    isLast ? "max-w-[46vw] font-medium text-foreground sm:max-w-none" : "",
+                  )}
                 >
                   {c.label}
                 </span>
@@ -94,7 +128,9 @@ export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, classN
         existe un único destino publicado — no genera ruido en Home,
         Blog, Contacto ni superficies sin ancla.
       */}
-      <TerritorialSwitcherMount className="h-8 min-w-40 shrink-0 text-xs" />
+      <TerritorialSwitcherMount
+        className={cn("h-8 min-w-40 shrink-0 text-xs", compact ? "hidden sm:flex" : null)}
+      />
     </nav>
   );
 }

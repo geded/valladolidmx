@@ -209,12 +209,13 @@ assert.deepEqual(policyConsumers, [
   "src/components/experience-builder/VisualStudio.tsx",
   "src/lib/experience-builder/block-library.ts",
   "src/lib/experience-builder/block-registry.ts",
+  "src/lib/experience-builder/home-materialization.ts",
   "src/lib/experience-builder/premium-template-registry.ts",
   "src/lib/experience-builder/studio.functions.ts",
 ]);
 const premiumTemplateRegistryPath = "src/lib/experience-builder/premium-template-registry.ts";
 const premiumTemplateRegistrySha256 =
-  "5f05a70a0ebb8e8ea8880e3b2531eb430251c87f565d7ea35ce38f910daadbb1";
+  "a900e5980ccd1fa452c00df77b28bfb49b0a76a2992990eb699e4f55b61dbe73";
 assert.equal(
   createHash("sha256").update(readFileSync(premiumTemplateRegistryPath)).digest("hex"),
   premiumTemplateRegistrySha256,
@@ -227,7 +228,15 @@ assert.ok(
   ),
   "PCA-2026-013 does not authorize the exact premium template registry path",
 );
-assert.match(authorization.founder_authority, new RegExp(premiumTemplateRegistrySha256));
+const registryAddendum = JSON.parse(
+  readFileSync("docs/governance/addenda/PCA-2026-059-ADDENDUM-ZZ-PR60-092.json", "utf8"),
+);
+assert.equal(registryAddendum.status, "Approved");
+assert.equal(registryAddendum.supersedes_acknowledged_revision.path, premiumTemplateRegistryPath);
+assert.equal(
+  registryAddendum.supersedes_acknowledged_revision.current_sha256,
+  premiumTemplateRegistrySha256,
+);
 
 const policy = readFileSync("src/lib/experience-builder/editorial-builder-policy.ts", "utf8");
 for (const runtimeType of [

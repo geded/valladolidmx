@@ -31,6 +31,11 @@ export interface UseAnonymousTripResult {
     kind: AnonymousPlannedItem["kind"],
     targetId: string | null,
   ) => Promise<boolean>;
+  setTravelerCount: (count: { adults: number; children?: number }) => Promise<boolean>;
+  /** Lote 3J.1 · Preferencias declaradas antes del registro (aditivas). */
+  setInterests: (interests: readonly string[]) => Promise<boolean>;
+  setTripDurationDays: (days: number | null) => Promise<boolean>;
+  setAccessibilityNeeds: (needs: string | null) => Promise<boolean>;
   reset: () => Promise<void>;
   acknowledgeReturn: () => void;
 }
@@ -148,6 +153,69 @@ export function useAnonymousTrip(): UseAnonymousTripResult {
     [mutate],
   );
 
+  const setTravelerCount: UseAnonymousTripResult["setTravelerCount"] = useCallback(
+    async (count) =>
+      Boolean(
+        await mutate((current) => ({
+          ...current,
+          travelerCount: {
+            adults: Math.max(1, Math.min(20, Math.floor(count.adults))),
+            children: Math.max(0, Math.min(20, Math.floor(count.children ?? 0))),
+          },
+        })),
+      ),
+    [mutate],
+  );
+
+  const setInterests: UseAnonymousTripResult["setInterests"] = useCallback(
+    async (interests) =>
+      Boolean(
+        await mutate((current) => {
+          const clean = Array.from(
+            new Set(interests.map((i) => i.trim()).filter((i) => i.length > 0)),
+          ).slice(0, 16);
+          if (clean.length === 0) {
+            const { interests: _drop, ...rest } = current;
+            return rest as AnonymousTravelDraft;
+          }
+          return { ...current, interests: clean.map((i) => i.slice(0, 60)) };
+        }),
+      ),
+    [mutate],
+  );
+
+  const setTripDurationDays: UseAnonymousTripResult["setTripDurationDays"] = useCallback(
+    async (days) =>
+      Boolean(
+        await mutate((current) => {
+          if (days == null) {
+            const { tripDurationDays: _drop, ...rest } = current;
+            return rest as AnonymousTravelDraft;
+          }
+          return {
+            ...current,
+            tripDurationDays: Math.max(1, Math.min(60, Math.floor(days))),
+          };
+        }),
+      ),
+    [mutate],
+  );
+
+  const setAccessibilityNeeds: UseAnonymousTripResult["setAccessibilityNeeds"] = useCallback(
+    async (needs) =>
+      Boolean(
+        await mutate((current) => {
+          const clean = needs?.trim() ?? "";
+          if (clean.length === 0) {
+            const { accessibilityNeeds: _drop, ...rest } = current;
+            return rest as AnonymousTravelDraft;
+          }
+          return { ...current, accessibilityNeeds: clean.slice(0, 300) };
+        }),
+      ),
+    [mutate],
+  );
+
   const reset = useCallback(async () => {
     await clearAnonymousTrip();
     setHasReturningTrip(false);
@@ -165,6 +233,10 @@ export function useAnonymousTrip(): UseAnonymousTripResult {
     removeFavorite,
     addPlannedItem,
     removePlannedItem,
+    setTravelerCount,
+    setInterests,
+    setTripDurationDays,
+    setAccessibilityNeeds,
     reset,
     acknowledgeReturn,
   };

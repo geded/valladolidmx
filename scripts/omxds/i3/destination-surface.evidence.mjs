@@ -77,6 +77,15 @@ function assertApprovedExactModification(authorizationId, protectedPath) {
   );
 }
 
+function assertApprovedExactAddendum(addendumFile, protectedPath, expectedDigest) {
+  const addendum = JSON.parse(readFileSync(join("docs/governance/addenda", addendumFile), "utf8"));
+  assert.equal(addendum.status, "Approved", `${addendumFile} must be Approved`);
+  assert.equal(addendum.parent, "PCA-2026-056", `${addendumFile} must extend PCA-2026-056`);
+  assert.equal(addendum.supersedes_acknowledged_revision?.operation, "modify");
+  assert.equal(addendum.supersedes_acknowledged_revision?.path, protectedPath);
+  assert.equal(addendum.supersedes_acknowledged_revision?.current_sha256, expectedDigest);
+}
+
 const surfacePath = "src/components/surfaces/DestinationSurface.tsx";
 const acknowledgedSurfaceRevisions = [
   {
@@ -103,6 +112,13 @@ const acknowledgedSurfaceRevisions = [
     sha256: "05b6b12f4c2d065d999dba8b951a462564f852635c50d63a377cbb6130946c71",
     authorizations: ["PCA-2026-056"],
   },
+  {
+    // Integración Premium · revisión exacta ya presente, reconciliada tras el gate del PR #60.
+    package: "integration-premium-pr60-destination-surface-reconciliation",
+    sha256: "4dd81bbfb907aa3c0b557fa72ac44d8420b84b7e1099c18dc9b066e44d163b33",
+    authorizations: ["PCA-2026-056"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZ-PR60-006.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
@@ -117,6 +133,8 @@ if (surfaceDrift !== "") {
   for (const authorizationId of acknowledged.authorizations) {
     assertApprovedExactModification(authorizationId, surfacePath);
   }
+  if (acknowledged.addendum)
+    assertApprovedExactAddendum(acknowledged.addendum, surfacePath, digest);
 }
 
 // 19.26 · Reconciliación fail-closed del gate I3-A.
@@ -136,6 +154,13 @@ const acknowledgedRouteRevisions = [
     sha256: "86f91f43dd57299f6eaa909e7cf19795bf7fe2f4c4f85ca3cd2839ceb8b2a4b0",
     authorizations: ["PCA-2026-056"],
   },
+  {
+    // Diagnóstico PR #60 · revisión exacta ya presente en integración.
+    package: "integration-premium-pr60-destination-route-reconciliation",
+    sha256: "e52e5843d039fd154b9e21c0361cfb793c65e12b9180c7c9395456da2015be88",
+    authorizations: ["PCA-2026-056"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZ-PR60-007.json",
+  },
 ];
 
 const routeDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", routePath], {
@@ -151,6 +176,7 @@ if (routeDrift !== "") {
   for (const authorizationId of acknowledged.authorizations) {
     assertApprovedExactModification(authorizationId, routePath);
   }
+  if (acknowledged.addendum) assertApprovedExactAddendum(acknowledged.addendum, routePath, digest);
 }
 
 const basePackage = JSON.parse(
@@ -161,11 +187,11 @@ assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-A");
 assertGovernedLockBaseline(base, "I3-A");
 
 const route = readFileSync(routePath, "utf8");
-assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
-assert.match(route, /surfaceContractsEnabled/);
+assert.match(route, /if \(!db\) throw notFound\(\)/);
 assert.match(route, /DestinationSurfaceContractBoundary/);
-assert.match(route, /legacy=/);
-assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
+assert.match(route, /DestinationSurfaceProvider/);
+assert.match(route, /presentation=\{search\.presentacion === "cinematografica"/);
+assert.doesNotMatch(route, /DESTINOS_MOCK/);
 
 const surface = readFileSync("src/components/surfaces/DestinationSurface.tsx", "utf8");
 assert.match(surface, /createOmxdsSurfaceContract/);
@@ -199,8 +225,9 @@ const acknowledgedProtectedRevisions = new Map([
   [
     "src/lib/experience-builder/composition-renderer.tsx",
     {
-      sha256: "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+      sha256: "ef0e4749f83c8c83a99c3da17acc04eacaa06cf338fb3b34f6d8e1f453d83262",
       authorizations: ["PCA-2026-056"],
+      addendum: "PCA-2026-056-ADDENDUM-ZZ-PR60-008.json",
     },
   ],
   [
@@ -244,6 +271,8 @@ for (const protectedPath of [
   for (const authorizationId of acknowledged.authorizations) {
     assertApprovedExactModification(authorizationId, protectedPath);
   }
+  if (acknowledged.addendum)
+    assertApprovedExactAddendum(acknowledged.addendum, protectedPath, digest);
 }
 // 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
 // la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin

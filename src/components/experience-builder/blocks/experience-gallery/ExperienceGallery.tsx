@@ -73,6 +73,8 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
       {variant === "carousel" ? (
         <ul
           className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 [scrollbar-width:none]"
+          tabIndex={0}
+          aria-label="Galería de la experiencia"
           role="list"
         >
           {visible.map((it, i) => (

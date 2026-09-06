@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZ-PR60-149",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir exclusivamente los tres P1 del PR #60. Reconoce sólo la revisión exacta que vuelve fail-closed el rate-limit de Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/alux/converse.functions.ts",
+    "previous_sha256": "f8170cae0c37e63c9820d2d1a667349efdec2b8fe135e581f8ad6af3cf92ef77",
+    "current_sha256": "d7c64418e7ec19e6559c9e7eb7fdc93235582ff2c4976354132f1ad5b9756f85",
+    "semantic_change": "Errores del RPC de rate-limit bloquean antes de cualquier llamada al modelo pagado.",
+    "authority": "Founder PR #60 · cierre P1 exacto · 2026-09-06"
+  },
+  "invariants": ["Sin comodines ni futuros SHA-256", "Sin cambios de pagos, datos ni despliegue"],
+  "recorded_at": "2026-09-06"
+}

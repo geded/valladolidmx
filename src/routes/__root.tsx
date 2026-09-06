@@ -78,6 +78,14 @@ import { LazyToasterHost } from "@/components/ui/LazyToasterHost";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
+import { ACTIVE_BRAND, ACTIVE_BRAND_THEME_STYLE } from "@/config/brand";
+import { BrandProvider, brandSettingsQueryOptions } from "@/lib/brand/brand-context";
+import { BRAND_SETTINGS_DEFAULTS } from "@/lib/brand/brand-settings.functions";
+import {
+  institutionalAuthorityQueryOptions,
+  useInstitutionalAuthority,
+} from "@/lib/institutional/institutional-context";
+
 import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
@@ -147,10 +155,33 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+/**
+ * Lote 3B · C — Sincroniza la autoridad institucional administrada en el
+ * CMS con el store sincrónico que consultan los distintivos. No pinta
+ * nada: cero impacto visual.
+ */
+function InstitutionalAuthoritySync() {
+  useInstitutionalAuthority();
+  return null;
+}
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: async () => ({
-    omxdsVisualFoundationsEnabled: await getOmxdsVisualFoundationsFlag(),
-  }),
+  loader: async ({ context }) => {
+    // Lote 3B · B — La identidad de marca administrable se precarga en SSR
+    // para que header, pie y superficies públicas la pinten sin parpadeo.
+    // Fail-safe: ante cualquier error se conserva el fallback de código.
+    const [omxdsVisualFoundationsEnabled] = await Promise.all([
+      getOmxdsVisualFoundationsFlag(),
+      context.queryClient
+        .ensureQueryData(brandSettingsQueryOptions)
+        .catch(() => BRAND_SETTINGS_DEFAULTS),
+      // Lote 3B · C — Autoridad institucional vigente (distintivos).
+      context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+    ]);
+
+    return { omxdsVisualFoundationsEnabled };
+  },
+
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -218,6 +249,8 @@ function RootShell({ children }: { children: ReactNode }) {
     <html
       lang="es"
       suppressHydrationWarning
+      data-tourism-brand={ACTIVE_BRAND.key}
+      style={ACTIVE_BRAND_THEME_STYLE}
       data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>
@@ -247,7 +280,11 @@ function RootComponent() {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/cuenta") ||
     pathname.startsWith("/concierge") ||
-    pathname.startsWith("/empresa");
+    pathname.startsWith("/empresa") ||
+    (pathname.startsWith("/lovable/founder-") &&
+      pathname !== "/lovable/founder-home-premium-preview" &&
+      pathname !== "/lovable/founder-zazil-premium-preview");
+  const showPublicAlux = !isAppShellRoute;
 
   // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
   // este punto se cambia por registro real con vite-plugin-pwa.
@@ -289,55 +326,58 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <AuthProvider>
-          {!isAppShellRoute ? <SkipLink /> : null}
-          {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
-          {!isAppShellRoute ? (
-            <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
-          ) : null}
-          {!isAppShellRoute ? <OfflineBanner /> : null}
-          <SyncStatusBanner />
-          <UpdateBanner />
-          <Outlet />
-          {!isAppShellRoute ? (
-            <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />
-          ) : null}
-          {!isAppShellRoute ? (
+        <BrandProvider>
+          <InstitutionalAuthoritySync />
+          <AuthProvider>
+            {!isAppShellRoute ? <SkipLink /> : null}
+            {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
+            {!isAppShellRoute ? (
+              <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
+            ) : null}
+            {!isAppShellRoute ? <OfflineBanner /> : null}
+            <SyncStatusBanner />
+            <UpdateBanner />
+            <Outlet />
+            {!isAppShellRoute ? (
+              <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />
+            ) : null}
+            {showPublicAlux ? (
+              <React.Suspense fallback={null}>
+                <AluxFloatingTrigger />
+              </React.Suspense>
+            ) : null}
             <React.Suspense fallback={null}>
-              <AluxFloatingTrigger />
+              <FloatingTravelPlanDock />
             </React.Suspense>
-          ) : null}
-          <React.Suspense fallback={null}>
-            <FloatingTravelPlanDock />
-          </React.Suspense>
-          <React.Suspense fallback={null}>
-            <AluxMemorySyncRunner />
-          </React.Suspense>
-          <React.Suspense fallback={null}>
-            <ConciergeProposalObserver />
-          </React.Suspense>
-          <LazyToasterHost />
-          {!isAppShellRoute ? (
             <React.Suspense fallback={null}>
-              <EditThisPageButton pathname={pathname} />
+              <AluxMemorySyncRunner />
             </React.Suspense>
-          ) : null}
-          {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
-          <ProtectedActionResumeRunner />
-          {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
-          <React.Suspense fallback={null}>
-            <SignInPromptSheet />
-          </React.Suspense>
-          <React.Suspense fallback={null}>
-            <AnonymousDraftImportRunner />
-          </React.Suspense>
-          {/*
+            <React.Suspense fallback={null}>
+              <ConciergeProposalObserver />
+            </React.Suspense>
+            <LazyToasterHost />
+            {!isAppShellRoute ? (
+              <React.Suspense fallback={null}>
+                <EditThisPageButton pathname={pathname} />
+              </React.Suspense>
+            ) : null}
+            {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
+            <ProtectedActionResumeRunner />
+            {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
+            <React.Suspense fallback={null}>
+              <SignInPromptSheet />
+            </React.Suspense>
+            <React.Suspense fallback={null}>
+              <AnonymousDraftImportRunner />
+            </React.Suspense>
+            {/*
           Navigation Blueprint · N3 — Único punto de suscripción global
           al Context Engine para persistir la cadena territorial en
           sessionStorage (deep-links, refresh, back/forward).
         */}
-          <GlobalNavigationSessionBridge />
-        </AuthProvider>
+            <GlobalNavigationSessionBridge />
+          </AuthProvider>
+        </BrandProvider>
       </I18nProvider>
     </QueryClientProvider>
   );

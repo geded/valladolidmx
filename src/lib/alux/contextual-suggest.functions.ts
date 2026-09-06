@@ -424,6 +424,14 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     const currentProductSlug = data.product?.slug;
     const limit = data.limit ?? 6;
 
+    // 3J.3 · Filtro duro: lo que el viajero ya guardó en Mi Viaje no se
+    // vuelve a sugerir (sólo entradas de tipo empresa con slug conocido).
+    const plannedSlugSet = new Set<string>(
+      (data.travelerPlan?.saved_items ?? [])
+        .filter((s) => s.kind === "business" && typeof s.slug === "string" && s.slug.length > 0)
+        .map((s) => String(s.slug).toLowerCase()),
+    );
+
     const seen = new Set<string>();
     const ordered: BizRow[] = [];
     function push(rows: BizRow[]) {
@@ -431,6 +439,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         if (r.slug === currentBusinessSlug) continue;
         // CV2.4 · Filtro duro: el concierge ya trabaja este negocio.
         if (conciergeReservedSlugSet.has(r.slug.toLowerCase())) continue;
+        if (plannedSlugSet.has(r.slug.toLowerCase())) continue;
         if (seen.has(r.id)) continue;
         seen.add(r.id);
         ordered.push(r);

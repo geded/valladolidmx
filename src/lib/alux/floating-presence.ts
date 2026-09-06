@@ -16,6 +16,7 @@
  */
 import { useRouterState } from "@tanstack/react-router";
 import { useHasStickyCta } from "@/lib/alux/sticky-cta-presence";
+import { useAluxEmbeddedVisible } from "@/lib/alux/embedded-presence";
 
 /** Prefijos de ruta con CTA sticky propio donde el flotante debe ocultarse. */
 const HIDDEN_PATH_PREFIXES: readonly string[] = ["/cuenta/carrito", "/cuenta/pagos"];
@@ -45,7 +46,13 @@ export interface AluxFloatingPresence {
   /** El flotante debe ocultarse en la superficie actual. */
   readonly shouldHide: boolean;
   /** Motivo (para tooling/debug; nunca visible al usuario). */
-  readonly reason: "ficha-business" | "ficha-product" | "checkout" | "sticky-cta" | "none";
+  readonly reason:
+    | "ficha-business"
+    | "ficha-product"
+    | "checkout"
+    | "alux-embedded"
+    | "sticky-cta"
+    | "none";
   /**
    * Offset vertical adicional (px) que el flotante debe respetar para no
    * solapar barras sticky comerciales. 0 cuando no hay barra activa.
@@ -56,12 +63,18 @@ export interface AluxFloatingPresence {
 export function useAluxFloatingPresence(): AluxFloatingPresence {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hasStickyCta = useHasStickyCta();
+  // Lote 3G · nunca superponer el flotante a un módulo de Alux embebido
+  // que ya está en pantalla (ni a "Mi Viaje" bajo él).
+  const aluxEmbeddedVisible = useAluxEmbeddedVisible();
 
   const ficha = detectFicha(pathname);
   if (ficha === "product") return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
   if (ficha === "business") return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
   if (HIDDEN_PATH_PREFIXES.some((p) => pathname.startsWith(p))) {
     return { shouldHide: true, reason: "checkout", bottomOffset: 0 };
+  }
+  if (aluxEmbeddedVisible) {
+    return { shouldHide: true, reason: "alux-embedded", bottomOffset: 0 };
   }
   if (hasStickyCta) return { shouldHide: false, reason: "sticky-cta", bottomOffset: 88 };
   return { shouldHide: false, reason: "none", bottomOffset: 0 };

@@ -308,6 +308,7 @@ export const getComposition = createServerFn({ method: "GET" })
     };
   });
 
+
 /**
  * Devuelve el árbol de la revisión activa (snapshot publicado) de una
  * composición, o `null` si nunca se publicó. Se usa en el Studio para

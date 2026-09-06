@@ -7,6 +7,8 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { useTranslation } from "@/i18n/context";
 import { SITE } from "@/config/site";
+// Lote 3B · B — El nombre de marca del pie se lee de `brand.identity`.
+import { useBrand } from "@/lib/brand/brand-context";
 
 interface FooterLinkItem {
   label: string;
@@ -39,6 +41,7 @@ function linkItems(value: unknown, fallback: FooterLinkItem[]): FooterLinkItem[]
 }
 
 export function SiteFooter({ config }: SiteFooterProps = {}) {
+  const brand = useBrand();
   const { t } = useTranslation();
   const exploreLinks = linkItems(config?.explore_links, [
     { href: "/oriente-maya", label: t("nav.destinations") },
@@ -58,17 +61,19 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
   return (
     <footer
       data-omxds-chrome="public-footer"
-      className="@container mt-24 border-t border-border bg-secondary/40"
+      className="@container mt-14 border-t border-border bg-secondary/40 lg:mt-24"
     >
-      <Container className="grid grid-cols-1 gap-10 py-12 @3xl:grid-cols-4">
-        <div>
+      <Container className="grid grid-cols-2 gap-x-5 gap-y-7 py-8 @3xl:grid-cols-4 @3xl:gap-10 @3xl:py-12">
+        <div className="col-span-2 @3xl:col-span-1">
           <BrandLogo tone="dark" size="md" />
-          <p className="mt-3 max-w-xs text-sm text-muted-foreground">{tagline}</p>
+          <p className="mt-2 line-clamp-2 max-w-xs text-xs leading-5 text-muted-foreground @3xl:mt-3 @3xl:text-sm">
+            {tagline}
+          </p>
         </div>
 
         <div>
           <h3 className="text-sm font-semibold text-foreground">{t("footer.explore")}</h3>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+          <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground @3xl:mt-3 @3xl:space-y-2 @3xl:text-sm">
             {exploreLinks.map((link) => (
               <li key={`${link.href}-${link.label}`}>
                 <a href={link.href} className="hover:text-foreground">
@@ -81,7 +86,7 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
 
         <div>
           <h3 className="text-sm font-semibold text-foreground">{t("footer.platform")}</h3>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+          <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground @3xl:mt-3 @3xl:space-y-2 @3xl:text-sm">
             {platformLinks.map((link) => (
               <li key={`${link.href}-${link.label}`}>
                 <a href={link.href} className="hover:text-foreground">
@@ -93,7 +98,7 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
         </div>
 
         {showLanguage ? (
-          <div>
+          <div className="col-span-2 @3xl:col-span-1">
             <h3 className="text-sm font-semibold text-foreground">{t("common.language")}</h3>
             <div className="mt-3">
               <LanguageSwitcher />
@@ -102,9 +107,9 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
         ) : null}
       </Container>
       <div className="border-t border-border/60">
-        <Container className="flex flex-col items-center justify-between gap-3 py-5 text-xs text-muted-foreground @3xl:flex-row">
+        <Container className="flex flex-col items-start justify-between gap-2 py-4 text-[11px] text-muted-foreground @3xl:flex-row @3xl:items-center @3xl:gap-3 @3xl:py-5 @3xl:text-xs">
           <p>
-            © {new Date().getFullYear()} {SITE.name}. {t("footer.rights")}
+            © {new Date().getFullYear()} {brand.name}. {t("footer.rights")}
           </p>
           <div className="flex gap-4">
             <span>{legalLabel}</span>

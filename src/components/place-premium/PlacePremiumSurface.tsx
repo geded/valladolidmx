@@ -14,23 +14,17 @@
  *  - `editorial`: lectura tipo revista territorial (historia primero).
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
-import { useMemo } from "react";
-import {
-  Accessibility,
-  CalendarDays,
-  Clock,
-  Compass,
-  Heart,
-  ImageOff,
-  Sparkles,
-  Ticket,
-} from "lucide-react";
+import { useMemo, type ReactNode } from "react";
+import { Accessibility, CalendarDays, Clock, Compass, Heart, ImageOff, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { PremiumHero, PremiumTerritorialBreadcrumb } from "@/components/premium";
-import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import {
+  DEFAULT_PREMIUM_PRESENTATION,
+  type PremiumPresentation,
+} from "@/lib/omxds/presentation/presentation";
 import { cn } from "@/lib/utils";
 import {
   PLACE_PREMIUM_DEMO_CONTENT,
@@ -47,6 +41,18 @@ export interface PlacePremiumSurfaceProps {
   builderNotice?: string | null;
   /** G8-Q2D-B · aviso de preview administrativa (“Borrador · no publicado”). */
   draftNotice?: string | null;
+  /**
+   * G4-PLACES · panel Alux contextual (TourismAluxPanel) inyectado por la
+   * ruta. La superficie sigue siendo render-only: sólo lo posiciona.
+   */
+  aluxSlot?: ReactNode;
+  /** Lote 3J.1 · Acción real de Mi Viaje (persistencia por ID canónico). */
+  tripSlot?: ReactNode;
+  /**
+   * G4-PLACES · cuando la ruta ya renderiza el breadcrumb territorial
+   * compartido (`PublicShell`), la superficie no debe duplicarlo.
+   */
+  showBreadcrumbs?: boolean;
   className?: string;
 }
 
@@ -56,6 +62,9 @@ export function PlacePremiumSurface({
   variant,
   builderNotice = null,
   draftNotice = null,
+  aluxSlot = null,
+  tripSlot = null,
+  showBreadcrumbs = true,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
@@ -68,11 +77,22 @@ export function PlacePremiumSurface({
     content.essentials.accessibility.length > 0;
   const hasGallery = content.gallery.items.length > 0;
   const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
+  /* Destino y, cuando el dato real la declara, subzona del destino. */
+  const heroEyebrow = [
+    content.identity.eyebrow,
+    content.identity.destinationLabel,
+    content.identity.zoneLabel || null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
       variant: "cluster",
-      heading: content.map.heading,
+      /* El encabezado ya lo aporta `SectionHeading`: el bloque de mapa no
+         debe repetirlo (paridad con el resto de fichas Premium). */
+      heading: null,
+
       center: content.map.center,
       points: content.map.points.map((p) => ({
         id: p.id,
@@ -108,7 +128,7 @@ export function PlacePremiumSurface({
       data-alux-safe-zone="true"
       className={cn("pb-24", className)}
     >
-      <Container className="pt-6">
+      <Container className="pt-3 sm:pt-6">
         {content.demoNotice ? <DemoNotice text={content.demoNotice} /> : null}
         {draftNotice ? (
           <p
@@ -130,93 +150,76 @@ export function PlacePremiumSurface({
         ) : null}
       </Container>
 
-      {cinematic ? (
-        <>
-          {/* Breadcrumb territorial permanente: visible ANTES del hero y
-              persistente al hacer scroll, igual que en Editorial. */}
-          <div className="sticky top-0 z-20 mt-4 border-y border-border bg-background/90 backdrop-blur">
-            <Container className="py-1.5">
-              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-            </Container>
-          </div>
-          <div className="mt-4">
-            <PremiumHero
-              vm={{
-                presentation: "cinematic",
-                eyebrow: content.identity.eyebrow,
-                title: content.identity.title,
-                description: content.identity.subtitle,
-                media: content.hero.cover.url
-                  ? {
-                      url: content.hero.cover.url,
-                      alt: content.hero.cover.alt,
-                      credit: content.hero.cover.credit,
-                    }
-                  : null,
-                badges: content.identity.badges.map((label) => ({ label })),
-                primaryAction: { label: content.hero.primaryCta.label },
-                secondaryAction: {
-                  label: content.hero.secondaryCta.label,
-                  href: content.hero.secondaryCta.href,
-                },
-              }}
-            />
-          </div>
-          {content.hero.cover.url ? null : (
-            <Container className="mt-3">
-              <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
-            </Container>
-          )}
-          <Container className="mt-8">
-            <IdentityStrip content={content} dense />
-          </Container>
-          {hasEssentials ? (
-            <Container className="mt-8">
-              <EssentialsBand content={content} />
-            </Container>
-          ) : null}
-          {hasGallery ? (
-            <Container className="mt-10">
-              <GalleryFilmstrip content={content} />
-            </Container>
-          ) : null}
-          {hasIntro ? (
-            <Container className="mt-14">
-              <IntroCentered content={content} />
-            </Container>
-          ) : null}
-        </>
-      ) : (
-        <>
-          <Container className="mt-4">
-            <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
-          </Container>
-          <Container className="mt-5">
-            <HeroEditorial content={content} />
-          </Container>
-          <Container className="mt-10">
-            <IdentityStrip content={content} />
-          </Container>
-          {hasIntro ? (
-            <Container className="mt-14">
-              <IntroEditorial content={content} />
-            </Container>
-          ) : null}
-          {hasEssentials ? (
-            <Container className="mt-14">
-              <EssentialsPanel content={content} />
-            </Container>
-          ) : null}
-          {hasGallery ? (
-            <Container className="mt-14">
-              <GalleryMosaic content={content} />
-            </Container>
-          ) : null}
-        </>
+      {showBreadcrumbs ? (
+        <Container className="mt-4">
+          <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} compactOnMobile />
+        </Container>
+      ) : null}
+
+      {/* Hero: misma familia y proporción aprobadas en las fichas Premium
+          de hotel y restaurante (`PremiumHero`, presentación editorial).
+          No existe hero propio de Lugares ni selector visible de
+          dirección visual. */}
+      <div className="mt-3 sm:mt-4">
+        <PremiumHero
+          vm={{
+            presentation: DEFAULT_PREMIUM_PRESENTATION,
+            eyebrow: heroEyebrow,
+            title: content.identity.title,
+            description: content.identity.subtitle,
+            media: content.hero.cover.url
+              ? {
+                  url: content.hero.cover.url,
+                  alt: content.hero.cover.alt,
+                  credit: content.hero.cover.credit,
+                }
+              : null,
+            badges: content.identity.badges.map((label) => ({ label })),
+            primaryAction: {
+              label: content.hero.primaryCta.label,
+              // 3J.2 · el CTA del hero delega SIEMPRE en la acción real de
+              // Mi Viaje (`tripSlot`); no duplica la lógica de persistencia.
+              onClick: () => {
+                document
+                  .getElementById("place-trip-action")
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              },
+            },
+            secondaryAction: {
+              label: content.hero.secondaryCta.label,
+              href: content.hero.secondaryCta.href,
+            },
+          }}
+        />
+      </div>
+      {content.hero.cover.url ? null : (
+        <Container className="mt-3">
+          <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
+        </Container>
       )}
 
+      <Container className="mt-5 sm:mt-8">
+        <IdentityStrip content={content} dense={cinematic} />
+      </Container>
+      {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
+      {hasIntro ? (
+        <Container className="mt-8 sm:mt-12">
+          {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
+        </Container>
+      ) : null}
+      {hasEssentials ? (
+        <Container className="mt-8 sm:mt-12">
+          {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
+        </Container>
+      ) : null}
+      {hasGallery ? (
+        <Container className="mt-8 sm:mt-12">
+          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
+        </Container>
+      ) : null}
+
       {hasMap ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
           <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             {content.map.points.length ? <ExperienceMapBlock dto={mapDto} /> : null}
@@ -235,7 +238,7 @@ export function PlacePremiumSurface({
       ) : null}
 
       {content.services.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="servicios-lugar" kicker="Servicios" title="Servicios disponibles" />
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {content.services.map((service) => (
@@ -252,7 +255,7 @@ export function PlacePremiumSurface({
       ) : null}
 
       {content.experiences.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading
             id="experiencias-lugar"
             kicker="Planea tu visita"
@@ -286,7 +289,7 @@ export function PlacePremiumSurface({
 
       {/* Eventos: sin contenido → el módulo se oculta por completo. */}
       {content.events.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="eventos-lugar" kicker="Agenda" title="Eventos relacionados" />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {content.events.map((item) => (
@@ -301,7 +304,7 @@ export function PlacePremiumSurface({
       ) : null}
 
       {content.nearby.length ? (
-        <Container className="mt-16">
+        <Container className="mt-10 sm:mt-16">
           <SectionHeading id="cerca-lugar" kicker="Alrededor" title="Lugares cercanos" />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2">
             {content.nearby.map((item) => (
@@ -326,11 +329,13 @@ export function PlacePremiumSurface({
         </Container>
       ) : null}
 
-      <Container className="mt-16">
+      <Container className="mt-10 sm:mt-16">
         <div
           className={cn(
             "grid gap-5",
-            cinematic ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" : "lg:grid-cols-2",
+            /* Alux vive en el módulo compartido (`aluxSlot`) y en el
+               botón flotante global: la ficha no lo duplica. */
+            "lg:grid-cols-1",
           )}
         >
           <section
@@ -344,34 +349,15 @@ export function PlacePremiumSurface({
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {content.trip.description}
             </p>
-            <Button type="button" className="mt-5 min-h-11 rounded-pill">
-              {content.trip.actionLabel}
-            </Button>
-          </section>
-
-          <section
-            aria-labelledby="alux-title"
-            className="rounded-3xl border border-border bg-card p-6"
-          >
-            <Sparkles className="size-5 text-primary" aria-hidden />
-            <h2 id="alux-title" className="mt-3 font-serif text-2xl">
-              {content.alux.title}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {content.alux.description}
-            </p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {content.alux.prompts.map((prompt, index) => (
-                <li key={`prompt-${index}`}>
-                  <span className="inline-flex min-h-11 items-center rounded-pill border border-border bg-background px-4 text-sm">
-                    {prompt}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <Button type="button" variant="outline" className="mt-5 min-h-11 rounded-pill">
-              {content.alux.actionLabel}
-            </Button>
+            {tripSlot ? (
+              <div id="place-trip-action" className="mt-5">
+                {tripSlot}
+              </div>
+            ) : (
+              <Button type="button" className="mt-5 min-h-11 rounded-pill">
+                {content.trip.actionLabel}
+              </Button>
+            )}
           </section>
         </div>
       </Container>
@@ -392,7 +378,7 @@ export function PlacePremiumSurface({
 
 function DemoNotice({ text }: { text: string }) {
   return (
-    <p className="rounded-2xl border border-warning/40 bg-warning/10 px-4 py-3 text-xs font-medium leading-5 text-foreground">
+    <p className="rounded-full border border-warning/40 bg-warning/10 px-3 py-1.5 text-[11px] font-medium leading-4 text-foreground sm:rounded-2xl sm:px-4 sm:py-3 sm:text-xs sm:leading-5">
       {text}
     </p>
   );
@@ -402,7 +388,7 @@ function SectionHeading({ id, kicker, title }: { id: string; kicker: string; tit
   return (
     <header id={id}>
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{kicker}</p>
-      <h2 className="mt-2 text-balance font-serif text-3xl sm:text-4xl">{title}</h2>
+      <h2 className="mt-1.5 text-balance font-serif text-2xl sm:mt-2 sm:text-4xl">{title}</h2>
     </header>
   );
 }
@@ -469,63 +455,21 @@ function IdentityStrip({
   return (
     <section
       aria-label="Identidad y clasificación"
-      className={cn("rounded-3xl border border-border bg-card", dense ? "p-4" : "p-6")}
+      /* Móvil: fila compacta de tres datos (no tarjeta vertical alta). */
+      className={cn("rounded-3xl border border-border bg-card p-3 sm:p-6", dense && "sm:p-4")}
     >
-      <dl className={cn("grid gap-4", dense ? "sm:grid-cols-3" : "sm:grid-cols-3")}>
+      <dl className="grid grid-cols-3 gap-2 sm:gap-4">
         {rows.map((row) => (
-          <div key={row.label}>
-            <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <div key={row.label} className="min-w-0">
+            <dt className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-xs sm:tracking-[0.16em]">
               {row.label}
             </dt>
-            <dd className="mt-1 font-medium">{row.value}</dd>
+            <dd className="mt-0.5 truncate text-sm font-medium sm:mt-1 sm:text-base">
+              {row.value}
+            </dd>
           </div>
         ))}
       </dl>
-    </section>
-  );
-}
-
-function HeroEditorial({ content }: { content: PlacePremiumContent }) {
-  return (
-    <section
-      aria-label="Presentación del lugar"
-      className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]"
-    >
-      <DemoImage media={content.hero.cover} className="aspect-[4/3] rounded-3xl lg:aspect-[5/4]" />
-      <div className="flex flex-col justify-center rounded-3xl border border-border bg-card p-6 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-          {content.identity.eyebrow}
-        </p>
-        <h1 className="mt-3 text-balance font-serif text-4xl leading-[1.02] sm:text-5xl">
-          {content.identity.title}
-        </h1>
-        <p className="mt-4 text-pretty leading-7 text-muted-foreground">
-          {content.identity.subtitle}
-        </p>
-        <ul className="mt-5 flex flex-wrap gap-2" aria-label="Clasificación">
-          {content.identity.badges.map((badge) => (
-            <li
-              key={badge}
-              className="rounded-pill border border-border bg-background px-3 py-1 text-xs font-medium"
-            >
-              {badge}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button type="button" className="min-h-11 rounded-pill">
-            {content.hero.primaryCta.label}
-          </Button>
-          <Button asChild variant="outline" className="min-h-11 rounded-pill">
-            <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
-          </Button>
-        </div>
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {content.hero.supporting.map((media, index) => (
-            <DemoImage key={`media-${index}`} media={media} className="aspect-[3/2] rounded-2xl" />
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
@@ -605,8 +549,14 @@ function EssentialsPanel({ content }: { content: PlacePremiumContent }) {
               <Clock className="size-3.5" aria-hidden />
               {fact.label}
             </dt>
-            <dd className="mt-2 font-serif text-xl">{fact.value}</dd>
-            {fact.hint ? <p className="mt-1 text-xs text-muted-foreground">{fact.hint}</p> : null}
+            <dd className="mt-2 font-serif text-xl">
+              {fact.value}
+              {fact.hint ? (
+                <span className="mt-1 block font-sans text-xs text-muted-foreground">
+                  {fact.hint}
+                </span>
+              ) : null}
+            </dd>
           </div>
         ))}
       </dl>
@@ -728,7 +678,11 @@ function GalleryFilmstrip({ content }: { content: PlacePremiumContent }) {
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground" id="galeria-lugar-title">
         {content.gallery.note}
       </p>
-      <ul className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+      <ul
+        className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2"
+        tabIndex={0}
+        aria-label="Galería del lugar"
+      >
         {content.gallery.items.map((media, index) => (
           <li key={`media-${index}`} className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]">
             <DemoImage media={media} className="aspect-[16/10] rounded-3xl" />

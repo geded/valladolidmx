@@ -16,6 +16,7 @@ export interface RegionDestinationInput {
   tagline?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  image_url?: string | null;
 }
 
 const PUEBLOS_MAGICOS = ["valladolid", "izamal", "espita"];
@@ -45,7 +46,9 @@ export function buildRegionPremiumRuntime(input: {
       hint: PUEBLOS_MAGICOS.includes(destination.slug)
         ? "Pueblo Mágico"
         : (destination.tagline ?? "Destino del Oriente Maya"),
-      media: { url: "", alt: "" },
+      media: destination.image_url
+        ? { url: destination.image_url, alt: destination.name }
+        : { url: "", alt: "" },
     })),
     servicesNote: "Selecciona un destino para descubrir su oferta publicada.",
     descubre: {
@@ -81,7 +84,9 @@ export function buildRegionPremiumRuntime(input: {
         name: destination.name,
         distance: "",
         tagline: destination.tagline ?? "",
-        media: { url: "", alt: "" },
+        media: destination.image_url
+          ? { url: destination.image_url, alt: destination.name }
+          : { url: "", alt: "" },
         href: `/oriente-maya/${destination.slug}`,
       })),
     },

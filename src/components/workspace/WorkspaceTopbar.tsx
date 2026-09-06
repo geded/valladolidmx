@@ -31,7 +31,13 @@ interface Crumb {
   to?: string;
 }
 
-export function WorkspaceTopbar({ title }: { title?: string }) {
+export function WorkspaceTopbar({
+  title,
+  titleAsText = false,
+}: {
+  title?: string;
+  titleAsText?: boolean;
+}) {
   const { setPaletteOpen, inspector, setInspector, workspace } = useWorkspace();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -163,6 +169,10 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
               })}
             </ol>
           </nav>
+        ) : titleAsText ? (
+          <p className="truncate font-display text-base md:text-lg">
+            {title ?? workspace?.label ?? "Workspace"}
+          </p>
         ) : (
           <h1 className="truncate font-display text-base md:text-lg">
             {title ?? workspace?.label ?? "Workspace"}

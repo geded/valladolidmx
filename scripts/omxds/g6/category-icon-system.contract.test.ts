@@ -63,8 +63,10 @@ const adopted = [
 // pueden acreditar la autoridad por delegación, y el delegado debe contener
 // la autoridad real. Cualquier otro caso sigue fallando (fail-closed).
 const DELEGATED_AUTHORITY: Record<string, string> = {
+  // Lote 1 · la preview del micrositio delega en la superficie de revisión
+  // compartida, que es donde vive la autoridad real de iconografía.
   "src/routes/lovable/g4-destination-microsite-preview.tsx":
-    "src/components/destination-premium/DestinationPremiumSurface.tsx",
+    "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
   "src/routes/lovable/g4-home-premium-preview.tsx":
     "src/components/home-premium/HomePremiumSurface.tsx",
 };

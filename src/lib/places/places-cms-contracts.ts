@@ -14,6 +14,7 @@
 import { z } from "zod";
 import {
   PLACE_ADMISSION_KINDS,
+  PLACE_ATTRACTION_FAMILIES,
   PLACE_EVENT_RELATION_KINDS,
   PLACE_PRODUCT_RELATION_KINDS,
 } from "./place-taxonomy";
@@ -71,6 +72,8 @@ export const PLACE_EDITABLE_COLUMNS = [
   "contact_email",
   "contact_website",
   "social_links",
+  /* Adenda documental: familia principal del Inventario de Atractivos. */
+  "attraction_family",
 ] as const;
 
 export type PlaceEditableColumn = (typeof PLACE_EDITABLE_COLUMNS)[number];
@@ -168,6 +171,9 @@ export const placeDetailsPatchSchema = z
     contact_email: z.string().trim().email("Correo inválido.").nullable().optional(),
     contact_website: httpsUrlSchema.nullable().optional(),
     social_links: z.record(z.string(), httpsUrlSchema).optional(),
+    /* Familia documental (tangible|intangible). `null` devuelve la herencia
+       desde el tipo de lugar; nunca se inventa una tercera familia. */
+    attraction_family: z.enum(PLACE_ATTRACTION_FAMILIES).nullable().optional(),
   })
   .strict()
   .refine(

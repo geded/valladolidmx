@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZ-PR60-150",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir exclusivamente los tres P1 del PR #60. Reconoce sólo la revisión exacta que persiste SEO mediante la RPC gobernada.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+    "previous_sha256": "01447537de617685ac4894cb309af8cad0ea64dcfc6fe555e9f0099d0d8a4984",
+    "current_sha256": "e69e984829b860cbc766930321251388f82286b31add80be531d08de08a79ea0",
+    "semantic_change": "Título, descripción, canonical y robots se persisten por la RPC SECURITY DEFINER gobernada.",
+    "authority": "Founder PR #60 · cierre P1 exacto · 2026-09-06"
+  },
+  "invariants": ["Sin comodines ni futuros SHA-256", "Sin ejecución de migraciones ni despliegue"],
+  "recorded_at": "2026-09-06"
+}

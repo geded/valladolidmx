@@ -23,6 +23,8 @@ export interface WorkspaceShellProps {
   /** Si false, se omite el Inspector (algunos workspaces no lo necesitan). */
   showInspector?: boolean;
   className?: string;
+  /** El contenido de la ruta aporta el h1; el título del chrome conserva sólo su estilo. */
+  topbarTitleAsText?: boolean;
 }
 
 export function WorkspaceShell({
@@ -31,6 +33,7 @@ export function WorkspaceShell({
   inspector,
   showInspector = true,
   className,
+  topbarTitleAsText = false,
 }: WorkspaceShellProps) {
   const bp = useWorkspaceBreakpoint();
   const showSidebar = bp !== "xs" && bp !== "sm";
@@ -41,7 +44,7 @@ export function WorkspaceShell({
         <div className={cn("flex h-[100dvh] w-full bg-background text-foreground", className)}>
           {showSidebar ? <WorkspaceSidebar /> : null}
           <div className="flex min-w-0 flex-1 flex-col">
-            <WorkspaceTopbar title={title} />
+            <WorkspaceTopbar title={title} titleAsText={topbarTitleAsText} />
             <main
               id="main"
               className="min-h-0 flex-1 overflow-y-auto"

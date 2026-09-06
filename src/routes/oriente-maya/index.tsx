@@ -1,10 +1,9 @@
 /**
  * /oriente-maya — Región Oriente Maya (SSR).
  *
- * US-R3 · Ola 2 · Sub-ola 2.1: la vista de la Región ahora se sirve
- * desde el Experience Builder resolviendo la plantilla oficial por
- * `kind = region` (slug interno `__tpl_region__`). Fallback seguro
- * a `<RegionSurface />` (misma UI) si la composición no está publicada.
+ * La región usa su catálogo Premium aprobado y no el bloque de micrositio
+ * de destino. Los datos siguen llegando del CMS; la composición visual
+ * corresponde a IMG_0575 y comparte el sistema multi-marca del sitio.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
@@ -16,18 +15,10 @@ import {
 } from "@/lib/discovery/seo";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
-import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
-import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import { RegionSurface } from "@/components/surfaces/RegionSurface";
-import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
-import { buildRegionPremiumRuntime } from "@/components/destination-premium/region-premium-runtime";
+import { RegionDestinationsPremiumSurface } from "@/components/destination-premium/RegionDestinationsPremiumSurface";
 
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
-import {
-  ContextEngineProvider,
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
 /**
  * H-02 · I7 · Fila 1 — Región-hub declara contexto raíz.
@@ -55,11 +46,8 @@ function buildRegionContext(): RouteContextDeclaration {
 
 export const Route = createFileRoute("/oriente-maya/")({
   loader: async () => {
-    const [composition, destinations] = await Promise.all([
-      getPublishedCompositionBySlug({ data: { slug: "__tpl_region__" } }).catch(() => null),
-      listPublishedDestinations().catch(() => []),
-    ]);
-    return { composition, destinations };
+    const destinations = await listPublishedDestinations().catch(() => []);
+    return { destinations };
   },
   head: ({ loaderData }) => {
     const destinations = loaderData?.destinations ?? [];
@@ -104,45 +92,27 @@ export const Route = createFileRoute("/oriente-maya/")({
   },
   component: OrienteMayaIndex,
   errorComponent: () => (
-    <PublicShell title={ORIENTE_MAYA.name} crumbs={[{ label: ORIENTE_MAYA.name }]}>
-      <RegionSurface />
+    <PublicShell variant="hero" crumbs={[{ label: ORIENTE_MAYA.name }]}>
+      <RegionDestinationsPremiumSurface destinations={[]} />
     </PublicShell>
   ),
 });
 
-/** Una composición sólo tiene autoridad si declara un bloque premium G4. */
-function hasPremiumAuthority(snapshot: unknown): boolean {
-  return JSON.stringify(snapshot ?? null).includes("premium-g4");
-}
-
 function OrienteMayaIndex() {
-  const { composition, destinations } = Route.useLoaderData();
+  const { destinations } = Route.useLoaderData();
+  const { presentacion } = Route.useSearch() as { presentacion?: string };
   const declaration = buildRegionContext();
-  // G8-R1-F1L-R2 — la portada regional usa la autoridad premium aprobada en
-  // modo Editorial (marcador neutral sin fotografía acreditada). La
-  // composición sólo prevalece si ya declara autoridad premium.
-  const usePremium = !composition || !hasPremiumAuthority(composition.snapshot);
-  const premiumContent = buildRegionPremiumRuntime({ destinations });
   return (
-    <ContextEngineProvider declaration={declaration}>
-      {usePremium ? (
-        <div data-destination-template="premium-g4" data-destination-presentation="editorial">
-          <DestinationPremiumSurface
-            content={premiumContent}
-            heroVariant="editorial"
-            sections={{
-              // La portada regional enumera destinos en `nearby`; no reutiliza
-              // el selector de categorías de una ficha de destino.
-              services: false,
-              gallery: false,
-              servicePreview: false,
-              map: premiumContent.map.points.length > 0,
-            }}
-          />
-        </div>
-      ) : (
-        <CompositionRenderer tree={composition!.snapshot} />
-      )}
-    </ContextEngineProvider>
+    <PublicShell variant="hero" contextDeclaration={declaration} useContextCrumbs>
+      <div
+        data-region-template="premium-approved"
+        data-region-presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+      >
+        <RegionDestinationsPremiumSurface
+          destinations={destinations}
+          presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+        />
+      </div>
+    </PublicShell>
   );
 }

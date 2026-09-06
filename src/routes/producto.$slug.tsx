@@ -1,3 +1,6 @@
+import { ExperiencePremiumSurface } from "@/components/experience-premium/ExperiencePremiumSurface";
+import { buildExperienceVMFromProduct } from "@/components/experience-premium/experience-premium-vm";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 /**
  * /producto/$slug — Ficha pública SSR de un producto (US-R3 · Sub-ola 2.3a).
  *
@@ -237,6 +240,31 @@ export const Route = createFileRoute("/producto/$slug")({
 function MarketplaceProductPage() {
   const { product, composition, surfaceContractsEnabled, canonicalBinding } = Route.useLoaderData();
   const declaration = buildProductContext(product);
+  /* Ficha canónica de Experiencia: familia `experience` / `tour` del
+     resolutor canónico ⇒ superficie oficial de Experiencia. El resto de
+     productos conserva íntegra su ruta de render actual. */
+  const isExperience =
+    canonicalBinding.family === "experience" || canonicalBinding.family === "tour";
+  if (isExperience) {
+    const vm = buildExperienceVMFromProduct(product);
+    return (
+      <ContextEngineProvider declaration={declaration}>
+        <PublicShell useContextCrumbs compactCrumbsOnMobile>
+          <ExperiencePremiumSurface
+            vm={vm}
+            aluxSlot={
+              <TourismAluxPanel
+                title="¿Esta experiencia encaja en tu viaje?"
+                description="Alux la compara con tu contexto y la guarda en Mi Viaje."
+                task={`Ayúdame a decidir si la experiencia "${vm.name}" encaja en mi viaje por el Oriente Maya.`}
+                prompts={["Con niños", "Medio día", "Cerca del centro", "Naturaleza"]}
+              />
+            }
+          />
+        </PublicShell>
+      </ContextEngineProvider>
+    );
+  }
   return (
     <ContextEngineProvider declaration={declaration}>
       <ProductSurfaceProvider product={product}>

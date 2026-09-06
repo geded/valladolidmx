@@ -4,16 +4,12 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
+import {
+  publishedDestinationsQueryOptions,
+  useDestinationLabel,
+} from "@/lib/destinations/destination-labels";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
-import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
-
-const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
-
-function destinationLabel(slug: string): string {
-  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
-}
 
 /**
  * H-02 · I4 — Declaración de contexto de la categoría piloto.
@@ -30,7 +26,10 @@ function destinationLabel(slug: string): string {
  *
  * `canonical` es siempre `/hoteles` — la herencia afecta UX, nunca SEO.
  */
-function buildHotelesContext(destino: string | undefined): RouteContextDeclaration {
+function buildHotelesContext(
+  destino: string | undefined,
+  destinationLabel: (slug: string) => string,
+): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
         {
@@ -58,11 +57,17 @@ function buildHotelesContext(destino: string | undefined): RouteContextDeclarati
 export const Route = createFileRoute("/hoteles")({
   validateSearch: (search: Record<string, unknown>) => ({
     destino: typeof search.destino === "string" ? search.destino : undefined,
+    presentacion:
+      search.presentacion === "cinematografica" ? ("cinematografica" as const) : undefined,
   }),
   loaderDeps: ({ search }) => ({ destino: search.destino }),
-  loader: async ({ deps }) => ({
-    dto: await getPublicListing({ data: { family: "hoteles", destino: deps.destino ?? null } }),
-  }),
+  loader: async ({ deps, context }) => {
+    // Lote 3B — Nombres de destino reales disponibles en SSR.
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
+    return {
+      dto: await getPublicListing({ data: { family: "hoteles", destino: deps.destino ?? null } }),
+    };
+  },
   head: () =>
     buildPublicHead({
       title: `Hoteles · ${SITE.name}`,
@@ -74,19 +79,26 @@ export const Route = createFileRoute("/hoteles")({
 });
 
 function HotelesRoute() {
+  const destinationLabel = useDestinationLabel();
   const { dto } = Route.useLoaderData();
-  const { destino } = Route.useSearch();
-  const contextDeclaration = buildHotelesContext(destino);
+  const { destino, presentacion } = Route.useSearch();
+  const contextDeclaration = buildHotelesContext(destino, destinationLabel);
   const legacyCrumbs = [
     { label: "Hoteles", to: "/hoteles" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
-  const destinoFacet = buildDestinationFacet([...dto.items]);
   return (
-    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
+    <PublicShell
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs
+      compactCrumbsOnMobile
+    >
       <ListingPremiumSurfaceFromDTO
         dto={dto}
-        facets={destino || !destinoFacet ? [] : [destinoFacet]}
+        presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}
+        showAddToTrip
+        showFavorite
       />
     </PublicShell>
   );

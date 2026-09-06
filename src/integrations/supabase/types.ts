@@ -828,6 +828,7 @@ export type Database = {
           description: string | null
           icon: string | null
           id: string
+          listing_family_key: string | null
           metadata: Json
           name: string
           parent_id: string | null
@@ -845,6 +846,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          listing_family_key?: string | null
           metadata?: Json
           name: string
           parent_id?: string | null
@@ -862,6 +864,7 @@ export type Database = {
           description?: string | null
           icon?: string | null
           id?: string
+          listing_family_key?: string | null
           metadata?: Json
           name?: string
           parent_id?: string | null
@@ -1548,6 +1551,7 @@ export type Database = {
           description: string | null
           destination_id: string
           display_name: string
+          filter_attributes: Json
           id: string
           is_demo_seed: boolean
           last_verified_at: string | null
@@ -1582,6 +1586,7 @@ export type Database = {
           description?: string | null
           destination_id: string
           display_name: string
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -1616,6 +1621,7 @@ export type Database = {
           description?: string | null
           destination_id?: string
           display_name?: string
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -2983,66 +2989,158 @@ export type Database = {
           },
         ]
       }
+      editorial_route_stops: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          day_number: number | null
+          duration_minutes: number | null
+          entity_id: string | null
+          entity_kind: string
+          id: string
+          note: string | null
+          position: number
+          route_id: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          day_number?: number | null
+          duration_minutes?: number | null
+          entity_id?: string | null
+          entity_kind: string
+          id?: string
+          note?: string | null
+          position?: number
+          route_id: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          day_number?: number | null
+          duration_minutes?: number | null
+          entity_id?: string | null
+          entity_kind?: string
+          id?: string
+          note?: string | null
+          position?: number
+          route_id?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_route_stops_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editorial_routes: {
         Row: {
+          audiences: string[]
           body: string | null
           cover_media_id: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
           destination_ids: string[]
+          difficulty: string | null
           duration_days: number
+          duration_hours: number | null
+          gallery_media_ids: string[]
           id: string
+          interests: string[]
+          is_demo_seed: boolean
           locale: Database["public"]["Enums"]["locale_code"]
           name: string
+          origin_destination_id: string | null
+          pace: string | null
           palette: Database["public"]["Enums"]["hero_palette"] | null
           published_at: string | null
+          region_slug: string
+          seasons: string[]
           slug: string
           status: Database["public"]["Enums"]["content_status"]
           summary: string | null
           updated_at: string
           updated_by: string | null
+          zone_ids: string[]
         }
         Insert: {
+          audiences?: string[]
           body?: string | null
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
           destination_ids?: string[]
+          difficulty?: string | null
           duration_days?: number
+          duration_hours?: number | null
+          gallery_media_ids?: string[]
           id?: string
+          interests?: string[]
+          is_demo_seed?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           name: string
+          origin_destination_id?: string | null
+          pace?: string | null
           palette?: Database["public"]["Enums"]["hero_palette"] | null
           published_at?: string | null
+          region_slug?: string
+          seasons?: string[]
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
           summary?: string | null
           updated_at?: string
           updated_by?: string | null
+          zone_ids?: string[]
         }
         Update: {
+          audiences?: string[]
           body?: string | null
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
           destination_ids?: string[]
+          difficulty?: string | null
           duration_days?: number
+          duration_hours?: number | null
+          gallery_media_ids?: string[]
           id?: string
+          interests?: string[]
+          is_demo_seed?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           name?: string
+          origin_destination_id?: string | null
+          pace?: string | null
           palette?: Database["public"]["Enums"]["hero_palette"] | null
           published_at?: string | null
+          region_slug?: string
+          seasons?: string[]
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
           summary?: string | null
           updated_at?: string
           updated_by?: string | null
+          zone_ids?: string[]
         }
         Relationships: [
           {
@@ -3050,6 +3148,13 @@ export type Database = {
             columns: ["cover_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_routes_origin_destination_id_fkey"
+            columns: ["origin_destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
             referencedColumns: ["id"]
           },
         ]
@@ -3330,6 +3435,7 @@ export type Database = {
           destination_id: string | null
           ends_at: string | null
           external_url: string | null
+          filter_attributes: Json
           id: string
           is_demo_seed: boolean
           is_free: boolean
@@ -3357,6 +3463,7 @@ export type Database = {
           destination_id?: string | null
           ends_at?: string | null
           external_url?: string | null
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
@@ -3384,6 +3491,7 @@ export type Database = {
           destination_id?: string | null
           ends_at?: string | null
           external_url?: string | null
+          filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
@@ -5327,6 +5435,7 @@ export type Database = {
       }
       place_types: {
         Row: {
+          attraction_family: string
           created_at: string
           description: string | null
           id: string
@@ -5337,6 +5446,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attraction_family?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -5347,6 +5457,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attraction_family?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -5430,6 +5541,7 @@ export type Database = {
           address_line: string | null
           admission_kind: string | null
           amenities: Json
+          attraction_family: string | null
           best_time_to_visit: string | null
           contact_email: string | null
           contact_phone: string | null
@@ -5473,6 +5585,7 @@ export type Database = {
           address_line?: string | null
           admission_kind?: string | null
           amenities?: Json
+          attraction_family?: string | null
           best_time_to_visit?: string | null
           contact_email?: string | null
           contact_phone?: string | null
@@ -5516,6 +5629,7 @@ export type Database = {
           address_line?: string | null
           admission_kind?: string | null
           amenities?: Json
+          attraction_family?: string | null
           best_time_to_visit?: string | null
           contact_email?: string | null
           contact_phone?: string | null
@@ -5644,6 +5758,7 @@ export type Database = {
           direct_sale_terms: string | null
           duration_minutes: number | null
           eligible_for_ems_campaigns: boolean
+          filter_attributes: Json
           generates_commission: boolean
           id: string
           is_demo_seed: boolean
@@ -5687,6 +5802,7 @@ export type Database = {
           direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
+          filter_attributes?: Json
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
@@ -5730,6 +5846,7 @@ export type Database = {
           direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
+          filter_attributes?: Json
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
@@ -6358,6 +6475,95 @@ export type Database = {
           status?: Database["public"]["Enums"]["system_alert_status"]
         }
         Relationships: []
+      }
+      tourism_attribute_definitions: {
+        Row: {
+          active: boolean
+          attribute_key: string
+          created_at: string
+          family_key: string
+          filter_group: string
+          filterable: boolean
+          help_text: string | null
+          id: string
+          input_type: string
+          label: string
+          required: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          attribute_key: string
+          created_at?: string
+          family_key: string
+          filter_group: string
+          filterable?: boolean
+          help_text?: string | null
+          id?: string
+          input_type: string
+          label: string
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          attribute_key?: string
+          created_at?: string
+          family_key?: string
+          filter_group?: string
+          filterable?: boolean
+          help_text?: string | null
+          id?: string
+          input_type?: string
+          label?: string
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tourism_attribute_options: {
+        Row: {
+          active: boolean
+          created_at: string
+          definition_id: string
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          definition_id: string
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          definition_id?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tourism_attribute_options_definition_id_fkey"
+            columns: ["definition_id"]
+            isOneToOne: false
+            referencedRelation: "tourism_attribute_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tourism_regions: {
         Row: {
@@ -7777,6 +7983,12 @@ export type Database = {
             }
             Returns: string
           }
+      cron_hooks_bootstrap_secret: { Args: { _value: string }; Returns: Json }
+      cron_hooks_get_secret: { Args: never; Returns: string }
+      cron_hooks_invoke: {
+        Args: { _include_legacy_apikey?: boolean; _path: string }
+        Returns: number
+      }
       dearmor: { Args: { "": string }; Returns: string }
       delete_business_product_faq: {
         Args: { _faq_id: string }
@@ -7966,6 +8178,17 @@ export type Database = {
           }
       eb_schedule_publish_composition: {
         Args: { _id: string; _notes?: string; _when: string }
+        Returns: undefined
+      }
+      eb_set_composition_seo_metadata: {
+        Args: {
+          _canonical_override?: string
+          _description?: string
+          _id: string
+          _kind?: Database["public"]["Enums"]["eb_page_kind"]
+          _robots_directive?: string
+          _title?: string
+        }
         Returns: undefined
       }
       eb_set_workflow_state: {
@@ -8517,6 +8740,10 @@ export type Database = {
       }
       resolve_business_claim_state: {
         Args: { _business_id: string }
+        Returns: string
+      }
+      resolve_tourism_attribute_family: {
+        Args: { _category_slug: string }
         Returns: string
       }
       review_entity_presentation_mode: {
@@ -9193,6 +9420,8 @@ export type Database = {
         | "product"
         | "event"
         | "note"
+        | "route"
+        | "place"
       travel_plan_source: "web" | "import" | "concierge" | "alux"
       travel_plan_status:
         | "draft"
@@ -9216,12 +9445,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -9245,11 +9474,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -9270,11 +9499,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -9295,11 +9524,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -9312,11 +9541,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -9485,7 +9714,15 @@ export const Constants = {
       related_override_mode: ["pin", "hide"],
       system_alert_severity: ["info", "warning", "critical"],
       system_alert_status: ["open", "acknowledged", "resolved"],
-      travel_item_kind: ["destination", "business", "product", "event", "note"],
+      travel_item_kind: [
+        "destination",
+        "business",
+        "product",
+        "event",
+        "note",
+        "route",
+        "place",
+      ],
       travel_plan_source: ["web", "import", "concierge", "alux"],
       travel_plan_status: [
         "draft",

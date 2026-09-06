@@ -18,9 +18,35 @@ import { DEFAULT_REGION_SLUG, type CanonicalRef, type NavigationContext } from "
 
 const REGION_PREFIX = `/${DEFAULT_REGION_SLUG}`;
 
-function seg(s: string | undefined): string {
-  return s ? `/${encodeURIComponent(s)}` : "";
+/**
+ * 3J.4 · Normalización de segmento de ruta.
+ *
+ * Los slugs institucionales viven en base de datos y NO se mutan desde el
+ * producto. Algunos registros históricos conservan mayúsculas (p. ej.
+ * `Casas-de-vacaciones`), mientras que el contrato público de URL exige
+ * kebab-case en minúsculas. La normalización ocurre exclusivamente en la
+ * capa de resolución: al emitir la URL se baja a minúsculas y al validarla
+ * se compara sin distinguir mayúsculas. El dato institucional permanece
+ * intacto.
+ */
+export function normalizeRouteSlug(value: string | null | undefined): string {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
 }
+
+/** Compara dos slugs bajo el contrato de ruta (case-insensitive). */
+export function routeSlugEquals(
+  a: string | null | undefined,
+  b: string | null | undefined,
+): boolean {
+  const left = normalizeRouteSlug(a);
+  return left.length > 0 && left === normalizeRouteSlug(b);
+}
+
+function seg(s: string | undefined): string {
+  const normalized = normalizeRouteSlug(s);
+  return normalized ? `/${encodeURIComponent(normalized)}` : "";
+}
+
 
 /**
  * Construye el path canónico para una referencia territorial.

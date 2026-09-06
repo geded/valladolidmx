@@ -1139,6 +1139,12 @@ function PageVisualEditor({
   }, []);
   const skipNextAutoSave = useRef(false);
   /**
+   * Firma canónica (misma función que el cliente usa siempre) del último
+   * árbol persistido: cargado del servidor o guardado con éxito.
+   */
+  const savedSignatureRef = useRef<string | null>(null);
+
+  /**
    * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
    * al aplicar cada mutación desde `commitTree`. `undo` / `redo` restauran
    * sin disparar `commitTree` de nuevo (marcan `skipHistory`). El
@@ -1226,8 +1232,10 @@ function PageVisualEditor({
         if (cancelled || !detail) return;
         setPage(detail);
         skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(detail.current_draft);
         setTree(detail.current_draft);
         resetHistory();
+
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
       }
@@ -1257,6 +1265,7 @@ function PageVisualEditor({
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
+      const signature = canonicalizeClient(tree);
       void save({ data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" } })
         .then((res) => {
           setPage((current) =>
@@ -1264,8 +1273,10 @@ function PageVisualEditor({
               ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
               : current,
           );
+          savedSignatureRef.current = signature;
           setSaveStatus("saved");
         })
+
         .catch((e) => {
           setSaveStatus("error");
           const msg = e instanceof Error ? e.message : String(e);
@@ -1320,8 +1331,14 @@ function PageVisualEditor({
     if (saveStatus === "saving")
       return "Hay cambios locales sin guardar. Espera a que termine el guardado.";
     if (saveStatus === "error") return "El último guardado falló. Resuélvelo antes de publicar.";
-    if (!draftHash || !page.draft_hash || draftHash !== page.draft_hash)
+    // La firma del servidor (`draft_hash`) se calcula sobre el texto jsonb de
+    // Postgres y no es comparable byte a byte con una firma calculada en el
+    // navegador. Para decidir "hay cambios locales sin guardar" comparamos la
+    // misma canonicalización a ambos lados: el árbol en pantalla contra el
+    // último árbol efectivamente persistido en esta sesión.
+    if (canonicalizeClient(tree) !== savedSignatureRef.current)
       return "Hay cambios locales sin guardar. Guarda antes de publicar o programar.";
+
     if (page.workflow_state !== "approved")
       return "La composición debe estar en estado aprobado antes de publicar o programar.";
     if (!page.approved_snapshot_hash || page.draft_hash !== page.approved_snapshot_hash)

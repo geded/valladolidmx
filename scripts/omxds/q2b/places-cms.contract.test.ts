@@ -55,11 +55,16 @@ describe("G8-Q2B · rutas CMS", () => {
     }
   });
 
-  test("no se declara ninguna ruta pública nueva de lugares", () => {
+  test("sólo existen las rutas públicas de lugares autorizadas (G4-PLACES)", () => {
+    /* Q2B cerró sin rutas públicas de lugares. La directiva Founder
+       G4-PLACES (2026-09) autorizó exactamente el listado regional
+       /lugares (layout + índice); cualquier otra ruta pública nueva de
+       lugares en la raíz sigue prohibida sin autorización expresa. */
     const publicRoutes = fs
       .readdirSync(path.join(root, "src/routes"))
-      .filter((file) => /^lugares?[.$]/i.test(file));
-    expect(publicRoutes).toEqual([]);
+      .filter((file) => /^lugares?[.$]/i.test(file))
+      .sort();
+    expect(publicRoutes).toEqual(["lugares.index.tsx", "lugares.tsx"]);
   });
 
   test("las pantallas están registradas en el Route Inventory canónico", () => {

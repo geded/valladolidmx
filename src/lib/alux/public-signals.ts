@@ -27,6 +27,26 @@ function getSessionKey(): string | null {
   }
 }
 
+/**
+ * Lote 3K · Clave de sesión anónima ÚNICA de Alux (misma que el chat público
+ * y la memoria territorial). Se crea sólo en el navegador y sólo si falta.
+ */
+export function ensureAluxSessionKey(): string {
+  if (typeof window === "undefined") return "";
+  const existing = getSessionKey();
+  if (existing) return existing;
+  const key =
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  try {
+    window.localStorage.setItem(SESSION_STORAGE_KEY, key);
+  } catch {
+    /* almacenamiento no disponible: la clave vive sólo en memoria */
+  }
+  return key;
+}
+
 function derivePathContext(): { destination?: string | null; category?: string | null } {
   if (typeof window === "undefined") return {};
   const parts = window.location.pathname.split("/").filter(Boolean);

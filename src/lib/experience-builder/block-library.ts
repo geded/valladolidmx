@@ -2861,6 +2861,12 @@ const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   smartBusinessesGridBlock,
   smartProductsGridBlock,
   smartEventsListBlock,
+  // US-R3 · Ola 1 — Superficies singleton oficiales (Marketplace, Alux,
+  // Arma tu Viaje). Estaban declaradas pero nunca registradas: sus
+  // composiciones publicadas renderizaban vacío en producción (Lote 3C).
+  surfaceMarketplaceBlock,
+  surfaceAluxBlock,
+  surfaceTripPlannerBlock,
   // US-R3 · Ola 2 · Sub-ola 2.1 — Region + Destination
   surfaceRegionBlock,
   surfaceDestinationBlock,

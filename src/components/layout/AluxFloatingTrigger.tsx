@@ -50,7 +50,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
-import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
+import { onAluxFloatingOpen, type AluxOpenSelection } from "@/lib/alux/floating-bus";
+import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
 import {
@@ -87,6 +88,7 @@ import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
@@ -114,11 +116,20 @@ export function AluxFloatingTrigger() {
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const queryClient = useQueryClient();
-  // Sólo confiamos en el contexto territorial cuando la ruta actual
-  // pertenece al árbol `/oriente-maya/*`. En cualquier otra superficie
-  // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
-  // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
-  const contextIsRelevant = pathname.startsWith("/oriente-maya/");
+  // Confiamos en el contexto territorial cuando la ruta pertenece al
+  // árbol canónico `/oriente-maya/*` y —Lote 3C · cierre— también en las
+  // superficies canónicas que DECLARAN su propio contexto vivo
+  // (`/rutas`, `/rutas/$slug`, `/casas-de-vacaciones`). En esas rutas sólo
+  // se acepta contexto `live` (declarado por la ruta), nunca rehidratado
+  // de sesión, para no arrastrar el destino de un recorrido anterior.
+  // En cualquier otra superficie el Sheet abre en "modo descubrimiento".
+  const isCanonicalTree = pathname.startsWith("/oriente-maya/");
+  const declaresOwnContext =
+    pathname === "/rutas" ||
+    pathname.startsWith("/rutas/") ||
+    pathname.startsWith("/casas-de-vacaciones");
+  const contextIsRelevant =
+    isCanonicalTree || (declaresOwnContext && rawCtx.origin === "live" && rawCtx.hasContext);
   const ctx: AluxContext = useMemo(
     () =>
       contextIsRelevant
@@ -140,10 +151,31 @@ export function AluxFloatingTrigger() {
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
 
+  /* Lote 3J.1 · La selección estructurada que entrega la superficie invocante
+     se conserva mientras el dock está abierto y se consume como contexto vivo
+     (nunca se degrada a texto libre ni se inventa). */
+  const [selection, setSelection] = useState<AluxOpenSelection | null>(null);
+  const [selectionTask, setSelectionTask] = useState<string | null>(null);
+
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
   useEffect(() => {
-    return onAluxFloatingOpen(() => setOpen(true));
+    return onAluxFloatingOpen((payload) => {
+      setSelection(payload.selection ?? null);
+      setSelectionTask(payload.hint ?? null);
+      setOpen(true);
+    });
   }, []);
+
+  // Al cerrar el dock la selección deja de estar vigente.
+  useEffect(() => {
+    if (!open) {
+      setSelection(null);
+      setSelectionTask(null);
+    }
+  }, [open]);
+
+  /* Destinos publicados del CMS — fuente única del modo descubrimiento. */
+  const { data: publishedDestinations } = usePublishedDestinations();
 
   const geo = useVisitorGeolocation();
   const suggestFn = useServerFn(aluxContextualSuggest);
@@ -287,11 +319,24 @@ export function AluxFloatingTrigger() {
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
+  /* Lote 3J.1 · El destino activo de la ruta manda; la selección entregada
+     sólo completa el contexto cuando la superficie no declara territorio. */
+  const effectiveDestination: AluxContextSlot | undefined =
+    ctx.destination ??
+    (selection?.destinationSlug
+      ? {
+          slug: selection.destinationSlug,
+          label: selection.destinationLabel ?? selection.destinationSlug,
+          href: `/oriente-maya/${selection.destinationSlug}`,
+        }
+      : undefined);
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
       "contextual-suggest",
-      ctx.destination?.slug ?? null,
+      effectiveDestination?.slug ?? null,
+      selection?.entityRef ?? null,
       ctx.category?.slug ?? null,
       ctx.business?.slug ?? null,
       ctx.product?.slug ?? null,
@@ -304,7 +349,7 @@ export function AluxFloatingTrigger() {
       suggestFn({
         data: {
           region: ctx.region,
-          destination: ctx.destination,
+          destination: effectiveDestination,
           category: ctx.category,
           business: ctx.business,
           product: ctx.product,
@@ -468,8 +513,9 @@ export function AluxFloatingTrigger() {
     unified.trip.stage,
   ]);
 
-  // AT-0: en superficies con CTA sticky comercial, cedemos el espacio.
-  if (presence.shouldHide) return null;
+  // AT-0: en superficies con CTA sticky comercial cedemos el espacio visual,
+  // pero el dock permanece montado para atender a los CTA embebidos
+  // ("Planear con Alux") que emiten `openAluxFloating` desde el contenido.
 
   const chain: AluxContextSlot[] = [
     ctx.destination,
@@ -504,6 +550,7 @@ export function AluxFloatingTrigger() {
         data-alux-saved-items={String(unified.trip.savedItemCount)}
         data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
         data-alux-reason={unified.reason}
+        hidden={presence.shouldHide}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
@@ -513,7 +560,7 @@ export function AluxFloatingTrigger() {
           type="button"
           onClick={() => setOpen(true)}
           title={`Alux · ${triggerLabel}`}
-          className="pointer-events-auto group flex max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
+          className="pointer-events-auto group flex min-h-11 max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
           <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
             {/* Sistema visual canónico Alux IA (activo gobernado). */}
@@ -559,6 +606,70 @@ export function AluxFloatingTrigger() {
               </div>
             </div>
           </SheetHeader>
+
+          {/* Lote 3J.1 · Selección entregada por la superficie invocante. */}
+          {selection && (selection.title || selection.destinationLabel) ? (
+            <section
+              aria-labelledby="alux-selection"
+              className="rounded-2xl border border-primary/25 bg-primary/5 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                <Sparkles className="size-3.5" aria-hidden />
+                <span id="alux-selection">Tu selección</span>
+              </div>
+              {selection.title ? (
+                selection.href ? (
+                  <a
+                    href={selection.href}
+                    className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline"
+                  >
+                    {selection.title}
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </a>
+                ) : (
+                  <p className="mt-2 text-sm font-medium text-foreground">{selection.title}</p>
+                )
+              ) : null}
+              {(selection.destinationLabel ?? selection.destinationSlug) ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <ContextChip
+                    slot={{
+                      slug: selection.destinationSlug ?? "destino",
+                      label: selection.destinationLabel ?? selection.destinationSlug!,
+                      ...(selection.destinationSlug
+                        ? { href: `/oriente-maya/${selection.destinationSlug}` }
+                        : {}),
+                    }}
+                  />
+                  {selection.familySlug ? (
+                    <ContextChip
+                      slot={{ slug: selection.familySlug, label: selection.familySlug }}
+                    />
+                  ) : null}
+                </div>
+              ) : null}
+              {selectionTask ? (
+                <p className="mt-2 text-[12px] leading-snug text-muted-foreground">
+                  {selectionTask}
+                </p>
+              ) : null}
+            </section>
+          ) : null}
+
+          {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
+          <AluxConverseChat
+            region={ctx.region}
+            destination={effectiveDestination}
+            category={ctx.category}
+            business={ctx.business}
+            product={ctx.product}
+            selection={selection}
+            stage={unified.trip.stage}
+            coords={geo.status === "granted" && geo.location ? geo.location : null}
+            locale={locale}
+          />
+
+
 
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
           {territory?.is_returning &&
@@ -780,21 +891,21 @@ export function AluxFloatingTrigger() {
                 Aún no exploras un destino del Oriente Maya. Elige un Pueblo Mágico para que te
                 acompañe con recomendaciones basadas en tu recorrido, nunca inventadas.
               </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <ContextChip
-                  slot={{
-                    slug: "valladolid",
-                    label: "Valladolid",
-                    href: "/oriente-maya/valladolid",
-                  }}
-                />
-                <ContextChip
-                  slot={{ slug: "izamal", label: "Izamal", href: "/oriente-maya/izamal" }}
-                />
-                <ContextChip
-                  slot={{ slug: "espita", label: "Espita", href: "/oriente-maya/espita" }}
-                />
-              </div>
+              {/* Lote 3J.1 · Destinos publicados del CMS (sin lista fija). */}
+              {(publishedDestinations ?? []).length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {(publishedDestinations ?? []).slice(0, 8).map((destination) => (
+                    <ContextChip
+                      key={destination.slug}
+                      slot={{
+                        slug: destination.slug,
+                        label: destination.name,
+                        href: `/oriente-maya/${destination.slug}`,
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : null}
             </section>
           )}
 
