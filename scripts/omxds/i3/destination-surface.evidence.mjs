@@ -119,6 +119,12 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-056"],
     addendum: "PCA-2026-056-ADDENDUM-ZZ-PR60-006.json",
   },
+  {
+    // Reconciliación cerrada · constructor, preview y ruta pública comparten autoridad Premium.
+    package: "main-premium-routes-territorial-cms-reconciliation",
+    sha256: "12c1e19fa15d0d52638ef4a799046a52e77f6681e1b8bf315269b79126504129",
+    authorizations: ["PCA-2026-067"],
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
@@ -160,6 +166,12 @@ const acknowledgedRouteRevisions = [
     sha256: "e52e5843d039fd154b9e21c0361cfb793c65e12b9180c7c9395456da2015be88",
     authorizations: ["PCA-2026-056"],
     addendum: "PCA-2026-056-ADDENDUM-ZZ-PR60-007.json",
+  },
+  {
+    // Reconciliación cerrada · la ruta pública hidrata las rutas editoriales publicadas del CMS.
+    package: "main-premium-routes-destination-route-reconciliation",
+    sha256: "34bc5197fa820a6b5e638bef5a8b98e09d30bad4c04470acf8397118a2c869e2",
+    authorizations: ["PCA-2026-067"],
   },
 ];
 

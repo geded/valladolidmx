@@ -42,7 +42,7 @@
     "/oriente-maya/{destino}/lugares/{slug}",
     "/rutas/{slug}"
   ],
-  "required_feature_flags": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bunx vitest run scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
     "bun run lint",
