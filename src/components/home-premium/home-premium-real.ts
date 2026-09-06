@@ -117,7 +117,11 @@ export function mergeHomeRealContent(
           .find((card): card is Card => Boolean(card?.mediaUrl));
         return {
           ...route,
-          media: cover ? mediaOf(cover) : { url: "", alt: route.title },
+          media: route.mediaUrl
+            ? { url: route.mediaUrl, alt: route.title }
+            : cover
+              ? mediaOf(cover)
+              : { url: "", alt: route.title },
         };
       }),
     },
@@ -152,7 +156,15 @@ export function mergeHomeRealContent(
     },
     eventos: {
       ...safeContent.eventos,
-      media: firstEventWithMedia ? mediaOf(firstEventWithMedia) : safeContent.eventos.media,
+      // La selección editorial explícita del constructor manda sobre la
+      // portada inferida del primer evento. Sólo usamos el evento como
+      // fallback cuando la composición publicada no configuró un medio.
+      media:
+        safeContent.eventos.media.url.length > 0
+          ? safeContent.eventos.media
+          : firstEventWithMedia
+            ? mediaOf(firstEventWithMedia)
+            : safeContent.eventos.media,
       items: real.eventos.map((card) => ({
         day: card.day,
         title: card.title,

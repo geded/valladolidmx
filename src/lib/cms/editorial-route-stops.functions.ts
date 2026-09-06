@@ -146,29 +146,75 @@ export const listRouteStopCandidatesCms = createServerFn({ method: "POST" })
     const kind = data.kind as RouteStopKind;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const db = context.supabase as any;
-    const conf: { table: string; label: string } | null =
+    const conf: {
+      table: string;
+      label: string;
+      territoryColumn?: "destination_id" | "business_id";
+    } | null =
       kind === "place"
-        ? { table: "points_of_interest", label: "name" }
+        ? { table: "points_of_interest", label: "name", territoryColumn: "destination_id" }
         : kind === "destination"
           ? { table: "destinations", label: "name" }
           : kind === "business"
-            ? { table: "businesses", label: "display_name" }
+            ? { table: "businesses", label: "display_name", territoryColumn: "destination_id" }
             : kind === "product" || kind === "experience"
-              ? { table: "products", label: "name" }
+              ? { table: "products", label: "name", territoryColumn: "business_id" }
               : kind === "event"
-                ? { table: "events", label: "title" }
+                ? { table: "events", label: "title", territoryColumn: "destination_id" }
                 : null;
     if (!conf) return [];
     const { data: rows, error } = await db
       .from(conf.table)
-      .select(`id, ${conf.label}`)
+      .select(`id, ${conf.label}${conf.territoryColumn ? `, ${conf.territoryColumn}` : ""}`)
       .eq("status", "published")
       .is("deleted_at", null)
       .order(conf.label, { ascending: true })
       .limit(200);
     if (error) throw error;
-    return ((rows ?? []) as Record<string, unknown>[]).map((r) => ({
-      id: String(r.id),
-      label: String(r[conf.label] ?? "—"),
-    }));
+    const records = (rows ?? []) as Record<string, unknown>[];
+    const businessToDestination = new Map<string, string>();
+    if (conf.territoryColumn === "business_id") {
+      const businessIds = records.map((row) => String(row.business_id ?? "")).filter(Boolean);
+      if (businessIds.length) {
+        const { data: businesses } = await db
+          .from("businesses")
+          .select("id, destination_id")
+          .in("id", businessIds);
+        for (const business of (businesses ?? []) as Record<string, unknown>[])
+          businessToDestination.set(String(business.id), String(business.destination_id));
+      }
+    }
+    const destinationIds = Array.from(
+      new Set(
+        records
+          .map((row) =>
+            conf.territoryColumn === "business_id"
+              ? businessToDestination.get(String(row.business_id ?? ""))
+              : conf.territoryColumn === "destination_id"
+                ? String(row.destination_id ?? "")
+                : "",
+          )
+          .filter(Boolean),
+      ),
+    );
+    const destinationNames = new Map<string, string>();
+    if (destinationIds.length) {
+      const { data: destinations } = await db
+        .from("destinations")
+        .select("id, name")
+        .in("id", destinationIds);
+      for (const destination of (destinations ?? []) as Record<string, unknown>[])
+        destinationNames.set(String(destination.id), String(destination.name));
+    }
+    return records.map((row) => {
+      const destinationId =
+        conf.territoryColumn === "business_id"
+          ? businessToDestination.get(String(row.business_id ?? ""))
+          : conf.territoryColumn === "destination_id"
+            ? String(row.destination_id ?? "")
+            : "";
+      const destination = destinationId ? destinationNames.get(destinationId) : null;
+      const label = String(row[conf.label] ?? "—");
+      return { id: String(row.id), label: destination ? `${label} · ${destination}` : label };
+    });
   });

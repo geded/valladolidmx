@@ -440,7 +440,15 @@ function RoutesSection({
                       </span>
                     ) : null}
                   </div>
-                  <h3 className="mt-3 font-display text-xl">{route.title}</h3>
+                  <h3 className="mt-3 font-display text-xl">
+                    {route.href ? (
+                      <Link to={route.href} className="underline-offset-4 hover:underline">
+                        {route.title}
+                      </Link>
+                    ) : (
+                      route.title
+                    )}
+                  </h3>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {route.duration} · {route.stops} paradas · {route.vibe}
                   </p>
@@ -816,12 +824,18 @@ function ServiceColumn({
 }
 
 function EventsSection({ content }: { content: HomePremiumContent }) {
+  const hasMedia = content.eventos.media.url.trim().length > 0;
   return (
     <section
       aria-labelledby="events-title"
       className="rounded-3xl border border-border bg-card p-5 sm:p-8"
     >
-      <div className="grid gap-5 md:grid-cols-[minmax(0,34%)_1fr] lg:gap-6">
+      <div
+        className={cn(
+          "grid gap-5 lg:gap-6",
+          hasMedia ? "md:grid-cols-[minmax(0,34%)_1fr]" : "md:grid-cols-1",
+        )}
+      >
         <div>
           <p className="text-xs font-semibold uppercase text-primary">{content.eventos.kicker}</p>
           <h2 id="events-title" className="mt-2 font-display text-3xl">
@@ -830,11 +844,13 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
           <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {content.eventos.description}
           </p>
-          <EditorialMediaFrame
-            media={content.eventos.media}
-            label={content.eventos.title}
-            className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
-          />
+          {hasMedia ? (
+            <EditorialMediaFrame
+              media={content.eventos.media}
+              label={content.eventos.title}
+              className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
+            />
+          ) : null}
         </div>
         <ol className="divide-y divide-border border-y border-border">
           {content.eventos.items.map((event, index) => (

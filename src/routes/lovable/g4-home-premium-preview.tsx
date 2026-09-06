@@ -149,6 +149,7 @@ const ROUTES = [
     description: "Una primera lectura de la ciudad, del centro a una cocina tradicional.",
     sequence: ["Plaza principal", "San Servacio", "Calzada de los Frailes", "Cocina local"],
     media: MEDIA.centro,
+    href: "/rutas",
   },
   {
     id: "cenotes",
@@ -159,6 +160,7 @@ const ROUTES = [
     description: "Una propuesta visual para ordenar agua, territorio y comunidades sin prisas.",
     sequence: ["Valladolid", "Cenote de la región", "Comunidad maya", "Regreso al centro"],
     media: MEDIA.cenote,
+    href: "/rutas",
   },
   {
     id: "pueblos",
@@ -169,6 +171,7 @@ const ROUTES = [
     description: "Tres escalas para comprender la identidad compartida y los matices del oriente.",
     sequence: ["Valladolid", "Espita", "Izamal"],
     media: MEDIA.calle,
+    href: "/rutas",
   },
 ] as const;
 

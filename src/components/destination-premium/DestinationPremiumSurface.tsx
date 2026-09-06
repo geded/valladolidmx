@@ -44,6 +44,12 @@ import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import {
+  routeDurationLabel,
+  routePublicPath,
+  type EditorialRouteCardDTO,
+} from "@/lib/routes-editorial/route-public-contract";
+import { recordAluxSignal } from "@/lib/alux/memory-store";
+import {
   DESTINATION_PREMIUM_G4_CONTENT,
   DESTINATION_PREMIUM_SECTION_ORDER,
   isPuebloMagico,
@@ -73,6 +79,8 @@ export interface DestinationPremiumSurfaceProps {
   renderServicePreview?: (service: DestinationPremiumService) => ReactNode;
   /** Acción canónica Guardar/Mi Viaje, inyectada sin duplicar su lógica. */
   heroAction?: ReactNode;
+  /** Rutas editoriales publicadas del CMS; nunca fixtures ni inferencias. */
+  routes?: readonly EditorialRouteCardDTO[];
 }
 
 const SERVICE_ICONS: Record<string, LucideIcon> = {
@@ -95,6 +103,7 @@ export function DestinationPremiumSurface({
   className,
   renderServicePreview,
   heroAction,
+  routes = [],
 }: DestinationPremiumSurfaceProps) {
   const visible = (key: DestinationPremiumSectionKey) => sections?.[key] !== false;
   const [activeService, setActiveService] = useState<string>(
@@ -194,6 +203,12 @@ export function DestinationPremiumSurface({
                 )}
               </Container>
             ) : null;
+          case "routes":
+            return routes.length > 0 ? (
+              <Container key={key} className="mt-14">
+                <DestinationRoutes content={content} routes={routes} />
+              </Container>
+            ) : null;
           case "map":
             return (
               <Container key={key} className="mt-16">
@@ -210,6 +225,100 @@ export function DestinationPremiumSurface({
             return null;
         }
       })}
+    </div>
+  );
+}
+
+function DestinationRoutes({
+  content,
+  routes,
+}: {
+  content: DestinationPremiumContent;
+  routes: readonly EditorialRouteCardDTO[];
+}) {
+  const belongsHere = (route: EditorialRouteCardDTO) =>
+    route.originDestinationSlug === content.slug || route.destinationSlugs.includes(content.slug);
+  const local = routes.filter(belongsHere).slice(0, 3);
+  const nearby = routes.filter((route) => !belongsHere(route)).slice(0, 3);
+
+  const group = (
+    id: string,
+    kicker: string,
+    title: string,
+    description: string,
+    items: readonly EditorialRouteCardDTO[],
+  ) =>
+    items.length > 0 ? (
+      <section aria-labelledby={id} className="mt-10 first:mt-0">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{kicker}</p>
+        <h2 id={id} className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+          {title}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((route) => (
+            <Link
+              key={route.id}
+              to={routePublicPath(route.slug)}
+              onClick={() =>
+                recordAluxSignal({
+                  kind: "entity_viewed",
+                  key: `route:${route.slug}`,
+                  at: Date.now(),
+                  purpose: "personalization",
+                })
+              }
+              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {route.coverUrl ? (
+                <EditorialMediaFrame
+                  media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name }}
+                  label={route.name}
+                  className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              ) : null}
+              <div className="p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+                  {route.originDestinationLabel ?? "Oriente Maya de Yucatán"}
+                </p>
+                <h3 className="mt-1 font-serif text-xl">{route.name}</h3>
+                {route.summary ? (
+                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{route.summary}</p>
+                ) : null}
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {[
+                    routeDurationLabel(route),
+                    route.stopCount ? `${route.stopCount} paradas` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                <span className="mt-3 inline-flex items-center text-xs font-semibold text-foreground">
+                  Ver ruta <ArrowRight className="ml-1 size-3" aria-hidden />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    ) : null;
+
+  return (
+    <div data-destination-routes="cms-published">
+      {group(
+        "rutas-del-destino",
+        "Explora con intención",
+        `Rutas para vivir ${content.hero.title}`,
+        "Itinerarios publicados que parten de este destino o lo incluyen entre sus paradas.",
+        local,
+      )}
+      {group(
+        "rutas-cercanas",
+        "Continúa por el territorio",
+        `Sigue explorando: rutas en destinos cercanos a ${content.hero.title}`,
+        "Descubre otros recorridos publicados y continúa tu viaje por el Oriente Maya de Yucatán.",
+        nearby,
+      )}
     </div>
   );
 }

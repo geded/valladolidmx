@@ -138,6 +138,7 @@ const schema: BlockSchema = {
     stops: { type: "number", label: "Número de paradas" },
     vibe: { type: "text", label: "Ambiente", translatable: true },
     description: { type: "text", label: "Descripción", translatable: true },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
     sequence: {
       type: "list",
       label: "Paradas en orden",

@@ -202,6 +202,7 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
             description: str(row.description, item?.description ?? ""),
             sequence: resolved,
             media: media(row, item?.media),
+            href: hrefN(row.href, item?.href ?? null),
           };
         },
       ).filter((item) => item.id.length > 0 && item.sequence.length > 0),
@@ -407,6 +408,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
       stops: r.stops,
       vibe: r.vibe,
       description: r.description,
+      href: r.href,
       sequence: r.sequence.map((label) => ({ label })),
       ...mediaRow(r.media),
     })),

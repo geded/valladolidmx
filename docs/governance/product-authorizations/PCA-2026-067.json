@@ -1,0 +1,152 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-067",
+  "title": "Main · reconciliación Premium y conexión territorial de rutas",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-06 para reconciliar en main las plantillas Premium aprobadas usando el breadcrumb como señal de versión, hacer coincidir constructor, preview y ruta pública por familia, y continuar las mejoras de rutas y paradas para que el CMS capture una mejor conexión territorial; conservar diseño, responsive, CMS, marca y Alux existentes, sin rediseñar, importar ramas antiguas completas, desplegar ni publicar.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/cms/EditorialRouteEditor.tsx" },
+    { "operation": "modify", "path": "src/components/cms/EntityEditor.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-content.ts"
+    },
+    { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" },
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-config.ts" },
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-content.ts" },
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-real.ts" },
+    { "operation": "modify", "path": "src/components/layout/BreadcrumbTerritorial.tsx" },
+    { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx" },
+    { "operation": "modify", "path": "src/lib/cms/editorial-route-stops.functions.ts" },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/home-premium-g4/contract.ts"
+    },
+    { "operation": "modify", "path": "src/lib/experience-builder/smart-blocks.server.ts" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-destination-microsite-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-home-premium-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya/{destino}",
+    "/oriente-maya/{destino}/{categoria}/{empresa}",
+    "/producto/{slug}",
+    "/eventos/{slug}",
+    "/oriente-maya/{destino}/lugares/{slug}",
+    "/rutas/{slug}"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun scripts/route-inventory-coverage.ts",
+    "bun run governance:check"
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/cms/EditorialRouteEditor.tsx",
+      "sha256": "0f9051139f8b8b45b99dadd77454301c31d9ad70379a608cb41acd515590474e",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/EntityEditor.tsx",
+      "sha256": "c7dbabfe93d9d687e419c7e3c176ed882d51e783a25e237f38eb2c8912e92368",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx",
+      "sha256": "b5b0debf60d56c57f08570056266c79b320469767d13dff977d73da1c47b6448",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-content.ts",
+      "sha256": "399f28a4200657165fca5072ce1a1946d0d7707aa142f6262afee8f177bc9ca8",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "d757652a88b60fc6d2ba5891352d5a875934c7b059dd5905dddbffc57e7faaa9",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts",
+      "sha256": "4078973343d883cc6103237c1d10791726f4f111bd30181717ed1d58032b8d6f",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts",
+      "sha256": "12ad40fd275b8d68da47400172f77cc4a2d99d7f9cb70248dcf2020784e1717f",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts",
+      "sha256": "0d98e741c4f282e7d6be9a9ce4d6d1b8c0cd4c8ca3895986f5fca3e85e5e0b11",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/BreadcrumbTerritorial.tsx",
+      "sha256": "7052ecc49770afdb38b4a61f11739c38c553543f93fd77a3296544aa6b48849a",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "sha256": "12c1e19fa15d0d52638ef4a799046a52e77f6681e1b8bf315269b79126504129",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cms/editorial-route-stops.functions.ts",
+      "sha256": "9ec88beffa04eb8bcb5f96f9e430bac7bba5e8dab9a9252750e70b422e38f6c2",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/home-premium-g4/contract.ts",
+      "sha256": "14b7e48e6bceed5f6c856c924408bec0b77f08803cd016b4b46f32ceeaf1c8b9",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/smart-blocks.server.ts",
+      "sha256": "2777f677b6ca58b1cd8d425c0e0f63e9be24eafc6d4468da4dbf48734b14b814",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "sha256": "32d31756e73d34e9d8025f7511c131ffee09f5ded6a49dcd516dee18c2c0eeae",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "sha256": "8ffe5a0e4bfc3a4ddfa7d7cdb56362f0843f995b96157b1856b3426ef67a8cf5",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx",
+      "sha256": "34bc5197fa820a6b5e638bef5a8b98e09d30bad4c04470acf8397118a2c869e2",
+      "authority": "Founder · reconciliación Premium y conexión territorial de rutas · 2026-09-06"
+    }
+  ]
+}

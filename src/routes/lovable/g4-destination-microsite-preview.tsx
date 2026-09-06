@@ -16,9 +16,13 @@
  *  - Vista interna, no indexable y sin persistencia.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { DestinationMicrositeReviewSurface } from "@/components/destination-premium/DestinationMicrositeReviewSurface";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { listPublicRoutes } from "@/lib/routes-editorial/route-public-reads.functions";
 
 export const Route = createFileRoute("/lovable/g4-destination-microsite-preview")({
+  loader: async () => ({
+    routes: await listPublicRoutes({ data: { destino: null, limit: 24 } }).catch(() => []),
+  }),
   head: () => ({
     meta: [
       { title: "G4-A · Vista previa micrositio Valladolid (interna)" },
@@ -33,5 +37,6 @@ export const Route = createFileRoute("/lovable/g4-destination-microsite-preview"
 });
 
 function G4DestinationMicrositePreview() {
-  return <DestinationMicrositeReviewSurface />;
+  const { routes } = Route.useLoaderData();
+  return <DestinationPremiumSurface routes={routes} />;
 }

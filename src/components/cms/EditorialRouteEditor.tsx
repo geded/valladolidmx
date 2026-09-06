@@ -28,6 +28,14 @@ const BASE_FIELDS: EditorField[] = [
     options: [],
     helpText: "Punto de partida sugerido del itinerario.",
   },
+  {
+    name: "destination_ids",
+    label: "Destinos incluidos en la ruta",
+    type: "multiselect",
+    options: [],
+    helpText:
+      "Selecciona todos los destinos recorridos. Esto conecta la ruta con sus micrositios y con las recomendaciones territoriales de Alux.",
+  },
   { name: "duration_days", label: "Duración (días)", type: "number" },
   { name: "duration_hours", label: "Duración (horas)", type: "number" },
   {
@@ -67,13 +75,16 @@ export function EditorialRouteEditor({ id }: { id?: string }) {
   const fields = useMemo(
     () =>
       BASE_FIELDS.map((f) =>
-        f.name === "origin_destination_id"
+        f.name === "origin_destination_id" || f.name === "destination_ids"
           ? {
               ...f,
-              options: [
-                { value: "", label: "Sin destino de salida" },
-                ...(destinations.data ?? []).map((d) => ({ value: d.id, label: d.name })),
-              ],
+              options:
+                f.name === "origin_destination_id"
+                  ? [
+                      { value: "", label: "Sin destino de salida" },
+                      ...(destinations.data ?? []).map((d) => ({ value: d.id, label: d.name })),
+                    ]
+                  : (destinations.data ?? []).map((d) => ({ value: d.id, label: d.name })),
             }
           : f,
       ),

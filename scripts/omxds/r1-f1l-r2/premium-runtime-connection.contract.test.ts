@@ -190,6 +190,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
           vibe: "Patrimonio",
           description: "Recorrido territorial",
           sequence: ["Valladolid", "Izamal"],
+          href: "/rutas/pueblos-magicos",
+          mediaUrl: "",
         },
       ],
       mapPoints: [],
@@ -234,12 +236,126 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
       experiencias: [],
       stays: [],
       food: [],
-      eventos: [],
+      eventos: [
+        {
+          title: "Serenata del domingo",
+          subtitle: "Parque principal",
+          category: "Evento",
+          href: "/eventos/serenata-del-domingo",
+          mediaUrl: "/api/public/studio-media/eventos/portada-inferida.webp",
+          puebloMagico: false,
+          day: "Domingo",
+        },
+      ],
       rutas: [],
       mapPoints: [],
     });
 
     expect(merged.eventos.media).toEqual(configured.eventos.media);
+  });
+
+  test("el preview y producción del destino consumen la misma superficie aprobada", () => {
+    const preview = read("src/routes/lovable/g4-destination-microsite-preview.tsx");
+    const publicSurface = read("src/components/surfaces/DestinationSurface.tsx");
+
+    expect(preview).toContain("DestinationPremiumSurface");
+    expect(preview).not.toContain("DestinationMicrositeReviewSurface");
+    expect(publicSurface).toContain("<DestinationPremiumSurface");
+  });
+
+  test("Home y micrositio consumen rutas editoriales publicadas del CMS", () => {
+    const homeReads = read("src/lib/experience-builder/smart-blocks.server.ts");
+    const destinationRoute = read("src/routes/oriente-maya/$destino.index.tsx");
+    const destinationSurface = read(
+      "src/components/destination-premium/DestinationPremiumSurface.tsx",
+    );
+
+    expect(homeReads).toContain("readPublishedRouteCards({ limit: 6 })");
+    expect(homeReads).not.toContain("function routesFrom(");
+    expect(homeReads).toContain("routePublicPath(route.slug)");
+    expect(destinationRoute).toContain("listPublicRoutes");
+    expect(destinationRoute).toContain("routes={routes}");
+    expect(destinationSurface).toContain('data-destination-routes="cms-published"');
+    expect(destinationSurface).toContain("Rutas para vivir");
+    expect(destinationSurface).toContain("Sigue explorando: rutas en destinos cercanos");
+    expect(destinationSurface).toContain("key: `route:${route.slug}`");
+  });
+
+  test("el CMS captura territorio y muestra contexto en cada parada", () => {
+    const routeEditor = read("src/components/cms/EditorialRouteEditor.tsx");
+    const entityEditor = read("src/components/cms/EntityEditor.tsx");
+    const stopReads = read("src/lib/cms/editorial-route-stops.functions.ts");
+
+    expect(routeEditor).toContain('name: "origin_destination_id"');
+    expect(routeEditor).toContain('name: "destination_ids"');
+    expect(routeEditor).toContain('type: "multiselect"');
+    expect(entityEditor).toContain('field.type === "multiselect"');
+    expect(stopReads).toContain('territoryColumn: "destination_id"');
+    expect(stopReads).toContain('territoryColumn: "business_id"');
+    expect(stopReads).toContain("`${label} · ${destination}`");
+  });
+
+  test("el breadcrumb territorial no puede ser desplazado por el selector en tablet", () => {
+    const breadcrumb = read("src/components/layout/BreadcrumbTerritorial.tsx");
+
+    expect(breadcrumb).toContain("flex-col items-stretch");
+    expect(breadcrumb).toContain("lg:flex-row");
+    expect(breadcrumb).toContain("w-full min-w-0");
+    expect(breadcrumb).toContain("lg:w-auto");
+  });
+
+  test("todas las familias aprobadas conservan breadcrumb, Alux y conexión productiva", () => {
+    const businessSurface = read("src/components/surfaces/BusinessSurface.tsx");
+    const entityRegistry = read("src/lib/experience-builder/entity-premium-templates.ts");
+
+    for (const preview of [
+      "src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "src/routes/lovable/g4-restaurant-premium-preview.tsx",
+    ]) {
+      expect(read(preview)).toContain("PremiumTerritorialBreadcrumb");
+    }
+    const vacationRental = read("src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx");
+    expect(vacationRental).toContain("PublicShell");
+    expect(vacationRental).toContain("crumbs={[");
+
+    expect(businessSurface).toContain("adaptHotelSurfaceContract");
+    expect(businessSurface).toContain("adaptRestaurantSurfaceContract");
+    expect(businessSurface).toContain("adaptVacationRentalSurfaceContract");
+    expect(businessSurface).toContain("useContextCrumbs");
+    expect(businessSurface).toContain("TourismAluxPanel");
+
+    for (const authority of [
+      "/lovable/g4-hotel-premium-preview",
+      "/lovable/g4-restaurant-premium-preview",
+      "/lovable/g8p2-vacation-rental-premium-preview",
+    ]) {
+      expect(entityRegistry).toContain(`visualAuthorityRoute: "${authority}"`);
+    }
+  });
+
+  test("Experiencia, Evento y Lugar comparten renderer entre preview y público", () => {
+    const pairs = [
+      [
+        "src/routes/lovable/g4-experience-premium-preview.tsx",
+        "src/routes/producto.$slug.tsx",
+        "ExperiencePremiumSurface",
+      ],
+      [
+        "src/routes/lovable/g4-event-premium-preview.tsx",
+        "src/routes/eventos.$slug.tsx",
+        "EventPremiumSurface",
+      ],
+      [
+        "src/routes/lovable/g4-place-premium-preview.tsx",
+        "src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+        "PlacePremiumSurface",
+      ],
+    ] as const;
+
+    for (const [preview, publicRoute, surface] of pairs) {
+      expect(read(preview)).toContain(surface);
+      expect(read(publicRoute)).toContain(surface);
+    }
   });
 
   test("la Home evita huecos con los medios gobernados production-eligible de cada vertical", () => {
@@ -351,7 +467,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
       expect(contract).toContain(field);
       expect(policy).toContain(`field: "${field}"`);
     }
-    expect(contract.match(/label: "Enlace canónico"/g)).toHaveLength(6);
+    expect(contract.match(/label: "Enlace canónico"/g)).toHaveLength(7);
     expect(surface).toContain('to={pueblo.href ?? "/oriente-maya"}');
     expect(surface).toContain("{content.pueblosMagicos.ctaLabel}");
     expect(shared).toContain("actionHref?: string");
