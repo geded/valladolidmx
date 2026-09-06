@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-065-ADDENDUM-ZZZZ-PR61-P2-006",
+  "status": "Approved",
+  "parent": "PCA-2026-065",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para cerrar exclusivamente los tres P2 del PR 61.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    "previous_sha256": "e3f0597ba9cea33ab03c9f11bc3764bd501c885cb32b4aeda487d55a89b2017f",
+    "current_sha256": "70ea33bbb43fe3953e75502b27b5e46f91e91d3825d3f635793a911df847258f",
+    "semantic_change": "Qué hacer conserva título, descripción y filtrado por facetas en la superficie compartida.",
+    "authority": "Founder · cierre P2 PR 61 · 2026-09-06"
+  },
+  "invariants": ["Sin rutas nuevas", "Sin modificar datos"],
+  "recorded_at": "2026-09-06"
+}

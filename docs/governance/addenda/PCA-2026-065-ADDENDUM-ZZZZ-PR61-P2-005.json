@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-065-ADDENDUM-ZZZZ-PR61-P2-005",
+  "status": "Approved",
+  "parent": "PCA-2026-065",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para cerrar exclusivamente los tres P2 del PR 61.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+    "previous_sha256": "9dce1ce8cf8c169bd697e273ad764234d05e604acb4692e51a44fa510c1ce5f7",
+    "current_sha256": "a2572ff121a06c406e8349004afbd2c5f3d9f7998361833d4672320efeb881fc",
+    "semantic_change": "El modo cinematográfico mantiene su altura y texto claro sin alterar el editorial.",
+    "authority": "Founder · cierre P2 PR 61 · 2026-09-06"
+  },
+  "invariants": ["Sin activos nuevos", "Sin despliegue"],
+  "recorded_at": "2026-09-06"
+}

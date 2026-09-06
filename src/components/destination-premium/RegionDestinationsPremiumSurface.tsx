@@ -117,10 +117,10 @@ export function RegionDestinationsPremiumSurface({
       <Container className="pt-5">
         <section
           className={cn(
-            "relative isolate overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft md:min-h-[40rem] lg:min-h-0",
+            "relative isolate overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft",
             cinematic
-              ? "min-h-[34rem]"
-              : "lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]",
+              ? "min-h-[34rem] md:min-h-[40rem] lg:min-h-[40rem]"
+              : "md:min-h-[40rem] lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]",
           )}
         >
           {cinematic ? (
@@ -133,18 +133,38 @@ export function RegionDestinationsPremiumSurface({
           {cinematic ? (
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/82 via-black/48 to-transparent" />
           ) : null}
-          <div className="flex flex-col justify-center p-7 text-foreground sm:p-10 lg:p-12">
+          <div
+            className={cn(
+              "flex flex-col justify-center p-7 sm:p-10 lg:p-12",
+              cinematic ? "text-white" : "text-foreground",
+            )}
+          >
             <p className="text-xs font-semibold uppercase tracking-[.19em] text-primary">
               {brand.tagline}
             </p>
-            <h1 className="mt-4 max-w-3xl font-serif text-display-hero text-foreground">
+            <h1
+              className={cn(
+                "mt-4 max-w-3xl font-serif text-display-hero",
+                cinematic ? "text-white" : "text-foreground",
+              )}
+            >
               Explora los destinos del Oriente Maya de Yucatán
             </h1>
             <div className="mt-5 h-1 w-20 rounded-full bg-primary" />
-            <h2 className="mt-5 font-serif text-xl text-foreground sm:text-2xl">
+            <h2
+              className={cn(
+                "mt-5 font-serif text-xl sm:text-2xl",
+                cinematic ? "text-white" : "text-foreground",
+              )}
+            >
               Valladolid, capital turística y punto de partida
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+            <p
+              className={cn(
+                "mt-3 max-w-2xl text-sm leading-6 sm:text-base",
+                cinematic ? "text-white/85" : "text-muted-foreground",
+              )}
+            >
               Desde el corazón del Oriente Maya descubre pueblos con historia, tradiciones vivas,
               cenotes sagrados, costa y sabores únicos.
             </p>

@@ -196,6 +196,9 @@ export function ListingPremiumSurfaceFromDTO({
             | "que-hacer"
         }
         dto={dto}
+        titleOverride={titleOverride}
+        subtitleOverride={subtitleOverride}
+        facets={facets}
         nearbyItems={nearbyItems}
         lockedDestinationLabel={lockedDestinationLabel}
       />

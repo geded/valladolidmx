@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZ-PR61-P2-002",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para cerrar exclusivamente los tres P2 del PR 61.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+    "previous_sha256": "9dce1ce8cf8c169bd697e273ad764234d05e604acb4692e51a44fa510c1ce5f7",
+    "current_sha256": "a2572ff121a06c406e8349004afbd2c5f3d9f7998361833d4672320efeb881fc",
+    "semantic_change": "El hero cinematográfico conserva altura y contraste en escritorio.",
+    "authority": "Founder · cierre P2 PR 61 · 2026-09-06"
+  },
+  "invariants": ["Editorial permanece intacto", "Sin activos nuevos"],
+  "recorded_at": "2026-09-06"
+}

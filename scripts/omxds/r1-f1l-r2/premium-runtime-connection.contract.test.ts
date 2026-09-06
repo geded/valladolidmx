@@ -277,11 +277,30 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
   test("la paridad pública conserva la autoridad Home sin hero verde ni medios cruzados", () => {
     const atlas = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
     const listing = read("src/components/listing-premium/TerritorialListingReviewSurface.tsx");
-    expect(atlas).toContain("bg-card shadow-soft md:min-h-[40rem]");
+    expect(atlas).toContain("bg-card shadow-soft");
+    expect(atlas).toContain(
+      '"md:min-h-[40rem] lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]"',
+    );
     expect(atlas).not.toContain("bg-selva shadow-soft");
+    expect(atlas).toContain('cinematic ? "text-white" : "text-foreground"');
+    expect(atlas).toContain('"min-h-[34rem] md:min-h-[40rem] lg:min-h-[40rem]"');
     expect(listing).toContain('profile.family === "restaurantes"');
     expect(listing).toContain("restaurant-cover.jpg");
     expect(listing).toContain('profile.family === "eventos"');
+  });
+
+  test("Qué hacer conserva los overrides editoriales y sus facetas en la superficie Premium", () => {
+    const wrapper = read("src/components/listing-premium/ListingPremiumSurface.tsx");
+    const territorial = read("src/components/listing-premium/TerritorialListingReviewSurface.tsx");
+    const route = read("src/routes/que-hacer.tsx");
+
+    expect(wrapper).toContain("titleOverride={titleOverride}");
+    expect(wrapper).toContain("subtitleOverride={subtitleOverride}");
+    expect(wrapper).toContain("facets={facets}");
+    expect(territorial).toContain("titleOverride?.trim() || baseProfile.title");
+    expect(territorial).toContain("subtitleOverride?.trim() || baseProfile.description");
+    expect(territorial).toContain("facet.extract(item.source) !== selected");
+    expect(route).toContain("facets={tipoFacet ? [tipoFacet] : []}");
   });
 
   test("los listados globales no heredan un destino obsoleto del historial de navegación", () => {

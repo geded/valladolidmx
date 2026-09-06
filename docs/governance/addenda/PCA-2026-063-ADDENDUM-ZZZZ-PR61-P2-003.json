@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZ-PR61-P2-003",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para cerrar exclusivamente los tres P2 del PR 61.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/listing-premium/ListingPremiumSurface.tsx",
+    "previous_sha256": "7e4289fe33eeb638385895c60cfb8f69e8406ce698097e9bb70f2507709d495d",
+    "current_sha256": "29099a1d9cb21bd356c6efcd347a8ed435656422338092d93509083b8df1e7ec",
+    "semantic_change": "La envoltura Premium conserva los overrides editoriales de Qué hacer.",
+    "authority": "Founder · cierre P2 PR 61 · 2026-09-06"
+  },
+  "invariants": ["Sin ruta paralela", "Sin ampliar producto"],
+  "recorded_at": "2026-09-06"
+}
