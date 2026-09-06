@@ -3,7 +3,7 @@
   "id": "PCA-2026-066",
   "title": "Main · navegación Home y paridad de autoría Premium",
   "status": "Approved",
-  "branch": "main",
+  "branch": "fix/main-home-builder-parity-2026-09-06",
   "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
   "founder_authority": "Autorización Founder del 2026-09-06 para corregir los enlaces no operativos de Home y comprobar/cablear que textos, enlaces, medios, visibilidad y límites de las plantillas Premium se modifiquen desde el constructor y se reflejen en la plataforma. Sin publicación, datos, migraciones, pagos, reservaciones, secretos, cron ni RLS.",
   "permissions": [
@@ -127,4 +127,3 @@
     }
   ]
 }
-
