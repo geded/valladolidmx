@@ -218,12 +218,105 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(JSON.stringify(emptyRealCorpus)).not.toContain("conceptual-preview");
   });
 
+  test("la Home evita huecos con los medios gobernados production-eligible de cada vertical", () => {
+    const merged = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
+      destinos: [],
+      experiencias: [
+        {
+          title: "Cena en cenote",
+          subtitle: "Experiencia acreditada",
+          category: "Experiencia",
+          href: "/producto/cena-en-cenote",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+      ],
+      stays: [
+        {
+          title: "Hotel acreditado",
+          subtitle: "Hospedaje",
+          category: "Hotel",
+          href: "/hoteles/hotel-acreditado",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+      ],
+      food: [
+        {
+          title: "Restaurante acreditado",
+          subtitle: "Gastronomía",
+          category: "Restaurante",
+          href: "/restaurantes/restaurante-acreditado",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+      ],
+      eventos: [],
+      rutas: [],
+      mapPoints: [],
+    });
+
+    expect(merged.experiencias.items[0]?.media.url).toContain(
+      "governed/v1p1c/experience-cover.jpg",
+    );
+    expect(merged.servicios.stays[0]?.media.url).toContain("governed/v1p1c/hotel-cover.jpg");
+    expect(merged.servicios.food[0]?.media.url).toContain("governed/v1p1c/restaurant-cover.jpg");
+    expect(JSON.stringify(merged)).not.toContain("conceptual-preview");
+  });
+
   test("los medios de Home usan el proxy estable y no dependen de service role", () => {
     const resolver = read("src/lib/experience-builder/smart-blocks.server.ts");
     expect(resolver).toContain("toStablePublicMediaUrl");
     expect(resolver).toContain("isAccreditedDestinationMedia");
+    expect(resolver).toContain("Promise.allSettled");
+    expect(resolver).toContain("Una fuente temporalmente indisponible no debe borrar las demás");
     expect(resolver).not.toContain("async function signMedia");
     expect(resolver).not.toContain("createSignedUrls(");
+  });
+
+  test("la paridad pública conserva la autoridad Home sin hero verde ni medios cruzados", () => {
+    const atlas = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
+    const listing = read("src/components/listing-premium/TerritorialListingReviewSurface.tsx");
+    expect(atlas).toContain("bg-card shadow-soft");
+    expect(atlas).toContain(
+      '"md:min-h-[40rem] lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]"',
+    );
+    expect(atlas).not.toContain("bg-selva shadow-soft");
+    expect(atlas).toContain('cinematic ? "text-white" : "text-foreground"');
+    expect(atlas).toContain('"min-h-[34rem] md:min-h-[40rem] lg:min-h-[40rem]"');
+    expect(listing).toContain('profile.family === "restaurantes"');
+    expect(listing).toContain("restaurant-cover.jpg");
+    expect(listing).toContain('profile.family === "eventos"');
+  });
+
+  test("Qué hacer conserva los overrides editoriales y sus facetas en la superficie Premium", () => {
+    const wrapper = read("src/components/listing-premium/ListingPremiumSurface.tsx");
+    const territorial = read("src/components/listing-premium/TerritorialListingReviewSurface.tsx");
+    const route = read("src/routes/que-hacer.tsx");
+
+    expect(wrapper).toContain("titleOverride={titleOverride}");
+    expect(wrapper).toContain("subtitleOverride={subtitleOverride}");
+    expect(wrapper).toContain("facets={facets}");
+    expect(territorial).toContain("titleOverride?.trim() || baseProfile.title");
+    expect(territorial).toContain("subtitleOverride?.trim() || baseProfile.description");
+    expect(territorial).toContain("facet.extract(item.source) !== selected");
+    expect(route).toContain("facets={tipoFacet ? [tipoFacet] : []}");
+  });
+
+  test("los listados globales no heredan un destino obsoleto del historial de navegación", () => {
+    for (const route of [
+      "hoteles.tsx",
+      "restaurantes.tsx",
+      "casas-de-vacaciones.tsx",
+      "eventos.index.tsx",
+      "experiencias.tsx",
+      "lugares.index.tsx",
+      "rutas.index.tsx",
+    ]) {
+      expect(read(`src/routes/${route}`)).not.toContain(
+        'inherit: destino ? [] : ["region", "destination"]',
+      );
+    }
   });
 
   test("experiencias y tours resuelven Premium en ambas rutas canónicas con el flag global OFF", () => {

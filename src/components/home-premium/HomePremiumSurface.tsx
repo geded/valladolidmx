@@ -635,10 +635,10 @@ function ExperiencesSection({
       </div>
       <div
         className={cn(
-          "hidden gap-4 lg:grid lg:h-[30rem]",
+          "hidden gap-4 lg:grid",
           layout === "carrusel"
-            ? "grid-flow-col auto-cols-[86%] overflow-x-auto pb-2 sm:auto-cols-[48%]"
-            : "lg:grid-cols-[1.2fr_1fr]",
+            ? "grid-flow-col auto-cols-[86%] overflow-x-auto pb-2 sm:auto-cols-[48%] lg:h-[30rem]"
+            : "lg:min-h-[30rem] lg:grid-cols-[1.2fr_1fr]",
         )}
       >
         <article
@@ -691,7 +691,7 @@ function ExperiencesSection({
             ) : null}
           </div>
         </article>
-        <div className="grid min-h-0 grid-rows-3 gap-3">
+        <div className="grid min-h-0 auto-rows-[minmax(9rem,auto)] gap-3">
           {items.slice(1).map((item: HomePremiumExperience) => (
             <CompactMediaRow key={item.title} item={item} />
           ))}

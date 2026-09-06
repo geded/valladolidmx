@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
@@ -24,7 +25,8 @@ type TerritorialListingFamily =
   | "restaurantes"
   | "casas-de-vacaciones"
   | "eventos"
-  | "lugares";
+  | "lugares"
+  | "que-hacer";
 
 interface ListingItem {
   name: string;
@@ -338,22 +340,58 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: [],
     nearby: [],
   },
+  "que-hacer": {
+    family: "que-hacer",
+    breadcrumb: "Qué hacer",
+    eyebrow: "Inspírate en el territorio",
+    title: "¿Qué hacer en el Oriente Maya?",
+    description:
+      "Cultura, naturaleza, aventura, gastronomía y eventos reunidos con la misma mirada editorial de Valladolid.mx.",
+    resultsTitle: "Ideas para descubrir el Oriente Maya",
+    itemLabel: "actividad",
+    searchLabel: "Buscar qué hacer",
+    searchPlaceholder: "Buscar actividad, destino o tema",
+    aluxQuestion: "¿Qué necesitas para tu viaje?",
+    aluxOptions: ["Primera visita", "Un día", "Naturaleza", "Cultura", "Cerca de Valladolid"],
+    filters: ["Destino", "Tipo", "Tema"],
+    nearbyTitle: "Más ideas del territorio",
+    mapTitle: "Qué hacer en el Oriente Maya",
+    aluxMapTitle: "Convierte tus guardados en un itinerario real.",
+    aluxMapDescription:
+      "Alux combina actividades, distancias y tiempo disponible sin convertir el viaje en una carrera.",
+    items: [],
+    nearby: [],
+  },
 };
 
 export function TerritorialListingReviewSurface({
   family = "hoteles",
   dto,
+  titleOverride,
+  subtitleOverride,
+  facets = [],
   nearbyItems,
   lockedDestinationLabel,
 }: {
   family?: TerritorialListingFamily;
   dto?: PublicListingDTO;
+  titleOverride?: string | null;
+  subtitleOverride?: string | null;
+  facets?: FacetDef[];
   /** Eventos de otros destinos: sección de descubrimiento separada. */
   nearbyItems?: readonly TourismCardVM[];
   /** Contexto territorial bloqueado (listado dentro de un destino). */
   lockedDestinationLabel?: string | null;
 }) {
-  const profile = PROFILES[family];
+  const baseProfile = PROFILES[family];
+  const profile = useMemo(
+    () => ({
+      ...baseProfile,
+      title: titleOverride?.trim() || baseProfile.title,
+      description: subtitleOverride?.trim() || baseProfile.description,
+    }),
+    [baseProfile, subtitleOverride, titleOverride],
+  );
   const [query, setQuery] = useState("");
   const [zone, setZone] = useState("");
   const [primary, setPrimary] = useState("");
@@ -397,6 +435,7 @@ export function TerritorialListingReviewSurface({
       setPrimary={setPrimary}
       secondary={secondary}
       setSecondary={setSecondary}
+      facets={facets}
     />
   );
 }
@@ -413,6 +452,7 @@ function TerritorialListingBody({
   setPrimary,
   secondary,
   setSecondary,
+  facets,
 }: {
   profile: ListingProfile;
   items: ListingItem[];
@@ -425,7 +465,9 @@ function TerritorialListingBody({
   setPrimary: (v: string) => void;
   secondary: string;
   setSecondary: (v: string) => void;
+  facets: FacetDef[];
 }) {
+  const [activeFacets, setActiveFacets] = useState<Record<string, string>>({});
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
   const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
   const secondaryValues = useMemo(
@@ -438,12 +480,19 @@ function TerritorialListingBody({
       if (zone && itemZone(item) !== zone) return false;
       if (primary && item.type !== primary) return false;
       if (secondary && !item.tags.includes(secondary)) return false;
+      if (
+        facets.some((facet) => {
+          const selected = activeFacets[facet.id];
+          return selected && (!item.source || facet.extract(item.source) !== selected);
+        })
+      )
+        return false;
       if (!needle) return true;
       return normalize(
         [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
       ).includes(needle);
     });
-  }, [items, primary, query, secondary, zone]);
+  }, [activeFacets, facets, items, primary, query, secondary, zone]);
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="w-full">
@@ -462,6 +511,9 @@ function TerritorialListingBody({
           secondary={secondary}
           setSecondary={setSecondary}
           secondaryValues={secondaryValues}
+          facets={facets}
+          activeFacets={activeFacets}
+          setActiveFacets={setActiveFacets}
         />
 
         <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
@@ -561,7 +613,15 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     copy: item.tagline ?? "",
     // G4-PLACES: los lugares sin medio acreditado usan marcador neutral;
     // nunca heredan una imagen hotelera u otro medio ajeno.
-    image: item.mediaUrl ?? (profile.family === "lugares" ? "" : `${MEDIA}/hotel-cover.jpg`),
+    image:
+      item.mediaUrl ??
+      (profile.family === "lugares"
+        ? ""
+        : profile.family === "restaurantes"
+          ? `${MEDIA}/restaurant-cover.jpg`
+          : profile.family === "eventos" || profile.family === "que-hacer"
+            ? `${MEDIA}/destination-gallery-1.jpg`
+            : `${MEDIA}/hotel-cover.jpg`),
     tags: unique([
       ...structuredTags,
       ...item.highlights,
@@ -664,6 +724,9 @@ function Filters({
   secondary,
   setSecondary,
   secondaryValues,
+  facets,
+  activeFacets,
+  setActiveFacets,
 }: {
   profile: ListingProfile;
   query: string;
@@ -677,6 +740,9 @@ function Filters({
   secondary: string;
   setSecondary: (value: string) => void;
   secondaryValues: string[];
+  facets: FacetDef[];
+  activeFacets: Record<string, string>;
+  setActiveFacets: (value: Record<string, string>) => void;
 }) {
   const selects = [
     { label: profile.filters[0], value: zone, setValue: setZone, options: zones },
@@ -707,6 +773,30 @@ function Filters({
         <button className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden">
           <Map className="size-4" aria-hidden /> Ver mapa
         </button>
+        {facets.map((facet) => (
+          <label key={facet.id} className="relative min-w-max lg:min-w-0">
+            <span className="sr-only">{facet.label}</span>
+            <select
+              aria-label={facet.label}
+              value={activeFacets[facet.id] ?? ""}
+              onChange={(event) =>
+                setActiveFacets({ ...activeFacets, [facet.id]: event.target.value })
+              }
+              className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+            >
+              <option value="">{facet.label}: todos</option>
+              {facet.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                  {option.count != null ? ` (${option.count})` : ""}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs">
+              ⌄
+            </span>
+          </label>
+        ))}
         {selects.map(({ label, value, setValue, options }) => (
           <label key={label} className="relative min-w-max lg:min-w-0">
             <span className="sr-only">{label}</span>
@@ -735,6 +825,7 @@ function Filters({
             setZone("");
             setPrimary("");
             setSecondary("");
+            setActiveFacets({});
           }}
           className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
         >

@@ -79,6 +79,8 @@ function QueHacerRoute() {
         titleOverride={activo ? `¿Qué hacer? · ${activo.label}` : null}
         subtitleOverride={activo?.description ?? null}
         facets={tipoFacet ? [tipoFacet] : []}
+        showAddToTrip
+        showFavorite
       />
 
       <section className="mt-10">

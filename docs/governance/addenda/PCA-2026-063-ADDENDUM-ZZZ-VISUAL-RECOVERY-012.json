@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZ-VISUAL-RECOVERY-012",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar exactamente la paridad visual, funcional, responsive y de Medios ya aprobada, sin perder trabajo ni créditos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    "previous_sha256": "35060257747b4434971961bb5d2506d12d74d135b6f7a64f763b057c463f560a",
+    "current_sha256": "e3f0597ba9cea33ab03c9f11bc3764bd501c885cb32b4aeda487d55a89b2017f",
+    "semantic_change": "La plantilla compartida incorpora Qué hacer y asigna medios por vertical.",
+    "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+  },
+  "invariants": [
+    "Sin comodines ni futuros SHA-256",
+    "Sin reemplazar activos ni créditos existentes",
+    "Sin ampliar producto"
+  ],
+  "recorded_at": "2026-09-06"
+}

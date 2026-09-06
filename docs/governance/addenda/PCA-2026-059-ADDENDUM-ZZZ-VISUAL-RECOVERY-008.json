@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZ-VISUAL-RECOVERY-008",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar exactamente la paridad visual, funcional, responsive y de Medios ya aprobada, sin perder trabajo ni créditos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/restaurantes.tsx",
+    "previous_sha256": "e33c4a45c9e5f56bd084a78041442fcaed911b134e0c7c0e17d297c9be98a5ec",
+    "current_sha256": "e38bb1e07e5f3cf2ca969158092beaaa21cf84fe9a80c7f6d3cbfe36b4a60ade",
+    "semantic_change": "El listado global evita heredar un destino obsoleto.",
+    "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+  },
+  "invariants": [
+    "Sin comodines ni futuros SHA-256",
+    "Sin reemplazar activos ni créditos existentes",
+    "Sin ampliar producto"
+  ],
+  "recorded_at": "2026-09-06"
+}

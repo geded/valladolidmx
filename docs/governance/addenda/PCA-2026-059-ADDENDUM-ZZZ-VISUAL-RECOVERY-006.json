@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZ-VISUAL-RECOVERY-006",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar exactamente la paridad visual, funcional, responsive y de Medios ya aprobada, sin perder trabajo ni créditos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/hoteles.tsx",
+    "previous_sha256": "21d057e61966adebc2444fca88efc6aae5e041fd0b79801cc4adde501b4aa2ab",
+    "current_sha256": "2b376d2a9d5f4ee47c7abb362eaeb32180e65ba37c28d900a32ecbcd2342c739",
+    "semantic_change": "El listado global evita heredar un destino obsoleto.",
+    "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+  },
+  "invariants": [
+    "Sin comodines ni futuros SHA-256",
+    "Sin reemplazar activos ni créditos existentes",
+    "Sin ampliar producto"
+  ],
+  "recorded_at": "2026-09-06"
+}

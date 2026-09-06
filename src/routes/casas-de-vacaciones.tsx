@@ -20,7 +20,6 @@ import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-
 import { buildDestinationFacet } from "@/components/surfaces/TourismListingSurface";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 
-
 /** H-02 · I5 — Declaración de contexto (patrón I4). */
 function buildCasasContext(
   destino: string | undefined,
@@ -50,7 +49,7 @@ function buildCasasContext(
       href: "/casas-de-vacaciones",
     },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/casas-de-vacaciones",
   });
 }
@@ -62,13 +61,11 @@ export const Route = createFileRoute("/casas-de-vacaciones")({
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps, context }) => {
     // Lote 3B — Nombres de destino reales disponibles en SSR.
-    await context.queryClient
-      .ensureQueryData(publishedDestinationsQueryOptions)
-      .catch(() => []);
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
     return {
-    dto: await getPublicListing({
-      data: { family: "casas-de-vacaciones", destino: deps.destino ?? null },
-    }),
+      dto: await getPublicListing({
+        data: { family: "casas-de-vacaciones", destino: deps.destino ?? null },
+      }),
     };
   },
   head: () =>
@@ -91,7 +88,12 @@ function CasasRoute() {
   ];
   const destinoFacet = buildDestinationFacet([...dto.items]);
   return (
-    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs compactCrumbsOnMobile>
+    <PublicShell
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs
+      compactCrumbsOnMobile
+    >
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         facets={destino || !destinoFacet ? [] : [destinoFacet]}

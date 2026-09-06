@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZ-VISUAL-RECOVERY-010",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar exactamente la paridad visual, funcional, responsive y de Medios ya aprobada, sin perder trabajo ni créditos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+    "previous_sha256": "2f6de9a34b256b8aa8cc9a6ad0d5017bad6dff50fb9e7e2019f2ade9350345e8",
+    "current_sha256": "9dce1ce8cf8c169bd697e273ad764234d05e604acb4692e51a44fa510c1ce5f7",
+    "semantic_change": "El Atlas recupera el hero editorial claro aprobado y reserva altura en iPad.",
+    "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+  },
+  "invariants": [
+    "Sin comodines ni futuros SHA-256",
+    "Sin reemplazar activos ni créditos existentes",
+    "Sin ampliar producto"
+  ],
+  "recorded_at": "2026-09-06"
+}

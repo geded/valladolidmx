@@ -35,7 +35,7 @@ function buildEventosContext(
   return defineRouteContext({
     current: { kind: "category", slug: "eventos", label: "Eventos", href: "/eventos" },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/eventos",
   });
 }
@@ -53,9 +53,7 @@ export const Route = createFileRoute("/eventos/")({
     }),
   loader: async ({ deps, context }) => {
     // Lote 3B — Nombres de destino reales disponibles en SSR.
-    await context.queryClient
-      .ensureQueryData(publishedDestinationsQueryOptions)
-      .catch(() => []);
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
     const destino = deps.destino ?? null;
     const [dto, regional] = await Promise.all([
       getPublicListing({ data: { family: "eventos", destino } }),
@@ -79,7 +77,12 @@ function EventosPage() {
   const label = destino ? (dto.destinationLabel ?? destinationLabel(destino)) : null;
   const crumbs = [{ label: "Eventos", to: "/eventos" }, ...(label ? [{ label }] : [])];
   return (
-    <PublicShell crumbs={crumbs} contextDeclaration={buildEventosContext(destino ?? undefined, destinationLabel)} useContextCrumbs compactCrumbsOnMobile>
+    <PublicShell
+      crumbs={crumbs}
+      contextDeclaration={buildEventosContext(destino ?? undefined, destinationLabel)}
+      useContextCrumbs
+      compactCrumbsOnMobile
+    >
       <ListingPremiumSurfaceFromDTO
         dto={dto}
         showAddToTrip

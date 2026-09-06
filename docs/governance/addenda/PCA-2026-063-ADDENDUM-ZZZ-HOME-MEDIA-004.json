@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZ-HOME-MEDIA-004",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para restaurar medios gobernados existentes y corregir la retícula responsive del Home.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "bd3b4ec688d1049c9f0d6a352f8b4ec8ec2a8a0fdf08291e64f680404f678ca3",
+    "current_sha256": "83e12683a96416b99bb5f079a5c3393d3f9fb95bc5efb6592c9e09b121d6c5eb",
+    "semantic_change": "La sección deja de imponer tres filas a un conjunto de cardinalidad variable.",
+    "authority": "Founder · Home media and responsive remediation · 2026-09-06"
+  },
+  "invariants": ["Sin comodines ni futuros SHA-256", "Sin cambios fuera del Home"],
+  "recorded_at": "2026-09-06"
+}
