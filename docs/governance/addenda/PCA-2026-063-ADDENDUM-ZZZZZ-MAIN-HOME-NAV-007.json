@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZZ-MAIN-HOME-NAV-007",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir navegación Home y asegurar autoría constructor→plataforma en plantillas Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    "previous_sha256": "70ea33bbb43fe3953e75502b27b5e46f91e91d3825d3f635793a911df847258f",
+    "current_sha256": "ef8a6cf6eddf9e9cc69033d63b6a3fd132ad0c319823f0183e2270544ea719c1",
+    "semantic_change": "Sustituye el enlace decorativo de exploración cercana por la ruta territorial canónica.",
+    "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+  },
+  "invariants": [
+    "Sin plantillas paralelas",
+    "Sin datos, migraciones, pagos, reservaciones, secretos, cron, RLS ni publicación",
+    "Orden y geometría Premium permanecen bloqueados"
+  ],
+  "recorded_at": "2026-09-06"
+}

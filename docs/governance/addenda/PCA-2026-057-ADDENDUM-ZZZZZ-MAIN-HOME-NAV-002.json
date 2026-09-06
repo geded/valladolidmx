@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-ZZZZZ-MAIN-HOME-NAV-002",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir los enlaces no operativos de Home y comprobar/cablear que textos, enlaces, medios, visibilidad y límites de las plantillas Premium se modifiquen desde el constructor y se reflejen en la plataforma. Sin publicación, datos, migraciones, pagos, reservaciones, secretos, cron ni RLS.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/home-premium/home-premium-content.ts",
+    "previous_sha256": "eb59e6ce53b6001ded5a4819613b7ce40bbc540d99874ec981a8bf06c439f427",
+    "current_sha256": "0d995c2a443ab7d50937ad3e2cb1ceae307138c8a91f8b20d7f93040640e7e4f",
+    "semantic_change": "Añade destinos editables de acciones Home.",
+    "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+  },
+  "invariants": [
+    "Sin plantillas paralelas",
+    "Sin publicación ni datos reales",
+    "Rutas exactas y SHA-256 cerrados"
+  ],
+  "recorded_at": "2026-09-06"
+}

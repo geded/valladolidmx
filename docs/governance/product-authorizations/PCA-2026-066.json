@@ -1,0 +1,130 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-066",
+  "title": "Main · navegación Home y paridad de autoría Premium",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir los enlaces no operativos de Home y comprobar/cablear que textos, enlaces, medios, visibilidad y límites de las plantillas Premium se modifiquen desde el constructor y se reflejen en la plataforma. Sin publicación, datos, migraciones, pagos, reservaciones, secretos, cron ni RLS.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/shared/PremiumShowcase.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/listing-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/home-premium-g4/contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/listing-premium-g5/contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/editorial-builder-policy.ts"
+    }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya",
+    "/rutas",
+    "/experiencias",
+    "/que-hacer"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "npx vitest run scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "node scripts/lint/lint-baseline.mjs",
+    "tsc --noEmit",
+    "vite build",
+    "route-inventory-coverage",
+    "governance:check"
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "cdc2fba0276fa108cf776c473c1d489dc1c387d25995f5c2e1d7ea92e79fc15a",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts",
+      "sha256": "d0ae4a24f691c8ab96e10b1cc6b49b51470a97701e8d1166d427c93bd6961598",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts",
+      "sha256": "0d995c2a443ab7d50937ad3e2cb1ceae307138c8a91f8b20d7f93040640e7e4f",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts",
+      "sha256": "f9453aa6ddb9220bbf5b774277198f7e54815ae9d7f322aa95731a10e614da04",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/shared/PremiumShowcase.tsx",
+      "sha256": "5e3b15373556ddd97e809e706aef5185a5aeec407ff105c1b8cbfe5a12903d35",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "sha256": "ef8a6cf6eddf9e9cc69033d63b6a3fd132ad0c319823f0183e2270544ea719c1",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/listing-premium-config.ts",
+      "sha256": "c280788d0155fe90d528d935b68322df0799aa20940904b2c1995b56fca7ca67",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/home-premium-g4/contract.ts",
+      "sha256": "b39d62011154d70b0432d9ce847b64e3aa5714ccdd6b7037e995959231507771",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/listing-premium-g5/contract.ts",
+      "sha256": "f8d0b2ef0770974dfa8440587bb523fd8462c0094a240ec53cf3928c894f3ded",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/editorial-builder-policy.ts",
+      "sha256": "b31f96672a241a6df334f47eb4fb9d165717e4bf6122f2d331b4c357c9a64e32",
+      "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+    }
+  ]
+}
+

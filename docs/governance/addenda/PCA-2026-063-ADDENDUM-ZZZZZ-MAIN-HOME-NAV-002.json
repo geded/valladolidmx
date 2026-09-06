@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZZ-MAIN-HOME-NAV-002",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir navegación Home y asegurar autoría constructor→plataforma en plantillas Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "83e12683a96416b99bb5f079a5c3393d3f9fb95bc5efb6592c9e09b121d6c5eb",
+    "current_sha256": "cdc2fba0276fa108cf776c473c1d489dc1c387d25995f5c2e1d7ea92e79fc15a",
+    "semantic_change": "Convierte Pueblos Mágicos y acciones visibles en navegación canónica y aclara la selección de rutas en mapa.",
+    "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+  },
+  "invariants": [
+    "Sin plantillas paralelas",
+    "Sin datos, migraciones, pagos, reservaciones, secretos, cron, RLS ni publicación",
+    "Orden y geometría Premium permanecen bloqueados"
+  ],
+  "recorded_at": "2026-09-06"
+}
+

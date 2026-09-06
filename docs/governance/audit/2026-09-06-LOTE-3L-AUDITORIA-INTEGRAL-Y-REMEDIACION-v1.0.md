@@ -82,3 +82,29 @@ No se añadieron para no romper la vista previa embebida ni los scripts ya integ
 
 ## 8. Límites respetados
 Sin publicar ni desplegar; sin ramas nuevas, PR ni merge; sin tocar `main`; sin cambios de tokens, colores, tipografía ni jerarquía; sin pagos, reservas, mapas, monitoreo, analítica nueva, flags, dominios, claves ni APIs; datos y medios demo intactos; solo se restringió el permiso de una función de base de datos.
+
+## 9. Addendum · navegación Home y paridad constructor→plataforma
+
+- **Fecha:** 2026-09-06.
+- **Rama y base:** `main@bc3210313fdf5687eefcfba6dedadba72dd3e369`.
+- **Autoridad:** instrucción Founder para corregir la navegación no operativa de
+  Home y verificar que enlaces, textos, medios, visibilidad y límites editables
+  de las plantillas Premium se propaguen del constructor al runtime público.
+- **Hallazgo:** varias llamadas a la acción se presentaban como enlaces sin
+  semántica navegable; las tarjetas de Pueblos Mágicos no tenían destino; un
+  enlace de listado apuntaba a `#`; y la fusión con contenido real descartaba el
+  medio estable elegido en el constructor para la sección de eventos.
+- **Corrección:** los contratos `home-premium-g4` y `listing-premium-g5`
+  exponen los destinos internos de CTA y elementos; la política editorial los
+  autoriza para los roles ya gobernados; la configuración serializa y resuelve
+  esos campos; y las superficies consumen enlaces reales. Los medios del
+  constructor sólo sobreviven a la fusión pública cuando proceden del endpoint
+  gobernado `/api/public/studio-media/`; previews conceptuales y demos continúan
+  excluidos.
+- **Invariantes:** no se altera orden, geometría, tokens ni estructura aprobada;
+  no se crean plantillas paralelas; no se modifican datos, migraciones, pagos,
+  reservaciones, secretos, cron ni RLS; no se publica ni despliega.
+- **Evidencia:** `premium-runtime-connection.contract.test.ts` cubre 17 contratos
+  de conexión, incluidos constructor→runtime, navegación y medio estable; además
+  se ejecutan typecheck, lint baseline, build, inventario de rutas y controles
+  completos de Governance.

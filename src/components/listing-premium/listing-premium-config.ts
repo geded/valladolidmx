@@ -25,6 +25,11 @@ const str = (value: unknown, fallback: string): string =>
 const strOrNull = (value: unknown, fallback: string | null | undefined): string | null =>
   typeof value === "string" && value.trim().length > 0 ? value : (fallback ?? null);
 
+const hrefOrNull = (value: unknown, fallback: string | null | undefined): string | null => {
+  const resolved = strOrNull(value, fallback)?.trim() ?? null;
+  return resolved?.startsWith("/") && resolved !== "#" ? resolved : null;
+};
+
 const bool = (value: unknown, fallback: boolean): boolean =>
   typeof value === "boolean" ? value : fallback;
 
@@ -68,6 +73,7 @@ export function resolveListingPremiumG5(config: Cfg = {}): ListingPremiumG5Resol
             priceHint: strOrNull(row.price_hint, base.priceHint),
             dateLabel: strOrNull(row.date_label, base.dateLabel),
             availabilityLabel: strOrNull(row.availability_label, base.availabilityLabel),
+            href: hrefOrNull(row.href, base.href),
           });
         });
 
@@ -119,6 +125,7 @@ export function listingPremiumG5DefaultConfig(familyId = "hoteles"): Cfg {
       price_hint: it.priceHint ?? "",
       date_label: it.dateLabel ?? "",
       availability_label: it.availabilityLabel ?? "",
+      href: it.href ?? "",
     })),
   };
 }

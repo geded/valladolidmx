@@ -27,12 +27,14 @@ export function PremiumSectionHead({
   title,
   description,
   action,
+  actionHref,
   id,
 }: {
   kicker: string;
   title: string;
   description?: string;
   action?: string;
+  actionHref?: string;
   id?: string;
 }) {
   return (
@@ -48,10 +50,17 @@ export function PremiumSectionHead({
           </p>
         ) : null}
       </div>
-      {action ? (
-        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+      {action && actionHref ? (
+        <Link
+          to={actionHref}
+          className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+        >
           {action}
           <ChevronRight className="size-4" aria-hidden />
+        </Link>
+      ) : action ? (
+        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+          {action}
         </span>
       ) : null}
     </div>
@@ -251,7 +260,12 @@ export function PremiumShowcaseGrid({
         ))}
       </div>
       <div className="hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
-        <article className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated">
+        <Link
+          to={featured.to}
+          params={featured.params as never}
+          onClick={() => onOpen?.(featured.key)}
+          className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
+        >
           <EditorialMediaFrame
             media={featured.media}
             className="absolute inset-0 h-full w-full object-cover"
@@ -263,16 +277,11 @@ export function PremiumShowcaseGrid({
           <div className="absolute inset-x-0 bottom-0 z-10 p-5">
             <h3 className="font-display text-3xl">{featured.name}</h3>
             <p className="mt-2 text-sm text-white/80">{featured.note}</p>
-            <Link
-              to={featured.to}
-              params={featured.params as never}
-              onClick={() => onOpen?.(featured.key)}
-              className="mt-3 inline-flex text-sm font-semibold"
-            >
+            <span className="mt-3 inline-flex text-sm font-semibold">
               {detailLabel} <ChevronRight className="size-4" />
-            </Link>
+            </span>
           </div>
-        </article>
+        </Link>
         <div className="grid grid-rows-3 gap-3">
           {companions.map((item) => (
             <Link

@@ -409,6 +409,7 @@ function RoutesSection({
         title={content.rutas.title}
         description={content.rutas.description}
         action={content.rutas.action}
+        actionHref={content.rutas.actionHref}
       />
       <div
         className="grid grid-flow-col auto-cols-[84%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31.5%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0"
@@ -472,7 +473,7 @@ function RoutesSection({
                     onClick={() => onSelectRoute(route.id)}
                     className="min-h-11 rounded-pill"
                   >
-                    Ver ruta
+                    {content.rutas.selectLabel}
                   </Button>
                   <Button
                     type="button"
@@ -518,6 +519,7 @@ function DestinationsSection({
         title={content.destinos.title}
         description={content.destinos.description}
         action={content.destinos.action}
+        actionHref={content.destinos.actionHref}
       />
       <PremiumShowcaseGrid
         items={items.slice(0, 4).map((destination) => ({
@@ -552,6 +554,7 @@ function PueblosMagicosSection({
         title={content.pueblosMagicos.title}
         description={content.pueblosMagicos.description}
         action={content.pueblosMagicos.action}
+        actionHref={content.pueblosMagicos.actionHref}
       />
       <div
         className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0"
@@ -559,8 +562,9 @@ function PueblosMagicosSection({
         aria-label="Pueblos Mágicos"
       >
         {pueblos.map((pueblo) => (
-          <article
+          <Link
             key={pueblo.name}
+            to={pueblo.href ?? "/oriente-maya"}
             className="group relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
           >
             <EditorialMediaFrame
@@ -576,10 +580,10 @@ function PueblosMagicosSection({
               <h3 className="mt-1 font-display text-xl">{pueblo.name}</h3>
               <p className="mt-1 line-clamp-1 text-xs text-white/80">{pueblo.note}</p>
               <span className="mt-2 inline-flex items-center text-xs font-semibold">
-                Descubrir <ChevronRight className="size-3" />
+                {content.pueblosMagicos.ctaLabel} <ChevronRight className="size-3" />
               </span>
             </div>
-          </article>
+          </Link>
         ))}
       </div>
     </section>
@@ -605,6 +609,7 @@ function ExperiencesSection({
         title={content.experiencias.title}
         description={content.experiencias.description}
         action={content.experiencias.action}
+        actionHref={content.experiencias.actionHref}
       />
       <div
         className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden"
@@ -879,6 +884,7 @@ function EditorialSection({
         title={content.queHacer.title}
         description={content.queHacer.description}
         action={content.queHacer.action}
+        actionHref={content.queHacer.actionHref}
       />
       <div
         className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0"

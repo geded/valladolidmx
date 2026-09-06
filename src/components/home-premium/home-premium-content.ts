@@ -133,6 +133,7 @@ export type HomePremiumContent = {
     title: string;
     description: string;
     action: string;
+    actionHref: string;
     disclaimer: string;
     items: HomePremiumDestination[];
   };
@@ -141,6 +142,7 @@ export type HomePremiumContent = {
     title: string;
     description: string;
     action: string;
+    actionHref: string;
     badgeNote: string;
     ctaLabel: string;
   };
@@ -149,6 +151,8 @@ export type HomePremiumContent = {
     title: string;
     description: string;
     action: string;
+    actionHref: string;
+    selectLabel: string;
     items: HomePremiumRoute[];
   };
   experiencias: {
@@ -156,6 +160,7 @@ export type HomePremiumContent = {
     title: string;
     description: string;
     action: string;
+    actionHref: string;
     items: HomePremiumExperience[];
   };
   servicios: {
@@ -179,6 +184,7 @@ export type HomePremiumContent = {
     title: string;
     description: string;
     action: string;
+    actionHref: string;
     items: HomePremiumEditorial[];
   };
   mapa: {
@@ -300,6 +306,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
     description:
       "Cada tarjeta abre el micrositio del destino. Valladolid es la capital turística y el punto de partida sugerido.",
     action: "Todos los destinos",
+    actionHref: "/oriente-maya",
     disclaimer:
       "Destinos publicados en el CMS del Oriente Maya de Yucatán. La ficha de cada destino concentra su información acreditada.",
     items: [],
@@ -310,6 +317,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
     description:
       "Valladolid, Izamal y Espita comparten un distintivo y tres formas distintas de vivir el oriente de Yucatán.",
     action: "Descubre los tres",
+    actionHref: "/oriente-maya",
     badgeNote:
       "Distintivo textual: el emblema gráfico oficial se incorpora únicamente cuando existe un asset acreditado.",
     ctaLabel: "Crear ruta con Alux",
@@ -320,6 +328,8 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
     description:
       "Secuencias construidas sobre los destinos publicados del Oriente Maya de Yucatán.",
     action: "Propuestas de Alux",
+    actionHref: "/rutas",
+    selectLabel: "Mostrar en el mapa",
     items: [],
   },
   experiencias: {
@@ -327,6 +337,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
     title: "Hay experiencias que no te puedes perder",
     description: "Experiencias publicadas por empresas acreditadas del territorio.",
     action: "Ver experiencias",
+    actionHref: "/experiencias",
     items: [],
   },
   servicios: {
@@ -352,6 +363,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
     description:
       "Contenido editorial publicado que prepara el viaje y contextualiza el territorio.",
     action: "Abrir cuaderno editorial",
+    actionHref: "/que-hacer",
     items: [],
   },
   mapa: {
