@@ -474,7 +474,11 @@ function GaleriaEditorial({
       ) : null}
 
       {layout === "carrusel" ? (
-        <ul className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
+        <ul
+          className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2"
+          tabIndex={0}
+          aria-label="Galería del destino"
+        >
           {items.map((m, i) => (
             <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
               <img

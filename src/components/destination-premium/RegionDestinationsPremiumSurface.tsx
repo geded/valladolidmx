@@ -150,7 +150,10 @@ export function RegionDestinationsPremiumSurface({
             </p>
           </div>
           <div
-            className={cn("relative min-h-72 overflow-hidden lg:min-h-full", cinematic && "hidden")}
+            className={cn(
+              "relative h-72 overflow-hidden md:h-80 lg:h-auto lg:min-h-full",
+              cinematic && "hidden",
+            )}
           >
             <img
               src={heroMedia.src}
@@ -195,7 +198,11 @@ export function RegionDestinationsPremiumSurface({
                 className="min-h-12 rounded-full pl-11"
               />
             </label>
-            <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Filtrar destinos">
+            <div
+              className="flex gap-2 overflow-x-auto pb-1"
+              aria-label="Filtrar destinos"
+              tabIndex={0}
+            >
               {[
                 ["todos", "Todos"],
                 ["pueblos", "Pueblos Mágicos"],

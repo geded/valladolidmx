@@ -56,6 +56,7 @@ function AYVPage() {
       title="Arma tu Viaje"
       description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
       crumbs={[{ label: "Arma tu Viaje" }]}
+      titleAsText
     >
       {composition && hasRenderableBlocks(composition.snapshot) ? (
         <CompositionRenderer tree={composition.snapshot} />

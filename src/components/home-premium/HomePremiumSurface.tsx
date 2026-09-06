@@ -410,7 +410,11 @@ function RoutesSection({
         description={content.rutas.description}
         action={content.rutas.action}
       />
-      <div className="grid grid-flow-col auto-cols-[84%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31.5%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0">
+      <div
+        className="grid grid-flow-col auto-cols-[84%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31.5%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0"
+        tabIndex={0}
+        aria-label="Rutas recomendadas"
+      >
         {content.rutas.items.map((route: HomePremiumRoute) => {
           const active = route.id === selectedRoute;
           return (
@@ -549,7 +553,11 @@ function PueblosMagicosSection({
         description={content.pueblosMagicos.description}
         action={content.pueblosMagicos.action}
       />
-      <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0">
+      <div
+        className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0"
+        tabIndex={0}
+        aria-label="Pueblos Mágicos"
+      >
         {pueblos.map((pueblo) => (
           <article
             key={pueblo.name}
@@ -598,7 +606,11 @@ function ExperiencesSection({
         description={content.experiencias.description}
         action={content.experiencias.action}
       />
-      <div className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden">
+      <div
+        className="flex snap-x gap-3 overflow-x-auto pb-2 lg:hidden"
+        tabIndex={0}
+        aria-label="Experiencias recomendadas"
+      >
         {items.map((item) =>
           item.href ? (
             <Link
@@ -868,7 +880,11 @@ function EditorialSection({
         description={content.queHacer.description}
         action={content.queHacer.action}
       />
-      <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0">
+      <div
+        className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-2 sm:auto-cols-[46%] md:grid-flow-row md:grid-cols-3 md:overflow-visible md:pb-0"
+        tabIndex={0}
+        aria-label="Qué hacer en el territorio"
+      >
         {content.queHacer.items.map((item: HomePremiumEditorial) =>
           item.href ? (
             <Link

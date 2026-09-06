@@ -5,9 +5,7 @@
  * usado en producción, así la paridad visual es 1:1.
  */
 
-import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import {
   resolveCompositionPreview,
   type CompositionPreviewPayload,
@@ -19,6 +17,15 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { PublicShell } from "@/components/discovery";
 
 export const Route = createFileRoute("/preview/composition/$token")({
+  loader: async ({ params }) => {
+    try {
+      const payload = await resolveCompositionPreview({ data: { token: params.token } });
+      if (!payload) throw notFound();
+      return { payload };
+    } catch {
+      throw notFound();
+    }
+  },
   head: ({ params }) =>
     buildPublicHead({
       title: "Vista previa · Borrador",
@@ -27,37 +34,11 @@ export const Route = createFileRoute("/preview/composition/$token")({
       noindex: true,
     }),
   component: PreviewCompositionView,
+  notFoundComponent: PreviewUnavailable,
 });
 
 function PreviewCompositionView() {
-  const { token } = useParams({ from: "/preview/composition/$token" });
-  const resolve = useServerFn(resolveCompositionPreview);
-  const [payload, setPayload] = useState<CompositionPreviewPayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        const p = await resolve({ data: { token } });
-        if (!p) setError("Este enlace no es válido o ya caducó.");
-        else setPayload(p);
-      } catch (e) {
-        setError((e as Error).message);
-      }
-    })();
-  }, [token, resolve]);
-
-  if (error) {
-    return (
-      <div className="mx-auto max-w-xl p-8 text-center">
-        <h1 className="text-xl font-semibold">Vista previa no disponible</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-      </div>
-    );
-  }
-  if (!payload) {
-    return <div className="p-8 text-sm text-muted-foreground">Cargando vista previa…</div>;
-  }
+  const { payload } = Route.useLoaderData() as { payload: CompositionPreviewPayload };
 
   // `timeZoneName` no puede combinarse con `dateStyle`/`timeStyle`:
   // hacerlo lanza `TypeError: Invalid option` y tumbaba toda la vista previa.
@@ -115,5 +96,14 @@ function PreviewCompositionView() {
         rendered
       )}
     </div>
+  );
+}
+
+function PreviewUnavailable() {
+  return (
+    <main className="mx-auto max-w-xl p-8 text-center">
+      <h1 className="text-xl font-semibold">Vista previa no disponible</h1>
+      <p className="mt-2 text-sm text-muted-foreground">Este enlace no es válido o ya caducó.</p>
+    </main>
   );
 }

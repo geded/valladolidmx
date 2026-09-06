@@ -459,9 +459,9 @@ function FieldShell({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
-      </label>
+      </div>
       {children}
       {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
     </div>
@@ -525,6 +525,7 @@ function CountrySelect({ value, onChange }: { value: string; onChange: (v: strin
         {known?.flag ?? "🌎"}
       </span>
       <select
+        aria-label="País de origen"
         value={known ? known.name : ""}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"

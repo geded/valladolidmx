@@ -177,7 +177,11 @@ export function ExperiencePremiumSurface({
       {vm.gallery.length > 0 ? (
         <section aria-labelledby="experiencia-galeria">
           <PremiumSectionHead id="experiencia-galeria" kicker="Galería" title="Cómo se ve" />
-          <div className="flex snap-x gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
+          <div
+            className="flex snap-x gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:overflow-visible"
+            tabIndex={0}
+            aria-label="Galería de la experiencia"
+          >
             {vm.gallery.slice(0, 6).map((media) => (
               <EditorialMediaFrame
                 key={media.url}

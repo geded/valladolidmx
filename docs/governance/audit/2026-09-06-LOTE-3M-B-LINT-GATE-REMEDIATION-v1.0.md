@@ -1,6 +1,9 @@
 # LOTE 3M-B · Remediación mecánica del Lint Gate
 
-**Fecha:** 2026-09-06 (UTC) · **Rama:** `integration/lovable-valladolidmx` · **Estado:** PARCIAL — alcance autorizado CERRADO, gate completo AÚN EN ROJO por deuda fuera de alcance.
+**Fecha:** 2026-09-06 (UTC) · **Rama:** `integration/lovable-valladolidmx` · **Estado:** CERRADO — Lote 3M-B.2 verificado en `a8a5beacfd31c40cf183cdf9161ac38b8eb75266`.
+
+> Nota histórica: las secciones 1–7 conservan la evidencia del primer alcance parcial. El cierre
+> consolidado del Lote 3M-B.2 se registra en el §8.
 
 ## 1. Preflight
 
@@ -139,3 +142,39 @@ Observación: 47 de los 51 buckets son `prettier/prettier` (mecánicos, autocorr
 ## 7. Cierre
 
 **NO SE DECLARA CIERRE DEL LOTE**: el gate completo continúa en FAIL por deuda ajena al alcance autorizado. El alcance encomendado queda 100 % corregido y verificado como equivalente.
+
+## 8. Addendum de cierre · Lote 3M-B.2
+
+El alcance adicional autorizado corrigió los 51 buckets restantes y los 13 pendientes mecánicos
+detectados durante la verificación, sin cambios funcionales. El commit
+`a8a5beacfd31c40cf183cdf9161ac38b8eb75266` cerró el gate sobre
+`integration/lovable-valladolidmx`.
+
+| Puerta            | Resultado de cierre                                                             |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `bun run lint`    | **PASS** · sin deuda nueva; la deuda histórica permanece visible en el baseline |
+| Typecheck         | **PASS**                                                                        |
+| Suite completa    | **PASS** · 896/896                                                              |
+| Build             | **PASS**                                                                        |
+| Route Inventory   | **PASS** · 247 rutas                                                            |
+| Alcance funcional | **Sin cambios** · correcciones mecánicas y equivalentes                         |
+
+El texto de cierre de §7 describe únicamente el corte parcial anterior y queda supersedido por este
+addendum verificable.
+
+## 9. Addendum posterior · Lote 3N-A (hallazgos P2 de 3L)
+
+Sobre el mismo HEAD base `a8a5beacfd31c40cf183cdf9161ac38b8eb75266` se cerraron los hallazgos
+P2 autorizados del informe 3L sin alterar el diseño Premium, contenido, CMS ni datos: unicidad de
+`h1`, nombres accesibles del perfil, `<main>` en accesos denegados, área táctil mínima en Cuenta,
+semántica de listas de definición, foco de carruseles, reserva estable de medios en Región y fallo
+cerrado HTTP 404 para `/preview/composition/<token>` inválido o expirado.
+
+La verificación final arrancó Vite en segundo plano, confirmó respuesta HTTP 200 y ejecutó 52 cargas
+(13 superficies × 1440/834/430/390). Resultado: desbordamiento horizontal 0, errores JavaScript 0 y
+listas de definición inválidas 0. Los medios remotos inaccesibles desde el sandbox quedaron fuera
+del criterio porque no fueron modificados por este lote. La medición aislada de Región, incluida la
+rotación del hero, produjo CLS `0 / 0.0049 / 0 / 0` respectivamente, por debajo del umbral 0.1.
+
+El token de control `expired-3na-token` respondió **HTTP 404**, con un único `h1` y un contenedor
+`main`. El servidor local fue detenido al concluir. No hubo publicación, PR, merge ni despliegue.

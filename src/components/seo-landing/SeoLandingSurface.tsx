@@ -305,7 +305,11 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
       {/* ── 2 · Franja horizontal de confianza ────────────────────── */}
       {trust.length > 0 ? (
         <section className={cn(SHELL, "mt-3")} aria-label="Señales de confianza">
-          <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:gap-0 sm:divide-x sm:divide-border sm:overflow-visible sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:pb-0 lg:grid-cols-4">
+          <ul
+            className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:gap-0 sm:divide-x sm:divide-border sm:overflow-visible sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:pb-0 lg:grid-cols-4"
+            tabIndex={0}
+            aria-label="Señales de confianza"
+          >
             {trust.map((item) => (
               <li
                 key={item.id}

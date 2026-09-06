@@ -549,8 +549,14 @@ function EssentialsPanel({ content }: { content: PlacePremiumContent }) {
               <Clock className="size-3.5" aria-hidden />
               {fact.label}
             </dt>
-            <dd className="mt-2 font-serif text-xl">{fact.value}</dd>
-            {fact.hint ? <p className="mt-1 text-xs text-muted-foreground">{fact.hint}</p> : null}
+            <dd className="mt-2 font-serif text-xl">
+              {fact.value}
+              {fact.hint ? (
+                <span className="mt-1 block font-sans text-xs text-muted-foreground">
+                  {fact.hint}
+                </span>
+              ) : null}
+            </dd>
           </div>
         ))}
       </dl>
@@ -672,7 +678,11 @@ function GalleryFilmstrip({ content }: { content: PlacePremiumContent }) {
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground" id="galeria-lugar-title">
         {content.gallery.note}
       </p>
-      <ul className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+      <ul
+        className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2"
+        tabIndex={0}
+        aria-label="Galería del lugar"
+      >
         {content.gallery.items.map((media, index) => (
           <li key={`media-${index}`} className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]">
             <DemoImage media={media} className="aspect-[16/10] rounded-3xl" />

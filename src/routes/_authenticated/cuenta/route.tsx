@@ -26,7 +26,11 @@ export const Route = createFileRoute("/_authenticated/cuenta")({
 function CuentaWorkspaceRoute() {
   return (
     <WorkspaceProvider initialWorkspaceId="cuenta">
-      <WorkspaceShell title="Mi Cuenta">
+      <WorkspaceShell
+        title="Mi Cuenta"
+        topbarTitleAsText
+        className="[&_a]:min-h-6 [&_a]:min-w-6 [&_button]:min-h-6 [&_button]:min-w-6"
+      >
         <TravelerOnboardingMount />
         <PendingReviewsBanner />
         <Outlet />

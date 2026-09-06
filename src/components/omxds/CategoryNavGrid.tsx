@@ -75,6 +75,8 @@ export function CategoryNavGrid({
     <ul
       data-omxds-category-nav-grid
       data-mobile-layout={mobileLayout}
+      tabIndex={isRail ? 0 : undefined}
+      aria-label={isRail ? "Categorías para explorar" : undefined}
       className={[
         "w-full min-w-0 gap-2.5",
         isRail
