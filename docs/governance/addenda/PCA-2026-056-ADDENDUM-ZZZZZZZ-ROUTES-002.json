@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-056-ADDENDUM-ZZZZZZZ-ROUTES-002",
+  "status": "Approved",
+  "parent": "PCA-2026-056",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-06 para reconciliar plantillas Premium y mejorar la conexión territorial de rutas y paradas en CMS.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.index.tsx",
+    "previous_sha256": "e52e5843d039fd154b9e21c0361cfb793c65e12b9180c7c9395456da2015be88",
+    "current_sha256": "34bc5197fa820a6b5e638bef5a8b98e09d30bad4c04470acf8397118a2c869e2",
+    "semantic_change": "Reconciliación autorizada de renderer Premium y conexión CMS territorial de rutas, sin rediseño ni publicación.",
+    "authority": "Founder · reconciliación Premium y rutas territoriales · 2026-09-06"
+  },
+  "invariants": [
+    "Diseño Premium preservado",
+    "CMS, marca y Alux preservados",
+    "Sin despliegue ni publicación"
+  ],
+  "recorded_at": "2026-09-06"
+}

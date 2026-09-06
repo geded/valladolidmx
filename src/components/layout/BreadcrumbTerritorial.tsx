@@ -73,13 +73,16 @@ export function BreadcrumbTerritorial({
   return (
     <nav
       aria-label="Ruta territorial"
-      className={cn("flex items-start justify-between gap-3 text-sm", className)}
+      className={cn(
+        "flex flex-col items-stretch gap-3 text-sm lg:flex-row lg:items-start lg:justify-between",
+        className,
+      )}
     >
       {compact ? <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} /> : null}
       {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
       <ol
         className={cn(
-          "flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
+          "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal lg:flex-1",
           compact ? "hidden sm:flex" : null,
         )}
       >
@@ -129,7 +132,10 @@ export function BreadcrumbTerritorial({
         Blog, Contacto ni superficies sin ancla.
       */}
       <TerritorialSwitcherMount
-        className={cn("h-8 min-w-40 shrink-0 text-xs", compact ? "hidden sm:flex" : null)}
+        className={cn(
+          "h-11 w-full min-w-40 shrink-0 text-xs lg:h-8 lg:w-auto lg:max-w-64",
+          compact ? "hidden sm:flex" : null,
+        )}
       />
     </nav>
   );

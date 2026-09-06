@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-066-ADDENDUM-ZZZZZZZ-ROUTES-028",
+  "status": "Approved",
+  "parent": "PCA-2026-066",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-06 para reconciliar plantillas Premium y mejorar la conexión territorial de rutas y paradas en CMS.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/home-premium-content.ts",
+    "previous_sha256": "0d995c2a443ab7d50937ad3e2cb1ceae307138c8a91f8b20d7f93040640e7e4f",
+    "current_sha256": "12ad40fd275b8d68da47400172f77cc4a2d99d7f9cb70248dcf2020784e1717f",
+    "semantic_change": "Reconciliación autorizada de renderer Premium y conexión CMS territorial de rutas, sin rediseño ni publicación.",
+    "authority": "Founder · reconciliación Premium y rutas territoriales · 2026-09-06"
+  },
+  "invariants": [
+    "Diseño Premium preservado",
+    "CMS, marca y Alux preservados",
+    "Sin despliegue ni publicación"
+  ],
+  "recorded_at": "2026-09-06"
+}

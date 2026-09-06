@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZZZZZ-ROUTE-SIGNAL-032",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-06 para mejorar la conexión territorial de rutas con Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/destination-premium/DestinationPremiumSurface.tsx",
+    "previous_sha256": "062a1f477f253028931fd29d0e6f3d75d7088f751fc807e61c8a7bbf73a67759",
+    "current_sha256": "b5b0debf60d56c57f08570056266c79b320469767d13dff977d73da1c47b6448",
+    "semantic_change": "La apertura consentida de una ruta publicada registra afinidad blanda y temporal para propuestas explicables de Alux.",
+    "authority": "Founder · rutas territoriales y Alux · 2026-09-06"
+  },
+  "invariants": ["Alux propone y el viajero confirma", "Sin datos sensibles", "Sin publicación"],
+  "recorded_at": "2026-09-06"
+}

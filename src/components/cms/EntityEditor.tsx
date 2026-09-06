@@ -25,6 +25,7 @@ export type FieldType =
   | "textarea"
   | "number"
   | "select"
+  | "multiselect"
   | "tags"
   | "datetime"
   | "boolean";
@@ -151,7 +152,7 @@ export function EntityEditor(props: Props) {
           payload[f.name] = Number.isNaN(date.getTime()) ? null : date.toISOString();
         } else if (f.type === "number") {
           payload[f.name] = Number(raw);
-        } else if (f.type === "tags") {
+        } else if (f.type === "tags" || f.type === "multiselect") {
           payload[f.name] = raw
             .split(/[\n,]+/)
             .map((s) => s.trim())
@@ -375,6 +376,25 @@ function FieldInput(props: { field: EditorField; value: string; onChange: (v: st
           onChange={(e) => onChange(e.target.value)}
           className={common}
         />
+      ) : field.type === "multiselect" ? (
+        <select
+          multiple
+          value={value.split("\n").filter(Boolean)}
+          onChange={(event) =>
+            onChange(
+              Array.from(event.currentTarget.selectedOptions)
+                .map((option) => option.value)
+                .join("\n"),
+            )
+          }
+          className={`${common} min-h-32`}
+        >
+          {(field.options ?? []).map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       ) : field.type === "boolean" ? (
         <select
           value={value || "false"}

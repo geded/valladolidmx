@@ -102,6 +102,7 @@ export type DestinationPremiumSectionKey =
   | "descubre"
   | "gallery"
   | "servicePreview"
+  | "routes"
   | "map"
   | "nearby";
 
@@ -111,6 +112,7 @@ export const DESTINATION_PREMIUM_SECTION_ORDER: DestinationPremiumSectionKey[] =
   "descubre",
   "gallery",
   "servicePreview",
+  "routes",
   "map",
   "nearby",
 ];

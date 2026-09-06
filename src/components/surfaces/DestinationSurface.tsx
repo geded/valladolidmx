@@ -63,6 +63,7 @@ import {
   type DestinationPremiumNearbySource,
 } from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import type { EditorialRouteCardDTO } from "@/lib/routes-editorial/route-public-contract";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -128,6 +129,8 @@ export interface DestinationSurfaceProps {
   galleryMedia?: PublicMediaAttribution[];
   /** Destinos publicados del corpus real para continuidad territorial. */
   nearbyDestinations?: DestinationPremiumNearbySource[];
+  /** Rutas editoriales publicadas para el destino y continuidad regional. */
+  routes?: readonly EditorialRouteCardDTO[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
   /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
@@ -257,6 +260,7 @@ export function DestinationSurfaceContractBoundary({
   premiumEnabled,
   presentation = "editorial",
   nearbyDestinations,
+  routes,
 }: DestinationSurfaceContractBoundaryProps) {
   // Lote 3B — La ficha de destino se sirve exclusivamente desde CMS.
   const premiumDestination = dbData ?? null;
@@ -291,6 +295,7 @@ export function DestinationSurfaceContractBoundary({
             content={content}
             heroVariant={presentation}
             sections={{ gallery: accreditedMedia.length > 0 }}
+            routes={routes}
             heroAction={
               premiumDestination.id ? (
                 <AddToTravelPlanButton

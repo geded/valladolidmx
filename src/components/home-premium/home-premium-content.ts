@@ -66,6 +66,8 @@ export type HomePremiumRoute = {
   description: string;
   sequence: string[];
   media: HomePremiumMedia;
+  /** URL canónica de la ruta editorial publicada. */
+  href: string | null;
 };
 
 export type HomePremiumDestination = {

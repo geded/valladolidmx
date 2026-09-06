@@ -28,6 +28,13 @@ import { PUBLIC_APPROVED_REVIEW_STATE } from "@/lib/omxds/public-eligibility";
 import { buildCanonicalEntityUrl } from "./canonical-entity-binding";
 import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
 import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
+import { readPublishedRouteCards } from "@/lib/routes-editorial/route-public-reads.server";
+import {
+  routeDifficultyLabel,
+  routeDurationLabel,
+  routePaceLabel,
+  routePublicPath,
+} from "@/lib/routes-editorial/route-public-contract";
 
 export type SmartBlockJsonValue =
   | string
@@ -476,6 +483,8 @@ export interface HomeRealRoute {
   vibe: string;
   description: string;
   sequence: string[];
+  href: string;
+  mediaUrl: string;
 }
 
 export interface HomeRealContent {
@@ -530,39 +539,6 @@ function cardsFrom(
   return out;
 }
 
-/** Construye rutas sobre destinos reales publicados; sin tiempos inventados. */
-function routesFrom(destinos: HomeRealCard[]): HomeRealRoute[] {
-  if (destinos.length < 2) return [];
-  const magicos = destinos.filter((d) => d.puebloMagico).map((d) => d.title);
-  const routes: HomeRealRoute[] = [];
-  if (magicos.length >= 2) {
-    routes.push({
-      id: "pueblos-magicos",
-      title: "Pueblos Mágicos del Oriente Maya",
-      duration: `${magicos.length} destinos`,
-      stops: magicos.length,
-      vibe: "Patrimonio y cultura viva",
-      description:
-        "Recorre los Pueblos Mágicos publicados del oriente de Yucatán en un orden comprensible, iniciando por la capital turística.",
-      sequence: magicos,
-    });
-  }
-  const territorio = destinos.slice(0, 4).map((d) => d.title);
-  if (territorio.length >= 2) {
-    routes.push({
-      id: "territorio-completo",
-      title: "Panorámica del territorio",
-      duration: `${territorio.length} destinos`,
-      stops: territorio.length,
-      vibe: "Primera aproximación",
-      description:
-        "Una secuencia amplia sobre los destinos publicados para reconocer el territorio antes de profundizar.",
-      sequence: territorio,
-    });
-  }
-  return routes;
-}
-
 /** Corpus real que alimenta la Home premium. Read-only, fail-closed. */
 export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealContent> {
   if (homeCache && Date.now() - homeCache.at < HOME_CACHE_TTL_MS) return homeCache.value;
@@ -589,6 +565,7 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
         limit: 6,
       }),
       resolveTerritoryMapPointsQuery(),
+      readPublishedRouteCards({ limit: 6 }),
     ]);
 
     // Una fuente temporalmente indisponible no debe borrar las demás
@@ -607,6 +584,8 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
     const mapResult = settled[4];
     const mapPoints =
       mapResult?.status === "fulfilled" ? (mapResult.value as HomeRealContent["mapPoints"]) : [];
+    const routeResult = settled[5];
+    const publishedRoutes = routeResult?.status === "fulfilled" ? routeResult.value : [];
 
     const destinos = cardsFrom(destRes, () => "Destino");
     const businesses = cardsFrom(bizRes, (item) =>
@@ -636,7 +615,20 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       stays,
       food,
       eventos,
-      rutas: routesFrom(destinos),
+      rutas: publishedRoutes.map((route) => ({
+        id: route.id,
+        title: route.name,
+        duration: routeDurationLabel(route) ?? "",
+        stops: route.stopCount,
+        vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
+        description: route.summary,
+        sequence: [
+          ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
+          ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
+        ],
+        href: routePublicPath(route.slug),
+        mediaUrl: route.coverUrl ?? "",
+      })),
       mapPoints,
     };
     homeCache = { at: Date.now(), value };
