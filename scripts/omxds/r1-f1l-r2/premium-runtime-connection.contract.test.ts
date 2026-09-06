@@ -200,6 +200,24 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(merged.destinos.items[0]?.media.url).toBe(mediaUrl);
   });
 
+  test("la Home pública nunca usa medios conceptuales como fallback", () => {
+    const withoutRealCorpus = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, undefined);
+    expect(withoutRealCorpus.hero.slides.every((slide) => slide.media.url === "")).toBe(true);
+    expect(withoutRealCorpus.eventos.media.url).toBe("");
+
+    const emptyRealCorpus = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
+      destinos: [],
+      experiencias: [],
+      stays: [],
+      food: [],
+      eventos: [],
+      rutas: [],
+      mapPoints: [],
+    });
+    expect(emptyRealCorpus.hero.slides).toEqual([]);
+    expect(JSON.stringify(emptyRealCorpus)).not.toContain("conceptual-preview");
+  });
+
   test("los medios de Home usan el proxy estable y no dependen de service role", () => {
     const resolver = read("src/lib/experience-builder/smart-blocks.server.ts");
     expect(resolver).toContain("toStablePublicMediaUrl");

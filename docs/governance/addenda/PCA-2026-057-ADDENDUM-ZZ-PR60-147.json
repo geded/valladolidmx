@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-ZZ-PR60-147",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir exclusivamente los tres P1 del PR #60. Reconoce sólo la revisión exacta que excluye medios conceptuales del fallback público de Home.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/home-premium/home-premium-real.ts",
+    "previous_sha256": "58260b92f01721808399537cfc401dd92b410273581cd0a1dc7f56629690f7f6",
+    "current_sha256": "fc7ff0709c606f8c77557d9269b82d04206ae707d0cf34f61d8fd19aa0ff2688",
+    "semantic_change": "El runtime público elimina URLs conceptuales y usa sólo medios reales acreditados.",
+    "authority": "Founder PR #60 · cierre P1 exacto · 2026-09-06"
+  },
+  "invariants": ["Sin comodines ni futuros SHA-256", "Sin cambios de datos ni despliegue"],
+  "recorded_at": "2026-09-06"
+}

@@ -7,6 +7,7 @@
  * fallback determinístico, anti-inyección/fugas y reparación de JSON truncado.
  */
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import {
   ALUX_CONVERSE_LIMITS,
   AluxConverseInputSchema,
@@ -89,6 +90,15 @@ function ctx(over: Partial<GroundingContext> = {}): GroundingContext {
     ...over,
   };
 }
+
+describe("PR #60 · rate-limit fail-closed", () => {
+  test("detiene la conversación si la RPC devuelve o lanza error", () => {
+    const source = readFileSync("src/lib/alux/converse.functions.ts", "utf8");
+    expect(source).toContain('if (rateRes.error) throw new Error("rate_check_failed")');
+    expect(source).toContain('error: new Error("rate_check_failed")');
+    expect(source).not.toContain(".then((r) => r.data as unknown)");
+  });
+});
 
 describe("Esquema de entrada", () => {
   test("rechaza mensajes vacíos o demasiado largos", () => {

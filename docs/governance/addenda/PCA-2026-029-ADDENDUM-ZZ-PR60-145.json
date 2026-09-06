@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-ZZ-PR60-145",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir exclusivamente los tres P1 del PR #60. Reconoce sólo la revisión exacta de tipos necesaria para ampliar la RPC SEO gobernada.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "9b976af4c1e3ff218a40ed8ad94e6878697d351c622d860b12b096992d7c558f",
+    "current_sha256": "afb332ed93e0d23a0ff9cd30eea3024941aead990a345fd2109fa7e165f58335",
+    "semantic_change": "Tipos exactos de la RPC SEO ampliados con título y descripción opcionales.",
+    "authority": "Founder PR #60 · cierre P1 exacto · 2026-09-06"
+  },
+  "invariants": ["Sin comodines ni futuros SHA-256", "Sin ejecución de migraciones ni despliegue"],
+  "recorded_at": "2026-09-06"
+}

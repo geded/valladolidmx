@@ -253,17 +253,18 @@ export const saveSeoLandingEditorModel = createServerFn({ method: "POST" })
     if (saveError) throw new Error(saveError.message);
 
     // SEO: columnas gobernadas de la composición (nunca la entidad de origen).
+    // La RPC SECURITY DEFINER valida rol, estado draft y actualiza los cuatro
+    // campos como una sola operación; authenticated no recibe UPDATE directo.
     if (data.seo) {
       const robots = data.seo.robots.trim() || "noindex,nofollow";
-      const { error: seoError } = await supabase
-        .from("page_compositions")
-        .update({
-          title: data.seo.title.trim() || row.id,
-          description: data.seo.description.trim() || null,
-          canonical_override: data.seo.canonical.trim() || null,
-          robots_directive: robots,
-        })
-        .eq("id", data.compositionId);
+      const { error: seoError } = await supabase.rpc("eb_set_composition_seo_metadata", {
+        _id: data.compositionId,
+        _kind: "landing",
+        _title: data.seo.title.trim() || row.id,
+        _description: data.seo.description.trim(),
+        _canonical_override: data.seo.canonical.trim(),
+        _robots_directive: robots,
+      });
       if (seoError) throw new Error(seoError.message);
     }
 

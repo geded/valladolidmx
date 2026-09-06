@@ -367,15 +367,17 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const phases: Record<string, number> = {};
     const tPrep = Date.now();
     const [rateRes, sessionUpsert, knownProbe] = await Promise.all([
-      Promise.resolve(
-        supabaseAdmin.rpc("alux_public_check_rate", {
-          _ip_hash: ipHash,
-          _hour_limit: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
-          _day_limit: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
-        }),
-      )
-        .then((r) => r.data as unknown)
-        .catch(() => null),
+      (async () => {
+        try {
+          return await supabaseAdmin.rpc("alux_public_check_rate", {
+            _ip_hash: ipHash,
+            _hour_limit: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
+            _day_limit: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
+          });
+        } catch {
+          return { data: null, error: new Error("rate_check_failed") };
+        }
+      })(),
       supabaseAdmin
         .from("alux_public_sessions")
         .upsert(
@@ -397,7 +399,8 @@ export const aluxConverse = createServerFn({ method: "POST" })
         .is("deleted_at", null)
         .limit(40),
     ]);
-    const rateRow = Array.isArray(rateRes) ? rateRes[0] : rateRes;
+    if (rateRes.error) throw new Error("rate_check_failed");
+    const rateRow = Array.isArray(rateRes.data) ? rateRes.data[0] : rateRes.data;
     const rateLimited = Boolean(rateRow && (rateRow as { allowed?: boolean }).allowed === false);
     const session = (sessionUpsert.data ?? null) as {
       id: string;

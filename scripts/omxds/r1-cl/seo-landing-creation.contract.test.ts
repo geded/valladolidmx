@@ -3,6 +3,7 @@
  * Sólo capa pura: identidad, idempotencia, SEO anticanibalización y legacy.
  */
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import {
   LEGACY_SEO_LANDING_DRAFTS,
   SEO_LANDING_CREATION_TEMPLATE,
@@ -14,6 +15,29 @@ import {
   parseSeoLandingEntityRef,
   resolveSeoLandingState,
 } from "../../../src/lib/experience-builder/seo-landing/seo-landing-creation";
+
+describe("PR #60 · persistencia SEO gobernada", () => {
+  test("el editor usa la RPC ampliada y nunca UPDATE directo", () => {
+    const editor = readFileSync(
+      "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "utf8",
+    );
+    const migration = readFileSync(
+      "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
+      "utf8",
+    );
+    expect(editor).toContain('rpc("eb_set_composition_seo_metadata"');
+    expect(editor).toContain("_title: data.seo.title.trim()");
+    expect(editor).toContain("_description: data.seo.description.trim()");
+    expect(editor).not.toContain('.from("page_compositions")\n        .update');
+    expect(migration).toContain("title = COALESCE(_title, title)");
+    expect(migration).toContain("description = CASE");
+    expect(migration).toContain("FOR UPDATE");
+    expect(migration).toContain(
+      "DROP FUNCTION IF EXISTS public.eb_set_composition_seo_metadata(uuid, public.eb_page_kind, text, text)",
+    );
+  });
+});
 
 describe("CL3 · permisos", () => {
   test("sólo roles editoriales gestionan landings", () => {

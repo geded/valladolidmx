@@ -107,23 +107,23 @@
     },
     {
       "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
-      "sha256": "4e6d39dab647c38547f30c068b1d40a7df562677b930806229342219c9fbeda5"
+      "sha256": "651d494ea46081ed91ba77017b7007214bf266880f9143735945fb5b0f8afd20"
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "304032ae4206d86a7d3b66a39a857480bcbd845861ff6d6618cd0178de095099"
+      "sha256": "aff5b0f79dee3da54424342e77c13fe3aacce7857aa8c5bfadc86e3fe26784d3"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "2844d14f6278f233542e0fc3df31a2414df590b65158894c709a0184842e4953"
+      "sha256": "68362f80afb649d256a81fcaa02a466546f405814dfbbcb3c262aff672e88a15"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "c991de83fa9d76e74b7d0f78fc43173ba75e05c8759926d550d53b6dff25b9b1"
+      "sha256": "42814eb75852d12ffdcda56bf967ce3d4fcefdbeadce660f37a33b0db7f582df"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "0c95f84566b4bc3eebe9b6d43e5ef786f0a4a1964fbf40c380d77394a32de08a"
+      "sha256": "f37179b40d9e2e6c78839f56cdf4bfb5a8eba9604aa9df66ebc59f5e7a9ec962"
     }
   ]
 }

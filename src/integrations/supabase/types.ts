@@ -8183,9 +8183,11 @@ export type Database = {
       eb_set_composition_seo_metadata: {
         Args: {
           _canonical_override?: string
+          _description?: string
           _id: string
           _kind?: Database["public"]["Enums"]["eb_page_kind"]
           _robots_directive?: string
+          _title?: string
         }
         Returns: undefined
       }
