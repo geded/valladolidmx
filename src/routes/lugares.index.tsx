@@ -49,7 +49,7 @@ function buildLugaresContext(
       href: "/lugares",
     },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/lugares",
   });
 }

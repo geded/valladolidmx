@@ -16,10 +16,8 @@ import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/Listi
  *
  * · Sin `destino` en la URL y sin `previous` persistido:
  *   ancestors = []  → breadcrumb visible "Inicio › Hoteles" (idéntico al legacy).
- * · Sin `destino` en la URL y con `previous` persistido desde
- *   `/oriente-maya/$destino` (dentro del TTL de 5 min):
- *   `inherit: ["region","destination"]` inyecta ambos slots →
- *   "Inicio › Oriente Maya › Valladolid › Hoteles".
+ * · Sin `destino` en la URL, el listado global no hereda contexto previo:
+ *   ancestors = [] → breadcrumb estable "Inicio › Hoteles".
  * · Con `?destino=<slug>` en la URL (deep link / filtro):
  *   los ancestros se declaran explícitamente (region + destination),
  *   no se depende de `previous` → breadcrumb determinístico.
@@ -49,7 +47,7 @@ function buildHotelesContext(
   return defineRouteContext({
     current: { kind: "category", slug: "hoteles", label: "Hoteles", href: "/hoteles" },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/hoteles",
   });
 }

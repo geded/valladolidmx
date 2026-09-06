@@ -181,12 +181,19 @@ export function ListingPremiumSurfaceFromDTO({
     dto.family === "restaurantes" ||
     dto.family === "casas-de-vacaciones" ||
     dto.family === "eventos" ||
-    dto.family === "lugares"
+    dto.family === "lugares" ||
+    dto.family === "que-hacer"
   ) {
     return (
       <TerritorialListingReviewSurface
         family={
-          dto.family as "hoteles" | "restaurantes" | "casas-de-vacaciones" | "eventos" | "lugares"
+          dto.family as
+            | "hoteles"
+            | "restaurantes"
+            | "casas-de-vacaciones"
+            | "eventos"
+            | "lugares"
+            | "que-hacer"
         }
         dto={dto}
         nearbyItems={nearbyItems}

@@ -43,7 +43,7 @@ function buildRestaurantesContext(
       href: "/restaurantes",
     },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/restaurantes",
   });
 }

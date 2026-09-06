@@ -268,8 +268,36 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const resolver = read("src/lib/experience-builder/smart-blocks.server.ts");
     expect(resolver).toContain("toStablePublicMediaUrl");
     expect(resolver).toContain("isAccreditedDestinationMedia");
+    expect(resolver).toContain("Promise.allSettled");
+    expect(resolver).toContain("Una fuente temporalmente indisponible no debe borrar las demás");
     expect(resolver).not.toContain("async function signMedia");
     expect(resolver).not.toContain("createSignedUrls(");
+  });
+
+  test("la paridad pública conserva la autoridad Home sin hero verde ni medios cruzados", () => {
+    const atlas = read("src/components/destination-premium/RegionDestinationsPremiumSurface.tsx");
+    const listing = read("src/components/listing-premium/TerritorialListingReviewSurface.tsx");
+    expect(atlas).toContain("bg-card shadow-soft md:min-h-[40rem]");
+    expect(atlas).not.toContain("bg-selva shadow-soft");
+    expect(listing).toContain('profile.family === "restaurantes"');
+    expect(listing).toContain("restaurant-cover.jpg");
+    expect(listing).toContain('profile.family === "eventos"');
+  });
+
+  test("los listados globales no heredan un destino obsoleto del historial de navegación", () => {
+    for (const route of [
+      "hoteles.tsx",
+      "restaurantes.tsx",
+      "casas-de-vacaciones.tsx",
+      "eventos.index.tsx",
+      "experiencias.tsx",
+      "lugares.index.tsx",
+      "rutas.index.tsx",
+    ]) {
+      expect(read(`src/routes/${route}`)).not.toContain(
+        'inherit: destino ? [] : ["region", "destination"]',
+      );
+    }
   });
 
   test("experiencias y tours resuelven Premium en ambas rutas canónicas con el flag global OFF", () => {

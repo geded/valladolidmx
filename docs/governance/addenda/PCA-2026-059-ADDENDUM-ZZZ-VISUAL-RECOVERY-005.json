@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZ-VISUAL-RECOVERY-005",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar exactamente la paridad visual, funcional, responsive y de Medios ya aprobada, sin perder trabajo ni créditos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/experiencias.tsx",
+    "previous_sha256": "dab935fac7d5926248e204e2390dc6bcfe3072cf438e7f771a4f9ad58339f7f1",
+    "current_sha256": "b983cad1dc57559ddb4c60bcd7baecf6ba34ef8f8dcb559a6940d69d80bc37e9",
+    "semantic_change": "El listado global evita heredar un destino obsoleto.",
+    "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+  },
+  "invariants": [
+    "Sin comodines ni futuros SHA-256",
+    "Sin reemplazar activos ni créditos existentes",
+    "Sin ampliar producto"
+  ],
+  "recorded_at": "2026-09-06"
+}

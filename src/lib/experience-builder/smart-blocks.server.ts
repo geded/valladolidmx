@@ -567,7 +567,7 @@ function routesFrom(destinos: HomeRealCard[]): HomeRealRoute[] {
 export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealContent> {
   if (homeCache && Date.now() - homeCache.at < HOME_CACHE_TTL_MS) return homeCache.value;
   try {
-    const [destRes, bizRes, prodRes, eventRes, mapPoints] = await Promise.all([
+    const settled = await Promise.allSettled([
       resolveSmartBlockQuery({
         select: ["slug", "name", "short_description", "hero_image_url", "href"],
         table: "destinations",
@@ -590,6 +590,23 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       }),
       resolveTerritoryMapPointsQuery(),
     ]);
+
+    // Una fuente temporalmente indisponible no debe borrar las demás
+    // secciones del Home. Cada familia degrada de forma independiente.
+    const emptyResult: SmartBlockResolveResult = { items: [], count: 0, cached: false };
+    const resultAt = (index: number): SmartBlockResolveResult => {
+      const result = settled[index];
+      return result?.status === "fulfilled"
+        ? (result.value as SmartBlockResolveResult)
+        : emptyResult;
+    };
+    const destRes = resultAt(0);
+    const bizRes = resultAt(1);
+    const prodRes = resultAt(2);
+    const eventRes = resultAt(3);
+    const mapResult = settled[4];
+    const mapPoints =
+      mapResult?.status === "fulfilled" ? (mapResult.value as HomeRealContent["mapPoints"]) : [];
 
     const destinos = cardsFrom(destRes, () => "Destino");
     const businesses = cardsFrom(bizRes, (item) =>

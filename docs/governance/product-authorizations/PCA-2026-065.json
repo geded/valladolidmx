@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-065",
+  "title": "Recuperación exacta de paridad visual en superficies públicas",
+  "status": "Approved",
+  "branch": "integration/lovable-valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar la paridad visual y responsive ya trabajada, conservar los medios y créditos existentes y corregir las regresiones observadas en producción, sin ampliar producto ni aceptar revisiones futuras.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lugares.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/rutas.index.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "sha256": "9dce1ce8cf8c169bd697e273ad764234d05e604acb4692e51a44fa510c1ce5f7",
+      "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "sha256": "e3f0597ba9cea33ab03c9f11bc3764bd501c885cb32b4aeda487d55a89b2017f",
+      "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lugares.index.tsx",
+      "sha256": "b709e08e250bbe23608cb7a42a565dd4e83beb667896d746036c4dc4639a76f0",
+      "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/rutas.index.tsx",
+      "sha256": "7970f66c183187acb72a009b728b1dc23d101a39378634a249c686a1985ca7d7",
+      "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+    }
+  ],
+  "public_routes": ["/oriente-maya", "/lugares", "/rutas"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun test scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "bun scripts/governance/validate-full-suite.mjs --base=bd3e16fb91ee9dc7ebfb1308c66bf92bbbf40e91"
+  ]
+}

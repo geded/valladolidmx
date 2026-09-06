@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-ZZZ-VISUAL-RECOVERY-001",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para recuperar exactamente la paridad visual, funcional, responsive y de Medios ya aprobada, sin perder trabajo ni créditos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/experience-builder/smart-blocks.server.ts",
+    "previous_sha256": "43c7fe72eac31eace44659708487520c454850953a31f77cd9424d530339f2bb",
+    "current_sha256": "bba56a19e991d60d0d3355fb7edfeedc50680b6a3cf3ed4ec6a07de00c9dd117",
+    "semantic_change": "El Home degrada por fuente y no elimina todas las secciones por un fallo aislado.",
+    "authority": "Founder · recuperación integral de paridad · 2026-09-06"
+  },
+  "invariants": [
+    "Sin comodines ni futuros SHA-256",
+    "Sin reemplazar activos ni créditos existentes",
+    "Sin ampliar producto"
+  ],
+  "recorded_at": "2026-09-06"
+}

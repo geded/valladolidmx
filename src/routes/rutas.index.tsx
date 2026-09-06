@@ -41,7 +41,7 @@ function buildRutasContext(
   return defineRouteContext({
     current: { kind: "category", slug: "rutas", label: "Rutas", href: "/rutas" },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/rutas",
   });
 }

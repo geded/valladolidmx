@@ -11,7 +11,6 @@ import {
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { ExperiencesListingSurface } from "@/components/experience-premium/ExperiencesListingSurface";
 
-
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).
  * El filtro editorial `?tema=` NO participa en el contexto jerárquico
@@ -46,7 +45,7 @@ function buildExperienciasContext(
       href: "/experiencias",
     },
     ancestors: explicitAncestors,
-    inherit: destino ? [] : ["region", "destination"],
+    inherit: [],
     canonical: "/experiencias",
   });
 }
@@ -59,9 +58,7 @@ export const Route = createFileRoute("/experiencias")({
   loaderDeps: ({ search }) => ({ destino: search.destino }),
   loader: async ({ deps, context }) => {
     // Lote 3B — Nombres de destino reales disponibles en SSR.
-    await context.queryClient
-      .ensureQueryData(publishedDestinationsQueryOptions)
-      .catch(() => []);
+    await context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []);
     return await getExperiencesListing({ data: { destino: deps.destino ?? null } });
   },
   head: () =>

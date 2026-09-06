@@ -24,7 +24,8 @@ type TerritorialListingFamily =
   | "restaurantes"
   | "casas-de-vacaciones"
   | "eventos"
-  | "lugares";
+  | "lugares"
+  | "que-hacer";
 
 interface ListingItem {
   name: string;
@@ -338,6 +339,28 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: [],
     nearby: [],
   },
+  "que-hacer": {
+    family: "que-hacer",
+    breadcrumb: "Qué hacer",
+    eyebrow: "Inspírate en el territorio",
+    title: "¿Qué hacer en el Oriente Maya?",
+    description:
+      "Cultura, naturaleza, aventura, gastronomía y eventos reunidos con la misma mirada editorial de Valladolid.mx.",
+    resultsTitle: "Ideas para descubrir el Oriente Maya",
+    itemLabel: "actividad",
+    searchLabel: "Buscar qué hacer",
+    searchPlaceholder: "Buscar actividad, destino o tema",
+    aluxQuestion: "¿Qué necesitas para tu viaje?",
+    aluxOptions: ["Primera visita", "Un día", "Naturaleza", "Cultura", "Cerca de Valladolid"],
+    filters: ["Destino", "Tipo", "Tema"],
+    nearbyTitle: "Más ideas del territorio",
+    mapTitle: "Qué hacer en el Oriente Maya",
+    aluxMapTitle: "Convierte tus guardados en un itinerario real.",
+    aluxMapDescription:
+      "Alux combina actividades, distancias y tiempo disponible sin convertir el viaje en una carrera.",
+    items: [],
+    nearby: [],
+  },
 };
 
 export function TerritorialListingReviewSurface({
@@ -561,7 +584,15 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     copy: item.tagline ?? "",
     // G4-PLACES: los lugares sin medio acreditado usan marcador neutral;
     // nunca heredan una imagen hotelera u otro medio ajeno.
-    image: item.mediaUrl ?? (profile.family === "lugares" ? "" : `${MEDIA}/hotel-cover.jpg`),
+    image:
+      item.mediaUrl ??
+      (profile.family === "lugares"
+        ? ""
+        : profile.family === "restaurantes"
+          ? `${MEDIA}/restaurant-cover.jpg`
+          : profile.family === "eventos" || profile.family === "que-hacer"
+            ? `${MEDIA}/destination-gallery-1.jpg`
+            : `${MEDIA}/hotel-cover.jpg`),
     tags: unique([
       ...structuredTags,
       ...item.highlights,
