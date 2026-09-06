@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "68362f80afb649d256a81fcaa02a466546f405814dfbbcb3c262aff672e88a15"
+      "source_sha256": "0712140344ec8392b604b6fc9994b075cd68b25429d0f36b8bd2e09627efdbdb"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -17050,6 +17050,30 @@
       "path": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
       "source": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
       "evidence": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md"
+    },
+    {
+      "id": "ART:AGENTS.md",
+      "type": "artifact",
+      "path": "AGENTS.md",
+      "source": "AGENTS.md",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-068.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-068.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-068.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-068.json"
     }
   ],
   "edges": [
@@ -50623,6 +50647,35 @@
       "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
       "verified_at": "2026-08-30",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:AGENTS.md:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:AGENTS.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-068.json:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-068.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-06",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-06",
+      "origin": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.86 · docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

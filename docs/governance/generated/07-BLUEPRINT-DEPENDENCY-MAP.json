@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.84",
+    "version": "0.86",
     "state": "Approved",
-    "source_sha256": "aff5b0f79dee3da54424342e77c13fe3aacce7857aa8c5bfadc86e3fe26784d3",
+    "source_sha256": "6264c14c0e0d87a7b360063cb2b3a30b05d9daf02bd7f9bdb085516ff7f25d5b",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -12132,6 +12132,24 @@
       "id": "ART:supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql",
       "type": "artifact",
       "path": "supabase/migrations/20260906010000_pr60_p1_governed_seo_metadata.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:AGENTS.md",
+      "type": "artifact",
+      "path": "AGENTS.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-068.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-068.json"
     }
   ],
   "edges": [
@@ -37253,6 +37271,24 @@
       "evidence": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
       "verified_at": "2026-08-30"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:AGENTS.md:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:AGENTS.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-068.json:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-068.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-06"
     }
   ],
   "critical_chain_coverage": [
