@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZZ-MAIN-HOME-NAV-004",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para corregir navegación Home y asegurar autoría constructor→plataforma en plantillas Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/home-premium-content.ts",
+    "previous_sha256": "eb59e6ce53b6001ded5a4819613b7ce40bbc540d99874ec981a8bf06c439f427",
+    "current_sha256": "0d995c2a443ab7d50937ad3e2cb1ceae307138c8a91f8b20d7f93040640e7e4f",
+    "semantic_change": "Declara destinos canónicos para las acciones de sección y una etiqueta semántica para seleccionar rutas.",
+    "authority": "Founder · navegación y autoría Premium en main · 2026-09-06"
+  },
+  "invariants": [
+    "Sin plantillas paralelas",
+    "Sin datos, migraciones, pagos, reservaciones, secretos, cron, RLS ni publicación",
+    "Orden y geometría Premium permanecen bloqueados"
+  ],
+  "recorded_at": "2026-09-06"
+}
+

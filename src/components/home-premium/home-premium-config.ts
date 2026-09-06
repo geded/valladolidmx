@@ -148,6 +148,8 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.destinos_title, base.destinos.title),
       description: str(config.destinos_description, base.destinos.description),
       action: str(config.destinos_action, base.destinos.action),
+      actionHref:
+        hrefN(config.destinos_action_href, base.destinos.actionHref) ?? base.destinos.actionHref,
       disclaimer: str(config.destinos_disclaimer, base.destinos.disclaimer),
       items: linked(
         mapRows(
@@ -169,6 +171,9 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.pueblos_title, base.pueblosMagicos.title),
       description: str(config.pueblos_description, base.pueblosMagicos.description),
       action: str(config.pueblos_action, base.pueblosMagicos.action),
+      actionHref:
+        hrefN(config.pueblos_action_href, base.pueblosMagicos.actionHref) ??
+        base.pueblosMagicos.actionHref,
       badgeNote: str(config.pueblos_badge_note, base.pueblosMagicos.badgeNote),
       ctaLabel: str(config.pueblos_cta_label, base.pueblosMagicos.ctaLabel),
     },
@@ -177,6 +182,8 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.rutas_title, base.rutas.title),
       description: str(config.rutas_description, base.rutas.description),
       action: str(config.rutas_action, base.rutas.action),
+      actionHref: hrefN(config.rutas_action_href, base.rutas.actionHref) ?? base.rutas.actionHref,
+      selectLabel: str(config.rutas_select_label, base.rutas.selectLabel),
       items: mapRows(
         config.rutas_items,
         base.rutas.items,
@@ -204,6 +211,9 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.experiencias_title, base.experiencias.title),
       description: str(config.experiencias_description, base.experiencias.description),
       action: str(config.experiencias_action, base.experiencias.action),
+      actionHref:
+        hrefN(config.experiencias_action_href, base.experiencias.actionHref) ??
+        base.experiencias.actionHref,
       items: linked(
         mapRows(
           config.experiencias_items,
@@ -289,6 +299,8 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       title: str(config.que_hacer_title, base.queHacer.title),
       description: str(config.que_hacer_description, base.queHacer.description),
       action: str(config.que_hacer_action, base.queHacer.action),
+      actionHref:
+        hrefN(config.que_hacer_action_href, base.queHacer.actionHref) ?? base.queHacer.actionHref,
       items: linked(
         mapRows(
           config.que_hacer_items,
@@ -364,6 +376,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
     destinos_title: c.destinos.title,
     destinos_description: c.destinos.description,
     destinos_action: c.destinos.action,
+    destinos_action_href: c.destinos.actionHref,
     destinos_disclaimer: c.destinos.disclaimer,
     destinos_max_items: c.destinos.items.length,
     destinos_items: c.destinos.items.map((d) => ({
@@ -377,12 +390,15 @@ export function homePremiumG4DefaultConfig(): Cfg {
     pueblos_title: c.pueblosMagicos.title,
     pueblos_description: c.pueblosMagicos.description,
     pueblos_action: c.pueblosMagicos.action,
+    pueblos_action_href: c.pueblosMagicos.actionHref,
     pueblos_badge_note: c.pueblosMagicos.badgeNote,
     pueblos_cta_label: c.pueblosMagicos.ctaLabel,
     rutas_kicker: c.rutas.kicker,
     rutas_title: c.rutas.title,
     rutas_description: c.rutas.description,
     rutas_action: c.rutas.action,
+    rutas_action_href: c.rutas.actionHref,
+    rutas_select_label: c.rutas.selectLabel,
     rutas_max_items: c.rutas.items.length,
     rutas_items: c.rutas.items.map((r) => ({
       id: r.id,
@@ -398,6 +414,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
     experiencias_title: c.experiencias.title,
     experiencias_description: c.experiencias.description,
     experiencias_action: c.experiencias.action,
+    experiencias_action_href: c.experiencias.actionHref,
     experiencias_max_items: c.experiencias.items.length,
     experiencias_items: c.experiencias.items.map((e) => ({
       title: e.title,
@@ -439,6 +456,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
     que_hacer_title: c.queHacer.title,
     que_hacer_description: c.queHacer.description,
     que_hacer_action: c.queHacer.action,
+    que_hacer_action_href: c.queHacer.actionHref,
     que_hacer_max_items: c.queHacer.items.length,
     que_hacer_items: c.queHacer.items.map((i) => ({
       kicker: i.kicker,

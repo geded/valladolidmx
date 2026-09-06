@@ -928,7 +928,10 @@ function NearbySection({ profile }: { profile: ListingProfile }) {
             Se muestran aparte para conservar claro qué pertenece al destino.
           </p>
         </div>
-        <a href="#" className="hidden shrink-0 text-sm font-semibold text-[#0d4b38] sm:block">
+        <a
+          href="/oriente-maya"
+          className="hidden shrink-0 text-sm font-semibold text-[#0d4b38] sm:block"
+        >
           Explorar alrededor →
         </a>
       </div>

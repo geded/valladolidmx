@@ -58,9 +58,23 @@ function withoutPresetMedia(content: HomePremiumContent): HomePremiumContent {
       stays: content.servicios.stays.map(withoutMedia),
       food: content.servicios.food.map(withoutMedia),
     },
-    eventos: { ...content.eventos, media: { ...content.eventos.media, url: "" } },
+    eventos: {
+      ...content.eventos,
+      media: isProductionEligibleConfiguredMedia(content.eventos.media.url)
+        ? content.eventos.media
+        : { ...content.eventos.media, url: "" },
+    },
     queHacer: { ...content.queHacer, items: content.queHacer.items.map(withoutMedia) },
   };
+}
+
+/** El constructor sólo puede aportar a producción un medio estable ya gobernado. */
+function isProductionEligibleConfiguredMedia(url: string): boolean {
+  return (
+    url.startsWith("/api/public/studio-media/") &&
+    !url.includes("/conceptual-preview/") &&
+    !url.includes("/demo-media/")
+  );
 }
 
 /** Fusiona el corpus real sobre el contenido editorial resuelto del bloque. */

@@ -102,12 +102,14 @@ const schema: BlockSchema = {
   destinos_title: text("Destinos · título", "destinos_title"),
   destinos_description: text("Destinos · descripción", "destinos_description"),
   destinos_action: text("Destinos · acción", "destinos_action"),
+  destinos_action_href: link("Destinos · destino de la acción", "destinos_action_href"),
   destinos_disclaimer: text("Destinos · nota al pie", "destinos_disclaimer"),
   destinos_max_items: limit("Destinos · máximo", "destinos_max_items"),
   destinos_items: list("Destinos curados", "destinos_items", {
     name: { type: "text", label: "Destino", translatable: false },
     note: { type: "text", label: "Nota editorial", translatable: true },
     pueblo_magico: { type: "boolean", label: "Pueblo Mágico" },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
     demo: { type: "boolean", label: "Marcar como demo visual" },
     ...mediaFields,
   }),
@@ -117,6 +119,7 @@ const schema: BlockSchema = {
   pueblos_title: text("Pueblos Mágicos · título", "pueblos_title"),
   pueblos_description: text("Pueblos Mágicos · descripción", "pueblos_description"),
   pueblos_action: text("Pueblos Mágicos · acción", "pueblos_action"),
+  pueblos_action_href: link("Pueblos Mágicos · destino de la acción", "pueblos_action_href"),
   pueblos_badge_note: text("Pueblos Mágicos · nota del distintivo", "pueblos_badge_note"),
   pueblos_cta_label: text("Pueblos Mágicos · CTA", "pueblos_cta_label"),
 
@@ -125,6 +128,8 @@ const schema: BlockSchema = {
   rutas_title: text("Rutas · título", "rutas_title"),
   rutas_description: text("Rutas · descripción", "rutas_description"),
   rutas_action: text("Rutas · acción", "rutas_action"),
+  rutas_action_href: link("Rutas · destino de la acción", "rutas_action_href"),
+  rutas_select_label: text("Rutas · CTA seleccionar en mapa", "rutas_select_label"),
   rutas_max_items: limit("Rutas · máximo", "rutas_max_items"),
   rutas_items: list("Rutas y paradas", "rutas_items", {
     id: { type: "text", label: "Identificador de ruta" },
@@ -150,11 +155,13 @@ const schema: BlockSchema = {
   experiencias_title: text("Experiencias · título", "experiencias_title"),
   experiencias_description: text("Experiencias · descripción", "experiencias_description"),
   experiencias_action: text("Experiencias · acción", "experiencias_action"),
+  experiencias_action_href: link("Experiencias · destino de la acción", "experiencias_action_href"),
   experiencias_max_items: limit("Experiencias · máximo", "experiencias_max_items"),
   experiencias_items: list("Experiencias curadas", "experiencias_items", {
     title: { type: "text", label: "Título", translatable: true },
     category: { type: "text", label: "Categoría", translatable: true },
     summary: { type: "text", label: "Resumen", translatable: true },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
     ...mediaFields,
   }),
 
@@ -170,6 +177,7 @@ const schema: BlockSchema = {
     destination: { type: "text", label: "Destino", translatable: false },
     category: { type: "text", label: "Categoría", translatable: true },
     summary: { type: "text", label: "Resumen", translatable: true },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
     ...mediaFields,
   }),
   servicios_food: list("Gastronomía curada", "servicios_food", {
@@ -177,6 +185,7 @@ const schema: BlockSchema = {
     destination: { type: "text", label: "Destino", translatable: false },
     category: { type: "text", label: "Categoría", translatable: true },
     summary: { type: "text", label: "Resumen", translatable: true },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
     ...mediaFields,
   }),
 
@@ -192,6 +201,7 @@ const schema: BlockSchema = {
     title: { type: "text", label: "Título", translatable: true },
     type: { type: "text", label: "Tipo", translatable: true },
     detail: { type: "text", label: "Detalle", translatable: true },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
   }),
 
   // 10 · Historias (Qué hacer)
@@ -199,11 +209,13 @@ const schema: BlockSchema = {
   que_hacer_title: text("Historias · título", "que_hacer_title"),
   que_hacer_description: text("Historias · descripción", "que_hacer_description"),
   que_hacer_action: text("Historias · acción", "que_hacer_action"),
+  que_hacer_action_href: link("Historias · destino de la acción", "que_hacer_action_href"),
   que_hacer_max_items: limit("Historias · máximo", "que_hacer_max_items"),
   que_hacer_items: list("Historias editoriales", "que_hacer_items", {
     kicker: { type: "text", label: "Kicker", translatable: true },
     title: { type: "text", label: "Título", translatable: true },
     body: { type: "text", label: "Texto", translatable: true },
+    href: { type: "text", label: "Enlace canónico", translatable: false },
     ...mediaFields,
   }),
 

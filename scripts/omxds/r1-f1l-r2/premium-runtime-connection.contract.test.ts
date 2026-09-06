@@ -218,6 +218,30 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(JSON.stringify(emptyRealCorpus)).not.toContain("conceptual-preview");
   });
 
+  test("la Home respeta la imagen gobernada de Eventos elegida en el constructor", () => {
+    const configured = {
+      ...HOME_PREMIUM_G4_CONTENT,
+      eventos: {
+        ...HOME_PREMIUM_G4_CONTENT.eventos,
+        media: {
+          url: "/api/public/studio-media/governed/eventos/agenda-cover.webp",
+          alt: "Agenda cultural del Oriente Maya",
+        },
+      },
+    };
+    const merged = mergeHomeRealContent(configured, {
+      destinos: [],
+      experiencias: [],
+      stays: [],
+      food: [],
+      eventos: [],
+      rutas: [],
+      mapPoints: [],
+    });
+
+    expect(merged.eventos.media).toEqual(configured.eventos.media);
+  });
+
   test("la Home evita huecos con los medios gobernados production-eligible de cada vertical", () => {
     const merged = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
       destinos: [],
@@ -301,6 +325,41 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(territorial).toContain("subtitleOverride?.trim() || baseProfile.description");
     expect(territorial).toContain("facet.extract(item.source) !== selected");
     expect(route).toContain("facets={tipoFacet ? [tipoFacet] : []}");
+  });
+
+  test("la Home expone enlaces en el constructor y convierte las acciones visibles en navegación", () => {
+    const contract = read("src/lib/experience-builder/blocks/home-premium-g4/contract.ts");
+    const surface = read("src/components/home-premium/HomePremiumSurface.tsx");
+    const shared = read("src/components/home-premium/shared/PremiumShowcase.tsx");
+    const policy = read("src/lib/experience-builder/editorial-builder-policy.ts");
+    const listingContract = read(
+      "src/lib/experience-builder/blocks/listing-premium-g5/contract.ts",
+    );
+    const listingConfig = read("src/components/listing-premium/listing-premium-config.ts");
+    const listingSurface = read(
+      "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    );
+
+    for (const field of [
+      "destinos_action_href",
+      "pueblos_action_href",
+      "rutas_action_href",
+      "experiencias_action_href",
+      "que_hacer_action_href",
+      "rutas_select_label",
+    ]) {
+      expect(contract).toContain(field);
+      expect(policy).toContain(`field: "${field}"`);
+    }
+    expect(contract.match(/label: "Enlace canónico"/g)).toHaveLength(6);
+    expect(surface).toContain('to={pueblo.href ?? "/oriente-maya"}');
+    expect(surface).toContain("{content.pueblosMagicos.ctaLabel}");
+    expect(shared).toContain("actionHref?: string");
+    expect(shared).toContain("to={actionHref}");
+    expect(shared).toContain("to={featured.to}");
+    expect(listingContract).toContain('href: { type: "text", label: "Enlace canónico"');
+    expect(listingConfig).toContain("href: hrefOrNull(row.href, base.href)");
+    expect(listingSurface).not.toContain('href="#"');
   });
 
   test("los listados globales no heredan un destino obsoleto del historial de navegación", () => {

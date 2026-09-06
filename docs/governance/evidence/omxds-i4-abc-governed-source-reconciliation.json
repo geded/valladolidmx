@@ -51,7 +51,7 @@
     },
     {
       "path": "src/lib/experience-builder/editorial-builder-policy.ts",
-      "sha256": "1690cdf28c7ef73f52f8230a06e065889c53062bc496f580a3076f2cf567a68d"
+      "sha256": "b31f96672a241a6df334f47eb4fb9d165717e4bf6122f2d331b4c357c9a64e32"
     },
     {
       "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
@@ -107,7 +107,7 @@
     },
     {
       "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
-      "sha256": "651d494ea46081ed91ba77017b7007214bf266880f9143735945fb5b0f8afd20"
+      "sha256": "64b2d4cac1c26e41cc49bc878be2396565548aa12107102ff51487c0c546f488"
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
@@ -123,7 +123,7 @@
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "f37179b40d9e2e6c78839f56cdf4bfb5a8eba9604aa9df66ebc59f5e7a9ec962"
+      "sha256": "fe9692607f58b543a04a3b45b43fde33349112b32c0e0c6be008b9dbb81d1ba2"
     }
   ]
 }

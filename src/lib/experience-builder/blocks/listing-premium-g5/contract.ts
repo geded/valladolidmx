@@ -71,6 +71,7 @@ const schema: BlockSchema = {
         price_hint: { type: "text", label: "Nota de precio", translatable: true },
         date_label: { type: "text", label: "Fecha", translatable: true },
         availability_label: { type: "text", label: "Disponibilidad", translatable: true },
+        href: { type: "text", label: "Enlace canónico", translatable: false },
       },
     },
   },

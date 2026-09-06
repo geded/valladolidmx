@@ -719,6 +719,13 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: ["founder_admin", "territorial_editor"],
         },
         {
+          field: "destinos_action_href",
+          class: "reference",
+          type: "text",
+          max_length: 500,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "destinos_disclaimer",
           class: "editorial",
           type: "text",
@@ -756,6 +763,13 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           type: "text",
           max_length: 400,
           translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "pueblos_action_href",
+          class: "reference",
+          type: "text",
+          max_length: 500,
           writable_by: ["founder_admin", "territorial_editor"],
         },
         {
@@ -807,6 +821,21 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: ["founder_admin", "territorial_editor"],
         },
         {
+          field: "rutas_action_href",
+          class: "reference",
+          type: "text",
+          max_length: 500,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "rutas_select_label",
+          class: "editorial",
+          type: "text",
+          max_length: 400,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "experiencias_kicker",
           class: "editorial",
           type: "text",
@@ -836,6 +865,13 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           type: "text",
           max_length: 400,
           translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "experiencias_action_href",
+          class: "reference",
+          type: "text",
+          max_length: 500,
           writable_by: ["founder_admin", "territorial_editor"],
         },
         {
@@ -940,6 +976,13 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           type: "text",
           max_length: 400,
           translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "que_hacer_action_href",
+          class: "reference",
+          type: "text",
+          max_length: 500,
           writable_by: ["founder_admin", "territorial_editor"],
         },
         {
