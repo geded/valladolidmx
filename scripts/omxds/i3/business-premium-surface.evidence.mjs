@@ -52,14 +52,14 @@ const acknowledgedRevisions = new Map([
     surfacePath,
     {
       // 19.29 · D-03 · El breadcrumb territorial navegable lo emite PublicShell.
-      sha256: "13573b139bf944381747a3669af42ac63933d7960a6ac61a26d2ef23a2a82e45",
+      sha256: "a4ef92bad2497c6a85a15205d66a85aa14b8ba9f853e8371622ac8464cdf8c1c",
       authorizations: ["PCA-2026-035"],
     },
   ],
   [
     routePath,
     {
-      sha256: "517fb6f0479f46fbd712d0bd2030ca53ef4d0c6ce8bf792734619a4ac35994be",
+      sha256: "047134c7003c2e1bf8b8a9c626e9d353c4e3f768352309e2f045b7900faf19f7",
       authorizations: ["PCA-2026-056"],
     },
   ],
@@ -277,7 +277,6 @@ assert.deepEqual(
     "src/routes/eventos.$slug.tsx",
     "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
     routePath,
-    "src/routes/oriente-maya/$destino.index.tsx",
     "src/routes/producto.$slug.tsx",
   ].sort(),
 );
@@ -309,7 +308,7 @@ for (const pcaGovernedPath of [
 const acknowledgedProtectedRevisions = new Map([
   [
     "src/lib/experience-builder/composition-renderer.tsx",
-    "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+    "ef0e4749f83c8c83a99c3da17acc04eacaa06cf338fb3b34f6d8e1f453d83262",
   ],
   [
     "src/lib/experience-builder/page-kind-registry.ts",
@@ -318,6 +317,9 @@ const acknowledgedProtectedRevisions = new Map([
 ]);
 const reconciliationAuthorization = JSON.parse(
   readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
+);
+const exactReconciliationAddendum = JSON.parse(
+  readFileSync("docs/governance/addenda/PCA-2026-056-ADDENDUM-ZZ-PR60-008.json", "utf8"),
 );
 assert.equal(reconciliationAuthorization.status, "Approved");
 assert.ok(
@@ -338,8 +340,13 @@ for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
   assert.ok(
     (reconciliationAuthorization.acknowledged_revisions ?? []).some(
       (entry) => entry.path === protectedPath && entry.sha256 === expectedDigest,
-    ),
-    `PCA-2026-056 does not acknowledge the exact I3-D revision: ${protectedPath}`,
+    ) ||
+      (exactReconciliationAddendum.status === "Approved" &&
+        exactReconciliationAddendum.parent === "PCA-2026-056" &&
+        exactReconciliationAddendum.supersedes_acknowledged_revision?.path === protectedPath &&
+        exactReconciliationAddendum.supersedes_acknowledged_revision?.current_sha256 ===
+          expectedDigest),
+    `Approved reconciliation does not acknowledge the exact I3-D revision: ${protectedPath}`,
   );
 }
 

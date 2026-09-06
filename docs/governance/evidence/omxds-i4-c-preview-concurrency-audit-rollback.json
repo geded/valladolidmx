@@ -42,19 +42,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "185059f00c5cc781152847fa953eb499718e57204c7ac30f1196b898f49b25ca"
+      "sha256": "304032ae4206d86a7d3b66a39a857480bcbd845861ff6d6618cd0178de095099"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "b71a9a158aeee017c124a5f6963a35c649e3f798f9a7e346a4edbe709a52dc81"
+      "sha256": "2844d14f6278f233542e0fc3df31a2414df590b65158894c709a0184842e4953"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "97899ed2f19c25d1eee7fb995a1526736992753d86a13f9f69aba2d125c6c516"
+      "sha256": "c991de83fa9d76e74b7d0f78fc43173ba75e05c8759926d550d53b6dff25b9b1"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "6b2b6566e5de99117e19295d4383d9dd361c7ec32cf7db0365b66b606b65b6f0"
+      "sha256": "0c95f84566b4bc3eebe9b6d43e5ef786f0a4a1964fbf40c380d77394a32de08a"
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-015.json",
@@ -62,7 +62,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "8c8118cce3b587f87d2c8fde60c0a717cc1b11c7b3c9927a9e5ba455bca98c7a"
+      "sha256": "4c6d4966e460c3e76c698caa7447a67461055c81753a0c051c3cdb8f401528df"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
@@ -70,7 +70,7 @@
     },
     {
       "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs",
-      "sha256": "59eb376b4aa4d751e7bcd2cbed76187669bbdbaba1e380df5fb14a33462a6452"
+      "sha256": "6f492c84857133be01ebce90ee6d71c0dfca2ef22400b7965551cfb06737bfce"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-preview-concurrency.evidence.mjs",
@@ -82,19 +82,19 @@
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "8ccb9ff54d72b083e6bdc999fa6d4f13e3a63c19edb5edd198e1504560eee25c"
+      "sha256": "6e68f55d00d22795720d32a167b32f4e32da52c91a88b383040adda67872d776"
     },
     {
       "path": "src/integrations/supabase/types.ts",
-      "sha256": "370b8ae7b8e06a1d39b1be73ae5fde2b7f1f052c86745fa33845bd72a92717e9"
+      "sha256": "9b976af4c1e3ff218a40ed8ad94e6878697d351c622d860b12b096992d7c558f"
     },
     {
       "path": "src/lib/experience-builder/studio.functions.ts",
-      "sha256": "3d9439fd9a176cbdb41b398b803126d466e11bfe5092cd249e1d0e3c619bd4a0"
+      "sha256": "2383b0303cce40a834ce916ef2b37736f878b92391e0e036fdb8bc933f34d8c7"
     },
     {
       "path": "src/routes/preview/composition.$token.tsx",
-      "sha256": "ef403105d7e406c60e9de4996bdbf082c0b4c9916a4392ced1c80c9a6dd2364e"
+      "sha256": "655e6ecc8e4832b1453668c91dd0176fffad89f7c057b2b34d375f0d703cbae1"
     },
     {
       "path": "supabase/migrations/20260805090000_omxds_i4c_preview_concurrency_audit_rollback.sql",

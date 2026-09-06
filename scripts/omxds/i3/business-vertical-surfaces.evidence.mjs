@@ -104,7 +104,7 @@ const flagConsumers = gitLines([
   "--",
   "src/routes",
 ]).sort();
-assert.ok(flagConsumers.includes(destinationRoutePath));
+assert.ok(!flagConsumers.includes(destinationRoutePath));
 assert.ok(flagConsumers.includes(routePath));
 const authorizations = readdirSync("docs/governance/product-authorizations")
   .filter((file) => file.endsWith(".json"))
@@ -203,11 +203,14 @@ const acknowledgedProtectedRevisions = new Map([
   ],
   [
     "src/lib/experience-builder/composition-renderer.tsx",
-    "17617151ad23b58315af726499008593d86fa30b9383caadc4834148dc07bf90",
+    "ef0e4749f83c8c83a99c3da17acc04eacaa06cf338fb3b34f6d8e1f453d83262",
   ],
 ]);
 const reconciliationAuthorization = JSON.parse(
   readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
+);
+const exactReconciliationAddendum = JSON.parse(
+  readFileSync("docs/governance/addenda/PCA-2026-056-ADDENDUM-ZZ-PR60-008.json", "utf8"),
 );
 assert.equal(reconciliationAuthorization.status, "Approved");
 assert.ok(
@@ -228,8 +231,13 @@ for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
   assert.ok(
     (reconciliationAuthorization.acknowledged_revisions ?? []).some(
       (entry) => entry.path === protectedPath && entry.sha256 === expectedDigest,
-    ),
-    `PCA-2026-056 does not acknowledge the exact I3-B revision: ${protectedPath}`,
+    ) ||
+      (exactReconciliationAddendum.status === "Approved" &&
+        exactReconciliationAddendum.parent === "PCA-2026-056" &&
+        exactReconciliationAddendum.supersedes_acknowledged_revision?.path === protectedPath &&
+        exactReconciliationAddendum.supersedes_acknowledged_revision?.current_sha256 ===
+          expectedDigest),
+    `Approved reconciliation does not acknowledge the exact I3-B revision: ${protectedPath}`,
   );
 }
 

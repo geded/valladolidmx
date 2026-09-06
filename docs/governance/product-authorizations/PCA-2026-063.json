@@ -1,0 +1,1490 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-063",
+  "title": "PR #60 · Manifiesto cerrado de 147 revisiones exactas frente a main",
+  "status": "Approved",
+  "branch": "integration/lovable-valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para registrar exclusivamente las 147 rutas actualmente UNAUTHORIZED del PR #60 frente a main —92 create y 55 modify— mediante operación, ruta y SHA-256 actual exactos. Reconciliación documental cerrada: no modifica esas rutas, no usa comodines, no acepta revisiones futuras y no autoriza despliegue ni cambios funcionales, datos, pagos, reservaciones, mapas, cron, secretos o RLS.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/components/alux/AluxConverseChat.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxMark.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/alux/TourismAluxPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/BusinessAttributesPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EditorialRouteEditor.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EditorialRouteStopsPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EventAttributesPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EventEditor.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/ProductAttributesPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/SeoLandingContentEditor.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceEditor.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceMediaPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/DestinationsAtlasSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-content.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-runtime.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/destinations-atlas-content.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/region-premium-runtime.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/ExperienceFiltersBar.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/ExperiencePremiumSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/ExperiencesListingSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/experience-premium-vm.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/home-premium/shared/PremiumShowcase.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/layout/CompactCrumbs.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/LanguageSwitcher.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/ListingPremiumSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/maps/MapUnavailableFallback.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/omxds/CategoryNavGrid.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/omxds/TourismChip.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/place-premium/PlacePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/place-premium/place-premium-content.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumAction.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumHero.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumTerritorialBreadcrumb.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/routes-premium/RoutePremiumSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/routes-premium/RoutesListingSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/seo-landing/SeoLandingSurface.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/surfaces/EventPremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/travel-plan/FloatingTravelPlanDock.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/travel-plan/TravelPlanBand.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/traveler/GuestPlanPreview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/config/brand.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/alux-surface-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse-contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse-grounding.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse-retrieval.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/embedded-presence.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/brand/brand-context.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/brand/brand-settings.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/business-attributes/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cms/editor-fields.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/editorial-route-stops.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/event-attributes.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/home-featured-categories-query.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/cron-dry-run.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/cron-hook-auth.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/coupon-review-reminders.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/trip-journey-emails.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/visibility-notifications.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/destinations/atlas-taxonomy.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/destinations/destination-labels.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/canonical-entity-binding.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/entity-premium-templates.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/home-materialization.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/media-rights.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/premium-template-registry.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-creation.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-template.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/smart-blocks.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-attributes.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-commerce.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-public-reads.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-public-reads.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/institutional/institutional-authority.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/institutional/institutional-authority.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/institutional/institutional-context.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/listings/listing-family-taxonomy.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/listings/listing-public-contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/listings/listing-public-reads.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/maps/google-maps-loader.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-public-contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-public-reads.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-public-reads.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-review-fixtures.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-taxonomy.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/places-cms-contracts.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/places-cms.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/portal/business-attributes.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/portal/product-attributes.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/routes-editorial/route-public-contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/routes-editorial/route-public-reads.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/routes-editorial/route-public-reads.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/hooks.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/import-contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/distintivos.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.index.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.nuevo.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/landing-seo.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/lugares.index.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/marca.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rutas.$id.editar.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rutas.index.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rutas.nueva.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/founder-home-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/founder-zazil-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-destination-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-destination-microsite-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-event-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-event-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-event-profile-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-experience-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-experience-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-hotel-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-place-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-place-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-restaurant-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8-r1f1c-route-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8-r1f1c-zone-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/territorial-listing-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lugares.index.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lugares.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/oriente-maya/$destino.lugares.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/oriente-maya/destinos.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/rutas.$slug.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/rutas.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/types/territory.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "sha256": "a2e158706d30964bac5e2e04e762c023c047e0fbf2644fbe388ad59508f045dc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxMark.tsx",
+      "sha256": "12dac9c5359ff4cd33f3bbf939e8f8564e7e19d3a5f0c0f1970851d7c2a9056c",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/alux/TourismAluxPanel.tsx",
+      "sha256": "3c748d552fc3f5c3c8d5f8be4f0e8d20daedc327eb6d5933b2e572c33dc4b5ca",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/BusinessAttributesPanel.tsx",
+      "sha256": "73e911264273fee6776f3e228bc171100f12232a53d669a6d48475b4d32ea64d",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EditorialRouteEditor.tsx",
+      "sha256": "b6366797a4c42449389d7a9c620804f7f5b61d66c7c16c46575490c9d9c91e96",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EditorialRouteStopsPanel.tsx",
+      "sha256": "e904f66d0f6047cc789047be8f5ad9444433ced2724a6657000b76fff238fec5",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EventAttributesPanel.tsx",
+      "sha256": "5f7c3a9a6b2704e45eed04696414e09576749600d9e4e5e0a0bce520e814fa70",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/EventEditor.tsx",
+      "sha256": "99f624e84a5dd1142257cd9ff2ad240029d2fa8b545a5acf5867fc9b71808d68",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/ProductAttributesPanel.tsx",
+      "sha256": "458fc7624eafdf4134f7cb0a583d535abd9c76133a1c1c1f83d8aeb0b3e8c579",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/SeoLandingContentEditor.tsx",
+      "sha256": "808d49132cc4eb77a2dbb19a5ac23289012fe0a93d006b8457754107cf0fdf09",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceEditor.tsx",
+      "sha256": "2571bccf847430a164b0c0901a613b94eceedc087ee004df66808c10b83fa034",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceMediaPanel.tsx",
+      "sha256": "5989a27889fe639bf0d39fff42bae9674d80ccdea792c436918162d79a4b49a1",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+      "sha256": "3198e174bb6830083ec0eca5a0d5817222153f703c1df15ee838a99736d3bb91",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx",
+      "sha256": "e2c5d7003c3d23f66dd1da3eab29f09de632a1c669556b57b456eb0bb14e8f62",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/DestinationsAtlasSurface.tsx",
+      "sha256": "ab6ad12ed4fb8b6e139df0ef06d0ef03daaba319f5f97b1471673bb08d2cd6cc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "sha256": "2f6de9a34b256b8aa8cc9a6ad0d5017bad6dff50fb9e7e2019f2ade9350345e8",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-content.ts",
+      "sha256": "7a9d07779289314f4aec766cece69e393d49c31dd0386784b4b295c8fe981429",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/destination-premium-runtime.ts",
+      "sha256": "bbdf1d3e5fabdbc8e15e5e04fd2194b6df65c0dc04497ffb50671fed18f4500e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/destination-premium/destinations-atlas-content.ts",
+      "sha256": "80b08f7012b1b8bb23d930a1a525b439d024530f67a1c394c0fc89f3f1fb496c",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/region-premium-runtime.ts",
+      "sha256": "d4c08f46a85580a9d55c46a846bcd446ccac8507c4790a4b99a4dae1b06dd749",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/ExperienceFiltersBar.tsx",
+      "sha256": "3a86b8391a16442e035d6b222a96ae5d36cad5b71fcf6417f50ec436e59071ef",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/ExperiencePremiumSurface.tsx",
+      "sha256": "c3b20ca7550f90f0c078dd1fa2fbfa48aaa39cf0c6813c7b84d2c50f628069b2",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/ExperiencesListingSurface.tsx",
+      "sha256": "31048daf7a52072cac03d4a957345fdfbc2c25d679d56eabe7bbf0035cf8e0df",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-premium/experience-premium-vm.ts",
+      "sha256": "bd6d933f41e0e17f78117d72835cd705468736bf2de09c04f3e601dd45dfc2d4",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "bd3b4ec688d1049c9f0d6a352f8b4ec8ec2a8a0fdf08291e64f680404f678ca3",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts",
+      "sha256": "eb59e6ce53b6001ded5a4819613b7ce40bbc540d99874ec981a8bf06c439f427",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/home-premium/shared/PremiumShowcase.tsx",
+      "sha256": "cb1055d4c657267e479402e996702d1edc53e25147a7fd187da0d75d7069b03b",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/layout/CompactCrumbs.tsx",
+      "sha256": "dabff7ff45fcea4d70815e4f69b65023bcc8bc5a5b959ca99086cd206470e123",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/LanguageSwitcher.tsx",
+      "sha256": "26b92deae8a40e4ef8d696f94ed6c3a75a630a4d819ce6b3ced86efe121ae157",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/ListingPremiumSurface.tsx",
+      "sha256": "5b818fad5222ee71ce903d5527b51ea419bcde73e761fca66343754f6f1f08bf",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "sha256": "a086318c09eaf78f818589ea86633b165360cf138337bf1004036eb156290aec",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "sha256": "35060257747b4434971961bb5d2506d12d74d135b6f7a64f763b057c463f560a",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/maps/MapUnavailableFallback.tsx",
+      "sha256": "451a6fac84ab9cf0b0851c4227b7f619a1e6bb3a89bca591d92539fc5786c424",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/omxds/CategoryNavGrid.tsx",
+      "sha256": "d5b83354200ab627a5e6ef67958be782dad608810e4b08ac0a80cbadbebca6a1",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/omxds/TourismChip.tsx",
+      "sha256": "0d921c815efc705c42eca5a9b63796848267467f4b7baa902dd7bbd6089beafb",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/place-premium/PlacePremiumSurface.tsx",
+      "sha256": "516c9eeccea29d164ec190db824155459abd09ff20b33bc0f78e639fa0b506fc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/place-premium/place-premium-content.ts",
+      "sha256": "3a22dfe463a27328fb9ad8a75166453c74b9486ac88421404d708458474fbe1c",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumAction.tsx",
+      "sha256": "497909c67d995e84aa0cea58ad1fa60d6810d8ca03b4b912a70216520a3b2798",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumHero.tsx",
+      "sha256": "48f37e75987e038b8e4de281e5f74384ef672f0f0adca5de2b04eccd35439de4",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumTerritorialBreadcrumb.tsx",
+      "sha256": "7b269fa4e33db17c1c8ae4414c50929a9a504a2a2bad1b6d1687c1c1e2d1ef23",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/routes-premium/RoutePremiumSurface.tsx",
+      "sha256": "246198a7d14fac6043c835c6fbc380f9808275e29d4c1f9bbfef22ce57c58e8f",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/routes-premium/RoutesListingSurface.tsx",
+      "sha256": "9e35fcfccfef09680edc7bb20a2d8397d6ab5703ef6df6c8bb823c7ab5f44507",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/seo-landing/SeoLandingSurface.tsx",
+      "sha256": "c6d031389dee2ee1eca74e00c3a881ba8fb1fa5c6f71bf5bcf135a34f5dcb8c1",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/surfaces/EventPremiumSurface.tsx",
+      "sha256": "60c3303c06778436c93dbc2590c0cbbacab60c01129153b739520cae91580fd7",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/travel-plan/FloatingTravelPlanDock.tsx",
+      "sha256": "478dcff939e739d12f8340c00812597a6aac3c5ccb144e5aa77de8e443f3412e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/travel-plan/TravelPlanBand.tsx",
+      "sha256": "07997581cf5467cd5b075448d9f9ff95cac791610a768a3abfbd489e4b525d18",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/traveler/GuestPlanPreview.tsx",
+      "sha256": "e8cddf9f8f6e24f65bcde3666bcc3e28a059166e0d3cfd23e793b73060a46704",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/config/brand.ts",
+      "sha256": "b86f3b47a56cea066cc967f8a45db7837c674ee9537f3ed84e43fcd76a5761a7",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/alux-surface-inventory.ts",
+      "sha256": "6e82300556e6f66f520c5f396c1b0047a75f03d1d718733c4d52abe1ece84308",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts",
+      "sha256": "33ffcc6d83d9d90a2de4fb13cc8e116b2ee1e72535dff84742bbf02817809105",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse-contract.ts",
+      "sha256": "26953bc4cdd48721e30420cc306b30a79665c0a5aafd7e703022da297c899f0a",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse-grounding.ts",
+      "sha256": "638cf0420f9dfa11b5a9920e3800ed254f15182782b1a86ff3b0fce93c43b57a",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse-retrieval.server.ts",
+      "sha256": "190ba957fb88eeb62f9408d5a0de7628a9d954629a58affd0d6c9eab957e2fb8",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/converse.functions.ts",
+      "sha256": "f8170cae0c37e63c9820d2d1a667349efdec2b8fe135e581f8ad6af3cf92ef77",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/embedded-presence.ts",
+      "sha256": "877a2db3cdad1e233d7e0bcdf7bc23ee3e6dc45fc277661a772f7bb0e1bbf71f",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/brand/brand-context.tsx",
+      "sha256": "94daa99243ad8c8dfc72ccbd9a8ea15e9dbc80ef035d9cd267a73cbfdcd6464a",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/brand/brand-settings.functions.ts",
+      "sha256": "93dcacb15ea562e39cf3d213a6d0997f88e00ee8259a5c319124f5a1ef688937",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/business-attributes/types.ts",
+      "sha256": "1d3cdb8f1934fc4859c0eec80a1e0a4d47864a4c1a1d2554466748ed76eaf2d7",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cms/editor-fields.ts",
+      "sha256": "3b20833b804c743b47fccbe4fdb4e37b0c0f865bcf943d7569bc4fd057f82e21",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/editorial-route-stops.functions.ts",
+      "sha256": "b1b57bc6f70c186fa9a2d2b32df3cc60dbf0bac703b6370953162aee60dfa36f",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/event-attributes.functions.ts",
+      "sha256": "8ce7f6be0f734b3a45764530a7ab964bf5050996e85279fb24879b422d19f8da",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/home-featured-categories-query.ts",
+      "sha256": "7b8708805abb0ea845c98ee268b37b1c76fe141a39ad0b755b9c8f6a341473e6",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/cron-dry-run.server.ts",
+      "sha256": "f6838d7631ac25f7abdc0cf059655b516b5982501dfd43b56ce84fb3c0b01715",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/cron-hook-auth.server.ts",
+      "sha256": "d6ede9651b3562484faeae5ce7470cbcbe72688424b03c8b510c5e3c6cdf2e76",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/coupon-review-reminders.server.ts",
+      "sha256": "fc9f4e7972a882a8193189a50478636ff0e24cda6dd9e8da66db5b8c12abd560",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/trip-journey-emails.server.ts",
+      "sha256": "639b8e3327474e9aec518bd72a3229613f6c3b7917be681b0403f53b5e2610cc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/visibility-notifications.server.ts",
+      "sha256": "4e1a27c8c80add27172ea7548439ebbdf572809b7aea8c939e9c49a14de93262",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/destinations/atlas-taxonomy.ts",
+      "sha256": "3bcd43fdbea23671815bcace28a05d46348c7d5d3df77a1b0be16adc0f2bad2d",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/destinations/destination-labels.ts",
+      "sha256": "5cfc4e44f8b29901037c9785d9cd0b67ed3ccfd03d72354e0e44ebfd63d705da",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/canonical-entity-binding.ts",
+      "sha256": "f342e975ff0ac912e92fc4cde7e8437e26cf034ec3ca379bb8f2abb70d6ade05",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/entity-premium-templates.ts",
+      "sha256": "02c97faa7c82e0a9ed9a01de3019ab56ccc9747bdead6976f2ba9dfa10f62a4e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/home-materialization.ts",
+      "sha256": "c9b331bff5124e0738b027bca040c526d812dd9eb13f61d0928e207610b8db5c",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/media-rights.ts",
+      "sha256": "f827ceff56891cb287294e119882faa930341d1c34105d9a98133c2261f8ecc7",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/premium-template-registry.ts",
+      "sha256": "a900e5980ccd1fa452c00df77b28bfb49b0a76a2992990eb699e4f55b61dbe73",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-admin.functions.ts",
+      "sha256": "58f45ab6e4c59a643bde43ddc1c056ecfd1c182dfc66f247a7c849cd8715b6e0",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-creation.functions.ts",
+      "sha256": "2e712cf7c8abfc08cd67fd6291cc597212e9546b84214f037982f142f07bcbd5",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-editor.functions.ts",
+      "sha256": "01447537de617685ac4894cb309af8cad0ea64dcfc6fe555e9f0099d0d8a4984",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-surface-vm.ts",
+      "sha256": "a64d7b6360760a0c44f9c59caf6eacbe4c62b217258ea164fd341c00f6cdfd85",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-template.ts",
+      "sha256": "31c8e677d2199f07f77719e45446905a97273f03709ec1a270501211b5c4cb31",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/smart-blocks.server.ts",
+      "sha256": "43c7fe72eac31eace44659708487520c454850953a31f77cd9424d530339f2bb",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-attributes.ts",
+      "sha256": "45747ada261568b36a2d0f41371100baa1fe6e8bf719b2285e08b0faa9a6789e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-commerce.ts",
+      "sha256": "8a7a214ff883326046708c47feb4229276cd8551d367ca8d1c340012c60e75ac",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-public-reads.functions.ts",
+      "sha256": "85ce41739973f244801b66f1f4e991891dd0af017a51145bfe8fe419257b67bf",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experiences/experience-public-reads.server.ts",
+      "sha256": "39fab55a3f6efb6eff869735e2d2af292a76d25e0d20843acdb6615991170512",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/institutional/institutional-authority.functions.ts",
+      "sha256": "83f22e48c753bd149f1f1ffd40533bbb7420f6442ca08f6b7da2f7f24524aa8e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/institutional/institutional-authority.ts",
+      "sha256": "f7bc494ec1824235897e524f216e6d106c1252cfa01079d890429f56031ce7ab",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/institutional/institutional-context.ts",
+      "sha256": "2ab09d2316283c266aebfa5c9787f87da10e3d61ed8e4e3afe94711b67f0d7bc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/listings/listing-family-taxonomy.functions.ts",
+      "sha256": "965c13761eefbd6819e31c371a504e8a5a26adf3e403e24f97676b8a5746181b",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/listings/listing-public-contract.ts",
+      "sha256": "3df4e23dc5038e3854031510b9b541e4d273f4c093dcab7a148ab09ee6caed69",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/listings/listing-public-reads.functions.ts",
+      "sha256": "eecefde644fa7e41b08b1d8bbbc560451b50e8bde24b5aed30cb09bdd99fb257",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/maps/google-maps-loader.ts",
+      "sha256": "e8df8681fc2c681a3d9c21d440d5716b891cc7ebf4527f87eafca78a9af2517d",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-public-contract.ts",
+      "sha256": "d528bdab18436d29dfe854fee1dd761253d33d3ebbb55f9fad5308206f106cb3",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-public-reads.functions.ts",
+      "sha256": "d8691535c7c469d4973d2fba34f25a11143ed680db90b93ce961b557022fc8bc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-public-reads.server.ts",
+      "sha256": "c06b49c94a6b383dcf79a25bec294e5faf8810aace4de281ce0358b4503350dc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-review-fixtures.ts",
+      "sha256": "0e52c61a8ab6faa335650350f84b2f1ea43eafd801bddd1ade90ad581587ae04",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-taxonomy.ts",
+      "sha256": "4c83b8a8ff055451bdbe712e0bb592445451dc74342b2c7887209d0d8965fd38",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/places-cms-contracts.ts",
+      "sha256": "b01aa0ccda06d7a34d1a6f4127c9bf87e0f6897a5aa5ef27f1110cc9d5e980f1",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/places-cms.functions.ts",
+      "sha256": "f0cc8d6a19462e32aa9e2cec256f76338e1b8729b92f9d10239d2b90d6c27e26",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/portal/business-attributes.functions.ts",
+      "sha256": "561a6854afce964374f3dbbb3f0eafb75397300ae180130cb094cf0468b4c98e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/portal/product-attributes.functions.ts",
+      "sha256": "315828ffd4f3ee21fbe5ef8637608c4ab2568cedec93630835b55ec47c5c3e4d",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/routes-editorial/route-public-contract.ts",
+      "sha256": "6308ba4b77008b8a0b670056645c96926114e8bdfd8c73b8808a13b84735d6bc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/routes-editorial/route-public-reads.functions.ts",
+      "sha256": "bb95195b09f586a905ff5fa1be28a68bdf91cf31fd86e34336a6937a53e3790d",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/routes-editorial/route-public-reads.server.ts",
+      "sha256": "9152fea26625fc28d6b6913876f7082032b90ad7ab2605c2a455f2a3dcb06b64",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/contract.ts",
+      "sha256": "e0518679c96671510b2c066ff567172d84670ed58a8718864eaf23c66dc69db6",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/hooks.ts",
+      "sha256": "360e83cb4b773f67d55527fc75c39b21e144498f27dc20f283ab0f0af0816791",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/import-contract.ts",
+      "sha256": "d321eaa75b20c8af5bf0edac24deca436b70be6e0178bb0aee9aefb2e0ba1808",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/distintivos.tsx",
+      "sha256": "4bdc144ec2f1c68105e253e4548a85ec08621af5f2e318050c31d90e9154025b",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.$eventId.editar.tsx",
+      "sha256": "d0427696a45b06e4e0e162f912573363a102e70c45249b8f160d9f3f9a1c3b96",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.index.tsx",
+      "sha256": "ad184c76152867c3a8b1a38d8c54159a4c489e0ff3abe5015acc0526977efac6",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.nuevo.tsx",
+      "sha256": "489eacb508f1173d96ea848aedd7a0b1bbe3299ee11fae322c8472cc1c2c2ba0",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/landing-seo.tsx",
+      "sha256": "c99f22bec79da25ebfe8c67614b08146e561e165ce5665ea8b38c174b6ac4bcd",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/lugares.index.tsx",
+      "sha256": "55a7681afa1e1171b41998cc5a552ae4b9308e878299aa005e3953ac76462b46",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/marca.tsx",
+      "sha256": "08712669bb872d266d46fa0a6fc6a05d06b7fdc4c1d8cdc38b525d3b1d77d594",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rutas.$id.editar.tsx",
+      "sha256": "5a771620a2ab6072ff0d9efbf9d82084f98a3e836e918d03549257bda049b04a",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rutas.index.tsx",
+      "sha256": "f72f5dbfbb2ea2e2420b5667895450063fa0f82865b69477cc36ce56e36243cd",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rutas.nueva.tsx",
+      "sha256": "e5df9bb9df619165589cd7e9232d520ba8e31f4e8bd6db1b0beb2ed656735dd0",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/founder-home-premium-preview.tsx",
+      "sha256": "d1d260ee65cbb98599005aa039880b5dee466770ee523a0dfba1420a0fda25a8",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/founder-zazil-premium-preview.tsx",
+      "sha256": "116e84e45e2a731cf08dc8979787b40c071cfeb56504508347e4f056cae905a2",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-destination-listing-premium-preview.tsx",
+      "sha256": "03e6ac6dd8724801557a89a8607879e0ececf84f21dee55691d2b227f2ec72b6",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "sha256": "63d6013ffcbdfafda00f30be250d515f7fc22f333f667aa73b3acad22ddf0917",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-event-listing-premium-preview.tsx",
+      "sha256": "664e9a99c843be606a73da14e78837aedaded322d9c20892bcb42bcf5d498b7b",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-event-premium-preview.tsx",
+      "sha256": "fbd7d6b11b79cf14df6168c59dc8d15de353ba4a18004be52e8bacff42b070a4",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-event-profile-premium-preview.tsx",
+      "sha256": "13d1ffc31fc0485cfafd7f5ed73b2c9ca51a3e1d03b0ef570e6e8048235ce989",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-experience-listing-premium-preview.tsx",
+      "sha256": "c0cf469c0fc161deead03583a6c034525a6af0de9fed7876f93c1d59bd186bd1",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-experience-premium-preview.tsx",
+      "sha256": "1e5fb1873c700bb43f634e2dd2da3a6653b4c84ba6a9044e7cca1bfec6ae4ee9",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "sha256": "2db606d51a6d7db495fc8f9791081cabb52c23aa13d88303aa28b9aac5115519",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "sha256": "658e17b4d0bd2d7358bca4a0daddf836c0e4af8ff9f544ac3c0d5bfc288b84a1",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-place-listing-premium-preview.tsx",
+      "sha256": "06f4858c97ab0db51bd61e03c14a6ebc18446bc0fb87c906dc186d237821bbda",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-place-premium-preview.tsx",
+      "sha256": "f3d1c1e60e0b524f81b4d93811d39942a67feb83e851cd8987d8b6ce0d917bb4",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-restaurant-listing-premium-preview.tsx",
+      "sha256": "d2a58273bcee84097a43df15fa756fc52362236bab4696e123d44714ce19efeb",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "sha256": "f36e1f4d8b2f29836182fc4635c6299e218e6872e6f3b9b9ec427f161a794af7",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-vacation-rental-listing-premium-preview.tsx",
+      "sha256": "484d2d21c16e9fb64fdcc8c4374132936fe26a4ec5d6c13812e834f13ca6a81f",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx",
+      "sha256": "663d0dae5abcccf98eab978c46fddc5c8426c61195719a65ba811d840cda9421",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8-r1f1c-route-preview.tsx",
+      "sha256": "ce0ed79df38b17cc1cd50087396f9f5bb480c7dd00e9769981c2a9649aa78c14",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8-r1f1c-zone-preview.tsx",
+      "sha256": "101dbd655bd8210ed95e07f9da861d6198142471ea55ffd8fcfff9084fb12eef",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx",
+      "sha256": "2d787b7b4294c7ed0891ba1244afe9113976f7ce7f7819aff9fd557b5bd13a81",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/territorial-listing-premium-preview.tsx",
+      "sha256": "b5f47feb2720c3d97036734d05ee3da5b389922b82bf0cc24ea867b3a23f6442",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lugares.index.tsx",
+      "sha256": "ac325a1b80c8ced09787a098685fd6938ab5458022d51e40c799993be28cd616",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lugares.tsx",
+      "sha256": "e67e9d2d037ff999675910babf2cc5a6a5509e54a4870b09bd5e8c3418a69d7e",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "sha256": "206261a7b29a0ba7832bff339a3aca5a2fa545a2d34e3d95af960a52fcff35e0",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/oriente-maya/$destino.lugares.index.tsx",
+      "sha256": "83f2d3cb19ac3db143fbaae2f197c243ca583f8a60e72f38d5ec5976c3ef0229",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.tsx",
+      "sha256": "1b5607d3e0f759634c3f9526ab697dbfbd3f60ffbdda91ee6632844985bd4cb2",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/oriente-maya/destinos.tsx",
+      "sha256": "64069fc45d2d2634b45b4fa458f115f2e760d8cb05761a3f7edb30a5e2989688",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/rutas.$slug.tsx",
+      "sha256": "c27dfb50babeee2f2a22cc341f57334e309a59d6277f7139d4d278db3abf5442",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/rutas.index.tsx",
+      "sha256": "faeed389dcde676c4881d61e2bc150c23766e9c1c0c81f9c61019345a07ce2dc",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/server.ts",
+      "sha256": "333c76c0af938ea1683fa4bf97b4f0ff238826d506673333dc8a59fcc58ea2e3",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    },
+    {
+      "operation": "modify",
+      "path": "src/types/territory.ts",
+      "sha256": "ca5b43461afc93b4e25a24fc6c558997c1b0426667a4cfcb18168b733f0828f0",
+      "authority": "Founder PR #60 exact closed reconciliation · 2026-09-06"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun scripts/governance/validate-full-suite.mjs --base=f8390e5d2c25af5b9b30c3534a9a08ce151646de"
+  ]
+}
