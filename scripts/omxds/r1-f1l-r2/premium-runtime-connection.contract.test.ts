@@ -218,6 +218,52 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(JSON.stringify(emptyRealCorpus)).not.toContain("conceptual-preview");
   });
 
+  test("la Home evita huecos con los medios gobernados production-eligible de cada vertical", () => {
+    const merged = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
+      destinos: [],
+      experiencias: [
+        {
+          title: "Cena en cenote",
+          subtitle: "Experiencia acreditada",
+          category: "Experiencia",
+          href: "/producto/cena-en-cenote",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+      ],
+      stays: [
+        {
+          title: "Hotel acreditado",
+          subtitle: "Hospedaje",
+          category: "Hotel",
+          href: "/hoteles/hotel-acreditado",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+      ],
+      food: [
+        {
+          title: "Restaurante acreditado",
+          subtitle: "Gastronomía",
+          category: "Restaurante",
+          href: "/restaurantes/restaurante-acreditado",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+      ],
+      eventos: [],
+      rutas: [],
+      mapPoints: [],
+    });
+
+    expect(merged.experiencias.items[0]?.media.url).toContain(
+      "governed/v1p1c/experience-cover.jpg",
+    );
+    expect(merged.servicios.stays[0]?.media.url).toContain("governed/v1p1c/hotel-cover.jpg");
+    expect(merged.servicios.food[0]?.media.url).toContain("governed/v1p1c/restaurant-cover.jpg");
+    expect(JSON.stringify(merged)).not.toContain("conceptual-preview");
+  });
+
   test("los medios de Home usan el proxy estable y no dependen de service role", () => {
     const resolver = read("src/lib/experience-builder/smart-blocks.server.ts");
     expect(resolver).toContain("toStablePublicMediaUrl");

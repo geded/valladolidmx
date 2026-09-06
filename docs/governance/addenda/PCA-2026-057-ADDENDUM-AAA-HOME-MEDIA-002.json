@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-AAA-HOME-MEDIA-002",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-06 para restaurar medios gobernados existentes y corregir la retícula responsive del Home.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/home-premium/home-premium-real.ts",
+    "previous_sha256": "fc7ff0709c606f8c77557d9269b82d04206ae707d0cf34f61d8fd19aa0ff2688",
+    "current_sha256": "c538655c258cbfb5ee672d729ef1543e586e9c164ea3d2b7579c135b708dbf72",
+    "semantic_change": "El Home usa sólo activos gobernados production-eligible de la vertical cuando la entidad no tiene portada propia.",
+    "authority": "Founder · Home media and responsive remediation · 2026-09-06"
+  },
+  "invariants": ["Sin previews ni activos futuros", "Sin activos nuevos"],
+  "recorded_at": "2026-09-06"
+}

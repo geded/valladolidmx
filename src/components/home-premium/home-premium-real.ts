@@ -6,8 +6,8 @@
  *   · La estructura editorial (títulos, kickers, CTAs) proviene del bloque.
  *   · TODA tarjeta proviene del corpus publicado y acreditado y lleva su URL
  *     canónica real. Sin URL canónica, la tarjeta no existe.
- *   · Sin fotografía acreditada, `media.url` queda vacío y la superficie
- *     renderiza el marcador editorial neutral (`EditorialMediaFrame`).
+ *   · Sin fotografía propia acreditada, la Home usa exclusivamente la portada
+ *     gobernada y production-eligible de su vertical. Nunca usa previews.
  *   · Una colección vacía oculta su sección; nunca se rellena con contenido
  *     demostrativo, simulado o de preview.
  */
@@ -16,7 +16,27 @@ import type { HomePremiumContent, HomePremiumSectionKey } from "./home-premium-c
 
 type Card = HomeRealContent["destinos"][number];
 
-const mediaOf = (card: Card) => ({ url: card.mediaUrl, alt: card.title });
+const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
+
+const GOVERNED_VERTICAL_MEDIA = {
+  experience: ["experience-cover.jpg", "experience-gallery-1.jpg", "experience-gallery-2.jpg"],
+  hotel: ["hotel-cover.jpg", "hotel-gallery-1.jpg", "hotel-gallery-2.jpg"],
+  restaurant: ["restaurant-cover.jpg", "restaurant-gallery-1.jpg", "restaurant-gallery-2.jpg"],
+} as const;
+
+type GovernedVertical = keyof typeof GOVERNED_VERTICAL_MEDIA;
+
+const mediaOf = (card: Card, vertical?: GovernedVertical, index = 0) => {
+  if (card.mediaUrl.length > 0) return { url: card.mediaUrl, alt: card.title };
+  if (!vertical) return { url: "", alt: card.title };
+
+  const assets = GOVERNED_VERTICAL_MEDIA[vertical];
+  const asset = assets[index % assets.length];
+  return {
+    url: `${GOVERNED_MEDIA_BASE}/${asset}`,
+    alt: `Imagen editorial gobernada de ${vertical === "hotel" ? "hospedaje" : vertical === "restaurant" ? "gastronomía" : "experiencias"} en el Oriente Maya`,
+  };
+};
 const withoutMedia = <T extends { media: { url: string; alt: string } }>(item: T): T => ({
   ...item,
   media: { ...item.media, url: "" },
@@ -89,30 +109,30 @@ export function mergeHomeRealContent(
     },
     experiencias: {
       ...safeContent.experiencias,
-      items: real.experiencias.map((card) => ({
+      items: real.experiencias.map((card, index) => ({
         title: card.title,
         category: card.category,
         summary: card.subtitle,
-        media: mediaOf(card),
+        media: mediaOf(card, "experience", index),
         href: card.href,
       })),
     },
     servicios: {
       ...safeContent.servicios,
-      stays: real.stays.map((card) => ({
+      stays: real.stays.map((card, index) => ({
         title: card.title,
         destination: card.category,
         category: "Hospedaje",
         summary: card.subtitle,
-        media: mediaOf(card),
+        media: mediaOf(card, "hotel", index),
         href: card.href,
       })),
-      food: real.food.map((card) => ({
+      food: real.food.map((card, index) => ({
         title: card.title,
         destination: card.category,
         category: "Gastronomía",
         summary: card.subtitle,
-        media: mediaOf(card),
+        media: mediaOf(card, "restaurant", index),
         href: card.href,
       })),
     },
