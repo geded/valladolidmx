@@ -3,7 +3,7 @@
   "id": "PCA-2026-067",
   "title": "Main · reconciliación Premium y conexión territorial de rutas",
   "status": "Approved",
-  "branch": "main",
+  "branch": "fix/premium-routes-territorial-cms-20260906",
   "blueprint": "docs/blueprint/G8-R1-F1L-PR58-PRODUCT-AUTHORIZATION-RECONCILIATION-MANIFEST-v1.0.md",
   "founder_authority": "Autorizaciones Founder del 2026-09-06 para reconciliar en main las plantillas Premium aprobadas usando el breadcrumb como señal de versión, hacer coincidir constructor, preview y ruta pública por familia, y continuar las mejoras de rutas y paradas para que el CMS capture una mejor conexión territorial; conservar diseño, responsive, CMS, marca y Alux existentes, sin rediseñar, importar ramas antiguas completas, desplegar ni publicar.",
   "permissions": [
