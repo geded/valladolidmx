@@ -211,6 +211,7 @@ import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './route
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/chat'
+import { Route as ApiCmsStudioMediaPreviewMediaIdRouteImport } from './routes/api/cms/studio-media-preview.$mediaId'
 import { Route as AuthenticatedPortalVentasEnLineaOrdenesRouteImport } from './routes/_authenticated/portal/ventas-en-linea.ordenes'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
@@ -250,6 +251,7 @@ import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_
 import { Route as AuthenticatedCmsRegionesIdEditarRouteImport } from './routes/_authenticated/cms/regiones.$id.editar'
 import { Route as AuthenticatedCmsProductosProductIdEditarRouteImport } from './routes/_authenticated/cms/productos.$productId.editar'
 import { Route as AuthenticatedCmsLugaresPlaceIdEditarRouteImport } from './routes/_authenticated/cms/lugares.$placeId.editar'
+import { Route as AuthenticatedCmsEventosEventIdPortadaPreviewRouteImport } from './routes/_authenticated/cms/eventos.$eventId.portada-preview'
 import { Route as AuthenticatedCmsEventosEventIdEditarRouteImport } from './routes/_authenticated/cms/eventos.$eventId.editar'
 import { Route as AuthenticatedCmsEmpresasBusinessIdPreviewRouteImport } from './routes/_authenticated/cms/empresas.$businessId.preview'
 import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './routes/_authenticated/cms/empresas.$businessId.editar'
@@ -1393,6 +1395,12 @@ const ApiPublicAluxChatRoute = ApiPublicAluxChatRouteImport.update({
   path: '/api/public/alux/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCmsStudioMediaPreviewMediaIdRoute =
+  ApiCmsStudioMediaPreviewMediaIdRouteImport.update({
+    id: '/api/cms/studio-media-preview/$mediaId',
+    path: '/api/cms/studio-media-preview/$mediaId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalVentasEnLineaOrdenesRoute =
   AuthenticatedPortalVentasEnLineaOrdenesRouteImport.update({
     id: '/ordenes',
@@ -1627,6 +1635,12 @@ const AuthenticatedCmsLugaresPlaceIdEditarRoute =
     path: '/lugares/$placeId/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsEventosEventIdPortadaPreviewRoute =
+  AuthenticatedCmsEventosEventIdPortadaPreviewRouteImport.update({
+    id: '/eventos/$eventId/portada-preview',
+    path: '/eventos/$eventId/portada-preview',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsEventosEventIdEditarRoute =
   AuthenticatedCmsEventosEventIdEditarRouteImport.update({
     id: '/eventos/$eventId/editar',
@@ -1853,6 +1867,7 @@ export interface FileRoutesByFullPath {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+  '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -1892,6 +1907,7 @@ export interface FileRoutesByFullPath {
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/cms/empresas/$businessId/preview': typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   '/cms/eventos/$eventId/editar': typeof AuthenticatedCmsEventosEventIdEditarRoute
+  '/cms/eventos/$eventId/portada-preview': typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   '/cms/lugares/$placeId/editar': typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   '/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/cms/regiones/$id/editar': typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -2090,6 +2106,7 @@ export interface FileRoutesByTo {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+  '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -2128,6 +2145,7 @@ export interface FileRoutesByTo {
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/cms/empresas/$businessId/preview': typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   '/cms/eventos/$eventId/editar': typeof AuthenticatedCmsEventosEventIdEditarRoute
+  '/cms/eventos/$eventId/portada-preview': typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   '/cms/lugares/$placeId/editar': typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   '/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/cms/regiones/$id/editar': typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -2338,6 +2356,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/_authenticated/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+  '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -2377,6 +2396,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/_authenticated/cms/empresas/$businessId/preview': typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   '/_authenticated/cms/eventos/$eventId/editar': typeof AuthenticatedCmsEventosEventIdEditarRoute
+  '/_authenticated/cms/eventos/$eventId/portada-preview': typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   '/_authenticated/cms/lugares/$placeId/editar': typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   '/_authenticated/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/_authenticated/cms/regiones/$id/editar': typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -2587,6 +2607,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/portal/ventas-en-linea/ordenes'
+    | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -2626,6 +2647,7 @@ export interface FileRouteTypes {
     | '/cms/empresas/$businessId/editar'
     | '/cms/empresas/$businessId/preview'
     | '/cms/eventos/$eventId/editar'
+    | '/cms/eventos/$eventId/portada-preview'
     | '/cms/lugares/$placeId/editar'
     | '/cms/productos/$productId/editar'
     | '/cms/regiones/$id/editar'
@@ -2824,6 +2846,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/portal/ventas-en-linea/ordenes'
+    | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -2862,6 +2885,7 @@ export interface FileRouteTypes {
     | '/cms/empresas/$businessId/editar'
     | '/cms/empresas/$businessId/preview'
     | '/cms/eventos/$eventId/editar'
+    | '/cms/eventos/$eventId/portada-preview'
     | '/cms/lugares/$placeId/editar'
     | '/cms/productos/$productId/editar'
     | '/cms/regiones/$id/editar'
@@ -3071,6 +3095,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
     | '/_authenticated/portal/ventas-en-linea/ordenes'
+    | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -3110,6 +3135,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/empresas/$businessId/editar'
     | '/_authenticated/cms/empresas/$businessId/preview'
     | '/_authenticated/cms/eventos/$eventId/editar'
+    | '/_authenticated/cms/eventos/$eventId/portada-preview'
     | '/_authenticated/cms/lugares/$placeId/editar'
     | '/_authenticated/cms/productos/$productId/editar'
     | '/_authenticated/cms/regiones/$id/editar'
@@ -3222,6 +3248,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
+  ApiCmsStudioMediaPreviewMediaIdRoute: typeof ApiCmsStudioMediaPreviewMediaIdRoute
   ApiPublicAluxChatRoute: typeof ApiPublicAluxChatRoute
   ApiPublicAluxSignalRoute: typeof ApiPublicAluxSignalRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
@@ -4656,6 +4683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAluxChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cms/studio-media-preview/$mediaId': {
+      id: '/api/cms/studio-media-preview/$mediaId'
+      path: '/api/cms/studio-media-preview/$mediaId'
+      fullPath: '/api/cms/studio-media-preview/$mediaId'
+      preLoaderRoute: typeof ApiCmsStudioMediaPreviewMediaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/portal/ventas-en-linea/ordenes': {
       id: '/_authenticated/portal/ventas-en-linea/ordenes'
       path: '/ordenes'
@@ -4927,6 +4961,13 @@ declare module '@tanstack/react-router' {
       path: '/lugares/$placeId/editar'
       fullPath: '/cms/lugares/$placeId/editar'
       preLoaderRoute: typeof AuthenticatedCmsLugaresPlaceIdEditarRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/cms/eventos/$eventId/portada-preview': {
+      id: '/_authenticated/cms/eventos/$eventId/portada-preview'
+      path: '/eventos/$eventId/portada-preview'
+      fullPath: '/cms/eventos/$eventId/portada-preview'
+      preLoaderRoute: typeof AuthenticatedCmsEventosEventIdPortadaPreviewRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/eventos/$eventId/editar': {
@@ -5286,6 +5327,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsEmpresasBusinessIdEditarRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   AuthenticatedCmsEmpresasBusinessIdPreviewRoute: typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   AuthenticatedCmsEventosEventIdEditarRoute: typeof AuthenticatedCmsEventosEventIdEditarRoute
+  AuthenticatedCmsEventosEventIdPortadaPreviewRoute: typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   AuthenticatedCmsLugaresPlaceIdEditarRoute: typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   AuthenticatedCmsProductosProductIdEditarRoute: typeof AuthenticatedCmsProductosProductIdEditarRoute
   AuthenticatedCmsRegionesIdEditarRoute: typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -5350,6 +5392,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
     AuthenticatedCmsEmpresasBusinessIdPreviewRoute,
   AuthenticatedCmsEventosEventIdEditarRoute:
     AuthenticatedCmsEventosEventIdEditarRoute,
+  AuthenticatedCmsEventosEventIdPortadaPreviewRoute:
+    AuthenticatedCmsEventosEventIdPortadaPreviewRoute,
   AuthenticatedCmsLugaresPlaceIdEditarRoute:
     AuthenticatedCmsLugaresPlaceIdEditarRoute,
   AuthenticatedCmsProductosProductIdEditarRoute:
@@ -5610,6 +5654,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
+  ApiCmsStudioMediaPreviewMediaIdRoute: ApiCmsStudioMediaPreviewMediaIdRoute,
   ApiPublicAluxChatRoute: ApiPublicAluxChatRoute,
   ApiPublicAluxSignalRoute: ApiPublicAluxSignalRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,

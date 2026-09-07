@@ -9,6 +9,7 @@
  * Todos los datos provienen de la lectura real (`getEventBySlug`).
  * Los atributos no capturados en el CMS simplemente no se muestran.
  */
+import type { ReactNode } from "react";
 import { ArrowRight, CalendarDays, Clock3, MapPin, Ticket } from "lucide-react";
 import { PublicShell } from "@/components/discovery";
 import { Container } from "@/components/layout/Container";
@@ -43,7 +44,15 @@ const TAG_KEYS = [
   "reservation_required",
 ] as const;
 
-export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
+export function EventPremiumSurface({
+  event,
+  readOnlyPreview = false,
+  previewCover,
+}: {
+  event: PublicEventDetail;
+  readOnlyPreview?: boolean;
+  previewCover?: ReactNode;
+}) {
   const attrs = event.filter_attributes ?? {};
   const eventType = attributeValues(attrs.event_type)[0];
   const startDay = formatDay(event.starts_at);
@@ -132,15 +141,17 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
                 </dl>
               ) : null}
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <AddToTravelPlanButton
-                  kind="event"
-                  targetId={event.id}
-                  title={event.title}
-                  slug={event.slug ?? null}
-                  imageUrl={event.cover_url ?? null}
-                  subtitle={startDay}
-                  variant="full"
-                />
+                {!readOnlyPreview ? (
+                  <AddToTravelPlanButton
+                    kind="event"
+                    targetId={event.id}
+                    title={event.title}
+                    slug={event.slug ?? null}
+                    imageUrl={event.cover_url ?? null}
+                    subtitle={startDay}
+                    variant="full"
+                  />
+                ) : null}
                 {event.external_url ? (
                   <a
                     href={event.external_url}
@@ -154,16 +165,17 @@ export function EventPremiumSurface({ event }: { event: PublicEventDetail }) {
               </div>
             </div>
             <div className="order-1 lg:order-2">
-              {event.cover_url ? (
-                <img
-                  src={event.cover_url}
-                  alt={event.title}
-                  className="h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-[26rem]"
-                  loading="eager"
-                />
-              ) : (
-                <div className="h-56 w-full rounded-3xl border border-dashed border-[#ded7c9] bg-[#efe8da] sm:h-72 lg:h-[26rem]" />
-              )}
+              {previewCover ??
+                (event.cover_url ? (
+                  <img
+                    src={event.cover_url}
+                    alt={event.title}
+                    className="h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-[26rem]"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="h-56 w-full rounded-3xl border border-dashed border-[#ded7c9] bg-[#efe8da] sm:h-72 lg:h-[26rem]" />
+                ))}
             </div>
           </section>
         </Container>

@@ -21,6 +21,10 @@ import {
   validateMediaRights,
   type MediaRightsInput,
 } from "./media-rights";
+import {
+  getEventBySlug,
+  type PublicEventDetail,
+} from "@/lib/events/public-reads.functions";
 
 const BUCKET = "studio-media";
 
@@ -39,6 +43,63 @@ function publicProxyUrl(path: string) {
     .map((seg) => encodeURIComponent(seg))
     .join("/")}`;
 }
+
+/**
+ * Resuelve una portada temporal únicamente para una vista autenticada.
+ * No escribe `events.cover_media_id`, no cambia el workflow del evento y
+ * rechaza cualquier activo que no sea IA/conceptual/temporal/preview_only.
+ */
+export const resolveSafeEventCoverPreview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { eventId: string; mediaId: string }) => {
+    if (!data?.eventId || !data?.mediaId) throw new Error("invalid_input");
+    return data;
+  })
+  .handler(async ({ data, context }): Promise<PublicEventDetail> => {
+    await assertEditorial(context);
+    const [{ data: event, error: eventError }, { data: media, error: mediaError }] =
+      await Promise.all([
+        context.supabase
+          .from("events")
+          .select("id, slug, status")
+          .eq("id", data.eventId)
+          .is("deleted_at", null)
+          .maybeSingle(),
+        context.supabase
+          .from("media_assets")
+          .select("id, storage_bucket, storage_path, status, review_state, metadata")
+          .eq("id", data.mediaId)
+          .is("deleted_at", null)
+          .maybeSingle(),
+      ]);
+    if (eventError) throw eventError;
+    if (mediaError) throw mediaError;
+    if (!event || event.status !== "published") throw new Error("event_not_available");
+    if (!media || media.storage_bucket !== BUCKET) throw new Error("media_not_available");
+
+    const metadata = (media.metadata && typeof media.metadata === "object"
+      ? media.metadata
+      : {}) as {
+      rights?: { nature?: unknown; ai_generated?: unknown; documentary?: unknown };
+      lifecycle?: { temporary?: unknown; production_eligible?: unknown; usage?: unknown };
+    };
+    const rights = metadata.rights ?? {};
+    const lifecycle = metadata.lifecycle ?? {};
+    const safePreviewOnly =
+      media.status === "draft" &&
+      media.review_state !== "approved" &&
+      rights.nature === "ai_generated" &&
+      rights.ai_generated === true &&
+      rights.documentary !== true &&
+      lifecycle.temporary === true &&
+      lifecycle.production_eligible === false &&
+      lifecycle.usage === "preview_only";
+    if (!safePreviewOnly) throw new Error("media_not_preview_only");
+
+    const realEvent = await getEventBySlug({ data: { slug: String(event.slug) } });
+    if (!realEvent || realEvent.id !== event.id) throw new Error("event_not_available");
+    return realEvent;
+  });
 
 function sanitizeFilename(name: string) {
   return (

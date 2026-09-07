@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZ-SAFE-EVENT-PREVIEW-002",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-07 para crear, integrar y desplegar exclusivamente el preview seguro y aislado de portadas IA temporales de eventos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routeTree.gen.ts",
+    "previous_sha256": "03b143e139b6c6ebb99dec348d1ffb21ba931b581306c2af518d0f46f39d0679",
+    "current_sha256": "afb7999eb7dec94f544e3bc58fe55058d0045ab35803b15d47c9a0cc188da1ec",
+    "semantic_change": "Registra exclusivamente la nueva ruta autenticada y noindex de preview de portada temporal.",
+    "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+  },
+  "invariants": [
+    "La ruta vive bajo /cms autenticado",
+    "No se añade ninguna ruta pública",
+    "No modifica eventos ni asociaciones de medios"
+  ],
+  "recorded_at": "2026-09-07"
+}

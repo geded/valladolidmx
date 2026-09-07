@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "0712140344ec8392b604b6fc9994b075cd68b25429d0f36b8bd2e09627efdbdb"
+      "source_sha256": "158cea520839d53d0bd1990655a8f9aead245bbf658fbb41e3d2ff251b217415"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -17074,6 +17074,41 @@
       "path": "docs/governance/product-authorizations/PCA-2026-068.json",
       "source": "docs/governance/product-authorizations/PCA-2026-068.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-068.json"
+    },
+    {
+      "id": "ART:scripts/omxds/g8/safe-event-cover-preview.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g8/safe-event-cover-preview.contract.test.ts",
+      "source": "scripts/omxds/g8/safe-event-cover-preview.contract.test.ts",
+      "evidence": "scripts/omxds/g8/safe-event-cover-preview.contract.test.ts"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
+      "source": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
+      "evidence": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/audit/2026-09-07-PR65-SAFE-EVENT-COVER-PREVIEW-EVIDENCE-v1.0.md",
+      "type": "artifact",
+      "path": "docs/governance/audit/2026-09-07-PR65-SAFE-EVENT-COVER-PREVIEW-EVIDENCE-v1.0.md",
+      "source": "docs/governance/audit/2026-09-07-PR65-SAFE-EVENT-COVER-PREVIEW-EVIDENCE-v1.0.md",
+      "evidence": "docs/governance/audit/2026-09-07-PR65-SAFE-EVENT-COVER-PREVIEW-EVIDENCE-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-069.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-069.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-069.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-069.json"
+    },
+    {
+      "id": "ART:src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "type": "artifact",
+      "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "source": "src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "evidence": "src/routes/api/cms/studio-media-preview.$mediaId.ts"
     }
   ],
   "edges": [
@@ -50676,6 +50711,76 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.86 · docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/g8/safe-event-cover-preview.contract.test.ts:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:scripts/omxds/g8/safe-event-cover-preview.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/audit/2026-09-07-PR65-SAFE-EVENT-COVER-PREVIEW-EVIDENCE-v1.0.md:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:docs/governance/audit/2026-09-07-PR65-SAFE-EVENT-COVER-PREVIEW-EVIDENCE-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-069.json:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-069.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/surfaces/EventPremiumSurface.tsx:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:src/components/surfaces/EventPremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/api/cms/studio-media-preview.$mediaId.ts:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     }
   ],
   "views": {

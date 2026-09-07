@@ -1,0 +1,67 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-069",
+  "title": "Preview autenticado y no persistente de portadas IA temporales para eventos",
+  "status": "Approved",
+  "branch": "feat/safe-event-cover-preview-20260907",
+  "blueprint": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-07 para crear el preview seguro de las seis portadas IA temporales aprobadas, y para crear un único commit, abrir PR hacia main, fusionar sólo con controles en PASS y desplegar exclusivamente el preview autenticado del CMS; sin modificar ni publicar eventos, sin asociar imágenes, sin cambiar cover_media_id y sin alterar el Home público ni otros datos del CMS.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/EventPremiumSurface.tsx" },
+    { "operation": "modify", "path": "src/lib/experience-builder/studio-media.functions.ts" },
+    { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" },
+    { "operation": "modify", "path": "src/routeTree.gen.ts" },
+    { "operation": "create", "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx" },
+    { "operation": "create", "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["none"],
+  "required_tests": [
+    "npx vitest run scripts/omxds/g8/safe-event-cover-preview.contract.test.ts",
+    "npx tsc --noEmit",
+    "npm run build",
+    "node scripts/lint/lint-baseline.mjs",
+    "bun scripts/route-inventory-coverage.ts",
+    "node scripts/governance/sync-governance.mjs --check",
+    "node scripts/governance/validate-governance-integrity.mjs",
+    "node scripts/governance/validate-product-authorization.mjs"
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/EventPremiumSurface.tsx",
+      "sha256": "415d181e33c2c7635b52bfa158b5710a92a10de7bade1e14fb6054cf2861c9cd",
+      "authority": "Founder · corrección P1 read-only del preview seguro · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "b6b359055115b8fe904ae14dad0f7536ead894f0eb008a227280562c93660a18",
+      "authority": "Founder · trazabilidad Governance del preview seguro · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/studio-media.functions.ts",
+      "sha256": "0c07eb6984c3645c49020ee6dfdd9cf7b82a84cbf72f601d36e42d35b2587e29",
+      "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts",
+      "sha256": "90548c6ec906e058a18e97541a41426e2a26065ea3623a4d8ecf361dfe7a1f7e",
+      "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
+      "sha256": "6f9a4a37058ef6da54a409bd8758a70f4ec33ffb6b9441fc05a172783f3ece4b",
+      "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "sha256": "620999fba9e3580c6fabfd6c12ecb1f4b384baca5c77c4c4a676387d73c0b9f9",
+      "authority": "Founder · corrección P2 endpoint autenticado del preview seguro · 2026-09-07"
+    }
+  ]
+}
