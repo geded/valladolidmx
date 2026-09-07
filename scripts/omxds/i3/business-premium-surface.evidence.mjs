@@ -51,9 +51,9 @@ const acknowledgedRevisions = new Map([
   [
     surfacePath,
     {
-      // 19.29 · D-03 · El breadcrumb territorial navegable lo emite PublicShell.
-      sha256: "a4ef92bad2497c6a85a15205d66a85aa14b8ba9f853e8371622ac8464cdf8c1c",
-      authorizations: ["PCA-2026-035"],
+      // Continuidad Premium · extiende mapa y recomendaciones sin alterar la entidad.
+      sha256: "4ff49113106936b0734554d830d876976a4b43fda3f13ef2dfc8c32d08fda4d2",
+      authorizations: ["PCA-2026-070"],
     },
   ],
   [

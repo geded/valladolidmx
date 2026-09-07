@@ -20,7 +20,7 @@
     "/oriente-maya/{destino}/{categoria}",
     "/oriente-maya/{destino}/{categoria}/{empresa}"
   ],
-  "required_feature_flags": ["none"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bun run typecheck",
     "bun run lint",

@@ -125,6 +125,13 @@ const acknowledgedSurfaceRevisions = [
     sha256: "12c1e19fa15d0d52638ef4a799046a52e77f6681e1b8bf315269b79126504129",
     authorizations: ["PCA-2026-067"],
   },
+  {
+    // Continuidad Premium · conserva medios públicos relacionados sin inventar contenido.
+    package: "premium-continuity-destination-related-media",
+    sha256: "07af6dd30bde81d2d3a0df290a07d1ebc980414d548a0c2d84db0c9f42629836",
+    authorizations: ["PCA-2026-056"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-DESTINATION-SURFACE.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
