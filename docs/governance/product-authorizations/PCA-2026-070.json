@@ -3,7 +3,7 @@
   "id": "PCA-2026-070",
   "title": "Corrección de continuidad visual Premium en superficies turísticas",
   "status": "Approved",
-  "branch": "main",
+  "branch": "integration/premium-continuity-20260907",
   "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
   "founder_authority": "Autorizaciones Founder del 2026-09-07 para revisar y corregir en main la mezcla entre secciones Premium y antiguas de hoteles, restaurantes, casas de vacaciones, eventos, lugares, sitios de interés y Qué hacer; mantener datos e imágenes demo durante construcción y revisión en Lovable, sin publicar ni desplegar producción y sin modificar datos del CMS.",
   "permissions": [
