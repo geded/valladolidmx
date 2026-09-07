@@ -8,7 +8,7 @@
   "founder_authority": "Autorización Founder del 2026-09-07 para completar el configurador global de Marca en CMS, incorporar una paleta administrable, conectarla mediante tokens CSS a plantillas Premium y componentes compartidos, conservar Valladolid.mx como predeterminado, validar contraste y permitir restaurar valores; sin migraciones, cambios de roles o permisos, publicación, despliegue ni modificación de otros datos CMS.",
   "permissions": [
     { "operation": "modify", "path": "src/config/brand.ts" },
-    { "operation": "modify", "path": "src/lib/brand/brand-theme.ts" },
+    { "operation": "create", "path": "src/lib/brand/brand-theme.ts" },
     { "operation": "modify", "path": "src/lib/brand/brand-context.tsx" },
     { "operation": "modify", "path": "src/lib/brand/brand-settings.functions.ts" },
     { "operation": "modify", "path": "src/routes/__root.tsx" },
@@ -17,7 +17,7 @@
     { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" },
     { "operation": "modify", "path": "src/components/home-premium/shared/PremiumShowcase.tsx" },
     {
-      "operation": "modify",
+      "operation": "create",
       "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx"
     },
     {
