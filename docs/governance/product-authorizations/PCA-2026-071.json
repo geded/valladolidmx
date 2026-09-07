@@ -16,8 +16,7 @@
       "operation": "modify",
       "path": "src/components/experience-builder/tourism-card/TourismCard.tsx"
     },
-    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" },
-    { "operation": "modify", "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs" }
+    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" }
   ],
   "acknowledged_revisions": [
     {
@@ -43,12 +42,6 @@
       "path": "src/lib/workspace/definitions/index.ts",
       "sha256": "4d7dfd5f7cd60b53fa2378e5bd4ba75833f0afd9b46521435fcfa71f0eb1328c",
       "authority": "Founder · preservación de la configuración global de Marca en CMS · 2026-09-07"
-    },
-    {
-      "operation": "modify",
-      "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs",
-      "sha256": "67412bec2ba59c932939866a1de7286eb51bc3aba05016c2bfd9f1ff6d73250d",
-      "authority": "Founder · actualización de evidencia I3-D al SHA Premium autorizado · 2026-09-07"
     }
   ],
   "public_routes": [
