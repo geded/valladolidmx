@@ -240,7 +240,7 @@ export function PremiumShowcaseGrid({
             to={item.to}
             params={item.params as never}
             onClick={() => onOpen?.(item.key)}
-            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white shadow-soft sm:w-[46%]"
+            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
           >
             {/* Tarjeta con título superpuesto: el marcador neutral F1L no
                 repite el nombre para evitar el doble rótulo sin fotografía. */}
@@ -264,7 +264,7 @@ export function PremiumShowcaseGrid({
           to={featured.to}
           params={featured.params as never}
           onClick={() => onOpen?.(featured.key)}
-          className="group relative min-h-0 overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated"
+          className="group relative min-h-0 overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
         >
           <EditorialMediaFrame
             media={featured.media}

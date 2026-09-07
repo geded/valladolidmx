@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.86",
     "state": "Approved",
-    "source_sha256": "641289c5b1c4f1f5e8c51e4a9fb9b609cbab97c5b79ea5dd527d22bd8078d9db",
+    "source_sha256": "9a94904c1e49865ea3d635a825b55a8cb45ccb3d408cc8a7f087944693c0bc26",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-09-06T00:00:00.000Z",
+  "generated_at": "2026-09-07T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -12175,6 +12175,16 @@
       "id": "ART:src/routes/api/cms/studio-media-preview.$mediaId.ts",
       "type": "artifact",
       "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-072.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-072.json"
+    },
+    {
+      "id": "ART:src/lib/brand/brand-theme.ts",
+      "type": "artifact",
+      "path": "src/lib/brand/brand-theme.ts"
     }
   ],
   "edges": [
@@ -37377,6 +37387,24 @@
       "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
       "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-072.json:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-072.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-07"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/brand/brand-theme.ts:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:src/lib/brand/brand-theme.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-07"
     }
   ],
   "critical_chain_coverage": [

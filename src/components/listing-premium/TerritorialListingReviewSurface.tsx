@@ -502,7 +502,7 @@ function TerritorialListingBody({
     (item) => item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
   );
   return (
-    <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
         <ListingIntro profile={profile} />
         <AluxBar profile={profile} />
@@ -536,12 +536,12 @@ function TerritorialListingBody({
           <div id="resultados" className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
                   Primero en el destino
                 </p>
                 <h2 className="mt-1 font-display text-2xl sm:text-3xl">{profile.resultsTitle}</h2>
               </div>
-              <p className="shrink-0 text-sm text-[#667067]">
+              <p className="shrink-0 text-sm text-[var(--muted-foreground)]">
                 {filteredItems.length} {filteredItems.length === 1 ? "opción" : "opciones"}
               </p>
             </div>
@@ -551,7 +551,7 @@ function TerritorialListingBody({
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
               {!filteredItems.length ? (
-                <div className="rounded-2xl border border-[#ded7c9] bg-white p-8 text-center text-sm text-[#5d685f]">
+                <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
                   No encontramos opciones con esos filtros. Prueba quitando una selección.
                 </div>
               ) : null}
@@ -670,17 +670,17 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
             ? Home
             : BedDouble;
   return (
-    <header className="grid gap-5 border-y border-[#ded7c9] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
+    <header className="grid gap-5 border-y border-[var(--border)] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
       <div className="max-w-3xl">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[#ba641e]">
+        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[var(--brand-primary-strong)]">
           <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
         <h1 className="mt-3 font-display text-display-hero">{profile.title}</h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-[#5d685f] sm:text-lg">
+        <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--muted-foreground)] sm:text-lg">
           {profile.description}
         </p>
       </div>
-      <button className="inline-flex min-h-11 w-fit items-center justify-center gap-2 justify-self-start rounded-full border border-[#0d4b38] px-5 text-sm font-semibold text-[#0d4b38] transition hover:bg-[#0d4b38]/10 sm:justify-self-end">
+      <button className="inline-flex min-h-11 w-fit items-center justify-center gap-2 justify-self-start rounded-full border border-[var(--selva)] px-5 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10 sm:justify-self-end">
         <Heart className="size-4" aria-hidden /> Ver mi viaje
       </button>
     </header>
@@ -690,7 +690,7 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
 function AluxBar({ profile }: { profile: ListingProfile }) {
   return (
     <section
-      className="mt-5 overflow-hidden rounded-2xl border border-[#0d4b38]/20 bg-[#0d4b38]/[.06] text-[#17251f]"
+      className="mt-5 overflow-hidden rounded-2xl border border-[var(--selva)]/20 bg-[var(--selva)]/[.06] text-[var(--brand-territory-deep)]"
       aria-label="Alux, concierge IA"
     >
       <div className="grid gap-2.5 p-3 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-3 lg:grid-cols-[auto_1fr_auto]">
@@ -702,7 +702,7 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
           />
           <div className="min-w-0">
             <p className="font-display text-sm leading-none">Alux</p>
-            <p className="mt-0.5 text-[11px] text-[#5d685f]">Tu concierge IA</p>
+            <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">Tu concierge IA</p>
           </div>
         </div>
         <div className="min-w-0 sm:pl-2">
@@ -711,14 +711,14 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
             {profile.aluxOptions.map((option) => (
               <button
                 key={option}
-                className="relative h-8 shrink-0 rounded-full border border-[#0d4b38]/25 bg-white/70 px-3 text-xs font-medium text-[#17251f] transition hover:border-[#0d4b38]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
+                className="relative h-8 shrink-0 rounded-full border border-[var(--selva)]/25 bg-card/70 px-3 text-xs font-medium text-[var(--brand-territory-deep)] transition hover:border-[var(--selva)]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
               >
                 {option}
               </button>
             ))}
           </div>
         </div>
-        <button className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38] transition hover:bg-[#0d4b38]/10 lg:inline-flex">
+        <button className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10 lg:inline-flex">
           Recomiéndame <Sparkles className="size-4" aria-hidden />
         </button>
       </div>
@@ -774,11 +774,11 @@ function Filters({
     },
   ];
   return (
-    <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+    <section className="mt-4 rounded-2xl border border-[var(--border)] bg-card p-3 shadow-sm sm:p-4">
       <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
         <label className="relative min-w-[12.5rem] lg:min-w-0">
           <Search
-            className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]"
+            className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--muted-foreground)]"
             aria-hidden
           />
           <span className="sr-only">{profile.searchLabel}</span>
@@ -786,14 +786,14 @@ function Filters({
             placeholder={profile.searchPlaceholder}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
+            className="min-h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--background)] pl-10 pr-3 text-sm outline-none"
           />
         </label>
         {hasMap ? (
           <button
             type="button"
             onClick={onShowMap}
-            className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden"
+            className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[var(--selva)] px-4 text-sm font-semibold text-white sm:hidden"
           >
             <Map className="size-4" aria-hidden /> Ver mapa
           </button>
@@ -807,7 +807,7 @@ function Filters({
               onChange={(event) =>
                 setActiveFacets({ ...activeFacets, [facet.id]: event.target.value })
               }
-              className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+              className="min-h-11 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--background)] pl-4 pr-9 text-sm"
             >
               <option value="">{facet.label}: todos</option>
               {facet.options.map((option) => (
@@ -829,7 +829,7 @@ function Filters({
               aria-label={label}
               value={value}
               onChange={(event) => setValue(event.target.value)}
-              className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+              className="min-h-11 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--background)] pl-4 pr-9 text-sm"
             >
               <option value="">{label}: todos</option>
               {options.map((option) => (
@@ -852,7 +852,7 @@ function Filters({
             setSecondary("");
             setActiveFacets({});
           }}
-          className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
+          className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[var(--brand-surface-soft)] px-4 text-sm font-semibold"
         >
           <SlidersHorizontal className="size-4" aria-hidden /> Limpiar
         </button>
@@ -872,21 +872,21 @@ function ListingCard({
 }) {
   return (
     <article
-      className={`group grid min-w-0 overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm ${
+      className={`group grid min-w-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm ${
         item.image
           ? "grid-cols-[7.25rem_minmax(0,1fr)] sm:grid-cols-[13rem_minmax(0,1fr)]"
           : "grid-cols-1"
       }`}
     >
       {item.image ? (
-        <div className="relative min-h-[10rem] overflow-hidden bg-[#ded7c9] sm:min-h-[13rem]">
+        <div className="relative min-h-[10rem] overflow-hidden bg-[var(--border)] sm:min-h-[13rem]">
           <img
             src={item.image}
             alt={item.name}
             className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
           />
           {featured ? (
-            <span className="absolute left-2 top-2 rounded-full bg-[#f3a61e] px-2 py-1 text-[10px] font-bold text-[#193126]">
+            <span className="absolute left-2 top-2 rounded-full bg-[var(--primary)] px-2 py-1 text-[10px] font-bold text-[var(--brand-territory-deep)]">
               Recomendado
             </span>
           ) : null}
@@ -895,25 +895,27 @@ function ListingCard({
       <div className="flex min-w-0 flex-col p-3 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[#ba641e]">
+            <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand-primary-strong)]">
               {item.type}
             </p>
             <h3 className="mt-1 font-display text-xl leading-tight sm:text-2xl">{item.name}</h3>
           </div>
           <button
             aria-label={`Guardar ${item.name}`}
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-[#ded7c9]"
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--border)]"
           >
             <Heart className="size-4" aria-hidden />
           </button>
         </div>
-        <p className="mt-1 flex items-center gap-1 text-xs text-[#697269]">
+        <p className="mt-1 flex items-center gap-1 text-xs text-[var(--muted-foreground)]">
           <MapPin className="size-3" aria-hidden /> {item.zone}
         </p>
-        <p className="mt-3 hidden text-sm leading-6 text-[#5d685f] sm:block">{item.copy}</p>
+        <p className="mt-3 hidden text-sm leading-6 text-[var(--muted-foreground)] sm:block">
+          {item.copy}
+        </p>
         <div className="mt-3 hidden flex-wrap gap-2 md:flex">
           {item.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-[#f1ece2] px-2.5 py-1 text-[11px]">
+            <span key={tag} className="rounded-full bg-[var(--background)] px-2.5 py-1 text-[11px]">
               {tag}
             </span>
           ))}
@@ -922,16 +924,16 @@ function ListingCard({
           {item.href ? (
             <a
               href={item.href}
-              className="inline-flex min-h-10 items-center rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm"
+              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm"
             >
               Ver {profile.itemLabel}
             </a>
           ) : (
-            <button className="min-h-10 rounded-full bg-[#0d4b38] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
+            <button className="min-h-10 rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
               Ver {profile.itemLabel}
             </button>
           )}
-          <button className="hidden min-h-11 rounded-full border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38] sm:inline-flex sm:items-center">
+          <button className="hidden min-h-11 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] sm:inline-flex sm:items-center">
             Agregar a mi viaje
           </button>
         </div>
@@ -942,20 +944,20 @@ function ListingCard({
 
 function NearbySection({ profile }: { profile: ListingProfile }) {
   return (
-    <section className="mt-10 border-t border-[#ded7c9] pt-7">
-      <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+    <section className="mt-10 border-t border-[var(--border)] pt-7">
+      <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
         Amplía la ruta
       </p>
       <div className="mt-1 flex items-end justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl sm:text-3xl">{profile.nearbyTitle}</h2>
-          <p className="mt-1 text-sm text-[#667067]">
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">
             Se muestran aparte para conservar claro qué pertenece al destino.
           </p>
         </div>
         <a
           href="/oriente-maya"
-          className="hidden shrink-0 text-sm font-semibold text-[#0d4b38] sm:block"
+          className="hidden shrink-0 text-sm font-semibold text-[var(--selva)] sm:block"
         >
           Explorar alrededor →
         </a>
@@ -964,7 +966,7 @@ function NearbySection({ profile }: { profile: ListingProfile }) {
         {profile.nearby.map((item) => (
           <article
             key={item.name}
-            className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white"
+            className="overflow-hidden rounded-2xl border border-[var(--border)] bg-card"
           >
             <div className="relative aspect-[16/9] overflow-hidden">
               <img
@@ -975,7 +977,7 @@ function NearbySection({ profile }: { profile: ListingProfile }) {
             </div>
             <div className="p-3 sm:p-4">
               <h3 className="font-display text-base sm:text-lg">{item.name}</h3>
-              <p className="mt-1 text-xs text-[#697269]">{item.zone}</p>
+              <p className="mt-1 text-xs text-[var(--muted-foreground)]">{item.zone}</p>
             </div>
           </article>
         ))}
@@ -1007,10 +1009,10 @@ function MapPanel({
     <aside
       className={`${showMobile ? "block" : "hidden"} order-first sm:block lg:order-none lg:sticky lg:top-24`}
     >
-      <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-[#ded7c9] px-4 py-3">
+      <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm">
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#ba641e]">
+            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[var(--brand-primary-strong)]">
               Mapa territorial
             </p>
             <h2 className="font-display text-xl">{profile.mapTitle}</h2>
@@ -1018,14 +1020,16 @@ function MapPanel({
           <button
             type="button"
             onClick={onClose}
-            className="grid size-10 place-items-center rounded-full bg-[#efe8da] lg:hidden"
+            className="grid size-10 place-items-center rounded-full bg-[var(--brand-surface-soft)] lg:hidden"
             aria-label="Cerrar mapa"
           >
             <Map className="size-4" aria-hidden />
           </button>
         </div>
         <Suspense
-          fallback={<div className="h-64 animate-pulse bg-[#dfe9df] sm:h-80 lg:h-[31rem]" />}
+          fallback={
+            <div className="h-64 animate-pulse bg-[var(--brand-surface-soft)] sm:h-80 lg:h-[31rem]" />
+          }
         >
           <InteractiveMap
             lat={first.lat}
@@ -1041,20 +1045,22 @@ function MapPanel({
             className="h-64 sm:h-80 lg:h-[31rem]"
           />
         </Suspense>
-        <div className="flex items-center justify-between gap-3 border-t border-[#ded7c9] p-4 text-sm">
-          <span className="text-[#5d685f]">Mapa sincronizado con tus resultados</span>
-          <a href="#resultados" className="font-semibold text-[#0d4b38]">
+        <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] p-4 text-sm">
+          <span className="text-[var(--muted-foreground)]">
+            Mapa sincronizado con tus resultados
+          </span>
+          <a href="#resultados" className="font-semibold text-[var(--selva)]">
             Ver resultados
           </a>
         </div>
       </section>
-      <section className="mt-4 hidden rounded-2xl bg-[#073f31] p-5 text-white lg:block">
-        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#f3a61e]">
+      <section className="mt-4 hidden rounded-2xl bg-[var(--brand-territory-deep)] p-5 text-white lg:block">
+        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[var(--primary)]">
           Alux conecta tu viaje
         </p>
         <h2 className="mt-2 font-display text-2xl">{profile.aluxMapTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-white/70">{profile.aluxMapDescription}</p>
-        <button className="mt-4 min-h-11 rounded-full bg-[#f3a61e] px-5 text-sm font-bold text-[#193126]">
+        <button className="mt-4 min-h-11 rounded-full bg-[var(--primary)] px-5 text-sm font-bold text-[var(--brand-territory-deep)]">
           Personalizar con Alux
         </button>
       </section>
@@ -1196,7 +1202,7 @@ function EventListingBody({
       : profile.resultsTitle;
 
   return (
-    <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
         <ListingIntro
           profile={
@@ -1209,11 +1215,11 @@ function EventListingBody({
         />
         <AluxBar profile={profile} />
 
-        <section className="mt-4 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+        <section className="mt-4 rounded-2xl border border-[var(--border)] bg-card p-3 shadow-sm sm:p-4">
           <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
             <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
               <Search
-                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]"
+                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--muted-foreground)]"
                 aria-hidden
               />
               <span className="sr-only">{profile.searchLabel}</span>
@@ -1221,12 +1227,12 @@ function EventListingBody({
                 placeholder={profile.searchPlaceholder}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
+                className="min-h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--background)] pl-10 pr-3 text-sm outline-none"
               />
             </label>
 
             {locked ? (
-              <span className="inline-flex min-h-11 min-w-max items-center gap-2 rounded-xl border border-[#0d4b38]/25 bg-[#0d4b38]/8 px-4 text-sm font-semibold text-[#0d4b38]">
+              <span className="inline-flex min-h-11 min-w-max items-center gap-2 rounded-xl border border-[var(--selva)]/25 bg-[var(--selva)]/8 px-4 text-sm font-semibold text-[var(--selva)]">
                 <MapPin className="size-4" aria-hidden /> {lockedDestinationLabel}
               </span>
             ) : (
@@ -1244,7 +1250,7 @@ function EventListingBody({
                 aria-label="Fecha"
                 value={dateRange}
                 onChange={(event) => setDateRange(event.target.value as EventDateRange)}
-                className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+                className="min-h-11 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--background)] pl-4 pr-9 text-sm"
               >
                 <option value="">Fecha: cualquiera</option>
                 {EVENT_DATE_RANGES.map((option) => (
@@ -1270,7 +1276,7 @@ function EventListingBody({
                 type="button"
                 onClick={() => setShowMore((value) => !value)}
                 aria-expanded={showMore}
-                className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38]"
+                className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)]"
               >
                 <SlidersHorizontal className="size-4" aria-hidden /> Más filtros
                 {activeSecondary.length ? ` (${activeSecondary.length})` : ""}
@@ -1279,7 +1285,7 @@ function EventListingBody({
           </div>
 
           {showMore && secondaryGroups.length > 0 ? (
-            <div className="mt-3 grid gap-3 border-t border-[#ded7c9] pt-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-3 grid gap-3 border-t border-[var(--border)] pt-3 sm:grid-cols-2 lg:grid-cols-3">
               {secondaryGroups.map((group) => (
                 <EventSelect
                   key={group.key}
@@ -1299,7 +1305,7 @@ function EventListingBody({
               <button
                 type="button"
                 onClick={clearAll}
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--brand-surface-soft)] px-4 text-sm font-semibold"
               >
                 Limpiar filtros
               </button>
@@ -1320,12 +1326,12 @@ function EventListingBody({
           <div className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
                   {lockedDestinationLabel ? "Primero en el destino" : "Agenda regional"}
                 </p>
                 <h2 className="mt-1 font-display text-2xl sm:text-3xl">{resultsTitle}</h2>
               </div>
-              <p className="shrink-0 text-sm text-[#667067]">
+              <p className="shrink-0 text-sm text-[var(--muted-foreground)]">
                 {filteredItems.length} {filteredItems.length === 1 ? "evento" : "eventos"}
               </p>
             </div>
@@ -1335,7 +1341,7 @@ function EventListingBody({
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
               {!filteredItems.length ? (
-                <div className="rounded-2xl border border-[#ded7c9] bg-white p-8 text-center text-sm text-[#5d685f]">
+                <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
                   {dto && !hasActiveFilters
                     ? dto.emptyMessage
                     : "No encontramos eventos con esos filtros. Prueba quitando una selección."}
@@ -1344,14 +1350,14 @@ function EventListingBody({
             </div>
 
             {nearbyItems && nearbyItems.length ? (
-              <section className="mt-10 border-t border-[#ded7c9] pt-7">
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+              <section className="mt-10 border-t border-[var(--border)] pt-7">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
                   Amplía la ruta
                 </p>
                 <h2 className="mt-1 font-display text-2xl sm:text-3xl">
                   Eventos cerca de {lockedDestinationLabel}
                 </h2>
-                <p className="mt-1 text-sm text-[#667067]">
+                <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                   Se muestran aparte y no cuentan dentro de la agenda local.
                 </p>
                 <div className="mt-4 space-y-4">
@@ -1403,7 +1409,7 @@ function EventSelect({
         aria-label={label}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+        className="min-h-11 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--background)] pl-4 pr-9 text-sm"
       >
         <option value="">{label}: todos</option>
         {options.map((option) => (
@@ -1451,20 +1457,22 @@ function EventMapPanel({
   if (!first) return null;
   return (
     <aside className="order-first hidden sm:block lg:order-none lg:sticky lg:top-24">
-      <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-[#ded7c9] px-4 py-3">
+      <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm">
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#ba641e]">
+            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[var(--brand-primary-strong)]">
               Mapa territorial
             </p>
             <h2 className="font-display text-xl">{title ?? profile.mapTitle}</h2>
           </div>
-          <span className="rounded-full bg-[#efe8da] px-3 py-1 text-xs font-semibold">
+          <span className="rounded-full bg-[var(--brand-surface-soft)] px-3 py-1 text-xs font-semibold">
             {items.length}
           </span>
         </div>
         <Suspense
-          fallback={<div className="h-64 animate-pulse bg-[#dfe9df] sm:h-80 lg:h-[31rem]" />}
+          fallback={
+            <div className="h-64 animate-pulse bg-[var(--brand-surface-soft)] sm:h-80 lg:h-[31rem]" />
+          }
         >
           <InteractiveMap
             lat={first.lat}
@@ -1480,14 +1488,14 @@ function EventMapPanel({
             className="h-64 sm:h-80 lg:h-[31rem]"
           />
         </Suspense>
-        <div className="flex items-center justify-between gap-3 border-t border-[#ded7c9] p-4 text-sm">
-          <span className="text-[#5d685f]">
+        <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] p-4 text-sm">
+          <span className="text-[var(--muted-foreground)]">
             {items.length} {items.length === 1 ? nounSingular : nounPlural} en el mapa
           </span>
         </div>
       </section>
-      <section className="mt-4 hidden rounded-2xl bg-[#073f31] p-5 text-white lg:block">
-        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#f3a61e]">
+      <section className="mt-4 hidden rounded-2xl bg-[var(--brand-territory-deep)] p-5 text-white lg:block">
+        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[var(--primary)]">
           Alux conecta tu viaje
         </p>
         <h2 className="mt-2 font-display text-2xl">{profile.aluxMapTitle}</h2>
@@ -1541,7 +1549,7 @@ function FacetSelect({
         aria-label={label}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-11 w-full appearance-none rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-4 pr-9 text-sm"
+        className="min-h-11 w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--background)] pl-4 pr-9 text-sm"
       >
         <option value="">{label}: todos</option>
         {options.map((option) => (
@@ -1734,7 +1742,7 @@ function PlaceListingBody({
       : profile.resultsTitle;
 
   return (
-    <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
         <ListingIntro
           profile={
@@ -1768,13 +1776,13 @@ function PlaceListingBody({
                   onClick={() => setFamily(option.value)}
                   className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                     active
-                      ? "border-[#0d4b38] bg-[#0d4b38] text-white"
-                      : "border-[#ded7c9] bg-white text-[#17251f]"
+                      ? "border-[var(--selva)] bg-[var(--selva)] text-white"
+                      : "border-[var(--border)] bg-card text-[var(--brand-territory-deep)]"
                   }`}
                 >
                   {option.label}
                   {typeof option.count === "number" ? (
-                    <span className={active ? "text-white/75" : "text-[#788078]"}>
+                    <span className={active ? "text-white/75" : "text-[var(--muted-foreground)]"}>
                       {option.count}
                     </span>
                   ) : null}
@@ -1783,11 +1791,11 @@ function PlaceListingBody({
             })}
         </div>
 
-        <section className="mt-3 rounded-2xl border border-[#ded7c9] bg-white p-3 shadow-sm sm:p-4">
+        <section className="mt-3 rounded-2xl border border-[var(--border)] bg-card p-3 shadow-sm sm:p-4">
           <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
             <label className="relative min-w-[12.5rem] flex-1 lg:min-w-0">
               <Search
-                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788078]"
+                className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--muted-foreground)]"
                 aria-hidden
               />
               <span className="sr-only">{profile.searchLabel}</span>
@@ -1795,12 +1803,12 @@ function PlaceListingBody({
                 placeholder={profile.searchPlaceholder}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
+                className="min-h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--background)] pl-10 pr-3 text-sm outline-none"
               />
             </label>
 
             {locked ? (
-              <span className="inline-flex min-h-11 min-w-max items-center gap-2 rounded-xl border border-[#0d4b38]/25 bg-[#0d4b38]/8 px-4 text-sm font-semibold text-[#0d4b38]">
+              <span className="inline-flex min-h-11 min-w-max items-center gap-2 rounded-xl border border-[var(--selva)]/25 bg-[var(--selva)]/8 px-4 text-sm font-semibold text-[var(--selva)]">
                 <MapPin className="size-4" aria-hidden /> {lockedDestinationLabel}
               </span>
             ) : (
@@ -1844,7 +1852,7 @@ function PlaceListingBody({
                 type="button"
                 onClick={() => setShowMore((value) => !value)}
                 aria-expanded={showMore}
-                className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl border border-[#0d4b38] px-4 text-sm font-semibold text-[#0d4b38]"
+                className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)]"
               >
                 <SlidersHorizontal className="size-4" aria-hidden /> Más filtros
                 {activeSecondary.length ? ` (${activeSecondary.length})` : ""}
@@ -1853,7 +1861,7 @@ function PlaceListingBody({
           </div>
 
           {showMore && secondaryGroups.length > 0 ? (
-            <div className="mt-3 grid gap-3 border-t border-[#ded7c9] pt-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-3 grid gap-3 border-t border-[var(--border)] pt-3 sm:grid-cols-2 lg:grid-cols-3">
               {secondaryGroups.map((group) => (
                 <FacetSelect
                   key={group.key}
@@ -1873,7 +1881,7 @@ function PlaceListingBody({
               <button
                 type="button"
                 onClick={clearAll}
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#efe8da] px-4 text-sm font-semibold"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--brand-surface-soft)] px-4 text-sm font-semibold"
               >
                 Limpiar filtros
               </button>
@@ -1885,12 +1893,12 @@ function PlaceListingBody({
           <div className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
                   {lockedDestinationLabel ? "Primero en el destino" : "Territorio y patrimonio"}
                 </p>
                 <h2 className="mt-1 font-display text-2xl sm:text-3xl">{resultsTitle}</h2>
               </div>
-              <p className="shrink-0 text-sm text-[#667067]">
+              <p className="shrink-0 text-sm text-[var(--muted-foreground)]">
                 {filteredItems.length} {filteredItems.length === 1 ? "lugar" : "lugares"}
               </p>
             </div>
@@ -1900,7 +1908,7 @@ function PlaceListingBody({
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
               {!filteredItems.length ? (
-                <div className="rounded-2xl border border-[#ded7c9] bg-white p-8 text-center text-sm text-[#5d685f]">
+                <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
                   {dto && !hasActiveFilters
                     ? dto.emptyMessage
                     : "No encontramos lugares con esos filtros. Prueba quitando una selección."}
@@ -1909,14 +1917,14 @@ function PlaceListingBody({
             </div>
 
             {nearbyItems && nearbyItems.length ? (
-              <section className="mt-10 border-t border-[#ded7c9] pt-7">
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
+              <section className="mt-10 border-t border-[var(--border)] pt-7">
+                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
                   Amplía la ruta
                 </p>
                 <h2 className="mt-1 font-display text-2xl sm:text-3xl">
                   Lugares cerca de {lockedDestinationLabel}
                 </h2>
-                <p className="mt-1 text-sm text-[#667067]">
+                <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                   Pertenecen a otros destinos por proximidad territorial: no son una subzona de{" "}
                   {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>

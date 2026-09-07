@@ -13,6 +13,12 @@ import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { ACTIVE_BRAND } from "@/config/brand";
+import {
+  BRAND_PALETTE_KEYS,
+  normalizeHexColor,
+  paletteContrastChecks,
+  type BrandPalette,
+} from "./brand-theme";
 
 export const BRAND_SETTINGS_KEY = "brand.identity";
 
@@ -24,6 +30,7 @@ export interface BrandSettings {
   discoveryPromise: string;
   conciergeName: string;
   logoSrc: string;
+  palette: BrandPalette;
 }
 
 /** Predeterminados = identidad activa en código (sin cambio visual). */
@@ -34,6 +41,7 @@ export const BRAND_SETTINGS_DEFAULTS: BrandSettings = {
   discoveryPromise: ACTIVE_BRAND.discoveryPromise,
   conciergeName: ACTIVE_BRAND.conciergeName,
   logoSrc: ACTIVE_BRAND.logo.src,
+  palette: ACTIVE_BRAND.palette,
 };
 
 const str = (value: unknown, fallback: string): string =>
@@ -43,6 +51,17 @@ const str = (value: unknown, fallback: string): string =>
 export function normalizeBrandSettings(value: unknown): BrandSettings {
   const row = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
   const logo = str(row.logoSrc, BRAND_SETTINGS_DEFAULTS.logoSrc);
+  const storedPalette =
+    row.palette && typeof row.palette === "object" ? (row.palette as Record<string, unknown>) : {};
+  const palette = Object.fromEntries(
+    BRAND_PALETTE_KEYS.map((key) => [
+      key,
+      normalizeHexColor(storedPalette[key], BRAND_SETTINGS_DEFAULTS.palette[key]),
+    ]),
+  ) as unknown as BrandPalette;
+  const safePalette = paletteContrastChecks(palette).every((check) => check.pass)
+    ? palette
+    : BRAND_SETTINGS_DEFAULTS.palette;
   return {
     name: str(row.name, BRAND_SETTINGS_DEFAULTS.name),
     shortName: str(row.shortName, BRAND_SETTINGS_DEFAULTS.shortName),
@@ -51,7 +70,25 @@ export function normalizeBrandSettings(value: unknown): BrandSettings {
     conciergeName: str(row.conciergeName, BRAND_SETTINGS_DEFAULTS.conciergeName),
     // Sólo rutas internas: no se admiten activos externos ni logos nuevos.
     logoSrc: logo.startsWith("/") ? logo : BRAND_SETTINGS_DEFAULTS.logoSrc,
+    palette: safePalette,
   };
+}
+
+export function validateBrandSettingsInput(input: Partial<BrandSettings>): BrandSettings {
+  const row = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
+  const rawPalette =
+    row.palette && typeof row.palette === "object" ? (row.palette as Record<string, unknown>) : {};
+  const completeHexPalette = BRAND_PALETTE_KEYS.every(
+    (key) => typeof rawPalette[key] === "string" && /^#[0-9a-f]{6}$/i.test(rawPalette[key]),
+  );
+  if (!completeHexPalette) throw new Error("brand_palette_invalid_color");
+  const palette = Object.fromEntries(
+    BRAND_PALETTE_KEYS.map((key) => [key, String(rawPalette[key]).toLowerCase()]),
+  ) as unknown as BrandPalette;
+  if (paletteContrastChecks(palette).some((check) => !check.pass)) {
+    throw new Error("brand_palette_contrast_failed");
+  }
+  return { ...normalizeBrandSettings(input), palette };
 }
 
 function publicClient() {
@@ -115,7 +152,7 @@ export const getBrandSettingsAdmin = createServerFn({ method: "GET" })
 /** Escritura administrativa. No publica nada más: sólo la configuración. */
 export const updateBrandSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: Partial<BrandSettings>) => normalizeBrandSettings(input))
+  .inputValidator((input: Partial<BrandSettings>) => validateBrandSettingsInput(input))
   .handler(async ({ data, context }): Promise<BrandSettings> => {
     await assertAdmin(context as unknown as Parameters<typeof assertAdmin>[0]);
     const { error } = await context.supabase.from("platform_settings").upsert(
@@ -124,8 +161,7 @@ export const updateBrandSettings = createServerFn({ method: "POST" })
         value:
           data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
         is_public: true,
-        description:
-          "Identidad editorial de la marca activa (nombre, lema, promesa, concierge, logo).",
+        description: "Identidad editorial y paleta visual de la marca activa.",
         updated_by: context.userId,
       },
       { onConflict: "key" },

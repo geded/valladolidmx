@@ -6,6 +6,12 @@ import { buildRegionPremiumRuntime } from "../../../src/components/destination-p
 import { buildDestinationPremiumRuntime } from "../../../src/components/destination-premium/destination-premium-runtime";
 import { HOME_PREMIUM_G4_CONTENT } from "../../../src/components/home-premium/home-premium-content";
 import { mergeHomeRealContent } from "../../../src/components/home-premium/home-premium-real";
+import { ACTIVE_BRAND } from "../../../src/config/brand";
+import {
+  brandPaletteStyle,
+  contrastRatio,
+  paletteContrastChecks,
+} from "../../../src/lib/brand/brand-theme";
 
 const root = process.cwd();
 const read = (path: string) => readFileSync(resolve(root, path), "utf8");
@@ -522,17 +528,46 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(card).toContain('caps.compact ? "aspect-[16/9] max-h-36"');
   });
 
-  test("el CMS conserva la configuración de Marca y recupera su acceso administrativo", () => {
+  test("el CMS administra identidad y paleta global con contraste y vista previa", () => {
     const definitions = read("src/lib/workspace/definitions/index.ts");
     const route = read("src/routes/_authenticated/cms/marca.tsx");
     const settings = read("src/lib/brand/brand-settings.functions.ts");
+    const context = read("src/lib/brand/brand-context.tsx");
+    const root = read("src/routes/__root.tsx");
+    const map = read("src/components/maps/InteractiveMap.tsx");
 
     expect(definitions).toContain('id: "cms.marca"');
     expect(definitions).toContain('to: "/cms/marca"');
     expect(definitions).toContain('roles: ["super_admin", "admin"]');
     expect(route).toContain("getBrandSettingsAdmin");
     expect(route).toContain("updateBrandSettings");
+    expect(route).toContain("PALETTE_FIELDS");
+    expect(route).toContain("paletteContrastChecks");
+    expect(route).toContain("Vista previa");
     expect(settings).toContain('export const BRAND_SETTINGS_KEY = "brand.identity"');
+    expect(settings).toContain("validateBrandSettingsInput");
     expect(settings).toContain("await assertAdmin");
+    expect(context).toContain("brandPaletteStyle");
+    expect(context).toContain("root.style.setProperty");
+    expect(root).toContain("brandSettings: normalizeBrandSettings(brandSettings)");
+    expect(root).toContain("brandPaletteStyle(brandSettings.palette)");
+    expect(map).toContain("getBrandMapStyles");
+    expect(map).toContain('themeColor("--primary"');
+  });
+
+  test("la paleta predeterminada pasa WCAG y genera los tokens canónicos", () => {
+    expect(paletteContrastChecks(ACTIVE_BRAND.palette).every((check) => check.pass)).toBe(true);
+    expect(
+      contrastRatio(ACTIVE_BRAND.palette.foreground, ACTIVE_BRAND.palette.background),
+    ).toBeGreaterThanOrEqual(4.5);
+    const style = brandPaletteStyle(ACTIVE_BRAND.palette) as Record<string, string>;
+    expect(style["--primary"]).toBe(ACTIVE_BRAND.palette.primary);
+    expect(style["--selva"]).toBe(ACTIVE_BRAND.palette.territory);
+    expect(style["--accent"]).toBe(ACTIVE_BRAND.palette.accent);
+    expect(
+      paletteContrastChecks(ACTIVE_BRAND.palette).some(
+        (check) => check.label === "Texto secundario general",
+      ),
+    ).toBe(true);
   });
 });

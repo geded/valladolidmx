@@ -103,18 +103,18 @@ export function EventPremiumSurface({
 
   return (
     <PublicShell crumbs={crumbs} useContextCrumbs compactCrumbsOnMobile>
-      <div className="bg-[#f7f2e8] pb-16 text-[#17251f]">
+      <div className="bg-[var(--background)] pb-16 text-[var(--foreground)]">
         <Container className="pt-4 sm:pt-6">
-          <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-[#ded7c9] bg-white p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9">
+          <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-[var(--border)] bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9">
             <div className="order-2 lg:order-1">
               <div className="flex flex-wrap items-center gap-2">
                 {eventType ? (
-                  <span className="rounded-full border border-[#0d4b38]/25 bg-[#0d4b38]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[.16em] text-[#0d4b38]">
+                  <span className="rounded-full border border-[var(--selva)]/25 bg-[var(--selva)]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[.16em] text-[var(--selva)]">
                     {humanizeAttributeValue(eventType)}
                   </span>
                 ) : null}
                 {event.destination_name ? (
-                  <span className="rounded-full border border-[#ded7c9] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[#667067]">
+                  <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[var(--muted-foreground)]">
                     {event.destination_name} · Oriente Maya de Yucatán
                   </span>
                 ) : null}
@@ -123,15 +123,20 @@ export function EventPremiumSurface({
                 {event.title}
               </h1>
               {event.summary ? (
-                <p className="mt-3 text-lg leading-7 text-[#4f5d54]">{event.summary}</p>
+                <p className="mt-3 text-lg leading-7 text-[var(--muted-foreground)]">
+                  {event.summary}
+                </p>
               ) : null}
               {facts.length ? (
                 <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-4 text-sm">
                   {facts.map(({ icon: Icon, label, value }) => (
                     <div key={label} className="flex min-w-0 items-start gap-2">
-                      <Icon className="mt-0.5 size-4 shrink-0 text-[#ba641e]" aria-hidden />
+                      <Icon
+                        className="mt-0.5 size-4 shrink-0 text-[var(--brand-primary-strong)]"
+                        aria-hidden
+                      />
                       <div>
-                        <dt className="text-[10px] uppercase tracking-[.14em] text-[#788078]">
+                        <dt className="text-[10px] uppercase tracking-[.14em] text-[var(--muted-foreground)]">
                           {label}
                         </dt>
                         <dd className="mt-0.5 font-semibold">{value}</dd>
@@ -157,7 +162,7 @@ export function EventPremiumSurface({
                     href={event.external_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#0d4b38] px-7 text-sm font-semibold text-[#0d4b38]"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--selva)] px-7 text-sm font-semibold text-[var(--selva)]"
                   >
                     Más información <ArrowRight className="size-4" aria-hidden />
                   </a>
@@ -174,7 +179,7 @@ export function EventPremiumSurface({
                     loading="eager"
                   />
                 ) : (
-                  <div className="h-56 w-full rounded-3xl border border-dashed border-[#ded7c9] bg-[#efe8da] sm:h-72 lg:h-[26rem]" />
+                  <div className="h-56 w-full rounded-3xl border border-dashed border-[var(--border)] bg-[var(--brand-surface-soft)] sm:h-72 lg:h-[26rem]" />
                 ))}
             </div>
           </section>
@@ -200,14 +205,14 @@ export function EventPremiumSurface({
           <Container className="mt-10 lg:mt-14">
             <section className="grid gap-7 lg:grid-cols-[.82fr_1.18fr] lg:items-start">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-[#ba641e]">
+                <p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
                   La experiencia
                 </p>
                 <h2 className="mt-3 font-display text-4xl leading-tight">Qué vas a vivir</h2>
                 {tags.length ? (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-white px-3 py-2 text-xs shadow-sm">
+                      <span key={tag} className="rounded-full bg-card px-3 py-2 text-xs shadow-sm">
                         {tag}
                       </span>
                     ))}
@@ -215,7 +220,7 @@ export function EventPremiumSurface({
                 ) : null}
               </div>
               {event.body ? (
-                <div className="whitespace-pre-line text-base leading-8 text-[#5d685f]">
+                <div className="whitespace-pre-line text-base leading-8 text-[var(--muted-foreground)]">
                   {event.body}
                 </div>
               ) : null}

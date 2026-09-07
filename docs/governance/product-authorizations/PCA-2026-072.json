@@ -1,0 +1,125 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-072",
+  "title": "Configurador global de identidad visual multi-marca",
+  "status": "Approved",
+  "branch": "feature/cms-global-brand-theme-20260907",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para completar el configurador global de Marca en CMS, incorporar una paleta administrable, conectarla mediante tokens CSS a plantillas Premium y componentes compartidos, conservar Valladolid.mx como predeterminado, validar contraste y permitir restaurar valores; sin migraciones, cambios de roles o permisos, publicación, despliegue ni modificación de otros datos CMS.",
+  "permissions": [
+    { "operation": "modify", "path": "src/config/brand.ts" },
+    { "operation": "create", "path": "src/lib/brand/brand-theme.ts" },
+    { "operation": "modify", "path": "src/lib/brand/brand-context.tsx" },
+    { "operation": "modify", "path": "src/lib/brand/brand-settings.functions.ts" },
+    { "operation": "modify", "path": "src/routes/__root.tsx" },
+    { "operation": "modify", "path": "src/routes/_authenticated/cms/marca.tsx" },
+    { "operation": "modify", "path": "src/components/maps/InteractiveMap.tsx" },
+    { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" },
+    { "operation": "modify", "path": "src/components/home-premium/shared/PremiumShowcase.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx"
+    },
+    { "operation": "modify", "path": "src/components/surfaces/EventPremiumSurface.tsx" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/config/brand.ts",
+      "sha256": "000d8f7676cbaa13a51d1f7d6ab2784dcbd37edc3a6a8f2b7a966e7380fe0bdc",
+      "authority": "Founder · paleta Valladolid.mx predeterminada · 2026-09-07"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/brand/brand-theme.ts",
+      "sha256": "d1021bdd56b3949f069ff969f86665fa92e01edfaface89e83fcaffa080f5dd3",
+      "authority": "Founder · tokens y contraste globales · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx",
+      "sha256": "c3930cd834b7571b9e630779bdf5e46be5922863a67308b1f3e4029727068f94",
+      "authority": "Founder · aplicación SSR de la paleta sin parpadeo · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/brand/brand-context.tsx",
+      "sha256": "7100f0b1440e108d2de8f77df5c8a84fd4fbbbe093f4ff6ce1c34ee5dbe53ec8",
+      "authority": "Founder · aplicación dinámica global · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/brand/brand-settings.functions.ts",
+      "sha256": "f80a9f3dce79d4a251f1b6f3441a5cd5b9c05be1cc46c1d51fad4f8e1b3f4f64",
+      "authority": "Founder · persistencia segura sin migración · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/marca.tsx",
+      "sha256": "c98f5ff22e44901804fbb30fa1b295d6e262d6ecc5582ad1f4a90a6768c812d5",
+      "authority": "Founder · editor visual con preview y restauración · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/maps/InteractiveMap.tsx",
+      "sha256": "8c666c04fe611905ddbcef30e6b4f51f09db7745b6d11c1e4513595a4adc1fa1",
+      "authority": "Founder · mapa vinculado a paleta de marca · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "2b14cdb5195b5fdadff8523f82dd767f4831e54d4e533edff577e14fa95969a3",
+      "authority": "Founder · Home Premium tokenizado · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/shared/PremiumShowcase.tsx",
+      "sha256": "b62dde7a48effc72995133c99161293a2f853a4b1e6f0702b36139214cb2e081",
+      "authority": "Founder · showcase compartido tokenizado · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+      "sha256": "c4ed37130715e38264b9d30a5e4bdfba0eae9b08812f7247a1b579a4adc6a948",
+      "authority": "Founder · micrositio tokenizado · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "sha256": "2447d29401465867ee107e50e040923de03534ef028b4bd7d0224e7acfe28637",
+      "authority": "Founder · listados territoriales tokenizados · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/EventPremiumSurface.tsx",
+      "sha256": "170ed9165fd280f69183eb8f6aaabe6dca5b72a0dbc74415c2e07281461ab826",
+      "authority": "Founder · eventos tokenizados · 2026-09-07"
+    }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya",
+    "/oriente-maya/{destino}",
+    "/hoteles",
+    "/restaurantes",
+    "/casas-de-vacaciones",
+    "/experiencias",
+    "/eventos",
+    "/lugares",
+    "/que-hacer",
+    "/cms/marca"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:r1:f1l:r2",
+    "bun scripts/route-inventory-coverage.ts",
+    "bun run governance:check"
+  ]
+}

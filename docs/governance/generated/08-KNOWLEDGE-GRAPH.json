@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-09-06T00:00:00.000Z",
+  "generated_at": "2026-09-07T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "158cea520839d53d0bd1990655a8f9aead245bbf658fbb41e3d2ff251b217415"
+      "source_sha256": "0af6dac58af643d2b05b8e68677685bbc2671e577da4df96bd812a3ae324eee9"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -17109,6 +17109,20 @@
       "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts",
       "source": "src/routes/api/cms/studio-media-preview.$mediaId.ts",
       "evidence": "src/routes/api/cms/studio-media-preview.$mediaId.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-072.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-072.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-072.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-072.json"
+    },
+    {
+      "id": "ART:src/lib/brand/brand-theme.ts",
+      "type": "artifact",
+      "path": "src/lib/brand/brand-theme.ts",
+      "source": "src/lib/brand/brand-theme.ts",
+      "evidence": "src/lib/brand/brand-theme.ts"
     }
   ],
   "edges": [
@@ -50780,6 +50794,26 @@
       "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
       "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-072.json:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-072.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-07",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/brand/brand-theme.ts:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:src/lib/brand/brand-theme.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-07",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     }
   ],

@@ -80,7 +80,11 @@ import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 import { ACTIVE_BRAND, ACTIVE_BRAND_THEME_STYLE } from "@/config/brand";
 import { BrandProvider, brandSettingsQueryOptions } from "@/lib/brand/brand-context";
-import { BRAND_SETTINGS_DEFAULTS } from "@/lib/brand/brand-settings.functions";
+import {
+  BRAND_SETTINGS_DEFAULTS,
+  normalizeBrandSettings,
+} from "@/lib/brand/brand-settings.functions";
+import { brandPaletteStyle } from "@/lib/brand/brand-theme";
 import {
   institutionalAuthorityQueryOptions,
   useInstitutionalAuthority,
@@ -170,7 +174,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
     // para que header, pie y superficies públicas la pinten sin parpadeo.
     // Fail-safe: ante cualquier error se conserva el fallback de código.
-    const [omxdsVisualFoundationsEnabled] = await Promise.all([
+    const [omxdsVisualFoundationsEnabled, brandSettings] = await Promise.all([
       getOmxdsVisualFoundationsFlag(),
       context.queryClient
         .ensureQueryData(brandSettingsQueryOptions)
@@ -179,7 +183,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
     ]);
 
-    return { omxdsVisualFoundationsEnabled };
+    return { omxdsVisualFoundationsEnabled, brandSettings: normalizeBrandSettings(brandSettings) };
   },
 
   head: () => ({
@@ -244,13 +248,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { omxdsVisualFoundationsEnabled } = Route.useLoaderData();
+  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
   return (
     <html
       lang="es"
       suppressHydrationWarning
       data-tourism-brand={ACTIVE_BRAND.key}
-      style={ACTIVE_BRAND_THEME_STYLE}
+      style={{ ...ACTIVE_BRAND_THEME_STYLE, ...brandPaletteStyle(brandSettings.palette) }}
       data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>
