@@ -515,7 +515,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
 
     expect(business).toContain("`Explora cerca de ${b.display_name}`");
     expect(business).toContain('id: "cerca-del-perfil"');
-    expect(business).toContain('maxItems: 4');
+    expect(business).toContain("maxItems: 4");
     expect(business).toContain('density: activePremium ? "compact" : "comfortable"');
     expect(business).toContain('variant: activePremium ? ("inline" as const)');
     expect(collection).toContain('"min-w-[210px] max-w-[240px] sm:min-w-[230px]"');
