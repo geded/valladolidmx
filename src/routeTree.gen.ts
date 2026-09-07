@@ -211,6 +211,7 @@ import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './route
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/chat'
+import { Route as ApiCmsStudioMediaPreviewMediaIdRouteImport } from './routes/api/cms/studio-media-preview.$mediaId'
 import { Route as AuthenticatedPortalVentasEnLineaOrdenesRouteImport } from './routes/_authenticated/portal/ventas-en-linea.ordenes'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
@@ -1394,6 +1395,12 @@ const ApiPublicAluxChatRoute = ApiPublicAluxChatRouteImport.update({
   path: '/api/public/alux/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCmsStudioMediaPreviewMediaIdRoute =
+  ApiCmsStudioMediaPreviewMediaIdRouteImport.update({
+    id: '/api/cms/studio-media-preview/$mediaId',
+    path: '/api/cms/studio-media-preview/$mediaId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalVentasEnLineaOrdenesRoute =
   AuthenticatedPortalVentasEnLineaOrdenesRouteImport.update({
     id: '/ordenes',
@@ -1860,6 +1867,7 @@ export interface FileRoutesByFullPath {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+  '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -2098,6 +2106,7 @@ export interface FileRoutesByTo {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+  '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -2347,6 +2356,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/_authenticated/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+  '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -2597,6 +2607,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/portal/ventas-en-linea/ordenes'
+    | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -2835,6 +2846,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/portal/ventas-en-linea/ordenes'
+    | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -3083,6 +3095,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
     | '/_authenticated/portal/ventas-en-linea/ordenes'
+    | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -3235,6 +3248,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
+  ApiCmsStudioMediaPreviewMediaIdRoute: typeof ApiCmsStudioMediaPreviewMediaIdRoute
   ApiPublicAluxChatRoute: typeof ApiPublicAluxChatRoute
   ApiPublicAluxSignalRoute: typeof ApiPublicAluxSignalRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
@@ -4669,6 +4683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAluxChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cms/studio-media-preview/$mediaId': {
+      id: '/api/cms/studio-media-preview/$mediaId'
+      path: '/api/cms/studio-media-preview/$mediaId'
+      fullPath: '/api/cms/studio-media-preview/$mediaId'
+      preLoaderRoute: typeof ApiCmsStudioMediaPreviewMediaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/portal/ventas-en-linea/ordenes': {
       id: '/_authenticated/portal/ventas-en-linea/ordenes'
       path: '/ordenes'
@@ -5633,6 +5654,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
+  ApiCmsStudioMediaPreviewMediaIdRoute: ApiCmsStudioMediaPreviewMediaIdRoute,
   ApiPublicAluxChatRoute: ApiPublicAluxChatRoute,
   ApiPublicAluxSignalRoute: ApiPublicAluxSignalRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,

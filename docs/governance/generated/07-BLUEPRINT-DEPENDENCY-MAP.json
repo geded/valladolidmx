@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.86",
     "state": "Approved",
-    "source_sha256": "a6f215df1d889d4bc0fe35b51e449850d1576741bd0b36fdf0851b69458cfca8",
+    "source_sha256": "641289c5b1c4f1f5e8c51e4a9fb9b609cbab97c5b79ea5dd527d22bd8078d9db",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -12170,6 +12170,11 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-069.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-069.json"
+    },
+    {
+      "id": "ART:src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "type": "artifact",
+      "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts"
     }
   ],
   "edges": [
@@ -37349,6 +37354,24 @@
     {
       "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
       "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/EventPremiumSurface.tsx:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:src/components/surfaces/EventPremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/api/cms/studio-media-preview.$mediaId.ts:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "origin": "ART:src/routes/api/cms/studio-media-preview.$mediaId.ts",
       "relation": "implements",
       "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
       "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",

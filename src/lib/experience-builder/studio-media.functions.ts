@@ -98,7 +98,7 @@ export const resolveSafeEventCoverPreview = createServerFn({ method: "POST" })
 
     const realEvent = await getEventBySlug({ data: { slug: String(event.slug) } });
     if (!realEvent || realEvent.id !== event.id) throw new Error("event_not_available");
-    return { ...realEvent, cover_url: publicProxyUrl(String(media.storage_path)) };
+    return realEvent;
   });
 
 function sanitizeFilename(name: string) {

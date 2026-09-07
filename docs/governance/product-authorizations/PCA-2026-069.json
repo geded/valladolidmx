@@ -7,10 +7,12 @@
   "blueprint": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
   "founder_authority": "Autorizaciones Founder del 2026-09-07 para crear el preview seguro de las seis portadas IA temporales aprobadas, y para crear un único commit, abrir PR hacia main, fusionar sólo con controles en PASS y desplegar exclusivamente el preview autenticado del CMS; sin modificar ni publicar eventos, sin asociar imágenes, sin cambiar cover_media_id y sin alterar el Home público ni otros datos del CMS.",
   "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/EventPremiumSurface.tsx" },
     { "operation": "modify", "path": "src/lib/experience-builder/studio-media.functions.ts" },
     { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" },
     { "operation": "modify", "path": "src/routeTree.gen.ts" },
-    { "operation": "create", "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx" }
+    { "operation": "create", "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx" },
+    { "operation": "create", "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts" }
   ],
   "public_routes": [],
   "required_feature_flags": ["none"],
@@ -27,27 +29,39 @@
   "acknowledged_revisions": [
     {
       "operation": "modify",
+      "path": "src/components/surfaces/EventPremiumSurface.tsx",
+      "sha256": "415d181e33c2c7635b52bfa158b5710a92a10de7bade1e14fb6054cf2861c9cd",
+      "authority": "Founder · corrección P1 read-only del preview seguro · 2026-09-07"
+    },
+    {
+      "operation": "modify",
       "path": "src/lib/experience-builder/route-inventory.ts",
-      "sha256": "df4c26c7b2ae64ce0b294b68c5a3f43c00b33d51ea0b4139f7e9fc851bbab49b",
+      "sha256": "b6b359055115b8fe904ae14dad0f7536ead894f0eb008a227280562c93660a18",
       "authority": "Founder · trazabilidad Governance del preview seguro · 2026-09-07"
     },
     {
       "operation": "modify",
       "path": "src/lib/experience-builder/studio-media.functions.ts",
-      "sha256": "3cfb2e452264c28d569399463c761e9567f39a9a972d373899cc8c11d7c53272",
+      "sha256": "0c07eb6984c3645c49020ee6dfdd9cf7b82a84cbf72f601d36e42d35b2587e29",
       "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
     },
     {
       "operation": "modify",
       "path": "src/routeTree.gen.ts",
-      "sha256": "afb7999eb7dec94f544e3bc58fe55058d0045ab35803b15d47c9a0cc188da1ec",
+      "sha256": "90548c6ec906e058a18e97541a41426e2a26065ea3623a4d8ecf361dfe7a1f7e",
       "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
     },
     {
       "operation": "create",
       "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
-      "sha256": "4fb400f64b73700d2ecd0a375c4c499afe02b4896ca713370f152c089161169b",
+      "sha256": "6f9a4a37058ef6da54a409bd8758a70f4ec33ffb6b9441fc05a172783f3ece4b",
       "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/cms/studio-media-preview.$mediaId.ts",
+      "sha256": "620999fba9e3580c6fabfd6c12ecb1f4b384baca5c77c4c4a676387d73c0b9f9",
+      "authority": "Founder · corrección P2 endpoint autenticado del preview seguro · 2026-09-07"
     }
   ]
 }

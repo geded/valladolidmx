@@ -585,6 +585,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/alux.tsx",
   "src/routes/api/dev/media-pipeline-derive.ts",
   "src/routes/api/dev/media-shadow-eval.ts",
+  "src/routes/api/cms/studio-media-preview.$mediaId.ts",
   "src/routes/api/public/alux/signal.ts",
   "src/routes/api/public/health/maps.ts",
   "src/routes/api/public/hooks/coupon-review-reminders.ts",
