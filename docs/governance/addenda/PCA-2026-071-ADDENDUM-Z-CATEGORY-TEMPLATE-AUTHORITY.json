@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-071-ADDENDUM-Z-CATEGORY-TEMPLATE-AUTHORITY",
+  "status": "Approved",
+  "parent": "PCA-2026-071",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para cerrar el hallazgo visual residual de la reconciliación Premium sin modificar contenido ni datos CMS.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/BusinessSurface.tsx",
+    "previous_sha256": "e4be4631b9fbcc7a943b202f3c6d1826e363f6da5efa18c2ec3022b6375beebf",
+    "current_sha256": "b2d8514385b494503d5675a12a49aa761037d21514e1b4b64c60b8d4f4faf22a",
+    "semantic_change": "Hotel, restaurante y casa vacacional conservan la composición aprobada por familia incluso sin elegibilidad comercial; medios y capacidades continúan fail-closed.",
+    "authority": "Founder · cierre de mezcla visual residual · 2026-09-07"
+  },
+  "invariants": ["Una autoridad visual por familia", "Sin datos inventados", "Sin publicación"],
+  "recorded_at": "2026-09-07"
+}

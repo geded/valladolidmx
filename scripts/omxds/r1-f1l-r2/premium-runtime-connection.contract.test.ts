@@ -522,8 +522,12 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(business).toContain("`Explora cerca de ${b.display_name}`");
     expect(business).toContain('id: "cerca-del-perfil"');
     expect(business).toContain("maxItems: 4");
-    expect(business).toContain('density: activePremium ? "compact" : "comfortable"');
-    expect(business).toContain('variant: activePremium ? ("inline" as const)');
+    expect(business).toContain('density: usesApprovedFamilyTemplate ? "compact" : "comfortable"');
+    expect(business).toContain('variant: usesApprovedFamilyTemplate ? ("inline" as const)');
+    expect(business).toContain("const usesApprovedFamilyTemplate = Boolean(");
+    expect(business).toContain('activeContract.family === "hotel"');
+    expect(business).toContain('activeContract.family === "restaurant"');
+    expect(business).toContain("{usesApprovedFamilyTemplate ? (");
     expect(collection).toContain('"min-w-[210px] max-w-[240px] sm:min-w-[230px]"');
     expect(card).toContain('caps.compact ? "aspect-[16/9] max-h-36"');
   });
