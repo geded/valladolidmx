@@ -1,0 +1,76 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-071",
+  "title": "Reconciliación visual integral de las autoridades Premium",
+  "status": "Approved",
+  "branch": "reconciliation/premium-visual-authority-20260907",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para reconciliar el historial de integration/lovable-valladolidmx con main usando las plantillas Premium aprobadas; recuperar componentes faltantes, eliminar secciones antiguas mezcladas, preservar marca, navegación territorial, breadcrumbs, Alux, Mi Viaje, mapas, tarjetas compactas y responsive; conservar demos sólo durante construcción; corregir contratos, pruebas y Governance; trabajar en una rama temporal y un único PR, sin modificar datos CMS, migraciones, pagos, reservaciones, secretos, permisos o RLS, y sin publicar ni desplegar.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx"
+    },
+    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "sha256": "e4be4631b9fbcc7a943b202f3c6d1826e363f6da5efa18c2ec3022b6375beebf",
+      "authority": "Founder · reconciliación integral de fichas Premium · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx",
+      "sha256": "2ecfdf51a85dcea5d9beae2a483b6da9a3a650fadc83078765512e8c8cda180b",
+      "authority": "Founder · tarjetas contextuales compactas aprobadas · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx",
+      "sha256": "796d1ce60013541969b0985e106bfd5d3370d33902eefd65190ae5cd8bd57dff",
+      "authority": "Founder · fallback editorial compacto sin tarjetas gigantes · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts",
+      "sha256": "4d7dfd5f7cd60b53fa2378e5bd4ba75833f0afd9b46521435fcfa71f0eb1328c",
+      "authority": "Founder · preservación de la configuración global de Marca en CMS · 2026-09-07"
+    }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya",
+    "/oriente-maya/{destino}",
+    "/oriente-maya/{destino}/{categoria}",
+    "/oriente-maya/{destino}/{categoria}/{empresa}",
+    "/hoteles",
+    "/restaurantes",
+    "/casas-de-vacaciones",
+    "/experiencias",
+    "/eventos",
+    "/lugares",
+    "/que-hacer",
+    "/cms/marca"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:i3:b",
+    "bun run test:i3:c",
+    "bun run test:i3:d",
+    "bun run test:r1:f1l:r2",
+    "bun run test:r1:a",
+    "bun run test:q2d:b",
+    "bun scripts/route-inventory-coverage.ts",
+    "bun run governance:check"
+  ]
+}

@@ -245,7 +245,12 @@ function ItemsLayout({
         {items.map((it) => (
           <li
             key={`${it.kind}-${it.id}`}
-            className="min-w-[260px] max-w-[300px] shrink-0 snap-start"
+            className={cn(
+              "shrink-0 snap-start",
+              tourismCaps.compact
+                ? "min-w-[210px] max-w-[240px] sm:min-w-[230px]"
+                : "min-w-[260px] max-w-[300px]",
+            )}
           >
             <TourismCard
               vm={toVM(it)}
