@@ -36,9 +36,13 @@ import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism
 import { businessToMapPoint } from "@/lib/experience-builder/adapters/entity-to-map-point";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import { ListingMapHeader } from "@/components/discovery/ListingMapHeader";
-import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
-import type { ListingFamilyId } from "@/lib/listings/listing-public-contract";
+import {
+  buildPublicListing,
+  listingFamilyContract,
+  type ListingFamilyId,
+} from "@/lib/listings/listing-public-contract";
+import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 
 const CANONICAL_LISTING_FAMILIES: Partial<Record<string, ListingFamilyId>> = {
   hoteles: "hoteles",
@@ -46,6 +50,7 @@ const CANONICAL_LISTING_FAMILIES: Partial<Record<string, ListingFamilyId>> = {
   restaurantes: "restaurantes",
   gastronomia: "restaurantes",
   experiencias: "experiencias",
+  "experiencias-tours": "experiencias",
   tours: "experiencias",
   eventos: "eventos",
   lugares: "lugares",
@@ -77,6 +82,18 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
     // E2 · US-E2.3 — Related Collection para superficie Categoría.
     // Fallback silencioso: el bloque se oculta si no hay datos.
     const family = CANONICAL_LISTING_FAMILIES[params.categoria] ?? null;
+    const premiumListingPromise = family
+      ? listingFamilyContract(family).source === "businesses"
+        ? Promise.resolve(
+            buildPublicListing({
+              family,
+              destino: params.destino,
+              businesses,
+              categorySlugs: [params.categoria],
+            }),
+          )
+        : getPublicListing({ data: { family, destino: params.destino } }).catch(() => null)
+      : Promise.resolve(null);
     const [related, premiumListing] = await Promise.all([
       getCategoryRelated({
         data: {
@@ -84,9 +101,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
           categorySlug: params.categoria,
         },
       }).catch(() => null),
-      family
-        ? getPublicListing({ data: { family, destino: params.destino } }).catch(() => null)
-        : Promise.resolve(null),
+      premiumListingPromise,
     ]);
     return { resolution, items, related, premiumListing };
   },

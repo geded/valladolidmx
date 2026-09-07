@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZZZZ-PREMIUM-CONTINUITY-LISTING-CONTRACT",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para corregir los enlaces y lecturas de las plantillas Premium en main, revisar en Lovable y no publicar ni desplegar producción.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/listings/listing-public-contract.ts",
+    "previous_sha256": "3df4e23dc5038e3854031510b9b541e4d273f4c093dcab7a148ab09ee6caed69",
+    "current_sha256": "f8cfbf99c21aeb0977fcc87ae20130559f446f1318036d919f17c9f0fd1d86f8",
+    "semantic_change": "Preserva el slug de categoría CMS de cada negocio al construir su enlace territorial.",
+    "authority": "Founder · continuidad Premium y navegación territorial correcta · 2026-09-07"
+  },
+  "invariants": [
+    "Cada tarjeta conserva la categoría registrada en CMS",
+    "Sin modificación de datos del CMS",
+    "Sin despliegue ni publicación de producción",
+    "Sin rediseño fuera del delta autorizado"
+  ],
+  "recorded_at": "2026-09-07"
+}

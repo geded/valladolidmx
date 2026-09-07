@@ -12,7 +12,8 @@
     { "operation": "modify", "path": "src/components/maps/BusinessLocationBlock.tsx" },
     { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
     { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx" },
-    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx" }
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx" },
+    { "operation": "modify", "path": "src/lib/listings/listing-public-contract.ts" }
   ],
   "public_routes": [
     "/oriente-maya",
@@ -64,8 +65,14 @@
     {
       "operation": "modify",
       "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx",
-      "sha256": "8a5cdbe6b6655dde56a6f030084b863a89a5a24f171d4dc77d4b6f4ec7588299",
+      "sha256": "32920e7252722eecbc67206fa3ceb2d3cc2552f22bf5cd1963c216725641457d",
       "authority": "Founder · conexión territorial con listados Premium · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/listings/listing-public-contract.ts",
+      "sha256": "f8cfbf99c21aeb0977fcc87ae20130559f446f1318036d919f17c9f0fd1d86f8",
+      "authority": "Founder · enlaces Premium preservan la categoría CMS de cada negocio · 2026-09-07"
     }
   ]
 }
