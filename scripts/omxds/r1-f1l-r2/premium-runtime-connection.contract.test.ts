@@ -505,4 +505,34 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
       'enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}',
     );
   });
+
+  test("las fichas Premium eliminan la colección antigua y no cubren contenido con un CTA fijo", () => {
+    const business = read("src/components/surfaces/BusinessSurface.tsx");
+    const collection = read(
+      "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx",
+    );
+    const card = read("src/components/experience-builder/tourism-card/TourismCard.tsx");
+
+    expect(business).toContain("`Explora cerca de ${b.display_name}`");
+    expect(business).toContain('id: "cerca-del-perfil"');
+    expect(business).toContain('maxItems: 4');
+    expect(business).toContain('density: activePremium ? "compact" : "comfortable"');
+    expect(business).toContain('variant: activePremium ? ("inline" as const)');
+    expect(collection).toContain('"min-w-[210px] max-w-[240px] sm:min-w-[230px]"');
+    expect(card).toContain('caps.compact ? "aspect-[16/9] max-h-36"');
+  });
+
+  test("el CMS conserva la configuración de Marca y recupera su acceso administrativo", () => {
+    const definitions = read("src/lib/workspace/definitions/index.ts");
+    const route = read("src/routes/_authenticated/cms/marca.tsx");
+    const settings = read("src/lib/brand/brand-settings.functions.ts");
+
+    expect(definitions).toContain('id: "cms.marca"');
+    expect(definitions).toContain('to: "/cms/marca"');
+    expect(definitions).toContain('roles: ["super_admin", "admin"]');
+    expect(route).toContain("getBrandSettingsAdmin");
+    expect(route).toContain("updateBrandSettings");
+    expect(settings).toContain('export const BRAND_SETTINGS_KEY = "brand.identity"');
+    expect(settings).toContain("await assertAdmin");
+  });
 });

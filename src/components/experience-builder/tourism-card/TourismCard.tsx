@@ -343,7 +343,12 @@ export function TourismCard({
       )}
     >
       {caps.showMedia ? (
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
+        <div
+          className={cn(
+            "relative w-full overflow-hidden bg-muted",
+            caps.compact ? "aspect-[16/9] max-h-36" : "aspect-[4/3]",
+          )}
+        >
           {vm.mediaUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -416,7 +421,7 @@ export function TourismCard({
           ) : null}
         </div>
       ) : null}
-      <div className="flex flex-1 flex-col p-5">
+      <div className={cn("flex flex-1 flex-col", caps.compact ? "p-4" : "p-5")}>
         {caps.showLocation && vm.location ? (
           <p className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
             <PinIcon />

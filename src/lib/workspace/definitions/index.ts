@@ -768,6 +768,19 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "bottom", "palette"],
     },
     {
+      // Lote 3B — acceso a la fuente única de identidad editorial.
+      // La autorización efectiva permanece en el servidor (admin/super_admin).
+      id: "cms.marca",
+      workspaceId: "cms",
+      label: "Marca",
+      icon: Settings,
+      to: "/cms/marca",
+      group: "estudio",
+      order: 12,
+      surfaces: ["sidebar", "palette"],
+      roles: ["super_admin", "admin"],
+    },
+    {
       id: "cms.reviews",
       workspaceId: "cms",
       label: "Reseñas",

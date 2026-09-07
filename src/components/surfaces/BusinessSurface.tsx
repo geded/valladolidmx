@@ -376,6 +376,10 @@ export function BusinessSurface({
   const ctaBarDto = activeContract
     ? {
         ...legacyCtaBarDto,
+        // La ficha Premium integra la acción al flujo editorial. Una barra
+        // fija ocultaba el contenido en iPad/móvil y mezclaba la composición
+        // aprobada con el patrón comercial heredado.
+        variant: activePremium ? ("inline" as const) : legacyCtaBarDto.variant,
         actions: dominantAction?.href
           ? [
               {
@@ -597,39 +601,54 @@ export function BusinessSurface({
               source: "business",
               entityKind: "mixed",
               variant: activePremium ? "carousel" : "grid",
-              columns: activePremium ? 3 : 2,
-              heading: "Sigue descubriendo",
-              subheading: `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
+              columns: activePremium ? 4 : 2,
+              density: activePremium ? "compact" : "comfortable",
+              heading: activePremium ? `Explora cerca de ${b.display_name}` : "Sigue descubriendo",
+              subheading: activePremium
+                ? `Opciones del mismo destino para continuar tu viaje por ${b.destination_slug || "el Oriente Maya"}.`
+                : `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
               emptyMessage: "Aún no hay empresas hermanas publicadas en este destino.",
               ariaLabel: `Descubrimiento contextual desde ${b.display_name}`,
-              groups: [
-                {
-                  id: "misma-categoria",
-                  entityKind: "business",
-                  heading: `Más de ${variant.eyebrow.toLowerCase()} en el destino`,
-                  maxItems: 6,
-                  variant: activePremium ? "carousel" : "grid",
-                  categorySlug: b.category_slug || null,
-                  seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}/${encodeURIComponent(b.category_slug || "")}`,
-                  seeAllLabel: "Ver todas",
-                },
-                {
-                  id: "otras-categorias",
-                  entityKind: "business",
-                  heading: "Otras experiencias del destino",
-                  maxItems: 6,
-                  variant: activePremium ? "carousel" : "grid",
-                  seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
-                  seeAllLabel: "Ver destino",
-                },
-              ],
+              groups: activePremium
+                ? [
+                    {
+                      id: "cerca-del-perfil",
+                      entityKind: "business",
+                      maxItems: 4,
+                      variant: "carousel",
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
+                      seeAllLabel: "Ver destino",
+                    },
+                  ]
+                : [
+                    {
+                      id: "misma-categoria",
+                      entityKind: "business",
+                      heading: `Más de ${variant.eyebrow.toLowerCase()} en el destino`,
+                      maxItems: 6,
+                      variant: "grid",
+                      categorySlug: b.category_slug || null,
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}/${encodeURIComponent(b.category_slug || "")}`,
+                      seeAllLabel: "Ver todas",
+                    },
+                    {
+                      id: "otras-categorias",
+                      entityKind: "business",
+                      heading: "Otras experiencias del destino",
+                      maxItems: 6,
+                      variant: "grid",
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
+                      seeAllLabel: "Ver destino",
+                    },
+                  ],
               capabilities: {
                 showImage: true,
                 showMeta: true,
                 showBadges: true,
                 showKindBadge: true,
                 dedupe: true,
-                showRationale: true,
+                showRationale: !activePremium,
+                compact: Boolean(activePremium),
               },
               contextRefs: {
                 destinationSlug: b.destination_slug || null,
