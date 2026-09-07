@@ -250,6 +250,7 @@ import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_
 import { Route as AuthenticatedCmsRegionesIdEditarRouteImport } from './routes/_authenticated/cms/regiones.$id.editar'
 import { Route as AuthenticatedCmsProductosProductIdEditarRouteImport } from './routes/_authenticated/cms/productos.$productId.editar'
 import { Route as AuthenticatedCmsLugaresPlaceIdEditarRouteImport } from './routes/_authenticated/cms/lugares.$placeId.editar'
+import { Route as AuthenticatedCmsEventosEventIdPortadaPreviewRouteImport } from './routes/_authenticated/cms/eventos.$eventId.portada-preview'
 import { Route as AuthenticatedCmsEventosEventIdEditarRouteImport } from './routes/_authenticated/cms/eventos.$eventId.editar'
 import { Route as AuthenticatedCmsEmpresasBusinessIdPreviewRouteImport } from './routes/_authenticated/cms/empresas.$businessId.preview'
 import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './routes/_authenticated/cms/empresas.$businessId.editar'
@@ -1627,6 +1628,12 @@ const AuthenticatedCmsLugaresPlaceIdEditarRoute =
     path: '/lugares/$placeId/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsEventosEventIdPortadaPreviewRoute =
+  AuthenticatedCmsEventosEventIdPortadaPreviewRouteImport.update({
+    id: '/eventos/$eventId/portada-preview',
+    path: '/eventos/$eventId/portada-preview',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsEventosEventIdEditarRoute =
   AuthenticatedCmsEventosEventIdEditarRouteImport.update({
     id: '/eventos/$eventId/editar',
@@ -1892,6 +1899,7 @@ export interface FileRoutesByFullPath {
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/cms/empresas/$businessId/preview': typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   '/cms/eventos/$eventId/editar': typeof AuthenticatedCmsEventosEventIdEditarRoute
+  '/cms/eventos/$eventId/portada-preview': typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   '/cms/lugares/$placeId/editar': typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   '/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/cms/regiones/$id/editar': typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -2128,6 +2136,7 @@ export interface FileRoutesByTo {
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/cms/empresas/$businessId/preview': typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   '/cms/eventos/$eventId/editar': typeof AuthenticatedCmsEventosEventIdEditarRoute
+  '/cms/eventos/$eventId/portada-preview': typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   '/cms/lugares/$placeId/editar': typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   '/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/cms/regiones/$id/editar': typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -2377,6 +2386,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/_authenticated/cms/empresas/$businessId/preview': typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   '/_authenticated/cms/eventos/$eventId/editar': typeof AuthenticatedCmsEventosEventIdEditarRoute
+  '/_authenticated/cms/eventos/$eventId/portada-preview': typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   '/_authenticated/cms/lugares/$placeId/editar': typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   '/_authenticated/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/_authenticated/cms/regiones/$id/editar': typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -2626,6 +2636,7 @@ export interface FileRouteTypes {
     | '/cms/empresas/$businessId/editar'
     | '/cms/empresas/$businessId/preview'
     | '/cms/eventos/$eventId/editar'
+    | '/cms/eventos/$eventId/portada-preview'
     | '/cms/lugares/$placeId/editar'
     | '/cms/productos/$productId/editar'
     | '/cms/regiones/$id/editar'
@@ -2862,6 +2873,7 @@ export interface FileRouteTypes {
     | '/cms/empresas/$businessId/editar'
     | '/cms/empresas/$businessId/preview'
     | '/cms/eventos/$eventId/editar'
+    | '/cms/eventos/$eventId/portada-preview'
     | '/cms/lugares/$placeId/editar'
     | '/cms/productos/$productId/editar'
     | '/cms/regiones/$id/editar'
@@ -3110,6 +3122,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/empresas/$businessId/editar'
     | '/_authenticated/cms/empresas/$businessId/preview'
     | '/_authenticated/cms/eventos/$eventId/editar'
+    | '/_authenticated/cms/eventos/$eventId/portada-preview'
     | '/_authenticated/cms/lugares/$placeId/editar'
     | '/_authenticated/cms/productos/$productId/editar'
     | '/_authenticated/cms/regiones/$id/editar'
@@ -4929,6 +4942,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsLugaresPlaceIdEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/eventos/$eventId/portada-preview': {
+      id: '/_authenticated/cms/eventos/$eventId/portada-preview'
+      path: '/eventos/$eventId/portada-preview'
+      fullPath: '/cms/eventos/$eventId/portada-preview'
+      preLoaderRoute: typeof AuthenticatedCmsEventosEventIdPortadaPreviewRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/eventos/$eventId/editar': {
       id: '/_authenticated/cms/eventos/$eventId/editar'
       path: '/eventos/$eventId/editar'
@@ -5286,6 +5306,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsEmpresasBusinessIdEditarRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   AuthenticatedCmsEmpresasBusinessIdPreviewRoute: typeof AuthenticatedCmsEmpresasBusinessIdPreviewRoute
   AuthenticatedCmsEventosEventIdEditarRoute: typeof AuthenticatedCmsEventosEventIdEditarRoute
+  AuthenticatedCmsEventosEventIdPortadaPreviewRoute: typeof AuthenticatedCmsEventosEventIdPortadaPreviewRoute
   AuthenticatedCmsLugaresPlaceIdEditarRoute: typeof AuthenticatedCmsLugaresPlaceIdEditarRoute
   AuthenticatedCmsProductosProductIdEditarRoute: typeof AuthenticatedCmsProductosProductIdEditarRoute
   AuthenticatedCmsRegionesIdEditarRoute: typeof AuthenticatedCmsRegionesIdEditarRoute
@@ -5350,6 +5371,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
     AuthenticatedCmsEmpresasBusinessIdPreviewRoute,
   AuthenticatedCmsEventosEventIdEditarRoute:
     AuthenticatedCmsEventosEventIdEditarRoute,
+  AuthenticatedCmsEventosEventIdPortadaPreviewRoute:
+    AuthenticatedCmsEventosEventIdPortadaPreviewRoute,
   AuthenticatedCmsLugaresPlaceIdEditarRoute:
     AuthenticatedCmsLugaresPlaceIdEditarRoute,
   AuthenticatedCmsProductosProductIdEditarRoute:

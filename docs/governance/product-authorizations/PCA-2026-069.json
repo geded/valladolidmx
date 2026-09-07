@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-069",
+  "title": "Preview autenticado y no persistente de portadas IA temporales para eventos",
+  "status": "Approved",
+  "branch": "feat/safe-event-cover-preview-20260907",
+  "blueprint": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-07 para crear el preview seguro de las seis portadas IA temporales aprobadas, y para crear un único commit, abrir PR hacia main, fusionar sólo con controles en PASS y desplegar exclusivamente el preview autenticado del CMS; sin modificar ni publicar eventos, sin asociar imágenes, sin cambiar cover_media_id y sin alterar el Home público ni otros datos del CMS.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/experience-builder/studio-media.functions.ts" },
+    { "operation": "modify", "path": "src/routeTree.gen.ts" },
+    { "operation": "create", "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["none"],
+  "required_tests": [
+    "npx vitest run scripts/omxds/g8/safe-event-cover-preview.contract.test.ts",
+    "npx tsc --noEmit",
+    "npm run build",
+    "node scripts/lint/lint-baseline.mjs",
+    "bun scripts/route-inventory-coverage.ts",
+    "node scripts/governance/sync-governance.mjs --check",
+    "node scripts/governance/validate-governance-integrity.mjs",
+    "node scripts/governance/validate-product-authorization.mjs"
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/studio-media.functions.ts",
+      "sha256": "3cfb2e452264c28d569399463c761e9567f39a9a972d373899cc8c11d7c53272",
+      "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts",
+      "sha256": "afb7999eb7dec94f544e3bc58fe55058d0045ab35803b15d47c9a0cc188da1ec",
+      "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx",
+      "sha256": "4fb400f64b73700d2ecd0a375c4c499afe02b4896ca713370f152c089161169b",
+      "authority": "Founder · preview seguro de portadas temporales · 2026-09-07"
+    }
+  ]
+}
