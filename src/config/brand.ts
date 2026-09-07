@@ -18,6 +18,8 @@ export interface TourismBrandDefinition {
     primaryForeground: string;
     secondary: string;
     secondaryForeground: string;
+    accent: string;
+    accentForeground: string;
     muted: string;
     mutedForeground: string;
     border: string;
@@ -40,20 +42,22 @@ export const ACTIVE_BRAND: TourismBrandDefinition = {
   conciergeName: "Alux",
   logo: { src: "/logo.png", width: 470, height: 159 },
   palette: {
-    background: "oklch(0.977 0.013 86.8)",
-    foreground: "oklch(0.227 0.017 112.9)",
-    card: "oklch(0.993 0.008 86.8)",
-    cardForeground: "oklch(0.227 0.017 112.9)",
-    primary: "oklch(0.777 0.14 74.9)",
-    primaryForeground: "oklch(0.227 0.017 112.9)",
-    secondary: "oklch(0.921 0.024 85.8)",
-    secondaryForeground: "oklch(0.227 0.017 112.9)",
-    muted: "oklch(0.945 0.018 85.8)",
-    mutedForeground: "oklch(0.511 0.073 125.9)",
-    border: "oklch(0.88 0.022 85.8)",
-    ring: "oklch(0.777 0.14 74.9)",
-    territory: "oklch(0.37 0.058 157)",
-    territoryForeground: "oklch(0.977 0.013 86.8)",
+    background: "#fbf7ee",
+    foreground: "#1c1d14",
+    card: "#fffdf7",
+    cardForeground: "#1c1d14",
+    primary: "#eaa840",
+    primaryForeground: "#1c1d14",
+    secondary: "#ece4d3",
+    secondaryForeground: "#1c1d14",
+    accent: "#057c94",
+    accentForeground: "#fbf7ee",
+    muted: "#f2ece0",
+    mutedForeground: "#5c6e3f",
+    border: "#ded7c8",
+    ring: "#eaa840",
+    territory: "#234933",
+    territoryForeground: "#fbf7ee",
   },
 };
 
@@ -66,6 +70,8 @@ export const ACTIVE_BRAND_THEME_STYLE = {
   "--primary-foreground": ACTIVE_BRAND.palette.primaryForeground,
   "--secondary": ACTIVE_BRAND.palette.secondary,
   "--secondary-foreground": ACTIVE_BRAND.palette.secondaryForeground,
+  "--accent": ACTIVE_BRAND.palette.accent,
+  "--accent-foreground": ACTIVE_BRAND.palette.accentForeground,
   "--muted": ACTIVE_BRAND.palette.muted,
   "--muted-foreground": ACTIVE_BRAND.palette.mutedForeground,
   "--border": ACTIVE_BRAND.palette.border,

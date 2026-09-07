@@ -43,54 +43,91 @@ export interface MapRouteStatus {
  * Conserva calles y referencias geográficas útiles, reduce ruido comercial
  * y traslada la paleta crema / selva / oro al lienzo de Google Maps.
  */
-const VALLADOLID_MAP_STYLES = [
-  { elementType: "geometry", stylers: [{ color: "#eee8d8" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#23483a" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#f7f3e9" }] },
-  {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#b7aa86" }],
-  },
-  {
-    featureType: "administrative.country",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#123e2f" }],
-  },
-  {
-    featureType: "landscape.natural",
-    elementType: "geometry",
-    stylers: [{ color: "#dfe5cf" }],
-  },
-  {
-    featureType: "landscape.man_made",
-    elementType: "geometry",
-    stylers: [{ color: "#f3eddf" }],
-  },
-  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#d7dfc8" }] },
-  { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#c7d6b6" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#fffaf0" }] },
-  {
-    featureType: "road",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#d5c9aa" }],
-  },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#d7a641" }] },
-  {
-    featureType: "road.highway",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#b47b13" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#173f31" }],
-  },
-  { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#8cbfc0" }] },
-  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#285e60" }] },
-] as const;
+function themeColor(property: string, fallback: string): string {
+  if (typeof document === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(property).trim() || fallback;
+}
+
+function mixHex(a: string, b: string, amount: number): string {
+  const channels = (hex: string) =>
+    [1, 3, 5].map((index) => Number.parseInt(hex.slice(index, index + 2), 16));
+  if (!/^#[0-9a-f]{6}$/i.test(a) || !/^#[0-9a-f]{6}$/i.test(b)) return a;
+  return `#${channels(a)
+    .map((channel, index) =>
+      Math.round(channel + (channels(b)[index]! - channel) * amount)
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
+}
+
+function getBrandMapStyles() {
+  const background = themeColor("--background", "#fbf7ee");
+  const secondary = themeColor("--secondary", "#ece4d3");
+  const territory = themeColor("--selva", "#234933");
+  const primary = themeColor("--primary", "#eaa840");
+  const accent = themeColor("--accent", "#057c94");
+  return [
+    { elementType: "geometry", stylers: [{ color: secondary }] },
+    { elementType: "labels.text.fill", stylers: [{ color: territory }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: background }] },
+    {
+      featureType: "administrative",
+      elementType: "geometry.stroke",
+      stylers: [{ color: mixHex(secondary, territory, 0.28) }],
+    },
+    {
+      featureType: "administrative.country",
+      elementType: "labels.text.fill",
+      stylers: [{ color: territory }],
+    },
+    {
+      featureType: "landscape.natural",
+      elementType: "geometry",
+      stylers: [{ color: mixHex(secondary, territory, 0.12) }],
+    },
+    {
+      featureType: "landscape.man_made",
+      elementType: "geometry",
+      stylers: [{ color: mixHex(background, secondary, 0.45) }],
+    },
+    {
+      featureType: "poi",
+      elementType: "geometry",
+      stylers: [{ color: mixHex(secondary, territory, 0.16) }],
+    },
+    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+    {
+      featureType: "poi.park",
+      elementType: "geometry",
+      stylers: [{ color: mixHex(secondary, territory, 0.24) }],
+    },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: background }] },
+    {
+      featureType: "road",
+      elementType: "geometry.stroke",
+      stylers: [{ color: mixHex(secondary, territory, 0.2) }],
+    },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: primary }] },
+    {
+      featureType: "road.highway",
+      elementType: "geometry.stroke",
+      stylers: [{ color: mixHex(primary, territory, 0.25) }],
+    },
+    {
+      featureType: "road.highway",
+      elementType: "labels.text.fill",
+      stylers: [{ color: territory }],
+    },
+    { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
+    {
+      featureType: "water",
+      elementType: "geometry",
+      stylers: [{ color: mixHex(accent, background, 0.55) }],
+    },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: accent }] },
+  ];
+}
 
 /**
  * Montaje condicional: el SDK sólo se descarga cuando el contenedor está
@@ -173,13 +210,11 @@ function labelForIndex(i: number) {
 }
 
 function getMarkerColors(): { bg: string; fg: string; stroke: string } {
-  if (typeof document === "undefined") {
-    return { bg: "#c88a17", fg: "#fffaf0", stroke: "#123e2f" };
-  }
-  const root = getComputedStyle(document.documentElement);
-  const bg = root.getPropertyValue("--primary").trim() || "#EAA840";
-  const fg = root.getPropertyValue("--primary-foreground").trim() || "#fffaf0";
-  return { bg, fg, stroke: "#123e2f" };
+  return {
+    bg: themeColor("--primary", "#eaa840"),
+    fg: themeColor("--primary-foreground", "#1c1d14"),
+    stroke: themeColor("--selva", "#234933"),
+  };
 }
 
 function markerIconDataUri(letter: string, selected = false): string {
@@ -237,8 +272,8 @@ export function InteractiveMap({
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
           zoom,
-          styles: VALLADOLID_MAP_STYLES,
-          backgroundColor: "#eee8d8",
+          styles: getBrandMapStyles(),
+          backgroundColor: themeColor("--secondary", "#ece4d3"),
           disableDefaultUI: true,
           zoomControl: true,
           streetViewControl: false,
@@ -280,7 +315,7 @@ export function InteractiveMap({
             suppressMarkers: true,
             preserveViewport: false,
             polylineOptions: {
-              strokeColor: "#c88a17",
+              strokeColor: themeColor("--primary", "#eaa840"),
               strokeOpacity: 0.95,
               strokeWeight: 5,
             },
@@ -324,7 +359,7 @@ export function InteractiveMap({
               new google.maps.Polyline({
                 map,
                 path: stops.map((s) => ({ lat: s.lat, lng: s.lng })),
-                strokeColor: "#c88a17",
+                strokeColor: themeColor("--primary", "#eaa840"),
                 strokeOpacity: 0,
                 icons: [
                   {

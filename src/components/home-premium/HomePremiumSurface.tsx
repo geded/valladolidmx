@@ -309,12 +309,12 @@ function HeroCinematic({ content }: { content: HomePremiumContent }) {
           className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
           aria-hidden
         />
-        <span className="absolute right-4 top-4 rounded-md bg-black/65 px-3 py-1.5 text-xs text-[#f7f3ea] backdrop-blur-sm">
+        <span className="absolute right-4 top-4 rounded-md bg-black/65 px-3 py-1.5 text-xs text-[var(--background)] backdrop-blur-sm">
           {slide.caption}
         </span>
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-10">
           <p className="text-xs font-semibold uppercase text-primary">Oriente Maya de Yucatán</p>
-          <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-[#f7f3ea] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-[3.35rem]">
+          <h1 className="mt-2.5 max-w-4xl text-balance font-display text-4xl leading-[1.02] text-[var(--background)] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-[3.35rem]">
             {content.hero.title}
           </h1>
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
@@ -573,7 +573,7 @@ function PueblosMagicosSection({
           <Link
             key={pueblo.name}
             to={pueblo.href ?? "/oriente-maya"}
-            className="group relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
+            className="group relative h-[12.5rem] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated lg:h-[15rem]"
           >
             <EditorialMediaFrame
               media={pueblo.media}
@@ -629,7 +629,7 @@ function ExperiencesSection({
             <Link
               key={item.title}
               to={item.href}
-              className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[#071814] text-white sm:w-[46%]"
+              className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
             >
               <EditorialMediaFrame
                 media={item.media}
@@ -657,7 +657,8 @@ function ExperiencesSection({
         <article
           className={cn(
             "h-full overflow-hidden rounded-2xl border border-border bg-card",
-            cinematic && "relative border-0 bg-[#071814] text-white shadow-elevated",
+            cinematic &&
+              "relative border-0 bg-[var(--brand-territory-deep)] text-white shadow-elevated",
           )}
         >
           <EditorialMediaFrame
@@ -696,7 +697,7 @@ function ExperiencesSection({
                 className={cn(
                   "mt-4 min-h-11 rounded-pill",
                   cinematic &&
-                    "border-white/45 bg-black/25 text-white hover:bg-white hover:text-[#071814]",
+                    "border-white/45 bg-black/25 text-white hover:bg-card hover:text-[var(--brand-territory-deep)]",
                 )}
               >
                 <Link to={featured.href}>Explorar experiencia</Link>
@@ -912,7 +913,7 @@ function EditorialSection({
             <Link
               key={item.title}
               to={item.href}
-              className="relative h-[12.5rem] overflow-hidden rounded-2xl bg-[#071814] text-white shadow-elevated lg:h-[15rem]"
+              className="relative h-[12.5rem] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated lg:h-[15rem]"
             >
               <EditorialMediaFrame
                 media={item.media}

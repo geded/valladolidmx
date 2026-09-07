@@ -13,7 +13,7 @@
  * viniendo del código y de los activos ya existentes: aquí no se crean
  * ni se sustituyen activos.
  */
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import {
   BRAND_SETTINGS_DEFAULTS,
@@ -22,6 +22,7 @@ import {
   type BrandSettings,
 } from "./brand-settings.functions";
 import { ACTIVE_BRAND } from "@/config/brand";
+import { brandPaletteStyle } from "./brand-theme";
 
 export const BRAND_SETTINGS_QUERY_KEY = ["brand", "identity"] as const;
 
@@ -42,9 +43,15 @@ const BrandContext = createContext<BrandSettings | null>(null);
  */
 export function BrandProvider({ children }: { children: ReactNode }) {
   const { data } = useQuery({ ...brandSettingsQueryOptions, initialData: BRAND_SETTINGS_DEFAULTS });
-  return (
-    <BrandContext.Provider value={normalizeBrandSettings(data)}>{children}</BrandContext.Provider>
-  );
+  const brand = normalizeBrandSettings(data);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const style = brandPaletteStyle(brand.palette) as Record<string, string>;
+    for (const [property, value] of Object.entries(style)) root.style.setProperty(property, value);
+  }, [brand.palette]);
+
+  return <BrandContext.Provider value={brand}>{children}</BrandContext.Provider>;
 }
 
 /** Identidad de marca vigente. Fuera del provider devuelve el fallback. */
