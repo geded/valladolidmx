@@ -103,7 +103,7 @@ export function EventPremiumSurface({
 
   return (
     <PublicShell crumbs={crumbs} useContextCrumbs compactCrumbsOnMobile>
-      <div className="bg-[var(--background)] pb-16 text-[var(--brand-territory-deep)]">
+      <div className="bg-[var(--background)] pb-16 text-[var(--foreground)]">
         <Container className="pt-4 sm:pt-6">
           <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-[var(--border)] bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9">
             <div className="order-2 lg:order-1">

@@ -49,7 +49,7 @@ export function DestinationMicrositeReviewSurface() {
   return (
     <div
       data-content-policy="destination-first-nearby-fallback"
-      className="bg-[var(--background)] pb-20 text-[var(--brand-territory-deep)]"
+      className="bg-[var(--background)] pb-20 text-[var(--foreground)]"
     >
       <Hero />
 
@@ -138,7 +138,7 @@ export function DestinationMicrositeReviewSurface() {
 
 function Hero() {
   return (
-    <section className="relative min-h-[34rem] overflow-hidden bg-[var(--brand-territory-deep)] text-white sm:min-h-[38rem] lg:min-h-[680px]">
+    <section className="relative min-h-[34rem] overflow-hidden bg-[var(--selva)] text-[var(--selva-foreground)] sm:min-h-[38rem] lg:min-h-[680px]">
       <img
         src={media.cover.url}
         alt={media.cover.alt}
@@ -164,7 +164,7 @@ function Hero() {
           <div className="mt-5 flex flex-wrap gap-2 lg:mt-7 lg:gap-3">
             <Button
               size="lg"
-              className="rounded-full bg-[var(--primary)] px-6 text-[var(--brand-territory-deep)] hover:bg-[var(--primary)]"
+              className="rounded-full bg-[var(--primary)] px-6 text-[var(--primary-foreground)] hover:bg-[var(--primary)]"
             >
               Descubrir Valladolid <ArrowRight className="ml-2 size-4" />
             </Button>
@@ -236,7 +236,7 @@ function DestinationIntro() {
 
 function AluxGuide() {
   return (
-    <section className="grid items-center gap-3 overflow-hidden rounded-[1.5rem] bg-[var(--brand-territory-deep)] px-4 py-4 text-white shadow-lg sm:grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto] md:px-5 lg:gap-5 lg:px-6 lg:py-5">
+    <section className="grid items-center gap-3 overflow-hidden rounded-[1.5rem] bg-[var(--selva)] px-4 py-4 text-[var(--selva-foreground)] shadow-lg sm:grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto] md:px-5 lg:gap-5 lg:px-6 lg:py-5">
       <div className="flex items-center gap-3">
         <AluxMark family="avatar" size={48} decorative />
         <div>
@@ -264,7 +264,7 @@ function AluxGuide() {
           )}
         </div>
       </div>
-      <Button className="rounded-full bg-[var(--primary)] text-[var(--brand-territory-deep)] hover:bg-[var(--primary)]">
+      <Button className="rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]">
         Preguntar a Alux <ArrowRight className="ml-2 size-4" />
       </Button>
     </section>
@@ -435,7 +435,7 @@ function Agenda() {
   return (
     <section>
       <SectionHeading eyebrow="Agenda local" title="Lo que está pasando en Valladolid" />
-      <div className="grid grid-flow-col auto-cols-[82%] overflow-x-auto rounded-[1.5rem] bg-[var(--brand-territory-deep)] text-white sm:auto-cols-[48%] md:grid-flow-row md:grid-cols-3 md:overflow-hidden">
+      <div className="grid grid-flow-col auto-cols-[82%] overflow-x-auto rounded-[1.5rem] bg-[var(--selva)] text-[var(--selva-foreground)] sm:auto-cols-[48%] md:grid-flow-row md:grid-cols-3 md:overflow-hidden">
         {[
           ["16", "MAY", "Noche de Valladolid"],
           ["24", "MAY", "Festival de la Calzada"],
@@ -509,7 +509,7 @@ function TerritoryMap() {
 
 function TripClose() {
   return (
-    <section className="grid items-center gap-4 rounded-[1.5rem] bg-[var(--brand-territory-deep)] px-5 py-5 text-white sm:grid-cols-[auto_1fr_auto] lg:gap-5 lg:rounded-[1.75rem] lg:px-7 lg:py-7">
+    <section className="grid items-center gap-4 rounded-[1.5rem] bg-[var(--selva)] px-5 py-5 text-[var(--selva-foreground)] sm:grid-cols-[auto_1fr_auto] lg:gap-5 lg:rounded-[1.75rem] lg:px-7 lg:py-7">
       <div className="flex justify-center">
         <img
           src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
@@ -529,7 +529,7 @@ function TripClose() {
           Guarda lugares, arma una ruta y continúa con Alux cuando lo necesites.
         </p>
       </div>
-      <Button className="rounded-full bg-[var(--primary)] text-[var(--brand-territory-deep)] hover:bg-[var(--primary)]">
+      <Button className="rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]">
         Armar mi viaje <Sparkles className="ml-2 size-4" />
       </Button>
     </section>

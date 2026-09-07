@@ -502,7 +502,7 @@ function TerritorialListingBody({
     (item) => item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
   );
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--brand-territory-deep)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
         <ListingIntro profile={profile} />
         <AluxBar profile={profile} />
@@ -1202,7 +1202,7 @@ function EventListingBody({
       : profile.resultsTitle;
 
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--brand-territory-deep)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
         <ListingIntro
           profile={
@@ -1742,7 +1742,7 @@ function PlaceListingBody({
       : profile.resultsTitle;
 
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--brand-territory-deep)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
         <ListingIntro
           profile={

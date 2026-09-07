@@ -8,9 +8,10 @@
   "founder_authority": "Autorización Founder del 2026-09-07 para completar el configurador global de Marca en CMS, incorporar una paleta administrable, conectarla mediante tokens CSS a plantillas Premium y componentes compartidos, conservar Valladolid.mx como predeterminado, validar contraste y permitir restaurar valores; sin migraciones, cambios de roles o permisos, publicación, despliegue ni modificación de otros datos CMS.",
   "permissions": [
     { "operation": "modify", "path": "src/config/brand.ts" },
-    { "operation": "create", "path": "src/lib/brand/brand-theme.ts" },
+    { "operation": "modify", "path": "src/lib/brand/brand-theme.ts" },
     { "operation": "modify", "path": "src/lib/brand/brand-context.tsx" },
     { "operation": "modify", "path": "src/lib/brand/brand-settings.functions.ts" },
+    { "operation": "modify", "path": "src/routes/__root.tsx" },
     { "operation": "modify", "path": "src/routes/_authenticated/cms/marca.tsx" },
     { "operation": "modify", "path": "src/components/maps/InteractiveMap.tsx" },
     { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" },
@@ -33,10 +34,16 @@
       "authority": "Founder · paleta Valladolid.mx predeterminada · 2026-09-07"
     },
     {
-      "operation": "create",
+      "operation": "modify",
       "path": "src/lib/brand/brand-theme.ts",
-      "sha256": "e19a0c47317ba89189e4fd9fc240b455b455d5e46b7224aaf25ee0be1a07b748",
+      "sha256": "d1021bdd56b3949f069ff969f86665fa92e01edfaface89e83fcaffa080f5dd3",
       "authority": "Founder · tokens y contraste globales · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx",
+      "sha256": "c3930cd834b7571b9e630779bdf5e46be5922863a67308b1f3e4029727068f94",
+      "authority": "Founder · aplicación SSR de la paleta sin parpadeo · 2026-09-07"
     },
     {
       "operation": "modify",
@@ -77,19 +84,19 @@
     {
       "operation": "modify",
       "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
-      "sha256": "ab634b7c5e0c5b478288f4ddfec656726f3057cd2cf76f093c34153b8e4d1666",
+      "sha256": "c4ed37130715e38264b9d30a5e4bdfba0eae9b08812f7247a1b579a4adc6a948",
       "authority": "Founder · micrositio tokenizado · 2026-09-07"
     },
     {
       "operation": "modify",
       "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
-      "sha256": "cfda94539a8d70d5a9f7d8d9a186175f6443538e044d0fbe2ab5b17d8b006f53",
+      "sha256": "2447d29401465867ee107e50e040923de03534ef028b4bd7d0224e7acfe28637",
       "authority": "Founder · listados territoriales tokenizados · 2026-09-07"
     },
     {
       "operation": "modify",
       "path": "src/components/surfaces/EventPremiumSurface.tsx",
-      "sha256": "e365069101b4a8197fde5f298bb71de085a59dbfb912e27ecc724b82d5515f83",
+      "sha256": "170ed9165fd280f69183eb8f6aaabe6dca5b72a0dbc74415c2e07281461ab826",
       "authority": "Founder · eventos tokenizados · 2026-09-07"
     }
   ],

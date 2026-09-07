@@ -533,6 +533,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const route = read("src/routes/_authenticated/cms/marca.tsx");
     const settings = read("src/lib/brand/brand-settings.functions.ts");
     const context = read("src/lib/brand/brand-context.tsx");
+    const root = read("src/routes/__root.tsx");
     const map = read("src/components/maps/InteractiveMap.tsx");
 
     expect(definitions).toContain('id: "cms.marca"');
@@ -548,6 +549,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(settings).toContain("await assertAdmin");
     expect(context).toContain("brandPaletteStyle");
     expect(context).toContain("root.style.setProperty");
+    expect(root).toContain("brandSettings: normalizeBrandSettings(brandSettings)");
+    expect(root).toContain("brandPaletteStyle(brandSettings.palette)");
     expect(map).toContain("getBrandMapStyles");
     expect(map).toContain('themeColor("--primary"');
   });
@@ -561,5 +564,10 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(style["--primary"]).toBe(ACTIVE_BRAND.palette.primary);
     expect(style["--selva"]).toBe(ACTIVE_BRAND.palette.territory);
     expect(style["--accent"]).toBe(ACTIVE_BRAND.palette.accent);
+    expect(
+      paletteContrastChecks(ACTIVE_BRAND.palette).some(
+        (check) => check.label === "Texto secundario general",
+      ),
+    ).toBe(true);
   });
 });

@@ -49,6 +49,18 @@ export function paletteContrastChecks(palette: BrandPalette) {
   return [
     { label: "Texto general", ratio: contrastRatio(palette.foreground, palette.background) },
     { label: "Texto en tarjetas", ratio: contrastRatio(palette.cardForeground, palette.card) },
+    {
+      label: "Texto secundario general",
+      ratio: contrastRatio(palette.mutedForeground, palette.background),
+    },
+    {
+      label: "Texto secundario en tarjetas",
+      ratio: contrastRatio(palette.mutedForeground, palette.card),
+    },
+    {
+      label: "Texto secundario en superficie tenue",
+      ratio: contrastRatio(palette.mutedForeground, palette.muted),
+    },
     { label: "Botón principal", ratio: contrastRatio(palette.primaryForeground, palette.primary) },
     {
       label: "Botón secundario",
