@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-ZZZZZZZZ-PR65-ROUTE-INVENTORY",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para añadir al PR #65 exclusivamente trazabilidad Governance del preview seguro, incluyendo el inventario requerido, sin cambios funcionales adicionales.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "42d7dd44e485650b093d8be5b2e369a4fa4b550ced895f8629b0aa9d4fdadf95",
+    "current_sha256": "df4c26c7b2ae64ce0b294b68c5a3f43c00b33d51ea0b4139f7e9fc851bbab49b",
+    "semantic_change": "Registra declarativamente la nueva ruta autenticada del preview seguro en SCANNED_ROUTE_FILES; no altera su comportamiento.",
+    "authority": "Founder · trazabilidad Governance PR #65 · 2026-09-07"
+  },
+  "invariants": [
+    "Sin cambios funcionales adicionales",
+    "Sin rutas públicas nuevas",
+    "Sin persistencia ni publicación de medios o eventos"
+  ],
+  "recorded_at": "2026-09-07"
+}

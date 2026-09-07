@@ -8,6 +8,7 @@
   "founder_authority": "Autorizaciones Founder del 2026-09-07 para crear el preview seguro de las seis portadas IA temporales aprobadas, y para crear un único commit, abrir PR hacia main, fusionar sólo con controles en PASS y desplegar exclusivamente el preview autenticado del CMS; sin modificar ni publicar eventos, sin asociar imágenes, sin cambiar cover_media_id y sin alterar el Home público ni otros datos del CMS.",
   "permissions": [
     { "operation": "modify", "path": "src/lib/experience-builder/studio-media.functions.ts" },
+    { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" },
     { "operation": "modify", "path": "src/routeTree.gen.ts" },
     { "operation": "create", "path": "src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx" }
   ],
@@ -24,6 +25,12 @@
     "node scripts/governance/validate-product-authorization.mjs"
   ],
   "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "df4c26c7b2ae64ce0b294b68c5a3f43c00b33d51ea0b4139f7e9fc851bbab49b",
+      "authority": "Founder · trazabilidad Governance del preview seguro · 2026-09-07"
+    },
     {
       "operation": "modify",
       "path": "src/lib/experience-builder/studio-media.functions.ts",
