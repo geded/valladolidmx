@@ -8,9 +8,16 @@
   "founder_authority": "Autorización Founder del 2026-09-07 para reconciliar el historial de integration/lovable-valladolidmx con main usando las plantillas Premium aprobadas; recuperar componentes faltantes, eliminar secciones antiguas mezcladas, preservar marca, navegación territorial, breadcrumbs, Alux, Mi Viaje, mapas, tarjetas compactas y responsive; conservar demos sólo durante construcción; corregir contratos, pruebas y Governance; trabajar en una rama temporal y un único PR, sin modificar datos CMS, migraciones, pagos, reservaciones, secretos, permisos o RLS, y sin publicar ni desplegar.",
   "permissions": [
     { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
-    { "operation": "modify", "path": "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx" },
-    { "operation": "modify", "path": "src/components/experience-builder/tourism-card/TourismCard.tsx" },
-    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" }
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx"
+    },
+    { "operation": "modify", "path": "src/lib/workspace/definitions/index.ts" },
+    { "operation": "modify", "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs" }
   ],
   "acknowledged_revisions": [
     {
@@ -36,6 +43,12 @@
       "path": "src/lib/workspace/definitions/index.ts",
       "sha256": "4d7dfd5f7cd60b53fa2378e5bd4ba75833f0afd9b46521435fcfa71f0eb1328c",
       "authority": "Founder · preservación de la configuración global de Marca en CMS · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "sha256": "67412bec2ba59c932939866a1de7286eb51bc3aba05016c2bfd9f1ff6d73250d",
+      "authority": "Founder · actualización de evidencia I3-D al SHA Premium autorizado · 2026-09-07"
     }
   ],
   "public_routes": [
