@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass, Map as MapIcon, MapPin, Palmtree, Search } from "lucide-react";
 
@@ -18,21 +18,6 @@ const InteractiveMap = lazy(() =>
 const PAGE_SIZE = 8;
 const PUEBLOS_MAGICOS = new Set(["valladolid", "izamal", "espita"]);
 const COASTAL = new Set(["el-cuyo", "las-coloradas", "rio-lagartos", "san-felipe"]);
-const HERO_MEDIA = [
-  {
-    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-territorio-v1.webp",
-    alt: "Valladolid como puerta de entrada al Oriente Maya",
-  },
-  {
-    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-naturaleza-v1.webp",
-    alt: "Naturaleza y cenotes del Oriente Maya",
-  },
-  {
-    src: "/api/public/studio-media/conceptual-preview/2026-09-01/oriente-maya-hero-cultura-v1.webp",
-    alt: "Cultura maya viva del oriente de Yucatán",
-  },
-] as const;
-
 function destinationFamily(destination: Destination): string {
   if (PUEBLOS_MAGICOS.has(destination.slug)) return "pueblos";
   if (COASTAL.has(destination.slug)) return "costa";
@@ -79,16 +64,6 @@ export function RegionDestinationsPremiumSurface({
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("todos");
   const [visible, setVisible] = useState(PAGE_SIZE);
-  const [heroIndex, setHeroIndex] = useState(0);
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-    const timer = window.setInterval(
-      () => setHeroIndex((value) => (value + 1) % HERO_MEDIA.length),
-      6800,
-    );
-    return () => window.clearInterval(timer);
-  }, []);
   const ordered = useMemo(() => orderedDestinations(destinations), [destinations]);
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase("es");
@@ -109,8 +84,10 @@ export function RegionDestinationsPremiumSurface({
   const heroDestination = ordered.find((destination) => destination.slug === "valladolid");
   const heroMedia = heroDestination?.image_url
     ? { src: heroDestination.image_url, alt: `Valladolid, punto de partida del Oriente Maya` }
-    : HERO_MEDIA[heroIndex];
-  const cinematic = presentation === "cinematic";
+    : null;
+  // La variante cinematográfica exige un medio CMS acreditado. Sin él,
+  // la misma autoridad resuelve una portada editorial completa y digna.
+  const cinematic = presentation === "cinematic" && heroMedia !== null;
 
   return (
     <div className="pb-20" data-region-destinations="premium-approved">
@@ -120,13 +97,15 @@ export function RegionDestinationsPremiumSurface({
             "relative isolate overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft",
             cinematic
               ? "min-h-[34rem] md:min-h-[40rem] lg:min-h-[40rem]"
-              : "md:min-h-[40rem] lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]",
+              : heroMedia
+                ? "md:min-h-[40rem] lg:grid lg:min-h-[25rem] lg:grid-cols-[minmax(0,.92fr)_minmax(0,1.08fr)]"
+                : "min-h-[24rem] bg-gradient-to-br from-card via-card to-secondary/55",
           )}
         >
           {cinematic ? (
             <img
-              src={heroMedia.src}
-              alt={heroMedia.alt}
+              src={heroMedia!.src}
+              alt={heroMedia!.alt}
               className="absolute inset-0 -z-20 size-full object-cover"
             />
           ) : null}
@@ -169,24 +148,21 @@ export function RegionDestinationsPremiumSurface({
               cenotes sagrados, costa y sabores únicos.
             </p>
           </div>
-          <div
-            className={cn(
-              "relative h-72 overflow-hidden md:h-80 lg:h-auto lg:min-h-full",
-              cinematic && "hidden",
-            )}
-          >
-            <img
-              src={heroMedia.src}
-              alt={heroMedia.alt}
-              className="absolute inset-0 size-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/24 via-transparent to-transparent" />
-            {!heroDestination?.image_url ? (
-              <span className="absolute bottom-4 left-4 rounded-full bg-background/90 px-3 py-1 text-[10px] text-foreground backdrop-blur">
-                Visual conceptual temporal · reemplazable en Medios
-              </span>
-            ) : null}
-          </div>
+          {heroMedia ? (
+            <div
+              className={cn(
+                "relative h-72 overflow-hidden md:h-80 lg:h-auto lg:min-h-full",
+                cinematic && "hidden",
+              )}
+            >
+              <img
+                src={heroMedia.src}
+                alt={heroMedia.alt}
+                className="absolute inset-0 size-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/24 via-transparent to-transparent" />
+            </div>
+          ) : null}
         </section>
 
         <TourismAluxPanel

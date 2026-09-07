@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZZZZZZZZ-PREMIUM-CONTINUITY-LISTING-SURFACE",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para integrar directamente en main y revisar en Lovable.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    "previous_sha256": "940ecbe05d945125b017c6902487418cc1f28c439919c42f4c03acacb8c30f00",
+    "current_sha256": "940ecbe05d945125b017c6902487418cc1f28c439919c42f4c03acacb8c30f00",
+    "semantic_change": "Cierre documental de la cadena de continuidad Premium; no añade cambios al archivo.",
+    "authority": "Founder · continuidad Premium en main · 2026-09-07"
+  },
+  "invariants": ["Sin cambios adicionales", "Sin despliegue ni publicación"],
+  "recorded_at": "2026-09-07"
+}

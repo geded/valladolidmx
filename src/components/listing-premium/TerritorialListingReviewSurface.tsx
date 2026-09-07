@@ -12,13 +12,17 @@ import {
   Sparkles,
   UtensilsCrossed,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
+
+const InteractiveMap = lazy(() =>
+  import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
+);
 
 type TerritorialListingFamily =
   | "hoteles"
@@ -467,6 +471,7 @@ function TerritorialListingBody({
   setSecondary: (v: string) => void;
   facets: FacetDef[];
 }) {
+  const [showMapMobile, setShowMapMobile] = useState(false);
   const [activeFacets, setActiveFacets] = useState<Record<string, string>>({});
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
   const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
@@ -493,6 +498,9 @@ function TerritorialListingBody({
       ).includes(needle);
     });
   }, [activeFacets, facets, items, primary, query, secondary, zone]);
+  const mappedItems = filteredItems.filter(
+    (item) => item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
+  );
   return (
     <div className="bg-[#f7f2e8] pb-12 text-[#17251f] sm:pb-16">
       <div className="w-full">
@@ -514,10 +522,18 @@ function TerritorialListingBody({
           facets={facets}
           activeFacets={activeFacets}
           setActiveFacets={setActiveFacets}
+          hasMap={mappedItems.length > 0}
+          onShowMap={() => setShowMapMobile(true)}
         />
 
-        <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
-          <div className="min-w-0">
+        <div
+          className={`mt-5 grid items-start gap-6 ${
+            mappedItems.length
+              ? "lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]"
+              : "grid-cols-1"
+          }`}
+        >
+          <div id="resultados" className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#ba641e]">
@@ -544,7 +560,14 @@ function TerritorialListingBody({
             {!dto ? <NearbySection profile={profile} /> : null}
           </div>
 
-          <MapPanel profile={profile} />
+          {mappedItems.length ? (
+            <MapPanel
+              profile={profile}
+              items={mappedItems}
+              showMobile={showMapMobile}
+              onClose={() => setShowMapMobile(false)}
+            />
+          ) : null}
         </div>
       </div>
     </div>
@@ -611,17 +634,9 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     name: item.name,
     zone: item.location?.label ?? profile.breadcrumb,
     copy: item.tagline ?? "",
-    // G4-PLACES: los lugares sin medio acreditado usan marcador neutral;
-    // nunca heredan una imagen hotelera u otro medio ajeno.
-    image:
-      item.mediaUrl ??
-      (profile.family === "lugares"
-        ? ""
-        : profile.family === "restaurantes"
-          ? `${MEDIA}/restaurant-cover.jpg`
-          : profile.family === "eventos" || profile.family === "que-hacer"
-            ? `${MEDIA}/destination-gallery-1.jpg`
-            : `${MEDIA}/hotel-cover.jpg`),
+    // Sin medio CMS acreditado, la variante editorial elimina el marco de
+    // imagen. Nunca usa fotografías de otra entidad o familia como relleno.
+    image: item.mediaUrl ?? "",
     tags: unique([
       ...structuredTags,
       ...item.highlights,
@@ -727,6 +742,8 @@ function Filters({
   facets,
   activeFacets,
   setActiveFacets,
+  hasMap,
+  onShowMap,
 }: {
   profile: ListingProfile;
   query: string;
@@ -743,6 +760,8 @@ function Filters({
   facets: FacetDef[];
   activeFacets: Record<string, string>;
   setActiveFacets: (value: Record<string, string>) => void;
+  hasMap: boolean;
+  onShowMap: () => void;
 }) {
   const selects = [
     { label: profile.filters[0], value: zone, setValue: setZone, options: zones },
@@ -770,9 +789,15 @@ function Filters({
             className="min-h-11 w-full rounded-xl border border-[#ded7c9] bg-[#fbfaf6] pl-10 pr-3 text-sm outline-none"
           />
         </label>
-        <button className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden">
-          <Map className="size-4" aria-hidden /> Ver mapa
-        </button>
+        {hasMap ? (
+          <button
+            type="button"
+            onClick={onShowMap}
+            className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[#0d4b38] px-4 text-sm font-semibold text-white sm:hidden"
+          >
+            <Map className="size-4" aria-hidden /> Ver mapa
+          </button>
+        ) : null}
         {facets.map((facet) => (
           <label key={facet.id} className="relative min-w-max lg:min-w-0">
             <span className="sr-only">{facet.label}</span>
@@ -846,27 +871,27 @@ function ListingCard({
   profile: ListingProfile;
 }) {
   return (
-    <article className="group grid min-w-0 grid-cols-[7.25rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm sm:grid-cols-[13rem_minmax(0,1fr)]">
-      <div className="relative min-h-[10rem] overflow-hidden bg-[#ded7c9] sm:min-h-[13rem]">
-        {item.image ? (
+    <article
+      className={`group grid min-w-0 overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm ${
+        item.image
+          ? "grid-cols-[7.25rem_minmax(0,1fr)] sm:grid-cols-[13rem_minmax(0,1fr)]"
+          : "grid-cols-1"
+      }`}
+    >
+      {item.image ? (
+        <div className="relative min-h-[10rem] overflow-hidden bg-[#ded7c9] sm:min-h-[13rem]">
           <img
             src={item.image}
             alt={item.name}
             className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
           />
-        ) : (
-          /* Marcador neutral: sin medio propio acreditado no se hereda
-             ninguna imagen de otra familia o entidad. */
-          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#efe8da] to-[#ded7c9]">
-            <Landmark className="size-8 text-[#8b9389]" aria-hidden />
-          </div>
-        )}
-        {featured ? (
-          <span className="absolute left-2 top-2 rounded-full bg-[#f3a61e] px-2 py-1 text-[10px] font-bold text-[#193126]">
-            Recomendado
-          </span>
-        ) : null}
-      </div>
+          {featured ? (
+            <span className="absolute left-2 top-2 rounded-full bg-[#f3a61e] px-2 py-1 text-[10px] font-bold text-[#193126]">
+              Recomendado
+            </span>
+          ) : null}
+        </div>
+      ) : null}
       <div className="flex min-w-0 flex-col p-3 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -959,9 +984,29 @@ function NearbySection({ profile }: { profile: ListingProfile }) {
   );
 }
 
-function MapPanel({ profile }: { profile: ListingProfile }) {
+function MapPanel({
+  profile,
+  items,
+  showMobile,
+  onClose,
+}: {
+  profile: ListingProfile;
+  items: ListingItem[];
+  showMobile: boolean;
+  onClose: () => void;
+}) {
+  const points = items.flatMap((item) => {
+    const coordinates = item.source?.coordinates;
+    return coordinates?.lat != null && coordinates?.lng != null
+      ? [{ item, lat: coordinates.lat, lng: coordinates.lng }]
+      : [];
+  });
+  const first = points[0];
+  if (!first) return null;
   return (
-    <aside className="order-first hidden sm:block lg:order-none lg:sticky lg:top-24">
+    <aside
+      className={`${showMobile ? "block" : "hidden"} order-first sm:block lg:order-none lg:sticky lg:top-24`}
+    >
       <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-[#ded7c9] px-4 py-3">
           <div>
@@ -971,40 +1016,36 @@ function MapPanel({ profile }: { profile: ListingProfile }) {
             <h2 className="font-display text-xl">{profile.mapTitle}</h2>
           </div>
           <button
+            type="button"
+            onClick={onClose}
             className="grid size-10 place-items-center rounded-full bg-[#efe8da] lg:hidden"
             aria-label="Cerrar mapa"
           >
             <Map className="size-4" aria-hidden />
           </button>
         </div>
-        <div
-          className="relative h-64 overflow-hidden bg-[#dfe9df] sm:h-80 lg:h-[31rem]"
-          style={{
-            backgroundImage: "radial-gradient(#b8c7b8 1px, transparent 1px)",
-            backgroundSize: "18px 18px",
-          }}
+        <Suspense
+          fallback={<div className="h-64 animate-pulse bg-[#dfe9df] sm:h-80 lg:h-[31rem]" />}
         >
-          <div className="absolute inset-0 opacity-50 [background:linear-gradient(135deg,transparent_42%,#fff_43%,#fff_47%,transparent_48%),linear-gradient(35deg,transparent_54%,#c9d8c8_55%,#c9d8c8_59%,transparent_60%)]" />
-          {[
-            [34, 42],
-            [58, 28],
-            [64, 62],
-          ].map(([left, top], index) => (
-            <span
-              key={index}
-              className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-[#f3a61e] text-xs font-bold shadow-md"
-              style={{ left: `${left}%`, top: `${top}%` }}
-            >
-              {index + 1}
-            </span>
-          ))}
-          <span className="absolute bottom-4 left-4 rounded-full bg-white/95 px-3 py-2 text-xs font-semibold shadow">
-            Valladolid · Yucatán
-          </span>
-        </div>
+          <InteractiveMap
+            lat={first.lat}
+            lng={first.lng}
+            zoom={12}
+            markerTitle={first.item.name}
+            markers={points.map(({ item, lat, lng }) => ({
+              lat,
+              lng,
+              title: item.name,
+              href: item.href,
+            }))}
+            className="h-64 sm:h-80 lg:h-[31rem]"
+          />
+        </Suspense>
         <div className="flex items-center justify-between gap-3 border-t border-[#ded7c9] p-4 text-sm">
           <span className="text-[#5d685f]">Mapa sincronizado con tus resultados</span>
-          <button className="font-semibold text-[#0d4b38]">Ver ruta</button>
+          <a href="#resultados" className="font-semibold text-[#0d4b38]">
+            Ver resultados
+          </a>
         </div>
       </section>
       <section className="mt-4 hidden rounded-2xl bg-[#073f31] p-5 text-white lg:block">
@@ -1266,7 +1307,16 @@ function EventListingBody({
           ) : null}
         </section>
 
-        <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]">
+        <div
+          className={`mt-5 grid items-start gap-6 ${
+            filteredItems.some(
+              (item) =>
+                item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
+            )
+              ? "lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]"
+              : "grid-cols-1"
+          }`}
+        >
           <div className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
@@ -1397,15 +1447,8 @@ function EventMapPanel({
     lat: number;
     lng: number;
   }[];
-  const lats = points.map((p) => p.lat);
-  const lngs = points.map((p) => p.lng);
-  const spread = (value: number, values: number[]) => {
-    if (values.length < 2) return 50;
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    if (max === min) return 50;
-    return 18 + ((value - min) / (max - min)) * 64;
-  };
+  const first = points[0];
+  if (!first) return null;
   return (
     <aside className="order-first hidden sm:block lg:order-none lg:sticky lg:top-24">
       <section className="overflow-hidden rounded-2xl border border-[#ded7c9] bg-white shadow-sm">
@@ -1420,33 +1463,23 @@ function EventMapPanel({
             {items.length}
           </span>
         </div>
-        <div
-          className="relative h-64 overflow-hidden bg-[#dfe9df] sm:h-80 lg:h-[31rem]"
-          style={{
-            backgroundImage: "radial-gradient(#b8c7b8 1px, transparent 1px)",
-            backgroundSize: "18px 18px",
-          }}
+        <Suspense
+          fallback={<div className="h-64 animate-pulse bg-[#dfe9df] sm:h-80 lg:h-[31rem]" />}
         >
-          <div className="absolute inset-0 opacity-50 [background:linear-gradient(135deg,transparent_42%,#fff_43%,#fff_47%,transparent_48%),linear-gradient(35deg,transparent_54%,#c9d8c8_55%,#c9d8c8_59%,transparent_60%)]" />
-          {points.map((point) => (
-            <span
-              key={point.item.name}
-              title={point.item.name}
-              className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-[#f3a61e] text-xs font-bold shadow-md"
-              style={{
-                left: `${spread(point.lng, lngs)}%`,
-                top: `${100 - spread(point.lat, lats)}%`,
-              }}
-            >
-              {point.index + 1}
-            </span>
-          ))}
-          {!points.length ? (
-            <span className="absolute inset-x-6 top-1/2 -translate-y-1/2 rounded-xl bg-white/95 px-4 py-3 text-center text-xs text-[#5d685f] shadow">
-              {emptyCoordsMessage}
-            </span>
-          ) : null}
-        </div>
+          <InteractiveMap
+            lat={first.lat}
+            lng={first.lng}
+            zoom={12}
+            markerTitle={first.item.name}
+            markers={points.map(({ item, lat, lng }) => ({
+              lat,
+              lng,
+              title: item.name,
+              href: item.href,
+            }))}
+            className="h-64 sm:h-80 lg:h-[31rem]"
+          />
+        </Suspense>
         <div className="flex items-center justify-between gap-3 border-t border-[#ded7c9] p-4 text-sm">
           <span className="text-[#5d685f]">
             {items.length} {items.length === 1 ? nounSingular : nounPlural} en el mapa

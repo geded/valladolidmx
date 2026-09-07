@@ -24,6 +24,8 @@ export interface BusinessLocationBlockProps {
   addressLine1?: string | null;
   addressLine2?: string | null;
   heading?: string;
+  /** La ficha Premium abre el mapa real directamente; la estándar conserva el fallback estático. */
+  presentation?: "standard" | "premium";
 }
 
 export function BusinessLocationBlock({
@@ -33,8 +35,9 @@ export function BusinessLocationBlock({
   addressLine1,
   addressLine2,
   heading = "Ubicación",
+  presentation = "standard",
 }: BusinessLocationBlockProps) {
-  const [showInteractive, setShowInteractive] = useState(false);
+  const [showInteractive, setShowInteractive] = useState(presentation === "premium");
 
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
@@ -90,15 +93,17 @@ export function BusinessLocationBlock({
           </a>
         </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => setShowInteractive((s) => !s)}
-        >
-          <MapIcon className="mr-2 h-4 w-4" aria-hidden />
-          {showInteractive ? "Ver mapa estático" : "Ver mapa interactivo"}
-        </Button>
+        {presentation === "standard" ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => setShowInteractive((s) => !s)}
+          >
+            <MapIcon className="mr-2 h-4 w-4" aria-hidden />
+            {showInteractive ? "Ver mapa estático" : "Ver mapa interactivo"}
+          </Button>
+        ) : null}
       </aside>
     </div>
   );

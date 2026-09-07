@@ -36,6 +36,28 @@ import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism
 import { businessToMapPoint } from "@/lib/experience-builder/adapters/entity-to-map-point";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import { ListingMapHeader } from "@/components/discovery/ListingMapHeader";
+import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
+import {
+  buildPublicListing,
+  listingFamilyContract,
+  type ListingFamilyId,
+} from "@/lib/listings/listing-public-contract";
+import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
+
+const CANONICAL_LISTING_FAMILIES: Partial<Record<string, ListingFamilyId>> = {
+  hoteles: "hoteles",
+  hospedaje: "hoteles",
+  restaurantes: "restaurantes",
+  gastronomia: "restaurantes",
+  experiencias: "experiencias",
+  "experiencias-tours": "experiencias",
+  tours: "experiencias",
+  eventos: "eventos",
+  lugares: "lugares",
+  "casas-de-vacaciones": "casas-de-vacaciones",
+  "casas-vacacionales": "casas-de-vacaciones",
+  "que-hacer": "que-hacer",
+};
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {
@@ -59,13 +81,29 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
     );
     // E2 · US-E2.3 — Related Collection para superficie Categoría.
     // Fallback silencioso: el bloque se oculta si no hay datos.
-    const related = await getCategoryRelated({
-      data: {
-        destinationSlug: params.destino,
-        categorySlug: params.categoria,
-      },
-    }).catch(() => null);
-    return { resolution, items, related };
+    const family = CANONICAL_LISTING_FAMILIES[params.categoria] ?? null;
+    const premiumListingPromise = family
+      ? listingFamilyContract(family).source === "businesses"
+        ? Promise.resolve(
+            buildPublicListing({
+              family,
+              destino: params.destino,
+              businesses,
+              categorySlugs: [params.categoria],
+            }),
+          )
+        : getPublicListing({ data: { family, destino: params.destino } }).catch(() => null)
+      : Promise.resolve(null);
+    const [related, premiumListing] = await Promise.all([
+      getCategoryRelated({
+        data: {
+          destinationSlug: params.destino,
+          categorySlug: params.categoria,
+        },
+      }).catch(() => null),
+      premiumListingPromise,
+    ]);
+    return { resolution, items, related, premiumListing };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -113,7 +151,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
 });
 
 function CategoriaEnDestinoPage() {
-  const { resolution, items, related } = Route.useLoaderData();
+  const { resolution, items, related, premiumListing } = Route.useLoaderData();
   const { destino, categoria } = Route.useParams();
   const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
   const ctx = resolutionToNavigationContext(resolution, destino);
@@ -188,42 +226,53 @@ function CategoriaEnDestinoPage() {
     <ContextEngineProvider declaration={declaration}>
       <CategorySurfaceRelatedProvider value={categoryValue}>
         <PublicShell crumbs={crumbs} compactCrumbsOnMobile>
-          <div onClick={handleListingClick}>
-            <TourismListingSurface
-              hero={{
-                eyebrow: destLabel,
-                title: `${catLabel} en ${destLabel}`,
-                subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
-                metaLabel: destLabel,
-              }}
-              items={items.map((b: MarketplaceBusinessCard) => {
-                const vm = businessToTourismCard(b, {
-                  destinationLabel: destLabel,
-                  regionLabel: "Oriente Maya",
-                  forcedCategorySlug: categoria,
-                });
-                const pointIndex = mapPoints.findIndex((p) => p.id === b.id);
-                // Inyectamos CTA primario: abre el modal (interceptado por
-                // handleListingClick porque el href apunta a la ficha completa).
-                return {
-                  ...vm,
-                  mapLabel: pointIndex >= 0 ? String.fromCharCode(65 + (pointIndex % 26)) : null,
-                  primaryAction: vm.href ? { label: primaryCtaLabel, href: vm.href } : null,
-                };
-              })}
-              destinationSlug={destino}
-              destinationLabel={destLabel}
-              mapSlot={
-                mapPoints.length > 0 ? (
-                  <ListingMapHeader
-                    heading={`${catLabel} en el mapa de ${destLabel}`}
-                    points={mapPoints}
-                  />
-                ) : null
-              }
-              emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
+          {premiumListing ? (
+            <ListingPremiumSurfaceFromDTO
+              dto={premiumListing}
+              titleOverride={`${catLabel} en ${destLabel}`}
+              subtitleOverride={`Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`}
+              lockedDestinationLabel={destLabel}
+              showAddToTrip
+              showFavorite
             />
-          </div>
+          ) : (
+            <div onClick={handleListingClick}>
+              <TourismListingSurface
+                hero={{
+                  eyebrow: destLabel,
+                  title: `${catLabel} en ${destLabel}`,
+                  subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
+                  metaLabel: destLabel,
+                }}
+                items={items.map((b: MarketplaceBusinessCard) => {
+                  const vm = businessToTourismCard(b, {
+                    destinationLabel: destLabel,
+                    regionLabel: "Oriente Maya",
+                    forcedCategorySlug: categoria,
+                  });
+                  const pointIndex = mapPoints.findIndex((p) => p.id === b.id);
+                  // Inyectamos CTA primario: abre el modal (interceptado por
+                  // handleListingClick porque el href apunta a la ficha completa).
+                  return {
+                    ...vm,
+                    mapLabel: pointIndex >= 0 ? String.fromCharCode(65 + (pointIndex % 26)) : null,
+                    primaryAction: vm.href ? { label: primaryCtaLabel, href: vm.href } : null,
+                  };
+                })}
+                destinationSlug={destino}
+                destinationLabel={destLabel}
+                mapSlot={
+                  mapPoints.length > 0 ? (
+                    <ListingMapHeader
+                      heading={`${catLabel} en el mapa de ${destLabel}`}
+                      points={mapPoints}
+                    />
+                  ) : null
+                }
+                emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
+              />
+            </div>
+          )}
           {hasRelated ? (
             <section id="descubre" className="mt-12">
               <ExperienceRelatedCollectionBlock

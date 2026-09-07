@@ -91,19 +91,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "aff5b0f79dee3da54424342e77c13fe3aacce7857aa8c5bfadc86e3fe26784d3"
+      "sha256": "641289c5b1c4f1f5e8c51e4a9fb9b609cbab97c5b79ea5dd527d22bd8078d9db"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "68362f80afb649d256a81fcaa02a466546f405814dfbbcb3c262aff672e88a15"
+      "sha256": "158cea520839d53d0bd1990655a8f9aead245bbf658fbb41e3d2ff251b217415"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "42814eb75852d12ffdcda56bf967ce3d4fcefdbeadce660f37a33b0db7f582df"
+      "sha256": "9bd7c13cd6427ede798f908c3d002f97f7acbea3fdc0a2fa763332a0c1a20f1a"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "fe9692607f58b543a04a3b45b43fde33349112b32c0e0c6be008b9dbb81d1ba2"
+      "sha256": "acefbe374853770d3f36631301c90c7d8a110e5778ce97e277f9664229624f6f"
     }
   ]
 }

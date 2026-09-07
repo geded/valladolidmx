@@ -269,7 +269,6 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
         businessToTourismCard(b, {
           destinationLabel: labelOf(b.destination_slug),
           regionLabel: ORIENTE_MAYA.name,
-          forcedCategorySlug: contract.forcedCategorySlug,
         }),
       );
   } else if (contract.source === "events") {

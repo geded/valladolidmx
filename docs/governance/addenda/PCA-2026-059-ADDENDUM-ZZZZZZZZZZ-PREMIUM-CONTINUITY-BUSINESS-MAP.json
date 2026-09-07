@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-BUSINESS-MAP",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para integrar directamente en main las correcciones de continuidad Premium y revisarlas en Lovable, sin publicar ni desplegar producción.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/maps/BusinessLocationBlock.tsx",
+    "previous_sha256": "d9a774b163d10a445e9e861d2f94b4b9105767712b9fa643de8d4eb0e04f59f3",
+    "current_sha256": "9022bc04faa1f2907a4c30aa406763ab52b6369d2165568ed70f79ef5e6ae29e",
+    "semantic_change": "La variante Premium abre el mapa interactivo real y la estándar conserva su comportamiento anterior.",
+    "authority": "Founder · continuidad Premium en main · 2026-09-07"
+  },
+  "invariants": [
+    "Datos e imágenes demo permitidos durante construcción y revisión",
+    "Sin modificación de datos del CMS",
+    "Sin despliegue ni publicación de producción",
+    "Sin rediseño fuera del delta autorizado"
+  ],
+  "recorded_at": "2026-09-07"
+}

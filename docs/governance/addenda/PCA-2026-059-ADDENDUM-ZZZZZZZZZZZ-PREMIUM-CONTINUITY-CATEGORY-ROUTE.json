@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZZZZ-PREMIUM-CONTINUITY-CATEGORY-ROUTE",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para corregir los enlaces y lecturas de las plantillas Premium en main, revisar en Lovable y no publicar ni desplegar producción.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx",
+    "previous_sha256": "8a5cdbe6b6655dde56a6f030084b863a89a5a24f171d4dc77d4b6f4ec7588299",
+    "current_sha256": "32920e7252722eecbc67206fa3ceb2d3cc2552f22bf5cd1963c216725641457d",
+    "semantic_change": "Incluye experiencias-tours, reutiliza el catálogo ya cargado y evita resultados vacíos por una segunda lectura.",
+    "authority": "Founder · continuidad Premium y navegación territorial correcta · 2026-09-07"
+  },
+  "invariants": [
+    "Cada tarjeta conserva la categoría registrada en CMS",
+    "Sin modificación de datos del CMS",
+    "Sin despliegue ni publicación de producción",
+    "Sin rediseño fuera del delta autorizado"
+  ],
+  "recorded_at": "2026-09-07"
+}
