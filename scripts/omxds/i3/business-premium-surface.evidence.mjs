@@ -51,9 +51,9 @@ const acknowledgedRevisions = new Map([
   [
     surfacePath,
     {
-      // Reconciliación visual Premium · continuidad compacta y CTA en flujo.
-      sha256: "e4be4631b9fbcc7a943b202f3c6d1826e363f6da5efa18c2ec3022b6375beebf",
-      authorizations: ["PCA-2026-071"],
+      // Autoridad visual de familia separada de elegibilidad comercial.
+      sha256: "b2d8514385b494503d5675a12a49aa761037d21514e1b4b64c60b8d4f4faf22a",
+      authorizations: ["PCA-2026-073"],
     },
   ],
   [
