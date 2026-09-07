@@ -17,7 +17,7 @@
     { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" },
     { "operation": "modify", "path": "src/components/home-premium/shared/PremiumShowcase.tsx" },
     {
-      "operation": "create",
+      "operation": "modify",
       "path": "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx"
     },
     {
@@ -34,7 +34,7 @@
       "authority": "Founder · paleta Valladolid.mx predeterminada · 2026-09-07"
     },
     {
-      "operation": "modify",
+      "operation": "create",
       "path": "src/lib/brand/brand-theme.ts",
       "sha256": "d1021bdd56b3949f069ff969f86665fa92e01edfaface89e83fcaffa080f5dd3",
       "authority": "Founder · tokens y contraste globales · 2026-09-07"
