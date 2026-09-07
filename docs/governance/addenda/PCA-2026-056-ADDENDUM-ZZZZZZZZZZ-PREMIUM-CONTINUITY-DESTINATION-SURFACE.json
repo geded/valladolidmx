@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-056-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-DESTINATION-SURFACE",
+  "status": "Approved",
+  "parent": "PCA-2026-056",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para integrar directamente en main las correcciones de continuidad Premium y revisarlas en Lovable, sin publicar ni desplegar producción.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/DestinationSurface.tsx",
+    "previous_sha256": "12c1e19fa15d0d52638ef4a799046a52e77f6681e1b8bf315269b79126504129",
+    "current_sha256": "07af6dd30bde81d2d3a0df290a07d1ebc980414d548a0c2d84db0c9f42629836",
+    "semantic_change": "Conserva medios públicos relacionados válidos para evitar vacíos artificiales en la superficie de destino.",
+    "authority": "Founder · continuidad Premium en main · 2026-09-07"
+  },
+  "invariants": [
+    "Datos e imágenes demo permitidos durante construcción y revisión",
+    "Sin modificación de datos del CMS",
+    "Sin despliegue ni publicación de producción",
+    "Sin rediseño fuera del delta autorizado"
+  ],
+  "recorded_at": "2026-09-07"
+}

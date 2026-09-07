@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-CATEGORY-ROUTE",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para integrar directamente en main las correcciones de continuidad Premium y revisarlas en Lovable, sin publicar ni desplegar producción.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx",
+    "previous_sha256": "d8e5a1da8413255629a933bd0b57ad3371680a19fd5e6972d9568ec5260d227d",
+    "current_sha256": "8a5cdbe6b6655dde56a6f030084b863a89a5a24f171d4dc77d4b6f4ec7588299",
+    "semantic_change": "Conecta familias territoriales reconocidas con su listado Premium canónico.",
+    "authority": "Founder · continuidad Premium en main · 2026-09-07"
+  },
+  "invariants": [
+    "Datos e imágenes demo permitidos durante construcción y revisión",
+    "Sin modificación de datos del CMS",
+    "Sin despliegue ni publicación de producción",
+    "Sin rediseño fuera del delta autorizado"
+  ],
+  "recorded_at": "2026-09-07"
+}

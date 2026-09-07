@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-LISTING-SURFACE",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para integrar directamente en main las correcciones de continuidad Premium y revisarlas en Lovable, sin publicar ni desplegar producción.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    "previous_sha256": "ef8a6cf6eddf9e9cc69033d63b6a3fd132ad0c319823f0183e2270544ea719c1",
+    "current_sha256": "940ecbe05d945125b017c6902487418cc1f28c439919c42f4c03acacb8c30f00",
+    "semantic_change": "Sustituye mapas dibujados por el mapa real y evita prestar imágenes entre entidades.",
+    "authority": "Founder · continuidad Premium en main · 2026-09-07"
+  },
+  "invariants": [
+    "Datos e imágenes demo permitidos durante construcción y revisión",
+    "Sin modificación de datos del CMS",
+    "Sin despliegue ni publicación de producción",
+    "Sin rediseño fuera del delta autorizado"
+  ],
+  "recorded_at": "2026-09-07"
+}

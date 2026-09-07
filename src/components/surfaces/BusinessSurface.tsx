@@ -556,6 +556,7 @@ export function BusinessSurface({
             name={b.display_name}
             addressLine1={b.primary_location.address_line1}
             addressLine2={b.primary_location.address_line2}
+            presentation={activePremium ? "premium" : "standard"}
           />
         </section>
       ) : null}
@@ -595,8 +596,8 @@ export function BusinessSurface({
             config={{
               source: "business",
               entityKind: "mixed",
-              variant: "grid",
-              columns: 2,
+              variant: activePremium ? "carousel" : "grid",
+              columns: activePremium ? 3 : 2,
               heading: "Sigue descubriendo",
               subheading: `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
               emptyMessage: "Aún no hay empresas hermanas publicadas en este destino.",
@@ -607,7 +608,7 @@ export function BusinessSurface({
                   entityKind: "business",
                   heading: `Más de ${variant.eyebrow.toLowerCase()} en el destino`,
                   maxItems: 6,
-                  variant: "grid",
+                  variant: activePremium ? "carousel" : "grid",
                   categorySlug: b.category_slug || null,
                   seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}/${encodeURIComponent(b.category_slug || "")}`,
                   seeAllLabel: "Ver todas",
@@ -617,7 +618,7 @@ export function BusinessSurface({
                   entityKind: "business",
                   heading: "Otras experiencias del destino",
                   maxItems: 6,
-                  variant: "grid",
+                  variant: activePremium ? "carousel" : "grid",
                   seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
                   seeAllLabel: "Ver destino",
                 },

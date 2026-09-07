@@ -1,0 +1,71 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-070",
+  "title": "Corrección de continuidad visual Premium en superficies turísticas",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorizaciones Founder del 2026-09-07 para revisar y corregir en main la mezcla entre secciones Premium y antiguas de hoteles, restaurantes, casas de vacaciones, eventos, lugares, sitios de interés y Qué hacer; mantener datos e imágenes demo durante construcción y revisión en Lovable, sin publicar ni desplegar producción y sin modificar datos del CMS.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx" },
+    { "operation": "modify", "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx" },
+    { "operation": "modify", "path": "src/components/maps/BusinessLocationBlock.tsx" },
+    { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
+    { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx" }
+  ],
+  "public_routes": [
+    "/oriente-maya",
+    "/oriente-maya/{destino}",
+    "/oriente-maya/{destino}/{categoria}",
+    "/oriente-maya/{destino}/{categoria}/{empresa}"
+  ],
+  "required_feature_flags": ["none"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run lint",
+    "bun run build",
+    "bun run test:r1:c2",
+    "bun run test:r1:f1l:r2",
+    "bun run test:q2d:b",
+    "bun run governance:check"
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx",
+      "sha256": "868dc3e462ba0505d9447b4e25e76c05cc2a6a7c59038374151c8f01d6ceb3eb",
+      "authority": "Founder · continuidad visual Premium para revisión en Lovable · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "sha256": "940ecbe05d945125b017c6902487418cc1f28c439919c42f4c03acacb8c30f00",
+      "authority": "Founder · listados territoriales Premium y mapas reales · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/maps/BusinessLocationBlock.tsx",
+      "sha256": "9022bc04faa1f2907a4c30aa406763ab52b6369d2165568ed70f79ef5e6ae29e",
+      "authority": "Founder · mapa coherente en perfiles Premium · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "sha256": "4ff49113106936b0734554d830d876976a4b43fda3f13ef2dfc8c32d08fda4d2",
+      "authority": "Founder · continuidad completa de hotel, restaurante y casa de vacaciones · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "sha256": "07af6dd30bde81d2d3a0df290a07d1ebc980414d548a0c2d84db0c9f42629836",
+      "authority": "Founder · medios relacionados conservados para revisión · 2026-09-07"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx",
+      "sha256": "8a5cdbe6b6655dde56a6f030084b863a89a5a24f171d4dc77d4b6f4ec7588299",
+      "authority": "Founder · conexión territorial con listados Premium · 2026-09-07"
+    }
+  ]
+}

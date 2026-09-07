@@ -231,25 +231,6 @@ function PremiumRelatedCollection({ service, name }: { service: string; name: st
   );
 }
 
-function withoutUnaccreditedRelatedMedia(
-  related?: DestinationRelatedDTO,
-): DestinationRelatedDTO | null {
-  if (!related) return null;
-  const stripBusiness = <T extends { cover_url?: string | null }>(item: T): T => ({
-    ...item,
-    cover_url: null,
-  });
-  return {
-    ...related,
-    hoteles: related.hoteles.map(stripBusiness),
-    restaurantes: related.restaurantes.map(stripBusiness),
-    experiencias: related.experiencias.map(stripBusiness),
-    otras: related.otras.map(stripBusiness),
-    productos: related.productos.map(stripBusiness),
-    eventos: related.eventos?.map((event) => ({ ...event, cover_url: null })) ?? [],
-  };
-}
-
 export function DestinationSurfaceContractBoundary({
   destinationSlug,
   dbData,
@@ -268,7 +249,9 @@ export function DestinationSurfaceContractBoundary({
     const accreditedMedia = (galleryMedia ?? []).filter(
       (item) => !hasForbiddenDestinationMedia(item),
     );
-    const safeRelated = withoutUnaccreditedRelatedMedia(related);
+    // `getDestinationRelated` ya es la lectura pública autorizada. No se
+    // borran sus portadas CMS válidas al entrar a la plantilla Premium.
+    const safeRelated = related ?? null;
     const content = buildDestinationPremiumRuntime({
       id: `destination:${destinationSlug}`,
       destination: premiumDestination,
