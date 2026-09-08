@@ -485,6 +485,21 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(listingSurface).not.toContain('href="#"');
   });
 
+  test("la mejora de rutas preserva la estructura visual aprobada de Home", () => {
+    const surface = read("src/components/home-premium/HomePremiumSurface.tsx");
+
+    expect(surface).toContain("<main data-home-presentation={heroVariant}>");
+    expect(surface).toContain("lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]");
+    expect(surface).toContain('aria-labelledby="alux-title"');
+    expect(surface).toContain("lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]");
+    expect(surface).toContain("to={actionHref}");
+    expect(surface).toContain("to={route.href}");
+    expect(surface).toContain("<TravelPlanBand");
+    expect(surface).not.toContain("PremiumEditorialHero");
+    expect(surface).not.toContain("PremiumAluxBar");
+    expect(surface).not.toContain("PremiumShowcaseGrid");
+  });
+
   test("los listados globales no heredan un destino obsoleto del historial de navegación", () => {
     for (const route of [
       "hoteles.tsx",

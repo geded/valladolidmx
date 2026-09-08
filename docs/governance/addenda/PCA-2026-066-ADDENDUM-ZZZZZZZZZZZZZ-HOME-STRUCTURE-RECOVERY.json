@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-066-ADDENDUM-ZZZZZZZZZZZZZ-HOME-STRUCTURE-RECOVERY",
+  "status": "Approved",
+  "parent": "PCA-2026-066",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para restaurar quirúrgicamente la estructura visual Home Premium aprobada y conservar las mejoras funcionales de rutas.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "2b14cdb5195b5fdadff8523f82dd767f4831e54d4e533edff577e14fa95969a3",
+    "current_sha256": "6a61a847e5874d4ba353fc6d0eb1021214bdee12e26c15b7c5a4e98b283681d8",
+    "semantic_change": "Recupera hero, Alux y composición asimétrica aprobados; preserva enlaces canónicos, datos CMS, medios, marca y Travel Plan.",
+    "authority": "Founder · estructura Home aprobada con mejora funcional preservada · 2026-09-08"
+  },
+  "invariants": [
+    "Sin cambios en rutas",
+    "Sin cambios de datos CMS",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-08"
+}
