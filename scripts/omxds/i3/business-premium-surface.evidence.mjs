@@ -274,7 +274,6 @@ const flagConsumers = gitLines([
 assert.deepEqual(
   flagConsumers,
   [
-    "src/routes/eventos.$slug.tsx",
     "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
     routePath,
     "src/routes/producto.$slug.tsx",
