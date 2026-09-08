@@ -500,15 +500,31 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     }
   });
 
-  test("experiencias y tours resuelven Premium en ambas rutas canónicas con el flag global OFF", () => {
+  test("eventos usan una sola autoridad Premium en ruta pública y previews CMS", () => {
+    const publicRoute = read("src/routes/eventos.$slug.tsx");
+    const cmsPreview = read("src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx");
+    const lovablePreview = read("src/routes/lovable/g4-event-premium-preview.tsx");
+
+    expect(publicRoute).toContain("<EventPremiumSurface event={event} />");
+    expect(publicRoute).not.toContain("EventSurfaceContractBoundary");
+    expect(publicRoute).not.toContain("getOmxdsSurfaceContractsFlag");
+    expect(cmsPreview).toContain("<EventPremiumSurface");
+    expect(lovablePreview).toContain("<EventPremiumSurface");
+  });
+
+  test("experiencias y tours reconocidos no regresan a plantillas ni composiciones antiguas", () => {
     const marketplace = read("src/routes/producto.$slug.tsx");
     const territorial = read("src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx");
-    expect(marketplace).toContain(
-      'enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}',
-    );
-    expect(territorial).toContain("bindProductRoute");
-    expect(territorial).toContain(
-      'enabled={surfaceContractsEnabled || canonicalBinding.surface === "premium"}',
+    for (const route of [marketplace, territorial]) {
+      expect(route).toContain('canonicalBinding.family === "experience"');
+      expect(route).toContain('canonicalBinding.family === "tour"');
+      expect(route).toContain("<ExperiencePremiumSurface");
+      expect(route.indexOf("if (isExperience)")).toBeLessThan(
+        route.indexOf("<ProductSurfaceContractBoundary"),
+      );
+    }
+    expect(marketplace.indexOf("if (isExperience)")).toBeLessThan(
+      marketplace.indexOf("<CompositionRenderer"),
     );
   });
 

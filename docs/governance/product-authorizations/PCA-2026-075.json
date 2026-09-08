@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-075",
+  "title": "Autoridad visual Premium única para eventos, experiencias y tours",
+  "status": "Approved",
+  "branch": "fix/event-product-template-authority-20260908",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para establecer EventPremiumSurface como única autoridad visual de eventos en la ruta pública y previews CMS, independientemente del flag, y añadir defensas que impidan a eventos, experiencias y tours reconocidos regresar a plantillas o composiciones antiguas; preservar diseño Premium, datos CMS, contenido, medios, navegación y comportamiento; no modificar lugares ni otras familias; crear un único PR a main, fusionar sólo con pruebas específicas, typecheck y Governance en PASS, verificar en Lovable y no publicar ni desplegar.",
+  "permissions": [
+    { "operation": "modify", "path": "src/routes/eventos.$slug.tsx" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/routes/eventos.$slug.tsx",
+      "sha256": "2c59110818051da64cd30f933fb176b3b3a12d59d7bd05d03efc894b99ce37b6",
+      "authority": "Founder · EventPremiumSurface como autoridad visual única · 2026-09-08"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "sha256": "32fbc82c3b4314c5f97281aa1c848116a10b9f787a6498705088ef226a37bc0f",
+      "authority": "Founder · experiencias y tours reconocidos preservan la plantilla Premium · 2026-09-08"
+    }
+  ],
+  "public_routes": [
+    "/eventos/{slug}",
+    "/cms/eventos/{eventId}/portada-preview",
+    "/producto/{slug}",
+    "/oriente-maya/{destino}/{categoria}/{empresa}/{producto}"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run test:r1:f1l:r2",
+    "bun run typecheck",
+    "bun run governance:check"
+  ]
+}

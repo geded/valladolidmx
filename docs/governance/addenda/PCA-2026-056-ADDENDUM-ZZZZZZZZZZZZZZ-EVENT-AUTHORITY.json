@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZ-EVENT-AUTHORITY",
+  "status": "Approved",
+  "parent": "PCA-2026-056",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para establecer EventPremiumSurface como autoridad visual única de eventos en ruta pública y previews CMS, independiente del flag.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/eventos.$slug.tsx",
+    "previous_sha256": "4c8d3f3c2203f6792ee70e44a617cdbeab05d3933d6892cbfb1c33d3f5d6fda6",
+    "current_sha256": "2c59110818051da64cd30f933fb176b3b3a12d59d7bd05d03efc894b99ce37b6",
+    "semantic_change": "La ruta pública de eventos usa directamente la misma EventPremiumSurface de los previews y elimina la selección por flag.",
+    "authority": "Founder · autoridad visual Premium única para eventos · 2026-09-08"
+  },
+  "invariants": [
+    "Diseño Premium, datos CMS, contenido, medios, navegación y comportamiento preservados",
+    "Sin modificación de lugares ni otras familias de negocio",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-08"
+}

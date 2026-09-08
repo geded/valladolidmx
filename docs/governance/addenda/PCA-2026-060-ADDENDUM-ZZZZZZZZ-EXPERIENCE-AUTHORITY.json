@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-060-ADDENDUM-ZZZZZZZZ-EXPERIENCE-AUTHORITY",
+  "status": "Approved",
+  "parent": "PCA-2026-060",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para impedir que experiencias y tours reconocidos regresen a plantillas o composiciones antiguas.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+    "previous_sha256": "2dd89fb8ab9a6e6ba42307ba0a45dfe3f424c1d436d96b91182e5255ac008dbb",
+    "current_sha256": "32fbc82c3b4314c5f97281aa1c848116a10b9f787a6498705088ef226a37bc0f",
+    "semantic_change": "La ruta territorial reconocida de experiencia o tour usa la autoridad ExperiencePremiumSurface y ya no alcanza el flujo genérico.",
+    "authority": "Founder · autoridad Premium de experiencias y tours · 2026-09-08"
+  },
+  "invariants": [
+    "Plantilla Premium y datos reales preservados",
+    "Productos genéricos sin cambios",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-08"
+}
