@@ -51,9 +51,9 @@ const acknowledgedRevisions = new Map([
   [
     surfacePath,
     {
-      // Autoridad visual de familia separada de elegibilidad comercial.
-      sha256: "b2d8514385b494503d5675a12a49aa761037d21514e1b4b64c60b8d4f4faf22a",
-      authorizations: ["PCA-2026-073"],
+      // Preview CMS y ruta pública resuelven la misma familia aprobada.
+      sha256: "66994319b66b9fe670980026f39d51816b54c5edbedaec8d12952e86918c5ffb",
+      authorizations: ["PCA-2026-074"],
     },
   ],
   [

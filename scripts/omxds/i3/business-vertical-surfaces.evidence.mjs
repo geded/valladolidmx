@@ -74,9 +74,10 @@ const surface = readFileSync("src/components/surfaces/BusinessSurface.tsx", "utf
 assert.match(surface, /BusinessSurfaceContractBoundary/);
 assert.match(surface, /adaptHotelSurfaceContract/);
 assert.match(surface, /adaptRestaurantSurfaceContract/);
-assert.match(surface, /const usesApprovedFamilyTemplate = Boolean/);
-assert.match(surface, /activeContract\.family === "hotel"/);
-assert.match(surface, /activeContract\.family === "restaurant"/);
+assert.match(surface, /resolveApprovedBusinessFamily\(/);
+assert.match(surface, /sourceBusiness\.category_family_key/);
+assert.match(surface, /sourceBusiness\.category_slug/);
+assert.match(surface, /const usesApprovedFamilyTemplate = approvedFamily !== null/);
 assert.match(surface, /variant: usesApprovedFamilyTemplate \? \("inline" as const\)/);
 assert.match(surface, /density: usesApprovedFamilyTemplate \? "compact" : "comfortable"/);
 assert.match(surface, /presentation=\{usesApprovedFamilyTemplate \? "premium" : "standard"\}/);

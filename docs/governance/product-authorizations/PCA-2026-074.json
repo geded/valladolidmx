@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-074",
+  "title": "Cierre de evidencia del preview CMS por familia Premium",
+  "status": "Approved",
+  "branch": "fix/category-template-authority-20260907",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para añadir al PR #69 un cuarto commit exclusivamente de trazabilidad que actualice la evidencia I3-B y las huellas Governance derivadas del commit 0829495c, sin cambios funcionales adicionales; fusionar a main únicamente si governance-integrity queda en PASS y sin publicar ni desplegar.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "sha256": "66994319b66b9fe670980026f39d51816b54c5edbedaec8d12952e86918c5ffb",
+      "authority": "Founder · preview CMS y ruta pública comparten autoridad Premium · 2026-09-08"
+    }
+  ],
+  "public_routes": [
+    "/cms/empresas/{businessId}/preview",
+    "/oriente-maya/{destino}/{categoria}/{empresa}"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": ["bun run test:i3:b", "bun run governance:check"]
+}
