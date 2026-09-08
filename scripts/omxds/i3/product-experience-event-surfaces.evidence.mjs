@@ -51,6 +51,9 @@ for (const file of allowed)
 const reconciliationAuthorization = JSON.parse(
   readFileSync("docs/governance/product-authorizations/PCA-2026-056.json", "utf8"),
 );
+const templateAuthorityAuthorization = JSON.parse(
+  readFileSync("docs/governance/product-authorizations/PCA-2026-075.json", "utf8"),
+);
 const exactReconciliationAddenda = [
   "PCA-2026-056-ADDENDUM-ZZ-PR60-008.json",
   "PCA-2026-056-ADDENDUM-ZZ-PR60-009.json",
@@ -60,7 +63,7 @@ const exactReconciliationAddenda = [
 ].map((file) => JSON.parse(readFileSync(join("docs/governance/addenda", file), "utf8")));
 function hasApprovedExactRevision(path, sha256) {
   return (
-    [reconciliationAuthorization].some(
+    [reconciliationAuthorization, templateAuthorityAuthorization].some(
       (authorization) =>
         authorization.status === "Approved" &&
         (authorization.acknowledged_revisions ?? []).some(
@@ -83,8 +86,8 @@ assert.ok(
 );
 const acknowledgedConsumerRevisions = new Map([
   [productRoutePath, "75696bf3b99860d749c4346f78af2439616e1ef74d66f1ef7740f32d980bbd18"],
-  [territorialProductRoutePath, "2dd89fb8ab9a6e6ba42307ba0a45dfe3f424c1d436d96b91182e5255ac008dbb"],
-  [eventRoutePath, "4c8d3f3c2203f6792ee70e44a617cdbeab05d3933d6892cbfb1c33d3f5d6fda6"],
+  [territorialProductRoutePath, "32fbc82c3b4314c5f97281aa1c848116a10b9f787a6498705088ef226a37bc0f"],
+  [eventRoutePath, "2c59110818051da64cd30f933fb176b3b3a12d59d7bd05d03efc894b99ce37b6"],
 ]);
 
 for (const file of [
@@ -155,7 +158,7 @@ const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
 assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-C");
 assertGovernedLockBaseline(base, "I3-C");
 
-for (const routePath of newConsumers) {
+for (const routePath of [productRoutePath, territorialProductRoutePath]) {
   const route = readFileSync(routePath, "utf8");
   assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
   assert.match(route, /surfaceContractsEnabled/);
@@ -166,11 +169,15 @@ assert.match(legacyProductRoute, /CompositionRenderer tree=\{composition\.snapsh
 assert.match(legacyProductRoute, /<ProductSurface \/>/);
 assert.match(legacyProductRoute, /ProductSurfaceContractBoundary/);
 const territorialProductRoute = readFileSync(territorialProductRoutePath, "utf8");
+assert.match(territorialProductRoute, /canonicalBinding\.family === "experience"/);
+assert.match(territorialProductRoute, /canonicalBinding\.family === "tour"/);
+assert.match(territorialProductRoute, /<ExperiencePremiumSurface/);
 assert.match(territorialProductRoute, /ProductSurfaceContractBoundary/);
 assert.match(territorialProductRoute, /legacy=\{<ProductSurface \/>\}/);
 const eventRoute = readFileSync(eventRoutePath, "utf8");
-assert.match(eventRoute, /EventSurfaceContractBoundary/);
-assert.match(eventRoute, /legacy=\{<EventPremiumSurface event=\{event\} \/>\}/);
+assert.match(eventRoute, /<EventPremiumSurface event=\{event\} \/>/);
+assert.doesNotMatch(eventRoute, /EventSurfaceContractBoundary/);
+assert.doesNotMatch(eventRoute, /getOmxdsSurfaceContractsFlag/);
 
 const productSurface = readFileSync("src/components/surfaces/ProductSurface.tsx", "utf8");
 assert.match(productSurface, /ProductSurfaceContractBoundary/);
@@ -213,7 +220,10 @@ const flagConsumers = gitLines([
   "--",
   "src/routes",
 ]).sort();
-assert.deepEqual(flagConsumers, [...existingConsumers, ...newConsumers].sort());
+assert.deepEqual(
+  flagConsumers,
+  [...existingConsumers, productRoutePath, territorialProductRoutePath].sort(),
+);
 const authorizations = readdirSync("docs/governance/product-authorizations")
   .filter((file) => file.endsWith(".json"))
   .map((file) =>
