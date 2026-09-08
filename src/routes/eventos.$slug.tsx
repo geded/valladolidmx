@@ -10,10 +10,7 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
-import { EventSurfaceContractBoundary } from "@/components/surfaces/EventSurface";
 import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
-import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
-import { bindEventRoute } from "@/lib/experience-builder/canonical-entity-binding";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -44,14 +41,9 @@ function buildEventContext(e: PublicEventDetail): RouteContextDeclaration {
 
 export const Route = createFileRoute("/eventos/$slug")({
   loader: async ({ params }) => {
-    const [event, surfaceContractsEnabled] = await Promise.all([
-      getEventBySlug({ data: { slug: params.slug } }),
-      getOmxdsSurfaceContractsFlag().catch(() => false),
-    ]);
+    const event = await getEventBySlug({ data: { slug: params.slug } });
     if (!event) throw notFound();
-    // G8-R1-C2 · Resolutor canónico de la familia evento.
-    const canonicalBinding = bindEventRoute({ eventId: event.id });
-    return { event, surfaceContractsEnabled, canonicalBinding };
+    return { event };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -132,15 +124,11 @@ export const Route = createFileRoute("/eventos/$slug")({
 });
 
 function EventoPage() {
-  const { event, surfaceContractsEnabled, canonicalBinding } = Route.useLoaderData();
+  const { event } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
-      <EventSurfaceContractBoundary
-        enabled={surfaceContractsEnabled && canonicalBinding.surface === "premium"}
-        event={event}
-        legacy={<EventPremiumSurface event={event} />}
-      />
+      <EventPremiumSurface event={event} />
     </ContextEngineProvider>
   );
 }

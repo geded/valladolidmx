@@ -6,6 +6,9 @@
  * cambia URL + breadcrumbs territoriales + canonical self-referencial.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { ExperiencePremiumSurface } from "@/components/experience-premium/ExperiencePremiumSurface";
+import { buildExperienceVMFromProduct } from "@/components/experience-premium/experience-premium-vm";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { getNonDiscoverableBusinessSlugs } from "@/lib/omxds/public-eligibility.functions";
@@ -188,6 +191,29 @@ function ProductoTerritorialPage() {
   const declaration = navigationContextToDeclaration(ctx, {
     currentLabel: product.name,
   });
+
+  const isExperience =
+    canonicalBinding.family === "experience" || canonicalBinding.family === "tour";
+  if (isExperience) {
+    const vm = buildExperienceVMFromProduct(product, related);
+    return (
+      <ContextEngineProvider declaration={declaration}>
+        <PublicShell useContextCrumbs compactCrumbsOnMobile>
+          <ExperiencePremiumSurface
+            vm={vm}
+            aluxSlot={
+              <TourismAluxPanel
+                title="¿Esta experiencia encaja en tu viaje?"
+                description="Alux la compara con tu contexto y la guarda en Mi Viaje."
+                task={`Ayúdame a decidir si la experiencia "${vm.name}" encaja en mi viaje por el Oriente Maya.`}
+                prompts={["Con niños", "Medio día", "Cerca del centro", "Naturaleza"]}
+              />
+            }
+          />
+        </PublicShell>
+      </ContextEngineProvider>
+    );
+  }
 
   return (
     <ContextEngineProvider declaration={declaration}>
