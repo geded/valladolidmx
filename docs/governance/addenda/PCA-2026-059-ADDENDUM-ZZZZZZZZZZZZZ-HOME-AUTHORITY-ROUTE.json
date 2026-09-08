@@ -8,7 +8,7 @@
     "operation": "modify",
     "path": "src/routes/index.tsx",
     "previous_sha256": "ba7f6a9bfc09cf3e10c21f2aca28e8c37f7872e9e67c070ae6f13b327f65b437",
-    "current_sha256": "cba1b0f3cf7f8dfa68eb2c9fbb9aededadff32f297d2af988dc94b3f6033fc64",
+    "current_sha256": "0f06d7368e38fbf11b199e1ca00fca83f07b9cea7fa172c3943ec0b60dbadbe7",
     "semantic_change": "La ruta pública conserva la configuración y SEO CMS del nodo Home Premium y excluye bloques hermanos antiguos.",
     "authority": "Founder · restauración cerrada de Home Premium · 2026-09-08"
   },

@@ -504,7 +504,7 @@ function isCompositionTree(value: unknown): value is CompositionTree {
 export function resolveHomePremiumAuthorityTree(snapshot: unknown): CompositionTree | null {
   if (!isCompositionTree(snapshot)) return null;
   const premiumNode = snapshot.root.children.find(
-    (node): node is CompositionNode => node.type === HOME_PREMIUM_G4_BLOCK_TYPE && !node.hidden,
+    (node): node is CompositionNode => node.type === HOME_PREMIUM_G4_BLOCK_TYPE,
   );
   if (!premiumNode) return null;
   return {

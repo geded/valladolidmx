@@ -81,9 +81,12 @@ export const Route = createFileRoute("/")({
       // Hero y la sección de categorías ya no dependen de `CATEGORIAS_MOCK`.
       context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
     ]);
+    const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
+    const premiumNode = authorityTree?.root.children[0];
     return {
-      seo: published?.snapshot?.chrome?.seo ?? null,
-      fallbackImage: published?.snapshot ? (pickFirstMediaUrl(published.snapshot) ?? null) : null,
+      seo: authorityTree?.chrome?.seo ?? null,
+      fallbackImage:
+        authorityTree && !premiumNode?.hidden ? (pickFirstMediaUrl(authorityTree) ?? null) : null,
     };
   },
   component: HomePage,

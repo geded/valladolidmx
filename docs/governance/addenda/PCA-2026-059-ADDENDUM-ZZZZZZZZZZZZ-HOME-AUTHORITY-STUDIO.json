@@ -8,7 +8,7 @@
     "operation": "modify",
     "path": "src/components/experience-builder/VisualStudio.tsx",
     "previous_sha256": "6e68f55d00d22795720d32a167b32f4e32da52c91a88b383040adda67872d776",
-    "current_sha256": "15e4dbd4087c22c0e55d8bfad695b9f7185258f8675a9447d39f4876f8ca29ce",
+    "current_sha256": "e539d1d9b8854c2903e7aa84e08f6f103dca1eebeefc2f1bffe7caaaf7b2a785",
     "semantic_change": "El preview del Studio comparte el mismo resolutor cerrado que la ruta pública de Home.",
     "authority": "Founder · paridad pública y CMS de Home Premium · 2026-09-08"
   },

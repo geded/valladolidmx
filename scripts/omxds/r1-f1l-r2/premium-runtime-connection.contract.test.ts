@@ -522,7 +522,11 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(publicRoute).toContain("tree={authorityTree}");
     expect(publicRoute).not.toContain("hasHomePremiumAuthority");
     expect(studio).toContain("resolveHomePremiumAuthorityTree(tree)");
+    expect(studio).toContain('previewMode && pageType === "home"');
+    expect(studio).toContain("pageType={pageType}");
     expect(studio).toContain("tree={renderedTree}");
+    expect(publicRoute).toContain("pickFirstMediaUrl(authorityTree)");
+    expect(publicRoute).not.toContain("pickFirstMediaUrl(published.snapshot)");
     expect(authority).toContain("root: { children: [premiumNode] }");
     expect(authority).toContain("chrome: snapshot.chrome");
 
@@ -544,6 +548,11 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     });
     expect(resolved?.root.children).toEqual([premiumNode]);
     expect(resolved?.chrome?.seo?.title).toBe("SEO CMS");
+
+    const hiddenPremiumNode = { ...premiumNode, hidden: true };
+    expect(
+      resolveHomePremiumAuthorityTree({ root: { children: [hiddenPremiumNode] } })?.root.children,
+    ).toEqual([hiddenPremiumNode]);
   });
 
   test("experiencias y tours reconocidos no regresan a plantillas ni composiciones antiguas", () => {

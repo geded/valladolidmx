@@ -2127,6 +2127,7 @@ function PageVisualEditor({
           const canvas = (
             <HomeCanvas
               tree={tree}
+              pageType={pageDef.page_type}
               previewMode={previewMode}
               deviceViewport={deviceViewport}
               selectedId={selectedId}
@@ -2673,6 +2674,7 @@ function DeviceToggle({
 
 function HomeCanvas({
   tree,
+  pageType,
   previewMode,
   deviceViewport,
   selectedId,
@@ -2686,6 +2688,7 @@ function HomeCanvas({
   commentCounts,
 }: {
   tree: CompositionTree;
+  pageType: string;
   previewMode: boolean;
   deviceViewport: DeviceViewport;
   selectedId: string | null;
@@ -2743,9 +2746,10 @@ function HomeCanvas({
   // por lo que container queries y breakpoints no se ven alterados.
   const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
   const headerVariant = resolveCanvasHeaderVariant(tree);
-  const renderedTree = previewMode
-    ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
-    : tree;
+  const renderedTree =
+    previewMode && pageType === "home"
+      ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
+      : tree;
 
   return (
     <div
@@ -2776,7 +2780,7 @@ function HomeCanvas({
           <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
             <CompositionRenderer
               tree={renderedTree}
-              pageType="home"
+              pageType={pageType}
               wrap={
                 previewMode
                   ? undefined

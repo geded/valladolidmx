@@ -15,19 +15,19 @@
     {
       "operation": "modify",
       "path": "src/routes/index.tsx",
-      "sha256": "cba1b0f3cf7f8dfa68eb2c9fbb9aededadff32f297d2af988dc94b3f6033fc64",
+      "sha256": "0f06d7368e38fbf11b199e1ca00fca83f07b9cea7fa172c3943ec0b60dbadbe7",
       "authority": "Founder · Home Premium como autoridad pública única · 2026-09-08"
     },
     {
       "operation": "modify",
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "15e4dbd4087c22c0e55d8bfad695b9f7185258f8675a9447d39f4876f8ca29ce",
+      "sha256": "e539d1d9b8854c2903e7aa84e08f6f103dca1eebeefc2f1bffe7caaaf7b2a785",
       "authority": "Founder · preview CMS comparte autoridad Home Premium · 2026-09-08"
     },
     {
       "operation": "modify",
       "path": "src/components/home-premium/home-premium-config.ts",
-      "sha256": "93fdeea32f22a5a86346a0db5d5c826b15f9f3d08f7de775b844a2745e909b09",
+      "sha256": "764a042f92258a353882ad5d22d2a7d105174218e9eefd14c1521157afd157c3",
       "authority": "Founder · aislamiento cerrado de la composición Premium · 2026-09-08"
     }
   ],
