@@ -10,9 +10,7 @@ function isCompositionTree(value: unknown): value is CompositionTree {
   if (!value || typeof value !== "object") return false;
   const root = (value as { root?: unknown }).root;
   return Boolean(
-    root &&
-      typeof root === "object" &&
-      Array.isArray((root as { children?: unknown }).children),
+    root && typeof root === "object" && Array.isArray((root as { children?: unknown }).children),
   );
 }
 
