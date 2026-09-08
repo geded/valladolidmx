@@ -12,6 +12,7 @@ import {
   contrastRatio,
   paletteContrastChecks,
 } from "../../../src/lib/brand/brand-theme";
+import { resolveHomePremiumAuthorityTree } from "../../../src/lib/experience-builder/home-premium-authority";
 
 const root = process.cwd();
 const read = (path: string) => readFileSync(resolve(root, path), "utf8");
@@ -510,6 +511,39 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(publicRoute).not.toContain("getOmxdsSurfaceContractsFlag");
     expect(cmsPreview).toContain("<EventPremiumSurface");
     expect(lovablePreview).toContain("<EventPremiumSurface");
+  });
+
+  test("Home pública y preview CMS aíslan la autoridad Premium de composiciones antiguas", () => {
+    const publicRoute = read("src/routes/index.tsx");
+    const studio = read("src/components/experience-builder/VisualStudio.tsx");
+    const authority = read("src/lib/experience-builder/home-premium-authority.ts");
+
+    expect(publicRoute).toContain("resolveHomePremiumAuthorityTree(published?.snapshot)");
+    expect(publicRoute).toContain("tree={authorityTree}");
+    expect(publicRoute).not.toContain("hasHomePremiumAuthority");
+    expect(studio).toContain("resolveHomePremiumAuthorityTree(tree)");
+    expect(studio).toContain("tree={renderedTree}");
+    expect(authority).toContain("root: { children: [premiumNode] }");
+    expect(authority).toContain("chrome: snapshot.chrome");
+
+    const premiumNode = {
+      id: "home-premium-authority",
+      type: "vmx.home.premium-g4",
+      version: "1.0.0",
+      config: { hero: { title: "CMS preservado" } },
+    };
+    const resolved = resolveHomePremiumAuthorityTree({
+      root: {
+        children: [
+          { id: "legacy-route-block", type: "vmx.legacy.routes", version: "1.0.0", config: {} },
+          premiumNode,
+          { id: "legacy-footer", type: "vmx.legacy.footer", version: "1.0.0", config: {} },
+        ],
+      },
+      chrome: { seo: { title: "SEO CMS" } },
+    });
+    expect(resolved?.root.children).toEqual([premiumNode]);
+    expect(resolved?.chrome?.seo?.title).toBe("SEO CMS");
   });
 
   test("experiencias y tours reconocidos no regresan a plantillas ni composiciones antiguas", () => {

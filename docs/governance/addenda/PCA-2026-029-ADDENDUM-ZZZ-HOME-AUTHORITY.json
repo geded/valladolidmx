@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-ZZZ-HOME-AUTHORITY",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para hacer que el preview CMS de Home resuelva exclusivamente la autoridad Home Premium sin mezclar bloques antiguos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/experience-builder/VisualStudio.tsx",
+    "previous_sha256": "6e68f55d00d22795720d32a167b32f4e32da52c91a88b383040adda67872d776",
+    "current_sha256": "5e83ae52472d2a7972109798dcc32d0f7cb81fcb9f0c473392b8aefc405bfa91",
+    "semantic_change": "El modo preview filtra la composición a la única superficie Home Premium; el modo de edición conserva la estructura administrable.",
+    "authority": "Founder · preview CMS con autoridad Home Premium única · 2026-09-08"
+  },
+  "invariants": ["Configuración CMS preservada", "Edición preservada", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-08"
+}

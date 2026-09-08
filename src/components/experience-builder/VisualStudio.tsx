@@ -89,6 +89,10 @@ import {
   type CompositionJsonObject,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import {
+  HOME_PREMIUM_FALLBACK_TREE,
+  resolveHomePremiumAuthorityTree,
+} from "@/lib/experience-builder/home-premium-authority";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
   canListEditorialBlock,
@@ -2740,6 +2744,9 @@ function HomeCanvas({
   // por lo que container queries y breakpoints no se ven alterados.
   const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
   const headerVariant = resolveCanvasHeaderVariant(tree);
+  const renderedTree = previewMode
+    ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
+    : tree;
 
   return (
     <div
@@ -2769,7 +2776,7 @@ function HomeCanvas({
         >
           <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
             <CompositionRenderer
-              tree={tree}
+              tree={renderedTree}
               pageType="home"
               wrap={
                 previewMode

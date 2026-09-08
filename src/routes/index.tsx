@@ -18,10 +18,9 @@ const ContinuityWelcomeSurface = lazy(() =>
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import {
-  HOME_PREMIUM_G4_CONTRACT_VERSION,
-  homePremiumG4DefaultConfig,
-} from "@/components/home-premium/home-premium-config";
-import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
+  HOME_PREMIUM_FALLBACK_TREE,
+  resolveHomePremiumAuthorityTree,
+} from "@/lib/experience-builder/home-premium-authority";
 import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
 import { homeFeaturedCategoriesQueryOptions } from "@/lib/cms/home-featured-categories-query";
 
@@ -100,14 +99,15 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const { data: published } = useQuery(publishedHomeQuery);
   const editWrap = useSectionEditWrap({ pageSlug: "home" });
+  const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
 
-  if (published?.snapshot && hasHomePremiumAuthority(published.snapshot)) {
+  if (authorityTree) {
     return (
       <PublicShell variant="hero">
         <Suspense fallback={null}>
           <ContinuityWelcomeSurface />
         </Suspense>
-        <CompositionRenderer tree={published.snapshot} pageType="home" wrap={editWrap} />
+        <CompositionRenderer tree={authorityTree} pageType="home" wrap={editWrap} />
       </PublicShell>
     );
   }
@@ -121,25 +121,3 @@ function HomePage() {
     </PublicShell>
   );
 }
-
-function hasHomePremiumAuthority(snapshot: unknown): boolean {
-  return JSON.stringify(snapshot ?? null).includes('"vmx.home.premium-g4"');
-}
-
-/**
- * Fallback canónico de runtime. No duplica JSX ni contenido: instancia el
- * mismo bloque compuesto que consumen Studio, preview y publicación. Los
- * medios permanecen vacíos hasta que el resolutor real acredite una portada.
- */
-const HOME_PREMIUM_FALLBACK_TREE: CompositionTree = {
-  root: {
-    children: [
-      {
-        id: "home-premium-g4-runtime-fallback",
-        type: "vmx.home.premium-g4",
-        version: HOME_PREMIUM_G4_CONTRACT_VERSION,
-        config: homePremiumG4DefaultConfig(),
-      },
-    ],
-  },
-};
