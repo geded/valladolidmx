@@ -9,9 +9,7 @@
   "permissions": [
     { "operation": "modify", "path": "src/routes/index.tsx" },
     { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
-    { "operation": "modify", "path": "src/components/home-premium/home-premium-config.ts" },
-    { "operation": "create", "path": "src/lib/experience-builder/home-premium-authority.ts" },
-    { "operation": "modify", "path": "src/lib/experience-builder/home-premium-authority.ts" }
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-config.ts" }
   ],
   "acknowledged_revisions": [
     {
@@ -31,18 +29,6 @@
       "path": "src/components/home-premium/home-premium-config.ts",
       "sha256": "93fdeea32f22a5a86346a0db5d5c826b15f9f3d08f7de775b844a2745e909b09",
       "authority": "Founder · aislamiento cerrado de la composición Premium · 2026-09-08"
-    },
-    {
-      "operation": "create",
-      "path": "src/lib/experience-builder/home-premium-authority.ts",
-      "sha256": "4711d2717e0fc5b555f59899176039afec4f195c49182b2e5f183bdeddb23ecd",
-      "authority": "Founder · reexportación trazable del resolutor único · 2026-09-08"
-    },
-    {
-      "operation": "modify",
-      "path": "src/lib/experience-builder/home-premium-authority.ts",
-      "sha256": "4711d2717e0fc5b555f59899176039afec4f195c49182b2e5f183bdeddb23ecd",
-      "authority": "Founder · consolidación del resolutor único · 2026-09-08"
     }
   ],
   "public_routes": ["/", "/cms/experience-builder"],
