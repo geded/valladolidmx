@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-ZZZ-RELATED-CURATION",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para preservar datos CMS, contenido, navegación y comportamiento existentes al consolidar la autoridad Premium de experiencias y tours.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/experience-premium/experience-premium-vm.ts",
+    "previous_sha256": "bd6d933f41e0e17f78117d72835cd705468736bf2de09c04f3e601dd45dfc2d4",
+    "current_sha256": "dac47148a0a511cddace5db599b312f2c6ec7ab5d8e09581289eb7cc4f64072a",
+    "semantic_change": "La proyección Premium incorpora las recomendaciones territoriales ya gobernadas por related_overrides, conservando pins y exclusiones del CMS antes de completar con productos de la misma empresa.",
+    "authority": "Founder · preservación de recomendaciones CMS en Experiencia Premium · 2026-09-08"
+  },
+  "invariants": [
+    "Datos y decisiones editoriales CMS preservados",
+    "Sin datos inventados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-08"
+}

@@ -523,6 +523,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
         route.indexOf("<ProductSurfaceContractBoundary"),
       );
     }
+    expect(territorial).toContain("buildExperienceVMFromProduct(product, related)");
     expect(marketplace.indexOf("if (isExperience)")).toBeLessThan(
       marketplace.indexOf("<CompositionRenderer"),
     );

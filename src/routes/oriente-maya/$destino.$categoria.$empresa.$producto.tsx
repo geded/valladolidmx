@@ -195,7 +195,7 @@ function ProductoTerritorialPage() {
   const isExperience =
     canonicalBinding.family === "experience" || canonicalBinding.family === "tour";
   if (isExperience) {
-    const vm = buildExperienceVMFromProduct(product);
+    const vm = buildExperienceVMFromProduct(product, related);
     return (
       <ContextEngineProvider declaration={declaration}>
         <PublicShell useContextCrumbs compactCrumbsOnMobile>

@@ -7,6 +7,7 @@
  * dato real se omite.
  */
 import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
+import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import {
   resolveExperienceCommerce,
   type ExperienceCommerceDecision,
@@ -90,6 +91,7 @@ function humanize(slug: string): string {
 
 export function buildExperienceVMFromProduct(
   product: MarketplaceProductDetail,
+  curatedRelated?: ProductRelatedDTO | null,
 ): ExperiencePremiumVM {
   const cover = product.cover_url
     ? { url: product.cover_url, alt: `${product.name} — ${product.business.display_name}` }
@@ -203,6 +205,32 @@ export function buildExperienceVMFromProduct(
         }
       : null;
 
+  const governedRelated: ExperienceRelatedVM[] = [
+    ...(curatedRelated?.sameCategoryInDestination ?? []),
+    ...(curatedRelated?.otherInDestination ?? []),
+  ].map((item) => ({
+    id: item.id,
+    name: item.name,
+    href: `/producto/${item.slug}`,
+    note: item.tagline || item.business_name,
+    media: null,
+  }));
+  const sameBusinessRelated: ExperienceRelatedVM[] = product.related.map((item) => ({
+    id: item.id,
+    name: item.name,
+    href: `/producto/${item.slug}`,
+    note: item.tagline || product.business.display_name,
+    media: item.cover_url ? { url: item.cover_url, alt: item.name } : null,
+  }));
+  const seenRelated = new Set<string>();
+  const related = [...governedRelated, ...sameBusinessRelated]
+    .filter((item) => {
+      if (seenRelated.has(item.id)) return false;
+      seenRelated.add(item.id);
+      return true;
+    })
+    .slice(0, 6);
+
   return {
     id: product.id,
     slug: product.slug,
@@ -232,13 +260,7 @@ export function buildExperienceVMFromProduct(
       product.review_stats.count > 0
         ? { value: product.review_stats.average, count: product.review_stats.count }
         : null,
-    related: product.related.slice(0, 6).map((item) => ({
-      id: item.id,
-      name: item.name,
-      href: `/producto/${item.slug}`,
-      note: item.tagline || product.business.display_name,
-      media: item.cover_url ? { url: item.cover_url, alt: item.name } : null,
-    })),
+    related,
     commerce,
     demoNotice: null,
   };
