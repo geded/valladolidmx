@@ -8,10 +8,13 @@
     "operation": "modify",
     "path": "src/routes/index.tsx",
     "previous_sha256": "ba7f6a9bfc09cf3e10c21f2aca28e8c37f7872e9e67c070ae6f13b327f65b437",
-    "current_sha256": "615e007fdbdd9f1bcaf8edf96f6d895d8480230bbc1472406fed4bec4fe5afc1",
+    "current_sha256": "cba1b0f3cf7f8dfa68eb2c9fbb9aededadff32f297d2af988dc94b3f6033fc64",
     "semantic_change": "La ruta pública conserva la configuración y SEO CMS del nodo Home Premium y excluye bloques hermanos antiguos.",
     "authority": "Founder · restauración cerrada de Home Premium · 2026-09-08"
   },
-  "invariants": ["Header, navegación, Alux, Mi Viaje, mapa y footer preservados", "Sin publicación ni despliegue"],
+  "invariants": [
+    "Header, navegación, Alux, Mi Viaje, mapa y footer preservados",
+    "Sin publicación ni despliegue"
+  ],
   "recorded_at": "2026-09-08"
 }

@@ -9,26 +9,40 @@
   "permissions": [
     { "operation": "modify", "path": "src/routes/index.tsx" },
     { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
-    { "operation": "create", "path": "src/lib/experience-builder/home-premium-authority.ts" }
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-config.ts" },
+    { "operation": "create", "path": "src/lib/experience-builder/home-premium-authority.ts" },
+    { "operation": "modify", "path": "src/lib/experience-builder/home-premium-authority.ts" }
   ],
   "acknowledged_revisions": [
     {
       "operation": "modify",
       "path": "src/routes/index.tsx",
-      "sha256": "615e007fdbdd9f1bcaf8edf96f6d895d8480230bbc1472406fed4bec4fe5afc1",
+      "sha256": "cba1b0f3cf7f8dfa68eb2c9fbb9aededadff32f297d2af988dc94b3f6033fc64",
       "authority": "Founder · Home Premium como autoridad pública única · 2026-09-08"
     },
     {
       "operation": "modify",
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "5e83ae52472d2a7972109798dcc32d0f7cb81fcb9f0c473392b8aefc405bfa91",
+      "sha256": "15e4dbd4087c22c0e55d8bfad695b9f7185258f8675a9447d39f4876f8ca29ce",
       "authority": "Founder · preview CMS comparte autoridad Home Premium · 2026-09-08"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts",
+      "sha256": "93fdeea32f22a5a86346a0db5d5c826b15f9f3d08f7de775b844a2745e909b09",
+      "authority": "Founder · aislamiento cerrado de la composición Premium · 2026-09-08"
     },
     {
       "operation": "create",
       "path": "src/lib/experience-builder/home-premium-authority.ts",
-      "sha256": "079a476f39a11c898415182fc00fd6a16d51177f902cc67cbc96e751b6372aa2",
-      "authority": "Founder · aislamiento cerrado de la composición Premium · 2026-09-08"
+      "sha256": "4711d2717e0fc5b555f59899176039afec4f195c49182b2e5f183bdeddb23ecd",
+      "authority": "Founder · reexportación trazable del resolutor único · 2026-09-08"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/home-premium-authority.ts",
+      "sha256": "4711d2717e0fc5b555f59899176039afec4f195c49182b2e5f183bdeddb23ecd",
+      "authority": "Founder · consolidación del resolutor único · 2026-09-08"
     }
   ],
   "public_routes": ["/", "/cms/experience-builder"],

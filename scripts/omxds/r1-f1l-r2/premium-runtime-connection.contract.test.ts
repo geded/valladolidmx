@@ -12,7 +12,7 @@ import {
   contrastRatio,
   paletteContrastChecks,
 } from "../../../src/lib/brand/brand-theme";
-import { resolveHomePremiumAuthorityTree } from "../../../src/lib/experience-builder/home-premium-authority";
+import { resolveHomePremiumAuthorityTree } from "../../../src/components/home-premium/home-premium-config";
 
 const root = process.cwd();
 const read = (path: string) => readFileSync(resolve(root, path), "utf8");
@@ -516,7 +516,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
   test("Home pública y preview CMS aíslan la autoridad Premium de composiciones antiguas", () => {
     const publicRoute = read("src/routes/index.tsx");
     const studio = read("src/components/experience-builder/VisualStudio.tsx");
-    const authority = read("src/lib/experience-builder/home-premium-authority.ts");
+    const authority = read("src/components/home-premium/home-premium-config.ts");
 
     expect(publicRoute).toContain("resolveHomePremiumAuthorityTree(published?.snapshot)");
     expect(publicRoute).toContain("tree={authorityTree}");

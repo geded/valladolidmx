@@ -20,7 +20,7 @@ import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discove
 import {
   HOME_PREMIUM_FALLBACK_TREE,
   resolveHomePremiumAuthorityTree,
-} from "@/lib/experience-builder/home-premium-authority";
+} from "@/components/home-premium/home-premium-config";
 import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
 import { homeFeaturedCategoriesQueryOptions } from "@/lib/cms/home-featured-categories-query";
 
@@ -33,7 +33,8 @@ const publishedHomeQuery = queryOptions({
 export const Route = createFileRoute("/")({
   head: (ctx) => {
     const loaderData = ctx.loaderData as
-      { seo?: Record<string, unknown> | null; fallbackImage?: string | null } | undefined;
+      | { seo?: Record<string, unknown> | null; fallbackImage?: string | null }
+      | undefined;
     const seo = (loaderData?.seo ?? {}) as {
       title?: string;
       description?: string;

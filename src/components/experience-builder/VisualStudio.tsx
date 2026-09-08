@@ -92,7 +92,7 @@ import { CompositionRenderer } from "@/lib/experience-builder/composition-render
 import {
   HOME_PREMIUM_FALLBACK_TREE,
   resolveHomePremiumAuthorityTree,
-} from "@/lib/experience-builder/home-premium-authority";
+} from "@/components/home-premium/home-premium-config";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
   canListEditorialBlock,
@@ -1239,7 +1239,6 @@ function PageVisualEditor({
         savedSignatureRef.current = canonicalizeClient(detail.current_draft);
         setTree(detail.current_draft);
         resetHistory();
-
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
       }
