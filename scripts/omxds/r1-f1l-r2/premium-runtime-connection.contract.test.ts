@@ -524,9 +524,14 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(business).toContain("maxItems: 4");
     expect(business).toContain('density: usesApprovedFamilyTemplate ? "compact" : "comfortable"');
     expect(business).toContain('variant: usesApprovedFamilyTemplate ? ("inline" as const)');
-    expect(business).toContain("const usesApprovedFamilyTemplate = Boolean(");
-    expect(business).toContain('activeContract.family === "hotel"');
-    expect(business).toContain('activeContract.family === "restaurant"');
+    expect(business).toContain("resolveApprovedBusinessFamily(");
+    expect(business).toContain("sourceBusiness.category_family_key");
+    expect(business).toContain("sourceBusiness.category_slug");
+    expect(business).toContain("activeContract?.family");
+    expect(business).toContain("const usesApprovedFamilyTemplate = approvedFamily !== null");
+    expect(business).toContain('hoteles: "hotel"');
+    expect(business).toContain('restaurantes: "restaurant"');
+    expect(business).toContain('"casas-de-vacaciones": "vacation_rental"');
     expect(business).toContain("{usesApprovedFamilyTemplate ? (");
     expect(collection).toContain('"min-w-[210px] max-w-[240px] sm:min-w-[230px]"');
     expect(card).toContain('caps.compact ? "aspect-[16/9] max-h-36"');

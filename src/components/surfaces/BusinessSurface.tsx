@@ -194,6 +194,48 @@ export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   );
 }
 
+type ApprovedBusinessFamily = "hotel" | "restaurant" | "vacation_rental";
+
+const APPROVED_FAMILY_BY_CMS_KEY: Readonly<Record<string, ApprovedBusinessFamily>> = {
+  hoteles: "hotel",
+  restaurantes: "restaurant",
+  "casas-de-vacaciones": "vacation_rental",
+};
+
+const APPROVED_FAMILY_BY_CATEGORY_SLUG: Readonly<Record<string, ApprovedBusinessFamily>> = {
+  hotel: "hotel",
+  hoteles: "hotel",
+  hospedaje: "hotel",
+  hospedajes: "hotel",
+  alojamiento: "hotel",
+  restaurante: "restaurant",
+  restaurantes: "restaurant",
+  restaurant: "restaurant",
+  restaurants: "restaurant",
+  cafeteria: "restaurant",
+  cafeterias: "restaurant",
+  "casa-de-vacaciones": "vacation_rental",
+  "casas-de-vacaciones": "vacation_rental",
+  "vacation-rental": "vacation_rental",
+  "vacation-rentals": "vacation_rental",
+  "renta-vacacional": "vacation_rental",
+  "rentas-vacacionales": "vacation_rental",
+};
+
+export function resolveApprovedBusinessFamily(
+  categoryFamilyKey: string | null | undefined,
+  categorySlug: string,
+  contractFamily?: string | null,
+): ApprovedBusinessFamily | null {
+  if (contractFamily === "hotel" || contractFamily === "restaurant") return contractFamily;
+
+  const cmsFamily = categoryFamilyKey?.trim().toLowerCase();
+  const familyFromCms = cmsFamily ? APPROVED_FAMILY_BY_CMS_KEY[cmsFamily] : undefined;
+  if (familyFromCms) return familyFromCms;
+
+  return APPROVED_FAMILY_BY_CATEGORY_SLUG[categorySlug.trim().toLowerCase()] ?? null;
+}
+
 /* ------------------------------------------------------------------ *
  * Surface
  * ------------------------------------------------------------------ */
@@ -325,20 +367,15 @@ export function BusinessSurface({
   // composición Premium editorial aunque sea demo o todavía no acredite
   // medios/capacidades comerciales. La elegibilidad sólo habilita los datos
   // Premium acreditados (galería, contacto y modo cinematográfico).
-  const usesApprovedFamilyTemplate = Boolean(
-    activeContract &&
-    (activeContract.family === "hotel" ||
-      activeContract.family === "restaurant" ||
-      sourceBusiness.category_family_key === "casas-de-vacaciones" ||
-      [
-        "casa-de-vacaciones",
-        "casas-de-vacaciones",
-        "vacation-rental",
-        "vacation-rentals",
-        "renta-vacacional",
-        "rentas-vacacionales",
-      ].includes(sourceBusiness.category_slug.trim().toLowerCase())),
+  // El preview CMS puede llegar deliberadamente sin `surfaceContract`.
+  // La familia declarada en sus propios datos sigue siendo autoridad visual;
+  // el contrato sólo gobierna capacidades, acciones y omisiones.
+  const approvedFamily = resolveApprovedBusinessFamily(
+    sourceBusiness.category_family_key,
+    sourceBusiness.category_slug,
+    activeContract?.family,
   );
+  const usesApprovedFamilyTemplate = approvedFamily !== null;
 
   const b: MarketplaceBusinessDetail = activePremium
     ? {
