@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.86",
     "state": "Approved",
-    "source_sha256": "9a94904c1e49865ea3d635a825b55a8cb45ccb3d408cc8a7f087944693c0bc26",
+    "source_sha256": "f075eb1a6374ea6c0d8f8614b2df1d91b6727215504bf26f9a8d7465b71c9bb3",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -12185,6 +12185,11 @@
       "id": "ART:src/lib/brand/brand-theme.ts",
       "type": "artifact",
       "path": "src/lib/brand/brand-theme.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-073.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-073.json"
     }
   ],
   "edges": [
@@ -37400,6 +37405,24 @@
     {
       "id": "AUTO:IMPLEMENTS:src/lib/brand/brand-theme.ts:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
       "origin": "ART:src/lib/brand/brand-theme.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-07"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-073.json:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-073.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "verified_at": "2026-09-07"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/BusinessSurface.tsx:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+      "origin": "ART:src/components/surfaces/BusinessSurface.tsx",
       "relation": "implements",
       "destination": "DOC:docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
       "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",

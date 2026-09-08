@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-073",
+  "title": "Autoridad visual de plantilla por familia independiente de elegibilidad comercial",
+  "status": "Consumed",
+  "branch": "fix/category-template-authority-20260907",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para corregir el resolutor compartido y la ruta canónica de modo que hoteles, restaurantes y casas de vacaciones conserven la plantilla visual aprobada de su familia aunque sus datos sean demo o no acrediten elegibilidad comercial Premium; la elegibilidad continúa gobernando únicamente medios y capacidades comerciales, se mantienen fallbacks editoriales compactos y queda prohibido modificar datos CMS, migraciones, permisos, publicación o despliegue.",
+  "permissions": [{ "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" }],
+  "public_routes": ["/oriente-maya/{destino}/{categoria}/{empresa}"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:i3:b",
+    "bun run test:r1:f1l:r2",
+    "bun scripts/route-inventory-coverage.ts",
+    "bun run governance:check",
+    "responsive 1440/834/430/390"
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "sha256": "66994319b66b9fe670980026f39d51816b54c5edbedaec8d12952e86918c5ffb",
+      "authority": "Founder · plantilla visual por familia independiente de elegibilidad comercial · 2026-09-07"
+    }
+  ]
+}

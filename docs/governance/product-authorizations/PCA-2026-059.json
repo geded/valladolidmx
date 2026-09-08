@@ -4242,7 +4242,7 @@
     {
       "operation": "modify",
       "path": "src/components/surfaces/BusinessSurface.tsx",
-      "sha256": "13573b139bf944381747a3669af42ac63933d7960a6ac61a26d2ef23a2a82e45",
+      "sha256": "66994319b66b9fe670980026f39d51816b54c5edbedaec8d12952e86918c5ffb",
       "authority": "Founder PR #58 control #288 · approved_blueprint_exact · docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md"
     },
     {

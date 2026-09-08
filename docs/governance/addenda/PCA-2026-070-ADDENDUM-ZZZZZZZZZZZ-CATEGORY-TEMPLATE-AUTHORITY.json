@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-070-ADDENDUM-ZZZZZZZZZZZ-CATEGORY-TEMPLATE-AUTHORITY",
+  "status": "Approved",
+  "parent": "PCA-2026-070",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para completar la continuidad visual Premium detectada como incompleta en dos fichas de hotel.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/BusinessSurface.tsx",
+    "previous_sha256": "e4be4631b9fbcc7a943b202f3c6d1826e363f6da5efa18c2ec3022b6375beebf",
+    "current_sha256": "66994319b66b9fe670980026f39d51816b54c5edbedaec8d12952e86918c5ffb",
+    "semantic_change": "La plantilla visual de familia deja de depender de la elegibilidad comercial Premium y ya no activa el bloque genérico antiguo para registros demo.",
+    "authority": "Founder · continuidad visual de plantillas verticales · 2026-09-07"
+  },
+  "invariants": [
+    "Plantillas aprobadas preservadas",
+    "Demos siguen identificados como demos",
+    "Sin despliegue"
+  ],
+  "recorded_at": "2026-09-07"
+}

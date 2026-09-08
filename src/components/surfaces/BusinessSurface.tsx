@@ -194,6 +194,48 @@ export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   );
 }
 
+type ApprovedBusinessFamily = "hotel" | "restaurant" | "vacation_rental";
+
+const APPROVED_FAMILY_BY_CMS_KEY: Readonly<Record<string, ApprovedBusinessFamily>> = {
+  hoteles: "hotel",
+  restaurantes: "restaurant",
+  "casas-de-vacaciones": "vacation_rental",
+};
+
+const APPROVED_FAMILY_BY_CATEGORY_SLUG: Readonly<Record<string, ApprovedBusinessFamily>> = {
+  hotel: "hotel",
+  hoteles: "hotel",
+  hospedaje: "hotel",
+  hospedajes: "hotel",
+  alojamiento: "hotel",
+  restaurante: "restaurant",
+  restaurantes: "restaurant",
+  restaurant: "restaurant",
+  restaurants: "restaurant",
+  cafeteria: "restaurant",
+  cafeterias: "restaurant",
+  "casa-de-vacaciones": "vacation_rental",
+  "casas-de-vacaciones": "vacation_rental",
+  "vacation-rental": "vacation_rental",
+  "vacation-rentals": "vacation_rental",
+  "renta-vacacional": "vacation_rental",
+  "rentas-vacacionales": "vacation_rental",
+};
+
+export function resolveApprovedBusinessFamily(
+  categoryFamilyKey: string | null | undefined,
+  categorySlug: string,
+  contractFamily?: string | null,
+): ApprovedBusinessFamily | null {
+  if (contractFamily === "hotel" || contractFamily === "restaurant") return contractFamily;
+
+  const cmsFamily = categoryFamilyKey?.trim().toLowerCase();
+  const familyFromCms = cmsFamily ? APPROVED_FAMILY_BY_CMS_KEY[cmsFamily] : undefined;
+  if (familyFromCms) return familyFromCms;
+
+  return APPROVED_FAMILY_BY_CATEGORY_SLUG[categorySlug.trim().toLowerCase()] ?? null;
+}
+
 /* ------------------------------------------------------------------ *
  * Surface
  * ------------------------------------------------------------------ */
@@ -320,6 +362,20 @@ export function BusinessSurface({
     premiumEligibility?.eligible
       ? premiumEligibility
       : null;
+  // La familia visual aprobada y la elegibilidad comercial son autoridades
+  // distintas. Una ficha Hotel/Restaurante/Casa de vacaciones conserva su
+  // composición Premium editorial aunque sea demo o todavía no acredite
+  // medios/capacidades comerciales. La elegibilidad sólo habilita los datos
+  // Premium acreditados (galería, contacto y modo cinematográfico).
+  // El preview CMS puede llegar deliberadamente sin `surfaceContract`.
+  // La familia declarada en sus propios datos sigue siendo autoridad visual;
+  // el contrato sólo gobierna capacidades, acciones y omisiones.
+  const approvedFamily = resolveApprovedBusinessFamily(
+    sourceBusiness.category_family_key,
+    sourceBusiness.category_slug,
+    activeContract?.family,
+  );
+  const usesApprovedFamilyTemplate = approvedFamily !== null;
 
   const b: MarketplaceBusinessDetail = activePremium
     ? {
@@ -379,7 +435,7 @@ export function BusinessSurface({
         // La ficha Premium integra la acción al flujo editorial. Una barra
         // fija ocultaba el contenido en iPad/móvil y mezclaba la composición
         // aprobada con el patrón comercial heredado.
-        variant: activePremium ? ("inline" as const) : legacyCtaBarDto.variant,
+        variant: usesApprovedFamilyTemplate ? ("inline" as const) : legacyCtaBarDto.variant,
         actions: dominantAction?.href
           ? [
               {
@@ -445,7 +501,7 @@ export function BusinessSurface({
       useContextCrumbs
       compactCrumbsOnMobile
     >
-      {activePremium ? (
+      {usesApprovedFamilyTemplate ? (
         <>
           <PremiumHero
             vm={{
@@ -455,12 +511,17 @@ export function BusinessSurface({
               eyebrow: variant.eyebrow,
               title: b.display_name,
               description: b.tagline || undefined,
-              media: activePremium.cover
+              media: activePremium?.cover
                 ? {
                     url: activePremium.cover.url,
                     alt: activePremium.cover.alt,
                   }
-                : null,
+                : b.cover_url
+                  ? {
+                      url: b.cover_url,
+                      alt: b.display_name,
+                    }
+                  : null,
               badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
             }}
           />
@@ -485,7 +546,7 @@ export function BusinessSurface({
         />
       )}
 
-      {activePremium ? null : (
+      {usesApprovedFamilyTemplate ? null : (
         <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap justify-end gap-2 px-5 sm:px-8 lg:px-12">
           <ShareButton title={b.display_name} />
           <FavoriteButton entityKind="business" entityId={b.id} />
@@ -560,7 +621,7 @@ export function BusinessSurface({
             name={b.display_name}
             addressLine1={b.primary_location.address_line1}
             addressLine2={b.primary_location.address_line2}
-            presentation={activePremium ? "premium" : "standard"}
+            presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}
           />
         </section>
       ) : null}
@@ -600,16 +661,18 @@ export function BusinessSurface({
             config={{
               source: "business",
               entityKind: "mixed",
-              variant: activePremium ? "carousel" : "grid",
-              columns: activePremium ? 4 : 2,
-              density: activePremium ? "compact" : "comfortable",
-              heading: activePremium ? `Explora cerca de ${b.display_name}` : "Sigue descubriendo",
-              subheading: activePremium
+              variant: usesApprovedFamilyTemplate ? "carousel" : "grid",
+              columns: usesApprovedFamilyTemplate ? 4 : 2,
+              density: usesApprovedFamilyTemplate ? "compact" : "comfortable",
+              heading: usesApprovedFamilyTemplate
+                ? `Explora cerca de ${b.display_name}`
+                : "Sigue descubriendo",
+              subheading: usesApprovedFamilyTemplate
                 ? `Opciones del mismo destino para continuar tu viaje por ${b.destination_slug || "el Oriente Maya"}.`
                 : `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
               emptyMessage: "Aún no hay empresas hermanas publicadas en este destino.",
               ariaLabel: `Descubrimiento contextual desde ${b.display_name}`,
-              groups: activePremium
+              groups: usesApprovedFamilyTemplate
                 ? [
                     {
                       id: "cerca-del-perfil",
@@ -647,8 +710,8 @@ export function BusinessSurface({
                 showBadges: true,
                 showKindBadge: true,
                 dedupe: true,
-                showRationale: !activePremium,
-                compact: Boolean(activePremium),
+                showRationale: !usesApprovedFamilyTemplate,
+                compact: usesApprovedFamilyTemplate,
               },
               contextRefs: {
                 destinationSlug: b.destination_slug || null,

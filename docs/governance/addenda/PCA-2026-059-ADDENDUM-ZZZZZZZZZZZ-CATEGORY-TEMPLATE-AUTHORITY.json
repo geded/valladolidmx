@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZZZZ-CATEGORY-TEMPLATE-AUTHORITY",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-07 para impedir que las fichas de familias aprobadas regresen a bloques antiguos cuando no acreditan elegibilidad comercial Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/BusinessSurface.tsx",
+    "previous_sha256": "e4be4631b9fbcc7a943b202f3c6d1826e363f6da5efa18c2ec3022b6375beebf",
+    "current_sha256": "66994319b66b9fe670980026f39d51816b54c5edbedaec8d12952e86918c5ffb",
+    "semantic_change": "Separa la autoridad visual de hotel, restaurante y casa vacacional de la elegibilidad comercial; conserva fallbacks editoriales compactos sin acreditar datos demo como reales.",
+    "authority": "Founder · autoridad visual por familia · 2026-09-07"
+  },
+  "invariants": ["Datos CMS sin cambios", "Elegibilidad comercial preservada", "Sin despliegue"],
+  "recorded_at": "2026-09-07"
+}
