@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-077",
+  "title": "Restauración quirúrgica de la estructura visual Home Premium",
+  "status": "Approved",
+  "branch": "fix/home-approved-structure-recovery-20260908",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para recuperar quirúrgicamente la estructura visual Home Premium aprobada antes de la reconciliación de rutas, conservando las mejoras legítimas de rutas, enlaces canónicos, datos CMS, medios, marca, Alux, Mi Viaje, navegación, responsive y comportamiento PWA; sin modificar rutas, otras familias, datos, publicación ni despliegue.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "6a61a847e5874d4ba353fc6d0eb1021214bdee12e26c15b7c5a4e98b283681d8",
+      "authority": "Founder · restauración visual Home Premium con mejoras de rutas preservadas · 2026-09-08"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run test:r1:f1l:r2",
+    "bun run typecheck",
+    "bun run lint",
+    "bun run governance:check",
+    "aceptación visual Lovable antes de publicar"
+  ]
+}
