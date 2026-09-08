@@ -18,10 +18,9 @@ const ContinuityWelcomeSurface = lazy(() =>
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import {
-  HOME_PREMIUM_G4_CONTRACT_VERSION,
-  homePremiumG4DefaultConfig,
+  HOME_PREMIUM_FALLBACK_TREE,
+  resolveHomePremiumAuthorityTree,
 } from "@/components/home-premium/home-premium-config";
-import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
 import { homeFeaturedCategoriesQueryOptions } from "@/lib/cms/home-featured-categories-query";
 
@@ -34,7 +33,8 @@ const publishedHomeQuery = queryOptions({
 export const Route = createFileRoute("/")({
   head: (ctx) => {
     const loaderData = ctx.loaderData as
-      { seo?: Record<string, unknown> | null; fallbackImage?: string | null } | undefined;
+      | { seo?: Record<string, unknown> | null; fallbackImage?: string | null }
+      | undefined;
     const seo = (loaderData?.seo ?? {}) as {
       title?: string;
       description?: string;
@@ -81,9 +81,12 @@ export const Route = createFileRoute("/")({
       // Hero y la sección de categorías ya no dependen de `CATEGORIAS_MOCK`.
       context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
     ]);
+    const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
+    const premiumNode = authorityTree?.root.children[0];
     return {
-      seo: published?.snapshot?.chrome?.seo ?? null,
-      fallbackImage: published?.snapshot ? (pickFirstMediaUrl(published.snapshot) ?? null) : null,
+      seo: authorityTree?.chrome?.seo ?? null,
+      fallbackImage:
+        authorityTree && !premiumNode?.hidden ? (pickFirstMediaUrl(authorityTree) ?? null) : null,
     };
   },
   component: HomePage,
@@ -100,14 +103,15 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const { data: published } = useQuery(publishedHomeQuery);
   const editWrap = useSectionEditWrap({ pageSlug: "home" });
+  const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
 
-  if (published?.snapshot && hasHomePremiumAuthority(published.snapshot)) {
+  if (authorityTree) {
     return (
       <PublicShell variant="hero">
         <Suspense fallback={null}>
           <ContinuityWelcomeSurface />
         </Suspense>
-        <CompositionRenderer tree={published.snapshot} pageType="home" wrap={editWrap} />
+        <CompositionRenderer tree={authorityTree} pageType="home" wrap={editWrap} />
       </PublicShell>
     );
   }
@@ -121,25 +125,3 @@ function HomePage() {
     </PublicShell>
   );
 }
-
-function hasHomePremiumAuthority(snapshot: unknown): boolean {
-  return JSON.stringify(snapshot ?? null).includes('"vmx.home.premium-g4"');
-}
-
-/**
- * Fallback canónico de runtime. No duplica JSX ni contenido: instancia el
- * mismo bloque compuesto que consumen Studio, preview y publicación. Los
- * medios permanecen vacíos hasta que el resolutor real acredite una portada.
- */
-const HOME_PREMIUM_FALLBACK_TREE: CompositionTree = {
-  root: {
-    children: [
-      {
-        id: "home-premium-g4-runtime-fallback",
-        type: "vmx.home.premium-g4",
-        version: HOME_PREMIUM_G4_CONTRACT_VERSION,
-        config: homePremiumG4DefaultConfig(),
-      },
-    ],
-  },
-};

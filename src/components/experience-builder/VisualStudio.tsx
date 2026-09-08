@@ -89,6 +89,10 @@ import {
   type CompositionJsonObject,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import {
+  HOME_PREMIUM_FALLBACK_TREE,
+  resolveHomePremiumAuthorityTree,
+} from "@/components/home-premium/home-premium-config";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
   canListEditorialBlock,
@@ -1235,7 +1239,6 @@ function PageVisualEditor({
         savedSignatureRef.current = canonicalizeClient(detail.current_draft);
         setTree(detail.current_draft);
         resetHistory();
-
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
       }
@@ -2124,6 +2127,7 @@ function PageVisualEditor({
           const canvas = (
             <HomeCanvas
               tree={tree}
+              pageType={pageDef.page_type}
               previewMode={previewMode}
               deviceViewport={deviceViewport}
               selectedId={selectedId}
@@ -2670,6 +2674,7 @@ function DeviceToggle({
 
 function HomeCanvas({
   tree,
+  pageType,
   previewMode,
   deviceViewport,
   selectedId,
@@ -2683,6 +2688,7 @@ function HomeCanvas({
   commentCounts,
 }: {
   tree: CompositionTree;
+  pageType: string;
   previewMode: boolean;
   deviceViewport: DeviceViewport;
   selectedId: string | null;
@@ -2740,6 +2746,10 @@ function HomeCanvas({
   // por lo que container queries y breakpoints no se ven alterados.
   const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
   const headerVariant = resolveCanvasHeaderVariant(tree);
+  const renderedTree =
+    previewMode && pageType === "home"
+      ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
+      : tree;
 
   return (
     <div
@@ -2769,8 +2779,8 @@ function HomeCanvas({
         >
           <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
             <CompositionRenderer
-              tree={tree}
-              pageType="home"
+              tree={renderedTree}
+              pageType={pageType}
               wrap={
                 previewMode
                   ? undefined

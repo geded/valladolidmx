@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-076",
+  "title": "Autoridad visual única de Home Premium",
+  "status": "Approved",
+  "branch": "fix/home-premium-authority-20260908",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para corregir la regresión de composición de Home: hacer Home Premium la única autoridad visual de la ruta pública y preview CMS, rechazar mezclas con bloques antiguos y conservar configuración CMS, Header, idiomas, acceso/registro, buscador, carrusel, Arma tu Viaje, Alux, mapa interactivo, navegación móvil y footer; validar 1440/834/430/390, pruebas específicas, typecheck y Governance; crear un PR separado y fusionar sólo con todo en PASS, sin publicar ni desplegar.",
+  "permissions": [
+    { "operation": "modify", "path": "src/routes/index.tsx" },
+    { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-config.ts" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/routes/index.tsx",
+      "sha256": "0f06d7368e38fbf11b199e1ca00fca83f07b9cea7fa172c3943ec0b60dbadbe7",
+      "authority": "Founder · Home Premium como autoridad pública única · 2026-09-08"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/VisualStudio.tsx",
+      "sha256": "e539d1d9b8854c2903e7aa84e08f6f103dca1eebeefc2f1bffe7caaaf7b2a785",
+      "authority": "Founder · preview CMS comparte autoridad Home Premium · 2026-09-08"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts",
+      "sha256": "764a042f92258a353882ad5d22d2a7d105174218e9eefd14c1521157afd157c3",
+      "authority": "Founder · aislamiento cerrado de la composición Premium · 2026-09-08"
+    }
+  ],
+  "public_routes": ["/", "/cms/experience-builder"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run test:r1:f1l:r2",
+    "bun run typecheck",
+    "bun run governance:check",
+    "responsive 1440/834/430/390"
+  ]
+}

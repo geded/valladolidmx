@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-ZZZZZZZZZZZZZ-HOME-AUTHORITY-ROUTE",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-08 para corregir la mezcla de composición de Home y restaurar la superficie Premium aprobada en la ruta pública.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/index.tsx",
+    "previous_sha256": "ba7f6a9bfc09cf3e10c21f2aca28e8c37f7872e9e67c070ae6f13b327f65b437",
+    "current_sha256": "0f06d7368e38fbf11b199e1ca00fca83f07b9cea7fa172c3943ec0b60dbadbe7",
+    "semantic_change": "La ruta pública conserva la configuración y SEO CMS del nodo Home Premium y excluye bloques hermanos antiguos.",
+    "authority": "Founder · restauración cerrada de Home Premium · 2026-09-08"
+  },
+  "invariants": [
+    "Header, navegación, Alux, Mi Viaje, mapa y footer preservados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-08"
+}
