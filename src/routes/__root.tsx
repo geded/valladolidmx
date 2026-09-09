@@ -14,13 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
 import { AuthProvider } from "@/hooks/useAuth";
-import {
-  PublicHeader,
-  PublicFooter,
-  OfflineBanner,
-  SyncStatusBanner,
-  UpdateBanner,
-} from "@/components/discovery";
+import { PublicHeader, PublicFooter, OfflineBanner } from "@/components/discovery";
 // H2·P3 · C1 — Lazy Toaster: `sonner` y su `<Toaster />` sólo se
 // descargan cuando el shim `@/lib/toast` dispara el primer toast, o
 // tras el prefetch en idle. Antes viajaban en el entry para el 100 %
@@ -71,12 +65,20 @@ const AnonymousDraftImportRunner = React.lazy(() =>
     default: m.AnonymousDraftImportRunner,
   })),
 );
+const SyncStatusBanner = React.lazy(() =>
+  import("@/components/discovery/SyncStatusBanner").then((m) => ({
+    default: m.SyncStatusBanner,
+  })),
+);
+const UpdateBanner = React.lazy(() =>
+  import("@/components/discovery/UpdateBanner").then((m) => ({
+    default: m.UpdateBanner,
+  })),
+);
 // H2·P3 · C1 — el host es tiny y necesita montar su useEffect cuanto
 // antes para suscribirse al bus del shim; el peso real de `sonner` se
 // difiere dentro de `LazyToasterHost` con un React.lazy interno.
 import { LazyToasterHost } from "@/components/ui/LazyToasterHost";
-import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
-import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 import { ACTIVE_BRAND, ACTIVE_BRAND_THEME_STYLE } from "@/config/brand";
 import { BrandProvider, brandSettingsQueryOptions } from "@/lib/brand/brand-context";
@@ -290,17 +292,34 @@ function RootComponent() {
       pathname !== "/lovable/founder-zazil-premium-preview");
   const showPublicAlux = !isAppShellRoute;
 
-  // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
-  // este punto se cambia por registro real con vite-plugin-pwa.
+  // La infraestructura PWA y el runner de sincronización son capacidades
+  // post-hidratación. Se cargan en idle para no formar parte del camino
+  // crítico público; la cola durable y su comportamiento permanecen intactos.
   useEffect(() => {
-    void registerServiceWorker();
-    startSyncRunner();
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+    let checkForUpdate: (() => Promise<boolean>) | null = null;
+    const startPwa = async () => {
+      const [{ registerServiceWorker, checkForUpdate: check }, { startSyncRunner }] =
+        await Promise.all([import("@/pwa/register-sw"), import("@/pwa/sync-runner")]);
+      if (cancelled) return;
+      checkForUpdate = check;
+      void registerServiceWorker();
+      startSyncRunner();
+    };
+    const idle = window.requestIdleCallback?.(() => void startPwa(), { timeout: 2_500 });
+    const fallback = idle == null ? window.setTimeout(() => void startPwa(), 1_200) : null;
     // Graceful Upgrade · comprobación oportunista al recuperar visibilidad.
     const onVisible = () => {
-      if (document.visibilityState === "visible") void checkForUpdate();
+      if (document.visibilityState === "visible" && checkForUpdate) void checkForUpdate();
     };
     document.addEventListener("visibilitychange", onVisible);
-    return () => document.removeEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      if (idle != null) window.cancelIdleCallback?.(idle);
+      if (fallback != null) window.clearTimeout(fallback);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   // H2·P3 — Prefetch idle de los widgets diferidos. Se invoca en el
@@ -339,8 +358,10 @@ function RootComponent() {
               <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
             ) : null}
             {!isAppShellRoute ? <OfflineBanner /> : null}
-            <SyncStatusBanner />
-            <UpdateBanner />
+            <React.Suspense fallback={null}>
+              <SyncStatusBanner />
+              <UpdateBanner />
+            </React.Suspense>
             <Outlet />
             {!isAppShellRoute ? (
               <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" />

@@ -70,3 +70,18 @@ flags, robots, sitemap, canónicas ni rutas nuevas.
 Gates: bun run test:r1:f1l:r2, bun run test:r1:f1l:p0, bun run lint,
 bun run typecheck, bun run build, bun run governance:check y
 bun run governance:product-check.
+
+## 6. Aislamiento del runtime público (2026-09-09)
+
+Con autorización Founder `PCA-2026-081`, la ruta `/` conserva la misma
+`HomePremiumSurface`, configuración, contenido real, datos CMS y capacidad de
+preview, pero deja de depender estáticamente del renderer universal. El
+adaptador público enfocado queda trazado en:
+
+- src/lib/experience-builder/home-premium-renderer.tsx
+
+El renderer universal continúa siendo la autoridad para Studio, preview y las
+demás familias. La separación no crea una segunda plantilla ni altera el
+contrato editorial aprobado. La evidencia de rendimiento, preservación
+funcional, precache PWA y rollback consta en
+`docs/governance/audit/2026-09-09-PUBLIC-HOME-RUNTIME-PWA-ISOLATION-v1.0.md`.

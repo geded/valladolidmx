@@ -614,11 +614,21 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
 
   test("Home pública y preview CMS aíslan la autoridad Premium de composiciones antiguas", () => {
     const publicRoute = read("src/routes/index.tsx");
+    const focusedRenderer = read("src/lib/experience-builder/home-premium-renderer.tsx");
     const studio = read("src/components/experience-builder/VisualStudio.tsx");
     const authority = read("src/components/home-premium/home-premium-config.ts");
 
     expect(publicRoute).toContain("resolveHomePremiumAuthorityTree(published?.snapshot)");
     expect(publicRoute).toContain("tree={authorityTree}");
+    expect(publicRoute).toContain("HomePremiumRenderer");
+    expect(publicRoute).not.toContain('from "@/lib/experience-builder/composition-renderer"');
+    expect(focusedRenderer).toContain("HomePremiumSurface");
+    expect(focusedRenderer).toContain("resolveHomePremiumG4(localized.config)");
+    expect(focusedRenderer).toContain("resolveHomePremiumRealContent");
+    expect(focusedRenderer).toContain("mergeHomeRealContent");
+    expect(focusedRenderer).not.toContain("DestinationPremiumSurface");
+    expect(focusedRenderer).not.toContain("ListingPremiumSurface");
+    expect(focusedRenderer).not.toContain("CockpitKpiGrid");
     expect(publicRoute).not.toContain("hasHomePremiumAuthority");
     expect(studio).toContain("resolveHomePremiumAuthorityTree(tree)");
     expect(studio).toContain('previewMode && pageType === "home"');
@@ -652,6 +662,21 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(
       resolveHomePremiumAuthorityTree({ root: { children: [hiddenPremiumNode] } })?.root.children,
     ).toEqual([hiddenPremiumNode]);
+  });
+
+  test("runtime público difiere PWA y el precache excluye familias privadas", () => {
+    const root = read("src/routes/__root.tsx");
+    const vite = read("vite.config.ts");
+
+    expect(root).toContain('import("@/pwa/register-sw")');
+    expect(root).toContain('import("@/pwa/sync-runner")');
+    expect(root).not.toContain('from "@/pwa/register-sw"');
+    expect(root).not.toContain('from "@/pwa/sync-runner"');
+    expect(vite).toContain('outDir: ".output/public"');
+    expect(vite).toContain('additionalManifestEntries: [{ url: "/offline"');
+    expect(vite).toContain('"assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*"');
+    expect(vite).not.toContain('globPatterns: ["**/*.{js,css');
+    expect(vite).not.toContain('cacheName: "static-assets"');
   });
 
   test("Home conserva la jerarquía de Marca e Inspiración alrededor de las rutas", () => {

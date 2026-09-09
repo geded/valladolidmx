@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-20260909-FOCUSED-HOME-INDEX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para desacoplar el renderer universal del Home público preservando el contrato, configuración CMS y autoridad Premium vigentes.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/index.tsx",
+    "previous_sha256": "0f06d7368e38fbf11b199e1ca00fca83f07b9cea7fa172c3943ec0b60dbadbe7",
+    "current_sha256": "1b1f69f51db0489677e3508a4aaef476ed1690a6de1a975243da242acf8b9b43",
+    "semantic_change": "Sustituye únicamente la importación del renderer universal por un adaptador enfocado que desemboca en la misma HomePremiumSurface.",
+    "authority": "Founder · aislamiento de carga Home · 2026-09-09"
+  },
+  "invariants": [
+    "HomePremiumSurface y vmx.home.premium-g4 siguen siendo la única autoridad visual.",
+    "CMS, preview y público conservan contenido, medios, SEO y comportamiento.",
+    "No se rediseña ni se publica."
+  ],
+  "recorded_at": "2026-09-09"
+}

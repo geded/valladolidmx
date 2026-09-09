@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
-import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { HomePremiumRenderer } from "@/lib/experience-builder/home-premium-renderer";
 import { PublicShell } from "@/components/discovery";
 // H2·P3 — `ContinuityWelcomeSurface` sólo se muestra a viajeros con
 // estado de continuidad (visita previa detectada). Para el primer
@@ -111,7 +111,7 @@ function HomePage() {
         <Suspense fallback={null}>
           <ContinuityWelcomeSurface />
         </Suspense>
-        <CompositionRenderer tree={authorityTree} pageType="home" wrap={editWrap} />
+        <HomePremiumRenderer tree={authorityTree} wrap={editWrap} />
       </PublicShell>
     );
   }
@@ -121,7 +121,7 @@ function HomePage() {
       <Suspense fallback={null}>
         <ContinuityWelcomeSurface />
       </Suspense>
-      <CompositionRenderer tree={HOME_PREMIUM_FALLBACK_TREE} pageType="home" wrap={editWrap} />
+      <HomePremiumRenderer tree={HOME_PREMIUM_FALLBACK_TREE} wrap={editWrap} />
     </PublicShell>
   );
 }
