@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-078",
+  "title": "Reconciliación del recorrido completo del Home con Marca e Inspiración",
+  "status": "Approved",
+  "branch": "fix/home-complete-discovery-reconciliation-20260909",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para corregir el Home conforme a las memorias aprobadas de Marca e Inspiración: preservar el hero fotográfico automático, la plantilla Premium, CMS, medios, responsive, navegación, Alux y Mi Viaje; restablecer la jerarquía territorio, categorías, rutas, Alux y Arma tu Viaje antes del resto del descubrimiento; las rutas enriquecen y no sustituyen la experiencia; sin modificar otras familias, datos, publicación ni despliegue.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "e9734bf638b1358d45c57b00980af49f96c379458a79fe7daa959005769ade7a",
+      "authority": "Founder · recorrido Home basado en Marca e Inspiración · 2026-09-09"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run test:r1:f1l:r2",
+    "bun run typecheck",
+    "bun run governance:check",
+    "aceptación visual en la vista previa lateral de Lovable antes de fusionar"
+  ]
+}

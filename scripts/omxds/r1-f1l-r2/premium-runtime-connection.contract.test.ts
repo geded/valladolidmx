@@ -570,6 +570,26 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     ).toEqual([hiddenPremiumNode]);
   });
 
+  test("Home conserva la jerarquía de Marca e Inspiración alrededor de las rutas", () => {
+    const surface = read("src/components/home-premium/HomePremiumSurface.tsx");
+    const territory = surface.indexOf('data-home-journey="territory"');
+    const categories = surface.indexOf('data-home-journey="categories"');
+    const routes = surface.indexOf('data-home-journey="routes"');
+    const alux = surface.indexOf('data-home-journey="alux"');
+    const travelPlan = surface.indexOf('data-home-journey="travel-plan"');
+    const remaining = surface.indexOf("remainingDiscoveryOrder.map");
+
+    expect(territory).toBeGreaterThan(-1);
+    expect(territory).toBeLessThan(categories);
+    expect(categories).toBeLessThan(routes);
+    expect(routes).toBeLessThan(alux);
+    expect(alux).toBeLessThan(travelPlan);
+    expect(travelPlan).toBeLessThan(remaining);
+    expect(surface).toContain('key !== "destinos" && key !== "rutas"');
+    expect(surface).toContain('heroVariant === "editorial"');
+    expect(surface).toContain("useHeroAutoplay(content.hero.slides.length, setIndex)");
+  });
+
   test("experiencias y tours reconocidos no regresan a plantillas ni composiciones antiguas", () => {
     const marketplace = read("src/routes/producto.$slug.tsx");
     const territorial = read("src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx");
