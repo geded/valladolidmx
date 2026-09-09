@@ -1,0 +1,69 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-081",
+  "title": "Aislamiento del runtime público Home y precache PWA",
+  "status": "Approved",
+  "branch": "perf/public-runtime-pwa-isolation-20260909",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para ejecutar inmediatamente la optimización estructural ya identificada: desacoplar la Home del renderer universal sin crear una segunda autoridad visual, conservar HomePremiumSurface y vmx.home.premium-g4 para público, CMS y preview, cargar cada familia sólo cuando su ruta la solicite, corregir el precache del Service Worker para incluir únicamente el cascarón público indispensable y excluir rutas, sesiones, CMS y administración; preservar íntegramente Alux, perfil inteligente, señales de exploración territorial, continuidad anónima local, Mi Viaje, mapas, navegación, contenido, medios y diseño aprobado; medir antes/después, probar y fusionar únicamente con todos los controles en PASS, sin publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/home-premium-renderer.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "vite.config.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/home-premium-renderer.tsx",
+      "sha256": "d1231e3cb1df10d55e0db063f0a75014302790e2dae50523c2b6d59496d294f5",
+      "authority": "Founder · adaptador público enfocado sobre la misma autoridad Home Premium · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/index.tsx",
+      "sha256": "1b1f69f51db0489677e3508a4aaef476ed1690a6de1a975243da242acf8b9b43",
+      "authority": "Founder · Home pública desacoplada del renderer universal preservando autoridad Premium · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx",
+      "sha256": "1bba9cd21f74b446551d1374a4fd50803338a4775fbe667a5a60c7d49a17e60b",
+      "authority": "Founder · inicialización PWA diferida sin alterar continuidad ni sincronización · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "vite.config.ts",
+      "sha256": "0120c308e8cd84293d4d2df9c2a13e2c1f4195ad42e2bb9ab9fb07e99dd29e05",
+      "authority": "Founder · precache limitado al cascarón público y rutas privadas excluidas · 2026-09-09"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run test:r1:f1l:r2",
+    "bunx vitest run scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts",
+    "bun run test:r1:e:r3",
+    "bun run test:r1:e:r1",
+    "bun run test:r1:e",
+    "bun run lint",
+    "bun run typecheck",
+    "bun scripts/route-inventory-coverage.ts",
+    "bun run build",
+    "bun test scripts",
+    "bun run governance:check",
+    "verificación responsive 1440/834/430/390 de la misma Home aprobada"
+  ]
+}

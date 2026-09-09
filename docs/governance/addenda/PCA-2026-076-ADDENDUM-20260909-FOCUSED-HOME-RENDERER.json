@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-076-ADDENDUM-20260909-FOCUSED-HOME-RENDERER",
+  "status": "Approved",
+  "parent": "PCA-2026-076",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para retirar el renderer universal del grafo inicial de la ruta Home sin sustituir la autoridad Home Premium compartida con CMS y preview.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/index.tsx",
+    "previous_sha256": "0f06d7368e38fbf11b199e1ca00fca83f07b9cea7fa172c3943ec0b60dbadbe7",
+    "current_sha256": "1b1f69f51db0489677e3508a4aaef476ed1690a6de1a975243da242acf8b9b43",
+    "semantic_change": "La ruta pública consume un adaptador enfocado que desemboca en la misma HomePremiumSurface y el mismo contrato vmx.home.premium-g4.",
+    "authority": "Founder · Home enfocada sin renderer universal inicial · 2026-09-09"
+  },
+  "invariants": [
+    "HomePremiumSurface y vmx.home.premium-g4 siguen siendo la única autoridad visual.",
+    "CMS, preview y público conservan contenido, medios, orden y comportamiento.",
+    "No se rediseña ni se crea una plantilla paralela."
+  ],
+  "recorded_at": "2026-09-09"
+}

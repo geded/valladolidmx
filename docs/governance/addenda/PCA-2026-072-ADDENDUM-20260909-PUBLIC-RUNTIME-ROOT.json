@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-072-ADDENDUM-20260909-PUBLIC-RUNTIME-ROOT",
+  "status": "Approved",
+  "parent": "PCA-2026-072",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para diferir el runtime PWA del shell raíz sin alterar la aplicación SSR de la paleta administrable ni la autoridad multi-marca.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/__root.tsx",
+    "previous_sha256": "c3930cd834b7571b9e630779bdf5e46be5922863a67308b1f3e4029727068f94",
+    "current_sha256": "1bba9cd21f74b446551d1374a4fd50803338a4775fbe667a5a60c7d49a17e60b",
+    "semantic_change": "Mantiene intacto el bootstrap SSR de marca y mueve sólo la inicialización PWA post-hidratación a carga idle.",
+    "authority": "Founder · marca SSR preservada durante aislamiento PWA · 2026-09-09"
+  },
+  "invariants": [
+    "La paleta CMS continúa aplicada en SSR sin parpadeo.",
+    "Header, footer, Alux y navegación conservan la marca activa.",
+    "No se modifica configuración ni datos de marca."
+  ],
+  "recorded_at": "2026-09-09"
+}

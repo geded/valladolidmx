@@ -91,19 +91,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "641289c5b1c4f1f5e8c51e4a9fb9b609cbab97c5b79ea5dd527d22bd8078d9db"
+      "sha256": "60ffb246b22e3921ef9b88a16b58ca98f9ad6089ff0d8f01ddf2a7f895a84493"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "158cea520839d53d0bd1990655a8f9aead245bbf658fbb41e3d2ff251b217415"
+      "sha256": "c99832cab2c34a1c5e82955168a0a2a8d61a2c28673c1b6ccc50b470ed75b531"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "9bd7c13cd6427ede798f908c3d002f97f7acbea3fdc0a2fa763332a0c1a20f1a"
+      "sha256": "8a78b41b5bda5fb44e9ebe0f23aa2e7bf44ae2fd9394638d8efa97e9c0c6bfd7"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "acefbe374853770d3f36631301c90c7d8a110e5778ce97e277f9664229624f6f"
+      "sha256": "1164224f943698a02d03adb5aeec55e6618adfb1192ae65a4cfd129d31d79ec7"
     }
   ]
 }

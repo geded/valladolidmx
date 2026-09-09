@@ -18,6 +18,9 @@ export default defineConfig({
     plugins: [
       mcpPlugin(),
       VitePWA({
+        // TanStack Start/Nitro publica los assets finales en `.output/public`.
+        // Sin este destino Workbox escaneaba `dist` y generaba 0 entradas.
+        outDir: ".output/public",
         strategies: "generateSW",
         registerType: "autoUpdate",
         injectRegister: null,
@@ -48,7 +51,16 @@ export default defineConfig({
             /^\/concierge/,
             /^\/empresa/,
           ],
-          globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2}"],
+          // Sólo el cascarón público estable. Los chunks de rutas, CMS,
+          // administración y sesiones se solicitan bajo demanda y nunca se
+          // incorporan indiscriminadamente al precache.
+          globPatterns: [
+            "favicon.ico",
+            "logo.png",
+            "og/default-1200x630.jpg",
+            "assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*",
+          ],
+          additionalManifestEntries: [{ url: "/offline", revision: "pwa-offline-v1" }],
           runtimeCaching: [
             // Rutas sensibles / autenticadas: NUNCA cachear.
             // Se resuelve siempre contra red; sin fallback offline.
@@ -74,15 +86,9 @@ export default defineConfig({
                 expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
               },
             },
-            {
-              urlPattern: ({ url, sameOrigin }) =>
-                sameOrigin && /\.(?:js|css|woff2)$/.test(url.pathname),
-              handler: "CacheFirst",
-              options: {
-                cacheName: "static-assets",
-                expiration: { maxEntries: 128, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              },
-            },
+            // Los assets públicos esenciales ya están versionados en el
+            // precache. No registrar un catch-all de JS/CSS aquí: también
+            // atraparía chunks privados de CMS/Admin después de visitarlos.
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin && /\.(?:png|jpg|jpeg|svg|webp|ico)$/.test(url.pathname),

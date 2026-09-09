@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-20260909-PUBLIC-RUNTIME-ROOT-INDEX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para desacoplar el renderer universal del Home público y diferir el runtime PWA, preservando Alux, continuidad anónima, marca, CMS y la autoridad Premium existente.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/__root.tsx",
+    "previous_sha256": "ada0c0f120700a8588978c753ac861f7f75a8ee80b1394a9c1413d6424fab493",
+    "current_sha256": "1bba9cd21f74b446551d1374a4fd50803338a4775fbe667a5a60c7d49a17e60b",
+    "semantic_change": "Difiere Service Worker, runner de sincronización y banners PWA fuera del camino crítico sin modificar sus contratos ni la continuidad del viajero.",
+    "authority": "Founder · aislamiento runtime público y PWA · 2026-09-09"
+  },
+  "invariants": [
+    "Alux, Mi Viaje, memoria, navegación anónima y sincronización conservan sus contratos.",
+    "No se modifica el diseño, contenido, marca, CMS ni rutas privadas.",
+    "No se publica ni despliega dentro del lote."
+  ],
+  "recorded_at": "2026-09-09"
+}

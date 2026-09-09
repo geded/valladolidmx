@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.86",
     "state": "Approved",
-    "source_sha256": "f075eb1a6374ea6c0d8f8614b2df1d91b6727215504bf26f9a8d7465b71c9bb3",
+    "source_sha256": "60ffb246b22e3921ef9b88a16b58ca98f9ad6089ff0d8f01ddf2a7f895a84493",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-09-07T00:00:00.000Z",
+  "generated_at": "2026-09-09T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -12190,6 +12190,16 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-073.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-073.json"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/home-premium-renderer.tsx",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/home-premium-renderer.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-081.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-081.json"
     }
   ],
   "edges": [
@@ -37428,6 +37438,24 @@
       "evidence": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
       "verified_at": "2026-09-07"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/home-premium-renderer.tsx:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/home-premium-renderer.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-09-09"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-081.json:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-081.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
+      "verified_at": "2026-09-09"
     }
   ],
   "critical_chain_coverage": [
