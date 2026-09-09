@@ -122,6 +122,9 @@ export function HomePremiumSurface({
   // Editorial y cinematográfica son variantes visuales del mismo sistema.
   // Nunca cambian jerarquía, orden ni geometría entre sí.
   const presentationOrder: HomePremiumSectionKey[] = order;
+  const remainingDiscoveryOrder = presentationOrder.filter(
+    (key) => key !== "destinos" && key !== "rutas",
+  );
 
   const renderSection = (key: HomePremiumSectionKey) => {
     if (key === "destinos")
@@ -169,7 +172,13 @@ export function HomePremiumSurface({
           )}
         </Container>
 
-        <Container className="mt-6 sm:mt-8">
+        {enabled("destinos") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="territory">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("destinos")}</div>
+          </Container>
+        ) : null}
+
+        <Container className="mt-6 sm:mt-8" data-home-journey="categories">
           {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
           <section
             aria-label={content.categorias.heading}
@@ -186,7 +195,13 @@ export function HomePremiumSurface({
           </section>
         </Container>
 
-        <Container className="mt-6 sm:mt-8">
+        {enabled("rutas") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="routes">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("rutas")}</div>
+          </Container>
+        ) : null}
+
+        <Container className="mt-6 sm:mt-8" data-home-journey="alux">
           <AluxPlanner
             content={content}
             selectedPrompt={selectedPrompt}
@@ -200,15 +215,7 @@ export function HomePremiumSurface({
           />
         </Container>
 
-        {presentationOrder.map((key) =>
-          enabled(key) ? (
-            <Container key={key} className="mt-8 lg:mt-12">
-              <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
-            </Container>
-          ) : null,
-        )}
-
-        <Container className="mt-8 lg:mt-12">
+        <Container className="mt-8 lg:mt-12" data-home-journey="travel-plan">
           <TravelPlanClose
             content={content}
             selectedRoute={selectedRoute}
@@ -216,6 +223,14 @@ export function HomePremiumSurface({
             onAdd={() => setAdded(true)}
           />
         </Container>
+
+        {remainingDiscoveryOrder.map((key) =>
+          enabled(key) ? (
+            <Container key={key} className="mt-8 lg:mt-12">
+              <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
+            </Container>
+          ) : null,
+        )}
       </main>
     </>
   );

@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-067-ADDENDUM-ZZZZZZZZZZZZZZ-HOME-BRAND-JOURNEY",
+  "status": "Approved",
+  "parent": "PCA-2026-067",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para reconciliar el recorrido Home con las memorias aprobadas de Marca e Inspiración.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "6a61a847e5874d4ba353fc6d0eb1021214bdee12e26c15b7c5a4e98b283681d8",
+    "current_sha256": "e9734bf638b1358d45c57b00980af49f96c379458a79fe7daa959005769ade7a",
+    "semantic_change": "Restablece la jerarquía territorio, categorías, rutas, Alux y Arma tu Viaje sin alterar diseño, contenido, medios ni comportamiento.",
+    "authority": "Founder · Marca e Inspiración gobiernan el recorrido Home · 2026-09-09"
+  },
+  "invariants": [
+    "Identidad territorial preservada",
+    "Alux preservado",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-09"
+}
