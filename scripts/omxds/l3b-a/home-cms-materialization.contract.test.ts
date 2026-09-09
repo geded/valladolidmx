@@ -37,6 +37,8 @@ describe("Home CMS-first · materialización equivalente", () => {
     expect(materialized.show_destinos).toBe(true);
     expect(materialized.show_mapa).toBe(true);
     expect(typeof materialized.destinos_max_items).toBe("number");
+    const categories = materialized.categorias_items as Array<Record<string, unknown>>;
+    expect(categories.find((item) => item.slug === "mapas")?.href).toBe("/mapa");
   });
 
   it("preserva las decisiones editoriales de medios vigentes", () => {
