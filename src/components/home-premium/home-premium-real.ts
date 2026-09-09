@@ -7,31 +7,40 @@
  *   · TODA tarjeta proviene del corpus publicado y acreditado y lleva su URL
  *     canónica real. Sin URL canónica, la tarjeta no existe.
  *   · Sin fotografía propia acreditada, la Home usa exclusivamente la portada
- *     gobernada y production-eligible de su vertical. Nunca usa previews.
+ *     gobernada de su vertical o el fallback temporal exacto aprobado.
  *   · Una colección vacía oculta su sección; nunca se rellena con contenido
  *     demostrativo, simulado o de preview.
  */
 import type { HomeRealContent } from "@/lib/experience-builder/smart-blocks.server";
-import type { HomePremiumContent, HomePremiumSectionKey } from "./home-premium-content";
+import { decodeSlotMedia } from "@/lib/media/slot-media";
+import {
+  HOME_PREMIUM_MEDIA,
+  type HomePremiumContent,
+  type HomePremiumSectionKey,
+} from "./home-premium-content";
 
 type Card = HomeRealContent["destinos"][number];
+type MediaCard = Pick<Card, "mediaUrl" | "title">;
 
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
 const GOVERNED_VERTICAL_MEDIA = {
+  destination: [HOME_PREMIUM_MEDIA.centro, HOME_PREMIUM_MEDIA.calle, HOME_PREMIUM_MEDIA.cenote],
   experience: ["experience-cover.jpg", "experience-gallery-1.jpg", "experience-gallery-2.jpg"],
   hotel: ["hotel-cover.jpg", "hotel-gallery-1.jpg", "hotel-gallery-2.jpg"],
   restaurant: ["restaurant-cover.jpg", "restaurant-gallery-1.jpg", "restaurant-gallery-2.jpg"],
+  route: [HOME_PREMIUM_MEDIA.cenote, HOME_PREMIUM_MEDIA.centro, HOME_PREMIUM_MEDIA.calle],
 } as const;
 
 type GovernedVertical = keyof typeof GOVERNED_VERTICAL_MEDIA;
 
-const mediaOf = (card: Card, vertical?: GovernedVertical, index = 0) => {
+const mediaOf = (card: MediaCard, vertical?: GovernedVertical, index = 0) => {
   if (card.mediaUrl.length > 0) return { url: card.mediaUrl, alt: card.title };
   if (!vertical) return { url: "", alt: card.title };
 
   const assets = GOVERNED_VERTICAL_MEDIA[vertical];
   const asset = assets[index % assets.length];
+  if (typeof asset !== "string") return asset;
   return {
     url: `${GOVERNED_MEDIA_BASE}/${asset}`,
     alt: `Imagen editorial gobernada de ${vertical === "hotel" ? "hospedaje" : vertical === "restaurant" ? "gastronomía" : "experiencias"} en el Oriente Maya`,
@@ -42,38 +51,51 @@ const withoutMedia = <T extends { media: { url: string; alt: string } }>(item: T
   media: { ...item.media, url: "" },
 });
 
-/** El runtime público nunca usa medios del preset como fallback acreditado. */
-function withoutPresetMedia(content: HomePremiumContent): HomePremiumContent {
+const APPROVED_HOME_PREVIEW_MEDIA = new Set<string>(
+  Object.values(HOME_PREMIUM_MEDIA).map((media) => media.url),
+);
+
+/**
+ * El runtime conserva únicamente medios estables o temporales expresamente
+ * aprobados para la Home. Nunca admite demos ni URLs conceptuales arbitrarias.
+ */
+function withoutUnapprovedMedia(content: HomePremiumContent): HomePremiumContent {
+  const preserveApproved = <T extends { media: { url: string; alt: string } }>(item: T): T =>
+    isApprovedConfiguredMedia(item.media.url) ? item : withoutMedia(item);
   return {
     ...content,
     hero: {
       ...content.hero,
-      slides: content.hero.slides.map((slide) => withoutMedia(slide)),
+      slides: content.hero.slides.map(preserveApproved),
     },
-    destinos: { ...content.destinos, items: content.destinos.items.map(withoutMedia) },
-    rutas: { ...content.rutas, items: content.rutas.items.map(withoutMedia) },
-    experiencias: { ...content.experiencias, items: content.experiencias.items.map(withoutMedia) },
+    destinos: { ...content.destinos, items: content.destinos.items.map(preserveApproved) },
+    rutas: { ...content.rutas, items: content.rutas.items.map(preserveApproved) },
+    experiencias: {
+      ...content.experiencias,
+      items: content.experiencias.items.map(preserveApproved),
+    },
     servicios: {
       ...content.servicios,
-      stays: content.servicios.stays.map(withoutMedia),
-      food: content.servicios.food.map(withoutMedia),
+      stays: content.servicios.stays.map(preserveApproved),
+      food: content.servicios.food.map(preserveApproved),
     },
     eventos: {
       ...content.eventos,
-      media: isProductionEligibleConfiguredMedia(content.eventos.media.url)
+      media: isApprovedConfiguredMedia(content.eventos.media.url)
         ? content.eventos.media
         : { ...content.eventos.media, url: "" },
     },
-    queHacer: { ...content.queHacer, items: content.queHacer.items.map(withoutMedia) },
+    queHacer: { ...content.queHacer, items: content.queHacer.items.map(preserveApproved) },
   };
 }
 
-/** El constructor sólo puede aportar a producción un medio estable ya gobernado. */
-function isProductionEligibleConfiguredMedia(url: string): boolean {
+function isApprovedConfiguredMedia(url: string): boolean {
+  const normalizedUrl = decodeSlotMedia(url).src;
   return (
-    url.startsWith("/api/public/studio-media/") &&
-    !url.includes("/conceptual-preview/") &&
-    !url.includes("/demo-media/")
+    APPROVED_HOME_PREVIEW_MEDIA.has(normalizedUrl) ||
+    (url.startsWith("/api/public/studio-media/") &&
+      !url.includes("/conceptual-preview/") &&
+      !url.includes("/demo-media/"))
   );
 }
 
@@ -82,7 +104,7 @@ export function mergeHomeRealContent(
   content: HomePremiumContent,
   real: HomeRealContent | undefined,
 ): HomePremiumContent {
-  const safeContent = withoutPresetMedia(content);
+  const safeContent = withoutUnapprovedMedia(content);
   if (!real) return safeContent;
 
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
@@ -97,14 +119,14 @@ export function mergeHomeRealContent(
     ...safeContent,
     hero: {
       ...safeContent.hero,
-      slides: realHeroSlides,
+      slides: realHeroSlides.length > 0 ? realHeroSlides : safeContent.hero.slides,
     },
     destinos: {
       ...safeContent.destinos,
-      items: real.destinos.map((card) => ({
+      items: real.destinos.map((card, index) => ({
         name: card.title,
         note: card.subtitle,
-        media: mediaOf(card),
+        media: mediaOf(card, "destination", index),
         puebloMagico: card.puebloMagico,
         href: card.href,
       })),
@@ -121,7 +143,7 @@ export function mergeHomeRealContent(
             ? { url: route.mediaUrl, alt: route.title }
             : cover
               ? mediaOf(cover)
-              : { url: "", alt: route.title },
+              : mediaOf({ title: route.title, mediaUrl: "" }, "route", real.rutas.indexOf(route)),
         };
       }),
     },

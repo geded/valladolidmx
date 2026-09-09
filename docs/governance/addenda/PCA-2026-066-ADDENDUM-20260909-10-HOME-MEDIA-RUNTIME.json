@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-066-ADDENDUM-20260909-10-HOME-MEDIA-RUNTIME",
+  "status": "Approved",
+  "parent": "PCA-2026-066",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para reconciliar el Home aprobado sin reconstrucción ni rediseño, recuperando Alux responsive y medios temporales expresamente aprobados, preservando CMS, navegación, rutas y comportamiento.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/home-premium-real.ts",
+    "previous_sha256": "f9453aa6ddb9220bbf5b774277198f7e54815ae9d7f322aa95731a10e614da04",
+    "current_sha256": "e48ba524710f9f403fed196818f5c13a9c3a67d00596c73a7d981cd115ac76c7",
+    "semantic_change": "Reconciliación quirúrgica del Home aprobado: restaura la barra Alux responsive compartida y/o la resolución gobernada de medios aprobados cuando el CMS aún no aporta un medio, sin alterar la autoridad Premium, el contenido, la navegación ni otras familias.",
+    "authority": "Founder · reconciliación Home responsive y medios aprobados · 2026-09-09"
+  },
+  "invariants": [
+    "HomePremiumSurface y vmx.home.premium-g4 continúan como única autoridad visual del Home.",
+    "Se preservan CMS, hero automático, recorrido, /mapa, Mi Viaje, Alux y navegación aprobada.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-09-09"
+}

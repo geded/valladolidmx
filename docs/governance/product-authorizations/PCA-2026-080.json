@@ -1,0 +1,63 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-080",
+  "title": "Reconciliación responsive y de medios aprobados del Home",
+  "status": "Approved",
+  "branch": "fix/home-approved-responsive-media-reconciliation-20260909",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para reconciliar, sin reconstruir ni rediseñar, el Home Premium aprobado: recuperar la barra Alux responsive compartida, conservar sus funciones y la apariencia clara de Marca, impedir que campos CMS de medios vacíos oculten los medios temporales expresamente aprobados para la etapa de construcción, preservar hero automático, recorrido, rutas, /mapa, Mi Viaje, CMS, navegación y demás familias, y revisar la carga inicial de la PWA sin retirar código no acreditado; fusionar sólo con controles en PASS y sin publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/home-materialization.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "5cdfd30bcf5b8ef07c07925dbfc1dfe79d17bf910f2f57f1cb53f622792f9ef6",
+      "authority": "Founder · Alux Home responsive compartido preservando funcionalidad · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-config.ts",
+      "sha256": "e78a6c24ba16fc844a65be7b55f0d00bb05033259b7f647ed2ce2ccd05986f3e",
+      "authority": "Founder · campos vacíos no eliminan medios aprobados · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-real.ts",
+      "sha256": "e48ba524710f9f403fed196818f5c13a9c3a67d00596c73a7d981cd115ac76c7",
+      "authority": "Founder · allowlist de medios temporales aprobados para Home en construcción · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/home-materialization.ts",
+      "sha256": "f6fc73128ee37df1aad61fa5adce8b717dbd6c57b36710696624e215f3cfe9b1",
+      "authority": "Founder · semántica CMS-first reconciliada · 2026-09-09"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run test:r1:f1l:r2",
+    "bunx vitest run scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "verificación en la vista previa lateral de Lovable después de fusionar"
+  ]
+}

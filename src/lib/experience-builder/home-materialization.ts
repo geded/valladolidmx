@@ -8,9 +8,9 @@
  *
  *  · Copia al snapshot todos los campos editables (textos, enlaces, orden,
  *    visibilidad, límites y referencias de medios).
- *  · Preserva EXACTAMENTE las decisiones editoriales de medios vigentes:
- *    un `media_url` presente y vacío significa "sin fotografía acreditada"
- *    y NO se sustituye por el medio conceptual del fixture.
+ *  · Preserva las referencias de medios vigentes. Un `media_url` vacío se
+ *    mantiene administrable en el snapshot y el resolutor aplica el medio
+ *    temporal aprobado hasta que el CMS guarde una referencia acreditada.
  *  · Preserva la longitud de cada colección tal y como se renderiza hoy.
  *
  * Invariante verificable: `resolveHomePremiumG4(current)` y
@@ -68,8 +68,8 @@ function stripNonCanonicalHrefs<T>(value: T): T {
 
 /**
  * Une la fila por defecto (texto/enlace acreditado) con la fila vigente del
- * snapshot: cualquier clave presente hoy gana, incluidas las decisiones de
- * medios explícitamente vacías.
+ * snapshot: cualquier valor presente hoy gana. Los medios vacíos permanecen
+ * vacíos en datos, pero el resolutor visual aplica el fallback aprobado.
  */
 function mergeRow(defaultRow: Row | undefined, currentRow: Row): Row {
   const base: Row = { ...stripNonCanonicalHrefs(defaultRow ?? {}) };

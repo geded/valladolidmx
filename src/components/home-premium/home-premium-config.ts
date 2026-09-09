@@ -58,14 +58,14 @@ const linked = <T extends { href: string | null }>(items: T[]): T[] =>
   items.filter((item) => typeof item.href === "string" && item.href.startsWith("/"));
 
 /**
- * G8-R1-F1L · Un `media_url` presente pero vacío es una decisión editorial
- * explícita (retiro de medio no acreditado) y NO debe caer al default.
- * La superficie renderiza entonces el marcador editorial neutral aprobado.
+ * Un `media_url` vacío significa que el slot aún no fue configurado en CMS.
+ * Conserva entonces el medio temporal aprobado del preset. El CMS sustituye
+ * ese fallback en cuanto recibe una referencia acreditada no vacía.
  */
 const media = (row: Cfg, fallback: HomePremiumMedia = EMPTY_MEDIA): HomePremiumMedia =>
-  "media_url" in row
+  typeof row.media_url === "string" && row.media_url.trim().length > 0
     ? {
-        url: typeof row.media_url === "string" ? row.media_url.trim() : "",
+        url: row.media_url.trim(),
         alt: typeof row.media_alt === "string" ? row.media_alt.trim() : fallback.alt,
       }
     : { url: fallback.url, alt: str(row.media_alt, fallback.alt) };
@@ -274,10 +274,8 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       description: str(config.eventos_description, base.eventos.description),
       media: {
         url:
-          "eventos_media_url" in config
-            ? typeof config.eventos_media_url === "string"
-              ? config.eventos_media_url.trim()
-              : ""
+          typeof config.eventos_media_url === "string" && config.eventos_media_url.trim().length > 0
+            ? config.eventos_media_url.trim()
             : base.eventos.media.url,
         alt: str(config.eventos_media_alt, base.eventos.media.alt),
       },
