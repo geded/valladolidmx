@@ -77,6 +77,48 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(adapter).toContain("mediaUrl: b.cover_url ?? null");
   });
 
+  test("cada enlace principal del Home desemboca en su autoridad aprobada", () => {
+    const expectedAuthorities: Array<[string, string, string]> = [
+      ["oriente-maya/index.tsx", "/oriente-maya/", "RegionDestinationsPremiumSurface"],
+      ["hoteles.tsx", "/hoteles", "ListingPremiumSurfaceFromDTO"],
+      ["restaurantes.tsx", "/restaurantes", "ListingPremiumSurfaceFromDTO"],
+      ["experiencias.tsx", "/experiencias", "ExperiencesListingSurface"],
+      ["casas-de-vacaciones.tsx", "/casas-de-vacaciones", "ListingPremiumSurfaceFromDTO"],
+      [
+        "oriente-maya/$destino.lugares.index.tsx",
+        "/oriente-maya/$destino/lugares/",
+        "ListingPremiumSurfaceFromDTO",
+      ],
+      ["que-hacer.tsx", "/que-hacer", "ListingPremiumSurfaceFromDTO"],
+      ["eventos.index.tsx", "/eventos/", "ListingPremiumSurfaceFromDTO"],
+      ["rutas.index.tsx", "/rutas/", "RoutesListingSurface"],
+    ];
+
+    for (const [routeFile, routeId, authority] of expectedAuthorities) {
+      const route = read(`src/routes/${routeFile}`);
+      expect(route).toContain(`createFileRoute("${routeId}")`);
+      expect(route).toContain(authority);
+    }
+
+    const home = HOME_PREMIUM_G4_CONTENT;
+    expect(home.categorias.items.find((item) => item.slug === "mapas")?.href).toBe("/mapa");
+    expect(read("src/routes/mapa.tsx")).toContain('createFileRoute("/mapa")');
+  });
+
+  test("Home conserva el Alux completo con la apariencia clara compartida de marca", () => {
+    const home = read("src/components/home-premium/HomePremiumSurface.tsx");
+    const shared = read("src/components/home-premium/shared/PremiumShowcase.tsx");
+
+    for (const token of ["border-selva/25", "bg-selva/[0.06]", "border-selva/70"]) {
+      expect(home).toContain(token);
+      expect(shared).toContain(token);
+    }
+    expect(home).toContain('data-alux-embedded="planner"');
+    expect(home).toContain("PARTY_OPTIONS.map");
+    expect(home).toContain("openAluxFloating");
+    expect(home).not.toContain('className="overflow-hidden rounded-2xl bg-selva');
+  });
+
   test("la autoridad visual conserva los enlaces del mapa y de las tarjetas", () => {
     const surface = read("src/components/destination-premium/DestinationPremiumSurface.tsx");
     expect(surface).toContain("href: p.href ?? null");

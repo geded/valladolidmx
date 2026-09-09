@@ -1,0 +1,44 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-079",
+  "title": "Sincronización de Alux y navegación canónica del Home",
+  "status": "Approved",
+  "branch": "fix/home-alux-map-authority-20260909",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-09 para sincronizar exclusivamente la apariencia de Alux del Home con el sistema claro de marca, conservar íntegramente sus funciones, corregir el enlace CMS de Mapa a /mapa y añadir pruebas específicas de navegación y autoridad Premium; un único PR hacia main, fusionable sólo con pruebas afectadas, typecheck y Governance en PASS; sin publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "489ebf0cd9dea4fe45a8fdc034fcc842d23e693436646ec7311ec87e6574b743",
+      "authority": "Founder · Alux Home alineado a Marca e Inspiración · 2026-09-09"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/home-premium-content.ts",
+      "sha256": "b2abf006c3e9e1861aefea9499491719388b5f7a57c72c5af551b6b8651420e4",
+      "authority": "Founder · enlace canónico CMS de Mapa · 2026-09-09"
+    }
+  ],
+  "public_routes": [
+    "/",
+    "/mapa"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/omxds/l3b-a/home-cms-materialization.contract.test.ts scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "bun run typecheck",
+    "bun run governance:check",
+    "verificación en la vista previa lateral de Lovable después de fusionar"
+  ]
+}

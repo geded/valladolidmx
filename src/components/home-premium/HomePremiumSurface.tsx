@@ -463,20 +463,21 @@ function AluxPlanner({
   return (
     <section
       aria-labelledby="alux-title"
-      className="overflow-hidden rounded-2xl bg-selva text-selva-foreground shadow-soft"
+      data-alux-embedded="planner"
+      className="overflow-hidden rounded-2xl border border-selva/25 bg-selva/[0.06] text-foreground shadow-none"
     >
-      <div className="grid min-h-20 items-center gap-3 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
-        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-white/20 sm:pr-3 lg:h-24">
+      <div className="grid min-h-20 items-center gap-3 border-l-2 border-selva/70 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
+        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-selva/20 sm:pr-3 lg:h-24">
           <img
             src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
             alt="Alux"
             className="h-14 w-14 shrink-0 object-contain lg:h-20 lg:w-20"
           />
           <div>
-            <h2 id="alux-title" className="font-display text-xl">
+            <h2 id="alux-title" className="font-display text-xl text-selva">
               Alux
             </h2>
-            <p className="text-xs text-white/70">Tu concierge IA</p>
+            <p className="text-xs text-muted-foreground">Tu concierge IA</p>
           </div>
         </div>
         <div>
@@ -503,7 +504,8 @@ function AluxPlanner({
         <Button
           type="button"
           onClick={openAlux}
-          className="size-11 rounded-full p-0"
+          variant="outline"
+          className="size-11 rounded-full border-selva/40 bg-background p-0 text-selva hover:bg-selva/10 hover:text-selva"
           aria-label="Continuar con Alux"
         >
           <ChevronRight className="size-5" />
