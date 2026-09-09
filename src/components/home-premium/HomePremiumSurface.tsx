@@ -32,6 +32,7 @@ import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { ACTIVE_BRAND } from "@/config/brand";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import { PremiumAluxBar } from "./shared/PremiumShowcase";
 import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
 
@@ -461,57 +462,12 @@ function AluxPlanner({
     });
   };
   return (
-    <section
-      aria-labelledby="alux-title"
-      data-alux-embedded="planner"
-      className="overflow-hidden rounded-2xl border border-selva/25 bg-selva/[0.06] text-foreground shadow-none"
-    >
-      <div className="grid min-h-20 items-center gap-3 border-l-2 border-selva/70 px-4 py-3 sm:grid-cols-[5.5rem_1fr_auto] sm:py-0 lg:grid-cols-[7rem_1fr_auto]">
-        <div className="flex h-16 items-center gap-2 overflow-hidden sm:border-r sm:border-selva/20 sm:pr-3 lg:h-24">
-          <img
-            src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
-            alt="Alux"
-            className="h-14 w-14 shrink-0 object-contain lg:h-20 lg:w-20"
-          />
-          <div>
-            <h2 id="alux-title" className="font-display text-xl text-selva">
-              Alux
-            </h2>
-            <p className="text-xs text-muted-foreground">Tu concierge IA</p>
-          </div>
-        </div>
-        <div>
-          <p className="font-display text-lg lg:text-xl">¿Cómo viajas hoy?</p>
-          <div
-            className="mt-2 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible"
-            role="group"
-            aria-label="Composición del viaje"
-          >
-            {PARTY_OPTIONS.map((option) => (
-              <Button
-                key={option.value}
-                type="button"
-                size="sm"
-                variant={selectedParty === option.value ? "default" : "secondary"}
-                onClick={() => onSelectParty(option.value)}
-                className="min-h-9 rounded-pill"
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <Button
-          type="button"
-          onClick={openAlux}
-          variant="outline"
-          className="size-11 rounded-full border-selva/40 bg-background p-0 text-selva hover:bg-selva/10 hover:text-selva"
-          aria-label="Continuar con Alux"
-        >
-          <ChevronRight className="size-5" />
-        </Button>
-      </div>
-    </section>
+    <PremiumAluxBar
+      question="¿Cómo viajas hoy?"
+      selectedParty={selectedParty}
+      onSelectParty={onSelectParty}
+      onContinue={openAlux}
+    />
   );
 }
 

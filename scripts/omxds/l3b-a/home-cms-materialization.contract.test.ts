@@ -41,7 +41,7 @@ describe("Home CMS-first · materialización equivalente", () => {
     expect(categories.find((item) => item.slug === "mapas")?.href).toBe("/mapa");
   });
 
-  it("preserva las decisiones editoriales de medios vigentes", () => {
+  it("preserva los campos CMS vacíos sin borrar el fallback visual aprobado", () => {
     expect(materialized.eventos_media_url).toBe("");
     for (const key of [
       "hero_slides",
@@ -56,6 +56,10 @@ describe("Home CMS-first · materialización equivalente", () => {
       expect(rows.length).toBe((CURRENT_CONFIG[key] as unknown[]).length);
       for (const row of rows) expect(row.media_url).toBe("");
     }
+
+    const resolved = resolveHomePremiumG4(materialized).content;
+    expect(resolved.hero.slides.every((slide) => slide.media.url.length > 0)).toBe(true);
+    expect(resolved.eventos.media.url.length).toBeGreaterThan(0);
   });
 
   it("no recorta ninguna colección respecto de lo que hoy se renderiza", () => {

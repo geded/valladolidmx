@@ -13,6 +13,7 @@ import {
   paletteContrastChecks,
 } from "../../../src/lib/brand/brand-theme";
 import { resolveHomePremiumAuthorityTree } from "../../../src/components/home-premium/home-premium-config";
+import { encodeSlotMedia } from "../../../src/lib/media/slot-media";
 
 const root = process.cwd();
 const read = (path: string) => readFileSync(resolve(root, path), "utf8");
@@ -110,11 +111,11 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const shared = read("src/components/home-premium/shared/PremiumShowcase.tsx");
 
     for (const token of ["border-selva/25", "bg-selva/[0.06]", "border-selva/70"]) {
-      expect(home).toContain(token);
       expect(shared).toContain(token);
     }
-    expect(home).toContain('data-alux-embedded="planner"');
-    expect(home).toContain("PARTY_OPTIONS.map");
+    expect(home).toContain("<PremiumAluxBar");
+    expect(shared).toContain('data-alux-embedded="bar"');
+    expect(shared).toContain("PARTY_OPTIONS.map");
     expect(home).toContain("openAluxFloating");
     expect(home).not.toContain('className="overflow-hidden rounded-2xl bg-selva');
   });
@@ -251,10 +252,10 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(merged.destinos.items[0]?.media.url).toBe(mediaUrl);
   });
 
-  test("la Home pública nunca usa medios conceptuales como fallback", () => {
+  test("la Home usa sólo los medios temporales expresamente aprobados como fallback", () => {
     const withoutRealCorpus = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, undefined);
-    expect(withoutRealCorpus.hero.slides.every((slide) => slide.media.url === "")).toBe(true);
-    expect(withoutRealCorpus.eventos.media.url).toBe("");
+    expect(withoutRealCorpus.hero.slides).toEqual(HOME_PREMIUM_G4_CONTENT.hero.slides);
+    expect(withoutRealCorpus.eventos.media).toEqual(HOME_PREMIUM_G4_CONTENT.eventos.media);
 
     const emptyRealCorpus = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
       destinos: [],
@@ -265,8 +266,49 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
       rutas: [],
       mapPoints: [],
     });
-    expect(emptyRealCorpus.hero.slides).toEqual([]);
-    expect(JSON.stringify(emptyRealCorpus)).not.toContain("conceptual-preview");
+    expect(emptyRealCorpus.hero.slides).toEqual(HOME_PREMIUM_G4_CONTENT.hero.slides);
+
+    const arbitraryConceptual = mergeHomeRealContent(
+      {
+        ...HOME_PREMIUM_G4_CONTENT,
+        hero: {
+          ...HOME_PREMIUM_G4_CONTENT.hero,
+          slides: [
+            {
+              media: {
+                url: "/api/public/studio-media/conceptual-preview/no-aprobada.webp",
+                alt: "No aprobada",
+              },
+              caption: "No aprobada",
+            },
+          ],
+        },
+      },
+      undefined,
+    );
+    expect(arbitraryConceptual.hero.slides[0]?.media.url).toBe("");
+  });
+
+  test("la Home conserva un medio temporal aprobado con metadatos del slot CMS", () => {
+    const approved = HOME_PREMIUM_G4_CONTENT.hero.slides[0]!;
+    const configuredUrl = encodeSlotMedia({
+      src: approved.media.url,
+      alt: approved.media.alt,
+      nature: "conceptual",
+      reviewState: "approved",
+    });
+    const merged = mergeHomeRealContent(
+      {
+        ...HOME_PREMIUM_G4_CONTENT,
+        hero: {
+          ...HOME_PREMIUM_G4_CONTENT.hero,
+          slides: [{ ...approved, media: { ...approved.media, url: configuredUrl } }],
+        },
+      },
+      undefined,
+    );
+
+    expect(merged.hero.slides[0]?.media.url).toBe(configuredUrl);
   });
 
   test("la Home respeta la imagen gobernada de Eventos elegida en el constructor", () => {
@@ -450,7 +492,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     );
     expect(merged.servicios.stays[0]?.media.url).toContain("governed/v1p1c/hotel-cover.jpg");
     expect(merged.servicios.food[0]?.media.url).toContain("governed/v1p1c/restaurant-cover.jpg");
-    expect(JSON.stringify(merged)).not.toContain("conceptual-preview");
+    expect(merged.hero.slides).toEqual(HOME_PREMIUM_G4_CONTENT.hero.slides);
   });
 
   test("los medios de Home usan el proxy estable y no dependen de service role", () => {
@@ -532,13 +574,13 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
 
     expect(surface).toContain("<main data-home-presentation={heroVariant}>");
     expect(surface).toContain("lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]");
-    expect(surface).toContain('aria-labelledby="alux-title"');
+    expect(surface).toContain("<PremiumAluxBar");
     expect(surface).toContain("lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]");
     expect(surface).toContain("to={actionHref}");
     expect(surface).toContain("to={route.href}");
     expect(surface).toContain("<TravelPlanBand");
     expect(surface).not.toContain("PremiumEditorialHero");
-    expect(surface).not.toContain("PremiumAluxBar");
+    expect(surface).toContain('question="¿Cómo viajas hoy?"');
     expect(surface).not.toContain("PremiumShowcaseGrid");
   });
 
