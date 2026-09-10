@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-086",
+  "title": "Corrección visual responsive del índice Oriente Maya",
+  "status": "Approved",
+  "branch": "fix/oriente-maya-responsive-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir en Explorar destinos la superposición de imagen y Alux, eliminar el espacio blanco artificial de la tarjeta Valladolid y ajustar la composición responsive observada en Lovable, sin crear otra plantilla ni cambiar contenido CMS.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx" },
+    { "operation": "modify", "path": "src/lib/alux/floating-presence.ts" }
+  ],
+  "acknowledged_revisions": [
+    { "operation": "modify", "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx", "sha256": "02f49177887962d6d824e271add62c244298ddc11722af9901bea743afd93426", "authority": "Founder · corrección visual Oriente Maya · 2026-09-10" },
+    { "operation": "modify", "path": "src/lib/alux/floating-presence.ts", "sha256": "a1902c43b6b2d38fe233c13d4fe3b8f94dda52c75139d22ff80a82b85f60942a", "authority": "Founder · Alux sin superposición en índice regional · 2026-09-10" }
+  ],
+  "public_routes": ["/oriente-maya"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "revisión visual en Lovable desktop, tablet y móvil"]
+}
