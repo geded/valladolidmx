@@ -69,7 +69,15 @@ async function resolvePublishedRouteSelection(
   summary: string;
   destinationSlugs: string[];
   stopRefs: Array<{ entityType: AluxConverseCandidate["entityType"]; entityId: string }>;
-  sequenceStops: Array<AluxConverseSequenceGroundingRef & { day: number | null }>;
+  sequenceStops: Array<
+    AluxConverseSequenceGroundingRef & {
+      day: number | null;
+      canonicalRef: {
+        entityType: AluxConverseCandidate["entityType"];
+        entityId: string;
+      } | null;
+    }
+  >;
 } | null> {
   if (!entityRef?.startsWith("route:")) return null;
   const routeId = entityRef.slice("route:".length).trim();
@@ -236,16 +244,43 @@ async function resolvePublishedRouteSelection(
     },
   );
   const sequenceStops = stopRows.flatMap(
-    (stop): Array<AluxConverseSequenceGroundingRef & { day: number | null }> => {
+    (
+      stop,
+    ): Array<
+      AluxConverseSequenceGroundingRef & {
+        day: number | null;
+        canonicalRef: {
+          entityType: AluxConverseCandidate["entityType"];
+          entityId: string;
+        } | null;
+      }
+    > => {
       const kind = String(stop["entity_kind"] ?? "");
       const entityType = typeOf(kind);
       const entityId = String(stop["entity_id"] ?? "");
       const title = titleOfStop(stop);
       const day = dayOfStop(stop);
-      if (entityType && entityId && title) return [{ entityType, entityId, title, day }];
       const stopId = String(stop["id"] ?? "");
+      if (entityType && entityId && stopId && title)
+        return [
+          {
+            entityType: "route_stop",
+            entityId: `route-stop:${stopId}`,
+            title,
+            day,
+            canonicalRef: { entityType, entityId },
+          },
+        ];
       return kind === "note" && stopId && title
-        ? [{ entityType: "route_stop", entityId: `route-stop:${stopId}`, title, day }]
+        ? [
+            {
+              entityType: "route_stop",
+              entityId: `route-stop:${stopId}`,
+              title,
+              day,
+              canonicalRef: null,
+            },
+          ]
         : [];
     },
   );
@@ -810,18 +845,11 @@ export const aluxConverse = createServerFn({ method: "POST" })
     );
     const selectedStopGroundingRefs = (selectedRoute?.sequenceStops ?? [])
       .flatMap((stop): Array<AluxConverseSequenceGroundingRef & { day: number | null }> => {
-        if (stop.entityType === "route_stop") return [stop];
-        const candidate = retrievedByKey.get(candidateKey(stop.entityType, stop.entityId));
-        return candidate
-          ? [
-              {
-                entityType: candidate.entityType,
-                entityId: candidate.entityId,
-                title: stop.title,
-                day: stop.day,
-              },
-            ]
-          : [];
+        if (!stop.canonicalRef) return [stop];
+        const candidate = retrievedByKey.get(
+          candidateKey(stop.canonicalRef.entityType, stop.canonicalRef.entityId),
+        );
+        return candidate ? [stop] : [];
       })
       .slice(0, ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding);
     const alternativeCandidates = candidates.filter(
