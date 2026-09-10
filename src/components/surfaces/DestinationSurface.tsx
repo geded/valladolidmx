@@ -282,8 +282,8 @@ export function DestinationSurfaceContractBoundary({
         if (!family) return [];
         const cmsSlugs = listingFamilyTaxonomy.taxonomy[family] ?? [];
         const slug = listingFamilyTaxonomy.available
-          ? cmsSlugs.find((candidate) => destinationCategorySlugs.has(candidate)) ?? cmsSlugs[0]
-          : listingFamilyContract(family).categorySlugs[0] ?? family;
+          ? (cmsSlugs.find((candidate) => destinationCategorySlugs.has(candidate)) ?? cmsSlugs[0])
+          : (listingFamilyContract(family).categorySlugs[0] ?? family);
         return slug
           ? [
               [
