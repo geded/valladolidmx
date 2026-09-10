@@ -68,10 +68,12 @@ async function resolvePublishedRouteSelection(
   title: string;
   summary: string;
   destinationSlugs: string[];
+  declaredDestinationIds: string[];
   stopRefs: Array<{ entityType: AluxConverseCandidate["entityType"]; entityId: string }>;
   sequenceStops: Array<
     AluxConverseSequenceGroundingRef & {
       day: number | null;
+      context: string | null;
       canonicalRef: {
         entityType: AluxConverseCandidate["entityType"];
         entityId: string;
@@ -95,7 +97,7 @@ async function resolvePublishedRouteSelection(
       .maybeSingle(),
     sb
       .from("editorial_route_stops")
-      .select("id, title, position, day_number, entity_kind, entity_id")
+      .select("id, title, note, duration_minutes, position, day_number, entity_kind, entity_id")
       .eq("route_id", routeId)
       .order("position", { ascending: true }),
   ]);
@@ -171,10 +173,19 @@ async function resolvePublishedRouteSelection(
     const day = Number(stop["day_number"]);
     return Number.isInteger(day) && day > 0 ? day : null;
   };
+  const contextOfStop = (stop: Record<string, unknown>): string | null => {
+    const duration = Number(stop["duration_minutes"]);
+    const note = sanitizeCmsText(stop["note"], 160);
+    const parts = [Number.isFinite(duration) && duration > 0 ? `${duration} min` : "", note].filter(
+      Boolean,
+    );
+    return parts.length ? parts.join(" · ") : null;
+  };
   const stops = stopRows
     .map((stop) => ({
       title: titleOfStop(stop),
       day: dayOfStop(stop),
+      context: contextOfStop(stop),
     }))
     .filter((stop) => Boolean(stop.title));
   const duration = route["duration_days"]
@@ -193,7 +204,7 @@ async function resolvePublishedRouteSelection(
     stops.reduce((groups, stop) => {
       const key = stop.day === null ? "unassigned" : String(stop.day);
       const group = groups.get(key) ?? { day: stop.day, titles: [] as string[] };
-      group.titles.push(stop.title);
+      group.titles.push(stop.context ? `${stop.title} (${stop.context})` : stop.title);
       groups.set(key, group);
       return groups;
     }, new Map<string, { day: number | null; titles: string[] }>()),
@@ -249,6 +260,7 @@ async function resolvePublishedRouteSelection(
     ): Array<
       AluxConverseSequenceGroundingRef & {
         day: number | null;
+        context: string | null;
         canonicalRef: {
           entityType: AluxConverseCandidate["entityType"];
           entityId: string;
@@ -260,6 +272,7 @@ async function resolvePublishedRouteSelection(
       const entityId = String(stop["entity_id"] ?? "");
       const title = titleOfStop(stop);
       const day = dayOfStop(stop);
+      const context = contextOfStop(stop);
       const stopId = String(stop["id"] ?? "");
       if (entityType && entityId && stopId && title)
         return [
@@ -268,6 +281,7 @@ async function resolvePublishedRouteSelection(
             entityId: `route-stop:${stopId}`,
             title,
             day,
+            context,
             canonicalRef: { entityType, entityId },
           },
         ];
@@ -278,6 +292,7 @@ async function resolvePublishedRouteSelection(
               entityId: `route-stop:${stopId}`,
               title,
               day,
+              context,
               canonicalRef: null,
             },
           ]
@@ -289,6 +304,7 @@ async function resolvePublishedRouteSelection(
     title: sanitizeCmsText(route["name"], 120) || "Ruta seleccionada",
     summary: routeSummary ? `${metadata}${summaryLabel}${routeSummary}` : metadata,
     destinationSlugs: territorySlugs,
+    declaredDestinationIds: territoryIds,
     stopRefs,
     sequenceStops,
   };
@@ -337,6 +353,7 @@ function buildUserPrompt(args: {
   candidates: readonly AluxConverseCandidate[];
   selectedStopGroundingRefs: readonly (AluxConverseSequenceGroundingRef & {
     day: number | null;
+    context: string | null;
   })[];
   nowLabel: string;
 }): string {
@@ -407,7 +424,7 @@ function buildUserPrompt(args: {
     );
     for (const ref of args.selectedStopGroundingRefs) {
       lines.push(
-        `- ${ref.day === null ? "Sin día asignado" : `Día ${ref.day}`} · ${ref.entityId} · "${ref.title.slice(0, 80)}"`,
+        `- ${ref.day === null ? "Sin día asignado" : `Día ${ref.day}`} · ${ref.entityId} · "${ref.title.slice(0, 80)}"${ref.context ? ` · ${ref.context}` : ""}`,
       );
     }
   }
@@ -707,6 +724,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
       .catch(() => null);
     const retrieved = await retrieval.retrieveConverseCandidates(sb, {
       destinationSlug,
+      declaredDestinationIds: selectedRoute?.declaredDestinationIds,
       extraDestinationSlugs,
       maxExtraDestinationSlugs: selectedRoute ? extraDestinationSlugs.length : undefined,
       selectedRoute: Boolean(selectedRoute),
@@ -844,13 +862,19 @@ export const aluxConverse = createServerFn({ method: "POST" })
       ALUX_CONVERSE_LIMITS.maxCandidatesForModel,
     );
     const selectedStopGroundingRefs = (selectedRoute?.sequenceStops ?? [])
-      .flatMap((stop): Array<AluxConverseSequenceGroundingRef & { day: number | null }> => {
-        if (!stop.canonicalRef) return [stop];
-        const candidate = retrievedByKey.get(
-          candidateKey(stop.canonicalRef.entityType, stop.canonicalRef.entityId),
-        );
-        return candidate ? [stop] : [];
-      })
+      .flatMap(
+        (
+          stop,
+        ): Array<
+          AluxConverseSequenceGroundingRef & { day: number | null; context: string | null }
+        > => {
+          if (!stop.canonicalRef) return [stop];
+          const candidate = retrievedByKey.get(
+            candidateKey(stop.canonicalRef.entityType, stop.canonicalRef.entityId),
+          );
+          return candidate ? [stop] : [];
+        },
+      )
       .slice(0, ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding);
     const alternativeCandidates = candidates.filter(
       (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),

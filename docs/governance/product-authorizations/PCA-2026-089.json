@@ -72,13 +72,13 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "c67fcf2ce090bed4c55d518a322bcab61cbaf17660ef759fe9b33aefc355c644",
+      "sha256": "fbdb77afad2ac6274e60777dbb211930d5640990af01369706119ebf40ea7dfc",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-retrieval.server.ts",
-      "sha256": "b4e1d0ce97d02f85881c97ed8963d7075c5ef43fc0b63d79fc844aad8b1c96a4",
+      "sha256": "b2074f060cce780951084e20436be19a41d64edf79bb8941f77c3955827a3580",
       "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
     },
     {

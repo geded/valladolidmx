@@ -48,6 +48,8 @@ export interface ConverseDestination {
 
 export interface ConverseRetrievalInput {
   readonly destinationSlug: string | null;
+  /** Territorios declarados por la ruta, incluso si aún no tienen una parada entity-backed. */
+  readonly declaredDestinationIds?: readonly string[];
   /** Destinos adicionales mencionados (se rotulan como cercanía). */
   readonly extraDestinationSlugs?: readonly string[];
   /** Límite ampliable para rutas publicadas que abarcan varios territorios canónicos. */
@@ -804,6 +806,9 @@ export async function retrieveConverseCandidates(
     .map((r) => ({ id: String(r["id"]), slug: String(r["slug"]), name: String(r["name"]) }))
     .filter((d) => d.id && d.slug && d.name);
   const selectedDestinationIds = await resolveSelectedDestinationIds(sb, input.selectedRefs);
+  for (const destinationId of input.declaredDestinationIds ?? []) {
+    if (destinationId) selectedDestinationIds.add(destinationId);
+  }
   const { data: selectedDestinationRows } = selectedDestinationIds.size
     ? await sb
         .from("destinations")
