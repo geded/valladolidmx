@@ -103,8 +103,8 @@
     {
       "operation": "modify",
       "path": "src/routes/api/public/alux/chat.ts",
-      "sha256": "d7b45dd90618638c1706bf52bca9b1ca54c6fc9df3c092d8abb92e32ac3964c2",
-      "authority": "Founder · revalidación de todos los favoritos empresariales antes de incorporarlos al contexto de Alux · 2026-09-10"
+      "sha256": "6070dfa53c01df99a04919183f789f5440d124d53515ec900a3ee28161dca263",
+      "authority": "Founder · revalidación de todos los favoritos empresariales y de productos antes de incorporarlos al contexto de Alux · 2026-09-10"
     },
     {
       "operation": "modify",
