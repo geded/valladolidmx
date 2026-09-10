@@ -1,7 +1,7 @@
 {
   "id": "PCA-2026-082-ADDENDUM-PR77-DESTINATION-AWARE-NAVIGATION",
   "status": "Approved",
-  "parent": "PCA-2026-082",
+  "parent": "PCA-2026-056",
   "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
   "founder_authority": "Autorización Founder del 2026-09-10 para corregir los 8 hallazgos vigentes del PR #77 en la misma rama y fusionar únicamente con todos los comentarios y controles en PASS; se mantienen las restricciones anteriores.",
   "supersedes_acknowledged_revision": {
