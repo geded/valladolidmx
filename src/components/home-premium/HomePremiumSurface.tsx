@@ -571,6 +571,11 @@ function RoutesSection({
                       onAdd();
                       openAluxFloating({
                         reason: "manual",
+                        selection: {
+                          entityRef: `route:${route.id}`,
+                          title: `${route.title} · ${route.duration} · ${route.stops} paradas · ${route.vibe}`,
+                          familySlug: "rutas",
+                        },
                         hint: buildAluxStageAwareHint(
                           `Ayúdame a personalizar esta ruta: ${route.title}. ${route.description}`,
                           `${route.duration} · ${route.stops} paradas · ${route.vibe}`,
