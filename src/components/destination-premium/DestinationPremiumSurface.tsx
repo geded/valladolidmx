@@ -77,6 +77,11 @@ export interface DestinationPremiumSurfaceProps {
   className?: string;
   /** Runtime productivo del CMS; sustituye las tarjetas ilustrativas G4. */
   renderServicePreview?: (service: DestinationPremiumService) => ReactNode;
+  /**
+   * En producción pública, cada categoría continúa por su URL territorial.
+   * Studio y previews conservan por defecto la selección local aprobada.
+   */
+  serviceNavigation?: "preview" | "territorial";
   /** Acción canónica Guardar/Mi Viaje, inyectada sin duplicar su lógica. */
   heroAction?: ReactNode;
   /** Rutas editoriales publicadas del CMS; nunca fixtures ni inferencias. */
@@ -102,6 +107,7 @@ export function DestinationPremiumSurface({
   initialService,
   className,
   renderServicePreview,
+  serviceNavigation = "preview",
   heroAction,
   routes = [],
 }: DestinationPremiumSurfaceProps) {
@@ -177,6 +183,7 @@ export function DestinationPremiumSurface({
                     content={content}
                     active={activeService}
                     onSelect={setActiveService}
+                    navigation={serviceNavigation}
                   />
                 </Container>
               </div>
@@ -473,11 +480,14 @@ function ServiciosStrip({
   content,
   active,
   onSelect,
+  navigation,
 }: {
   content: DestinationPremiumContent;
   active: string;
   onSelect: (key: string) => void;
+  navigation: "preview" | "territorial";
 }) {
+  const navigates = navigation === "territorial";
   return (
     <section aria-label="Servicios del micrositio">
       <CategoryNavGrid
@@ -485,10 +495,13 @@ function ServiciosStrip({
           slug: s.key,
           label: s.label,
           countLabel: s.hint,
+          href: navigates
+            ? `/oriente-maya/${encodeURIComponent(content.slug)}/${encodeURIComponent(s.key)}`
+            : null,
         }))}
-        mode="select"
-        activeSlug={active}
-        onSelect={onSelect}
+        mode={navigates ? "navigate" : "select"}
+        activeSlug={navigates ? null : active}
+        onSelect={navigates ? undefined : onSelect}
         showCounts={false}
         variant="standard"
         desktopColumnsClassName="lg:grid-cols-6"

@@ -7,8 +7,7 @@
  * y funcional 1:1 con la implementación previa. Rediseño en US-R4+.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
+import { ArrowRight, MessageCircle, Sparkles } from "lucide-react";
 
 export function AluxSurface() {
   return (
@@ -17,26 +16,34 @@ export function AluxSurface() {
         <span className="grid size-10 place-items-center rounded-xl bg-primary/15 text-primary">
           <Sparkles className="size-5" aria-hidden />
         </span>
-        <h2 className="mt-4 text-lg font-semibold">Qué hará Alux</h2>
+        <h2 className="mt-4 text-lg font-semibold">Tu siguiente mejor paso</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-          <li>· Resumir expedientes del Concierge Workspace</li>
-          <li>· Sugerir productos candidatos</li>
-          <li>· Preparar borradores de propuesta</li>
-          <li>· Detectar riesgos y oportunidades operativas</li>
+          <li>· Revisar los destinos y experiencias de tu viaje</li>
+          <li>· Detectar qué puede faltar según tu tiempo y ritmo</li>
+          <li>· Sugerir lugares cercanos sin cambiar tu plan</li>
         </ul>
+        <Link
+          to="/arma-tu-viaje"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+        >
+          Ver mi viaje
+          <ArrowRight className="size-4" aria-hidden />
+        </Link>
       </div>
       <div className="rounded-2xl border border-border bg-card/60 p-6">
-        <ComingSoonBadge label="Activo para Concierge" />
-        <h2 className="mt-4 text-lg font-semibold">Workspace operativo</h2>
+        <span className="grid size-10 place-items-center rounded-xl bg-primary/15 text-primary">
+          <MessageCircle className="size-5" aria-hidden />
+        </span>
+        <h2 className="mt-4 text-lg font-semibold">Cuando quieras hacerlo realidad</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          El asistente está disponible dentro de los expedientes internos del Concierge Workspace.
-          El acceso público conversacional queda separado.
+          Tu expediente conserva lo que elegiste. Cuando tú lo decidas, un concierge humano podrá
+          revisarlo contigo, coordinar opciones y ayudarte a convertirlo en un viaje real.
         </p>
         <Link
-          to="/concierge"
+          to="/arma-tu-viaje"
           className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]"
         >
-          Abrir Concierge Workspace
+          Preparar mi viaje
           <ArrowRight className="size-4" aria-hidden />
         </Link>
       </div>

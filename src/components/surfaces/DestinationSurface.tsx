@@ -276,6 +276,7 @@ export function DestinationSurfaceContractBoundary({
           <DestinationPremiumSurface
             showBreadcrumbs={false}
             content={content}
+            serviceNavigation="territorial"
             heroVariant={presentation}
             sections={{ gallery: accreditedMedia.length > 0 }}
             routes={routes}

@@ -124,4 +124,11 @@ export const ANON_COPY = {
   },
 } as const;
 
+export function planAcknowledgedCopy(title: string) {
+  return {
+    title: "Perfecto.",
+    body: `${title} ya forma parte de tu viaje. Alux puede ayudarte a elegir el siguiente paso.`,
+  } as const;
+}
+
 export type AnonCopyKey = keyof typeof ANON_COPY;

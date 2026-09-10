@@ -11,6 +11,8 @@ import { SITE } from "@/config/site";
 import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { useAuth } from "@/hooks/useAuth";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 
 export const Route = createFileRoute("/arma-tu-viaje")({
   loader: async () => {
@@ -50,6 +52,16 @@ function hasRenderableBlocks(tree: unknown): boolean {
 
 function AYVPage() {
   const { composition } = Route.useLoaderData();
+  const { user } = useAuth();
+  const anonymous = useAnonymousTrip();
+  const hasAnonymousExpedient = Boolean(
+    anonymous.trip &&
+    (anonymous.trip.plannedItems.length > 0 ||
+      anonymous.trip.favorites.length > 0 ||
+      anonymous.trip.destinationIds.length > 0),
+  );
+  const mustShowLiveExpedient = Boolean(user?.id) || hasAnonymousExpedient;
+  const snapshot = composition?.snapshot;
   return (
     <PublicShell
       eyebrow="Plataforma"
@@ -58,8 +70,10 @@ function AYVPage() {
       crumbs={[{ label: "Arma tu Viaje" }]}
       titleAsText
     >
-      {composition && hasRenderableBlocks(composition.snapshot) ? (
-        <CompositionRenderer tree={composition.snapshot} />
+      {mustShowLiveExpedient ? (
+        <TripPlannerSurface />
+      ) : composition && snapshot && hasRenderableBlocks(snapshot) ? (
+        <CompositionRenderer tree={snapshot} />
       ) : (
         <TripPlannerSurface />
       )}
