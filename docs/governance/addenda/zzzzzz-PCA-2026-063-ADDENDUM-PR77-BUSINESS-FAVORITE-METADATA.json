@@ -5,7 +5,7 @@
   "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
   "founder_authority": "Autorización Founder del 2026-09-10 para preservar favoritos de Alux con identificación y metadatos disponibles.",
   "supersedes_acknowledged_revision": {
-    "operation": "modify",
+    "operation": "create",
     "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
     "previous_sha256": "a086318c09eaf78f818589ea86633b165360cf138337bf1004036eb156290aec",
     "current_sha256": "fab9d508cd69843953ec6c89d242705271a5e318968a7861be56e76f24fe542f",
