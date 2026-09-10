@@ -805,7 +805,11 @@ export async function retrieveConverseCandidates(
     .filter((d) => d.id && d.slug && d.name);
   const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
 
-  const destination = input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null;
+  const selectedDestinationIds = await resolveSelectedDestinationIds(sb, input.selectedRefs);
+  const destination =
+    (input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null) ??
+    knownDestinations.find((d) => selectedDestinationIds.has(d.id)) ??
+    null;
   const familiesLoaded = new Set<string>();
   const collect = (list: readonly AluxConverseCandidate[]) => {
     for (const c of list) familiesLoaded.add(c.entityType);
@@ -822,13 +826,9 @@ export async function retrieveConverseCandidates(
     // Otros destinos publicados como opción de región (planear salidas).
     const others = knownDestinations.filter((d) => d.id !== destination.id).slice(0, 8);
 
-    const routeLimits = input.selectedRoute
-      ? { businesses: 60, perFamily: 60 }
-      : { businesses: 60, perFamily: 10 };
-    const nearbyLimits = input.selectedRoute
-      ? { businesses: 60, perFamily: 60 }
-      : { businesses: 12, perFamily: 4 };
-    const selectedDestinationIds = await resolveSelectedDestinationIds(sb, input.selectedRefs);
+    const routeLimits = { businesses: 60, perFamily: 10 };
+    const nearbyLimits = { businesses: 12, perFamily: 4 };
+    const requiredLimits = { businesses: 60, perFamily: 60 };
     const requiredDestinations = knownDestinations.filter((d) => selectedDestinationIds.has(d.id));
     const requiredBundles = input.selectedRefs
       ? await Promise.all(
@@ -837,7 +837,7 @@ export async function retrieveConverseCandidates(
               sb,
               required,
               required.id === destination.id ? "destination" : "nearby",
-              routeLimits,
+              requiredLimits,
               input.selectedRefs,
             ),
           ),
