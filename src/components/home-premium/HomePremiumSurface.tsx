@@ -569,6 +569,13 @@ function RoutesSection({
                     onClick={() => {
                       onSelectRoute(route.id);
                       onAdd();
+                      openAluxFloating({
+                        reason: "manual",
+                        hint: buildAluxStageAwareHint(
+                          `Ayúdame a personalizar esta ruta: ${route.title}. ${route.description}`,
+                          `${route.duration} · ${route.stops} paradas · ${route.vibe}`,
+                        ),
+                      });
                     }}
                     className="h-auto min-h-11 whitespace-normal rounded-pill px-3 py-2 leading-tight"
                   >
