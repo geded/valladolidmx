@@ -21,16 +21,16 @@
   ],
   "acknowledged_revisions": [
     { "operation": "modify", "path": "src/components/destination-premium/DestinationPremiumSurface.tsx", "sha256": "33aa9c1d4f21391658b8ef01d75b00e6a898237a384cc8aea870c03f114907a2", "authority": "Founder · navegación territorial móvil inequívoca con slugs CMS · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/alux/PublicAluxChat.tsx", "sha256": "2deeafdd50589b4105cbbb6c1c7c0738b7ee53b5b2e120b20ea26a05501ea931", "authority": "Founder · continuidad del expediente anónimo hacia Alux · 2026-09-10" },
+    { "operation": "modify", "path": "src/components/alux/PublicAluxChat.tsx", "sha256": "ea487f44fd7673f6c3ad9d5219a8e0f4186e0fe378b02fefad8f2b90ea957330", "authority": "Founder · continuidad completa del expediente anónimo hacia Alux · 2026-09-10" },
     { "operation": "modify", "path": "src/components/surfaces/AluxSurface.tsx", "sha256": "8070f3bb0366d4faada43e831040e373384ee104a2ebc0ce35e54c48d036f3dc", "authority": "Founder · siguiente mejor acción y entrega humana · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx", "sha256": "6910f8b85cd97ba977b97ac113d713bfdf9ebc93dc911ac984ab24787bf445e0", "authority": "Founder · conexión pública a categorías acreditadas por CMS · 2026-09-10" },
+    { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx", "sha256": "f875988bf7ef6d16553f5fdfea2c680edaeb6294006cb1b47468878242a17db7", "authority": "Founder · conexión pública mediante familias administradas por CMS · 2026-09-10" },
     { "operation": "modify", "path": "src/components/surfaces/TripPlannerSurface.tsx", "sha256": "d0ddb4aa6573f0b75e247ed6c75db682d7f6a4460b91adf6a842df8326e7297f", "authority": "Founder · expediente anónimo y siguiente acción de Alux · 2026-09-10" },
     { "operation": "modify", "path": "src/components/traveler/AddToTravelPlanButton.tsx", "sha256": "3e38acc19c452160a7470679b1df0aded662b2c0c8712ecc7b5703891a04eb5c", "authority": "Founder · confirmación inequívoca de Mi Viaje · 2026-09-10" },
     { "operation": "modify", "path": "src/lib/traveler/anonymous-draft/copy.ts", "sha256": "86f555b08e81387a3842d6abb964918b00cd26fdef6ea49a514e67403c1f6110", "authority": "Founder · respuesta contextual del Concierge Voice · 2026-09-10" },
-    { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts", "sha256": "4ba9b3496c9796554fe324c71549dbb1c894de6bfc17917df3fe6d79bc5fc7ea", "authority": "Founder · taxonomía pública CMS como autoridad de navegación · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts", "sha256": "62de53dcf166a8e73de384dbf55b0ab017688b24522277e75040eafcb0e018a3", "authority": "Founder · contexto mínimo seguro del expediente para Alux · 2026-09-10" },
+    { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts", "sha256": "567685747ba8121997efdba02447175efc89bd2c6e940489e18588eb210d60e8", "authority": "Founder · preservación de la lectura pública CMS existente · 2026-09-10" },
+    { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts", "sha256": "f9db4505b104005a54688f13040db130fe6bde63f45136740357d3414e853f25", "authority": "Founder · contexto mínimo de viaje tratado como datos no confiables · 2026-09-10" },
     { "operation": "modify", "path": "src/routes/arma-tu-viaje.tsx", "sha256": "389d9b48d10cd623d81ad2ab10775bc6223b6da64134ecf97016ed1166c7cfcd", "authority": "Founder · visibilidad del expediente vivo antes del registro · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx", "sha256": "f9303601cda2237c5bd1114f90742ac5ab615b1a280990913c843514e0753016", "authority": "Founder · hidratación de categorías publicadas del CMS · 2026-09-10" }
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx", "sha256": "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8", "authority": "Founder · hidratación de taxonomía de familias administrada por CMS · 2026-09-10" }
   ],
   "public_routes": [
     "/oriente-maya/{destino}",
