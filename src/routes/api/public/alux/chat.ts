@@ -34,6 +34,67 @@ const EVENTS_LIMIT = 5;
 type Msg = { role: "user" | "assistant"; content: string };
 type Visitor = { lat: number; lng: number };
 type PathContext = { destination?: string | null; category?: string | null };
+type TripContext = {
+  destinations: string[];
+  items: Array<{ kind: string; title: string | null; slug: string | null }>;
+  interests: string[];
+  durationDays: number | null;
+  travelerCount: { adults: number; children: number } | null;
+};
+
+function parseTripContext(input: unknown): TripContext | null {
+  if (!input || typeof input !== "object") return null;
+  const value = input as Record<string, unknown>;
+  const strings = (candidate: unknown, limit: number, maxLength: number) =>
+    Array.isArray(candidate)
+      ? candidate
+          .filter((item): item is string => typeof item === "string")
+          .slice(0, limit)
+          .map((item) => item.slice(0, maxLength))
+      : [];
+  const items = Array.isArray(value.items)
+    ? value.items.slice(0, 20).flatMap((candidate) => {
+        if (!candidate || typeof candidate !== "object") return [];
+        const item = candidate as Record<string, unknown>;
+        const kind = typeof item.kind === "string" ? item.kind.slice(0, 40) : "";
+        const title = typeof item.title === "string" ? item.title.slice(0, 180) : null;
+        const slug = typeof item.slug === "string" ? item.slug.slice(0, 180) : null;
+        return kind && (title || slug) ? [{ kind, title, slug }] : [];
+      })
+    : [];
+  const count = value.travelerCount as Record<string, unknown> | null;
+  const adults = typeof count?.adults === "number" ? Math.max(1, Math.min(20, count.adults)) : null;
+  const children =
+    typeof count?.children === "number" ? Math.max(0, Math.min(20, count.children)) : 0;
+  const duration =
+    typeof value.durationDays === "number" ? Math.max(1, Math.min(60, value.durationDays)) : null;
+  const result: TripContext = {
+    destinations: strings(value.destinations, 8, 128),
+    items,
+    interests: strings(value.interests, 16, 60),
+    durationDays: duration,
+    travelerCount: adults === null ? null : { adults, children },
+  };
+  return result.destinations.length || result.items.length || result.interests.length
+    ? result
+    : null;
+}
+
+function tripContextToPromptBlock(context: TripContext | null): string {
+  if (!context) return "";
+  const lines = [
+    context.destinations.length ? `Destinos elegidos: ${context.destinations.join(", ")}` : "",
+    context.items.length
+      ? `Elementos elegidos: ${context.items.map((item) => `${item.kind}: ${item.title ?? item.slug}`).join("; ")}`
+      : "",
+    context.interests.length ? `Intereses: ${context.interests.join(", ")}` : "",
+    context.durationDays ? `Duración: ${context.durationDays} días` : "",
+    context.travelerCount
+      ? `Viajeros: ${context.travelerCount.adults} adultos, ${context.travelerCount.children} niños`
+      : "",
+  ].filter(Boolean);
+  return `[EXPEDIENTE DEL VIAJERO]\n${lines.join("\n")}\nUsa este contexto para explicar qué falta y proponer el siguiente paso. No modifiques el viaje sin confirmación.`;
+}
 
 // ---------------------------------------------------------------------------
 // Ola A9 · Contexto temporal / ambiental (concierge, no chatbot).
@@ -402,6 +463,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           history?: Msg[];
           visitor?: Visitor;
           pathContext?: PathContext;
+          tripContext?: unknown;
           locale?: string;
         };
         try {
@@ -417,6 +479,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (message.length > MAX_MESSAGE_LEN) return json({ error: "message_too_long" }, 400);
         const visitor = parseVisitor(body.visitor);
         const pathContext = parsePathContext(body.pathContext);
+        const tripContext = parseTripContext(body.tripContext);
         const locale =
           typeof body.locale === "string" && ALLOWED_LOCALES.has(body.locale) ? body.locale : "es";
         const localeBlock = LOCALE_DIRECTIVES[locale];
@@ -601,6 +664,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           nearbyBlock,
           eventsBlock,
           weatherBlock,
+          tripContextToPromptBlock(tripContext),
           `---\n${guardrails}`,
         ]
           .filter(Boolean)
