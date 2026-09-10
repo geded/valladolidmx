@@ -91,10 +91,13 @@ async function hydrateTripContextItems(
 ): Promise<TripContext | null> {
   if (!context) return null;
   const unresolved = context.items.filter((item) => !item.title && !item.slug && item.targetId);
-  if (!unresolved.length) return context;
+  const businessIds = context.items
+    .filter((item) => item.kind === "business" && item.targetId)
+    .map((item) => item.targetId);
+  if (!unresolved.length && !businessIds.length) return context;
 
   const idsByKind = {
-    business: unresolved.filter((item) => item.kind === "business").map((item) => item.targetId),
+    business: businessIds,
     product: unresolved.filter((item) => item.kind === "product").map((item) => item.targetId),
     promotion: unresolved.filter((item) => item.kind === "promotion").map((item) => item.targetId),
   };
@@ -137,6 +140,10 @@ async function hydrateTripContextItems(
   }
 
   const items = context.items.flatMap((item) => {
+    if (item.kind === "business" && item.targetId) {
+      const resolved = metadata.get(`business:${item.targetId}`);
+      return resolved ? [{ ...item, ...resolved }] : [];
+    }
     if (item.title || item.slug) return [item];
     const resolved = metadata.get(`${item.kind}:${item.targetId}`);
     return resolved ? [{ ...item, ...resolved }] : [];
