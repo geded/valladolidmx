@@ -41,8 +41,14 @@ const BrandContext = createContext<BrandSettings | null>(null);
  * lo revalida en cliente. Nunca suspende ni bloquea el primer paint:
  * el fallback seguro está disponible de inmediato.
  */
-export function BrandProvider({ children }: { children: ReactNode }) {
-  const { data } = useQuery({ ...brandSettingsQueryOptions, initialData: BRAND_SETTINGS_DEFAULTS });
+export function BrandProvider({
+  children,
+  initialBrand = BRAND_SETTINGS_DEFAULTS,
+}: {
+  children: ReactNode;
+  initialBrand?: BrandSettings;
+}) {
+  const { data } = useQuery({ ...brandSettingsQueryOptions, initialData: initialBrand });
   const brand = normalizeBrandSettings(data);
 
   useEffect(() => {
