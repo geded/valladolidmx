@@ -332,6 +332,14 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     ]);
   });
 
+  test("la consulta Home incluye Valladolid aunque quede fuera del primer lote", () => {
+    const resolver = read("src/lib/experience-builder/smart-blocks.server.ts");
+
+    expect(resolver).toContain('filters: [{ column: "slug", op: "eq", value: "valladolid" }]');
+    expect(resolver).toContain("...destRes.items.filter((item) => item.slug !== \"valladolid\")");
+    expect(resolver).toContain("].slice(0, 8)");
+  });
+
   test("la Home conserva un medio temporal aprobado con metadatos del slot CMS", () => {
     const approved = HOME_PREMIUM_G4_CONTENT.hero.slides[0]!;
     const configuredUrl = encodeSlotMedia({
