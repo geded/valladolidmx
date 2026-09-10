@@ -62,7 +62,7 @@ const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 async function resolvePublishedRouteSelection(
   sb: SupabaseClient,
   entityRef: string | null | undefined,
-): Promise<{ title: string; summary: string } | null> {
+): Promise<{ title: string; summary: string; destinationSlugs: string[] } | null> {
   if (!entityRef?.startsWith("route:")) return null;
   const routeId = entityRef.slice("route:".length).trim();
   if (!routeId) return null;
@@ -70,7 +70,9 @@ async function resolvePublishedRouteSelection(
   const [routeRes, stopsRes] = await Promise.all([
     sb
       .from("editorial_routes")
-      .select("id, name, summary, duration_days, duration_hours, pace, difficulty")
+      .select(
+        "id, name, summary, duration_days, duration_hours, pace, difficulty, origin_destination_id, destination_ids",
+      )
       .eq("id", routeId)
       .eq("status", "published")
       .is("deleted_at", null)
@@ -103,7 +105,21 @@ async function resolvePublishedRouteSelection(
       .is("deleted_at", null);
     return (data ?? []) as unknown as Array<Record<string, unknown>>;
   };
-  const [destinations, places, businesses, products, events] = await Promise.all([
+  const territoryIds = Array.from(
+    new Set([
+      ...(route["origin_destination_id"] ? [String(route["origin_destination_id"])] : []),
+      ...((route["destination_ids"] ?? []) as string[]).map(String),
+    ]),
+  );
+  const [territories, destinations, places, businesses, products, events] = await Promise.all([
+    territoryIds.length
+      ? sb
+          .from("destinations")
+          .select("id, slug")
+          .in("id", territoryIds)
+          .eq("status", "published")
+          .is("deleted_at", null)
+      : Promise.resolve({ data: [] }),
     publishedLabels("destinations", "name", idsOf("destination")),
     publishedLabels("points_of_interest", "name", idsOf("place")),
     publishedLabels("businesses", "display_name", idsOf("business")),
@@ -146,18 +162,36 @@ async function resolvePublishedRouteSelection(
     .map((value) => sanitizeCmsText(value, 80))
     .filter(Boolean)
     .join(" · ");
-  const facts = [
-    `Duración: ${duration}.`,
-    attributes ? `Estilo: ${attributes}.` : "",
-    stops.length ? `Paradas en orden: ${stops.join(" → ")}.` : "Paradas: no publicadas.",
-    sanitizeCmsText(route["summary"], 400),
-  ]
+  const separator = " → ";
+  const sequencePrefix = "Paradas en orden: ";
+  const sequenceBudget = 820;
+  const stopBudget = stops.length
+    ? Math.max(
+        4,
+        Math.floor(
+          (sequenceBudget - sequencePrefix.length - separator.length * (stops.length - 1) - 1) /
+            stops.length,
+        ),
+      )
+    : 0;
+  const compactStops = stops.map((stop) => sanitizeCmsText(stop, stopBudget));
+  const sequence = compactStops.length
+    ? `${sequencePrefix}${compactStops.join(separator)}.`
+    : "Paradas: no publicadas.";
+  const metadata = [`Duración: ${duration}.`, attributes ? `Estilo: ${attributes}.` : "", sequence]
     .filter(Boolean)
     .join(" ");
+  const summaryLabel = " Descripción: ";
+  const summaryBudget = Math.max(0, 1000 - metadata.length - summaryLabel.length);
+  const routeSummary = summaryBudget > 0 ? sanitizeCmsText(route["summary"], summaryBudget) : "";
+  const territorySlugs = ((territories.data ?? []) as Array<{ id: string; slug: string }>)
+    .sort((a, b) => territoryIds.indexOf(a.id) - territoryIds.indexOf(b.id))
+    .map((territory) => territory.slug);
 
   return {
     title: sanitizeCmsText(route["name"], 120) || "Ruta seleccionada",
-    summary: sanitizeCmsText(facts, 1000),
+    summary: routeSummary ? `${metadata}${summaryLabel}${routeSummary}` : metadata,
+    destinationSlugs: territorySlugs,
   };
 }
 
@@ -517,6 +551,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
     phases["prep"] = Date.now() - tPrep;
 
     // ── 4. Destino efectivo + intención determinística ──────────────────
+    const selectedRoute = await resolvePublishedRouteSelection(
+      sb,
+      data.context?.selection?.entityRef,
+    );
     const knownSlugs = ((knownProbe.data ?? []) as Array<{ slug: string }>).map((r) => r.slug);
     const baseIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
     const mentioned = baseIntent.mentionedDestinationSlugs;
@@ -525,24 +563,27 @@ export const aluxConverse = createServerFn({ method: "POST" })
       mentioned[0] ??
       data.understood?.destinationSlug ??
       data.context?.selection?.destinationSlug ??
+      selectedRoute?.destinationSlugs[0] ??
       session?.last_destination_slug ??
       null;
     const understood = mergeUnderstood(data.understood, baseIntent, destinationSlug);
     const intent = intentFromUnderstood(baseIntent, understood);
-    const extraDestinationSlugs = mentioned.filter((s) => s !== destinationSlug);
+    const extraDestinationSlugs = Array.from(
+      new Set([
+        ...mentioned.filter((s) => s !== destinationSlug),
+        ...(selectedRoute?.destinationSlugs.filter((s) => s !== destinationSlug) ?? []),
+      ]),
+    );
 
     // ── 5. Recuperación CMS-first (ajustes de Alux se cargan en paralelo) ──
     const tRetrieval = Date.now();
     const settingsPromise = import("./settings.functions")
       .then((m) => m.resolveAluxSettingsServer(supabaseAdmin))
       .catch(() => null);
-    const [retrieved, selectedRoute] = await Promise.all([
-      retrieval.retrieveConverseCandidates(sb, {
-        destinationSlug,
-        extraDestinationSlugs,
-      }),
-      resolvePublishedRouteSelection(sb, data.context?.selection?.entityRef),
-    ]);
+    const retrieved = await retrieval.retrieveConverseCandidates(sb, {
+      destinationSlug,
+      extraDestinationSlugs,
+    });
     phases["retrieval"] = Date.now() - tRetrieval;
 
     // Distancias sólo con consentimiento explícito (coords presentes).
