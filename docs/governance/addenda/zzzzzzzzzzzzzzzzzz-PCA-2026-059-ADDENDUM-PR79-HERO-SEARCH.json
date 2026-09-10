@@ -1,0 +1,7 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR79-HERO-SEARCH", "status": "Approved", "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección visual Founder basada en IMG_0654 del preview Lovable.",
+  "supersedes_acknowledged_revision": { "operation": "modify", "path": "src/components/home/HeroSearchPill.tsx", "previous_sha256": "3f311965b66e8def55353f74b945b7935416c62bada8ccf6c636c8cacbadd7c9", "current_sha256": "d6d162e91414dd83795152285b27265a08115177118b56c5d78283a95b2003ba", "semantic_change": "Recompone el buscador móvil en una rejilla compacta que mantiene destino, categoría y búsqueda visibles sin recorte y con nombres accesibles.", "authority": "Founder · corrección visual PR #79 · 2026-09-10" },
+  "invariants": ["Navegación y fuente CMS preservadas", "Sin publicación ni despliegue"], "recorded_at": "2026-09-10"
+}

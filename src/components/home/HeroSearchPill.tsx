@@ -107,7 +107,7 @@ export function HeroSearchPill({
     >
       <div
         className={cn(
-          "flex w-full min-w-0 flex-row items-center gap-0 rounded-full bg-white p-1 shadow-[0_8px_28px_-10px_rgba(0,0,0,0.32)] ring-1 ring-black/5 backdrop-blur-sm",
+          "grid w-full min-w-0 grid-cols-[minmax(0,1fr)_2.75rem_2.75rem] items-center gap-1 rounded-full bg-white p-1 shadow-[0_8px_28px_-10px_rgba(0,0,0,0.32)] ring-1 ring-black/5 backdrop-blur-sm sm:flex sm:flex-row sm:gap-0",
           maxWidthClass,
         )}
       >
@@ -116,8 +116,9 @@ export function HeroSearchPill({
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label={`${destinoLabel}: ${destino?.name ?? destinoPlaceholder}`}
               className={cn(
-                "group relative flex min-h-12 min-w-0 flex-[1.12] items-center gap-2 rounded-full px-2.5 py-1 text-left transition-colors sm:flex-1 sm:px-3 sm:py-1.5",
+                "group relative flex min-h-12 min-w-0 items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:flex-[1.12] sm:px-3 sm:py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
@@ -157,21 +158,22 @@ export function HeroSearchPill({
         </Popover>
 
         {/* Divisor */}
-        <div aria-hidden className="my-auto h-7 w-px shrink-0 bg-border/70 sm:h-6" />
+        <div aria-hidden className="my-auto hidden h-6 w-px shrink-0 bg-border/70 sm:block" />
 
         {/* Segmento: Categoría */}
         <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label={`${categoriaLabel}: ${categoria?.name ?? categoriaPlaceholder}`}
               className={cn(
-                "group relative flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-full px-2.5 py-1 text-left transition-colors sm:px-3 sm:py-1.5",
+                "group relative flex size-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-border/70 p-0 text-left transition-colors sm:flex sm:min-h-12 sm:min-w-0 sm:flex-1 sm:justify-start sm:gap-2 sm:border-0 sm:px-3 sm:py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openCategoria && "bg-muted/70",
               )}
             >
               <Compass className="size-4 shrink-0 text-primary" aria-hidden />
-              <span className="flex min-w-0 flex-col leading-tight">
+              <span className="hidden min-w-0 flex-col leading-tight sm:flex">
                 <span className="text-[9px] font-semibold uppercase tracking-[0.13em] text-muted-foreground sm:text-[10px] sm:tracking-[0.14em]">
                   {categoriaLabel}
                 </span>

@@ -1,0 +1,7 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR79-MI-VIAJE", "status": "Approved", "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección visual Founder basada en IMG_0654 del preview Lovable.",
+  "supersedes_acknowledged_revision": { "operation": "modify", "path": "src/components/travel-plan/MiViajeChip.tsx", "previous_sha256": "78d39aa25201e258551d7119d1c13bccfe8877bf4dde2392bae9895cc289c563", "current_sha256": "2e3d7fd8047e6c8cb37053608e1215f4f6999fa5fc2eef45d8af610eae5931b7", "semantic_change": "Uniforma la altura táctil de Mi Viaje con los controles globales sin cambiar sesión, conteo ni ruta.", "authority": "Founder · corrección visual PR #79 · 2026-09-10" },
+  "invariants": ["Identificador, conteo y ruta preservados", "Sin publicación ni despliegue"], "recorded_at": "2026-09-10"
+}

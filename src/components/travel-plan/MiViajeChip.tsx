@@ -75,7 +75,7 @@ export function MiViajeChip({ isOverlay = false }: Props) {
           : `Mi Viaje · ${count} elemento${count === 1 ? "" : "s"}`
       }
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium tracking-tight transition-all active:scale-[0.98]",
+        "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-medium tracking-tight transition-all active:scale-[0.98]",
         isConfirmed
           ? isOverlay
             ? "border-emerald-300/60 bg-emerald-500/15 text-white hover:bg-emerald-500/25"

@@ -1,0 +1,7 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR79-LANGUAGE", "status": "Approved", "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección visual Founder basada en IMG_0654 del preview Lovable.",
+  "supersedes_acknowledged_revision": { "operation": "modify", "path": "src/components/layout/LanguageSwitcher.tsx", "previous_sha256": "26b92deae8a40e4ef8d696f94ed6c3a75a630a4d819ce6b3ced86efe121ae157", "current_sha256": "086cb322100049333bad5d8d93823b3627f5cdf0271ad5ceed91d5ddf0576c0a", "semantic_change": "Convierte el disparador de idioma en un control circular de globo sin eliminar idiomas ni su menú.", "authority": "Founder · corrección visual PR #79 · 2026-09-10" },
+  "invariants": ["Seis idiomas y traducción preservados", "Sin publicación ni despliegue"], "recorded_at": "2026-09-10"
+}
