@@ -52,6 +52,8 @@ export interface ConverseRetrievalInput {
   readonly extraDestinationSlugs?: readonly string[];
   /** Límite ampliable para rutas publicadas que abarcan varios territorios canónicos. */
   readonly maxExtraDestinationSlugs?: number;
+  /** Una ruta seleccionada exige resolver todas sus paradas con la elegibilidad canónica. */
+  readonly selectedRoute?: boolean;
   readonly nowIso?: string;
 }
 
@@ -750,12 +752,18 @@ export async function retrieveConverseCandidates(
     // Otros destinos publicados como opción de región (planear salidas).
     const others = knownDestinations.filter((d) => d.id !== destination.id).slice(0, 8);
 
+    const routeLimits = input.selectedRoute
+      ? { businesses: 60, perFamily: 60 }
+      : { businesses: 60, perFamily: 10 };
+    const nearbyLimits = input.selectedRoute
+      ? { businesses: 60, perFamily: 60 }
+      : { businesses: 12, perFamily: 4 };
     const [own, routes, destCandidates, ...extraBundles] = await Promise.all([
-      loadDestinationBundle(sb, destination, "destination", { businesses: 60, perFamily: 10 }),
+      loadDestinationBundle(sb, destination, "destination", routeLimits),
       loadRoutes(sb, knownDestinations, destination, "destination", 6),
       loadDestinationCandidates(sb, others),
       ...extras.map(async (extra) => [
-        ...(await loadDestinationBundle(sb, extra, "nearby", { businesses: 12, perFamily: 4 })),
+        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits)),
         ...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)),
       ]),
     ]);

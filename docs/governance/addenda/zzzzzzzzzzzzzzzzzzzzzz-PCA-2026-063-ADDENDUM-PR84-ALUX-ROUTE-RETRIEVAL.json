@@ -8,7 +8,7 @@
     "operation": "create",
     "path": "src/lib/alux/converse-retrieval.server.ts",
     "previous_sha256": "246fca9784400af5d8e1a16bf8a4e40a69ea2f40010384302745685e8e0636c0",
-    "current_sha256": "246fca9784400af5d8e1a16bf8a4e40a69ea2f40010384302745685e8e0636c0",
+    "current_sha256": "e0daf9c67b49d5cf8ce5072e27962e5979d284fe682dbca4400fc07fe4eba20a",
     "semantic_change": "Permite ampliar el límite de destinos cercanos sólo cuando una ruta publicada acredita más territorios canónicos.",
     "authority": "Founder · alcance territorial completo de ruta para Alux · 2026-09-10"
   },

@@ -67,7 +67,7 @@ async function resolvePublishedRouteSelection(
   title: string;
   summary: string;
   destinationSlugs: string[];
-  stopCandidates: AluxConverseCandidate[];
+  stopRefs: Array<{ entityType: AluxConverseCandidate["entityType"]; entityId: string }>;
 } | null> {
   if (!entityRef?.startsWith("route:")) return null;
   const routeId = entityRef.slice("route:".length).trim();
@@ -199,47 +199,20 @@ async function resolvePublishedRouteSelection(
       return kind as AluxConverseCandidate["entityType"];
     return null;
   };
-  const familyOf = (kind: string): AluxConverseCandidate["family"] => {
-    if (kind === "destination") return "destino";
-    if (kind === "place") return "lugar";
-    if (kind === "event") return "evento";
-    if (kind === "experience" || kind === "product") return "experiencia";
-    return "otra";
-  };
-  const stopCandidates = stopRows.flatMap((stop): AluxConverseCandidate[] => {
-    const kind = String(stop["entity_kind"] ?? "");
-    const entityType = typeOf(kind);
-    const entityId = String(stop["entity_id"] ?? "");
-    const title = canonicalLabels.get(`${kind}:${entityId}`);
-    if (!entityType || !entityId || !title) return [];
-    return [
-      {
-        entityType,
-        entityId,
-        family: familyOf(kind),
-        title,
-        href: `/rutas/${String(route["slug"] ?? "")}`,
-        destinationSlug: territorySlugs[0] ?? null,
-        destinationLabel: null,
-        scope: "destination",
-        summary: "Parada publicada de la ruta seleccionada.",
-        facts: [{ id: "F", text: "Parada confirmada en la ruta seleccionada" }],
-        unavailable: [],
-        tags: ["ruta", "parada"],
-        planKind: entityType,
-        imageUrl: null,
-        subtitle: "Parada de la ruta",
-        coords: null,
-        openState: null,
-      },
-    ];
-  });
+  const stopRefs = stopRows.flatMap(
+    (stop): Array<{ entityType: AluxConverseCandidate["entityType"]; entityId: string }> => {
+      const kind = String(stop["entity_kind"] ?? "");
+      const entityType = typeOf(kind);
+      const entityId = String(stop["entity_id"] ?? "");
+      return entityType && entityId ? [{ entityType, entityId }] : [];
+    },
+  );
 
   return {
     title: sanitizeCmsText(route["name"], 120) || "Ruta seleccionada",
     summary: routeSummary ? `${metadata}${summaryLabel}${routeSummary}` : metadata,
     destinationSlugs: territorySlugs,
-    stopCandidates,
+    stopRefs,
   };
 }
 
@@ -634,6 +607,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
       maxExtraDestinationSlugs: selectedRoute
         ? Math.max(0, selectedRoute.destinationSlugs.length - 1)
         : undefined,
+      selectedRoute: Boolean(selectedRoute),
     });
     phases["retrieval"] = Date.now() - tRetrieval;
 
@@ -657,10 +631,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
         candidate,
       ]),
     );
-    const selectedStopCandidates = (selectedRoute?.stopCandidates ?? []).map(
-      (candidate) =>
-        retrievedByKey.get(candidateKey(candidate.entityType, candidate.entityId)) ?? candidate,
-    );
+    const selectedStopCandidates = (selectedRoute?.stopRefs ?? []).flatMap((ref) => {
+      const candidate = retrievedByKey.get(candidateKey(ref.entityType, ref.entityId));
+      return candidate ? [candidate] : [];
+    });
     const stopKeys = new Set(
       selectedStopCandidates.map((candidate) =>
         candidateKey(candidate.entityType, candidate.entityId),
@@ -756,10 +730,17 @@ export const aluxConverse = createServerFn({ method: "POST" })
 
     // ── 7. Ranking determinístico → tope de candidatos para el modelo ───
     const keepSaved = intent.asksRemove || intent.asksReplan;
-    const ranked = rankConverseCandidates(candidates, ctx, { keepSaved });
+    const selectedForModel = selectedStopCandidates.slice(
+      0,
+      ALUX_CONVERSE_LIMITS.maxCandidatesForModel,
+    );
+    const ranked = rankConverseCandidates(candidates, ctx, {
+      keepSaved,
+      limit: ALUX_CONVERSE_LIMITS.maxCandidatesForModel - selectedForModel.length,
+    });
     const rankedCandidates = ranked.map((r) => r.candidate);
     const modelCandidates = [
-      ...selectedStopCandidates,
+      ...selectedForModel,
       ...rankedCandidates.filter(
         (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
       ),
