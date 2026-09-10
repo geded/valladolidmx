@@ -14,6 +14,10 @@
     {
       "operation": "modify",
       "path": "src/components/home/HeroSearchPill.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx"
     }
   ],
   "acknowledged_revisions": [
@@ -28,9 +32,23 @@
       "path": "src/components/home/HeroSearchPill.tsx",
       "sha256": "3f311965b66e8def55353f74b945b7935416c62bada8ccf6c636c8cacbadd7c9",
       "authority": "Founder · buscador compacto y profesional para móvil, iPad y escritorio · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "sha256": "1e00c034b02397f4a97a6a2a06a05bb683b37b8b0f22ea4a6c732fe0b3a367a3",
+      "authority": "Founder · filtros compactos y profesionales para listados responsive · 2026-09-10"
     }
   ],
-  "public_routes": ["/"],
+  "public_routes": [
+    "/",
+    "/hoteles",
+    "/restaurantes",
+    "/casas-de-vacaciones",
+    "/destinos/:destino/hoteles",
+    "/destinos/:destino/restaurantes",
+    "/destinos/:destino/casas-de-vacaciones"
+  ],
   "required_feature_flags": [],
   "required_tests": [
     "bun run lint",
