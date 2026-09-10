@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-082-ADDENDUM-PR78-LISTING-FILTERS",
+  "status": "Approved",
+  "parent": "PCA-2026-082",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para modernizar la experiencia responsive pública usando Airbnb como referente de claridad y ligereza, preservando la identidad Oriente Maya y la autoridad Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+    "previous_sha256": "fab9d508cd69843953ec6c89d242705271a5e318968a7861be56e76f24fe542f",
+    "current_sha256": "1e00c034b02397f4a97a6a2a06a05bb683b37b8b0f22ea4a6c732fe0b3a367a3",
+    "semantic_change": "Compacta la barra de filtros en móvil y unifica sus controles redondeados sin cambiar filtros, resultados, mapa, favoritos ni datos.",
+    "authority": "Founder · modernización responsive PR #78 · 2026-09-10"
+  },
+  "invariants": [
+    "Misma autoridad Premium para público, CMS y preview",
+    "Identificadores y metadatos de favoritos preservados",
+    "Sin publicación, despliegue ni fusión"
+  ],
+  "recorded_at": "2026-09-10"
+}

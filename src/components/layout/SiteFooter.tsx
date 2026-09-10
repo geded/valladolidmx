@@ -61,9 +61,9 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
   return (
     <footer
       data-omxds-chrome="public-footer"
-      className="@container mt-14 border-t border-border bg-secondary/40 lg:mt-24"
+      className="@container mt-16 border-t border-border/70 bg-secondary/30 lg:mt-24"
     >
-      <Container className="grid grid-cols-2 gap-x-5 gap-y-7 py-8 @3xl:grid-cols-4 @3xl:gap-10 @3xl:py-12">
+      <Container className="grid grid-cols-2 gap-x-6 gap-y-8 py-10 @3xl:grid-cols-4 @3xl:gap-12 @3xl:py-14">
         <div className="col-span-2 @3xl:col-span-1">
           <BrandLogo tone="dark" size="md" />
           <p className="mt-2 line-clamp-2 max-w-xs text-xs leading-5 text-muted-foreground @3xl:mt-3 @3xl:text-sm">
@@ -73,7 +73,7 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
 
         <div>
           <h3 className="text-sm font-semibold text-foreground">{t("footer.explore")}</h3>
-          <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground @3xl:mt-3 @3xl:space-y-2 @3xl:text-sm">
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {exploreLinks.map((link) => (
               <li key={`${link.href}-${link.label}`}>
                 <a href={link.href} className="hover:text-foreground">
@@ -86,7 +86,7 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
 
         <div>
           <h3 className="text-sm font-semibold text-foreground">{t("footer.platform")}</h3>
-          <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground @3xl:mt-3 @3xl:space-y-2 @3xl:text-sm">
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {platformLinks.map((link) => (
               <li key={`${link.href}-${link.label}`}>
                 <a href={link.href} className="hover:text-foreground">
@@ -107,7 +107,7 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
         ) : null}
       </Container>
       <div className="border-t border-border/60">
-        <Container className="flex flex-col items-start justify-between gap-2 py-4 text-[11px] text-muted-foreground @3xl:flex-row @3xl:items-center @3xl:gap-3 @3xl:py-5 @3xl:text-xs">
+        <Container className="flex flex-col items-start justify-between gap-3 py-5 text-xs text-muted-foreground @3xl:flex-row @3xl:items-center">
           <p>
             © {new Date().getFullYear()} {brand.name}. {t("footer.rights")}
           </p>

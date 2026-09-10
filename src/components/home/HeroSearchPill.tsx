@@ -107,8 +107,7 @@ export function HeroSearchPill({
     >
       <div
         className={cn(
-          "flex w-full min-w-0 flex-col items-stretch rounded-3xl bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5 backdrop-blur-sm",
-          "p-1 gap-1 sm:flex-row sm:rounded-full",
+          "flex w-full min-w-0 flex-row items-center gap-0 rounded-full bg-white p-1 shadow-[0_8px_28px_-10px_rgba(0,0,0,0.32)] ring-1 ring-black/5 backdrop-blur-sm",
           maxWidthClass,
         )}
       >
@@ -118,19 +117,19 @@ export function HeroSearchPill({
             <button
               type="button"
               className={cn(
-                "group relative flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
+                "group relative flex min-h-12 min-w-0 flex-[1.12] items-center gap-2 rounded-full px-2.5 py-1 text-left transition-colors sm:flex-1 sm:px-3 sm:py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
             >
               <MapPin className="size-4 shrink-0 text-primary" aria-hidden />
               <span className="flex min-w-0 flex-col leading-tight">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.13em] text-muted-foreground sm:text-[10px] sm:tracking-[0.14em]">
                   {destinoLabel}
                 </span>
                 <span
                   className={cn(
-                    "truncate text-[13px]",
+                    "truncate text-xs sm:text-[13px]",
                     destino ? "font-medium text-foreground" : "text-muted-foreground/80",
                   )}
                 >
@@ -138,7 +137,7 @@ export function HeroSearchPill({
                 </span>
               </span>
               <ChevronDown
-                className="ml-auto size-3.5 shrink-0 text-muted-foreground/70"
+                className="ml-auto hidden size-3.5 shrink-0 text-muted-foreground/70 sm:block"
                 aria-hidden
               />
             </button>
@@ -158,7 +157,7 @@ export function HeroSearchPill({
         </Popover>
 
         {/* Divisor */}
-        <div aria-hidden className="mx-3 h-px bg-border/70 sm:my-auto sm:mx-0 sm:h-6 sm:w-px" />
+        <div aria-hidden className="my-auto h-7 w-px shrink-0 bg-border/70 sm:h-6" />
 
         {/* Segmento: Categoría */}
         <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
@@ -166,19 +165,19 @@ export function HeroSearchPill({
             <button
               type="button"
               className={cn(
-                "group relative flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
+                "group relative flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-full px-2.5 py-1 text-left transition-colors sm:px-3 sm:py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openCategoria && "bg-muted/70",
               )}
             >
               <Compass className="size-4 shrink-0 text-primary" aria-hidden />
               <span className="flex min-w-0 flex-col leading-tight">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.13em] text-muted-foreground sm:text-[10px] sm:tracking-[0.14em]">
                   {categoriaLabel}
                 </span>
                 <span
                   className={cn(
-                    "truncate text-[13px]",
+                    "truncate text-xs sm:text-[13px]",
                     categoria ? "font-medium text-foreground" : "text-muted-foreground/80",
                   )}
                 >
@@ -186,7 +185,7 @@ export function HeroSearchPill({
                 </span>
               </span>
               <ChevronDown
-                className="ml-auto size-3.5 shrink-0 text-muted-foreground/70"
+                className="ml-auto hidden size-3.5 shrink-0 text-muted-foreground/70 sm:block"
                 aria-hidden
               />
             </button>
@@ -209,13 +208,13 @@ export function HeroSearchPill({
           type="submit"
           aria-label={submitLabel}
           className={cn(
-            "inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-primary-foreground shadow-md",
+            "inline-flex size-11 min-h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-primary p-0 text-primary-foreground shadow-md",
             "sm:ml-1 sm:w-auto sm:px-3 sm:py-0",
             "transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
           )}
         >
           <Search className="size-4" aria-hidden />
-          <span className="text-sm font-semibold">{submitLabel}</span>
+          <span className="sr-only text-sm font-semibold sm:not-sr-only">{submitLabel}</span>
         </button>
       </div>
     </form>

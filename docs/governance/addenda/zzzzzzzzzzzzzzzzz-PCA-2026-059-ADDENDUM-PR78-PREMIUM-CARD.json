@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR78-PREMIUM-CARD",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para modernizar todas las superficies públicas existentes con una experiencia profesional tipo Airbnb, preservando la identidad Oriente Maya y sus funciones.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/premium/PremiumCard.tsx",
+    "previous_sha256": "b1b7b462ecb77444a4d53b59436523ad2e69f871db1bf9bd491a26bcc1fb742a",
+    "current_sha256": "c36a77124056224a986371629350d2f5c2aab961b1de01be8c268884895d0caa",
+    "semantic_change": "Aligera bordes, sombra, espaciado y tipografía de la tarjeta Premium compartida sin cambiar contenido, enlaces ni medios.",
+    "authority": "Founder · modernización responsive PR #78 · 2026-09-10"
+  },
+  "invariants": ["Contenido y enlaces CMS preservados", "Identidad Oriente Maya preservada", "Sin publicación, despliegue ni fusión"],
+  "recorded_at": "2026-09-10"
+}

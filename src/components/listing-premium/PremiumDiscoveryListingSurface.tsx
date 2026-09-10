@@ -504,9 +504,9 @@ interface FilterBarProps {
 
 function FilterBar(props: FilterBarProps) {
   return (
-    <section className="mt-4 rounded-2xl border border-border bg-card p-3 shadow-sm">
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[1.35fr_repeat(3,1fr)_auto]">
-        <label className="relative">
+    <section className="mt-4 rounded-[1.5rem] border border-border bg-card p-2.5 shadow-sm sm:p-3">
+      <div className="grid grid-cols-2 gap-2 xl:grid-cols-[1.35fr_repeat(3,1fr)_auto]">
+        <label className="relative col-span-2 xl:col-span-1">
           <Search
             className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden
@@ -516,7 +516,7 @@ function FilterBar(props: FilterBarProps) {
             value={props.query}
             onChange={(event) => props.setQuery(event.target.value)}
             placeholder={`Buscar ${props.profile.itemNoun}, zona o servicio`}
-            className="min-h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 text-sm outline-none focus:border-selva"
+            className="min-h-11 w-full rounded-full border border-border bg-background pl-10 pr-4 text-sm outline-none transition-colors focus:border-selva"
           />
         </label>
         <SelectFilter
@@ -541,7 +541,7 @@ function FilterBar(props: FilterBarProps) {
           type="button"
           aria-expanded={props.showMapMobile}
           onClick={() => props.setShowMapMobile(!props.showMapMobile)}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border px-4 text-sm font-medium xl:hidden"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-medium transition-colors hover:border-selva/50 xl:hidden"
         >
           <MapIcon className="size-4" aria-hidden />{" "}
           {props.showMapMobile ? "Ocultar mapa" : "Ver mapa"}
@@ -568,7 +568,7 @@ function SelectFilter({
       <select
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        className="min-h-11 w-full appearance-none rounded-lg border border-border bg-background px-3 pr-9 text-sm outline-none focus:border-selva"
+        className="min-h-11 w-full appearance-none rounded-full border border-border bg-background px-3 pr-9 text-sm outline-none transition-colors focus:border-selva"
       >
         <option value={ALL}>{label}: todos</option>
         {options.map((option) => (
