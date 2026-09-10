@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR78-HOME-SEARCH",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para modernizar la experiencia responsive pública usando Airbnb como referente de claridad y ligereza, preservando la identidad Oriente Maya y la autoridad Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home/HeroSearchPill.tsx",
+    "previous_sha256": "cbf1babf9062275692d060b7bc6e85ba0d96efd9c9df55afdca9b51c8484df9d",
+    "current_sha256": "3f311965b66e8def55353f74b945b7935416c62bada8ccf6c636c8cacbadd7c9",
+    "semantic_change": "Compacta el buscador del Home en móvil como una sola píldora horizontal, preservando destino, categoría y rutas canónicas.",
+    "authority": "Founder · modernización responsive PR #78 · 2026-09-10"
+  },
+  "invariants": [
+    "Misma autoridad Premium para público, CMS y preview",
+    "Identidad Oriente Maya y navegación canónica preservadas",
+    "Sin publicación, despliegue ni fusión"
+  ],
+  "recorded_at": "2026-09-10"
+}

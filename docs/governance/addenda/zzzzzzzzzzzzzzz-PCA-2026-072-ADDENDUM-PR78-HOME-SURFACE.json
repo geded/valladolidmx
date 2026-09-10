@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-072-ADDENDUM-PR78-HOME-SURFACE",
+  "status": "Approved",
+  "parent": "PCA-2026-072",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para modernizar la experiencia responsive pública usando Airbnb como referente de claridad y ligereza, preservando la identidad Oriente Maya y la autoridad Premium.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "5cdfd30bcf5b8ef07c07925dbfc1dfe79d17bf910f2f57f1cb53f622792f9ef6",
+    "current_sha256": "cfd6a710dd88ecd10808a8edde39745a7c35a671ee1385194edfceeecbf22356",
+    "semantic_change": "Actualiza la pregunta del buscador Home a ¿Dónde empezamos? sin alterar su navegación, contenido ni autoridad visual.",
+    "authority": "Founder · modernización responsive PR #78 · 2026-09-10"
+  },
+  "invariants": [
+    "Misma autoridad Premium para público, CMS y preview",
+    "Identidad Oriente Maya y navegación canónica preservadas",
+    "Sin publicación, despliegue ni fusión"
+  ],
+  "recorded_at": "2026-09-10"
+}
