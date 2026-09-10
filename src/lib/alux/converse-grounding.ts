@@ -309,10 +309,14 @@ export function groundModelOutput(
   let sequence: AluxConverseSequenceStep[] | null = null;
   if (output.sequence && output.sequence.length > 0) {
     const steps: AluxConverseSequenceStep[] = [];
-    const usedDays = new Set<number>();
+    const usedDays = new Set<number | null>();
     const ordered = output.sequence
-      .map((s, i) => ({ day: s.day ?? i + 1, ids: s.ids }))
-      .sort((a, b) => a.day - b.day);
+      .map((s, index) => ({ day: s.day, ids: s.ids, index }))
+      .sort(
+        (a, b) =>
+          (a.day === null ? Number.POSITIVE_INFINITY : a.day) -
+            (b.day === null ? Number.POSITIVE_INFINITY : b.day) || a.index - b.index,
+      );
     for (const s of ordered) {
       if (usedDays.has(s.day)) continue;
       const refs = s.ids

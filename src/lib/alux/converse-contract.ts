@@ -254,7 +254,7 @@ export interface AluxConverseSequenceGroundingRef {
 }
 
 export interface AluxConverseSequenceStep {
-  readonly day: number;
+  readonly day: number | null;
   readonly refs: readonly AluxConverseSequenceGroundingRef[];
 }
 
@@ -338,6 +338,13 @@ const numOrNull = (min: number, max: number, int = false) =>
     )
     .catch(null);
 
+const positiveIntOrNull = z
+  .preprocess(
+    (v) => (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : v),
+    z.number().int().positive().nullable(),
+  )
+  .catch(null);
+
 const ModelStageSchema = z
   .preprocess(
     (v) => {
@@ -394,7 +401,7 @@ export const AluxModelOutputSchema = z.object({
       z
         .array(
           z.object({
-            day: numOrNull(1, ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding, true),
+            day: positiveIntOrNull,
             ids: clampArr(clampStr(64), ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding),
           }),
         )

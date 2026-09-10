@@ -60,19 +60,19 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-contract.ts",
-      "sha256": "131d4767b1cd8c13473b6a3cc4b810c820b871f961c82b7c2d54a9c8d5ed2777",
+      "sha256": "d37294fd3f16acea659dd0cb7c635f2f218dcba3ba733b6a13c3e59d8d076f59",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/components/alux/AluxConverseChat.tsx",
-      "sha256": "fa062207ebd8ba9247983f7bcd6bc32933266407c2d28103ab7ec65c97ec5795",
+      "sha256": "929f02b2dc54ba9c8a0410edef86b125d56c37c851238db14cf1cf22c3814720",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "77fd37671647cd504807c73eea004cd1d1502a2b8fe9f7dc8d138831ca7ddbd2",
+      "sha256": "4ac63b54812d68a78206d9a06cfd81c8a5e1968fc591f285f2045e1a42380743",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
@@ -84,7 +84,7 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-grounding.ts",
-      "sha256": "88c6e894b6ef5b34c2b688bc368eed7aed07734010e6834484d2b98c505804ea",
+      "sha256": "af9ea6fdc7fbaf89e379be4cf4ac8cfc9717a676f78a32fe1ef582a6190f2f5a",
       "authority": "Founder · grounding completo de paradas de ruta para Alux · 2026-09-10"
     },
     {
