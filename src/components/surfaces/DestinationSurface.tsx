@@ -64,6 +64,8 @@ import {
 } from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import type { EditorialRouteCardDTO } from "@/lib/routes-editorial/route-public-contract";
+import { isListingFamilyId, type ListingFamilyId } from "@/lib/listings/listing-public-contract";
+import type { ListingFamilyTaxonomyResult } from "@/lib/listings/listing-family-taxonomy.functions";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -131,8 +133,8 @@ export interface DestinationSurfaceProps {
   nearbyDestinations?: DestinationPremiumNearbySource[];
   /** Rutas editoriales publicadas para el destino y continuidad regional. */
   routes?: readonly EditorialRouteCardDTO[];
-  /** Slugs publicados del CMS autorizados para navegación territorial. */
-  publicCategorySlugs?: readonly string[];
+  /** Taxonomía CMS-first para resolver la categoría pública de cada familia. */
+  listingFamilyTaxonomy?: ListingFamilyTaxonomyResult;
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
   /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
@@ -244,7 +246,7 @@ export function DestinationSurfaceContractBoundary({
   presentation = "editorial",
   nearbyDestinations,
   routes,
-  publicCategorySlugs = [],
+  listingFamilyTaxonomy = { available: false, taxonomy: {} },
 }: DestinationSurfaceContractBoundaryProps) {
   // Lote 3B — La ficha de destino se sirve exclusivamente desde CMS.
   const premiumDestination = dbData ?? null;
@@ -262,18 +264,13 @@ export function DestinationSurfaceContractBoundary({
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
       nearbyDestinations,
     });
-    const published = new Set(publicCategorySlugs);
-    const aliases: Record<string, readonly string[]> = {
-      hoteles: ["hoteles", "hospedaje"],
-      restaurantes: ["restaurantes", "gastronomia"],
-      experiencias: ["experiencias", "experiencias-tours", "tours"],
-      eventos: ["eventos", "eventos-home"],
-      "casas-de-vacaciones": ["casas-de-vacaciones", "casas-vacacionales"],
-      "que-hacer": ["que-hacer"],
-    };
     const serviceHrefByKey = Object.fromEntries(
       content.services.flatMap((service) => {
-        const slug = aliases[service.key]?.find((candidate) => published.has(candidate));
+        const family: ListingFamilyId | null = isListingFamilyId(service.key) ? service.key : null;
+        const slug =
+          listingFamilyTaxonomy.available && family
+            ? listingFamilyTaxonomy.taxonomy[family]?.[0]
+            : undefined;
         return slug
           ? [
               [
