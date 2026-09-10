@@ -27,6 +27,7 @@
     { "operation": "modify", "path": "src/lib/traveler/anonymous-draft/copy.ts" },
     { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts" },
     { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts" },
+    { "operation": "modify", "path": "src/routes/alux.tsx" },
     { "operation": "modify", "path": "src/routes/arma-tu-viaje.tsx" },
     { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx" },
     { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" }
@@ -97,6 +98,12 @@
       "path": "src/routes/api/public/alux/chat.ts",
       "sha256": "64f74a1e18540c94ef8fca4191e835954b21511e195468654f9d32e7250ae1fb",
       "authority": "Founder · rate limit previo a la resolución server-side de favoritos · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/alux.tsx",
+      "sha256": "79775f8cc7468d1ea33f10d65becbf6db1513979c9a1b7f27db84f63258441af",
+      "authority": "Founder · viajeros autenticados usan Alux conectado con su plan activo · 2026-09-10"
     },
     {
       "operation": "modify",
