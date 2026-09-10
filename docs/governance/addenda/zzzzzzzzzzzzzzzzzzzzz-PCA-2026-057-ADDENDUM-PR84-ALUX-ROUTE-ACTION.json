@@ -8,7 +8,7 @@
     "operation": "create",
     "path": "src/components/home-premium/HomePremiumSurface.tsx",
     "previous_sha256": "c6dbee7dd60367387011cb28c5d77c7634a6e9237e2fc304ff32f077c7e735aa",
-    "current_sha256": "5c9462caa2c8b92e3633d45319af44041acda29069e24048cbc5f9682eef4dc7",
+    "current_sha256": "5b3227aa4475c67dad172c33935f9bdcc781e896ef75b9a9c8f47e3a6f427b75",
     "semantic_change": "Conecta el CTA existente de personalización con el Alux flotante y le entrega el contexto de la ruta seleccionada.",
     "authority": "Founder · activación funcional de Alux desde rutas · 2026-09-10"
   },

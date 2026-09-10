@@ -33,6 +33,7 @@ import {
   AluxModelOutputSchema,
   detectInjectionAttempt,
   parseTravelIntent,
+  sanitizeCmsText,
   sanitizeUserText,
   type AluxConverseAiStatus,
   type AluxConverseCandidate,
@@ -574,10 +575,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
       destinationSlug: ctx.destinationSlug,
       knownDestinations: retrieved.knownDestinations,
       selectionTitle: data.context?.selection?.title
-        ? sanitizeUserText(data.context.selection.title, 120)
+        ? sanitizeCmsText(data.context.selection.title, 120)
         : null,
       selectionSummary: data.context?.selection?.summary
-        ? sanitizeUserText(data.context.selection.summary, 1000)
+        ? sanitizeCmsText(data.context.selection.summary, 1000)
         : null,
       stage: data.context?.stage ?? null,
       tripItems,
