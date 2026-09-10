@@ -4,6 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { HomePremiumRenderer } from "@/lib/experience-builder/home-premium-renderer";
+import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { PublicShell } from "@/components/discovery";
 // H2·P3 — `ContinuityWelcomeSurface` sólo se muestra a viajeros con
 // estado de continuidad (visita previa detectada). Para el primer
@@ -102,7 +103,7 @@ export const Route = createFileRoute("/")({
  * mismo bloque compuesto Premium G4 usado por Studio y publicación.
  */
 function HomePage() {
-  const { authorityTree } = Route.useLoaderData();
+  const { authorityTree } = Route.useLoaderData() as { authorityTree: CompositionTree };
   const editWrap = useSectionEditWrap({ pageSlug: "home" });
 
   return (
