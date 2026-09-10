@@ -68,13 +68,13 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "d741137c06cdbaa87d1f335707c7075839950f03a574e12c3810df1ffd19f78c",
+      "sha256": "3169b2a038e0300abc7c661e45da79d54776fddb7d93148ddde1eaef524557f0",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-retrieval.server.ts",
-      "sha256": "6237b805bf82d34859e01cb77e61aae5daf34004ff8514479bf505b88fffa7c1",
+      "sha256": "2f7cc59edb646327f317abebecf4a3f4c6941aeafa018edbc08f0a152644ae83",
       "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
     },
     {
@@ -86,7 +86,7 @@
     {
       "operation": "modify",
       "path": "src/routes/lovable/g4-home-premium-preview.tsx",
-      "sha256": "f01557904a323967340f6945fe71cd5e38426faf4d3c6113501b8ca049d6ce64",
+      "sha256": "18b118742d401078aae609fcfbabfff379f41415a254a7f7b6114eb63f1b681c",
       "authority": "Founder · preview compartida con rutas CMS canónicas · 2026-09-10"
     }
   ],

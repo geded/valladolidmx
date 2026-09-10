@@ -741,17 +741,15 @@ export const aluxConverse = createServerFn({ method: "POST" })
       0,
       ALUX_CONVERSE_LIMITS.maxCandidatesForModel,
     );
-    const ranked = rankConverseCandidates(candidates, ctx, {
+    const alternativeCandidates = candidates.filter(
+      (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
+    );
+    const ranked = rankConverseCandidates(alternativeCandidates, ctx, {
       keepSaved,
       limit: ALUX_CONVERSE_LIMITS.maxCandidatesForModel - selectedForModel.length,
     });
     const rankedCandidates = ranked.map((r) => r.candidate);
-    const modelCandidates = [
-      ...selectedForModel,
-      ...rankedCandidates.filter(
-        (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
-      ),
-    ];
+    const modelCandidates = [...selectedForModel, ...rankedCandidates];
 
     // ── 8. Modelo IA (proveedor y ajustes ya configurados) ──────────────
     const [{ generateText }, { createLovableAiGatewayProvider }, settings] = await Promise.all([

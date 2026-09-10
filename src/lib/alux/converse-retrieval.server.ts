@@ -69,6 +69,44 @@ export interface ConverseRetrievalResult {
   readonly scope: "destination" | "region" | "none";
 }
 
+async function resolveSelectedDestinationIds(
+  sb: SupabaseClient,
+  refs: ConverseRetrievalInput["selectedRefs"],
+): Promise<Set<string>> {
+  const idsOf = (type: AluxConverseCandidate["entityType"]) =>
+    refs?.filter((ref) => ref.entityType === type).map((ref) => ref.entityId) ?? [];
+  const businessIds = idsOf("business");
+  const placeIds = idsOf("place");
+  const eventIds = idsOf("event");
+  const productIds = idsOf("product");
+  const [businesses, places, events, products] = await Promise.all([
+    businessIds.length
+      ? sb.from("businesses").select("destination_id").in("id", businessIds)
+      : Promise.resolve({ data: [] }),
+    placeIds.length
+      ? sb.from("points_of_interest").select("destination_id").in("id", placeIds)
+      : Promise.resolve({ data: [] }),
+    eventIds.length
+      ? sb.from("events").select("destination_id").in("id", eventIds)
+      : Promise.resolve({ data: [] }),
+    productIds.length
+      ? sb.from("products").select("businesses!inner(destination_id)").in("id", productIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const destinationIds = new Set(idsOf("destination"));
+  for (const result of [businesses, places, events]) {
+    for (const row of (result.data ?? []) as Array<{ destination_id?: string }>) {
+      if (row.destination_id) destinationIds.add(row.destination_id);
+    }
+  }
+  for (const row of (products.data ?? []) as Array<{
+    businesses?: { destination_id?: string } | null;
+  }>) {
+    if (row.businesses?.destination_id) destinationIds.add(row.businesses.destination_id);
+  }
+  return destinationIds;
+}
+
 /* ─────────────────────────── helpers ─────────────────────────── */
 
 let factCounter = 0;
@@ -790,12 +828,27 @@ export async function retrieveConverseCandidates(
     const nearbyLimits = input.selectedRoute
       ? { businesses: 60, perFamily: 60 }
       : { businesses: 12, perFamily: 4 };
+    const selectedDestinationIds = await resolveSelectedDestinationIds(sb, input.selectedRefs);
+    const requiredDestinations = knownDestinations.filter((d) => selectedDestinationIds.has(d.id));
+    const requiredBundles = input.selectedRefs
+      ? await Promise.all(
+          requiredDestinations.map((required) =>
+            loadDestinationBundle(
+              sb,
+              required,
+              required.id === destination.id ? "destination" : "nearby",
+              routeLimits,
+              input.selectedRefs,
+            ),
+          ),
+        )
+      : [];
     const [own, routes, destCandidates, ...extraBundles] = await Promise.all([
-      loadDestinationBundle(sb, destination, "destination", routeLimits, input.selectedRefs),
+      loadDestinationBundle(sb, destination, "destination", routeLimits),
       loadRoutes(sb, knownDestinations, destination, "destination", 6),
       loadDestinationCandidates(sb, others),
       ...extras.map(async (extra) => [
-        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits, input.selectedRefs)),
+        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits)),
         ...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)),
       ]),
     ]);
@@ -811,6 +864,7 @@ export async function retrieveConverseCandidates(
       ...collect(own),
       ...collect(routes),
       ...extraBundles.flatMap((b) => collect(b)),
+      ...requiredBundles.flatMap((b) => collect(b)),
       ...collect(selectedDestinationCandidates),
       ...collect(destCandidates),
     ]);
