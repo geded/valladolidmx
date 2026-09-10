@@ -82,6 +82,8 @@ export interface DestinationPremiumSurfaceProps {
    * Studio y previews conservan por defecto la selección local aprobada.
    */
   serviceNavigation?: "preview" | "territorial";
+  /** Enlaces canónicos resueltos contra categorías publicadas del CMS. */
+  serviceHrefByKey?: Readonly<Record<string, string>>;
   /** Acción canónica Guardar/Mi Viaje, inyectada sin duplicar su lógica. */
   heroAction?: ReactNode;
   /** Rutas editoriales publicadas del CMS; nunca fixtures ni inferencias. */
@@ -108,6 +110,7 @@ export function DestinationPremiumSurface({
   className,
   renderServicePreview,
   serviceNavigation = "preview",
+  serviceHrefByKey = {},
   heroAction,
   routes = [],
 }: DestinationPremiumSurfaceProps) {
@@ -184,6 +187,7 @@ export function DestinationPremiumSurface({
                     active={activeService}
                     onSelect={setActiveService}
                     navigation={serviceNavigation}
+                    hrefByKey={serviceHrefByKey}
                   />
                 </Container>
               </div>
@@ -481,23 +485,26 @@ function ServiciosStrip({
   active,
   onSelect,
   navigation,
+  hrefByKey,
 }: {
   content: DestinationPremiumContent;
   active: string;
   onSelect: (key: string) => void;
   navigation: "preview" | "territorial";
+  hrefByKey: Readonly<Record<string, string>>;
 }) {
   const navigates = navigation === "territorial";
+  const services = navigates
+    ? content.services.filter((service) => hrefByKey[service.key])
+    : content.services;
   return (
     <section aria-label="Servicios del micrositio">
       <CategoryNavGrid
-        items={content.services.map((s) => ({
+        items={services.map((s) => ({
           slug: s.key,
           label: s.label,
           countLabel: s.hint,
-          href: navigates
-            ? `/oriente-maya/${encodeURIComponent(content.slug)}/${encodeURIComponent(s.key)}`
-            : null,
+          href: navigates ? hrefByKey[s.key] : null,
         }))}
         mode={navigates ? "navigate" : "select"}
         activeSlug={navigates ? null : active}
