@@ -422,13 +422,15 @@ function mergeUnderstood(
   prev: AluxConverseInput["understood"],
   intent: AluxTravelIntent,
   destinationSlug: string | null,
+  preservePreviousDestination = true,
 ): NonNullable<AluxConverseInput["understood"]> {
   const interests = Array.from(new Set([...(prev?.interests ?? []), ...intent.interests])).slice(
     0,
     10,
   );
   return {
-    destinationSlug: destinationSlug ?? prev?.destinationSlug ?? null,
+    destinationSlug:
+      destinationSlug ?? (preservePreviousDestination ? (prev?.destinationSlug ?? null) : null),
     stage: intent.stage ?? prev?.stage ?? null,
     company: intent.company ?? prev?.company ?? null,
     interests,
@@ -579,15 +581,24 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const knownSlugs = ((knownProbe.data ?? []) as Array<{ slug: string }>).map((r) => r.slug);
     const baseIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
     const mentioned = baseIntent.mentionedDestinationSlugs;
-    const destinationSlug =
-      mentioned[0] ??
-      selectedRoute?.destinationSlugs[0] ??
-      data.context?.destination?.slug ??
-      data.understood?.destinationSlug ??
-      data.context?.selection?.destinationSlug ??
-      session?.last_destination_slug ??
-      null;
-    const understood = mergeUnderstood(data.understood, baseIntent, destinationSlug);
+    const selectedRouteNeedsStopTerritory = Boolean(
+      selectedRoute && selectedRoute.destinationSlugs.length === 0 && mentioned.length === 0,
+    );
+    const destinationSlug = selectedRouteNeedsStopTerritory
+      ? null
+      : (mentioned[0] ??
+        selectedRoute?.destinationSlugs[0] ??
+        data.context?.destination?.slug ??
+        data.understood?.destinationSlug ??
+        data.context?.selection?.destinationSlug ??
+        session?.last_destination_slug ??
+        null);
+    const understood = mergeUnderstood(
+      data.understood,
+      baseIntent,
+      destinationSlug,
+      !selectedRouteNeedsStopTerritory,
+    );
     const intent = intentFromUnderstood(baseIntent, understood);
     const extraDestinationSlugs = Array.from(
       new Set([
@@ -604,9 +615,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const retrieved = await retrieval.retrieveConverseCandidates(sb, {
       destinationSlug,
       extraDestinationSlugs,
-      maxExtraDestinationSlugs: selectedRoute
-        ? Math.max(0, selectedRoute.destinationSlugs.length - 1)
-        : undefined,
+      maxExtraDestinationSlugs: selectedRoute ? extraDestinationSlugs.length : undefined,
       selectedRoute: Boolean(selectedRoute),
       selectedRefs: selectedRoute?.stopRefs,
     });
