@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-RATE-LIMIT-BEFORE-HYDRATION",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir el P1 que exige aplicar el rate limit antes de hidratar favoritos en el endpoint público de Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "1f790eff9e9d3ccc630cf2e06f216884b92c48479b2040ae95da6faa0ed3bbcf",
+    "current_sha256": "64f74a1e18540c94ef8fca4191e835954b21511e195468654f9d32e7250ae1fb",
+    "semantic_change": "Ejecuta la hidratación de favoritos únicamente después de que el rate limit autoriza la solicitud.",
+    "authority": "Founder · cierre final de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "Sin consultas de hidratación para solicitudes limitadas",
+    "Sólo entidades publicadas",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}
