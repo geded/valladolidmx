@@ -12,7 +12,7 @@
   ],
   "acknowledged_revisions": [
     { "operation": "modify", "path": "src/components/home-premium/home-premium-real.ts", "sha256": "909c30bfa886dcc369e164ba42d9f46d39e1de29ef30640ff9941358aedfca42", "authority": "Founder · Valladolid primero en Home · 2026-09-10" },
-    { "operation": "modify", "path": "src/lib/experience-builder/smart-blocks.server.ts", "sha256": "bf4ebd05364e07d74347dff0c85814c6a2ef5648947e8d16a25bb75acfc3093e", "authority": "Founder · incluir Valladolid en el corpus acotado del Home · 2026-09-10" }
+    { "operation": "modify", "path": "src/lib/experience-builder/smart-blocks.server.ts", "sha256": "8ed3b65063c001297ad5f8448aa8590ac67b1f16d8d097b5816fae76702b378b", "authority": "Founder · incluir Valladolid en el corpus acotado del Home · 2026-09-10" }
   ],
   "public_routes": ["/"],
   "required_feature_flags": [],
