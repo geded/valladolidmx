@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-PRODUCT-OWNER-AND-EVENT-ELIGIBILITY",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para exigir elegibilidad pública de la empresa propietaria de cada producto y revalidar los eventos guardados antes de incorporarlos al contexto de Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "6070dfa53c01df99a04919183f789f5440d124d53515ec900a3ee28161dca263",
+    "current_sha256": "3ac9c581fb935254841c2205f43d4fdce52a1a9bf8cc164f2f5d592f81bbb673",
+    "semantic_change": "Conserva productos sólo cuando su empresa propietaria sigue publicada, no eliminada y aprobada; además revalida los eventos por targetId y descarta los despublicados o eliminados.",
+    "authority": "Founder · cierre de dos P1 de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "CMS y revisión editorial gobiernan la visibilidad pública",
+    "Productos y eventos sólo ingresan al contexto cuando toda su cadena pública es elegible",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}
