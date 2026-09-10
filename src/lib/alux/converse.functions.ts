@@ -36,6 +36,7 @@ import {
   parseTravelIntent,
   sanitizeCmsText,
   sanitizeUserText,
+  candidateKey,
   type AluxConverseAiStatus,
   type AluxConverseCandidate,
   type AluxConverseInput,
@@ -62,7 +63,12 @@ const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 async function resolvePublishedRouteSelection(
   sb: SupabaseClient,
   entityRef: string | null | undefined,
-): Promise<{ title: string; summary: string; destinationSlugs: string[] } | null> {
+): Promise<{
+  title: string;
+  summary: string;
+  destinationSlugs: string[];
+  stopCandidates: AluxConverseCandidate[];
+} | null> {
   if (!entityRef?.startsWith("route:")) return null;
   const routeId = entityRef.slice("route:".length).trim();
   if (!routeId) return null;
@@ -71,7 +77,7 @@ async function resolvePublishedRouteSelection(
     sb
       .from("editorial_routes")
       .select(
-        "id, name, summary, duration_days, duration_hours, pace, difficulty, origin_destination_id, destination_ids",
+        "id, slug, name, summary, duration_days, duration_hours, pace, difficulty, origin_destination_id, destination_ids",
       )
       .eq("id", routeId)
       .eq("status", "published")
@@ -187,11 +193,53 @@ async function resolvePublishedRouteSelection(
   const territorySlugs = ((territories.data ?? []) as Array<{ id: string; slug: string }>)
     .sort((a, b) => territoryIds.indexOf(a.id) - territoryIds.indexOf(b.id))
     .map((territory) => territory.slug);
+  const typeOf = (kind: string): AluxConverseCandidate["entityType"] | null => {
+    if (kind === "experience" || kind === "product") return "product";
+    if (["destination", "business", "event", "place"].includes(kind))
+      return kind as AluxConverseCandidate["entityType"];
+    return null;
+  };
+  const familyOf = (kind: string): AluxConverseCandidate["family"] => {
+    if (kind === "destination") return "destino";
+    if (kind === "place") return "lugar";
+    if (kind === "event") return "evento";
+    if (kind === "experience" || kind === "product") return "experiencia";
+    return "otra";
+  };
+  const stopCandidates = stopRows.flatMap((stop): AluxConverseCandidate[] => {
+    const kind = String(stop["entity_kind"] ?? "");
+    const entityType = typeOf(kind);
+    const entityId = String(stop["entity_id"] ?? "");
+    const title = canonicalLabels.get(`${kind}:${entityId}`);
+    if (!entityType || !entityId || !title) return [];
+    return [
+      {
+        entityType,
+        entityId,
+        family: familyOf(kind),
+        title,
+        href: `/rutas/${String(route["slug"] ?? "")}`,
+        destinationSlug: territorySlugs[0] ?? null,
+        destinationLabel: null,
+        scope: "destination",
+        summary: "Parada publicada de la ruta seleccionada.",
+        facts: [{ id: "F", text: "Parada confirmada en la ruta seleccionada" }],
+        unavailable: [],
+        tags: ["ruta", "parada"],
+        planKind: entityType,
+        imageUrl: null,
+        subtitle: "Parada de la ruta",
+        coords: null,
+        openState: null,
+      },
+    ];
+  });
 
   return {
     title: sanitizeCmsText(route["name"], 120) || "Ruta seleccionada",
     summary: routeSummary ? `${metadata}${summaryLabel}${routeSummary}` : metadata,
     destinationSlugs: territorySlugs,
+    stopCandidates,
   };
 }
 
@@ -590,7 +638,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
     phases["retrieval"] = Date.now() - tRetrieval;
 
     // Distancias sólo con consentimiento explícito (coords presentes).
-    const candidates: readonly AluxConverseCandidate[] = data.coords
+    const retrievedCandidates: readonly AluxConverseCandidate[] = data.coords
       ? retrieved.candidates.map((c) => {
           if (!c.coords) return c;
           const km = proximity.haversineKm(data.coords!, c.coords);
@@ -603,6 +651,27 @@ export const aluxConverse = createServerFn({ method: "POST" })
           };
         })
       : retrieved.candidates;
+    const retrievedByKey = new Map(
+      retrievedCandidates.map((candidate) => [
+        candidateKey(candidate.entityType, candidate.entityId),
+        candidate,
+      ]),
+    );
+    const selectedStopCandidates = (selectedRoute?.stopCandidates ?? []).map(
+      (candidate) =>
+        retrievedByKey.get(candidateKey(candidate.entityType, candidate.entityId)) ?? candidate,
+    );
+    const stopKeys = new Set(
+      selectedStopCandidates.map((candidate) =>
+        candidateKey(candidate.entityType, candidate.entityId),
+      ),
+    );
+    const candidates: readonly AluxConverseCandidate[] = [
+      ...selectedStopCandidates,
+      ...retrievedCandidates.filter(
+        (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
+      ),
+    ];
 
     const ctx: GroundingContext = {
       activeKey: activeKeyFromRef(data.context?.selection?.entityRef ?? null),
@@ -688,7 +757,13 @@ export const aluxConverse = createServerFn({ method: "POST" })
     // ── 7. Ranking determinístico → tope de candidatos para el modelo ───
     const keepSaved = intent.asksRemove || intent.asksReplan;
     const ranked = rankConverseCandidates(candidates, ctx, { keepSaved });
-    const modelCandidates = ranked.map((r) => r.candidate);
+    const rankedCandidates = ranked.map((r) => r.candidate);
+    const modelCandidates = [
+      ...selectedStopCandidates,
+      ...rankedCandidates.filter(
+        (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
+      ),
+    ];
 
     // ── 8. Modelo IA (proveedor y ajustes ya configurados) ──────────────
     const [{ generateText }, { createLovableAiGatewayProvider }, settings] = await Promise.all([
