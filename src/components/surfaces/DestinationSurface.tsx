@@ -131,6 +131,8 @@ export interface DestinationSurfaceProps {
   nearbyDestinations?: DestinationPremiumNearbySource[];
   /** Rutas editoriales publicadas para el destino y continuidad regional. */
   routes?: readonly EditorialRouteCardDTO[];
+  /** Slugs publicados del CMS autorizados para navegación territorial. */
+  publicCategorySlugs?: readonly string[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
   /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
@@ -242,6 +244,7 @@ export function DestinationSurfaceContractBoundary({
   presentation = "editorial",
   nearbyDestinations,
   routes,
+  publicCategorySlugs = [],
 }: DestinationSurfaceContractBoundaryProps) {
   // Lote 3B — La ficha de destino se sirve exclusivamente desde CMS.
   const premiumDestination = dbData ?? null;
@@ -259,6 +262,28 @@ export function DestinationSurfaceContractBoundary({
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
       nearbyDestinations,
     });
+    const published = new Set(publicCategorySlugs);
+    const aliases: Record<string, readonly string[]> = {
+      hoteles: ["hoteles", "hospedaje"],
+      restaurantes: ["restaurantes", "gastronomia"],
+      experiencias: ["experiencias", "experiencias-tours", "tours"],
+      eventos: ["eventos", "eventos-home"],
+      "casas-de-vacaciones": ["casas-de-vacaciones", "casas-vacacionales"],
+      "que-hacer": ["que-hacer"],
+    };
+    const serviceHrefByKey = Object.fromEntries(
+      content.services.flatMap((service) => {
+        const slug = aliases[service.key]?.find((candidate) => published.has(candidate));
+        return slug
+          ? [
+              [
+                service.key,
+                `/oriente-maya/${encodeURIComponent(destinationSlug)}/${encodeURIComponent(slug)}`,
+              ],
+            ]
+          : [];
+      }),
+    );
     return (
       <div
         data-omxds-visual-foundations="enabled"
@@ -277,6 +302,7 @@ export function DestinationSurfaceContractBoundary({
             showBreadcrumbs={false}
             content={content}
             serviceNavigation="territorial"
+            serviceHrefByKey={serviceHrefByKey}
             heroVariant={presentation}
             sections={{ gallery: accreditedMedia.length > 0 }}
             routes={routes}
