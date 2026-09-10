@@ -181,21 +181,36 @@ async function resolvePublishedRouteSelection(
   const separator = " → ";
   const sequencePrefix = "Paradas en orden: ";
   const sequenceBudget = 820;
-  const stopBudget = stops.length
-    ? Math.max(
-        4,
-        Math.floor(
-          (sequenceBudget - sequencePrefix.length - separator.length * (stops.length - 1) - 1) /
-            stops.length,
-        ),
-      )
-    : 0;
-  const compactStops = stops.map(
-    (stop) =>
-      `${stop.day === null ? "Sin día asignado" : `Día ${stop.day}`}: ${sanitizeCmsText(stop.title, stopBudget)}`,
+  const groupedStops = Array.from(
+    stops.reduce((groups, stop) => {
+      const key = stop.day === null ? "unassigned" : String(stop.day);
+      const group = groups.get(key) ?? { day: stop.day, titles: [] as string[] };
+      group.titles.push(stop.title);
+      groups.set(key, group);
+      return groups;
+    }, new Map<string, { day: number | null; titles: string[] }>()),
+  ).map(([, group]) => group);
+  const groupSeparator = " | ";
+  const groupPrefixes = groupedStops.map((group) =>
+    group.day === null ? "Sin día: " : `Día ${group.day}: `,
   );
-  const sequence = compactStops.length
-    ? `${sequencePrefix}${compactStops.join(separator)}.`
+  const sequenceOverhead =
+    sequencePrefix.length +
+    1 +
+    groupPrefixes.reduce((sum, prefix) => sum + prefix.length, 0) +
+    separator.length * Math.max(0, stops.length - groupedStops.length) +
+    groupSeparator.length * Math.max(0, groupedStops.length - 1);
+  const stopBudget = stops.length
+    ? Math.max(0, Math.floor((sequenceBudget - sequenceOverhead) / stops.length))
+    : 0;
+  const compactGroups = groupedStops.map(
+    (group, index) =>
+      `${groupPrefixes[index]}${group.titles
+        .map((title) => sanitizeCmsText(title, stopBudget))
+        .join(separator)}`,
+  );
+  const sequence = compactGroups.length
+    ? `${sequencePrefix}${compactGroups.join(groupSeparator)}.`
     : "Paradas: no publicadas.";
   const metadata = [`Duración: ${duration}.`, attributes ? `Estilo: ${attributes}.` : "", sequence]
     .filter(Boolean)
@@ -263,7 +278,7 @@ REGLAS INQUEBRANTABLES
 {"text": string (máx ${ALUX_CONVERSE_LIMITS.maxTextChars} caracteres, mensaje al explorador),
  "clarifyingQuestions": string[] (0-${ALUX_CONVERSE_LIMITS.maxClarifyingQuestions}),
  "recommendations": [{"id": string, "reason": string (≤200, por qué, sólo con hechos o inferencias declaradas), "day": number|null}] (0-${ALUX_CONVERSE_LIMITS.maxRecommendations}),
- "sequence": [{"day": number, "ids": string[]}] | null,
+ "sequence": [{"day": number|null, "ids": string[]}] | null,
  "reorder": {"orderedSavedKeys": string[], "rationale": string} | null,
  "understood": {"destinationSlug": string|null, "stage": "planeando"|"en_region"|null, "company": string|null, "interests": string[], "travelDates": string|null, "durationDays": number|null, "accessibility": string|null, "restrictions": string[]},
  "citedFactIds": string[],
@@ -802,7 +817,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
               {
                 entityType: candidate.entityType,
                 entityId: candidate.entityId,
-                title: candidate.title,
+                title: stop.title,
                 day: stop.day,
               },
             ]
