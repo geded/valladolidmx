@@ -153,6 +153,13 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-082"],
     addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZZZZ-P1-CMS-FAMILY-SURFACE.json",
   },
+  {
+    // Cierre PR #77 · prioriza slugs presentes en el destino y conserva fallback contractual.
+    package: "first-wave-territorial-category-navigation-destination-aware",
+    sha256: "941e972e74cc320bff57b7ae6fbe3e311f718e94eedffc0df46eeae37d27ca1d",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-082-ADDENDUM-PR77-DESTINATION-AWARE-NAVIGATION.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",

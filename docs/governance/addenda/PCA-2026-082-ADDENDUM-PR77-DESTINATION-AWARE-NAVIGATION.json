@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-082-ADDENDUM-PR77-DESTINATION-AWARE-NAVIGATION",
+  "status": "Approved",
+  "parent": "PCA-2026-082",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir los 8 hallazgos vigentes del PR #77 en la misma rama y fusionar únicamente con todos los comentarios y controles en PASS; se mantienen las restricciones anteriores.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/DestinationSurface.tsx",
+    "previous_sha256": "f875988bf7ef6d16553f5fdfea2c680edaeb6294006cb1b47468878242a17db7",
+    "current_sha256": "941e972e74cc320bff57b7ae6fbe3e311f718e94eedffc0df46eeae37d27ca1d",
+    "semantic_change": "Selecciona primero una categoría CMS representada en el destino y conserva los slugs contractuales cuando la lectura de taxonomía falla.",
+    "authority": "Founder · cierre de los 8 hallazgos del PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "Taxonomía CMS-first cuando está disponible",
+    "Fallback fail-safe del contrato existente",
+    "Plantilla Premium y diseño preservados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}
