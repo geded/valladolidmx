@@ -75,7 +75,11 @@ function parseTripContext(input: unknown): TripContext | null {
     durationDays: duration,
     travelerCount: adults === null ? null : { adults, children },
   };
-  return result.destinations.length || result.items.length || result.interests.length
+  return result.destinations.length ||
+    result.items.length ||
+    result.interests.length ||
+    result.durationDays !== null ||
+    result.travelerCount !== null
     ? result
     : null;
 }

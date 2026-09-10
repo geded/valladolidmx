@@ -64,7 +64,11 @@ import {
 } from "@/components/destination-premium/destination-premium-runtime";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import type { EditorialRouteCardDTO } from "@/lib/routes-editorial/route-public-contract";
-import { isListingFamilyId, type ListingFamilyId } from "@/lib/listings/listing-public-contract";
+import {
+  isListingFamilyId,
+  listingFamilyContract,
+  type ListingFamilyId,
+} from "@/lib/listings/listing-public-contract";
 import type { ListingFamilyTaxonomyResult } from "@/lib/listings/listing-family-taxonomy.functions";
 import {
   createOmxdsSurfaceContract,
@@ -264,13 +268,22 @@ export function DestinationSurfaceContractBoundary({
       mapPoints: (mapPoints ?? []).map((point) => ({ ...point, badge: point.badge ?? null })),
       nearbyDestinations,
     });
+    const destinationCategorySlugs = new Set(
+      [
+        ...(safeRelated?.hoteles ?? []),
+        ...(safeRelated?.restaurantes ?? []),
+        ...(safeRelated?.experiencias ?? []),
+        ...(safeRelated?.otras ?? []),
+      ].map((item) => item.category_slug.toLowerCase()),
+    );
     const serviceHrefByKey = Object.fromEntries(
       content.services.flatMap((service) => {
         const family: ListingFamilyId | null = isListingFamilyId(service.key) ? service.key : null;
-        const slug =
-          listingFamilyTaxonomy.available && family
-            ? listingFamilyTaxonomy.taxonomy[family]?.[0]
-            : undefined;
+        if (!family) return [];
+        const cmsSlugs = listingFamilyTaxonomy.taxonomy[family] ?? [];
+        const slug = listingFamilyTaxonomy.available
+          ? cmsSlugs.find((candidate) => destinationCategorySlugs.has(candidate)) ?? cmsSlugs[0]
+          : listingFamilyContract(family).categorySlugs[0] ?? family;
         return slug
           ? [
               [
