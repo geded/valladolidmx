@@ -160,6 +160,13 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-082"],
     addendum: "PCA-2026-082-ADDENDUM-PR77-DESTINATION-AWARE-NAVIGATION.json",
   },
+  {
+    // P1 PR #77 · familias sin categoría territorial usan su ruta canónica contractual.
+    package: "pr77-canonical-routes-without-territorial-category",
+    sha256: "0e2841380cdaabe7f5e8289bbca5cc2d296797cf97903430fc8bc28506c9c796",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-082-ADDENDUM-PR77-CANONICAL-FAMILY-ROUTES.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",

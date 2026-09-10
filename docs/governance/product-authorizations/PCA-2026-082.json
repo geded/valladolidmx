@@ -5,10 +5,21 @@
   "status": "Approved",
   "branch": "perf/public-runtime-pwa-isolation-20260909",
   "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
-  "founder_authority": "Autorización Founder del 2026-09-10 para ejecutar la primera oleada derivada de la auditoría territorial y resolver sus hallazgos P1: navegación móvil del micrositio a categorías preservando contexto y taxonomía CMS, confirmación inequívoca de Agregar a Mi Viaje, expediente anónimo antes del registro y Alux con siguiente mejor acción y entrega al concierge humano; autorización posterior para abrir PR y fusionar únicamente con todos los controles en PASS; sin despliegue ni publicación.",
+  "founder_authority": "Autorización Founder del 2026-09-10 para ejecutar la primera oleada derivada de la auditoría territorial y resolver sus hallazgos P1: navegación móvil del micrositio a categorías preservando contexto y taxonomía CMS, confirmación inequívoca de Agregar a Mi Viaje, expediente anónimo antes del registro y Alux con siguiente mejor acción y entrega al concierge humano; autorización posterior para corregir los dos nuevos P1 del PR #77 —preservar el identificador de favoritos sin metadatos para Alux y usar rutas canónicas válidas en familias sin categoría territorial—, actualizar únicamente su trazabilidad derivada, solicitar nueva revisión y fusionar sólo con comentarios y controles en PASS; sin despliegue ni publicación.",
   "permissions": [
-    { "operation": "modify", "path": "src/components/destination-premium/DestinationPremiumSurface.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx"
+    },
     { "operation": "modify", "path": "src/components/alux/PublicAluxChat.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHeroFromProduct.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx"
+    },
     { "operation": "modify", "path": "src/components/surfaces/AluxSurface.tsx" },
     { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx" },
     { "operation": "modify", "path": "src/components/surfaces/TripPlannerSurface.tsx" },
@@ -21,18 +32,90 @@
     { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" }
   ],
   "acknowledged_revisions": [
-    { "operation": "modify", "path": "src/components/destination-premium/DestinationPremiumSurface.tsx", "sha256": "33aa9c1d4f21391658b8ef01d75b00e6a898237a384cc8aea870c03f114907a2", "authority": "Founder · navegación territorial móvil inequívoca con slugs CMS · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/alux/PublicAluxChat.tsx", "sha256": "e1cd60182f572a7b80e9c089da7bb2fd8e8d4d88da5d16729f2c8e9e84ee8e1a", "authority": "Founder · continuidad completa del expediente anónimo hacia Alux · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/surfaces/AluxSurface.tsx", "sha256": "8070f3bb0366d4faada43e831040e373384ee104a2ebc0ce35e54c48d036f3dc", "authority": "Founder · siguiente mejor acción y entrega humana · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx", "sha256": "941e972e74cc320bff57b7ae6fbe3e311f718e94eedffc0df46eeae37d27ca1d", "authority": "Founder · cierre de 8 hallazgos del PR #77 con navegación por slug disponible y fallback contractual · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/surfaces/TripPlannerSurface.tsx", "sha256": "d0ddb4aa6573f0b75e247ed6c75db682d7f6a4460b91adf6a842df8326e7297f", "authority": "Founder · expediente anónimo y siguiente acción de Alux · 2026-09-10" },
-    { "operation": "modify", "path": "src/components/traveler/AddToTravelPlanButton.tsx", "sha256": "3e38acc19c452160a7470679b1df0aded662b2c0c8712ecc7b5703891a04eb5c", "authority": "Founder · confirmación inequívoca de Mi Viaje · 2026-09-10" },
-    { "operation": "modify", "path": "src/lib/traveler/anonymous-draft/copy.ts", "sha256": "86f555b08e81387a3842d6abb964918b00cd26fdef6ea49a514e67403c1f6110", "authority": "Founder · respuesta contextual del Concierge Voice · 2026-09-10" },
-    { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts", "sha256": "567685747ba8121997efdba02447175efc89bd2c6e940489e18588eb210d60e8", "authority": "Founder · preservación de la lectura pública CMS existente · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts", "sha256": "839430ececf92463e5885a5da95d71cdc123fe839da8b145a1f69efb35773157", "authority": "Founder · contexto de viaje descriptivo y política de acceso coherente · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/arma-tu-viaje.tsx", "sha256": "6964a5847285c507953a2f26e84902bd2fe9b7d8052e4b2560312a0aeaa9dee3", "authority": "Founder · expediente vivo dentro de la composición publicada del CMS · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx", "sha256": "2859ca239843dd8fc9be4d2b3bae21aac1c6e18b00b29fa7f35f30ca9365aafd", "authority": "Founder · resolución de familia mediante la misma taxonomía CMS-first · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx", "sha256": "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8", "authority": "Founder · hidratación de taxonomía de familias administrada por CMS · 2026-09-10" }
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx",
+      "sha256": "33aa9c1d4f21391658b8ef01d75b00e6a898237a384cc8aea870c03f114907a2",
+      "authority": "Founder · navegación territorial móvil inequívoca con slugs CMS · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/PublicAluxChat.tsx",
+      "sha256": "3ac7372d199d964fc63dded2e7349fb5f59fda515eca8a2994e04a0e154ff2ea",
+      "authority": "Founder · preservación del identificador de favoritos sin metadatos para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHeroFromProduct.tsx",
+      "sha256": "141ed9b72cc8049dec7d2ccf0e306a78e124d501d84a58c62aa0eb59f70d2204",
+      "authority": "Founder · metadatos descriptivos del favorito de producto para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+      "sha256": "fab9d508cd69843953ec6c89d242705271a5e318968a7861be56e76f24fe542f",
+      "authority": "Founder · título descriptivo del favorito de negocio para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/AluxSurface.tsx",
+      "sha256": "8070f3bb0366d4faada43e831040e373384ee104a2ebc0ce35e54c48d036f3dc",
+      "authority": "Founder · siguiente mejor acción y entrega humana · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "sha256": "0e2841380cdaabe7f5e8289bbca5cc2d296797cf97903430fc8bc28506c9c796",
+      "authority": "Founder · rutas canónicas válidas para familias sin categoría territorial · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/TripPlannerSurface.tsx",
+      "sha256": "d0ddb4aa6573f0b75e247ed6c75db682d7f6a4460b91adf6a842df8326e7297f",
+      "authority": "Founder · expediente anónimo y siguiente acción de Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/traveler/AddToTravelPlanButton.tsx",
+      "sha256": "3e38acc19c452160a7470679b1df0aded662b2c0c8712ecc7b5703891a04eb5c",
+      "authority": "Founder · confirmación inequívoca de Mi Viaje · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/anonymous-draft/copy.ts",
+      "sha256": "86f555b08e81387a3842d6abb964918b00cd26fdef6ea49a514e67403c1f6110",
+      "authority": "Founder · respuesta contextual del Concierge Voice · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cms/public-reads.functions.ts",
+      "sha256": "567685747ba8121997efdba02447175efc89bd2c6e940489e18588eb210d60e8",
+      "authority": "Founder · preservación de la lectura pública CMS existente · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/api/public/alux/chat.ts",
+      "sha256": "e7f1e6836f345babf470f3aeac84cfd2f94c0fb580529783254a8fc4af138a44",
+      "authority": "Founder · conservación fail-safe de favoritos identificados sin metadatos · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/arma-tu-viaje.tsx",
+      "sha256": "6964a5847285c507953a2f26e84902bd2fe9b7d8052e4b2560312a0aeaa9dee3",
+      "authority": "Founder · expediente vivo dentro de la composición publicada del CMS · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx",
+      "sha256": "2859ca239843dd8fc9be4d2b3bae21aac1c6e18b00b29fa7f35f30ca9365aafd",
+      "authority": "Founder · resolución de familia mediante la misma taxonomía CMS-first · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx",
+      "sha256": "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8",
+      "authority": "Founder · hidratación de taxonomía de familias administrada por CMS · 2026-09-10"
+    }
   ],
   "public_routes": [
     "/oriente-maya/{destino}",
