@@ -103,8 +103,8 @@
     {
       "operation": "modify",
       "path": "src/routes/api/public/alux/chat.ts",
-      "sha256": "64f74a1e18540c94ef8fca4191e835954b21511e195468654f9d32e7250ae1fb",
-      "authority": "Founder · rate limit previo a la resolución server-side de favoritos · 2026-09-10"
+      "sha256": "87fef498fdf9f084beb4dcb2f1e41830a6b218620ec66a2ee46b71c2ec626841",
+      "authority": "Founder · elegibilidad pública canónica en la hidratación de favoritos · 2026-09-10"
     },
     {
       "operation": "modify",
