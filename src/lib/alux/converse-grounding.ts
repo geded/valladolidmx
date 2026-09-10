@@ -29,6 +29,7 @@ import {
   type AluxConverseEntityType,
   type AluxConverseFamily,
   type AluxConverseRecommendation,
+  type AluxConverseSequenceGroundingRef,
   type AluxConverseResponse,
   type AluxConverseSequenceStep,
   type AluxConverseTripItem,
@@ -263,17 +264,17 @@ export function groundModelOutput(
   output: AluxModelOutput,
   candidates: readonly AluxConverseCandidate[],
   ctx: GroundingContext,
-  sequenceGroundingCandidates: readonly AluxConverseCandidate[] = candidates,
+  sequenceGroundingRefs: readonly AluxConverseSequenceGroundingRef[] = candidates,
 ): GroundedResult {
   const byId = new Map<string, AluxConverseCandidate>();
-  const sequenceById = new Map<string, AluxConverseCandidate>();
+  const sequenceById = new Map<string, AluxConverseSequenceGroundingRef>();
   const factIndex = new Map<string, { text: string; owner: string }>();
   for (const c of candidates) {
     byId.set(c.entityId, c);
     sequenceById.set(c.entityId, c);
     for (const f of c.facts) factIndex.set(f.id, { text: f.text, owner: c.entityId });
   }
-  for (const c of sequenceGroundingCandidates) sequenceById.set(c.entityId, c);
+  for (const ref of sequenceGroundingRefs) sequenceById.set(ref.entityId, ref);
   const saved = tripKeySet(ctx.tripItems);
   let rejected = 0;
 

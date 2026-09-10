@@ -8,7 +8,7 @@
     "operation": "create",
     "path": "src/lib/alux/converse-contract.ts",
     "previous_sha256": "26953bc4cdd48721e30420cc306b30a79665c0a5aafd7e703022da297c899f0a",
-    "current_sha256": "37af3c484adcf4a06956f6eb4de36dcf44fa8d0d17c3127d5bd897f107c7b0ea",
+    "current_sha256": "131d4767b1cd8c13473b6a3cc4b810c820b871f961c82b7c2d54a9c8d5ed2777",
     "semantic_change": "Transporta el contexto editorial completo de la ruta seleccionada hasta la conversación de Alux.",
     "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
   },

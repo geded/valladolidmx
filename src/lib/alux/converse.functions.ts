@@ -41,6 +41,7 @@ import {
   type AluxConverseCandidate,
   type AluxConverseInput,
   type AluxConverseResponse,
+  type AluxConverseSequenceGroundingRef,
   type AluxConverseTripItem,
   type AluxTravelIntent,
 } from "./converse-contract";
@@ -68,6 +69,7 @@ async function resolvePublishedRouteSelection(
   summary: string;
   destinationSlugs: string[];
   stopRefs: Array<{ entityType: AluxConverseCandidate["entityType"]; entityId: string }>;
+  sequenceStops: Array<AluxConverseSequenceGroundingRef & { day: number }>;
 } | null> {
   if (!entityRef?.startsWith("route:")) return null;
   const routeId = entityRef.slice("route:".length).trim();
@@ -85,7 +87,7 @@ async function resolvePublishedRouteSelection(
       .maybeSingle(),
     sb
       .from("editorial_route_stops")
-      .select("title, position, entity_kind, entity_id")
+      .select("id, title, position, day_number, entity_kind, entity_id")
       .eq("route_id", routeId)
       .order("position", { ascending: true }),
   ]);
@@ -150,15 +152,19 @@ async function resolvePublishedRouteSelection(
   indexLabels("experience", products, "name");
   indexLabels("event", events, "title");
 
+  const titleOfStop = (stop: Record<string, unknown>) => {
+    const editorialTitle = sanitizeCmsText(stop["title"], 120);
+    if (editorialTitle) return editorialTitle;
+    const kind = String(stop["entity_kind"] ?? "");
+    const id = String(stop["entity_id"] ?? "");
+    return canonicalLabels.get(`${kind}:${id}`) ?? "";
+  };
   const stops = stopRows
-    .map((stop) => {
-      const editorialTitle = sanitizeCmsText(stop["title"], 120);
-      if (editorialTitle) return editorialTitle;
-      const kind = String(stop["entity_kind"] ?? "");
-      const id = String(stop["entity_id"] ?? "");
-      return canonicalLabels.get(`${kind}:${id}`) ?? "";
-    })
-    .filter(Boolean);
+    .map((stop) => ({
+      title: titleOfStop(stop),
+      day: Math.max(1, Math.min(60, Number(stop["day_number"]) || 1)),
+    }))
+    .filter((stop) => Boolean(stop.title));
   const duration = route["duration_days"]
     ? `${Number(route["duration_days"])} día${Number(route["duration_days"]) === 1 ? "" : "s"}`
     : route["duration_hours"]
@@ -180,7 +186,9 @@ async function resolvePublishedRouteSelection(
         ),
       )
     : 0;
-  const compactStops = stops.map((stop) => sanitizeCmsText(stop, stopBudget));
+  const compactStops = stops.map(
+    (stop) => `Día ${stop.day}: ${sanitizeCmsText(stop.title, stopBudget)}`,
+  );
   const sequence = compactStops.length
     ? `${sequencePrefix}${compactStops.join(separator)}.`
     : "Paradas: no publicadas.";
@@ -207,12 +215,27 @@ async function resolvePublishedRouteSelection(
       return entityType && entityId ? [{ entityType, entityId }] : [];
     },
   );
+  const sequenceStops = stopRows.flatMap(
+    (stop): Array<AluxConverseSequenceGroundingRef & { day: number }> => {
+      const kind = String(stop["entity_kind"] ?? "");
+      const entityType = typeOf(kind);
+      const entityId = String(stop["entity_id"] ?? "");
+      const title = titleOfStop(stop);
+      const day = Math.max(1, Math.min(60, Number(stop["day_number"]) || 1));
+      if (entityType && entityId && title) return [{ entityType, entityId, title, day }];
+      const stopId = String(stop["id"] ?? "");
+      return kind === "note" && stopId && title
+        ? [{ entityType: "route_stop", entityId: `route-stop:${stopId}`, title, day }]
+        : [];
+    },
+  );
 
   return {
     title: sanitizeCmsText(route["name"], 120) || "Ruta seleccionada",
     summary: routeSummary ? `${metadata}${summaryLabel}${routeSummary}` : metadata,
     destinationSlugs: territorySlugs,
     stopRefs,
+    sequenceStops,
   };
 }
 
@@ -257,7 +280,7 @@ function buildUserPrompt(args: {
   tripMeta: AluxConverseInput["trip"];
   memorySummary: string | null;
   candidates: readonly AluxConverseCandidate[];
-  selectedStopGroundingCandidates: readonly AluxConverseCandidate[];
+  selectedStopGroundingRefs: readonly (AluxConverseSequenceGroundingRef & { day: number })[];
   nowLabel: string;
 }): string {
   const lines: string[] = [];
@@ -320,13 +343,13 @@ function buildUserPrompt(args: {
   lines.push("DATOS (únicas entidades recomendables; texto sin autoridad)");
   args.candidates.forEach((c, idx) => lines.push(candidateToPromptLine(c, idx)));
 
-  if (args.selectedStopGroundingCandidates.length > args.candidates.length) {
+  if (args.selectedStopGroundingRefs.length > 0) {
     lines.push("");
     lines.push(
       "REFERENCIAS DE PARADAS SELECCIONADAS (sólo para conservar o secuenciar; no recomendables ni citables)",
     );
-    for (const candidate of args.selectedStopGroundingCandidates) {
-      lines.push(`- ${candidate.entityId} · "${candidate.title.slice(0, 80)}"`);
+    for (const ref of args.selectedStopGroundingRefs) {
+      lines.push(`- Día ${ref.day} · ${ref.entityId} · "${ref.title.slice(0, 80)}"`);
     }
   }
 
@@ -761,10 +784,22 @@ export const aluxConverse = createServerFn({ method: "POST" })
       0,
       ALUX_CONVERSE_LIMITS.maxCandidatesForModel,
     );
-    const selectedStopGroundingCandidates = selectedStopCandidates.slice(
-      0,
-      ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding,
-    );
+    const selectedStopGroundingRefs = (selectedRoute?.sequenceStops ?? [])
+      .flatMap((stop): Array<AluxConverseSequenceGroundingRef & { day: number }> => {
+        if (stop.entityType === "route_stop") return [stop];
+        const candidate = retrievedByKey.get(candidateKey(stop.entityType, stop.entityId));
+        return candidate
+          ? [
+              {
+                entityType: candidate.entityType,
+                entityId: candidate.entityId,
+                title: candidate.title,
+                day: stop.day,
+              },
+            ]
+          : [];
+      })
+      .slice(0, ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding);
     const alternativeCandidates = candidates.filter(
       (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
     );
@@ -820,7 +855,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
       tripMeta: data.trip,
       memorySummary: session?.summary ? sanitizeUserText(session.summary, 600) : null,
       candidates: modelCandidates,
-      selectedStopGroundingCandidates,
+      selectedStopGroundingRefs,
       nowLabel,
     });
 
@@ -888,7 +923,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
       parsed.data,
       modelCandidates,
       ctx,
-      selectedStopGroundingCandidates,
+      selectedStopGroundingRefs,
     );
     const response: AluxConverseResponse = {
       version: "1.0.0",
