@@ -60,7 +60,7 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-contract.ts",
-      "sha256": "b308ebe92c497b66bce250f91635bc73702dab2157245c1a0531670111228c92",
+      "sha256": "37af3c484adcf4a06956f6eb4de36dcf44fa8d0d17c3127d5bd897f107c7b0ea",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
@@ -72,13 +72,13 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "d2ff8af1b00f676192ba13e0059deb69e83eb1883307edd072beb12447d8fe32",
+      "sha256": "5369e4325d7a1eedbe69b17269e03b55e2e537b058a338d995d11b9029b5acd4",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-retrieval.server.ts",
-      "sha256": "7e8bd7a12ec426389e76fbce41c36a8a414a8b722f2056a2909c0922ed529e23",
+      "sha256": "c60d9405d4b9ad224b0247f699685cc66c1db01507ba469cf87977f994a1dec3",
       "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
     },
     {

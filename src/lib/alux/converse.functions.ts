@@ -59,7 +59,6 @@ const ANON_DAY_LIMIT = 40;
 const AUTH_HOUR_LIMIT = 30;
 const AUTH_DAY_LIMIT = 120;
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
-const MAX_SELECTED_ROUTE_STOPS_FOR_GROUNDING = 60;
 
 async function resolvePublishedRouteSelection(
   sb: SupabaseClient,
@@ -764,7 +763,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
     );
     const selectedStopGroundingCandidates = selectedStopCandidates.slice(
       0,
-      MAX_SELECTED_ROUTE_STOPS_FOR_GROUNDING,
+      ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding,
     );
     const alternativeCandidates = candidates.filter(
       (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),

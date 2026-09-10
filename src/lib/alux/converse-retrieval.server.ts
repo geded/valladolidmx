@@ -824,12 +824,11 @@ export async function retrieveConverseCandidates(
     const requestedExtraSlugs = Array.from(
       new Set([...(input.extraDestinationSlugs ?? []), ...selectedDestinationSlugs]),
     );
-    const selectedExtraCount = selectedDestinationSlugs.filter(
-      (slug) => slug !== destination.slug,
-    ).length;
-    const maxExtras = Math.max(input.maxExtraDestinationSlugs ?? 2, selectedExtraCount);
-    const extras = requestedExtraSlugs
-      .filter((s) => s !== destination.slug)
+    const filteredExtraSlugs = requestedExtraSlugs.filter((slug) => slug !== destination.slug);
+    const maxExtras = input.selectedRoute
+      ? filteredExtraSlugs.length
+      : (input.maxExtraDestinationSlugs ?? 2);
+    const extras = filteredExtraSlugs
       .map((s) => bySlug.get(s))
       .filter((d): d is ConverseDestination => Boolean(d))
       .slice(0, Math.max(0, Math.min(maxExtras, 39)));

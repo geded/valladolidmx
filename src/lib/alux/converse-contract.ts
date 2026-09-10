@@ -33,6 +33,8 @@ export const ALUX_CONVERSE_LIMITS = {
   maxHistoryChars: 700,
   /** Candidatos máximos que se muestran al modelo (tras ranking determinístico). */
   maxCandidatesForModel: 24,
+  /** Paradas máximas de una ruta seleccionada que pueden preservarse en una secuencia. */
+  maxSelectedRouteStopsForGrounding: 60,
   /** Recomendaciones máximas por respuesta. */
   maxRecommendations: 6,
   /** Preguntas aclaratorias máximas. */
@@ -371,9 +373,16 @@ export const AluxModelOutputSchema = z.object({
               .filter(
                 (s) => s && typeof s === "object" && Array.isArray((s as { ids?: unknown }).ids),
               )
-              .slice(0, 7)
+              .slice(0, ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding)
           : null,
-      z.array(z.object({ day: numOrNull(1, 14, true), ids: clampArr(clampStr(64), 6) })).nullable(),
+      z
+        .array(
+          z.object({
+            day: numOrNull(1, ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding, true),
+            ids: clampArr(clampStr(64), ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding),
+          }),
+        )
+        .nullable(),
     )
     .catch(null),
   reorder: z
