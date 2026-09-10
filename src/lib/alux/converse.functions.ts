@@ -161,7 +161,7 @@ async function resolvePublishedRouteSelection(
   indexLabels("event", events, "title");
 
   const titleOfStop = (stop: Record<string, unknown>) => {
-    const editorialTitle = sanitizeCmsText(stop["title"], 120);
+    const editorialTitle = sanitizeCmsText(stop["title"], 200);
     if (editorialTitle) return editorialTitle;
     const kind = String(stop["entity_kind"] ?? "");
     const id = String(stop["entity_id"] ?? "");

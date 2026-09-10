@@ -798,14 +798,36 @@ export async function retrieveConverseCandidates(
     .is("deleted_at", null)
     .order("name", { ascending: true })
     .limit(40);
-  const knownDestinations: ConverseDestination[] = (
+  const sampledDestinations: ConverseDestination[] = (
     (destRows ?? []) as Array<Record<string, unknown>>
   )
     .map((r) => ({ id: String(r["id"]), slug: String(r["slug"]), name: String(r["name"]) }))
     .filter((d) => d.id && d.slug && d.name);
-  const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
-
   const selectedDestinationIds = await resolveSelectedDestinationIds(sb, input.selectedRefs);
+  const { data: selectedDestinationRows } = selectedDestinationIds.size
+    ? await sb
+        .from("destinations")
+        .select("id, slug, name")
+        .in("id", Array.from(selectedDestinationIds))
+        .eq("status", "published")
+        .is("deleted_at", null)
+    : { data: [] };
+  const selectedDestinations = ((selectedDestinationRows ?? []) as Array<Record<string, unknown>>)
+    .map((row) => ({
+      id: String(row["id"]),
+      slug: String(row["slug"]),
+      name: String(row["name"]),
+    }))
+    .filter((destination) => destination.id && destination.slug && destination.name);
+  const knownDestinations = Array.from(
+    new Map(
+      [...sampledDestinations, ...selectedDestinations].map((destination) => [
+        destination.id,
+        destination,
+      ]),
+    ).values(),
+  );
+  const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
   const destination =
     (input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null) ??
     knownDestinations.find((d) => selectedDestinationIds.has(d.id)) ??
