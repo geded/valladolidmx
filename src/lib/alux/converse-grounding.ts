@@ -263,13 +263,17 @@ export function groundModelOutput(
   output: AluxModelOutput,
   candidates: readonly AluxConverseCandidate[],
   ctx: GroundingContext,
+  sequenceGroundingCandidates: readonly AluxConverseCandidate[] = candidates,
 ): GroundedResult {
   const byId = new Map<string, AluxConverseCandidate>();
+  const sequenceById = new Map<string, AluxConverseCandidate>();
   const factIndex = new Map<string, { text: string; owner: string }>();
   for (const c of candidates) {
     byId.set(c.entityId, c);
+    sequenceById.set(c.entityId, c);
     for (const f of c.facts) factIndex.set(f.id, { text: f.text, owner: c.entityId });
   }
+  for (const c of sequenceGroundingCandidates) sequenceById.set(c.entityId, c);
   const saved = tripKeySet(ctx.tripItems);
   let rejected = 0;
 
@@ -311,7 +315,7 @@ export function groundModelOutput(
     for (const s of ordered) {
       if (usedDays.has(s.day)) continue;
       const refs = s.ids
-        .map((id) => byId.get(id.trim()))
+        .map((id) => sequenceById.get(id.trim()))
         .filter((c): c is AluxConverseCandidate => Boolean(c))
         .map((c) => ({ entityType: c.entityType, entityId: c.entityId, title: c.title }));
       rejected += s.ids.length - refs.length;

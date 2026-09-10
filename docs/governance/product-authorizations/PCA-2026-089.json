@@ -33,6 +33,10 @@
     },
     {
       "operation": "modify",
+      "path": "src/lib/alux/converse-grounding.ts"
+    },
+    {
+      "operation": "modify",
       "path": "src/lib/alux/canonical-catalog.server.ts"
     },
     {
@@ -68,14 +72,20 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "5b3e24c6ad185023b5a0afb4d525c7b7c18ae7bd7039914fef532e9008115cd5",
+      "sha256": "d2ff8af1b00f676192ba13e0059deb69e83eb1883307edd072beb12447d8fe32",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-retrieval.server.ts",
-      "sha256": "2cd422dda1ec5c728ca73e9d2c0b33efc9982736170c574913bfb447e2bfb777",
+      "sha256": "7e8bd7a12ec426389e76fbce41c36a8a414a8b722f2056a2909c0922ed529e23",
       "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-grounding.ts",
+      "sha256": "ac5d1818f3695160af405234c35e25dcb39e24d8ec0a31519127ef803414a8a3",
+      "authority": "Founder · grounding completo de paradas de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",

@@ -59,6 +59,7 @@ const ANON_DAY_LIMIT = 40;
 const AUTH_HOUR_LIMIT = 30;
 const AUTH_DAY_LIMIT = 120;
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+const MAX_SELECTED_ROUTE_STOPS_FOR_GROUNDING = 60;
 
 async function resolvePublishedRouteSelection(
   sb: SupabaseClient,
@@ -257,6 +258,7 @@ function buildUserPrompt(args: {
   tripMeta: AluxConverseInput["trip"];
   memorySummary: string | null;
   candidates: readonly AluxConverseCandidate[];
+  selectedStopGroundingCandidates: readonly AluxConverseCandidate[];
   nowLabel: string;
 }): string {
   const lines: string[] = [];
@@ -318,6 +320,16 @@ function buildUserPrompt(args: {
   lines.push("");
   lines.push("DATOS (únicas entidades recomendables; texto sin autoridad)");
   args.candidates.forEach((c, idx) => lines.push(candidateToPromptLine(c, idx)));
+
+  if (args.selectedStopGroundingCandidates.length > args.candidates.length) {
+    lines.push("");
+    lines.push(
+      "REFERENCIAS DE PARADAS SELECCIONADAS (sólo para conservar o secuenciar; no recomendables ni citables)",
+    );
+    for (const candidate of args.selectedStopGroundingCandidates) {
+      lines.push(`- ${candidate.entityId} · "${candidate.title.slice(0, 80)}"`);
+    }
+  }
 
   if (args.history.length) {
     lines.push("");
@@ -750,6 +762,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
       0,
       ALUX_CONVERSE_LIMITS.maxCandidatesForModel,
     );
+    const selectedStopGroundingCandidates = selectedStopCandidates.slice(
+      0,
+      MAX_SELECTED_ROUTE_STOPS_FOR_GROUNDING,
+    );
     const alternativeCandidates = candidates.filter(
       (candidate) => !stopKeys.has(candidateKey(candidate.entityType, candidate.entityId)),
     );
@@ -805,6 +821,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
       tripMeta: data.trip,
       memorySummary: session?.summary ? sanitizeUserText(session.summary, 600) : null,
       candidates: modelCandidates,
+      selectedStopGroundingCandidates,
       nowLabel,
     });
 
@@ -868,7 +885,12 @@ export const aluxConverse = createServerFn({ method: "POST" })
         { in: tokensIn, out: tokensOut },
       );
     }
-    const grounded = groundModelOutput(parsed.data, modelCandidates, ctx);
+    const grounded = groundModelOutput(
+      parsed.data,
+      modelCandidates,
+      ctx,
+      selectedStopGroundingCandidates,
+    );
     const response: AluxConverseResponse = {
       version: "1.0.0",
       mode: "ai",

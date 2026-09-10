@@ -818,11 +818,21 @@ export async function retrieveConverseCandidates(
 
   if (destination) {
     // Cercanías rotuladas: sólo destinos mencionados explícitamente.
-    const extras = (input.extraDestinationSlugs ?? [])
+    const selectedDestinationSlugs = knownDestinations
+      .filter((candidate) => selectedDestinationIds.has(candidate.id))
+      .map((candidate) => candidate.slug);
+    const requestedExtraSlugs = Array.from(
+      new Set([...(input.extraDestinationSlugs ?? []), ...selectedDestinationSlugs]),
+    );
+    const selectedExtraCount = selectedDestinationSlugs.filter(
+      (slug) => slug !== destination.slug,
+    ).length;
+    const maxExtras = Math.max(input.maxExtraDestinationSlugs ?? 2, selectedExtraCount);
+    const extras = requestedExtraSlugs
       .filter((s) => s !== destination.slug)
       .map((s) => bySlug.get(s))
       .filter((d): d is ConverseDestination => Boolean(d))
-      .slice(0, Math.max(0, Math.min(input.maxExtraDestinationSlugs ?? 2, 39)));
+      .slice(0, Math.max(0, Math.min(maxExtras, 39)));
     // Otros destinos publicados como opción de región (planear salidas).
     const others = knownDestinations.filter((d) => d.id !== destination.id).slice(0, 8);
 
