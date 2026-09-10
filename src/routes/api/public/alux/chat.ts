@@ -104,6 +104,7 @@ async function hydrateTripContextItems(
           .from("businesses")
           .select("id, slug, display_name, status, deleted_at")
           .in("id", idsByKind.business)
+          .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       : Promise.resolve({ data: [] }),
     idsByKind.product.length
       ? supabaseAdmin
