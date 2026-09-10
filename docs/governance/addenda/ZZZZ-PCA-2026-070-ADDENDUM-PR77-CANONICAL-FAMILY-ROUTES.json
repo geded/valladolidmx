@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-070-ADDENDUM-PR77-CANONICAL-FAMILY-ROUTES",
+  "status": "Approved",
+  "parent": "PCA-2026-070",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para usar rutas canónicas válidas en familias sin categoría territorial.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/DestinationSurface.tsx",
+    "previous_sha256": "941e972e74cc320bff57b7ae6fbe3e311f718e94eedffc0df46eeae37d27ca1d",
+    "current_sha256": "0e2841380cdaabe7f5e8289bbca5cc2d296797cf97903430fc8bc28506c9c796",
+    "semantic_change": "Usa la ruta canónica contractual cuando no existe categoría territorial.",
+    "authority": "Founder · dos nuevos P1 del PR #77 · 2026-09-10"
+  },
+  "invariants": ["Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-10"
+}

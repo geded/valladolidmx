@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-ALUX-FAVORITE-ID",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para preservar el identificador de favoritos sin metadatos para Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/alux/PublicAluxChat.tsx",
+    "previous_sha256": "e1cd60182f572a7b80e9c089da7bb2fd8e8d4d88da5d16729f2c8e9e84ee8e1a",
+    "current_sha256": "3ac7372d199d964fc63dded2e7349fb5f59fda515eca8a2994e04a0e154ff2ea",
+    "semantic_change": "Incluye targetId en el contexto anónimo enviado a Alux.",
+    "authority": "Founder · dos nuevos P1 del PR #77 · 2026-09-10"
+  },
+  "invariants": ["Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-10"
+}
