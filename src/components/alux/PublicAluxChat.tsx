@@ -28,6 +28,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
 import { toast } from "@/lib/toast";
 import { useTranslation } from "@/i18n/context";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -74,6 +75,7 @@ export function PublicAluxChat() {
   const [hasMemory, setHasMemory] = useState(false);
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const anonymous = useAnonymousTrip();
 
   useEffect(() => {
     const key = ensureSessionKey();
@@ -154,6 +156,19 @@ export function PublicAluxChat() {
               if (parts[0] !== "oriente-maya") return undefined;
               return { destination: parts[1] ?? null, category: parts[2] ?? null };
             })(),
+            tripContext: anonymous.trip
+              ? {
+                  destinations: anonymous.trip.destinationIds.slice(0, 8),
+                  items: anonymous.trip.plannedItems.slice(0, 20).map((item) => ({
+                    kind: item.kind,
+                    title: item.title,
+                    slug: item.slug,
+                  })),
+                  interests: anonymous.trip.interests?.slice(0, 16),
+                  durationDays: anonymous.trip.tripDurationDays,
+                  travelerCount: anonymous.trip.travelerCount,
+                }
+              : undefined,
           }),
         });
         const data = await res.json().catch(() => ({}));
@@ -191,7 +206,7 @@ export function PublicAluxChat() {
         setSending(false);
       }
     },
-    [messages, sending, sessionKey, location, locale],
+    [messages, sending, sessionKey, location, locale, anonymous.trip],
   );
 
   return (
