@@ -132,6 +132,13 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-056"],
     addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-DESTINATION-SURFACE.json",
   },
+  {
+    // Primera oleada territorial · la misma superficie Premium enlaza categorías públicas reales.
+    package: "first-wave-territorial-category-navigation",
+    sha256: "a791bb51e99556761a6603986152365c89b57ef8fe2583034adad72ecd29199d",
+    authorizations: ["PCA-2026-056"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZ-FIRST-WAVE-DESTINATION.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
