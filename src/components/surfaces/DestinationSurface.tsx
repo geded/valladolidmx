@@ -287,7 +287,9 @@ export function DestinationSurfaceContractBoundary({
           : contract.categorySlugs[0];
         const href = slug
           ? `/oriente-maya/${encodeURIComponent(destinationSlug)}/${encodeURIComponent(slug)}`
-          : contract.route;
+          : contract.categorySlugs.length === 0
+            ? contract.route
+            : null;
         return href ? [[service.key, href]] : [];
       }),
     );

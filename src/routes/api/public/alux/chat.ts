@@ -85,6 +85,71 @@ function parseTripContext(input: unknown): TripContext | null {
     : null;
 }
 
+async function hydrateTripContextItems(
+  supabaseAdmin: (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"],
+  context: TripContext | null,
+): Promise<TripContext | null> {
+  if (!context) return null;
+  const unresolved = context.items.filter((item) => !item.title && !item.slug && item.targetId);
+  if (!unresolved.length) return context;
+
+  const idsByKind = {
+    business: unresolved.filter((item) => item.kind === "business").map((item) => item.targetId),
+    product: unresolved.filter((item) => item.kind === "product").map((item) => item.targetId),
+    promotion: unresolved.filter((item) => item.kind === "promotion").map((item) => item.targetId),
+  };
+  const [businesses, products, promotions] = await Promise.all([
+    idsByKind.business.length
+      ? supabaseAdmin
+          .from("businesses")
+          .select("id, slug, display_name, status, deleted_at")
+          .in("id", idsByKind.business)
+      : Promise.resolve({ data: [] }),
+    idsByKind.product.length
+      ? supabaseAdmin
+          .from("products")
+          .select("id, slug, name, status, deleted_at")
+          .in("id", idsByKind.product)
+      : Promise.resolve({ data: [] }),
+    idsByKind.promotion.length
+      ? supabaseAdmin
+          .from("promotions")
+          .select("id, slug, title, status, deleted_at")
+          .in("id", idsByKind.promotion)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const metadata = new Map<string, { title: string; slug: string | null }>();
+  for (const row of businesses.data ?? []) {
+    if (row.status === "published" && !row.deleted_at && row.display_name) {
+      metadata.set(`business:${row.id}`, { title: row.display_name, slug: row.slug ?? null });
+    }
+  }
+  for (const row of products.data ?? []) {
+    if (row.status === "published" && !row.deleted_at && row.name) {
+      metadata.set(`product:${row.id}`, { title: row.name, slug: row.slug ?? null });
+    }
+  }
+  for (const row of promotions.data ?? []) {
+    if (row.status === "published" && !row.deleted_at && row.title) {
+      metadata.set(`promotion:${row.id}`, { title: row.title, slug: row.slug ?? null });
+    }
+  }
+
+  const items = context.items.flatMap((item) => {
+    if (item.title || item.slug) return [item];
+    const resolved = metadata.get(`${item.kind}:${item.targetId}`);
+    return resolved ? [{ ...item, ...resolved }] : [];
+  });
+  const hydrated = { ...context, items };
+  return hydrated.destinations.length ||
+    hydrated.items.length ||
+    hydrated.interests.length ||
+    hydrated.durationDays !== null ||
+    hydrated.travelerCount !== null
+    ? hydrated
+    : null;
+}
+
 function tripContextToUserBlock(context: TripContext | null): string {
   if (!context) return "";
   const lines = [
@@ -491,7 +556,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (message.length > MAX_MESSAGE_LEN) return json({ error: "message_too_long" }, 400);
         const visitor = parseVisitor(body.visitor);
         const pathContext = parsePathContext(body.pathContext);
-        const tripContext = parseTripContext(body.tripContext);
+        let tripContext = parseTripContext(body.tripContext);
         const locale =
           typeof body.locale === "string" && ALLOWED_LOCALES.has(body.locale) ? body.locale : "es";
         const localeBlock = LOCALE_DIRECTIVES[locale];
@@ -516,6 +581,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (!apiKey) return json({ error: "missing_api_key" }, 500);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        tripContext = await hydrateTripContextItems(supabaseAdmin, tripContext);
 
         // 1) Rate-limit atómico por IP.
         const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
