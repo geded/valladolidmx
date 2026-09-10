@@ -166,7 +166,7 @@ export function RegionDestinationsPremiumSurface({
         </section>
 
         <TourismAluxPanel
-          className="relative z-10 -mt-3"
+          className="relative z-10 mt-5"
           title="¿Qué lugares quieres conocer?"
           description="Te propongo una ruta según tus días, compañía e intereses; Valladolid funciona como base para descubrir la región sin convertir el viaje en una carrera."
           task="Ayúdame a descubrir destinos del Oriente Maya desde Valladolid y convertirlos en una ruta real."
@@ -356,7 +356,7 @@ function DestinationCard({ destination, index }: { destination: Destination; ind
     <article
       className={cn(
         "group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background",
-        isFeatured && "sm:row-span-2 lg:col-span-1",
+        isFeatured && "sm:col-span-2 lg:col-span-1",
       )}
     >
       <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }} className="block">

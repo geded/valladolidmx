@@ -68,6 +68,12 @@ export function useAluxFloatingPresence(): AluxFloatingPresence {
   const aluxEmbeddedVisible = useAluxEmbeddedVisible();
 
   const ficha = detectFicha(pathname);
+  // El índice regional ya integra su panel canónico de Alux dentro del flujo.
+  // Mantener además el dock flotante termina cubriendo tarjetas cuando el
+  // observador cambia de estado durante el scroll, especialmente en preview.
+  if (pathname === "/oriente-maya" || pathname === "/oriente-maya/") {
+    return { shouldHide: true, reason: "alux-embedded", bottomOffset: 0 };
+  }
   if (ficha === "product") return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
   if (ficha === "business") return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
   if (HIDDEN_PATH_PREFIXES.some((p) => pathname.startsWith(p))) {
