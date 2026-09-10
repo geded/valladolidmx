@@ -492,7 +492,7 @@ function RoutesSection({
         actionHref={content.rutas.actionHref}
       />
       <div
-        className="grid grid-flow-col auto-cols-[84%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31.5%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0"
+        className="grid grid-flow-col auto-cols-[84%] items-start gap-3 overflow-x-auto pb-2 md:auto-cols-[46%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0"
         tabIndex={0}
         aria-label="Rutas recomendadas"
       >
@@ -502,7 +502,7 @@ function RoutesSection({
             <article
               key={route.id}
               className={cn(
-                "overflow-hidden rounded-2xl border bg-card",
+                "self-start overflow-hidden rounded-2xl border bg-card",
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
@@ -554,12 +554,12 @@ function RoutesSection({
                     </li>
                   ))}
                 </ol>
-                <div className="grid grid-cols-2 gap-2 lg:mt-5">
+                <div className="grid grid-cols-1 gap-2 lg:mt-5 xl:grid-cols-2">
                   <Button
                     type="button"
                     variant={active ? "default" : "outline"}
                     onClick={() => onSelectRoute(route.id)}
-                    className="min-h-11 rounded-pill"
+                    className="h-auto min-h-11 whitespace-normal rounded-pill px-3 py-2 leading-tight"
                   >
                     {content.rutas.selectLabel}
                   </Button>
@@ -570,7 +570,7 @@ function RoutesSection({
                       onSelectRoute(route.id);
                       onAdd();
                     }}
-                    className="min-h-11 rounded-pill whitespace-normal"
+                    className="h-auto min-h-11 whitespace-normal rounded-pill px-3 py-2 leading-tight"
                   >
                     Personalizar con Alux
                   </Button>
