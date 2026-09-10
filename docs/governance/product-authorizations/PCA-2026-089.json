@@ -32,7 +32,7 @@
     {
       "operation": "modify",
       "path": "src/components/home-premium/HomePremiumSurface.tsx",
-      "sha256": "5b3227aa4475c67dad172c33935f9bdcc781e896ef75b9a9c8f47e3a6f427b75",
+      "sha256": "aeb3e287c3d1226796e8f6ffb332897a601730bf66b778c6e621c8e925a9b041",
       "authority": "Founder · activación funcional de Alux desde rutas · 2026-09-10"
     },
     {
@@ -56,7 +56,7 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "77ef7ac78554ced5880a51d32ff8406c2b34294fe9ecbcd32ee1cdaae6bba463",
+      "sha256": "c161a39dc139ea02cfce474e81a1e094a467eb9ebd1ef2c22bc14dcf73ca6c33",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     }
   ],

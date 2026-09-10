@@ -63,20 +63,20 @@ export type HomePremiumHeroVariant = "editorial" | "cinematic";
 const ALUX_ROUTE_SUMMARY_MAX = 1000;
 
 function buildAluxRouteSummary(route: HomePremiumRoute): string {
-  const itinerary = `Duración: ${route.duration}. Estilo: ${route.vibe}. Paradas en orden: ${route.sequence.join(" → ")}.`;
-  if (itinerary.length >= ALUX_ROUTE_SUMMARY_MAX) {
-    return `${itinerary.slice(0, ALUX_ROUTE_SUMMARY_MAX - 1).trimEnd()}…`;
+  const metadata = `Duración: ${route.duration}. Estilo: ${route.vibe}.`;
+  if (metadata.length >= ALUX_ROUTE_SUMMARY_MAX) {
+    return `${metadata.slice(0, ALUX_ROUTE_SUMMARY_MAX - 1).trimEnd()}…`;
   }
 
   const label = " Descripción: ";
-  const available = ALUX_ROUTE_SUMMARY_MAX - itinerary.length - label.length;
-  if (available <= 0 || !route.description.trim()) return itinerary;
+  const available = ALUX_ROUTE_SUMMARY_MAX - metadata.length - label.length;
+  if (available <= 0 || !route.description.trim()) return metadata;
   const description = route.description.trim();
   const boundedDescription =
     description.length > available
       ? `${description.slice(0, Math.max(0, available - 1)).trimEnd()}…`
       : description;
-  return `${itinerary}${label}${boundedDescription}`;
+  return `${metadata}${label}${boundedDescription}`;
 }
 
 export interface HomePremiumSurfaceProps {

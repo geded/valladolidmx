@@ -26,6 +26,7 @@
  * rate-limit atómico `alux_public_check_rate`. No se crea analítica nueva.
  */
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   ALUX_CONVERSE_COPY,
   ALUX_CONVERSE_LIMITS,
@@ -57,6 +58,59 @@ const ANON_DAY_LIMIT = 40;
 const AUTH_HOUR_LIMIT = 30;
 const AUTH_DAY_LIMIT = 120;
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
+async function resolvePublishedRouteSelection(
+  sb: SupabaseClient,
+  entityRef: string | null | undefined,
+): Promise<{ title: string; summary: string } | null> {
+  if (!entityRef?.startsWith("route:")) return null;
+  const routeId = entityRef.slice("route:".length).trim();
+  if (!routeId) return null;
+
+  const [routeRes, stopsRes] = await Promise.all([
+    sb
+      .from("editorial_routes")
+      .select("id, name, summary, duration_days, duration_hours, pace, difficulty")
+      .eq("id", routeId)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .maybeSingle(),
+    sb
+      .from("editorial_route_stops")
+      .select("title, position")
+      .eq("route_id", routeId)
+      .order("position", { ascending: true })
+      .limit(40),
+  ]);
+  if (routeRes.error || !routeRes.data) return null;
+
+  const route = routeRes.data as Record<string, unknown>;
+  const stops = ((stopsRes.data ?? []) as Array<Record<string, unknown>>)
+    .map((stop) => sanitizeCmsText(stop["title"], 120))
+    .filter(Boolean);
+  const duration = route["duration_days"]
+    ? `${Number(route["duration_days"])} día${Number(route["duration_days"]) === 1 ? "" : "s"}`
+    : route["duration_hours"]
+      ? `${Number(route["duration_hours"])} h`
+      : "no publicada";
+  const attributes = [route["pace"], route["difficulty"]]
+    .map((value) => sanitizeCmsText(value, 80))
+    .filter(Boolean)
+    .join(" · ");
+  const facts = [
+    `Duración: ${duration}.`,
+    attributes ? `Estilo: ${attributes}.` : "",
+    stops.length ? `Paradas en orden: ${stops.join(" → ")}.` : "Paradas: no publicadas.",
+    sanitizeCmsText(route["summary"], 400),
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    title: sanitizeCmsText(route["name"], 120) || "Ruta seleccionada",
+    summary: sanitizeCmsText(facts, 1000),
+  };
+}
 
 /* ─────────────────────────── prompt ─────────────────────────── */
 
@@ -433,10 +487,13 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const settingsPromise = import("./settings.functions")
       .then((m) => m.resolveAluxSettingsServer(supabaseAdmin))
       .catch(() => null);
-    const retrieved = await retrieval.retrieveConverseCandidates(sb, {
-      destinationSlug,
-      extraDestinationSlugs,
-    });
+    const [retrieved, selectedRoute] = await Promise.all([
+      retrieval.retrieveConverseCandidates(sb, {
+        destinationSlug,
+        extraDestinationSlugs,
+      }),
+      resolvePublishedRouteSelection(sb, data.context?.selection?.entityRef),
+    ]);
     phases["retrieval"] = Date.now() - tRetrieval;
 
     // Distancias sólo con consentimiento explícito (coords presentes).
@@ -574,12 +631,12 @@ export const aluxConverse = createServerFn({ method: "POST" })
       destinationLabel: ctx.destinationLabel,
       destinationSlug: ctx.destinationSlug,
       knownDestinations: retrieved.knownDestinations,
-      selectionTitle: data.context?.selection?.title
-        ? sanitizeCmsText(data.context.selection.title, 120)
-        : null,
-      selectionSummary: data.context?.selection?.summary
-        ? sanitizeCmsText(data.context.selection.summary, 1000)
-        : null,
+      selectionTitle:
+        selectedRoute?.title ??
+        (data.context?.selection?.title
+          ? sanitizeCmsText(data.context.selection.title, 120)
+          : null),
+      selectionSummary: selectedRoute?.summary ?? null,
       stage: data.context?.stage ?? null,
       tripItems,
       tripMeta: data.trip,
