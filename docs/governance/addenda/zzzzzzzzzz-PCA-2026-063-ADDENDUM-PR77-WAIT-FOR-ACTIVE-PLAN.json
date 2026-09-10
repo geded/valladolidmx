@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR77-WAIT-FOR-ACTIVE-PLAN",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para impedir que Alux envíe mensajes antes de cargar correctamente el plan activo autenticado.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/alux/AluxConverseChat.tsx",
+    "previous_sha256": "a2e158706d30964bac5e2e04e762c023c047e0fbf2644fbe388ad59508f045dc",
+    "current_sha256": "2759d9f525beaa262e034808998de5a83923bfb0c73be16de273b31218f37915",
+    "semantic_change": "Bloquea starters y envío mientras carga el plan activo y ofrece reintento fail-closed cuando la lectura falla.",
+    "authority": "Founder · cierre P2 de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "Sin mensajes autenticados con contexto incompleto",
+    "Fallo de plan recuperable y fail-closed",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

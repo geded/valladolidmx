@@ -12,6 +12,7 @@
       "path": "src/components/destination-premium/DestinationPremiumSurface.tsx"
     },
     { "operation": "modify", "path": "src/components/alux/PublicAluxChat.tsx" },
+    { "operation": "modify", "path": "src/components/alux/AluxConverseChat.tsx" },
     {
       "operation": "modify",
       "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHeroFromProduct.tsx"
@@ -44,6 +45,12 @@
       "path": "src/components/alux/PublicAluxChat.tsx",
       "sha256": "3ac7372d199d964fc63dded2e7349fb5f59fda515eca8a2994e04a0e154ff2ea",
       "authority": "Founder · preservación del identificador de favoritos sin metadatos para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "sha256": "2759d9f525beaa262e034808998de5a83923bfb0c73be16de273b31218f37915",
+      "authority": "Founder · espera y recuperación de carga del plan activo antes de habilitar Alux · 2026-09-10"
     },
     {
       "operation": "modify",
