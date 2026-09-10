@@ -581,7 +581,6 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (!apiKey) return json({ error: "missing_api_key" }, 500);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        tripContext = await hydrateTripContextItems(supabaseAdmin, tripContext);
 
         // 1) Rate-limit atómico por IP.
         const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
@@ -605,6 +604,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             429,
           );
         }
+        tripContext = await hydrateTripContextItems(supabaseAdmin, tripContext);
 
         // 2) Upsert de sesión.
         const { data: sessionRow, error: sessErr } = await supabaseAdmin
