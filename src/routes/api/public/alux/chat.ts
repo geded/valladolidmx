@@ -97,14 +97,20 @@ async function hydrateTripContextItems(
   const productIds = context.items
     .filter((item) => item.kind === "product" && item.targetId)
     .map((item) => item.targetId);
-  if (!unresolved.length && !businessIds.length && !productIds.length) return context;
+  const eventIds = context.items
+    .filter((item) => item.kind === "event" && item.targetId)
+    .map((item) => item.targetId);
+  if (!unresolved.length && !businessIds.length && !productIds.length && !eventIds.length) {
+    return context;
+  }
 
   const idsByKind = {
     business: businessIds,
     product: productIds,
+    event: eventIds,
     promotion: unresolved.filter((item) => item.kind === "promotion").map((item) => item.targetId),
   };
-  const [businesses, products, promotions] = await Promise.all([
+  const [businesses, products, events, promotions] = await Promise.all([
     idsByKind.business.length
       ? supabaseAdmin
           .from("businesses")
@@ -115,8 +121,19 @@ async function hydrateTripContextItems(
     idsByKind.product.length
       ? supabaseAdmin
           .from("products")
-          .select("id, slug, name, status, deleted_at")
+          .select(
+            "id, slug, name, status, deleted_at, business:businesses!inner(status, deleted_at, source_review_state)",
+          )
           .in("id", idsByKind.product)
+          .eq("business.status", "published")
+          .is("business.deleted_at", null)
+          .eq(`business.${PUBLIC_BUSINESS_ELIGIBILITY_EQ[0]}`, PUBLIC_BUSINESS_ELIGIBILITY_EQ[1])
+      : Promise.resolve({ data: [] }),
+    idsByKind.event.length
+      ? supabaseAdmin
+          .from("events")
+          .select("id, slug, title, status, deleted_at")
+          .in("id", idsByKind.event)
       : Promise.resolve({ data: [] }),
     idsByKind.promotion.length
       ? supabaseAdmin
@@ -136,6 +153,11 @@ async function hydrateTripContextItems(
       metadata.set(`product:${row.id}`, { title: row.name, slug: row.slug ?? null });
     }
   }
+  for (const row of events.data ?? []) {
+    if (row.status === "published" && !row.deleted_at && row.title) {
+      metadata.set(`event:${row.id}`, { title: row.title, slug: row.slug ?? null });
+    }
+  }
   for (const row of promotions.data ?? []) {
     if (row.status === "published" && !row.deleted_at && row.title) {
       metadata.set(`promotion:${row.id}`, { title: row.title, slug: row.slug ?? null });
@@ -149,6 +171,10 @@ async function hydrateTripContextItems(
     }
     if (item.kind === "product" && item.targetId) {
       const resolved = metadata.get(`product:${item.targetId}`);
+      return resolved ? [{ ...item, ...resolved }] : [];
+    }
+    if (item.kind === "event" && item.targetId) {
+      const resolved = metadata.get(`event:${item.targetId}`);
       return resolved ? [{ ...item, ...resolved }] : [];
     }
     if (item.title || item.slug) return [item];
