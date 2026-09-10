@@ -17,6 +17,7 @@
     { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts" },
     { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts" },
     { "operation": "modify", "path": "src/routes/arma-tu-viaje.tsx" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx" },
     { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" }
   ],
   "acknowledged_revisions": [
@@ -28,8 +29,9 @@
     { "operation": "modify", "path": "src/components/traveler/AddToTravelPlanButton.tsx", "sha256": "3e38acc19c452160a7470679b1df0aded662b2c0c8712ecc7b5703891a04eb5c", "authority": "Founder · confirmación inequívoca de Mi Viaje · 2026-09-10" },
     { "operation": "modify", "path": "src/lib/traveler/anonymous-draft/copy.ts", "sha256": "86f555b08e81387a3842d6abb964918b00cd26fdef6ea49a514e67403c1f6110", "authority": "Founder · respuesta contextual del Concierge Voice · 2026-09-10" },
     { "operation": "modify", "path": "src/lib/cms/public-reads.functions.ts", "sha256": "567685747ba8121997efdba02447175efc89bd2c6e940489e18588eb210d60e8", "authority": "Founder · preservación de la lectura pública CMS existente · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts", "sha256": "f9db4505b104005a54688f13040db130fe6bde63f45136740357d3414e853f25", "authority": "Founder · contexto mínimo de viaje tratado como datos no confiables · 2026-09-10" },
-    { "operation": "modify", "path": "src/routes/arma-tu-viaje.tsx", "sha256": "389d9b48d10cd623d81ad2ab10775bc6223b6da64134ecf97016ed1166c7cfcd", "authority": "Founder · visibilidad del expediente vivo antes del registro · 2026-09-10" },
+    { "operation": "modify", "path": "src/routes/api/public/alux/chat.ts", "sha256": "558cf64ffdf9d980256d83891e9a525b7959786ba4b4f139f90232e5f9678592", "authority": "Founder · contexto de viaje descriptivo y política de acceso coherente · 2026-09-10" },
+    { "operation": "modify", "path": "src/routes/arma-tu-viaje.tsx", "sha256": "6964a5847285c507953a2f26e84902bd2fe9b7d8052e4b2560312a0aeaa9dee3", "authority": "Founder · expediente vivo dentro de la composición publicada del CMS · 2026-09-10" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx", "sha256": "2859ca239843dd8fc9be4d2b3bae21aac1c6e18b00b29fa7f35f30ca9365aafd", "authority": "Founder · resolución de familia mediante la misma taxonomía CMS-first · 2026-09-10" },
     { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx", "sha256": "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8", "authority": "Founder · hidratación de taxonomía de familias administrada por CMS · 2026-09-10" }
   ],
   "public_routes": [
