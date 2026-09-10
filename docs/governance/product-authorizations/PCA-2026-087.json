@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-087",
+  "title": "Valladolid como primer destino del Home",
+  "status": "Approved",
+  "branch": "fix/home-valladolid-first-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para mantener siempre Valladolid como primera tarjeta de destinos del Home y punto de partida para explorar el Oriente Maya, preservando el orden CMS del resto de destinos.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-real.ts" }
+  ],
+  "acknowledged_revisions": [
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-real.ts", "sha256": "909c30bfa886dcc369e164ba42d9f46d39e1de29ef30640ff9941358aedfca42", "authority": "Founder · Valladolid primero en Home · 2026-09-10" }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "contrato Home Premium", "revisión visual en Lovable"]
+}
