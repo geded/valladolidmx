@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-085",
+  "title": "Primera pintura estable de Home y chrome público",
+  "status": "Approved",
+  "branch": "fix/stable-home-first-paint-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir la doble carga visible del Home: entregar desde SSR la composición, marca y chrome definitivos, evitar sustitución tardía del fallback y conservar la bienvenida de continuidad sin desplazar el Hero.",
+  "permissions": [
+    { "operation": "modify", "path": "src/routes/index.tsx" },
+    { "operation": "modify", "path": "src/routes/__root.tsx" },
+    { "operation": "modify", "path": "src/lib/brand/brand-context.tsx" }
+  ],
+  "acknowledged_revisions": [
+    { "operation": "modify", "path": "src/routes/index.tsx", "sha256": "36cd877768409369da3e452a21555f029a659e1c6ff8b76e3af90e54a4170991", "authority": "Founder · Home estable desde la primera pintura · 2026-09-10" },
+    { "operation": "modify", "path": "src/routes/__root.tsx", "sha256": "1298614e9e9e173700fdf78717ccf1b6ce40976d10438537e5bfc50263f40f37", "authority": "Founder · chrome público SSR sin cambio tardío · 2026-09-10" },
+    { "operation": "modify", "path": "src/lib/brand/brand-context.tsx", "sha256": "d3ceab07fb66ce8fffc356492f30acf6bfd58eb30b5f4508cbcf9a79397581ec", "authority": "Founder · marca SSR como estado inicial del provider · 2026-09-10" }
+  ],
+  "public_routes": ["/", "/hoteles", "/restaurantes", "/experiencias", "/eventos", "/oriente-maya"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "revisión visual de recarga en Lovable 1440/834/430/390"]
+}

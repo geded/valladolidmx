@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider, queryOptions, useQuery } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, queryOptions } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -176,16 +176,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
     // para que header, pie y superficies públicas la pinten sin parpadeo.
     // Fail-safe: ante cualquier error se conserva el fallback de código.
-    const [omxdsVisualFoundationsEnabled, brandSettings] = await Promise.all([
+    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome] = await Promise.all([
       getOmxdsVisualFoundationsFlag(),
       context.queryClient
         .ensureQueryData(brandSettingsQueryOptions)
         .catch(() => BRAND_SETTINGS_DEFAULTS),
       // Lote 3B · C — Autoridad institucional vigente (distintivos).
       context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+      // El chrome público debe llegar en la primera respuesta para evitar que
+      // header y footer cambien de geometría después de hidratar React.
+      context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
     ]);
 
-    return { omxdsVisualFoundationsEnabled, brandSettings: normalizeBrandSettings(brandSettings) };
+    return {
+      omxdsVisualFoundationsEnabled,
+      brandSettings: normalizeBrandSettings(brandSettings),
+      publishedHome,
+    };
   },
 
   head: () => ({
@@ -275,7 +282,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { omxdsVisualFoundationsEnabled } = Route.useLoaderData();
+  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerVariant = pathname === "/" ? "overlay" : "solid";
   // Rutas con shell propio (CMS Studio, Portal Empresarial, Admin, Cuenta).
@@ -349,7 +356,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <BrandProvider>
+        <BrandProvider initialBrand={brandSettings}>
           <InstitutionalAuthoritySync />
           <AuthProvider>
             {!isAppShellRoute ? <SkipLink /> : null}
@@ -422,8 +429,8 @@ function PublicChrome({
   // menú, botón destacado y columnas del footer una sola vez desde el
   // Experience Builder y verlo aplicado en cualquier ruta.
   void pathname;
-  const { data: published } = useQuery(rootPublishedHomeQuery);
-  const config = published?.snapshot?.chrome?.[position];
+  const { publishedHome } = Route.useLoaderData();
+  const config = publishedHome?.snapshot?.chrome?.[position];
 
   if (position === "header") {
     return <PublicHeader variant={headerVariant} config={config} />;

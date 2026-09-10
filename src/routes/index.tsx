@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense, lazy } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { HomePremiumRenderer } from "@/lib/experience-builder/home-premium-renderer";
@@ -82,11 +81,13 @@ export const Route = createFileRoute("/")({
       context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
     ]);
     const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
-    const premiumNode = authorityTree?.root.children[0];
+    const stableAuthorityTree = authorityTree ?? HOME_PREMIUM_FALLBACK_TREE;
+    const premiumNode = stableAuthorityTree.root.children[0];
     return {
-      seo: authorityTree?.chrome?.seo ?? null,
+      authorityTree: stableAuthorityTree,
+      seo: stableAuthorityTree.chrome?.seo ?? null,
       fallbackImage:
-        authorityTree && !premiumNode?.hidden ? (pickFirstMediaUrl(authorityTree) ?? null) : null,
+        !premiumNode?.hidden ? (pickFirstMediaUrl(stableAuthorityTree) ?? null) : null,
     };
   },
   component: HomePage,
@@ -101,27 +102,15 @@ export const Route = createFileRoute("/")({
  * mismo bloque compuesto Premium G4 usado por Studio y publicación.
  */
 function HomePage() {
-  const { data: published } = useQuery(publishedHomeQuery);
+  const { authorityTree } = Route.useLoaderData();
   const editWrap = useSectionEditWrap({ pageSlug: "home" });
-  const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
-
-  if (authorityTree) {
-    return (
-      <PublicShell variant="hero">
-        <Suspense fallback={null}>
-          <ContinuityWelcomeSurface />
-        </Suspense>
-        <HomePremiumRenderer tree={authorityTree} wrap={editWrap} />
-      </PublicShell>
-    );
-  }
 
   return (
     <PublicShell variant="hero">
+      <HomePremiumRenderer tree={authorityTree} wrap={editWrap} />
       <Suspense fallback={null}>
         <ContinuityWelcomeSurface />
       </Suspense>
-      <HomePremiumRenderer tree={HOME_PREMIUM_FALLBACK_TREE} wrap={editWrap} />
     </PublicShell>
   );
 }
