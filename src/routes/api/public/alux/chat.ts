@@ -94,11 +94,14 @@ async function hydrateTripContextItems(
   const businessIds = context.items
     .filter((item) => item.kind === "business" && item.targetId)
     .map((item) => item.targetId);
-  if (!unresolved.length && !businessIds.length) return context;
+  const productIds = context.items
+    .filter((item) => item.kind === "product" && item.targetId)
+    .map((item) => item.targetId);
+  if (!unresolved.length && !businessIds.length && !productIds.length) return context;
 
   const idsByKind = {
     business: businessIds,
-    product: unresolved.filter((item) => item.kind === "product").map((item) => item.targetId),
+    product: productIds,
     promotion: unresolved.filter((item) => item.kind === "promotion").map((item) => item.targetId),
   };
   const [businesses, products, promotions] = await Promise.all([
@@ -142,6 +145,10 @@ async function hydrateTripContextItems(
   const items = context.items.flatMap((item) => {
     if (item.kind === "business" && item.targetId) {
       const resolved = metadata.get(`business:${item.targetId}`);
+      return resolved ? [{ ...item, ...resolved }] : [];
+    }
+    if (item.kind === "product" && item.targetId) {
+      const resolved = metadata.get(`product:${item.targetId}`);
       return resolved ? [{ ...item, ...resolved }] : [];
     }
     if (item.title || item.slug) return [item];
