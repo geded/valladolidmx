@@ -146,6 +146,13 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-082"],
     addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZ-P1-CMS-DESTINATION.json",
   },
+  {
+    // Remediación P1 final · resuelve cada slug desde listing_family_key administrado por CMS.
+    package: "first-wave-territorial-category-navigation-cms-family",
+    sha256: "f875988bf7ef6d16553f5fdfea2c680edaeb6294006cb1b47468878242a17db7",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZZZZ-P1-CMS-FAMILY-SURFACE.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
@@ -200,6 +207,13 @@ const acknowledgedRouteRevisions = [
     sha256: "f9303601cda2237c5bd1114f90742ac5ab615b1a280990913c843514e0753016",
     authorizations: ["PCA-2026-082"],
     addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZ-P1-CMS-ROUTE.json",
+  },
+  {
+    // Remediación P1 final · hidrata la taxonomía CMS-first de familias de listado.
+    package: "first-wave-destination-route-listing-family-taxonomy",
+    sha256: "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZZZZ-P1-CMS-FAMILY-ROUTE.json",
   },
 ];
 
