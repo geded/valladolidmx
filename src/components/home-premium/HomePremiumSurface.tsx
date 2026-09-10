@@ -266,7 +266,7 @@ function HeroSearch() {
   return (
     <HeroSearchPill
       destinoLabel="Destino"
-      destinoPlaceholder="¿A dónde quieres ir?"
+      destinoPlaceholder="¿Dónde empezamos?"
       categoriaLabel="Categoría"
       categoriaPlaceholder="¿Qué quieres descubrir?"
       submitLabel="Buscar"

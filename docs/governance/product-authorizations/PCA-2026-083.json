@@ -1,0 +1,44 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-083",
+  "title": "Modernización responsive profesional de superficies públicas",
+  "status": "Approved",
+  "branch": "design/professional-responsive-airbnb-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para modernizar Home y plantillas públicas en escritorio, iPad y celular usando Airbnb como referente de claridad, ligereza, navegación y conversión, preservando la identidad Oriente Maya, la autoridad Premium, el CMS, breadcrumbs, mapas, Alux, Mi Viaje, favoritos, contenido, medios y rutas; revisar visualmente mediante el preview de Lovable del mismo PR, sin publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home/HeroSearchPill.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "cfd6a710dd88ecd10808a8edde39745a7c35a671ee1385194edfceeecbf22356",
+      "authority": "Founder · pregunta de inicio del buscador móvil · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home/HeroSearchPill.tsx",
+      "sha256": "3f311965b66e8def55353f74b945b7935416c62bada8ccf6c636c8cacbadd7c9",
+      "authority": "Founder · buscador compacto y profesional para móvil, iPad y escritorio · 2026-09-10"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun test scripts",
+    "bun scripts/route-inventory-coverage.ts",
+    "bun run governance:check",
+    "revisión visual en preview Lovable 1440/834/430/390"
+  ]
+}
