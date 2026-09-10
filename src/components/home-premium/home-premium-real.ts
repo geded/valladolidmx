@@ -22,6 +22,21 @@ import {
 type Card = HomeRealContent["destinos"][number];
 type MediaCard = Pick<Card, "mediaUrl" | "title">;
 
+/** Valladolid es la puerta de entrada territorial del Home, aunque el CMS
+ * entregue los destinos en otro orden. Conserva intacto el orden relativo
+ * del resto del corpus publicado. */
+function withValladolidFirst(cards: readonly Card[]): Card[] {
+  const valladolidIndex = cards.findIndex(
+    (card) => card.href?.replace(/\/$/, "") === "/oriente-maya/valladolid",
+  );
+  if (valladolidIndex <= 0) return [...cards];
+  return [
+    cards[valladolidIndex],
+    ...cards.slice(0, valladolidIndex),
+    ...cards.slice(valladolidIndex + 1),
+  ];
+}
+
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
 const GOVERNED_VERTICAL_MEDIA = {
@@ -109,6 +124,7 @@ export function mergeHomeRealContent(
 
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
   const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
+  const homeDestinations = withValladolidFirst(real.destinos);
   const firstEventWithMedia = real.eventos.find((card) => card.mediaUrl.length > 0);
   const realHeroSlides = destinationsWithMedia.slice(0, 3).map((card) => ({
     media: mediaOf(card),
@@ -123,7 +139,7 @@ export function mergeHomeRealContent(
     },
     destinos: {
       ...safeContent.destinos,
-      items: real.destinos.map((card, index) => ({
+      items: homeDestinations.map((card, index) => ({
         name: card.title,
         note: card.subtitle,
         media: mediaOf(card, "destination", index),
