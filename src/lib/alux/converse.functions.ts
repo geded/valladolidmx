@@ -608,6 +608,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
         ? Math.max(0, selectedRoute.destinationSlugs.length - 1)
         : undefined,
       selectedRoute: Boolean(selectedRoute),
+      selectedRefs: selectedRoute?.stopRefs,
     });
     phases["retrieval"] = Date.now() - tRetrieval;
 
@@ -631,10 +632,16 @@ export const aluxConverse = createServerFn({ method: "POST" })
         candidate,
       ]),
     );
-    const selectedStopCandidates = (selectedRoute?.stopRefs ?? []).flatMap((ref) => {
-      const candidate = retrievedByKey.get(candidateKey(ref.entityType, ref.entityId));
-      return candidate ? [candidate] : [];
-    });
+    const selectedStopCandidates = Array.from(
+      new Map(
+        (selectedRoute?.stopRefs ?? []).flatMap((ref) => {
+          const candidate = retrievedByKey.get(candidateKey(ref.entityType, ref.entityId));
+          return candidate
+            ? [[candidateKey(candidate.entityType, candidate.entityId), candidate]]
+            : [];
+        }),
+      ).values(),
+    );
     const stopKeys = new Set(
       selectedStopCandidates.map((candidate) =>
         candidateKey(candidate.entityType, candidate.entityId),

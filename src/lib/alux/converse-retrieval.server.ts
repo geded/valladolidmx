@@ -54,6 +54,10 @@ export interface ConverseRetrievalInput {
   readonly maxExtraDestinationSlugs?: number;
   /** Una ruta seleccionada exige resolver todas sus paradas con la elegibilidad canónica. */
   readonly selectedRoute?: boolean;
+  readonly selectedRefs?: readonly {
+    entityType: AluxConverseCandidate["entityType"];
+    entityId: string;
+  }[];
   readonly nowIso?: string;
 }
 
@@ -215,12 +219,13 @@ async function loadBusinessesFor(
   destination: ConverseDestination,
   scope: AluxConverseScope,
   limit: number,
+  requiredIds?: readonly string[],
 ): Promise<{
   candidates: AluxConverseCandidate[];
   ids: string[];
   index: Map<string, { slug: string; categorySlug: string; name: string }>;
 }> {
-  const { data, error } = await sb
+  let query = sb
     .from("businesses")
     .select(
       "id, slug, display_name, tagline, description, filter_attributes, business_categories!businesses_primary_category_id_fkey ( slug, name )",
@@ -229,8 +234,9 @@ async function loadBusinessesFor(
     .eq("status", "published")
     .is("deleted_at", null)
     .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
-    .order("display_name", { ascending: true })
-    .limit(limit);
+    .order("display_name", { ascending: true });
+  if (requiredIds) query = query.in("id", [...requiredIds]);
+  const { data, error } = await query.limit(requiredIds ? Math.max(1, requiredIds.length) : limit);
   if (error || !data) return { candidates: [], ids: [], index: new Map() };
 
   const rows = (data as Array<Record<string, unknown>>).map((row) => {
@@ -697,8 +703,27 @@ async function loadDestinationBundle(
   destination: ConverseDestination,
   scope: AluxConverseScope,
   limits: { businesses: number; perFamily: number },
+  selectedRefs?: ConverseRetrievalInput["selectedRefs"],
 ): Promise<AluxConverseCandidate[]> {
-  const biz = await loadBusinessesFor(sb, destination, scope, limits.businesses);
+  const idsOf = (type: AluxConverseCandidate["entityType"]) =>
+    selectedRefs?.filter((ref) => ref.entityType === type).map((ref) => ref.entityId) ?? [];
+  const productIds = idsOf("product");
+  const { data: ownerRows } = productIds.length
+    ? await sb.from("products").select("business_id").in("id", productIds)
+    : { data: [] };
+  const requiredBusinessIds = Array.from(
+    new Set([
+      ...idsOf("business"),
+      ...((ownerRows ?? []) as Array<{ business_id: string }>).map((row) => row.business_id),
+    ]),
+  );
+  const biz = await loadBusinessesFor(
+    sb,
+    destination,
+    scope,
+    limits.businesses,
+    selectedRefs ? requiredBusinessIds : undefined,
+  );
   const catalog = await loadAluxCanonicalCandidates(sb, {
     destinationId: destination.id,
     destinationSlug: destination.slug,
@@ -706,6 +731,13 @@ async function loadDestinationBundle(
     businessIndex: biz.index,
     limitPerFamily: limits.perFamily,
     includeDemoSeed: true,
+    requiredEntityIds: selectedRefs
+      ? {
+          place: idsOf("place"),
+          product: productIds,
+          event: idsOf("event"),
+        }
+      : undefined,
   });
   const enriched = await enrichCatalog(
     sb,
@@ -759,18 +791,27 @@ export async function retrieveConverseCandidates(
       ? { businesses: 60, perFamily: 60 }
       : { businesses: 12, perFamily: 4 };
     const [own, routes, destCandidates, ...extraBundles] = await Promise.all([
-      loadDestinationBundle(sb, destination, "destination", routeLimits),
+      loadDestinationBundle(sb, destination, "destination", routeLimits, input.selectedRefs),
       loadRoutes(sb, knownDestinations, destination, "destination", 6),
       loadDestinationCandidates(sb, others),
       ...extras.map(async (extra) => [
-        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits)),
+        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits, input.selectedRefs)),
         ...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)),
       ]),
     ]);
+    const selectedDestinations = input.selectedRefs
+      ? knownDestinations.filter((d) =>
+          input.selectedRefs?.some(
+            (ref) => ref.entityType === "destination" && ref.entityId === d.id,
+          ),
+        )
+      : [];
+    const selectedDestinationCandidates = await loadDestinationCandidates(sb, selectedDestinations);
     const candidates = renumberFacts([
       ...collect(own),
       ...collect(routes),
       ...extraBundles.flatMap((b) => collect(b)),
+      ...collect(selectedDestinationCandidates),
       ...collect(destCandidates),
     ]);
     return {

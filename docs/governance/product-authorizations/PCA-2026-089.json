@@ -30,6 +30,14 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-retrieval.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx"
     }
   ],
   "acknowledged_revisions": [
@@ -60,14 +68,26 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "a6b2af483ecf25021e640635c77500096324d3d9da0e44b01be2d7e9dabafa6b",
+      "sha256": "d741137c06cdbaa87d1f335707c7075839950f03a574e12c3810df1ffd19f78c",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     },
     {
       "operation": "modify",
       "path": "src/lib/alux/converse-retrieval.server.ts",
-      "sha256": "e0daf9c67b49d5cf8ce5072e27962e5979d284fe682dbca4400fc07fe4eba20a",
+      "sha256": "6237b805bf82d34859e01cb77e61aae5daf34004ff8514479bf505b88fffa7c1",
       "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts",
+      "sha256": "78509c1d4c8b5f917db2bf780570d97eed8efaa2a07dfe32c3c3931b8db50237",
+      "authority": "Founder · elegibilidad canónica por ID para paradas de ruta · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "sha256": "f01557904a323967340f6945fe71cd5e38426faf4d3c6113501b8ca049d6ce64",
+      "authority": "Founder · preview compartida con rutas CMS canónicas · 2026-09-10"
     }
   ],
   "public_routes": ["/"],

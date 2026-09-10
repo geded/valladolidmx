@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR84-HOME-PREVIEW-CANONICAL-ROUTES.json",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para completar la conexión CMS canónica de Personalizar con Alux y fusionar el PR #84 a main.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+    "previous_sha256": "8ffe5a0e4bfc3a4ddfa7d7cdb56362f0843f995b96157b1856b3426ef67a8cf5",
+    "current_sha256": "f01557904a323967340f6945fe71cd5e38426faf4d3c6113501b8ca049d6ce64",
+    "semantic_change": "sustituye IDs fixture de rutas por referencias canónicas CMS",
+    "authority": "Founder · cierre canónico Home → Alux · 2026-09-10"
+  },
+  "invariants": [
+    "Sin rediseño de la plantilla Premium",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}
