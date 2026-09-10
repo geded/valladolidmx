@@ -56,7 +56,7 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "c161a39dc139ea02cfce474e81a1e094a467eb9ebd1ef2c22bc14dcf73ca6c33",
+      "sha256": "77b0ce5bd45170db74f683273a12d0d41279dbc445a4105daa900e5acc759bdf",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     }
   ],

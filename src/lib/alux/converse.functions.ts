@@ -77,16 +77,65 @@ async function resolvePublishedRouteSelection(
       .maybeSingle(),
     sb
       .from("editorial_route_stops")
-      .select("title, position")
+      .select("title, position, entity_kind, entity_id")
       .eq("route_id", routeId)
-      .order("position", { ascending: true })
-      .limit(40),
+      .order("position", { ascending: true }),
   ]);
   if (routeRes.error || !routeRes.data) return null;
 
   const route = routeRes.data as Record<string, unknown>;
-  const stops = ((stopsRes.data ?? []) as Array<Record<string, unknown>>)
-    .map((stop) => sanitizeCmsText(stop["title"], 120))
+  const stopRows = (stopsRes.data ?? []) as Array<Record<string, unknown>>;
+  const idsOf = (kind: string) =>
+    Array.from(
+      new Set(
+        stopRows
+          .filter((stop) => stop["entity_kind"] === kind && stop["entity_id"])
+          .map((stop) => String(stop["entity_id"])),
+      ),
+    );
+  const publishedLabels = async (table: string, label: string, ids: string[]) => {
+    if (!ids.length) return [] as Array<Record<string, unknown>>;
+    const { data } = await sb
+      .from(table)
+      .select(`id, ${label}`)
+      .in("id", ids)
+      .eq("status", "published")
+      .is("deleted_at", null);
+    return (data ?? []) as unknown as Array<Record<string, unknown>>;
+  };
+  const [destinations, places, businesses, products, events] = await Promise.all([
+    publishedLabels("destinations", "name", idsOf("destination")),
+    publishedLabels("points_of_interest", "name", idsOf("place")),
+    publishedLabels("businesses", "display_name", idsOf("business")),
+    publishedLabels(
+      "products",
+      "name",
+      Array.from(new Set([...idsOf("product"), ...idsOf("experience")])),
+    ),
+    publishedLabels("events", "title", idsOf("event")),
+  ]);
+  const canonicalLabels = new Map<string, string>();
+  const indexLabels = (kind: string, rows: Array<Record<string, unknown>>, field: string) => {
+    for (const row of rows) {
+      const label = sanitizeCmsText(row[field], 120);
+      if (label) canonicalLabels.set(`${kind}:${String(row["id"])}`, label);
+    }
+  };
+  indexLabels("destination", destinations, "name");
+  indexLabels("place", places, "name");
+  indexLabels("business", businesses, "display_name");
+  indexLabels("product", products, "name");
+  indexLabels("experience", products, "name");
+  indexLabels("event", events, "title");
+
+  const stops = stopRows
+    .map((stop) => {
+      const editorialTitle = sanitizeCmsText(stop["title"], 120);
+      if (editorialTitle) return editorialTitle;
+      const kind = String(stop["entity_kind"] ?? "");
+      const id = String(stop["entity_id"] ?? "");
+      return canonicalLabels.get(`${kind}:${id}`) ?? "";
+    })
     .filter(Boolean);
   const duration = route["duration_days"]
     ? `${Number(route["duration_days"])} día${Number(route["duration_days"]) === 1 ? "" : "s"}`
