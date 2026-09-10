@@ -38,6 +38,22 @@ export interface PublicHomeCategory {
   palette: "primary" | "selva" | "cenote" | "atardecer";
 }
 
+export const listPublicBusinessCategorySlugs = createServerFn({ method: "GET" }).handler(
+  async (): Promise<string[]> => {
+    const supabase = publicClient();
+    const { data, error } = await supabase
+      .from("business_categories")
+      .select("slug")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .order("sort_order", { ascending: true });
+    if (error) throw new Error(`public_category_slugs_read_failed: ${error.message}`);
+    return (data ?? [])
+      .map((row) => row.slug)
+      .filter((slug): slug is string => typeof slug === "string" && slug.length > 0);
+  },
+);
+
 const ALLOWED_PALETTES = new Set(["primary", "selva", "cenote", "atardecer"]);
 
 /**
