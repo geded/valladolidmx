@@ -33,6 +33,7 @@ import {
 import {
   useAnonymousTrip,
   ANON_COPY,
+  planAcknowledgedCopy,
   type AnonymousItemKind,
 } from "@/lib/traveler/anonymous-draft";
 import { useProgressiveRegistration } from "@/lib/traveler/anonymous-draft/use-progressive-registration";
@@ -161,7 +162,7 @@ export function AddToTravelPlanButton({
         notifyPlanChanged(res.created ? "add_item" : "already_in_plan"),
       );
       // AC1.2 · Founder Intent Recognition Principle.
-      const c = res.created ? ANON_COPY.intent.planAcknowledged : ANON_COPY.intent.planAlready;
+      const c = res.created ? planAcknowledgedCopy(title) : ANON_COPY.intent.planAlready;
       toast(c.title, { description: c.body });
     },
     onError: (e) => {
@@ -205,7 +206,10 @@ export function AddToTravelPlanButton({
       // No forzamos `optimisticDone` a null aquí: el efecto lo limpia en
       // cuanto la suscripción canónica reporta `alreadyInPlan = true`.
       setPhase("idle");
-      const c = ANON_COPY.intent.planAcknowledged;
+      void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
+        notifyPlanChanged("add_item"),
+      );
+      const c = planAcknowledgedCopy(title);
       toast(c.title, { description: c.body });
     } catch (e) {
       setOptimisticDone(null);

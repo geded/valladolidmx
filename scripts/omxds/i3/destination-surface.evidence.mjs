@@ -132,6 +132,48 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-056"],
     addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZ-PREMIUM-CONTINUITY-DESTINATION-SURFACE.json",
   },
+  {
+    // Primera oleada territorial · la misma superficie Premium enlaza categorías públicas reales.
+    package: "first-wave-territorial-category-navigation",
+    sha256: "a791bb51e99556761a6603986152365c89b57ef8fe2583034adad72ecd29199d",
+    authorizations: ["PCA-2026-056"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZ-FIRST-WAVE-DESTINATION.json",
+  },
+  {
+    // Remediación P1 · sólo expone enlaces acreditados por la taxonomía pública del CMS.
+    package: "first-wave-territorial-category-navigation-cms",
+    sha256: "6910f8b85cd97ba977b97ac113d713bfdf9ebc93dc911ac984ab24787bf445e0",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZ-P1-CMS-DESTINATION.json",
+  },
+  {
+    // Remediación P1 final · resuelve cada slug desde listing_family_key administrado por CMS.
+    package: "first-wave-territorial-category-navigation-cms-family",
+    sha256: "f875988bf7ef6d16553f5fdfea2c680edaeb6294006cb1b47468878242a17db7",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZZZZ-P1-CMS-FAMILY-SURFACE.json",
+  },
+  {
+    // Cierre PR #77 · prioriza slugs presentes en el destino y conserva fallback contractual.
+    package: "first-wave-territorial-category-navigation-destination-aware",
+    sha256: "941e972e74cc320bff57b7ae6fbe3e311f718e94eedffc0df46eeae37d27ca1d",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-082-ADDENDUM-PR77-DESTINATION-AWARE-NAVIGATION.json",
+  },
+  {
+    // P1 PR #77 · familias sin categoría territorial usan su ruta canónica contractual.
+    package: "pr77-canonical-routes-without-territorial-category",
+    sha256: "0e2841380cdaabe7f5e8289bbca5cc2d296797cf97903430fc8bc28506c9c796",
+    authorizations: ["PCA-2026-082"],
+    addendum: "ZZZZ-PCA-2026-056-ADDENDUM-PR77-CANONICAL-FAMILY-ROUTES.json",
+  },
+  {
+    // P1 final PR #77 · familias comerciales sin mapeo CMS permanecen ocultas.
+    package: "pr77-hide-unmapped-cms-business-families",
+    sha256: "04210cba9de33e6ab8253abcef120a9ad73abd4fe19b5fb14202dc1e2acb107c",
+    authorizations: ["PCA-2026-082"],
+    addendum: "zzzzzzz-PCA-2026-056-ADDENDUM-PR77-HIDE-UNMAPPED-CMS-FAMILIES.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
@@ -179,6 +221,20 @@ const acknowledgedRouteRevisions = [
     package: "main-premium-routes-destination-route-reconciliation",
     sha256: "34bc5197fa820a6b5e638bef5a8b98e09d30bad4c04470acf8397118a2c869e2",
     authorizations: ["PCA-2026-067"],
+  },
+  {
+    // Remediación P1 · hidrata los slugs publicados que gobiernan los enlaces de categoría.
+    package: "first-wave-destination-route-public-category-slugs",
+    sha256: "f9303601cda2237c5bd1114f90742ac5ab615b1a280990913c843514e0753016",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZ-P1-CMS-ROUTE.json",
+  },
+  {
+    // Remediación P1 final · hidrata la taxonomía CMS-first de familias de listado.
+    package: "first-wave-destination-route-listing-family-taxonomy",
+    sha256: "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZZZZ-P1-CMS-FAMILY-ROUTE.json",
   },
 ];
 

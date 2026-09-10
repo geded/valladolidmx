@@ -182,7 +182,12 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   }, [messages.length, status]);
 
   // Mi Viaje (fuente canónica): plan activo autenticado o borrador anónimo.
-  const { data: active } = useQuery({
+  const {
+    data: active,
+    isPending: isPlanPending,
+    isError: isPlanError,
+    refetch: refetchPlan,
+  } = useQuery({
     queryKey: ["traveler", "active-plan", user?.id],
     queryFn: () => fetchActive(),
     enabled: isAuthed,
@@ -242,7 +247,13 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   const send = useCallback(
     async (text: string) => {
       const message = text.trim().slice(0, ALUX_CONVERSE_LIMITS.maxMessageChars);
-      if (!message || status === "thinking" || !sessionKey) return;
+      if (
+        !message ||
+        status === "thinking" ||
+        !sessionKey ||
+        (isAuthed && (isPlanPending || isPlanError))
+      )
+        return;
       const userMsg: ThreadMessage = { id: newId(), role: "user", content: message };
       const history = messages
         .filter((m) => !m.failed)
@@ -305,7 +316,18 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         window.setTimeout(() => inputRef.current?.focus(), 0);
       }
     },
-    [status, sessionKey, messages, converseFn, props, understood, tripMeta],
+    [
+      status,
+      sessionKey,
+      isAuthed,
+      isPlanPending,
+      isPlanError,
+      messages,
+      converseFn,
+      props,
+      understood,
+      tripMeta,
+    ],
   );
 
   const lastFailed = [...messages].reverse().find((m) => m.role === "user" && m.failed);
@@ -364,6 +386,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
 
   const starters = props.starters ?? defaultStarters(props.destination?.label ?? null);
   const thinking = status === "thinking";
+  const planBlocked = isAuthed && (isPlanPending || isPlanError);
   const titleById = useMemo(
     () => new Map(tripItems.map((i) => [tripItemKey(i.kind, i.targetId), i.title ?? ""])),
     [tripItems],
@@ -398,6 +421,29 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         Pregunta libre. Alux responde sólo con el catálogo publicado y te dice cuándo un dato no
         está disponible.
       </p>
+      {isAuthed && isPlanPending ? (
+        <p role="status" className="mt-3 flex items-center gap-2 text-[12px] text-muted-foreground">
+          <Loader2 className="size-3.5 animate-spin" aria-hidden />
+          Cargando tu viaje antes de conversar…
+        </p>
+      ) : null}
+      {isAuthed && isPlanError ? (
+        <div
+          role="alert"
+          className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-[12px] text-foreground"
+        >
+          <AlertCircle className="size-3.5 text-destructive" aria-hidden />
+          <span>No pude cargar tu viaje. Alux no enviará un contexto incompleto.</span>
+          <button
+            type="button"
+            onClick={() => void refetchPlan()}
+            className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-background px-3 font-medium hover:bg-muted"
+          >
+            <RotateCcw className="size-3" aria-hidden />
+            Reintentar
+          </button>
+        </div>
+      ) : null}
 
       {/* Anuncios para lector de pantalla */}
       <p className="sr-only" role="status" aria-live="polite">
@@ -480,7 +526,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       </div>
 
       {/* Sugerencias iniciales */}
-      {hydrated && messages.length === 0 && !thinking ? (
+      {hydrated && messages.length === 0 && !thinking && !planBlocked ? (
         <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Preguntas sugeridas">
           {starters.map((s) => (
             <button
@@ -524,12 +570,12 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               ? `Pregúntale a Alux sobre ${props.destination.label}…`
               : "¿Qué viaje tienes en mente?"
           }
-          disabled={thinking}
+          disabled={thinking || planBlocked}
           className="min-h-11 flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] leading-snug text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-focus disabled:opacity-60"
         />
         <button
           type="submit"
-          disabled={thinking || input.trim().length === 0}
+          disabled={thinking || planBlocked || input.trim().length === 0}
           aria-label="Enviar a Alux"
           className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >

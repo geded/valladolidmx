@@ -50,6 +50,7 @@ function hasRenderableBlocks(tree: unknown): boolean {
 
 function AYVPage() {
   const { composition } = Route.useLoaderData();
+  const snapshot = composition?.snapshot;
   return (
     <PublicShell
       eyebrow="Plataforma"
@@ -58,8 +59,8 @@ function AYVPage() {
       crumbs={[{ label: "Arma tu Viaje" }]}
       titleAsText
     >
-      {composition && hasRenderableBlocks(composition.snapshot) ? (
-        <CompositionRenderer tree={composition.snapshot} />
+      {composition && snapshot && hasRenderableBlocks(snapshot) ? (
+        <CompositionRenderer tree={snapshot} />
       ) : (
         <TripPlannerSurface />
       )}

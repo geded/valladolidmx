@@ -28,6 +28,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
 import { toast } from "@/lib/toast";
 import { useTranslation } from "@/i18n/context";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
+import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -74,6 +76,8 @@ export function PublicAluxChat() {
   const [hasMemory, setHasMemory] = useState(false);
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const anonymous = useAnonymousTrip();
+  const anonymousTripReady = anonymous.status !== "idle" && anonymous.status !== "loading";
 
   useEffect(() => {
     const key = ensureSessionKey();
@@ -132,7 +136,7 @@ export function PublicAluxChat() {
   const send = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
-      if (!trimmed || sending || !sessionKey) return;
+      if (!trimmed || sending || !sessionKey || !anonymousTripReady) return;
       setError(null);
       const nextHistory = [...messages, { role: "user" as const, content: trimmed }];
       setMessages(nextHistory);
@@ -154,6 +158,22 @@ export function PublicAluxChat() {
               if (parts[0] !== "oriente-maya") return undefined;
               return { destination: parts[1] ?? null, category: parts[2] ?? null };
             })(),
+            tripContext: anonymous.trip
+              ? {
+                  destinations: anonymous.trip.destinationIds.slice(0, 8),
+                  items: selectAnonymousTravelItems(anonymous.trip)
+                    .slice(0, 20)
+                    .map((item) => ({
+                      kind: item.kind,
+                      targetId: item.targetId,
+                      title: item.title,
+                      slug: item.slug,
+                    })),
+                  interests: anonymous.trip.interests?.slice(0, 16),
+                  durationDays: anonymous.trip.tripDurationDays,
+                  travelerCount: anonymous.trip.travelerCount,
+                }
+              : undefined,
           }),
         });
         const data = await res.json().catch(() => ({}));
@@ -191,7 +211,7 @@ export function PublicAluxChat() {
         setSending(false);
       }
     },
-    [messages, sending, sessionKey, location, locale],
+    [messages, sending, sessionKey, location, locale, anonymous.trip, anonymousTripReady],
   );
 
   return (
@@ -280,6 +300,7 @@ export function PublicAluxChat() {
                   key={s}
                   type="button"
                   onClick={() => send(s)}
+                  disabled={!anonymousTripReady}
                   className="text-xs rounded-pill border border-border/60 bg-muted/40 px-3 py-2 hover:bg-muted transition"
                 >
                   {s}
@@ -341,6 +362,7 @@ export function PublicAluxChat() {
           placeholder="Escribe tu pregunta…"
           rows={1}
           maxLength={800}
+          disabled={!anonymousTripReady}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -349,7 +371,11 @@ export function PublicAluxChat() {
           }}
           className="min-h-[44px] max-h-40 resize-none bg-background"
         />
-        <Button type="submit" size="icon" disabled={sending || !input.trim()}>
+        <Button
+          type="submit"
+          size="icon"
+          disabled={sending || !input.trim() || !anonymousTripReady}
+        >
           <Send className="h-4 w-4" />
           <span className="sr-only">Enviar</span>
         </Button>

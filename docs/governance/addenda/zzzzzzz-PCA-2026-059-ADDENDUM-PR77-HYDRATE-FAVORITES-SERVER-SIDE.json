@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-HYDRATE-FAVORITES-SERVER-SIDE",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para resolver server-side los favoritos sin metadatos detectados en la revisión del PR #77.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "e7f1e6836f345babf470f3aeac84cfd2f94c0fb580529783254a8fc4af138a44",
+    "current_sha256": "1f790eff9e9d3ccc630cf2e06f216884b92c48479b2040ae95da6faa0ed3bbcf",
+    "semantic_change": "Hidrata en servidor negocios, productos y promociones publicados antes de entregar el contexto a Alux.",
+    "authority": "Founder · cierre de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": ["Sólo entidades publicadas", "Fail-closed", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-10"
+}

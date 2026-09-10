@@ -81,7 +81,12 @@ export function ExperienceHeroFromProduct() {
       headerActionsSlot={
         <>
           <ShareProductButton title={p.name} />
-          <FavoriteButton entityKind="product" entityId={p.id} />
+          <FavoriteButton
+            entityKind="product"
+            entityId={p.id}
+            entityTitle={p.name}
+            entitySlug={p.slug}
+          />
         </>
       }
       extensionsSlot={

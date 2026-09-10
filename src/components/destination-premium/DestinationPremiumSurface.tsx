@@ -77,6 +77,13 @@ export interface DestinationPremiumSurfaceProps {
   className?: string;
   /** Runtime productivo del CMS; sustituye las tarjetas ilustrativas G4. */
   renderServicePreview?: (service: DestinationPremiumService) => ReactNode;
+  /**
+   * En producción pública, cada categoría continúa por su URL territorial.
+   * Studio y previews conservan por defecto la selección local aprobada.
+   */
+  serviceNavigation?: "preview" | "territorial";
+  /** Enlaces canónicos resueltos contra categorías publicadas del CMS. */
+  serviceHrefByKey?: Readonly<Record<string, string>>;
   /** Acción canónica Guardar/Mi Viaje, inyectada sin duplicar su lógica. */
   heroAction?: ReactNode;
   /** Rutas editoriales publicadas del CMS; nunca fixtures ni inferencias. */
@@ -102,6 +109,8 @@ export function DestinationPremiumSurface({
   initialService,
   className,
   renderServicePreview,
+  serviceNavigation = "preview",
+  serviceHrefByKey = {},
   heroAction,
   routes = [],
 }: DestinationPremiumSurfaceProps) {
@@ -177,6 +186,8 @@ export function DestinationPremiumSurface({
                     content={content}
                     active={activeService}
                     onSelect={setActiveService}
+                    navigation={serviceNavigation}
+                    hrefByKey={serviceHrefByKey}
                   />
                 </Container>
               </div>
@@ -473,22 +484,31 @@ function ServiciosStrip({
   content,
   active,
   onSelect,
+  navigation,
+  hrefByKey,
 }: {
   content: DestinationPremiumContent;
   active: string;
   onSelect: (key: string) => void;
+  navigation: "preview" | "territorial";
+  hrefByKey: Readonly<Record<string, string>>;
 }) {
+  const navigates = navigation === "territorial";
+  const services = navigates
+    ? content.services.filter((service) => hrefByKey[service.key])
+    : content.services;
   return (
     <section aria-label="Servicios del micrositio">
       <CategoryNavGrid
-        items={content.services.map((s) => ({
+        items={services.map((s) => ({
           slug: s.key,
           label: s.label,
           countLabel: s.hint,
+          href: navigates ? hrefByKey[s.key] : null,
         }))}
-        mode="select"
-        activeSlug={active}
-        onSelect={onSelect}
+        mode={navigates ? "navigate" : "select"}
+        activeSlug={navigates ? null : active}
+        onSelect={navigates ? undefined : onSelect}
         showCounts={false}
         variant="standard"
         desktopColumnsClassName="lg:grid-cols-6"

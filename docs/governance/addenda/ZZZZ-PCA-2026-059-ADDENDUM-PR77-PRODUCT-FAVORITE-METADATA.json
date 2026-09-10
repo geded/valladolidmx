@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-PRODUCT-FAVORITE-METADATA",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para preservar favoritos de Alux con identificación y metadatos disponibles.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHeroFromProduct.tsx",
+    "previous_sha256": "be785cfdccf1f168b423df59700e5276269454c71d6c26b3541a80f41e74119a",
+    "current_sha256": "141ed9b72cc8049dec7d2ccf0e306a78e124d501d84a58c62aa0eb59f70d2204",
+    "semantic_change": "Persiste título y slug disponibles con el favorito de producto.",
+    "authority": "Founder · dos nuevos P1 del PR #77 · 2026-09-10"
+  },
+  "invariants": ["Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-10"
+}

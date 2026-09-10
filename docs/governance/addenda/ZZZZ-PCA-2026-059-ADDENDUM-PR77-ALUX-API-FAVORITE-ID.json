@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-ALUX-API-FAVORITE-ID",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para preservar el identificador de favoritos sin metadatos para Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "839430ececf92463e5885a5da95d71cdc123fe839da8b145a1f69efb35773157",
+    "current_sha256": "e7f1e6836f345babf470f3aeac84cfd2f94c0fb580529783254a8fc4af138a44",
+    "semantic_change": "Valida y conserva targetId aun cuando faltan título y slug.",
+    "authority": "Founder · dos nuevos P1 del PR #77 · 2026-09-10"
+  },
+  "invariants": ["Datos del viaje permanecen no confiables", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-10"
+}

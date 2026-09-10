@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-AUTHENTICATED-PLAN-AWARE-ALUX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para dirigir a viajeros autenticados desde /alux al chat conectado con su plan activo.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/alux.tsx",
+    "previous_sha256": "12da990ac071c87ab02bb98309355f18a3ea36371049c885f19bc297a8b12283",
+    "current_sha256": "79775f8cc7468d1ea33f10d65becbf6db1513979c9a1b7f27db84f63258441af",
+    "semantic_change": "Separa el chat público anónimo del chat autenticado que consume el plan activo canónico.",
+    "authority": "Founder · cierre final de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "Sin flash del chat anónimo durante la carga de sesión",
+    "Plan autenticado mediante AluxConverseChat",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

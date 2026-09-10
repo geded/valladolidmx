@@ -6,6 +6,9 @@ import { AluxSurface } from "@/components/surfaces/AluxSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicAluxChat } from "@/components/alux/PublicAluxChat";
+import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
+import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/i18n/context";
 
 export const Route = createFileRoute("/alux")({
   loader: async () => {
@@ -24,6 +27,8 @@ export const Route = createFileRoute("/alux")({
 
 function AluxPage() {
   const { composition } = Route.useLoaderData();
+  const { user, loading } = useAuth();
+  const { locale } = useTranslation();
   return (
     <PublicShell
       eyebrow="Inteligencia"
@@ -32,7 +37,22 @@ function AluxPage() {
       crumbs={[{ label: "Alux" }]}
     >
       <div className="mx-auto w-full max-w-3xl px-4 mb-10">
-        <PublicAluxChat />
+        {loading ? (
+          <div className="min-h-48 animate-pulse rounded-2xl border border-border/60 bg-muted/30" />
+        ) : user ? (
+          <AluxConverseChat
+            selection={null}
+            coords={null}
+            locale={locale}
+            starters={[
+              "Revisa lo que elegí y dime qué falta",
+              "¿Cuál debería ser mi siguiente paso?",
+              "Ayúdame a ordenar mi viaje",
+            ]}
+          />
+        ) : (
+          <PublicAluxChat />
+        )}
       </div>
       {composition ? <CompositionRenderer tree={composition.snapshot} /> : <AluxSurface />}
     </PublicShell>

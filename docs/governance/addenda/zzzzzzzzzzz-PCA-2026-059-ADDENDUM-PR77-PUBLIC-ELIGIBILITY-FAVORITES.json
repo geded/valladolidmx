@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-PUBLIC-ELIGIBILITY-FAVORITES",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para aplicar la elegibilidad pública canónica al hidratar favoritos empresariales para Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "64f74a1e18540c94ef8fca4191e835954b21511e195468654f9d32e7250ae1fb",
+    "current_sha256": "87fef498fdf9f084beb4dcb2f1e41830a6b218620ec66a2ee46b71c2ec626841",
+    "semantic_change": "Exige PUBLIC_BUSINESS_ELIGIBILITY_EQ antes de hidratar un negocio favorito en el contexto de Alux.",
+    "authority": "Founder · cierre P1 de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "CMS y revisión editorial gobiernan la visibilidad pública",
+    "Sólo entidades publicadas y elegibles",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

@@ -245,6 +245,22 @@ function GuestSection({ guestCount }: { guestCount: number }) {
         </ProgressiveRegistrationButton>
       </div>
       <GuestPlanPreview limit={6} />
+      <div className="mt-4 flex flex-col gap-3 rounded-xl border border-primary/25 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-medium">Tu siguiente mejor paso</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Alux puede revisar lo que elegiste y sugerirte qué falta según el destino, el tiempo y
+            el ritmo de tu viaje.
+          </p>
+        </div>
+        <Link
+          to="/alux"
+          className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-95"
+        >
+          Continuar con Alux
+          <ArrowRight className="size-4" aria-hidden />
+        </Link>
+      </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
         <ProgressiveRegistrationButton
           reason="other_device"
@@ -434,14 +450,14 @@ function AluxTeaserSection({ authed }: { authed: boolean }) {
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             {authed
               ? "Cuando tu expediente tenga al menos un elemento, Alux analiza el ritmo, detecta huecos y sugiere hoteles, restaurantes y experiencias del catálogo — sin modificar nada sin tu confirmación."
-              : "Al iniciar sesión y armar tu expediente, Alux analiza tu plan, detecta huecos y sugiere hoteles, restaurantes y experiencias del catálogo. Nunca modifica tu viaje sin tu confirmación."}
+              : "Alux puede acompañarte desde ahora: revisa el contexto de tu recorrido y te ayuda a elegir el siguiente paso. Nunca modifica tu viaje sin tu confirmación."}
           </p>
           <div className="mt-4">
             <Link
-              to={authed ? "/oriente-maya" : "/auth"}
+              to={authed ? "/oriente-maya" : "/alux"}
               className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-background px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
             >
-              {authed ? "Empezar a explorar" : "Iniciar sesión"}
+              {authed ? "Empezar a explorar" : "Continuar con Alux"}
               <ArrowRight className="size-4" aria-hidden />
             </Link>
           </div>

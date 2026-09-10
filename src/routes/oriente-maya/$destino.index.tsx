@@ -33,6 +33,7 @@ import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { isF1kDestination } from "@/lib/omxds/pilot-allowlist";
 import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import { listPublicRoutes } from "@/lib/routes-editorial/route-public-reads.functions";
+import { getListingFamilyTaxonomy } from "@/lib/listings/listing-family-taxonomy.functions";
 
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 
@@ -72,6 +73,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       evaluationLot,
       homeRealContent,
       routes,
+      listingFamilyTaxonomy,
     ] = await Promise.all([
       getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
@@ -82,6 +84,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       getEvaluationLotSlugs().catch(() => null),
       resolveHomePremiumRealContent().catch(() => null),
       listPublicRoutes({ data: { destino: null, limit: 24 } }).catch(() => []),
+      getListingFamilyTaxonomy().catch(() => ({ available: false as const, taxonomy: {} })),
     ]);
     if (!db) throw notFound();
     const dest = {
@@ -125,6 +128,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
         isF1kDestination(params.destino),
       nearbyDestinations: homeRealContent?.destinos ?? [],
       routes,
+      listingFamilyTaxonomy,
     };
   },
   head: ({ loaderData, params }) =>
@@ -179,6 +183,7 @@ function DestinoPage() {
     premiumEnabled,
     nearbyDestinations,
     routes,
+    listingFamilyTaxonomy,
   } = Route.useLoaderData();
   const search = Route.useSearch() as { presentacion?: "cinematografica" };
   const declaration = buildDestinationContext(dest.slug, dest.name);
@@ -207,6 +212,7 @@ function DestinoPage() {
           presentation={search.presentacion === "cinematografica" ? "cinematic" : "editorial"}
           nearbyDestinations={nearbyDestinations}
           routes={routes}
+          listingFamilyTaxonomy={listingFamilyTaxonomy}
         />
       </DestinationSurfaceProvider>
     </PublicShell>
