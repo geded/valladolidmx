@@ -139,6 +139,13 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-056"],
     addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZ-FIRST-WAVE-DESTINATION.json",
   },
+  {
+    // Remediación P1 · sólo expone enlaces acreditados por la taxonomía pública del CMS.
+    package: "first-wave-territorial-category-navigation-cms",
+    sha256: "6910f8b85cd97ba977b97ac113d713bfdf9ebc93dc911ac984ab24787bf445e0",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZ-P1-CMS-DESTINATION.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
@@ -186,6 +193,13 @@ const acknowledgedRouteRevisions = [
     package: "main-premium-routes-destination-route-reconciliation",
     sha256: "34bc5197fa820a6b5e638bef5a8b98e09d30bad4c04470acf8397118a2c869e2",
     authorizations: ["PCA-2026-067"],
+  },
+  {
+    // Remediación P1 · hidrata los slugs publicados que gobiernan los enlaces de categoría.
+    package: "first-wave-destination-route-public-category-slugs",
+    sha256: "f9303601cda2237c5bd1114f90742ac5ab615b1a280990913c843514e0753016",
+    authorizations: ["PCA-2026-082"],
+    addendum: "PCA-2026-056-ADDENDUM-ZZZZZZZZZZZZZZZZZ-P1-CMS-ROUTE.json",
   },
 ];
 
