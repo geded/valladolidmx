@@ -116,6 +116,7 @@ export function HeroSearchPill({
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label={`${destinoLabel}: ${destino?.name ?? destinoPlaceholder}`}
               className={cn(
                 "group relative flex min-h-12 min-w-0 items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:flex-[1.12] sm:px-3 sm:py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
@@ -164,6 +165,7 @@ export function HeroSearchPill({
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label={`${categoriaLabel}: ${categoria?.name ?? categoriaPlaceholder}`}
               className={cn(
                 "group relative flex size-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-border/70 p-0 text-left transition-colors sm:flex sm:min-h-12 sm:min-w-0 sm:flex-1 sm:justify-start sm:gap-2 sm:border-0 sm:px-3 sm:py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
