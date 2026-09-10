@@ -573,7 +573,8 @@ function RoutesSection({
                         reason: "manual",
                         selection: {
                           entityRef: `route:${route.id}`,
-                          title: `${route.title} · ${route.duration} · ${route.stops} paradas · ${route.vibe}`,
+                          title: route.title,
+                          summary: `${route.description} Duración: ${route.duration}. Estilo: ${route.vibe}. Paradas en orden: ${route.sequence.join(" → ")}.`,
                           familySlug: "rutas",
                         },
                         hint: buildAluxStageAwareHint(

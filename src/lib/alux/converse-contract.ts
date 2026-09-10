@@ -149,6 +149,7 @@ export const AluxConverseSelectionSchema = z
   .object({
     entityRef: z.string().max(160).optional(),
     title: z.string().max(200).optional(),
+    summary: z.string().max(1000).optional(),
     destinationSlug: z.string().max(120).optional(),
     destinationLabel: z.string().max(160).optional(),
     familySlug: z.string().max(80).optional(),

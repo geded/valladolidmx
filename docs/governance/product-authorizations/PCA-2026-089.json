@@ -10,14 +10,54 @@
     {
       "operation": "modify",
       "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/floating-bus.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts"
     }
   ],
   "acknowledged_revisions": [
     {
       "operation": "modify",
       "path": "src/components/home-premium/HomePremiumSurface.tsx",
-      "sha256": "9fdcb1dc6bd6c5f524b8cf7ddab582c15a639aa32b1aff08079cecf776d8133a",
+      "sha256": "5c9462caa2c8b92e3633d45319af44041acda29069e24048cbc5f9682eef4dc7",
       "authority": "Founder · activación funcional de Alux desde rutas · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/floating-bus.ts",
+      "sha256": "c1412500c9c3bc73136a6dbb248b53d4559951e618c5709e48c8baeb2e5dc58e",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-contract.ts",
+      "sha256": "b308ebe92c497b66bce250f91635bc73702dab2157245c1a0531670111228c92",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "sha256": "fa062207ebd8ba9247983f7bcd6bc32933266407c2d28103ab7ec65c97ec5795",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts",
+      "sha256": "03c174731d68f199aa73a4b0e7d101b6591c8d4e921622c66614b23f1411437b",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
     }
   ],
   "public_routes": ["/"],

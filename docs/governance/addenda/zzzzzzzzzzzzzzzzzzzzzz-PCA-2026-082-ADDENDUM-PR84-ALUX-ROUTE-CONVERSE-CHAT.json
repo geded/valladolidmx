@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-082-ADDENDUM-PR84-ALUX-ROUTE-CONVERSE-CHAT",
+  "status": "Approved",
+  "parent": "PCA-2026-082",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para que Personalizar con Alux consuma la descripción y secuencia completa de la ruta elegida.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/alux/AluxConverseChat.tsx",
+    "previous_sha256": "2759d9f525beaa262e034808998de5a83923bfb0c73be16de273b31218f37915",
+    "current_sha256": "fa062207ebd8ba9247983f7bcd6bc32933266407c2d28103ab7ec65c97ec5795",
+    "semantic_change": "Transporta el contexto editorial completo de la ruta seleccionada hasta la conversación de Alux.",
+    "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+  },
+  "invariants": [
+    "Catálogo y rutas canónicas preservados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

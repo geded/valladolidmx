@@ -283,6 +283,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                 ? {
                     entityRef: props.selection.entityRef,
                     title: props.selection.title,
+                    summary: props.selection.summary,
                     destinationSlug: props.selection.destinationSlug,
                     destinationLabel: props.selection.destinationLabel,
                     familySlug: props.selection.familySlug,

@@ -92,6 +92,7 @@ function buildUserPrompt(args: {
   destinationSlug: string | null;
   knownDestinations: readonly { slug: string; name: string }[];
   selectionTitle: string | null;
+  selectionSummary: string | null;
   stage: string | null;
   tripItems: readonly AluxConverseTripItem[];
   tripMeta: AluxConverseInput["trip"];
@@ -109,6 +110,7 @@ function buildUserPrompt(args: {
     `- Destinos publicados: ${args.knownDestinations.map((d) => `${d.name} (${d.slug})`).join(", ")}`,
   );
   if (args.selectionTitle) lines.push(`- Ficha activa (no repetir): "${args.selectionTitle}"`);
+  if (args.selectionSummary) lines.push(`- Itinerario seleccionado: ${args.selectionSummary}`);
   if (args.stage) lines.push(`- Etapa detectada por la interfaz: ${args.stage}`);
   const u = args.understood;
   const understoodBits: string[] = [];
@@ -573,6 +575,9 @@ export const aluxConverse = createServerFn({ method: "POST" })
       knownDestinations: retrieved.knownDestinations,
       selectionTitle: data.context?.selection?.title
         ? sanitizeUserText(data.context.selection.title, 120)
+        : null,
+      selectionSummary: data.context?.selection?.summary
+        ? sanitizeUserText(data.context.selection.summary, 1000)
         : null,
       stage: data.context?.stage ?? null,
       tripItems,
