@@ -8,7 +8,7 @@
     "operation": "create",
     "path": "src/lib/alux/converse.functions.ts",
     "previous_sha256": "d7c64418e7ec19e6559c9e7eb7fdc93235582ff2c4976354132f1ad5b9756f85",
-    "current_sha256": "4c619743f7dbf17553cd1ce32dd17676b9d98828990815bd4cf573353f8d8b9b",
+    "current_sha256": "4ef8c65ba7ec0e49ea3099842902de7b2706f1e41f8f657cb55b8a6c6c88137c",
     "semantic_change": "Transporta el contexto editorial completo de la ruta seleccionada hasta la conversación de Alux.",
     "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
   },

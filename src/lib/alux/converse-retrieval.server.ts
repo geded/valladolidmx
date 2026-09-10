@@ -50,6 +50,8 @@ export interface ConverseRetrievalInput {
   readonly destinationSlug: string | null;
   /** Destinos adicionales mencionados (se rotulan como cercanía). */
   readonly extraDestinationSlugs?: readonly string[];
+  /** Límite ampliable para rutas publicadas que abarcan varios territorios canónicos. */
+  readonly maxExtraDestinationSlugs?: number;
   readonly nowIso?: string;
 }
 
@@ -744,7 +746,7 @@ export async function retrieveConverseCandidates(
       .filter((s) => s !== destination.slug)
       .map((s) => bySlug.get(s))
       .filter((d): d is ConverseDestination => Boolean(d))
-      .slice(0, 2);
+      .slice(0, Math.max(0, Math.min(input.maxExtraDestinationSlugs ?? 2, 39)));
     // Otros destinos publicados como opción de región (planear salidas).
     const others = knownDestinations.filter((d) => d.id !== destination.id).slice(0, 8);
 

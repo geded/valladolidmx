@@ -559,11 +559,11 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const baseIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
     const mentioned = baseIntent.mentionedDestinationSlugs;
     const destinationSlug =
-      data.context?.destination?.slug ??
       mentioned[0] ??
+      selectedRoute?.destinationSlugs[0] ??
+      data.context?.destination?.slug ??
       data.understood?.destinationSlug ??
       data.context?.selection?.destinationSlug ??
-      selectedRoute?.destinationSlugs[0] ??
       session?.last_destination_slug ??
       null;
     const understood = mergeUnderstood(data.understood, baseIntent, destinationSlug);
@@ -583,6 +583,9 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const retrieved = await retrieval.retrieveConverseCandidates(sb, {
       destinationSlug,
       extraDestinationSlugs,
+      maxExtraDestinationSlugs: selectedRoute
+        ? Math.max(0, selectedRoute.destinationSlugs.length - 1)
+        : undefined,
     });
     phases["retrieval"] = Date.now() - tRetrieval;
 

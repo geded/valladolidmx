@@ -26,6 +26,10 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-retrieval.server.ts"
     }
   ],
   "acknowledged_revisions": [
@@ -56,8 +60,14 @@
     {
       "operation": "modify",
       "path": "src/lib/alux/converse.functions.ts",
-      "sha256": "4c619743f7dbf17553cd1ce32dd17676b9d98828990815bd4cf573353f8d8b9b",
+      "sha256": "4ef8c65ba7ec0e49ea3099842902de7b2706f1e41f8f657cb55b8a6c6c88137c",
       "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-retrieval.server.ts",
+      "sha256": "246fca9784400af5d8e1a16bf8a4e40a69ea2f40010384302745685e8e0636c0",
+      "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
     }
   ],
   "public_routes": ["/"],
