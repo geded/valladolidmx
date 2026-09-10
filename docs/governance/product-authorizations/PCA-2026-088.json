@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-088",
+  "title": "Corrección responsive de tarjetas de rutas del Home",
+  "status": "Approved",
+  "branch": "fix/home-routes-responsive-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir únicamente la presentación existente de las tarjetas de rutas del Home, evitando botones montados y alturas vacías en distintos dispositivos, sin crear diseño, contenido ni funcionalidad nueva.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "c6dbee7dd60367387011cb28c5d77c7634a6e9237e2fc304ff32f077c7e735aa",
+      "authority": "Founder · corrección visual responsive de rutas · 2026-09-10"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "revisión visual en preview Lovable"]
+}
