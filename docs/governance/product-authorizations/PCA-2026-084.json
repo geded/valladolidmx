@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-084",
+  "title": "Corrección visual responsive de header y buscador público",
+  "status": "Approved",
+  "branch": "fix/header-search-responsive-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección Founder del 2026-09-10 basada en evidencia visual del preview Lovable: uniformar controles del header con patrón profesional tipo Airbnb y eliminar montaje y recorte del buscador Home en celular, revisando su propagación en las autoridades compartidas sin crear plantillas nuevas.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/home/HeroSearchPill.tsx" },
+    { "operation": "modify", "path": "src/components/layout/LanguageSwitcher.tsx" },
+    { "operation": "modify", "path": "src/components/travel-plan/MiViajeChip.tsx" },
+    { "operation": "modify", "path": "src/components/layout/UserMenu.tsx" }
+  ],
+  "acknowledged_revisions": [
+    { "operation": "modify", "path": "src/components/home/HeroSearchPill.tsx", "sha256": "d041f61a0d756da3396dd2ac48b94f80e461372ac0777b8d60634f40440db23c", "authority": "Founder · buscador móvil sin montaje a 390/430 · 2026-09-10" },
+    { "operation": "modify", "path": "src/components/layout/LanguageSwitcher.tsx", "sha256": "086cb322100049333bad5d8d93823b3627f5cdf0271ad5ceed91d5ddf0576c0a", "authority": "Founder · selector de idioma global tipo viaje · 2026-09-10" },
+    { "operation": "modify", "path": "src/components/travel-plan/MiViajeChip.tsx", "sha256": "2e3d7fd8047e6c8cb37053608e1215f4f6999fa5fc2eef45d8af610eae5931b7", "authority": "Founder · altura uniforme del header · 2026-09-10" },
+    { "operation": "modify", "path": "src/components/layout/UserMenu.tsx", "sha256": "a9048707c45500f95527321f3c0c6abb705cd89d20e0050b0ab3e27b7ce56264", "authority": "Founder · acceso global consistente tipo Airbnb · 2026-09-10" }
+  ],
+  "public_routes": ["/", "todas las rutas públicas con SiteHeader"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "revisión visual Lovable 1440/834/430/390"],
+  "visual_evidence": "IMG_0654.png · recorte del buscador y controles desiguales observados en preview Lovable"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "PCA-2026-083-ADDENDUM-PR79-HERO-SEARCH", "status": "Approved", "parent": "PCA-2026-083",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección visual Founder basada en IMG_0654 del preview Lovable.",
+  "supersedes_acknowledged_revision": { "operation": "modify", "path": "src/components/home/HeroSearchPill.tsx", "previous_sha256": "3f311965b66e8def55353f74b945b7935416c62bada8ccf6c636c8cacbadd7c9", "current_sha256": "d041f61a0d756da3396dd2ac48b94f80e461372ac0777b8d60634f40440db23c", "semantic_change": "Corrige el montaje observado en el buscador móvil preservando ¿Dónde empezamos? y sus rutas canónicas.", "authority": "Founder · corrección visual PR #79 · 2026-09-10" },
+  "invariants": ["Pregunta y rutas canónicas preservadas", "Sin publicación ni despliegue"], "recorded_at": "2026-09-10"
+}

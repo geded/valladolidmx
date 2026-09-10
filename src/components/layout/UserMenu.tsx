@@ -111,7 +111,7 @@ export function UserMenu() {
   if (loading) {
     return (
       <span
-        className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1 text-[13px] text-muted-foreground"
+        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[13px] text-muted-foreground"
         aria-busy="true"
       >
         <UserRound className="size-4 opacity-60" aria-hidden />
@@ -128,7 +128,7 @@ export function UserMenu() {
           type="button"
           onClick={() => setOpen((v) => !v)}
           onBlur={() => setTimeout(() => setOpen(false), 120)}
-          className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1 text-[13px] font-medium hover:bg-accent transition-all active:scale-[0.98]"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium transition-all hover:bg-accent active:scale-[0.98]"
           title={role ? ROLE_LABELS[role] : undefined}
           aria-haspopup="menu"
           aria-expanded={open}
@@ -214,7 +214,7 @@ export function UserMenu() {
   return (
     <Link
       to="/auth"
-      className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-[13px] font-medium text-primary-foreground shadow-sm hover:opacity-90 transition-all active:scale-[0.98]"
+      className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
       title={t("nav.sign_in")}
     >
       <UserRound className="size-4" aria-hidden />

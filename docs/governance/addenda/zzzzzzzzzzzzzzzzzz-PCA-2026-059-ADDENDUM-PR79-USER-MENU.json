@@ -1,0 +1,7 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR79-USER-MENU", "status": "Approved", "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección visual Founder basada en IMG_0654 del preview Lovable.",
+  "supersedes_acknowledged_revision": { "operation": "modify", "path": "src/components/layout/UserMenu.tsx", "previous_sha256": "006e1e0e7da6927e00d73575e21d5435f6cf99d1afead1e118d60f9d00c111bb", "current_sha256": "a9048707c45500f95527321f3c0c6abb705cd89d20e0050b0ab3e27b7ce56264", "semantic_change": "Unifica altura y radio del acceso de usuario sin cambiar autenticación, roles ni destinos.", "authority": "Founder · corrección visual PR #79 · 2026-09-10" },
+  "invariants": ["Autenticación, roles y navegación preservados", "Sin publicación ni despliegue"], "recorded_at": "2026-09-10"
+}

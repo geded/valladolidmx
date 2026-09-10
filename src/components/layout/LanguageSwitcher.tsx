@@ -24,10 +24,10 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("common.language")}
-        className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-[13px] font-medium text-foreground hover:bg-accent transition-all active:scale-[0.98]"
+        className="inline-flex size-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-card p-0 text-foreground transition-all hover:bg-accent active:scale-[0.98]"
       >
         <Globe className="size-4" aria-hidden />
-        <span className="uppercase">{locale}</span>
+        <span className="sr-only">{locale.toUpperCase()}</span>
       </button>
       {open ? (
         <>
