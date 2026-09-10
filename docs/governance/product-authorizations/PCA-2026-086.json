@@ -12,7 +12,7 @@
   ],
   "acknowledged_revisions": [
     { "operation": "modify", "path": "src/components/destination-premium/RegionDestinationsPremiumSurface.tsx", "sha256": "02f49177887962d6d824e271add62c244298ddc11722af9901bea743afd93426", "authority": "Founder · corrección visual Oriente Maya · 2026-09-10" },
-    { "operation": "modify", "path": "src/lib/alux/floating-presence.ts", "sha256": "a1902c43b6b2d38fe233c13d4fe3b8f94dda52c75139d22ff80a82b85f60942a", "authority": "Founder · Alux sin superposición en índice regional · 2026-09-10" }
+    { "operation": "modify", "path": "src/lib/alux/floating-presence.ts", "sha256": "0fa1e831b835e3374adb74737453c8c7e3254db70b99e76bd5b7b506023351a0", "authority": "Founder · Alux sin superposición en índice regional · 2026-09-10" }
   ],
   "public_routes": ["/oriente-maya"],
   "required_feature_flags": [],
