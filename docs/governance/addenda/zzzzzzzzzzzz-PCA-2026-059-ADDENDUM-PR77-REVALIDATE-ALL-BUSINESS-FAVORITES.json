@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR77-REVALIDATE-ALL-BUSINESS-FAVORITES",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para revalidar todos los favoritos empresariales contra la elegibilidad pública vigente antes de incorporarlos al contexto de Alux.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "87fef498fdf9f084beb4dcb2f1e41830a6b218620ec66a2ee46b71c2ec626841",
+    "current_sha256": "d7b45dd90618638c1706bf52bca9b1ca54c6fc9df3c092d8abb92e32ac3964c2",
+    "semantic_change": "Revalida también los favoritos empresariales que ya contienen título o slug y descarta los que ya no cumplen la elegibilidad pública canónica.",
+    "authority": "Founder · cierre P1 de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": [
+    "CMS y revisión editorial gobiernan la visibilidad pública",
+    "Sólo entidades publicadas y elegibles",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}
