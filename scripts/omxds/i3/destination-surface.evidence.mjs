@@ -167,6 +167,13 @@ const acknowledgedSurfaceRevisions = [
     authorizations: ["PCA-2026-082"],
     addendum: "ZZZZ-PCA-2026-056-ADDENDUM-PR77-CANONICAL-FAMILY-ROUTES.json",
   },
+  {
+    // P1 final PR #77 · familias comerciales sin mapeo CMS permanecen ocultas.
+    package: "pr77-hide-unmapped-cms-business-families",
+    sha256: "04210cba9de33e6ab8253abcef120a9ad73abd4fe19b5fb14202dc1e2acb107c",
+    authorizations: ["PCA-2026-082"],
+    addendum: "zzzzzzz-PCA-2026-056-ADDENDUM-PR77-HIDE-UNMAPPED-CMS-FAMILIES.json",
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",

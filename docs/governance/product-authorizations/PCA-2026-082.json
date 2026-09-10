@@ -65,8 +65,8 @@
     {
       "operation": "modify",
       "path": "src/components/surfaces/DestinationSurface.tsx",
-      "sha256": "0e2841380cdaabe7f5e8289bbca5cc2d296797cf97903430fc8bc28506c9c796",
-      "authority": "Founder · rutas canónicas válidas para familias sin categoría territorial · 2026-09-10"
+      "sha256": "04210cba9de33e6ab8253abcef120a9ad73abd4fe19b5fb14202dc1e2acb107c",
+      "authority": "Founder · oculta familias comerciales sin mapeo CMS y preserva rutas canónicas no territoriales · 2026-09-10"
     },
     {
       "operation": "modify",
@@ -95,8 +95,8 @@
     {
       "operation": "modify",
       "path": "src/routes/api/public/alux/chat.ts",
-      "sha256": "e7f1e6836f345babf470f3aeac84cfd2f94c0fb580529783254a8fc4af138a44",
-      "authority": "Founder · conservación fail-safe de favoritos identificados sin metadatos · 2026-09-10"
+      "sha256": "1f790eff9e9d3ccc630cf2e06f216884b92c48479b2040ae95da6faa0ed3bbcf",
+      "authority": "Founder · resolución server-side de favoritos publicados sin metadatos · 2026-09-10"
     },
     {
       "operation": "modify",

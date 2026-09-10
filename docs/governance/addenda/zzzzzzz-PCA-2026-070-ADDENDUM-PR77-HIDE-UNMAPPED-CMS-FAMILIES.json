@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-070-ADDENDUM-PR77-HIDE-UNMAPPED-CMS-FAMILIES",
+  "status": "Approved",
+  "parent": "PCA-2026-070",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir los dos nuevos P1 detectados en la revisión del PR #77.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/DestinationSurface.tsx",
+    "previous_sha256": "0e2841380cdaabe7f5e8289bbca5cc2d296797cf97903430fc8bc28506c9c796",
+    "current_sha256": "04210cba9de33e6ab8253abcef120a9ad73abd4fe19b5fb14202dc1e2acb107c",
+    "semantic_change": "Oculta familias comerciales sin mapeo CMS publicado.",
+    "authority": "Founder · cierre de revisión PR #77 · 2026-09-10"
+  },
+  "invariants": ["CMS-first", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-09-10"
+}
