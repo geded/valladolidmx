@@ -289,6 +289,49 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(arbitraryConceptual.hero.slides[0]?.media.url).toBe("");
   });
 
+  test("la Home presenta Valladolid primero aunque el CMS entregue otro orden", () => {
+    const merged = mergeHomeRealContent(HOME_PREMIUM_G4_CONTENT, {
+      destinos: [
+        {
+          title: "Ek Balam",
+          subtitle: "Ciudad maya",
+          category: "Destino",
+          href: "/oriente-maya/ek-balam",
+          mediaUrl: "",
+          puebloMagico: false,
+        },
+        {
+          title: "Valladolid",
+          subtitle: "Capital turística",
+          category: "Destino",
+          href: "/oriente-maya/valladolid/",
+          mediaUrl: "",
+          puebloMagico: true,
+        },
+        {
+          title: "Espita",
+          subtitle: "Pueblo Mágico",
+          category: "Destino",
+          href: "/oriente-maya/espita",
+          mediaUrl: "",
+          puebloMagico: true,
+        },
+      ],
+      experiencias: [],
+      stays: [],
+      food: [],
+      eventos: [],
+      rutas: [],
+      mapPoints: [],
+    });
+
+    expect(merged.destinos.items.map((item) => item.name)).toEqual([
+      "Valladolid",
+      "Ek Balam",
+      "Espita",
+    ]);
+  });
+
   test("la Home conserva un medio temporal aprobado con metadatos del slot CMS", () => {
     const approved = HOME_PREMIUM_G4_CONTENT.hero.slides[0]!;
     const configuredUrl = encodeSlotMedia({
