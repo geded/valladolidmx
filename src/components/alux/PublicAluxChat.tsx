@@ -29,6 +29,7 @@ import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
 import { toast } from "@/lib/toast";
 import { useTranslation } from "@/i18n/context";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
+import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -159,11 +160,13 @@ export function PublicAluxChat() {
             tripContext: anonymous.trip
               ? {
                   destinations: anonymous.trip.destinationIds.slice(0, 8),
-                  items: anonymous.trip.plannedItems.slice(0, 20).map((item) => ({
-                    kind: item.kind,
-                    title: item.title,
-                    slug: item.slug,
-                  })),
+                  items: selectAnonymousTravelItems(anonymous.trip)
+                    .slice(0, 20)
+                    .map((item) => ({
+                      kind: item.kind,
+                      title: item.title,
+                      slug: item.slug,
+                    })),
                   interests: anonymous.trip.interests?.slice(0, 16),
                   durationDays: anonymous.trip.tripDurationDays,
                   travelerCount: anonymous.trip.travelerCount,
