@@ -566,6 +566,15 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       }),
       resolveTerritoryMapPointsQuery(),
       readPublishedRouteCards({ limit: 6 }),
+      // Valladolid es la puerta territorial del Home. La consulta dedicada
+      // garantiza su presencia aunque el orden general lo deje fuera del
+      // primer lote de ocho destinos publicados.
+      resolveSmartBlockQuery({
+        select: ["slug", "name", "short_description", "hero_image_url", "href"],
+        table: "destinations",
+        filters: [{ column: "slug", op: "eq", value: "valladolid" }],
+        limit: 1,
+      }),
     ]);
 
     // Una fuente temporalmente indisponible no debe borrar las demás
@@ -586,8 +595,13 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       mapResult?.status === "fulfilled" ? (mapResult.value as HomeRealContent["mapPoints"]) : [];
     const routeResult = settled[5];
     const publishedRoutes = routeResult?.status === "fulfilled" ? routeResult.value : [];
+    const valladolidRes = resultAt(6);
 
-    const destinos = cardsFrom(destRes, () => "Destino");
+    const valladolidItem = valladolidRes.items[0];
+    const destinationItems = valladolidItem
+      ? [valladolidItem, ...destRes.items.filter((item) => item.slug !== "valladolid")].slice(0, 8)
+      : destRes.items;
+    const destinos = cardsFrom({ ...destRes, items: destinationItems }, () => "Destino");
     const businesses = cardsFrom(bizRes, (item) =>
       typeof item.category_slug === "string" ? item.category_slug : "",
     );
