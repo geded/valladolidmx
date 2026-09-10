@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-078-ADDENDUM-PR84-ALUX-ROUTE-ACTION",
+  "status": "Approved",
+  "parent": "PCA-2026-078",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para activar el botón existente Personalizar con Alux en las rutas del Home.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "c6dbee7dd60367387011cb28c5d77c7634a6e9237e2fc304ff32f077c7e735aa",
+    "current_sha256": "ad70e4fb0722d65dac1a2e6d3737a8787e4a090e72a8cf732ef6ae328109feed",
+    "semantic_change": "Conecta el CTA existente de personalización con el Alux flotante y le entrega el contexto de la ruta seleccionada.",
+    "authority": "Founder · activación funcional de Alux desde rutas · 2026-09-10"
+  },
+  "invariants": [
+    "Diseño, contenido y enlaces existentes preservados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

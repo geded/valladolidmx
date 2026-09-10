@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-089",
+  "title": "Activación de Alux desde la personalización de rutas del Home",
+  "status": "Approved",
+  "branch": "fix/home-route-alux-action-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir el botón existente Personalizar con Alux de las rutas del Home y hacer que abra el concierge con el contexto de la ruta seleccionada, sin rediseñar la sección, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "ad70e4fb0722d65dac1a2e6d3737a8787e4a090e72a8cf732ef6ae328109feed",
+      "authority": "Founder · activación funcional de Alux desde rutas · 2026-09-10"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "revisión funcional del botón Personalizar con Alux"]
+}
