@@ -281,17 +281,14 @@ export function DestinationSurfaceContractBoundary({
         const family: ListingFamilyId | null = isListingFamilyId(service.key) ? service.key : null;
         if (!family) return [];
         const cmsSlugs = listingFamilyTaxonomy.taxonomy[family] ?? [];
+        const contract = listingFamilyContract(family);
         const slug = listingFamilyTaxonomy.available
           ? (cmsSlugs.find((candidate) => destinationCategorySlugs.has(candidate)) ?? cmsSlugs[0])
-          : (listingFamilyContract(family).categorySlugs[0] ?? family);
-        return slug
-          ? [
-              [
-                service.key,
-                `/oriente-maya/${encodeURIComponent(destinationSlug)}/${encodeURIComponent(slug)}`,
-              ],
-            ]
-          : [];
+          : contract.categorySlugs[0];
+        const href = slug
+          ? `/oriente-maya/${encodeURIComponent(destinationSlug)}/${encodeURIComponent(slug)}`
+          : contract.route;
+        return href ? [[service.key, href]] : [];
       }),
     );
     return (

@@ -165,6 +165,7 @@ export function PublicAluxChat() {
                     .slice(0, 20)
                     .map((item) => ({
                       kind: item.kind,
+                      targetId: item.targetId,
                       title: item.title,
                       slug: item.slug,
                     })),

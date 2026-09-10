@@ -36,7 +36,7 @@ type Visitor = { lat: number; lng: number };
 type PathContext = { destination?: string | null; category?: string | null };
 type TripContext = {
   destinations: string[];
-  items: Array<{ kind: string; title: string | null; slug: string | null }>;
+  items: Array<{ kind: string; targetId: string; title: string | null; slug: string | null }>;
   interests: string[];
   durationDays: number | null;
   travelerCount: { adults: number; children: number } | null;
@@ -57,9 +57,10 @@ function parseTripContext(input: unknown): TripContext | null {
         if (!candidate || typeof candidate !== "object") return [];
         const item = candidate as Record<string, unknown>;
         const kind = typeof item.kind === "string" ? item.kind.slice(0, 40) : "";
+        const targetId = typeof item.targetId === "string" ? item.targetId.slice(0, 128) : "";
         const title = typeof item.title === "string" ? item.title.slice(0, 180) : null;
         const slug = typeof item.slug === "string" ? item.slug.slice(0, 180) : null;
-        return kind && (title || slug) ? [{ kind, title, slug }] : [];
+        return kind && (title || slug || targetId) ? [{ kind, targetId, title, slug }] : [];
       })
     : [];
   const count = value.travelerCount as Record<string, unknown> | null;
@@ -89,7 +90,7 @@ function tripContextToUserBlock(context: TripContext | null): string {
   const lines = [
     context.destinations.length ? `Destinos elegidos: ${context.destinations.join(", ")}` : "",
     context.items.length
-      ? `Elementos elegidos: ${context.items.map((item) => `${item.kind}: ${item.title ?? item.slug}`).join("; ")}`
+      ? `Elementos elegidos: ${context.items.map((item) => `${item.kind}: ${item.title ?? item.slug ?? `referencia ${item.targetId}`}`).join("; ")}`
       : "",
     context.interests.length ? `Intereses: ${context.interests.join(", ")}` : "",
     context.durationDays ? `Duración: ${context.durationDays} días` : "",

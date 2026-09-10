@@ -651,7 +651,7 @@ function PremiumListingCard({
               {item.location?.label ?? item.territorialContext ?? "Oriente Maya"}
             </p>
           </div>
-          <FavoriteButton entityKind="business" entityId={item.id} />
+          <FavoriteButton entityKind="business" entityId={item.id} entityTitle={item.name} />
         </div>
         {item.tagline ? (
           <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.tagline}</p>
