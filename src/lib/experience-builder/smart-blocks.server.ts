@@ -599,10 +599,7 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
 
     const valladolidItem = valladolidRes.items[0];
     const destinationItems = valladolidItem
-      ? [
-          valladolidItem,
-          ...destRes.items.filter((item) => item.slug !== "valladolid"),
-        ].slice(0, 8)
+      ? [valladolidItem, ...destRes.items.filter((item) => item.slug !== "valladolid")].slice(0, 8)
       : destRes.items;
     const destinos = cardsFrom({ ...destRes, items: destinationItems }, () => "Destino");
     const businesses = cardsFrom(bizRes, (item) =>
