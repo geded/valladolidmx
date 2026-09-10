@@ -40,9 +40,11 @@ import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/Listi
 import {
   buildPublicListing,
   listingFamilyContract,
+  isListingFamilyId,
   type ListingFamilyId,
 } from "@/lib/listings/listing-public-contract";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
+import { getListingFamilyTaxonomy } from "@/lib/listings/listing-family-taxonomy.functions";
 
 const CANONICAL_LISTING_FAMILIES: Partial<Record<string, ListingFamilyId>> = {
   hoteles: "hoteles",
@@ -72,16 +74,25 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
     }
     // Listado de empresas por dest+cat (filtrado defensivo cliente,
     // fuente única de verdad ya validada por el resolver).
-    const businesses = await listMarketplaceBusinesses().catch(
-      () => [] as MarketplaceBusinessCard[],
-    );
+    const [businesses, familyTaxonomy] = await Promise.all([
+      listMarketplaceBusinesses().catch(() => [] as MarketplaceBusinessCard[]),
+      getListingFamilyTaxonomy().catch(() => ({ available: false as const, taxonomy: {} })),
+    ]);
     const items: MarketplaceBusinessCard[] = businesses.filter(
       (b: MarketplaceBusinessCard) =>
         b.destination_slug === params.destino && b.category_slug === params.categoria,
     );
     // E2 · US-E2.3 — Related Collection para superficie Categoría.
     // Fallback silencioso: el bloque se oculta si no hay datos.
-    const family = CANONICAL_LISTING_FAMILIES[params.categoria] ?? null;
+    const cmsFamily = Object.entries(familyTaxonomy.taxonomy).find(
+      ([candidate, slugs]) =>
+        isListingFamilyId(candidate) && slugs?.includes(params.categoria.toLowerCase()),
+    )?.[0];
+    const family = familyTaxonomy.available
+      ? isListingFamilyId(cmsFamily)
+        ? cmsFamily
+        : null
+      : (CANONICAL_LISTING_FAMILIES[params.categoria] ?? null);
     const premiumListingPromise = family
       ? listingFamilyContract(family).source === "businesses"
         ? Promise.resolve(
