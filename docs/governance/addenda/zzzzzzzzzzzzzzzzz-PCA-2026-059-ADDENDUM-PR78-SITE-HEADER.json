@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-PR78-SITE-HEADER",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para modernizar todas las superficies públicas existentes con una experiencia profesional tipo Airbnb, preservando la identidad Oriente Maya y sus funciones.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/layout/SiteHeader.tsx",
+    "previous_sha256": "7a8b67db0ebc0e7fa7df9bf406b75b09487ca23522e7fb4600547b8ce163b654",
+    "current_sha256": "7366241b6de9efaa2e47c43a3ec51f87f3cfdf762ea5f7fce239b826e3e58e5c",
+    "semantic_change": "Refina altura, transparencia, controles y panel móvil del encabezado global sin cambiar navegación, idiomas, acceso ni Mi Viaje.",
+    "authority": "Founder · modernización responsive PR #78 · 2026-09-10"
+  },
+  "invariants": ["Navegación y accesos preservados", "Marca y configuración CMS preservadas", "Sin publicación, despliegue ni fusión"],
+  "recorded_at": "2026-09-10"
+}

@@ -18,6 +18,18 @@
     {
       "operation": "modify",
       "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumCard.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/SiteHeader.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/SiteFooter.tsx"
     }
   ],
   "acknowledged_revisions": [
@@ -38,6 +50,24 @@
       "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
       "sha256": "1e00c034b02397f4a97a6a2a06a05bb683b37b8b0f22ea4a6c732fe0b3a367a3",
       "authority": "Founder · filtros compactos y profesionales para listados responsive · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumCard.tsx",
+      "sha256": "c36a77124056224a986371629350d2f5c2aab961b1de01be8c268884895d0caa",
+      "authority": "Founder · tarjetas públicas ligeras y profesionales en todos los dispositivos · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/SiteHeader.tsx",
+      "sha256": "7366241b6de9efaa2e47c43a3ec51f87f3cfdf762ea5f7fce239b826e3e58e5c",
+      "authority": "Founder · navegación global refinada para escritorio, iPad y celular · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/SiteFooter.tsx",
+      "sha256": "ce919ade70fe8dc30c151cccf6050b5980ce30b50fb016959e73bffafac8eef1",
+      "authority": "Founder · pie global más claro y legible en todos los dispositivos · 2026-09-10"
     }
   ],
   "public_routes": [

@@ -270,7 +270,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               aria-label="Navegación principal"
               tabIndex={-1}
               style={{ backgroundColor: "var(--background)" }}
-              className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(76vw,21rem)] flex-col overflow-y-auto rounded-2xl border border-border/70 shadow-2xl outline-none lg:hidden"
+              className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(86vw,23rem)] flex-col overflow-y-auto rounded-[1.75rem] border border-border/70 shadow-2xl outline-none lg:hidden"
             >
               <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
                 <BrandLogo tone="dark" size="sm" />
@@ -278,7 +278,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Cerrar menú"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-all active:scale-[0.98]"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all active:scale-[0.98]"
                 >
                   <X className="size-4" />
                 </button>
@@ -288,7 +288,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                 <a
                   href={ctaHref}
                   onClick={() => setOpen(false)}
-                  className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                  className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
                 >
                   <Compass className="size-4" aria-hidden />
                   {ctaLabel}
@@ -318,7 +318,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
           "sticky top-0 z-30 transition-colors duration-300",
           isOverlay
             ? "border-b border-transparent bg-transparent"
-            : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
+            : "border-b border-border/60 bg-background/92 backdrop-blur-xl shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
         )}
       >
         {/*
@@ -334,7 +334,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
         )}
         <div className="@container">
           <SiteTopBar hidden={isOverlay} />
-          <Container className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
+          <Container className="grid h-[4.5rem] grid-cols-[auto_1fr_auto] items-center gap-4 lg:h-20 lg:gap-6">
             <Link to="/" aria-label="Inicio" className="flex items-center">
               <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
             </Link>
@@ -400,7 +400,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-11 w-11 items-center justify-center rounded-md border transition-all active:scale-[0.98] xl:hidden",
+          "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-[0.98] xl:hidden",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
@@ -438,7 +438,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
       data-header-button-kind={btn.kind}
       className={cn(
         hiddenOnMobile,
-        "items-center rounded-md font-medium tracking-tight transition-all active:scale-[0.98]",
+        "items-center rounded-full font-medium tracking-tight transition-all active:scale-[0.98]",
         sizeClass,
         variantClass,
       )}
