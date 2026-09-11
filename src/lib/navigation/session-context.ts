@@ -184,6 +184,33 @@ export function isStandaloneDisplay(): boolean {
   }
 }
 
+/**
+ * `true` cuando la app se muestra dentro del panel de vista previa de
+ * Lovable (iframe sobre un host de preview). Ese panel siempre recarga
+ * en `/`, por lo que el explorador perdía su ubicación al refrescar.
+ * No aplica al sitio publicado ni a la navegación normal.
+ */
+export function isLovablePreviewFrame(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.top === window.self) return false;
+    const h = window.location.hostname;
+    return (
+      h.startsWith("id-preview--") ||
+      h.startsWith("preview--") ||
+      h === "lovableproject.com" ||
+      h.endsWith(".lovableproject.com") ||
+      h === "lovableproject-dev.com" ||
+      h.endsWith(".lovableproject-dev.com") ||
+      h.endsWith(".beta.lovable.dev") ||
+      h === "localhost" ||
+      h === "127.0.0.1"
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function clearNavigationSession(): void {
   if (!hasWindow()) return;
   try {
