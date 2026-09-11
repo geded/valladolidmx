@@ -34,7 +34,7 @@ export function businessToHeroDTO(b: MarketplaceBusinessDetail): ExperienceHeroD
   }
   const meta: ExperienceHeroDTO["meta"] = [];
   if (b.destination_slug) {
-    meta.push({ iconKey: "map-pin", label: b.destination_slug.replace(/-/g, " ") });
+    meta.push({ iconKey: "map-pin", label: humanizeSlug(b.destination_slug) });
   }
   meta.push({ iconKey: "tag", label: variant.eyebrow });
 
@@ -110,7 +110,7 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     items.push({
       iconKey: "map-pin",
       label: "Destino",
-      value: b.destination_slug.replace(/-/g, " "),
+      value: humanizeSlug(b.destination_slug),
       tone: "default",
     });
   }

@@ -143,18 +143,18 @@ export function CompactCrumbs({
       ) : null}
 
       {contextCrumb ? (
-        <li className="flex min-w-0 items-center gap-1.5">
+        <li className="flex shrink-0 items-center gap-1.5">
           <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
           {contextCrumb.to ? (
             <Link
               to={contextCrumb.to}
               params={contextCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[24vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-11 max-w-[26vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
             >
               {contextCrumb.label}
             </Link>
           ) : (
-            <span className="inline-flex min-h-11 max-w-[24vw] items-center truncate px-1">
+            <span className="inline-flex min-h-11 max-w-[26vw] items-center truncate px-1">
               {contextCrumb.label}
             </span>
           )}
