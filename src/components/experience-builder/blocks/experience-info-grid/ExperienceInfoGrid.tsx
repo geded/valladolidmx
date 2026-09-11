@@ -87,18 +87,24 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
           })}
         </ul>
       ) : (
-        <ul className={cn("grid gap-3", colCls)} role="list">
+        <ul className={cn("grid gap-2 sm:gap-3", colCls)} role="list">
           {items.map((it, i) => {
             const I = it.iconKey ? ICONS[it.iconKey] : null;
             return (
-              <li key={i} className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
-                  {I ? <I className="h-4 w-4" aria-hidden="true" /> : null}
-                  {it.label}
+              <li
+                key={i}
+                className="min-w-0 rounded-lg border border-border bg-card p-2.5 sm:p-4"
+              >
+                <div className="flex min-w-0 items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground sm:gap-2 sm:text-xs sm:tracking-widest">
+                  {I ? <I className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true" /> : null}
+                  <span className="truncate">{it.label}</span>
                 </div>
                 <MaybeLink
                   href={it.href}
-                  className={cn("mt-1 block text-base font-semibold", TONE[it.tone])}
+                  className={cn(
+                    "mt-0.5 block text-sm font-semibold leading-snug sm:mt-1 sm:text-base",
+                    TONE[it.tone],
+                  )}
                 >
                   {it.value}
                 </MaybeLink>

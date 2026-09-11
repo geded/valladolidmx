@@ -43,9 +43,11 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
         </span>
       ) : null}
       {title ? (
-        <Heading className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</Heading>
+        <Heading className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
+          {title}
+        </Heading>
       ) : null}
-      {lead ? <p className="text-lg text-muted-foreground">{lead}</p> : null}
+      {lead ? <p className="text-base text-muted-foreground sm:text-lg">{lead}</p> : null}
       {body ? (
         capabilities.richText ? (
           <div
@@ -88,7 +90,7 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
       aria-label={ariaLabel ?? undefined}
       data-eb-block="experience-section"
       data-eb-anchor={capabilities.anchor ? (title ?? undefined) : undefined}
-      className={cn("w-full py-10 sm:py-14", TONE[tone], className)}
+      className={cn("w-full py-6 sm:py-10 lg:py-14", TONE[tone], className)}
     >
       {variant === "split" && media ? (
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 md:grid-cols-2">
