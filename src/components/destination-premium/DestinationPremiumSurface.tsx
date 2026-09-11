@@ -547,25 +547,25 @@ function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {lead ? (
+      {hasMedia ? (
+        <div className="grid grid-cols-2 gap-3">
           <img
             src={lead.url}
             alt={lead.alt}
             loading="lazy"
             className="col-span-2 h-48 w-full rounded-2xl object-cover shadow-soft"
           />
-        ) : null}
-        {rest.slice(0, 2).map((m) => (
-          <img
-            key={m.url}
-            src={m.url}
-            alt={m.alt}
-            loading="lazy"
-            className="h-40 w-full rounded-2xl object-cover shadow-soft"
-          />
-        ))}
-      </div>
+          {rest.slice(0, 2).map((m) => (
+            <img
+              key={m.url}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className="h-40 w-full rounded-2xl object-cover shadow-soft"
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }
