@@ -626,16 +626,9 @@ export function AluxFloatingTrigger() {
             {triggerLabel}
           </span>
         </button>
-        {nudge && !open && (
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="pointer-events-auto mt-2 block max-w-[80vw] rounded-2xl border border-primary/30 bg-card/95 px-3 py-2 text-left text-[12px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
-          >
-            <span className="mr-1 text-primary">✨</span>
-            {nudge.message}
-          </button>
-        )}
+        {/* Consolidación Alux: la sugerencia proactiva ya NO se pinta como un
+            segundo globo flotante. Vive dentro del mismo panel (nota + pistas)
+            y aquí sólo se señala con el punto pulsante del dock. */}
       </div>
 
       <Sheet
