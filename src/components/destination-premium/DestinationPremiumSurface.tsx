@@ -402,7 +402,9 @@ function HeroCopy({
         {content.hero.title}
       </h1>
       <p className="mt-3 text-lg text-foreground/80 sm:text-xl">{content.hero.subtitle}</p>
-      <p className="mt-4 max-w-xl text-base text-muted-foreground">{content.hero.description}</p>
+      {content.hero.description ? (
+        <p className="mt-4 max-w-xl text-base text-muted-foreground">{content.hero.description}</p>
+      ) : null}
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Button size="lg" className="rounded-pill px-6" asChild>
           <a href={content.hero.primaryCta.href}>
@@ -532,40 +534,46 @@ function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
   return (
     <section
       aria-labelledby="descubre-destino"
-      className={hasMedia ? "grid gap-8 lg:grid-cols-[1.1fr_1fr]" : "grid gap-8"}
+      className={cn(
+        "border-y border-border py-10 sm:py-14",
+        hasMedia ? "grid gap-8 md:grid-cols-12 md:items-center lg:gap-16" : "grid gap-8",
+      )}
     >
-      <div>
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-          {content.descubre.kicker}
-        </p>
-        <h2 id="descubre-destino" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+      {hasMedia ? (
+        <div className="grid grid-cols-2 gap-3 md:col-span-5">
+          <EditorialMediaFrame
+            media={lead}
+            label={content.hero.title}
+            className="col-span-2 aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated"
+          />
+          {rest.slice(0, 2).map((m, index) => (
+            <EditorialMediaFrame
+              key={m.url || `destination-narrative-${index}`}
+              media={m}
+              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-soft"
+            />
+          ))}
+        </div>
+      ) : null}
+      <div className={hasMedia ? "md:col-span-7 md:pl-2" : "max-w-3xl"}>
+        <div className="flex items-center gap-3">
+          <span className="h-px w-8 shrink-0 bg-primary" aria-hidden />
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            {content.descubre.kicker}
+          </p>
+        </div>
+        <h2
+          id="descubre-destino"
+          className="mt-4 max-w-2xl font-serif text-3xl leading-tight tracking-tight sm:text-4xl"
+        >
           {content.descubre.title}
         </h2>
-        <div className="mt-4 space-y-4 text-base leading-relaxed text-foreground/80">
+        <div className="mt-5 max-w-[68ch] space-y-4 text-base leading-relaxed text-foreground/80 sm:text-lg">
           {content.descubre.paragraphs.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
         </div>
       </div>
-      {hasMedia ? (
-        <div className="grid grid-cols-2 gap-3">
-          <img
-            src={lead.url}
-            alt={lead.alt}
-            loading="lazy"
-            className="col-span-2 h-48 w-full rounded-2xl object-cover shadow-soft"
-          />
-          {rest.slice(0, 2).map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-40 w-full rounded-2xl object-cover shadow-soft"
-            />
-          ))}
-        </div>
-      ) : null}
     </section>
   );
 }

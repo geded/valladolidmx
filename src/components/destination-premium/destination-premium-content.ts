@@ -108,8 +108,8 @@ export type DestinationPremiumSectionKey =
 
 export const DESTINATION_PREMIUM_SECTION_ORDER: DestinationPremiumSectionKey[] = [
   "hero",
-  "services",
   "descubre",
+  "services",
   "gallery",
   "servicePreview",
   "routes",
