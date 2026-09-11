@@ -122,6 +122,67 @@ export function writeNavigationSession(snapshot: NavigationSessionSnapshot): voi
   }
 }
 
+/**
+ * Continuidad de ubicación en app instalada (PWA).
+ *
+ * iOS/Android relanzan la app instalada en `start_url` ("/") cuando el
+ * sistema descarta el proceso (teléfono trabado, reinicio, cambio de
+ * ajustes). Para no perder la ubicación del explorador guardamos la
+ * última ruta pública visitada en `localStorage` (sobrevive al
+ * relanzamiento, a diferencia de `sessionStorage`) y la restauramos
+ * únicamente en ese arranque en frío.
+ *
+ * No afecta SSR, SEO ni la navegación normal del navegador.
+ */
+const LAST_ROUTE_KEY = "vll:nav:last-route:v1";
+
+/** Rutas privadas/operativas que nunca se restauran automáticamente. */
+const NON_RESTORABLE = /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa|offline)(?:\/|$)/;
+
+export function isRestorablePath(path: string): boolean {
+  if (!path.startsWith("/")) return false;
+  if (path === "/") return false;
+  return !NON_RESTORABLE.test(path);
+}
+
+export function writeLastRoute(path: string): void {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return;
+  if (!isRestorablePath(path)) return;
+  try {
+    localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ path, at: Date.now() }));
+  } catch {
+    // storage lleno / bloqueado → silencioso
+  }
+}
+
+export function readLastRoute(): string | null {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(LAST_ROUTE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { path?: string; at?: number };
+    if (!parsed?.path || typeof parsed.at !== "number") return null;
+    if (Date.now() - parsed.at > TTL_MS) {
+      localStorage.removeItem(LAST_ROUTE_KEY);
+      return null;
+    }
+    return isRestorablePath(parsed.path) ? parsed.path : null;
+  } catch {
+    return null;
+  }
+}
+
+/** `true` cuando la app corre instalada (standalone), no en pestaña. */
+export function isStandaloneDisplay(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const iosStandalone = (window.navigator as { standalone?: boolean }).standalone === true;
+    return iosStandalone || window.matchMedia("(display-mode: standalone)").matches;
+  } catch {
+    return false;
+  }
+}
+
 export function clearNavigationSession(): void {
   if (!hasWindow()) return;
   try {
