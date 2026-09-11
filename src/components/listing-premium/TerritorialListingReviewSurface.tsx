@@ -1229,7 +1229,7 @@ function EventListingBody({
             lockedDestinationLabel
               ? { ...profile, title: `Eventos en ${lockedDestinationLabel}` }
               : dto
-                ? { ...profile, title: "Eventos del Oriente Maya" }
+                ? { ...profile, title: "Eventos del Oriente Maya de Yucatán" }
                 : profile
           }
         />
@@ -1769,7 +1769,7 @@ function PlaceListingBody({
             lockedDestinationLabel
               ? { ...profile, title: `Lugares y sitios de interés en ${lockedDestinationLabel}` }
               : dto
-                ? { ...profile, title: "Lugares y sitios de interés del Oriente Maya" }
+                ? { ...profile, title: "Lugares y sitios de interés del Oriente Maya de Yucatán" }
                 : profile
           }
         />
