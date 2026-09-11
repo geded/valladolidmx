@@ -27,7 +27,15 @@ function formatDuration(seconds: number) {
   return m === 0 ? `${h} h` : `${h} h ${m} min`;
 }
 
-export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: number }) {
+export function DistanceBadge({
+  destLat,
+  destLng,
+  compact = false,
+}: {
+  destLat: number;
+  destLng: number;
+  compact?: boolean;
+}) {
   const { location, status, request } = useVisitorGeolocation();
   const fn = useServerFn(computeRoute);
 
@@ -48,6 +56,29 @@ export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: 
   });
 
   if (!location) {
+    if (compact) {
+      return (
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-10 max-w-full justify-start px-2 text-muted-foreground"
+          onClick={request}
+          disabled={status === "prompting"}
+        >
+          <MapPin className="h-4 w-4 shrink-0" aria-hidden />
+          <span className="truncate">
+            {status === "prompting"
+              ? "Calculando…"
+              : status === "denied"
+                ? "Sin permiso"
+                : status === "unavailable"
+                  ? "No disponible"
+                  : "Calcular distancia"}
+          </span>
+        </Button>
+      );
+    }
+
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4" aria-hidden />
@@ -66,16 +97,32 @@ export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: 
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Calculando distancia…</p>;
+    return (
+      <p
+        className={
+          compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"
+        }
+      >
+        Calculando distancia…
+      </p>
+    );
   }
 
   if (isError || !data?.ok || data.distanceMeters == null) {
-    return <p className="text-sm text-muted-foreground">No pudimos calcular la ruta ahora.</p>;
+    return (
+      <p
+        className={
+          compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"
+        }
+      >
+        Ruta no disponible
+      </p>
+    );
   }
 
   return (
-    <p className="text-sm text-foreground">
-      <MapPin className="mr-1.5 inline h-4 w-4 text-primary" aria-hidden />
+    <p className={compact ? "truncate text-xs text-foreground" : "text-sm text-foreground"}>
+      <MapPin className="mr-1.5 inline h-4 w-4 shrink-0 text-primary" aria-hidden />
       <span className="font-medium">{formatDistance(data.distanceMeters)}</span>
       {data.durationSeconds != null ? (
         <>
@@ -83,7 +130,7 @@ export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: 
           <span>{formatDuration(data.durationSeconds)} en auto</span>
         </>
       ) : null}
-      <span className="text-muted-foreground"> desde tu ubicación</span>
+      {compact ? null : <span className="text-muted-foreground"> desde tu ubicación</span>}
     </p>
   );
 }
