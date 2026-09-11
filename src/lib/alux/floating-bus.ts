@@ -31,6 +31,44 @@ export interface AluxOpenSelection {
   readonly familySlug?: string;
   /** Ruta canónica de la entidad seleccionada. */
   readonly href?: string;
+  /**
+   * Datos turísticos legibles (duración, paradas, ritmo, origen→destino) que
+   * el dock muestra en "Tu selección". Nunca instrucciones internas ni prompts.
+   */
+  readonly facts?: readonly string[];
+  /** Acciones rápidas contextuales que alimentan el chat existente. */
+  readonly quickActions?: readonly string[];
+  /**
+   * Ancla existente en la superficie invocante donde ya vive un mapa
+   * (`#mapa` del Home). Si está presente, el dock ofrece volver a él.
+   */
+  readonly mapAnchor?: string;
+}
+
+/**
+ * Petición para enfocar la selección en el mapa YA EXISTENTE de la superficie
+ * invocante. No crea mapa ni motor geográfico: sólo avisa a quien lo posee.
+ */
+export interface AluxMapFocusPayload {
+  readonly entityRef?: string;
+  readonly anchor?: string;
+}
+
+const MAP_FOCUS_EVENT = "alux:map-focus";
+
+export function requestAluxMapFocus(payload: AluxMapFocusPayload): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<AluxMapFocusPayload>(MAP_FOCUS_EVENT, { detail: payload }));
+}
+
+export function onAluxMapFocus(handler: (payload: AluxMapFocusPayload) => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const listener = (ev: Event) => {
+    const detail = (ev as CustomEvent<AluxMapFocusPayload>).detail;
+    if (detail) handler(detail);
+  };
+  window.addEventListener(MAP_FOCUS_EVENT, listener);
+  return () => window.removeEventListener(MAP_FOCUS_EVENT, listener);
 }
 
 export interface AluxOpenPayload {
