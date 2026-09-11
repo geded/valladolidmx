@@ -284,6 +284,8 @@ export function AluxFloatingTrigger() {
   // A14 · Intención de viaje detectada por navegación + señales A11.
   const unusedCouponCount = lens?.active_coupons.length ?? 0;
   const { intent, nudge } = useTravelIntent({ pathname, unusedCouponCount });
+  // Pistas contextuales por superficie, dentro del MISMO panel de Alux.
+  const contextualStarters = useMemo(() => surfaceStarters(pathname, intent), [pathname, intent]);
 
   // Al abrir el sheet, descartamos el nudge activo (respeto).
   useEffect(() => {
