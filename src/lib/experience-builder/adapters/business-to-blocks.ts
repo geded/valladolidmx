@@ -97,6 +97,12 @@ export function businessToDescriptionSectionDTO(
 /* ------------------------------------------------------------------ *
  * Info-grid — datos rápidos.
  * ------------------------------------------------------------------ */
+function humanizeSlug(slug: string): string {
+  const clean = slug.trim().replace(/-/g, " ").toLowerCase();
+  if (!clean) return "";
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
 export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceInfoGridDTO | null {
   const variant = resolveBusinessVariant(b.category_slug);
   const items: ExperienceInfoGridDTO["items"] = [];
@@ -109,10 +115,12 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     });
   }
   if (b.category_slug) {
+    /* La categoría mostrada proviene del slug real declarado en el CMS,
+       no del agrupador editorial del hero. */
     items.push({
       iconKey: "tag",
       label: "Categoría",
-      value: variant.eyebrow,
+      value: humanizeSlug(b.category_slug),
       tone: "default",
     });
   }

@@ -182,11 +182,67 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
     productsHeading: "Estancias y servicios",
     productsEmpty: "Sin opciones de estancia publicadas.",
   },
+  /* Slugs reales declarados en el CMS (`business_categories.slug`). */
+  restaurantes: {
+    eyebrow: "Gastronomía",
+    productsHeading: "Menú y reservaciones",
+    productsEmpty: "Sin menú publicado.",
+  },
+  gastronomia: {
+    eyebrow: "Gastronomía",
+    productsHeading: "Menú y reservaciones",
+    productsEmpty: "Sin menú publicado.",
+  },
+  hoteles: {
+    eyebrow: "Hospedaje",
+    productsHeading: "Habitaciones y experiencias",
+    productsEmpty: "Sin habitaciones publicadas.",
+  },
+  cenotes: {
+    eyebrow: "Naturaleza",
+    productsHeading: "Accesos y experiencias",
+    productsEmpty: "Sin accesos publicados.",
+  },
+  tours: {
+    eyebrow: "Experiencia",
+    productsHeading: "Tours disponibles",
+    productsEmpty: "Sin tours publicados.",
+  },
+  experiencias: {
+    eyebrow: "Experiencia",
+    productsHeading: "Experiencias disponibles",
+    productsEmpty: "Sin experiencias publicadas.",
+  },
+  "experiencias-tours": {
+    eyebrow: "Experiencia",
+    productsHeading: "Experiencias y tours",
+    productsEmpty: "Sin experiencias publicadas.",
+  },
+  "servicios-turisticos": {
+    eyebrow: "Servicio",
+    productsHeading: "Servicios",
+    productsEmpty: "Sin servicios publicados.",
+  },
+  artesanias: {
+    eyebrow: "Tienda",
+    productsHeading: "Catálogo",
+    productsEmpty: "Sin productos publicados.",
+  },
+  naturaleza: {
+    eyebrow: "Naturaleza",
+    productsHeading: "Accesos y experiencias",
+    productsEmpty: "Sin accesos publicados.",
+  },
+  cultura: {
+    eyebrow: "Cultura",
+    productsHeading: "Entradas y visitas guiadas",
+    productsEmpty: "Sin entradas publicadas.",
+  },
 };
 
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   return (
-    CATEGORY_VARIANTS[categorySlug] ?? {
+    CATEGORY_VARIANTS[categorySlug.trim().toLowerCase()] ?? {
       eyebrow: "Catálogo Oriente Maya",
       productsHeading: "Productos y experiencias",
       productsEmpty: "Sin productos publicados.",
@@ -439,8 +495,7 @@ export function BusinessSurface({
         return false;
       if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
       if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
-      if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
-        return false;
+      if (activeContract.omissions.includes("reputation") && anchor.id === "resenas") return false;
       if (activeContract.omissions.includes("collection") && anchor.id === "descubre") return false;
       return true;
     }),
@@ -664,7 +719,7 @@ export function BusinessSurface({
       ) : null}
 
       {!activeContract?.omissions.includes("reputation") ? (
-        <section id="opiniones" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="resenas" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceReviewsBlock
             config={{
               source: "business",
