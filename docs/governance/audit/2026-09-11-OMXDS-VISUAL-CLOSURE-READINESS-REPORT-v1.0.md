@@ -9,18 +9,18 @@ HEAD verificado: `ad88911c` · árbol limpio al inicio del diagnóstico.
 
 ## Matriz de cierre
 
-| # | Área | Estado | Evidencia / autoridad |
-| --- | --- | --- | --- |
-| 1 | Home Premium | PASS | `/` 200 en 1440/834/430/390; H1 único; overflow 0; imágenes rotas 0; rutas, mapa y Mi Viaje sobre componentes existentes; un solo Alux flotante |
-| 2 | Oriente Maya y micrositios | PASS | `/oriente-maya` (`Inicio`), `/oriente-maya/valladolid` (`Inicio > Oriente Maya`), H1 territorial correcto |
-| 3 | Listados globales vs micrositio | PASS con observación | Global: “Hoteles/Restaurantes/Casas/Experiencias/Eventos/Lugares/Rutas del Oriente Maya de Yucatán” y “¿Qué hacer en el Oriente Maya de Yucatán?” con breadcrumb `Inicio > Oriente Maya`. Micrositio: “Hoteles en Valladolid” con `Inicio > Oriente Maya > Valladolid > Hoteles`. Observación en #A |
-| 4 | Autoridad visual compartida de cards | PASS | Una sola card por familia (`ListingCard` territorial y `TourismCard`); media canónica CMS 4:3, fallback editorial compacto cuando no hay portada; no se inventa media |
-| 5 | Fichas Premium | PASS | Ficha de hotel `demo-3j3-hotel-casa-piedra` 200 en 1440 y 390, H1 único, overflow 0, sin imágenes rotas ni plantillas paralelas visibles |
-| 6 | Alux | PASS con observación | Máximo 1 concierge flotante en todas las rutas medidas; nunca 2. Observación en #B |
-| 7 | Mapa | PASS | Un solo `InteractiveMap` reutilizado vía `MapPanel`/`ExperienceMapBlock`; sin mapas duplicados |
-| 8 | Responsive 1440/834/430/390 | PASS | 13 rutas × 4 anchos: overflow horizontal 0 en 52/52 mediciones |
-| 9 | Funcionalidad preservada | PASS | Filtros, favoritos, Mi Viaje, bindings CMS, navegación y breadcrumbs operativos; sin regresiones detectadas |
-| 10 | Data Readiness | PENDIENTE (dato, no código) | Ver tabla de cobertura de portadas |
+| #   | Área                                 | Estado                      | Evidencia / autoridad                                                                                                                                                                                                                                                                               |
+| --- | ------------------------------------ | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Home Premium                         | PASS                        | `/` 200 en 1440/834/430/390; H1 único; overflow 0; imágenes rotas 0; rutas, mapa y Mi Viaje sobre componentes existentes; un solo Alux flotante                                                                                                                                                     |
+| 2   | Oriente Maya y micrositios           | PASS                        | `/oriente-maya` (`Inicio`), `/oriente-maya/valladolid` (`Inicio > Oriente Maya`), H1 territorial correcto                                                                                                                                                                                           |
+| 3   | Listados globales vs micrositio      | PASS con observación        | Global: “Hoteles/Restaurantes/Casas/Experiencias/Eventos/Lugares/Rutas del Oriente Maya de Yucatán” y “¿Qué hacer en el Oriente Maya de Yucatán?” con breadcrumb `Inicio > Oriente Maya`. Micrositio: “Hoteles en Valladolid” con `Inicio > Oriente Maya > Valladolid > Hoteles`. Observación en #A |
+| 4   | Autoridad visual compartida de cards | PASS                        | Una sola card por familia (`ListingCard` territorial y `TourismCard`); media canónica CMS 4:3, fallback editorial compacto cuando no hay portada; no se inventa media                                                                                                                               |
+| 5   | Fichas Premium                       | PASS                        | Ficha de hotel `demo-3j3-hotel-casa-piedra` 200 en 1440 y 390, H1 único, overflow 0, sin imágenes rotas ni plantillas paralelas visibles                                                                                                                                                            |
+| 6   | Alux                                 | PASS con observación        | Máximo 1 concierge flotante en todas las rutas medidas; nunca 2. Observación en #B                                                                                                                                                                                                                  |
+| 7   | Mapa                                 | PASS                        | Un solo `InteractiveMap` reutilizado vía `MapPanel`/`ExperienceMapBlock`; sin mapas duplicados                                                                                                                                                                                                      |
+| 8   | Responsive 1440/834/430/390          | PASS                        | 13 rutas × 4 anchos: overflow horizontal 0 en 52/52 mediciones                                                                                                                                                                                                                                      |
+| 9   | Funcionalidad preservada             | PASS                        | Filtros, favoritos, Mi Viaje, bindings CMS, navegación y breadcrumbs operativos; sin regresiones detectadas                                                                                                                                                                                         |
+| 10  | Data Readiness                       | PENDIENTE (dato, no código) | Ver tabla de cobertura de portadas                                                                                                                                                                                                                                                                  |
 
 ## Observaciones abiertas (no bloqueantes)
 
@@ -36,14 +36,14 @@ conviene confirmarlo documentalmente como criterio de cierre.
 
 ## Data Readiness (cobertura de portada canónica en contenido publicado)
 
-| Familia | Publicados | Con portada | Faltantes |
-| --- | --- | --- | --- |
-| Hoteles | 4 | 2 | 2 |
-| Restaurantes | 5 | 2 | 3 |
-| Casas de vacaciones | 3 | 1 | 2 |
-| Experiencias | 3 | 2 | 1 |
-| Cenotes | 1 | 0 | 1 |
-| Eventos | 9 | 1 | 8 |
+| Familia             | Publicados | Con portada | Faltantes |
+| ------------------- | ---------- | ----------- | --------- |
+| Hoteles             | 4          | 2           | 2         |
+| Restaurantes        | 5          | 2           | 3         |
+| Casas de vacaciones | 3          | 1           | 2         |
+| Experiencias        | 3          | 2           | 1         |
+| Cenotes             | 1          | 0           | 1         |
+| Eventos             | 9          | 1           | 8         |
 
 No es defecto de código: las fichas sin portada resuelven correctamente al fallback editorial aprobado.
 Se resuelve cargando medios reales desde el CMS; prohibido inventar o asignar imágenes conceptuales.
@@ -55,13 +55,13 @@ acciones visibles sin efecto. Se auditaron y corrigieron **sólo autoridades com
 
 ### Causas raíz
 
-| Defecto | Causa raíz | Autoridad corregida |
-| --- | --- | --- |
-| Cards beige en “Explora cerca de…” | La lectura de relacionados no proyectaba ni firmaba la portada CMS y el adaptador fijaba `imageUrl: null` | `src/lib/catalog/business-related.functions.ts`, `src/lib/experience-builder/adapters/business-related-to-block.ts` |
-| Acciones sin efecto en fichas | Anclas de sub-navegación y CTA “Contactar” emitidas sin sección/dato real; enlaces de destino con segmento vacío | `src/components/surfaces/BusinessSurface.tsx` |
-| Enlace decorativo `href="#"` | La barra de acciones caía a `"#"` cuando no había destino ni handler | `src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar.tsx` |
-| Favorito y “Agregar a mi viaje” sin efecto en listados | La tarjeta compartida pintaba botones estáticos sin handler | `src/components/listing-premium/TerritorialListingReviewSurface.tsx` (reutiliza `FavoriteButton` y `AddToTravelPlanButton`) |
-| Destino repetido al final de la ruta territorial (#A) | El selector se montaba dentro del `nav` de migajas | `src/components/layout/BreadcrumbTerritorial.tsx` |
+| Defecto                                                | Causa raíz                                                                                                       | Autoridad corregida                                                                                                         |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Cards beige en “Explora cerca de…”                     | La lectura de relacionados no proyectaba ni firmaba la portada CMS y el adaptador fijaba `imageUrl: null`        | `src/lib/catalog/business-related.functions.ts`, `src/lib/experience-builder/adapters/business-related-to-block.ts`         |
+| Acciones sin efecto en fichas                          | Anclas de sub-navegación y CTA “Contactar” emitidas sin sección/dato real; enlaces de destino con segmento vacío | `src/components/surfaces/BusinessSurface.tsx`                                                                               |
+| Enlace decorativo `href="#"`                           | La barra de acciones caía a `"#"` cuando no había destino ni handler                                             | `src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar.tsx`                                          |
+| Favorito y “Agregar a mi viaje” sin efecto en listados | La tarjeta compartida pintaba botones estáticos sin handler                                                      | `src/components/listing-premium/TerritorialListingReviewSurface.tsx` (reutiliza `FavoriteButton` y `AddToTravelPlanButton`) |
+| Destino repetido al final de la ruta territorial (#A)  | El selector se montaba dentro del `nav` de migajas                                                               | `src/components/layout/BreadcrumbTerritorial.tsx`                                                                           |
 
 ### Verificación en preview
 
@@ -118,3 +118,18 @@ Ajustes mínimos sobre autoridades compartidas existentes, sin crear componentes
 Verificación: typecheck OK; ESLint focalizado sin hallazgos nuevos (los avisos restantes son deuda previa);
 Playwright en 1440 / 834 / 430 / 390 con status 200, un solo H1, overflow 0 e imágenes rotas 0.
 No se publicó ni desplegó.
+
+## Delta de navegación y portada de ficha (Conato 1910) — aplicado
+
+1. `CompactCrumbs.tsx` conserva visibles en móvil el destino y la categoría antes de la ficha; la región
+   continúa accesible en el menú intermedio. La ruta queda `Valladolid > Restaurantes > Conato 1910`.
+2. `marketplace-reads.functions.ts` resuelve en el detalle la misma portada asociada mediante
+   `business_media → media_assets` que ya usan los listados; antes la ficha omitía esa lectura.
+3. `PremiumHero.tsx` reduce únicamente la altura no cinematográfica en móvil; tablet y escritorio conservan
+   la composición Premium aprobada.
+4. Se sembró una portada temporal de revisión desde el sitio oficial de Conato, marcada con
+   `demo_seed_batch=conato-cover-review-2026-09`, procedencia y reemplazo obligatorio antes de producción.
+5. La etiqueta territorial del bloque de datos ahora se presenta como `Valladolid`, no como slug en minúsculas.
+
+Verificación: 393/834/1440 muestran destino, categoría y ficha; imágenes rotas 0; la portada real se carga
+desde el CMS. No se publicó ni desplegó.

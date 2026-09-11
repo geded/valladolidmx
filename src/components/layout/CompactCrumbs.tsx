@@ -64,8 +64,15 @@ export function CompactCrumbs({
   const anchor = resolveCompactAnchorIndex(crumbs, anchorIndex);
   const current = crumbs[lastIndex];
   const anchorCrumb = anchor < lastIndex ? crumbs[anchor] : undefined;
+  // En fichas territoriales profundas mantenemos visible también el nivel
+  // inmediatamente posterior al destino (normalmente la categoría). Así la
+  // cadena móvil conserva Destino → Categoría → Ficha sin expandir el menú.
+  const contextIndex = anchor + 1 < lastIndex ? anchor + 1 : -1;
+  const contextCrumb = contextIndex >= 0 ? crumbs[contextIndex] : undefined;
   // La casita ya cubre Home: no se repite dentro del menú.
-  const hidden = crumbs.filter((c, i) => i !== lastIndex && i !== anchor && c.to !== "/");
+  const hidden = crumbs.filter(
+    (c, i) => i !== lastIndex && i !== anchor && i !== contextIndex && c.to !== "/",
+  );
 
   if (!current) return null;
 
@@ -123,13 +130,32 @@ export function CompactCrumbs({
             <Link
               to={anchorCrumb.to}
               params={anchorCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[28vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-11 max-w-[22vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
             >
               {anchorCrumb.label}
             </Link>
           ) : (
-            <span className="inline-flex min-h-11 max-w-[28vw] items-center truncate px-1">
+            <span className="inline-flex min-h-11 max-w-[22vw] items-center truncate px-1">
               {anchorCrumb.label}
+            </span>
+          )}
+        </li>
+      ) : null}
+
+      {contextCrumb ? (
+        <li className="flex shrink-0 items-center gap-1.5">
+          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+          {contextCrumb.to ? (
+            <Link
+              to={contextCrumb.to}
+              params={contextCrumb.params as never}
+              className="inline-flex min-h-11 max-w-[26vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
+            >
+              {contextCrumb.label}
+            </Link>
+          ) : (
+            <span className="inline-flex min-h-11 max-w-[26vw] items-center truncate px-1">
+              {contextCrumb.label}
             </span>
           )}
         </li>
@@ -140,7 +166,7 @@ export function CompactCrumbs({
         <span
           aria-current="page"
           title={current.label}
-          className="block max-w-[42vw] truncate font-medium text-foreground"
+          className="block max-w-[30vw] truncate font-medium text-foreground"
         >
           {current.label}
         </span>
