@@ -689,7 +689,13 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
  * tokens del sistema). Esta superficie ya no renderiza uno paralelo.
  */
 
-function ListingIntro({ profile, compact = false }: { profile: ListingProfile; compact?: boolean }) {
+function ListingIntro({
+  profile,
+  compact = false,
+}: {
+  profile: ListingProfile;
+  compact?: boolean;
+}) {
   const Icon =
     profile.family === "eventos"
       ? CalendarDays
