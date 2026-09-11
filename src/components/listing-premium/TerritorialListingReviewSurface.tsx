@@ -566,7 +566,7 @@ function TerritorialListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1366,7 +1366,7 @@ function EventListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1390,7 +1390,7 @@ function EventListingBody({
                 <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                   Se muestran aparte y no cuentan dentro de la agenda local.
                 </p>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {nearbyItems.slice(0, 6).map((card) => (
                     <ListingCard
                       key={card.id}
@@ -1933,7 +1933,7 @@ function PlaceListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1958,7 +1958,7 @@ function PlaceListingBody({
                   Pertenecen a otros destinos por proximidad territorial: no son una subzona de{" "}
                   {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {nearbyItems.slice(0, 6).map((card) => (
                     <ListingCard
                       key={card.id}
