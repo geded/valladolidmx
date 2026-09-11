@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "batch": "G8-R1-F1L-R3-OPEN-DESTINATION-GALLERY",
+  "licensePolicy": "Wikimedia Commons files with an explicit Creative Commons license",
+  "items": [
+    {
+      "destinationSlug": "valladolid",
+      "sortOrder": 1,
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cenote_Zaci,_Valladolid,_Yucatan,_Mexico_30_Marzo_2021.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cenote_Zaci,_Valladolid,_Yucatan,_Mexico_30_Marzo_2021.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "credit": "Sharon Hahn Darlin · CC BY 2.0 · Wikimedia Commons",
+      "alt": "Cenote Zací en el centro de Valladolid, Yucatán",
+      "title": "Cenote Zací, Valladolid",
+      "place": "Valladolid, Yucatán"
+    },
+    {
+      "destinationSlug": "valladolid",
+      "sortOrder": 2,
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Paseo_de_los_Frailes_-_Valladolid,_Yucat%C3%A1n.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Paseo_de_los_Frailes_-_Valladolid,_Yucat%C3%A1n.jpg",
+      "author": "Erik Cleves Kristensen",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "credit": "Erik Cleves Kristensen · CC BY 2.0 · Wikimedia Commons",
+      "alt": "Calzada de los Frailes con casas coloridas en Valladolid, Yucatán",
+      "title": "Calzada de los Frailes, Valladolid",
+      "place": "Valladolid, Yucatán"
+    },
+    {
+      "destinationSlug": "valladolid",
+      "sortOrder": 3,
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Iglesia_de_San_Servacio,_Valladolid,_Yucatan,_Mexico_Marzo_2021.jpg",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Iglesia_de_San_Servacio,_Valladolid,_Yucatan,_Mexico_Marzo_2021.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "credit": "Sharon Hahn Darlin · CC BY 2.0 · Wikimedia Commons",
+      "alt": "Catedral de San Servacio frente al parque principal de Valladolid, Yucatán",
+      "title": "Catedral de San Servacio, Valladolid",
+      "place": "Valladolid, Yucatán"
+    }
+  ]
+}
