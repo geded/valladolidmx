@@ -528,8 +528,12 @@ function ServiciosStrip({
 
 function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
   const [lead, ...rest] = content.descubre.media.filter((item) => Boolean(item.url));
+  const hasMedia = Boolean(lead);
   return (
-    <section aria-labelledby="descubre-destino" className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
+    <section
+      aria-labelledby="descubre-destino"
+      className={hasMedia ? "grid gap-8 lg:grid-cols-[1.1fr_1fr]" : "grid gap-8"}
+    >
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
           {content.descubre.kicker}
