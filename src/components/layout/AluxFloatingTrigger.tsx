@@ -58,7 +58,7 @@ import {
 } from "@/lib/alux/floating-bus";
 import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
-import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
+import { useTravelIntent, markNudgeShown, surfaceStarters } from "@/lib/alux/travel-intent";
 import {
   Sheet,
   SheetContent,
@@ -284,6 +284,8 @@ export function AluxFloatingTrigger() {
   // A14 · Intención de viaje detectada por navegación + señales A11.
   const unusedCouponCount = lens?.active_coupons.length ?? 0;
   const { intent, nudge } = useTravelIntent({ pathname, unusedCouponCount });
+  // Pistas contextuales por superficie, dentro del MISMO panel de Alux.
+  const contextualStarters = useMemo(() => surfaceStarters(pathname, intent), [pathname, intent]);
 
   // Al abrir el sheet, descartamos el nudge activo (respeto).
   useEffect(() => {
@@ -577,7 +579,7 @@ export function AluxFloatingTrigger() {
         data-alux-saved-items={String(unified.trip.savedItemCount)}
         data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
         data-alux-reason={unified.reason}
-        hidden={presence.shouldHide}
+        hidden={presence.shouldHide || (open && !minimized)}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
@@ -626,16 +628,9 @@ export function AluxFloatingTrigger() {
             {triggerLabel}
           </span>
         </button>
-        {nudge && !open && (
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="pointer-events-auto mt-2 block max-w-[80vw] rounded-2xl border border-primary/30 bg-card/95 px-3 py-2 text-left text-[12px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
-          >
-            <span className="mr-1 text-primary">✨</span>
-            {nudge.message}
-          </button>
-        )}
+        {/* Consolidación Alux: la sugerencia proactiva ya NO se pinta como un
+            segundo globo flotante. Vive dentro del mismo panel (nota + pistas)
+            y aquí sólo se señala con el punto pulsante del dock. */}
       </div>
 
       <Sheet
@@ -779,6 +774,16 @@ export function AluxFloatingTrigger() {
             />
           ) : null}
 
+          {/* Sugerencia proactiva consolidada: mismo Alux, dentro del panel. */}
+          {nudge ? (
+            <p className="rounded-2xl border border-primary/25 bg-primary/5 px-3 py-2 text-[12px] font-medium text-foreground">
+              <span className="mr-1 text-primary" aria-hidden>
+                ✨
+              </span>
+              {nudge.message}
+            </p>
+          ) : null}
+
           {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
           <AluxConverseChat
             region={ctx.region}
@@ -792,7 +797,9 @@ export function AluxFloatingTrigger() {
             locale={locale}
             {...(selection?.quickActions && selection.quickActions.length > 0
               ? { starters: selection.quickActions }
-              : {})}
+              : contextualStarters.length > 0
+                ? { starters: contextualStarters }
+                : {})}
             onProposal={(titles) => {
               setProposalTitles(titles);
               setMapVariant("proposal");

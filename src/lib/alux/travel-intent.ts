@@ -36,6 +36,45 @@ export const INTENT_NUDGE_MESSAGES: Record<TravelIntent, string | null> = {
   perdido: "¿Te oriento con algo específico?",
 };
 
+/**
+ * Sugerencias contextuales por superficie.
+ *
+ * Viven DENTRO del mismo Alux global (como pistas iniciales del panel);
+ * nunca como un segundo globo flotante. Una sola representación flotante
+ * visible por pantalla.
+ */
+export function surfaceStarters(pathname: string, intent: TravelIntent): readonly string[] {
+  const p = pathname.toLowerCase();
+  const has = (s: string) => p.includes(s);
+
+  if (has("hoteles") || has("casas-de-vacaciones")) {
+    return ["¿Cómo te gustaría hospedarte?", "Opciones con encanto colonial", "Cerca del centro"];
+  }
+  if (has("restaurantes") || has("gastronomia")) {
+    return ["¿Qué te gustaría comer?", "Abierto ahora cerca de mí", "Cocina yucateca tradicional"];
+  }
+  if (has("eventos")) {
+    return ["¿Qué hay este fin de semana?", "Eventos para esta noche", "Actividades en familia"];
+  }
+  if (has("experiencias") || has("que-hacer") || has("tours")) {
+    return ["¿Qué puedo hacer hoy?", "Experiencias de medio día", "Cenotes y naturaleza"];
+  }
+  if (has("rutas")) {
+    return ["Personaliza esta ruta", "Versión más corta", "Con paradas para comer"];
+  }
+  if (has("lugares")) {
+    return ["Sitios imperdibles", "Lugares cerca de mí", "Patrimonio y cultura maya"];
+  }
+  if (has("/oriente-maya")) {
+    return ["¿Ya estás en la región o estás planeando?", "Arma mi plan del día", "Qué ver primero"];
+  }
+  if (p === "/" || p === "") {
+    return ["¿Cómo viajas hoy?", "Estoy planeando mi viaje", "Ya estoy en la región"];
+  }
+  const fallback = INTENT_NUDGE_MESSAGES[intent];
+  return fallback ? [fallback] : [];
+}
+
 const SIGNALS_KEY = "alux_recent_signals_v1";
 const NUDGE_KEY = "alux_intent_nudge_v1";
 const NUDGE_COOLDOWN_MS = 10 * 60 * 1000;
