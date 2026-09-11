@@ -6,8 +6,9 @@
  * viven aquí — la evolución futura ocurre añadiendo variantes o
  * capabilities, jamás duplicando el bloque.
  */
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   clampRating,
   ratingLabel,
