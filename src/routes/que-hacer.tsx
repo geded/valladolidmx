@@ -70,6 +70,7 @@ function QueHacerRoute() {
   return (
     <PublicShell
       crumbs={[
+        { label: "Oriente Maya", to: "/oriente-maya" },
         { label: "¿Qué hacer?", to: "/que-hacer" },
         ...(activo ? [{ label: activo.label }] : []),
       ]}
