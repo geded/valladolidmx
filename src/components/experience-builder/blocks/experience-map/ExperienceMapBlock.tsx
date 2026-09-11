@@ -103,9 +103,7 @@ export function ExperienceMapBlock({
           "grid gap-6",
           immersive
             ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start"
-            : isMulti
-              ? "md:grid-cols-[minmax(0,1fr)_320px]"
-              : "md:grid-cols-[minmax(0,1fr)_320px]",
+            : "lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start",
         )}
       >
         <div className="min-w-0 space-y-3">
@@ -169,11 +167,11 @@ export function ExperienceMapBlock({
         >
           <ul
             className={cn(
-              "space-y-3",
+              "grid gap-3 sm:grid-cols-2 lg:grid-cols-1 lg:space-y-0",
               isMulti
                 ? immersive
-                  ? "max-h-[36rem] overflow-y-auto pr-1"
-                  : "max-h-[560px] overflow-y-auto pr-1"
+                  ? "lg:max-h-[36rem] lg:overflow-y-auto lg:pr-1"
+                  : "lg:max-h-[560px] lg:overflow-y-auto lg:pr-1"
                 : undefined,
             )}
             aria-label="Puntos en el mapa"
