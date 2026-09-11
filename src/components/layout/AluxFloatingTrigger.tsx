@@ -648,12 +648,51 @@ export function AluxFloatingTrigger() {
                   ) : null}
                 </div>
               ) : null}
-              {selectionTask ? (
+              {/* Sólo resumen turístico: nunca instrucciones internas ni prompts. */}
+              {selection.facts && selection.facts.length > 0 ? (
                 <p className="mt-2 text-[12px] leading-snug text-muted-foreground">
-                  {selectionTask}
+                  {selection.facts.join(" · ")}
                 </p>
               ) : null}
+              {selection.mapAnchor ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    requestAluxMapFocus({
+                      ...(selection.entityRef ? { entityRef: selection.entityRef } : {}),
+                      anchor: selection.mapAnchor!,
+                    });
+                    setOpen(false);
+                  }}
+                  className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+                >
+                  <MapPin className="size-3.5" aria-hidden />
+                  Ver mi ruta en el mapa
+                </button>
+              ) : null}
+              {selection.title ? (
+                <button
+                  type="button"
+                  onClick={() => setShareOpen(true)}
+                  className="ml-2 mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <Share2 className="size-3.5" aria-hidden />
+                  Compartir ruta
+                </button>
+              ) : null}
             </section>
+          ) : null}
+
+          {selection?.title ? (
+            <ShareSheet
+              open={shareOpen}
+              onOpenChange={setShareOpen}
+              title={selection.title}
+              url={selection.href ?? (typeof window !== "undefined" ? window.location.href : "/")}
+              {...(selection.facts && selection.facts.length > 0
+                ? { text: selection.facts.join(" · ") }
+                : {})}
+            />
           ) : null}
 
           {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
