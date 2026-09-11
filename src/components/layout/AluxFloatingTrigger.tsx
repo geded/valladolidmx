@@ -795,7 +795,9 @@ export function AluxFloatingTrigger() {
             locale={locale}
             {...(selection?.quickActions && selection.quickActions.length > 0
               ? { starters: selection.quickActions }
-              : {})}
+              : contextualStarters.length > 0
+                ? { starters: contextualStarters }
+                : {})}
             onProposal={(titles) => {
               setProposalTitles(titles);
               setMapVariant("proposal");
