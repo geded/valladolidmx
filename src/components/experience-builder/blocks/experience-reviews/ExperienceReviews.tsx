@@ -6,8 +6,9 @@
  * viven aquí — la evolución futura ocurre añadiendo variantes o
  * capabilities, jamás duplicando el bloque.
  */
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   clampRating,
   ratingLabel,
@@ -344,6 +345,9 @@ export function ExperienceReviews({
     capabilities,
   } = dto;
 
+  const isMobile = useIsMobile();
+  const [expanded, setExpanded] = useState(false);
+
   const showAggregate = capabilities.showAggregate && aggregate != null && aggregate.count > 0;
 
   const wrap = (children: ReactNode) => (
@@ -493,12 +497,29 @@ export function ExperienceReviews({
 
   const renderBody = (list: ExperienceReviewItem[]): ReactNode => {
     if (list.length === 0) return null;
-    if (variant === "grid") return bodyGrid(list);
-    if (variant === "carousel") return bodyCarousel(list);
-    if (variant === "compact") return bodyCompact(list);
-    if (variant === "featured") return bodyFeatured(list);
-    if (variant === "wall") return bodyWall(list);
-    return bodyList(list);
+    const visible = isMobile && !expanded ? list.slice(0, 1) : list;
+    const showMore = isMobile && list.length > 1;
+    const body: ReactNode = (() => {
+      if (variant === "grid") return bodyGrid(visible);
+      if (variant === "carousel") return bodyCarousel(visible);
+      if (variant === "compact") return bodyCompact(visible);
+      if (variant === "featured") return bodyFeatured(visible);
+      if (variant === "wall") return bodyWall(visible);
+      return bodyList(visible);
+    })();
+    if (!showMore) return body;
+    return (
+      <div className="flex flex-col gap-3">
+        {body}
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="self-start rounded-pill border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent"
+        >
+          {expanded ? "Ver menos" : `Ver más reseñas (${list.length})`}
+        </button>
+      </div>
+    );
   };
 
   const listSide = (
