@@ -163,7 +163,7 @@ export function ExperienceMapBlock({
 
         <aside
           className={cn(
-            "space-y-4",
+            "space-y-4 self-start",
             immersive && "rounded-2xl border border-border bg-background/70 p-3 backdrop-blur",
           )}
         >
