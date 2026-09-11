@@ -71,72 +71,80 @@ export function BreadcrumbTerritorial({
   const compact = compactOnMobile && shouldCompactCrumbs(effectiveCrumbs);
 
   return (
-    <nav
-      aria-label="Ruta territorial"
+    <div
       className={cn(
         "flex flex-col items-stretch gap-3 text-sm lg:flex-row lg:items-start lg:justify-between",
         className,
       )}
     >
-      {compact ? <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} /> : null}
-      {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
-      <ol
-        className={cn(
-          "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal lg:flex-1",
-          compact ? "hidden sm:flex" : null,
-        )}
-      >
-        <li className="flex shrink-0 items-center gap-1.5">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            <Home className="size-3.5" aria-hidden />
-            <span className="sr-only">Inicio</span>
-          </Link>
-        </li>
-        {effectiveCrumbs.map((c, i) => {
-          const isLast = i === effectiveCrumbs.length - 1;
-          return (
-            <li key={`${c.label}-${i}`} className="flex min-w-0 shrink-0 items-center gap-1.5">
-              <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+      {/*
+        El selector de destino vive FUERA del `nav` de migajas: dentro se
+        leía como una migaja más y repetía el destino al final de la ruta.
+      */}
+      <nav aria-label="Ruta territorial" className="min-w-0 lg:flex-1">
+        {compact ? (
+          <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
+        ) : null}
+        {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
+        <ol
+          className={cn(
+            "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
+            compact ? "hidden sm:flex" : null,
+          )}
+        >
+          <li className="flex shrink-0 items-center gap-1.5">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
+            >
+              <Home className="size-3.5" aria-hidden />
+              <span className="sr-only">Inicio</span>
+            </Link>
+          </li>
+          {effectiveCrumbs.map((c, i) => {
+            const isLast = i === effectiveCrumbs.length - 1;
+            return (
+              <li key={`${c.label}-${i}`} className="flex min-w-0 shrink-0 items-center gap-1.5">
+                <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
 
-              {c.to && !isLast ? (
-                <Link
-                  to={c.to}
-                  params={c.params as never}
-                  className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-                >
-                  {c.label}
-                </Link>
-              ) : (
-                <span
-                  aria-current={isLast ? "page" : undefined}
-                  className={cn(
-                    "block truncate",
-                    // El nombre actual puede truncarse en móvil.
-                    isLast ? "max-w-[46vw] font-medium text-foreground sm:max-w-none" : "",
-                  )}
-                >
-                  {c.label}
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+                {c.to && !isLast ? (
+                  <Link
+                    to={c.to}
+                    params={c.params as never}
+                    className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {c.label}
+                  </Link>
+                ) : (
+                  <span
+                    aria-current={isLast ? "page" : undefined}
+                    className={cn(
+                      "block truncate",
+                      // El nombre actual puede truncarse en móvil.
+                      isLast ? "max-w-[46vw] font-medium text-foreground sm:max-w-none" : "",
+                    )}
+                  >
+                    {c.label}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
       {/*
         N2.5 · Montaje visual único del DestinationSwitcher junto al
         breadcrumb. Se autooculta si no hay contexto territorial o si
         existe un único destino publicado — no genera ruido en Home,
         Blog, Contacto ni superficies sin ancla.
       */}
-      <TerritorialSwitcherMount
-        className={cn(
-          "h-11 w-full min-w-40 shrink-0 text-xs lg:h-8 lg:w-auto lg:max-w-64",
-          compact ? "hidden sm:flex" : null,
-        )}
-      />
-    </nav>
+      <div
+        role="group"
+        aria-label="Cambiar de destino"
+        className={cn("shrink-0", compact ? "hidden sm:block" : null)}
+      >
+        <TerritorialSwitcherMount className="h-11 w-full min-w-40 text-xs lg:h-8 lg:w-auto lg:max-w-64" />
+      </div>
+    </div>
   );
 }

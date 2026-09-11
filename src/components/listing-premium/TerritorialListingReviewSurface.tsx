@@ -17,6 +17,10 @@ import type { TourismCardVM } from "@/components/experience-builder/tourism-card
 import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import type { FavoriteEntityKind } from "@/lib/traveler/traveler-favorites.functions";
+import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
@@ -910,11 +914,42 @@ function Filters({
   );
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Traduce la entidad de la tarjeta a los kinds ya soportados. */
+function savableKinds(source?: TourismCardVM): {
+  favorite: FavoriteEntityKind | null;
+  travel: TravelItemKind | null;
+} {
+  if (!source || !UUID_RE.test(source.id)) return { favorite: null, travel: null };
+  switch (source.entityKind) {
+    case "business":
+    case "hotel":
+    case "restaurant":
+      return { favorite: "business", travel: "business" };
+    case "product":
+    case "experience":
+      return { favorite: "product", travel: "product" };
+    case "promotion":
+      return { favorite: "promotion", travel: null };
+    case "event":
+      return { favorite: null, travel: "event" };
+    case "place":
+      return { favorite: null, travel: "place" };
+    case "destination":
+      return { favorite: null, travel: "destination" };
+    default:
+      return { favorite: null, travel: null };
+  }
+}
+
 /**
  * Autoridad visual compartida de las tarjetas de listado territorial.
  * Con portada acreditada: imagen protagonista arriba (4:3), favorito sobre
  * la imagen y ficha compacta debajo. Sin portada: marcador editorial
  * aprobado con altura controlada (nunca un hueco vacío ni fotografía ajena).
+ * Las acciones sólo se muestran cuando la entidad las soporta: ningún
+ * botón visible queda sin efecto.
  */
 function ListingCard({
   item,
@@ -928,6 +963,7 @@ function ListingCard({
   compactFallback?: boolean;
 }) {
   const tags = item.tags.slice(0, 3);
+  const kinds = savableKinds(item.source);
   return (
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm transition hover:shadow-md">
       <div
@@ -954,13 +990,15 @@ function ListingCard({
             Recomendado
           </span>
         ) : null}
-        <button
-          type="button"
-          aria-label={`Guardar ${item.name}`}
-          className="absolute right-2 top-2 grid size-9 place-items-center rounded-full border border-[var(--border)] bg-card/90 backdrop-blur"
-        >
-          <Heart className="size-4" aria-hidden />
-        </button>
+        {kinds.favorite && item.source ? (
+          <FavoriteButton
+            entityKind={kinds.favorite}
+            entityId={item.source.id}
+            entityTitle={item.name}
+            {...(item.image ? { entityImageUrl: item.image } : {})}
+            className="absolute right-2 top-2 z-10"
+          />
+        ) : null}
       </div>
       <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
         <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand-primary-strong)]">
@@ -989,18 +1027,22 @@ function ListingCard({
           {item.href ? (
             <a
               href={item.href}
-              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white"
+              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-[var(--selva-foreground)]"
             >
               Ver {profile.itemLabel}
             </a>
-          ) : (
-            <button className="min-h-10 rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white">
-              Ver {profile.itemLabel}
-            </button>
-          )}
-          <button className="inline-flex min-h-10 items-center rounded-full border border-[var(--selva)] px-3 text-xs font-semibold text-[var(--selva)]">
-            Agregar a mi viaje
-          </button>
+          ) : null}
+          {kinds.travel && item.source ? (
+            <AddToTravelPlanButton
+              kind={kinds.travel}
+              targetId={item.source.id}
+              title={item.name}
+              eligibilityMode="legacy"
+              {...(item.source.href ? { slug: item.source.href } : {})}
+              {...(item.image ? { imageUrl: item.image } : {})}
+              {...(item.zone ? { subtitle: item.zone } : {})}
+            />
+          ) : null}
         </div>
       </div>
     </article>

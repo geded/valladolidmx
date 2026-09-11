@@ -48,20 +48,46 @@ conviene confirmarlo documentalmente como criterio de cierre.
 No es defecto de código: las fichas sin portada resuelven correctamente al fallback editorial aprobado.
 Se resuelve cargando medios reales desde el CMS; prohibido inventar o asignar imágenes conceptuales.
 
+## Ampliación · QA funcional de CTAs, resolución de media y armonía responsive (2026-09-11)
+
+Hallazgo del Founder en móvil (perfil Conato 1910): áreas beige sin fotografía en “Explora cerca de…” y
+acciones visibles sin efecto. Se auditaron y corrigieron **sólo autoridades compartidas**.
+
+### Causas raíz
+
+| Defecto | Causa raíz | Autoridad corregida |
+| --- | --- | --- |
+| Cards beige en “Explora cerca de…” | La lectura de relacionados no proyectaba ni firmaba la portada CMS y el adaptador fijaba `imageUrl: null` | `src/lib/catalog/business-related.functions.ts`, `src/lib/experience-builder/adapters/business-related-to-block.ts` |
+| Acciones sin efecto en fichas | Anclas de sub-navegación y CTA “Contactar” emitidas sin sección/dato real; enlaces de destino con segmento vacío | `src/components/surfaces/BusinessSurface.tsx` |
+| Enlace decorativo `href="#"` | La barra de acciones caía a `"#"` cuando no había destino ni handler | `src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar.tsx` |
+| Favorito y “Agregar a mi viaje” sin efecto en listados | La tarjeta compartida pintaba botones estáticos sin handler | `src/components/listing-premium/TerritorialListingReviewSurface.tsx` (reutiliza `FavoriteButton` y `AddToTravelPlanButton`) |
+| Destino repetido al final de la ruta territorial (#A) | El selector se montaba dentro del `nav` de migajas | `src/components/layout/BreadcrumbTerritorial.tsx` |
+
+### Verificación en preview
+
+- 8 rutas públicas × 1440/834/430/390: status 200, overflow horizontal 0, H1 único, imágenes rotas 0,
+  `nav` territorial único y **0** selectores dentro del nav (antes 1 por ruta con destino activo).
+- Enlaces `href="#"` visibles: **0** en todas las rutas medidas y en la ficha de Conato 1910.
+- Ficha `/oriente-maya/valladolid/restaurantes/conato-1910` en 1440 y 390: overflow 0, sin imágenes rotas,
+  la sección de recomendaciones ya resuelve portadas CMS reales cuando existen.
+- Controles: typecheck y ESLint focalizado en verde.
+
+### Data Readiness revalidado
+
+La cifra de 17 registros sin portada se mantiene: no eran fallos de resolución en el listado, pero sí lo eran
+en la sección de recomendaciones, donde toda portada se perdía. Corregido el resolutor, las entidades con
+media la muestran y sólo las realmente sin media usan el marcador editorial compacto.
+
 ## Lista mínima de correcciones antes del cierre formal
 
-1. Ajustar el nav territorial para eliminar la lectura duplicada del destino (#A).
-2. Declarar en la documentación el criterio de presencia/ausencia del dock de Alux por superficie (#B).
-3. Cargar portadas reales para los 17 registros publicados sin media (Data Readiness).
-
-Ninguna de las tres es bloqueante de código. Las dos primeras son deltas mínimos sobre autoridad existente;
-la tercera es contenido.
+1. ~~Ajustar el nav territorial para eliminar la lectura duplicada del destino (#A).~~ **Corregido.**
+2. Declarar en la documentación el criterio de presencia/ausencia del dock de Alux por superficie (#B). **Pendiente documental.**
+3. Cargar portadas reales para los 17 registros publicados sin media (Data Readiness). **Backlog CMS.**
 
 ## Recomendación
 
-**GO condicionado.** La capa visual pública OMXDS puede declararse cerrada una vez aplicadas #A y #B y
-registrada la carga de portadas como tarea de contenido en curso. No se detectaron BLOQUEANTES de código,
-plantillas paralelas, cards duplicadas, mapas duplicados, doble Alux ni overflow.
+**GO condicionado.** Sin defectos funcionales ni visuales atribuibles a las autoridades compartidas tras esta
+ampliación. Queda pendiente sólo la nota documental #B y el contenido CMS faltante.
 
 ## Carriles siguientes confirmados (no iniciados en este turno)
 

@@ -120,5 +120,55 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
       ...sameDestinationOtherNatural,
     ].slice(0, 6);
 
+    /* Portada canónica del CMS (`business_media` role=cover → `media_assets`).
+       Misma vía que `listMarketplaceBusinesses`/`getDestinationRelated`: el
+       bucket es privado y la URL se firma server-side. Best-effort: sin
+       portada acreditada `cover_url` queda en null y la tarjeta compartida
+       resuelve su marcador editorial aprobado. Nunca se inventa una imagen. */
+    const shown = [...sameCategory, ...sameDestinationOther];
+    if (shown.length > 0) {
+      try {
+        const { data: bmedia } = await supabase
+          .from("business_media")
+          .select(
+            "business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+          )
+          .in(
+            "business_id",
+            shown.map((c) => c.id),
+          )
+          .eq("role", "cover")
+          .order("sort_order", { ascending: true });
+        if (bmedia && bmedia.length > 0) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const seen = new Set<string>();
+          const firstPerBusiness = (bmedia as Array<Record<string, unknown>>).filter((r) => {
+            const bid = String(r.business_id);
+            if (seen.has(bid)) return false;
+            seen.add(bid);
+            return true;
+          });
+          const signed = await Promise.all(
+            firstPerBusiness.map(async (r) => {
+              const asset = r.media_assets as {
+                storage_bucket?: string;
+                storage_path?: string;
+              } | null;
+              if (!asset?.storage_bucket || !asset?.storage_path)
+                return [String(r.business_id), null] as const;
+              const { data: s } = await supabaseAdmin.storage
+                .from(asset.storage_bucket)
+                .createSignedUrl(asset.storage_path, 3600);
+              return [String(r.business_id), s?.signedUrl ?? null] as const;
+            }),
+          );
+          const byBiz = new Map(signed);
+          for (const card of shown) card.cover_url = byBiz.get(card.id) ?? null;
+        }
+      } catch (e) {
+        console.warn("[getBusinessRelated] cover sign failed", e);
+      }
+    }
+
     return { sameCategory, sameDestinationOther };
   });
