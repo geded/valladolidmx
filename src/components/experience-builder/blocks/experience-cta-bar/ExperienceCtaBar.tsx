@@ -23,7 +23,6 @@ import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 
-
 const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar,
   heart: Heart,
@@ -179,9 +178,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
               </button>
             );
           }
-          const href = a.href ?? "#";
+          // Fail-closed: una acción sin destino no se pinta como enlace
+          // decorativo. Ningún botón visible puede quedar sin efecto.
+          if (!a.href) return null;
           return (
-            <a key={i} className={classes} href={href} aria-label={a.label || a.action}>
+            <a key={i} className={classes} href={a.href} aria-label={a.label || a.action}>
               {inner}
             </a>
           );

@@ -406,25 +406,45 @@ export function BusinessSurface({
   // bloques + anchors que la sub-navegación necesita.
   const heroDto = businessToHeroDTO(b);
   const subnavDto = businessToSubnavDTO(b);
-  const effectiveSubnavDto = activeContract
-    ? {
-        ...subnavDto,
-        anchors: subnavDto.anchors.filter((anchor) => {
-          if (
-            activeContract.omissions.includes("offer") &&
-            ["servicios", "promociones"].includes(anchor.id)
-          )
-            return false;
-          if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
-          if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
-          if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
-            return false;
-          if (activeContract.omissions.includes("collection") && anchor.id === "descubre")
-            return false;
-          return true;
-        }),
-      }
-    : subnavDto;
+  /* Contacto acreditado: dato Premium cuando existe y, si no, el contacto
+     público ya publicado en el CMS. Autoridad única para la sección
+     `#contacto`, su ancla en la sub-navegación y la acción "Contactar". */
+  const contactSource = activePremium?.contact ?? b.primary_contact ?? null;
+  /* Enlaces territoriales sólo cuando el slug real existe: nunca se emite
+     una URL con segmento vacío desde una ficha. */
+  const destinationHref = b.destination_slug
+    ? `/oriente-maya/${encodeURIComponent(b.destination_slug)}`
+    : null;
+  const categoryHref =
+    destinationHref && b.category_slug
+      ? `${destinationHref}/${encodeURIComponent(b.category_slug)}`
+      : null;
+  const hasLocation = b.primary_location?.latitude != null && b.primary_location?.longitude != null;
+  const hasRelated = Boolean(
+    related && (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0),
+  );
+  const effectiveSubnavDto = {
+    ...subnavDto,
+    anchors: subnavDto.anchors.filter((anchor) => {
+      // Ningún ancla visible puede apuntar a una sección que no se renderiza.
+      if (anchor.id === "contacto" && !contactSource) return false;
+      if (anchor.id === "ubicacion" && !hasLocation) return false;
+      if (anchor.id === "descubre" && !hasRelated) return false;
+      if (anchor.id === "promociones" && !showPromotions) return false;
+      if (!activeContract) return true;
+      if (
+        activeContract.omissions.includes("offer") &&
+        ["servicios", "promociones"].includes(anchor.id)
+      )
+        return false;
+      if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
+      if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
+      if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
+        return false;
+      if (activeContract.omissions.includes("collection") && anchor.id === "descubre") return false;
+      return true;
+    }),
+  };
   const descriptionSection = businessToDescriptionSectionDTO(b);
   const infoGridDto = businessToInfoGridDTO(b);
   const legacyCtaBarDto = businessToCtaBarDTO(b);
@@ -447,7 +467,11 @@ export function BusinessSurface({
             ]
           : [],
       }
-    : legacyCtaBarDto;
+    : {
+        ...legacyCtaBarDto,
+        // Sin contacto acreditado no se muestra una acción sin destino.
+        actions: contactSource ? legacyCtaBarDto.actions : [],
+      };
   const premiumGalleryDto = activePremium
     ? {
         variant: "mosaic" as const,
@@ -477,7 +501,7 @@ export function BusinessSurface({
         },
       }
     : null;
-  const premiumContactDto = activePremium?.contact
+  const premiumContactDto = contactSource
     ? {
         variant: "cards" as const,
         heading: "Contacto",
@@ -485,8 +509,8 @@ export function BusinessSurface({
         items: [
           {
             iconKey: "message-circle",
-            label: activePremium.contact.label || "Contacto público",
-            value: activePremium.contact.value,
+            label: contactSource.label || "Contacto público",
+            value: contactSource.value,
             tone: "default" as const,
           },
         ],
@@ -679,8 +703,11 @@ export function BusinessSurface({
                       entityKind: "business",
                       maxItems: 4,
                       variant: "carousel",
-                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
-                      seeAllLabel: "Ver destino",
+                      // Sólo enlazamos cuando el destino real existe: nunca
+                      // se emite una URL con segmento vacío.
+                      ...(destinationHref
+                        ? { seeAllHref: destinationHref, seeAllLabel: "Ver destino" }
+                        : {}),
                     },
                   ]
                 : [
@@ -691,8 +718,9 @@ export function BusinessSurface({
                       maxItems: 6,
                       variant: "grid",
                       categorySlug: b.category_slug || null,
-                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}/${encodeURIComponent(b.category_slug || "")}`,
-                      seeAllLabel: "Ver todas",
+                      ...(categoryHref
+                        ? { seeAllHref: categoryHref, seeAllLabel: "Ver todas" }
+                        : {}),
                     },
                     {
                       id: "otras-categorias",
@@ -700,8 +728,9 @@ export function BusinessSurface({
                       heading: "Otras experiencias del destino",
                       maxItems: 6,
                       variant: "grid",
-                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
-                      seeAllLabel: "Ver destino",
+                      ...(destinationHref
+                        ? { seeAllHref: destinationHref, seeAllLabel: "Ver destino" }
+                        : {}),
                     },
                   ],
               capabilities: {
