@@ -579,7 +579,7 @@ export function AluxFloatingTrigger() {
         data-alux-saved-items={String(unified.trip.savedItemCount)}
         data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
         data-alux-reason={unified.reason}
-        hidden={presence.shouldHide}
+        hidden={presence.shouldHide || (open && !minimized)}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
