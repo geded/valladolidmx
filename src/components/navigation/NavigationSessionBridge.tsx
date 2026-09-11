@@ -46,6 +46,10 @@ export function NavigationSessionBridge() {
  * playgrounds). Recomendado como punto de montaje canónico N3.
  */
 export function GlobalNavigationSessionBridge() {
+  const router = useRouter();
+  const location = useRouterState({ select: (s) => s.location });
+  const restored = useRef(false);
+
   useEffect(() => {
     return subscribeResolvedContext((ctx) => {
       if (!ctx) return;
@@ -54,5 +58,24 @@ export function GlobalNavigationSessionBridge() {
       writeNavigationSession(snapshot);
     });
   }, []);
+
+  // Continuidad de ubicación: recuerda la última ruta pública visitada.
+  useEffect(() => {
+    writeLastRoute(`${location.pathname}${location.searchStr ?? ""}`);
+  }, [location.pathname, location.searchStr]);
+
+  // Arranque en frío de la app instalada: el sistema relanza en "/" y el
+  // explorador perdía su ubicación. Restauramos la última ruta pública.
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    if (!isStandaloneDisplay()) return;
+    if (location.pathname !== "/" || (location.searchStr ?? "") !== "") return;
+    const last = readLastRoute();
+    if (!last) return;
+    void router.navigate({ to: last, replace: true }).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return null;
 }
