@@ -172,7 +172,6 @@ async function main() {
         media_asset_id: asset.id,
         role: "gallery",
         sort_order: item.sortOrder ?? 1,
-        status: "published",
       },
       { onConflict: "destination_id,media_asset_id,role" },
     );
