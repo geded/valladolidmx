@@ -31,6 +31,13 @@ Corrección y verificación de las autoridades públicas Premium existentes. No 
 5. Ejecutar typecheck, lint focalizado, pruebas relevantes, Route Inventory, smoke funcional y Playwright visual/interactivo en los cuatro anchos.
 6. Actualizar el mismo Closure Readiness Report con QA de CTAs, resolución de media, armonía responsive, matriz PASS/PENDIENTE/BLOQUEANTE y correcciones exactas.
 
+## Pendiente detectado en móvil (Conato 1910)
+
+- Reducir el alto del marcador sin fotografía en las tarjetas de “Explora cerca de…”.
+- Dar respiro lateral al carrusel para que la tarjeta no quede cortada contra el borde.
+- Equilibrar la barra inferior: nombre sin truncar y acción principal a escala táctil correcta.
+- Corregir el texto truncado del aviso de mapa.
+
 ## Criterio de GO
 
 GO sólo si no quedan defectos funcionales o visuales atribuibles a las autoridades compartidas. Los registros que realmente carecen de portada pueden quedar como backlog CMS documentado.
