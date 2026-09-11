@@ -242,7 +242,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   return (
-    CATEGORY_VARIANTS[categorySlug] ?? {
+    CATEGORY_VARIANTS[categorySlug.trim().toLowerCase()] ?? {
       eyebrow: "Catálogo Oriente Maya",
       productsHeading: "Productos y experiencias",
       productsEmpty: "Sin productos publicados.",
