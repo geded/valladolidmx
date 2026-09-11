@@ -118,3 +118,18 @@ Ajustes mínimos sobre autoridades compartidas existentes, sin crear componentes
 Verificación: typecheck OK; ESLint focalizado sin hallazgos nuevos (los avisos restantes son deuda previa);
 Playwright en 1440 / 834 / 430 / 390 con status 200, un solo H1, overflow 0 e imágenes rotas 0.
 No se publicó ni desplegó.
+
+## Delta de navegación y portada de ficha (Conato 1910) — aplicado
+
+1. `CompactCrumbs.tsx` conserva visibles en móvil el destino y la categoría antes de la ficha; la región
+   continúa accesible en el menú intermedio. La ruta queda `Valladolid > Restaurantes > Conato 1910`.
+2. `marketplace-reads.functions.ts` resuelve en el detalle la misma portada asociada mediante
+   `business_media → media_assets` que ya usan los listados; antes la ficha omitía esa lectura.
+3. `PremiumHero.tsx` reduce únicamente la altura no cinematográfica en móvil; tablet y escritorio conservan
+   la composición Premium aprobada.
+4. Se sembró una portada temporal de revisión desde el sitio oficial de Conato, marcada con
+   `demo_seed_batch=conato-cover-review-2026-09`, procedencia y reemplazo obligatorio antes de producción.
+5. La etiqueta territorial del bloque de datos ahora se presenta como `Valladolid`, no como slug en minúsculas.
+
+Verificación: 393/834/1440 muestran destino, categoría y ficha; imágenes rotas 0; la portada real se carga
+desde el CMS. No se publicó ni desplegó.
