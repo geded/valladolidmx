@@ -119,6 +119,34 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * puede alimentar el binding gobernado `geography.location`.
    */
   provenance?: "published" | "demo";
+  /**
+   * Reputación acreditada de la ficha (`reviews`, subject_kind = business,
+   * status = published). `null` = la empresa aún no tiene reseñas publicadas;
+   * la superficie omite la sección de reputación. Nunca se inventan datos.
+   */
+  reviews?: MarketplaceBusinessReviews | null;
+}
+
+export interface MarketplaceBusinessReviewItem {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  language: string;
+  author_display_name: string | null;
+  verified_source: string | null;
+  published_at: string | null;
+  helpful_count: number;
+  business_response: string | null;
+  business_response_at: string | null;
+}
+
+export interface MarketplaceBusinessReviews {
+  count: number;
+  average: number;
+  verified_count: number;
+  distribution: Record<"1" | "2" | "3" | "4" | "5", number>;
+  items: MarketplaceBusinessReviewItem[];
 }
 
 export interface MarketplaceSearchHit {
@@ -985,40 +1013,101 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     if (error) throw new Error(`marketplace_business_failed: ${error.message}`);
     if (!biz) return null;
 
-    const [{ data: products, error: pErr }, { data: promos, error: prErr }, { data: locations }] =
-      await Promise.all([
-        supabase
-          .from("products")
-          .select(
-            "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
-          )
-          .eq("business_id", String(biz.id))
-          .eq("status", "published")
-          .is("deleted_at", null)
-          .order("name", { ascending: true })
-          .limit(48),
-        supabase
-          .from("promotions")
-          .select(
-            "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
-          )
-          .eq("business_id", String(biz.id))
-          .eq("status", "published")
-          .is("deleted_at", null)
-          .order("ends_at", { ascending: true, nullsFirst: false })
-          .limit(24),
-        supabase
-          .from("business_locations")
-          .select(
-            "label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at",
-          )
-          .eq("business_id", String(biz.id))
-          .is("deleted_at", null)
-          .order("is_primary", { ascending: false })
-          .limit(1),
-      ]);
+    const [
+      { data: products, error: pErr },
+      { data: promos, error: prErr },
+      { data: locations },
+      { data: reviewRows },
+    ] = await Promise.all([
+      supabase
+        .from("products")
+        .select(
+          "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
+        )
+        .eq("business_id", String(biz.id))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("name", { ascending: true })
+        .limit(48),
+      supabase
+        .from("promotions")
+        .select(
+          "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
+        )
+        .eq("business_id", String(biz.id))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("ends_at", { ascending: true, nullsFirst: false })
+        .limit(24),
+      supabase
+        .from("business_locations")
+        .select("label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at")
+        .eq("business_id", String(biz.id))
+        .is("deleted_at", null)
+        .order("is_primary", { ascending: false })
+        .limit(1),
+      supabase
+        .from("reviews")
+        .select(
+          "id, rating, title, body, language, author_display_name, verified_source, published_at, helpful_count, business_response, business_response_at",
+        )
+        .eq("subject_kind", "business")
+        .eq("subject_id", String(biz.id))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(24),
+    ]);
     if (pErr) throw new Error(`marketplace_products_failed: ${pErr.message}`);
     if (prErr) throw new Error(`marketplace_promos_failed: ${prErr.message}`);
+
+    /* Reputación acreditada: sólo reseñas publicadas y no eliminadas.
+       Sin filas → `null` (la superficie omite la sección). */
+    const reviewItems: MarketplaceBusinessReviewItem[] = (
+      (reviewRows ?? []) as Array<Record<string, unknown>>
+    ).map((r) => ({
+      id: String(r.id),
+      rating: Number(r.rating ?? 0),
+      title: (r.title as string | null) ?? null,
+      body: (r.body as string | null) ?? null,
+      language: typeof r.language === "string" ? r.language : "es",
+      author_display_name: (r.author_display_name as string | null) ?? null,
+      verified_source: (r.verified_source as string | null) ?? null,
+      published_at: (r.published_at as string | null) ?? null,
+      helpful_count: Number(r.helpful_count ?? 0),
+      business_response: (r.business_response as string | null) ?? null,
+      business_response_at: (r.business_response_at as string | null) ?? null,
+    }));
+    const reviewsSummary: MarketplaceBusinessReviews | null =
+      reviewItems.length > 0
+        ? {
+            count: reviewItems.length,
+            average:
+              Math.round(
+                (reviewItems.reduce((acc, it) => acc + it.rating, 0) / reviewItems.length) * 10,
+              ) / 10,
+            verified_count: reviewItems.filter(
+              (it) => it.verified_source && it.verified_source !== "declared_visitor",
+            ).length,
+            distribution: reviewItems.reduce(
+              (acc, it) => {
+                const key = String(Math.min(5, Math.max(1, Math.round(it.rating)))) as
+                  | "1"
+                  | "2"
+                  | "3"
+                  | "4"
+                  | "5";
+                acc[key] += 1;
+                return acc;
+              },
+              { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } as Record<
+                "1" | "2" | "3" | "4" | "5",
+                number
+              >,
+            ),
+            items: reviewItems,
+          }
+        : null;
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
@@ -1057,6 +1146,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       description: typeof biz.description === "string" ? biz.description : "",
       primary_location: detailPrimaryLocation,
       provenance: "published",
+      reviews: reviewsSummary,
       verified: Boolean(biz.verified),
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
