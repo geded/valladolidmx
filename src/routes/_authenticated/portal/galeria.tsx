@@ -22,6 +22,7 @@ import {
 } from "@/lib/portal/business-media.functions";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { prepareImageForRole } from "@/lib/cms/image-upload";
 import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
 import { toast } from "@/lib/toast";
 
@@ -152,10 +153,13 @@ function MediaSection({
       queryKey: ["portal", "media", businessId],
     });
 
-  const handleUpload = async (file: File) => {
+  const handleUpload = async (original: File) => {
     setBusy(true);
     setStatus(null);
     try {
+      setStatus("Optimizando imagen para web…");
+      const file = await prepareImageForRole(original, role);
+
       const ticket = await ticketFn({
         data: {
           businessId,
