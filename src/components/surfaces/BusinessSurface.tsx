@@ -439,8 +439,7 @@ export function BusinessSurface({
         return false;
       if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
       if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
-      if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
-        return false;
+      if (activeContract.omissions.includes("reputation") && anchor.id === "resenas") return false;
       if (activeContract.omissions.includes("collection") && anchor.id === "descubre") return false;
       return true;
     }),
