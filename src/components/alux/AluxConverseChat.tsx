@@ -136,6 +136,12 @@ export interface AluxConverseChatProps {
   readonly locale: AluxConverseInput["locale"];
   /** Preguntas sugeridas cuando el hilo está vacío. */
   readonly starters?: readonly string[];
+  /**
+   * Notifica la última secuencia propuesta por Alux (títulos canónicos en
+   * orden) para que la superficie invocante pueda ofrecer verla en su mapa.
+   * No crea otro motor: sólo transporta lo que la respuesta ya contiene.
+   */
+  readonly onProposal?: (titles: readonly string[]) => void;
 }
 
 /* ─────────────────────────── componente ─────────────────────────── */
@@ -302,6 +308,14 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           { id: newId(), role: "assistant", content: res.text, response: res },
         ]);
         setUnderstood(res.understood ?? {});
+        // Transporta la secuencia ya propuesta (sin reinterpretarla) para que
+        // la superficie con mapa pueda representarla con sus puntos canónicos.
+        if (res.sequence && res.sequence.length > 0) {
+          const titles = res.sequence
+            .flatMap((step) => step.refs.map((r) => r.title))
+            .filter((t): t is string => Boolean(t && t.trim()));
+          if (titles.length > 0) props.onProposal?.(titles);
+        }
         setStatus("idle");
         setLiveNote(
           res.recommendations.length
@@ -527,7 +541,13 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       </div>
 
       {/* Sugerencias iniciales */}
-      {hydrated && messages.length === 0 && !thinking && !planBlocked ? (
+      {/* Acciones rápidas contextuales: cuando la superficie entrega las suyas
+          permanecen disponibles durante toda la conversación (ciclo iterativo);
+          las sugerencias genéricas siguen apareciendo sólo con el hilo vacío. */}
+      {hydrated &&
+      !thinking &&
+      !planBlocked &&
+      (Boolean(props.starters?.length) || messages.length === 0) ? (
         <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Preguntas sugeridas">
           {starters.map((s) => (
             <button

@@ -52,6 +52,17 @@ export interface AluxOpenSelection {
 export interface AluxMapFocusPayload {
   readonly entityRef?: string;
   readonly anchor?: string;
+  /**
+   * Qué debe representar el mapa existente: la ruta publicada tal cual
+   * ("original") o la secuencia ya propuesta por Alux ("proposal").
+   */
+  readonly variant?: "original" | "proposal";
+  /**
+   * Títulos canónicos de la secuencia propuesta, en orden. La superficie
+   * dueña del mapa sólo usa los que coinciden con sus puntos publicados;
+   * jamás se inventan coordenadas ni paradas.
+   */
+  readonly sequenceTitles?: readonly string[];
 }
 
 const MAP_FOCUS_EVENT = "alux:map-focus";

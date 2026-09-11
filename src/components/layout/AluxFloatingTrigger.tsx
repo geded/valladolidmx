@@ -165,12 +165,27 @@ export function AluxFloatingTrigger() {
      muestra al viajero (Founder Concierge Voice). */
   const [, setSelectionTask] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  /* La sesión sigue viva mientras el viajero consulta el mapa: el panel sólo
+     se repliega a una barra compacta y se restaura con el mismo diálogo. */
+  const [minimized, setMinimized] = useState(false);
+  /* Última secuencia propuesta por Alux (títulos canónicos, en orden). */
+  const [proposalTitles, setProposalTitles] = useState<readonly string[] | null>(null);
+  const [mapVariant, setMapVariant] = useState<"original" | "proposal">("original");
 
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
   useEffect(() => {
     return onAluxFloatingOpen((payload) => {
-      setSelection(payload.selection ?? null);
+      setSelection((prev) => {
+        const next = payload.selection ?? null;
+        // Cambiar de ruta reinicia la propuesta; reabrir la misma la conserva.
+        if ((prev?.entityRef ?? null) !== (next?.entityRef ?? null)) {
+          setProposalTitles(null);
+          setMapVariant("original");
+        }
+        return next;
+      });
       setSelectionTask(payload.hint ?? null);
+      setMinimized(false);
       setOpen(true);
     });
   }, []);
@@ -180,6 +195,9 @@ export function AluxFloatingTrigger() {
     if (!open) {
       setSelection(null);
       setSelectionTask(null);
+      setMinimized(false);
+      setProposalTitles(null);
+      setMapVariant("original");
     }
   }, [open]);
 
@@ -565,8 +583,28 @@ export function AluxFloatingTrigger() {
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
         }}
       >
+        {/* Dock compacto persistente: la sesión sigue viva mientras el
+            viajero mira el mapa; "Continuar con Alux" reabre el mismo hilo. */}
+        {minimized && selection ? (
+          <button
+            type="button"
+            onClick={() => setMinimized(false)}
+            className="pointer-events-auto flex min-h-11 max-w-[86vw] items-center gap-2 rounded-full border border-primary/40 bg-card/95 px-3.5 py-2 text-left text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
+          >
+            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+              <AluxMark family="avatar" size={20} decorative loading="eager" />
+            </span>
+            <span className="min-w-0 truncate">
+              Alux · Personalizando{selection.title ? ` ${selection.title}` : ""}
+            </span>
+            <span className="shrink-0 rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
+              Continuar con Alux
+            </span>
+          </button>
+        ) : null}
         <button
           type="button"
+          hidden={minimized && Boolean(selection)}
           onClick={() => setOpen(true)}
           title={`Alux · ${triggerLabel}`}
           className="pointer-events-auto group flex min-h-11 max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
@@ -600,7 +638,13 @@ export function AluxFloatingTrigger() {
         )}
       </div>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet
+        open={open && !minimized}
+        onOpenChange={(v) => {
+          setMinimized(false);
+          setOpen(v);
+        }}
+      >
         <SheetContent side="right" className="flex w-full max-w-md flex-col gap-6 overflow-y-auto">
           <SheetHeader className="text-left">
             <div className="flex items-center gap-2">
@@ -663,6 +707,31 @@ export function AluxFloatingTrigger() {
                   {selection.facts.join(" · ")}
                 </p>
               ) : null}
+              {/* Ruta original vs propuesta de Alux — sólo cuando ya existe
+                  una secuencia propuesta con paradas canónicas. */}
+              {proposalTitles && proposalTitles.length > 0 ? (
+                <div
+                  role="group"
+                  aria-label="Qué mostrar en el mapa"
+                  className="mt-3 inline-flex rounded-full border border-primary/25 bg-background p-0.5"
+                >
+                  {(["original", "proposal"] as const).map((variant) => (
+                    <button
+                      key={variant}
+                      type="button"
+                      aria-pressed={mapVariant === variant}
+                      onClick={() => setMapVariant(variant)}
+                      className={
+                        mapVariant === variant
+                          ? "inline-flex min-h-8 items-center rounded-full bg-primary/15 px-3 text-[11px] font-semibold text-primary"
+                          : "inline-flex min-h-8 items-center rounded-full px-3 text-[11px] font-medium text-muted-foreground"
+                      }
+                    >
+                      {variant === "original" ? "Ruta original" : "Tu propuesta con Alux"}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               {selection.mapAnchor ? (
                 <button
                   type="button"
@@ -670,8 +739,14 @@ export function AluxFloatingTrigger() {
                     requestAluxMapFocus({
                       ...(selection.entityRef ? { entityRef: selection.entityRef } : {}),
                       anchor: selection.mapAnchor!,
+                      variant: mapVariant,
+                      ...(mapVariant === "proposal" && proposalTitles
+                        ? { sequenceTitles: proposalTitles }
+                        : {}),
                     });
-                    setOpen(false);
+                    /* La conversación NO se destruye: el panel se repliega y
+                       el viajero puede continuar donde iba. */
+                    setMinimized(true);
                   }}
                   className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
                 >
@@ -718,6 +793,10 @@ export function AluxFloatingTrigger() {
             {...(selection?.quickActions && selection.quickActions.length > 0
               ? { starters: selection.quickActions }
               : {})}
+            onProposal={(titles) => {
+              setProposalTitles(titles);
+              setMapVariant("proposal");
+            }}
           />
 
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}

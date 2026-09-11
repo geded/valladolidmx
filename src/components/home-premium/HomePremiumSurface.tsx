@@ -122,6 +122,8 @@ export function HomePremiumSurface({
   const cinematic = heroVariant === "cinematic";
   const routes = content.rutas.items;
   const [selectedRoute, setSelectedRoute] = useState<string>(routes[0]?.id ?? "");
+  /* Secuencia propuesta por Alux para el mapa existente (títulos canónicos). */
+  const [proposalSequence, setProposalSequence] = useState<readonly string[] | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState(content.alux.prompts[0] ?? "");
   const anonymousTrip = useAnonymousTrip();
   const [selectedParty, setSelectedParty] = useState<PartyComposition | null>(null);
@@ -146,6 +148,11 @@ export function HomePremiumSurface({
         ? payload.entityRef.slice("route:".length)
         : null;
       if (id && routes.some((route) => route.id === id)) setSelectedRoute(id);
+      setProposalSequence(
+        payload.variant === "proposal" && payload.sequenceTitles?.length
+          ? payload.sequenceTitles
+          : null,
+      );
       if (typeof document === "undefined") return;
       const target = document.getElementById(payload.anchor ?? "mapa");
       target?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -217,7 +224,13 @@ export function HomePremiumSurface({
     if (key === "servicios") return <ServicesSection content={content} />;
     if (key === "eventos") return <EventsSection content={content} />;
     if (key === "queHacer") return <EditorialSection content={content} cinematic={cinematic} />;
-    return <MapSection content={content} selectedRoute={selectedRoute} />;
+    return (
+      <MapSection
+        content={content}
+        selectedRoute={selectedRoute}
+        proposalSequence={proposalSequence}
+      />
+    );
   };
 
   return (
@@ -1173,9 +1186,13 @@ function describeRoute(
 function MapSection({
   content,
   selectedRoute,
+  proposalSequence,
 }: {
   content: HomePremiumContent;
   selectedRoute: string;
+  /* Secuencia propuesta por Alux (títulos canónicos). Sólo se representa con
+     puntos ya publicados del mismo mapa; nunca se inventan coordenadas. */
+  proposalSequence?: readonly string[] | null;
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
@@ -1190,9 +1207,15 @@ function MapSection({
       .filter((point) => point.kind === "destination")
       .map((point) => [normalizeLabel(point.title), point]),
   );
-  const routePoints = (route?.sequence ?? [])
+  const proposalPoints = (proposalSequence ?? [])
     .map((title) => pointByTitle.get(normalizeLabel(title)))
     .filter((point): point is NonNullable<typeof point> => Boolean(point));
+  const showingProposal = proposalPoints.length >= 2;
+  const routePoints = showingProposal
+    ? proposalPoints
+    : (route?.sequence ?? [])
+        .map((title) => pointByTitle.get(normalizeLabel(title)))
+        .filter((point): point is NonNullable<typeof point> => Boolean(point));
   const mapDto = {
     ...content.mapa.dto,
     center: null,
@@ -1216,7 +1239,9 @@ function MapSection({
         </div>
         {route ? (
           <div className="rounded-xl bg-muted p-4">
-            <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
+            <p className="text-[10px] font-semibold uppercase text-primary">
+              {showingProposal ? "Tu propuesta con Alux" : "Ruta activa"}
+            </p>
             <p className="mt-1 font-display text-lg">{route.title}</p>
             <p className="text-xs text-muted-foreground">{describeRoute(route, false)}</p>
           </div>
