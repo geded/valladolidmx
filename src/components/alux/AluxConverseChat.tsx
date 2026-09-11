@@ -308,6 +308,14 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           { id: newId(), role: "assistant", content: res.text, response: res },
         ]);
         setUnderstood(res.understood ?? {});
+        // Transporta la secuencia ya propuesta (sin reinterpretarla) para que
+        // la superficie con mapa pueda representarla con sus puntos canónicos.
+        if (res.sequence && res.sequence.length > 0) {
+          const titles = res.sequence
+            .flatMap((step) => step.refs.map((r) => r.title))
+            .filter((t): t is string => Boolean(t && t.trim()));
+          if (titles.length > 0) props.onProposal?.(titles);
+        }
         setStatus("idle");
         setLiveNote(
           res.recommendations.length
