@@ -346,7 +346,11 @@ export function TourismCard({
         <div
           className={cn(
             "relative w-full overflow-hidden bg-muted",
-            caps.compact ? "aspect-[16/9] max-h-36" : "aspect-[4/3]",
+            !vm.mediaUrl
+              ? "h-24 sm:h-28"
+              : caps.compact
+                ? "aspect-[16/9] max-h-36"
+                : "aspect-[4/3]",
           )}
         >
           {vm.mediaUrl ? (
