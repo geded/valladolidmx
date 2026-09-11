@@ -348,7 +348,7 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     family: "que-hacer",
     breadcrumb: "Qué hacer",
     eyebrow: "Inspírate en el territorio",
-    title: "¿Qué hacer en el Oriente Maya?",
+    title: "¿Qué hacer en el Oriente Maya de Yucatán?",
     description:
       "Cultura, naturaleza, aventura, gastronomía y eventos reunidos con la misma mirada editorial de Valladolid.mx.",
     resultsTitle: "Ideas para descubrir el Oriente Maya",
@@ -367,6 +367,20 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     nearby: [],
   },
 };
+
+/**
+ * Resuelve el alcance territorial del copy aprobado. El copy base está
+ * redactado con Valladolid como marcador territorial; aquí se sustituye
+ * por el destino activo o por la región completa en entradas globales.
+ */
+function territorialize(text: string, destinationLabel: string | null): string {
+  if (destinationLabel) return text.replace(/Valladolid/g, destinationLabel);
+  return text
+    .replace(/cerca de Valladolid/g, "cerca del Oriente Maya")
+    .replace(/en Valladolid/g, "del Oriente Maya de Yucatán")
+    .replace(/de Valladolid/g, "del Oriente Maya de Yucatán")
+    .replace(/Valladolid/g, "el Oriente Maya");
+}
 
 export function TerritorialListingReviewSurface({
   family = "hoteles",
@@ -388,13 +402,19 @@ export function TerritorialListingReviewSurface({
   lockedDestinationLabel?: string | null;
 }) {
   const baseProfile = PROFILES[family];
+  // Alcance territorial real: destino activo cuando la entrada lo declara,
+  // región completa cuando la entrada es global. Nunca un destino por defecto.
+  const scopeLabel = lockedDestinationLabel ?? dto?.destinationLabel ?? null;
   const profile = useMemo(
     () => ({
       ...baseProfile,
-      title: titleOverride?.trim() || baseProfile.title,
+      title: titleOverride?.trim() || territorialize(baseProfile.title, scopeLabel),
       description: subtitleOverride?.trim() || baseProfile.description,
+      resultsTitle: territorialize(baseProfile.resultsTitle, scopeLabel),
+      nearbyTitle: territorialize(baseProfile.nearbyTitle, scopeLabel),
+      mapTitle: territorialize(baseProfile.mapTitle, scopeLabel),
     }),
-    [baseProfile, subtitleOverride, titleOverride],
+    [baseProfile, scopeLabel, subtitleOverride, titleOverride],
   );
   const [query, setQuery] = useState("");
   const [zone, setZone] = useState("");
