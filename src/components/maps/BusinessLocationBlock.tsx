@@ -42,7 +42,7 @@ export function BusinessLocationBlock({
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
   return (
-    <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
       <div className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold text-foreground">{heading}</h2>
@@ -78,8 +78,10 @@ export function BusinessLocationBlock({
         )}
       </div>
 
-      <aside className="space-y-4 rounded-2xl border border-border bg-card p-5">
-        <DistanceBadge destLat={lat} destLng={lng} />
+      <aside className="grid gap-3 self-start rounded-2xl border border-border bg-card p-5 sm:grid-cols-2 lg:grid-cols-1 lg:gap-4">
+        <div className="sm:col-span-2 lg:col-span-1">
+          <DistanceBadge destLat={lat} destLng={lng} />
+        </div>
 
         <Button asChild className="w-full">
           <a
