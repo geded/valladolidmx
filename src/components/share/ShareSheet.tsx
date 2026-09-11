@@ -6,7 +6,6 @@
  * comparte una URL canónica ya existente. Nunca expone instrucciones internas
  * de Alux — sólo título turístico + URL + marca.
  */
-import { useState } from "react";
 import { Copy, Facebook, Mail, MessageCircle, Share2 } from "lucide-react";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -132,10 +131,4 @@ export function ShareSheet({ open, onOpenChange, title, url, text }: ShareSheetP
       </SheetContent>
     </Sheet>
   );
-}
-
-/** Hook mínimo para abrir la hoja desde cualquier acción compacta existente. */
-export function useShareSheet() {
-  const [open, setOpen] = useState(false);
-  return { open, setOpen, openShare: () => setOpen(true) };
 }

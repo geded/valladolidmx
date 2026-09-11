@@ -720,8 +720,6 @@ export function AluxFloatingTrigger() {
               : {})}
           />
 
-
-
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
           {territory?.is_returning &&
             territory.last_destination_slug &&
