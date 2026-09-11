@@ -113,7 +113,7 @@ function AggregateCard({
   return (
     <aside
       data-eb-slot="reviews-aggregate"
-      className="flex flex-col gap-1.5 rounded-2xl border border-border bg-card p-4"
+      className="flex self-start flex-col gap-1.5 rounded-2xl border border-border bg-card p-4"
     >
       <div className="flex items-center gap-2">
         <span className="text-2xl font-semibold tabular-nums">
