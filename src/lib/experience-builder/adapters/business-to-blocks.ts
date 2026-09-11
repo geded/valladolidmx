@@ -109,10 +109,12 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     });
   }
   if (b.category_slug) {
+    /* La categoría mostrada proviene del slug real declarado en el CMS,
+       no del agrupador editorial del hero. */
     items.push({
       iconKey: "tag",
       label: "Categoría",
-      value: variant.eyebrow,
+      value: humanizeSlug(b.category_slug),
       tone: "default",
     });
   }
