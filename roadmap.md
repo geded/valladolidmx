@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Reconciliación visual Premium de `/que-hacer`: header, filtros, cards/fallback, mapa y temas compactos; pendiente cierre de gates y comparativa 1440/834/430/390.
+- [x] Reconciliación visual Premium de `/que-hacer`: header, filtros, cards/fallback, mapa y temas compactos; QA 1440/834/430/390 sin overflow, un H1 y un solo Alux. Data Readiness: 11 resultados actuales sin portada canónica. La URL territorial `/oriente-maya/valladolid/que-hacer` no existe y queda fuera de alcance para no crear una ruta nueva.
 - [x] Estandarización transversal del breadcrumb móvil (primitiva compartida `CompactCrumbs`, unificación `BreadcrumbTerritorial` + `PremiumTerritorialBreadcrumb`, activación en listados/perfiles/previews, eliminación de breadcrumb duplicado en destino).
 - [ ] QA responsive 390/430/834/1440 de la estandarización del breadcrumb.
 - [x] Lote 1 · Integridad técnica y contratos: auditoría y reparación de los 4 hallazgos rojos de `bun test scripts/` (1 fail + 3 errors) — todos clasificados como contrato obsoleto; suite 756/756, typecheck y build en verde.
