@@ -102,7 +102,7 @@ export function ExperienceMapBlock({
         className={cn(
           "grid gap-6",
           immersive
-            ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-stretch"
+            ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start"
             : isMulti
               ? "md:grid-cols-[minmax(0,1fr)_320px]"
               : "md:grid-cols-[minmax(0,1fr)_320px]",
@@ -163,7 +163,7 @@ export function ExperienceMapBlock({
 
         <aside
           className={cn(
-            "space-y-4",
+            "space-y-4 self-start",
             immersive && "rounded-2xl border border-border bg-background/70 p-3 backdrop-blur",
           )}
         >
