@@ -133,3 +133,22 @@ No se publicó ni desplegó.
 
 Verificación: 393/834/1440 muestran destino, categoría y ficha; imágenes rotas 0; la portada real se carga
 desde el CMS. No se publicó ni desplegó.
+
+## Delta transversal de radios Premium — aplicado
+
+**Scope Gate:** PASS. La autorización Founder cubre Home, región, destinos, listados, fichas, rutas, lugares,
+eventos, experiencias, landings SEO y sus previews, exclusivamente para armonizar el redondeo existente. No
+se modificaron contenido, medios, CMS, datos, rutas, contratos, mapas, Alux, Mi Viaje, SEO ni lógica.
+
+**Preservation Gate visual:** PASS. El inventario confirmó que Home, destino, listados, cards, galerías,
+experiencias, rutas y landings SEO ya consumían radios OMXDS aprobados. La única divergencia transversal estaba
+en `PremiumHero`, que anulaba su radio a partir de `sm`; se eliminó esa anulación y la portada mantiene ahora
+`rounded-3xl` (24 px) en móvil, tablet y escritorio. Los modos cinematográficos realmente full-bleed, mapas,
+lightboxes y controles se preservaron sin recorte.
+
+Validación Playwright: 12 rutas públicas × 1440/834/430/390 = 48 combinaciones, todas con status 200, un H1,
+overflow horizontal 0 e imágenes rotas 0. Se revisaron visualmente Home, micrositio de destino, listado y ficha
+Premium. Typecheck, Prettier, ESLint focalizado, lint baseline, Route Inventory (249 rutas) y 31 contratos OMXDS
+pasaron. `governance:check` permanece rojo por 32 brechas históricas del árbol activo (huellas obsoletas y dos
+artefactos previos no registrados); no se ejecutó sincronización automática porque modificaría gobernanza fuera
+del alcance autorizado. No se publicó, desplegó, abrió PR ni fusionó.
