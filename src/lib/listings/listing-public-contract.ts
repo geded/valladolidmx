@@ -286,10 +286,14 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
     ];
   }
 
+  // Alcance territorial del título: entrada global ⇒ toda la región;
+  // entrada desde micrositio ⇒ destino activo. Nunca un destino por defecto.
   const heroTitle =
-    destino && contract.source !== "editorial"
-      ? `${contract.hero.title} en ${destinationLabel}`
-      : contract.hero.title;
+    contract.source === "editorial"
+      ? contract.hero.title
+      : destino
+        ? `${contract.hero.title} en ${destinationLabel}`
+        : `${contract.hero.title} del ${REGION_SCOPE_LABEL}`;
 
   const emptyMessage =
     destino &&
