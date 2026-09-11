@@ -137,7 +137,8 @@ export function writeNavigationSession(snapshot: NavigationSessionSnapshot): voi
 const LAST_ROUTE_KEY = "vll:nav:last-route:v1";
 
 /** Rutas privadas/operativas que nunca se restauran automáticamente. */
-const NON_RESTORABLE = /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa|offline)(?:\/|$)/;
+const NON_RESTORABLE =
+  /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa|offline)(?:\/|$)/;
 
 export function isRestorablePath(path: string): boolean {
   if (!path.startsWith("/")) return false;
