@@ -24,6 +24,7 @@ import {
   destinationToTourismCard,
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 /* v1.1.0 · G4-PLACES — se incorpora la familia `lugares` (fuente real
    `points_of_interest`) como séptima familia del contrato. Cambio aditivo:
