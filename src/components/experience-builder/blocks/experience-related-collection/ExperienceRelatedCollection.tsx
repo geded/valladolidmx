@@ -240,7 +240,7 @@ function ItemsLayout({
     return (
       <ul
         role="list"
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]"
+        className="flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin]"
       >
         {items.map((it) => (
           <li
