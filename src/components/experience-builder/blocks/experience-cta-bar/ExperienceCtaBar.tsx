@@ -103,7 +103,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
     >
       {(label || meta) && (
         <div className="min-w-0 flex-1">
-          {label ? <p className="truncate text-sm font-semibold text-foreground">{label}</p> : null}
+          {label ? (
+            <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+              {label}
+            </p>
+          ) : null}
           {meta ? <p className="truncate text-xs text-muted-foreground">{meta}</p> : null}
         </div>
       )}
