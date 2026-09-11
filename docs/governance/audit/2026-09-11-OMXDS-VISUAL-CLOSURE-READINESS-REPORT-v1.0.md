@@ -102,3 +102,19 @@ venta directa y venta asistida, reutilizando la instrumentación ya implementada
 
 No se editó Commerce ni CV8. No se abrió PR, no se fusionó, no se publicó y no se desplegó.
 No se crearon componentes, rutas, plantillas ni sistemas paralelos. Sólo lecturas y verificación en preview.
+
+## Delta de armonía móvil (Conato 1910) — aplicado
+
+Ajustes mínimos sobre autoridades compartidas existentes, sin crear componentes ni variantes nuevas:
+
+1. `TourismCard.tsx` — el marcador sin fotografía deja de heredar la proporción de imagen y usa altura
+   controlada (`h-24 sm:h-28`). Las tarjetas con media canónica conservan 4:3 / 16:9 compacto.
+2. `ExperienceRelatedCollection.tsx` — el carrusel añade respiro final y `scroll-px` para que la última
+   tarjeta no quede cortada contra el borde en móvil.
+3. `ExperienceCtaBar.tsx` — el nombre ya no se trunca (`line-clamp-2`) y las acciones ajustan escala táctil
+   en móvil conservando `min-h-11`.
+4. `ExperienceMapBlock.tsx` — el título del punto del mapa deja de truncarse en una línea.
+
+Verificación: typecheck OK; ESLint focalizado sin hallazgos nuevos (los avisos restantes son deuda previa);
+Playwright en 1440 / 834 / 430 / 390 con status 200, un solo H1, overflow 0 e imágenes rotas 0.
+No se publicó ni desplegó.
