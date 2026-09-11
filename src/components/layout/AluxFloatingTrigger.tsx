@@ -44,13 +44,18 @@ import {
   Navigation,
   Users,
   Headset,
+  Share2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
-import { onAluxFloatingOpen, type AluxOpenSelection } from "@/lib/alux/floating-bus";
+import {
+  onAluxFloatingOpen,
+  requestAluxMapFocus,
+  type AluxOpenSelection,
+} from "@/lib/alux/floating-bus";
 import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
@@ -89,6 +94,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
 import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
@@ -156,6 +162,7 @@ export function AluxFloatingTrigger() {
      (nunca se degrada a texto libre ni se inventa). */
   const [selection, setSelection] = useState<AluxOpenSelection | null>(null);
   const [selectionTask, setSelectionTask] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
   useEffect(() => {
