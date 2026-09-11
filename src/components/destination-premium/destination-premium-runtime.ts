@@ -45,7 +45,13 @@ export function buildDestinationPremiumRuntime(input: {
     ...gallery.map(mediaOf),
     ...approvedConceptual.slice(1),
   ];
-  const paragraphs = destination.description?.trim() ? [destination.description.trim()] : [];
+  // La descripción CMS ya se muestra en la portada. Repetirla en
+  // "Descubre" duplicaba el mismo texto en la misma pantalla.
+  const heroDescription =
+    destination.description?.trim() ||
+    `Explora ${destination.name} y prepara tu recorrido por el Oriente Maya de Yucatán.`;
+  const descubreText = destination.description?.trim() ?? "";
+  const paragraphs = descubreText && descubreText !== heroDescription ? [descubreText] : [];
   const mapItems = [
     ...(destination.latitude != null && destination.longitude != null
       ? [
@@ -85,9 +91,7 @@ export function buildDestinationPremiumRuntime(input: {
       regionBadge: "Oriente Maya de Yucatán",
       title: destination.name,
       subtitle: destination.tagline ?? "Descubre este destino del Oriente Maya de Yucatán",
-      description:
-        destination.description?.trim() ||
-        `Explora ${destination.name} y prepara tu recorrido por el Oriente Maya de Yucatán.`,
+      description: heroDescription,
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Explorar servicios", href: "#servicios-destino" },
       cover: allMedia[0] ?? { url: "", alt: "" },

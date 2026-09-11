@@ -192,12 +192,18 @@ export function DestinationPremiumSurface({
                 </Container>
               </div>
             );
-          case "descubre":
+          case "descubre": {
+            // Sin párrafos propios y sin medios la sección sólo aportaba
+            // espacio en blanco: no se renderiza.
+            const hasDescubreText = content.descubre.paragraphs.some((p) => p.trim().length > 0);
+            const hasDescubreMedia = content.descubre.media.some((m) => Boolean(m.url));
+            if (!hasDescubreText && !hasDescubreMedia) return null;
             return (
               <Container key={key} className="mt-14">
                 <DescubreDestino content={content} />
               </Container>
             );
+          }
           case "gallery":
             return (
               <Container key={key} className="mt-14">
@@ -522,8 +528,12 @@ function ServiciosStrip({
 
 function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
   const [lead, ...rest] = content.descubre.media.filter((item) => Boolean(item.url));
+  const hasMedia = Boolean(lead);
   return (
-    <section aria-labelledby="descubre-destino" className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
+    <section
+      aria-labelledby="descubre-destino"
+      className={hasMedia ? "grid gap-8 lg:grid-cols-[1.1fr_1fr]" : "grid gap-8"}
+    >
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
           {content.descubre.kicker}
@@ -537,25 +547,25 @@ function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {lead ? (
+      {hasMedia ? (
+        <div className="grid grid-cols-2 gap-3">
           <img
             src={lead.url}
             alt={lead.alt}
             loading="lazy"
             className="col-span-2 h-48 w-full rounded-2xl object-cover shadow-soft"
           />
-        ) : null}
-        {rest.slice(0, 2).map((m) => (
-          <img
-            key={m.url}
-            src={m.url}
-            alt={m.alt}
-            loading="lazy"
-            className="h-40 w-full rounded-2xl object-cover shadow-soft"
-          />
-        ))}
-      </div>
+          {rest.slice(0, 2).map((m) => (
+            <img
+              key={m.url}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className="h-40 w-full rounded-2xl object-cover shadow-soft"
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }
