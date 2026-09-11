@@ -45,7 +45,13 @@ export function buildDestinationPremiumRuntime(input: {
     ...gallery.map(mediaOf),
     ...approvedConceptual.slice(1),
   ];
-  const paragraphs = destination.description?.trim() ? [destination.description.trim()] : [];
+  // La descripción CMS ya se muestra en la portada. Repetirla en
+  // "Descubre" duplicaba el mismo texto en la misma pantalla.
+  const heroDescription =
+    destination.description?.trim() ||
+    `Explora ${destination.name} y prepara tu recorrido por el Oriente Maya de Yucatán.`;
+  const descubreText = destination.description?.trim() ?? "";
+  const paragraphs = descubreText && descubreText !== heroDescription ? [descubreText] : [];
   const mapItems = [
     ...(destination.latitude != null && destination.longitude != null
       ? [
