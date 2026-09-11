@@ -37,6 +37,7 @@ import {
   EXPERIENCE_ATTRIBUTE_FAMILY,
   EXPERIENCE_TYPE_ATTRIBUTE_KEY,
 } from "@/lib/experiences/experience-attributes";
+import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 export interface ExperienceAxisDTO {
   readonly key: string;
@@ -307,7 +308,9 @@ export async function listExperiencesListing(
     provenance: "real_reads",
     hero: {
       eyebrow: contract.hero.eyebrow,
-      title: destino ? `${contract.hero.title} en ${destinationLabel}` : contract.hero.title,
+      title: destino
+        ? `${contract.hero.title} en ${destinationLabel}`
+        : `${contract.hero.title} del ${REGION_SCOPE_LABEL}`,
       subtitle: contract.hero.subtitle,
       metaLabel: items.length ? `${items.length} experiencias publicadas` : null,
     },

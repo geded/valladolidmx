@@ -24,6 +24,7 @@ import {
   destinationToTourismCard,
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 /* v1.1.0 · G4-PLACES — se incorpora la familia `lugares` (fuente real
    `points_of_interest`) como séptima familia del contrato. Cambio aditivo:
@@ -181,7 +182,7 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     forcedCategorySlug: null,
     hero: {
       eyebrow: "Editorial",
-      title: "¿Qué hacer en el Oriente Maya?",
+      title: "¿Qué hacer en el Oriente Maya de Yucatán?",
       subtitle: "Cultura, naturaleza, aventura, gastronomía y eventos para inspirar tu viaje.",
     },
     emptyMessage:
@@ -286,10 +287,14 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
     ];
   }
 
+  // Alcance territorial del título: entrada global ⇒ toda la región;
+  // entrada desde micrositio ⇒ destino activo. Nunca un destino por defecto.
   const heroTitle =
-    destino && contract.source !== "editorial"
-      ? `${contract.hero.title} en ${destinationLabel}`
-      : contract.hero.title;
+    contract.source === "editorial"
+      ? contract.hero.title
+      : destino
+        ? `${contract.hero.title} en ${destinationLabel}`
+        : `${contract.hero.title} del ${REGION_SCOPE_LABEL}`;
 
   const emptyMessage =
     destino &&

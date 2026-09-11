@@ -170,7 +170,7 @@ export function RoutesListingSurface({
     <div className={cn("space-y-8", className)}>
       <PremiumEditorialHero
         eyebrow="Itinerarios del Oriente Maya"
-        title={territory ? `Rutas desde ${territory}` : "Rutas sugeridas"}
+        title={territory ? `Rutas desde ${territory}` : "Rutas del Oriente Maya de Yucatán"}
         subtitle="Itinerarios editoriales con paradas reales: destinos, lugares, eventos y empresas publicadas."
         media={
           heroRoute?.coverUrl
