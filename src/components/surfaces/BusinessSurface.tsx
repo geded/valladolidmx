@@ -663,7 +663,7 @@ export function BusinessSurface({
       ) : null}
 
       {!activeContract?.omissions.includes("reputation") ? (
-        <section id="opiniones" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="resenas" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceReviewsBlock
             config={{
               source: "business",
