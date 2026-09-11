@@ -876,6 +876,56 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       }
     }
 
+    /* Portada oficial del CMS (business_media role=cover → media_assets).
+       Misma vía canónica que `getDestinationRelated`: el bucket es privado,
+       por lo que la URL se firma server-side con el cliente administrativo.
+       Best-effort: si no hay portada acreditada, `cover_url` queda en null y
+       la tarjeta usa su fallback editorial aprobado. */
+    if (rows.length > 0) {
+      try {
+        const { data: bmedia } = await supabase
+          .from("business_media")
+          .select(
+            "business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, alt_text )",
+          )
+          .in(
+            "business_id",
+            rows.map((r) => r.id),
+          )
+          .eq("role", "cover")
+          .order("sort_order", { ascending: true });
+        if (bmedia && bmedia.length > 0) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const seen = new Set<string>();
+          const firstPerBusiness = (bmedia as Array<Record<string, unknown>>).filter((r) => {
+            const bid = String(r.business_id);
+            if (seen.has(bid)) return false;
+            seen.add(bid);
+            return true;
+          });
+          const signed = await Promise.all(
+            firstPerBusiness.map(async (r) => {
+              const asset = r.media_assets as {
+                storage_bucket?: string;
+                storage_path?: string;
+              } | null;
+              if (!asset?.storage_bucket || !asset?.storage_path)
+                return [String(r.business_id), null] as const;
+              const { data: s } = await supabaseAdmin.storage
+                .from(asset.storage_bucket)
+                .createSignedUrl(asset.storage_path, 3600);
+              return [String(r.business_id), s?.signedUrl ?? null] as const;
+            }),
+          );
+          const byBiz = new Map(signed);
+          for (const row of rows) row.cover_url = byBiz.get(row.id) ?? null;
+        }
+      } catch (e) {
+        console.warn("[listMarketplaceBusinesses] cover sign failed", e);
+      }
+    }
+
+
     // Ordenar por (spotlight + visibility) DESC, luego alfabético
     rows.sort((a, b) => {
       const scoreA = (a.spotlight_boost ?? 0) + (a.visibility_boost ?? 0);
