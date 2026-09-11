@@ -345,6 +345,9 @@ export function ExperienceReviews({
     capabilities,
   } = dto;
 
+  const isMobile = useIsMobile();
+  const [expanded, setExpanded] = useState(false);
+
   const showAggregate = capabilities.showAggregate && aggregate != null && aggregate.count > 0;
 
   const wrap = (children: ReactNode) => (
