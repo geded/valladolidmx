@@ -925,7 +925,6 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       }
     }
 
-
     // Ordenar por (spotlight + visibility) DESC, luego alfabético
     rows.sort((a, b) => {
       const scoreA = (a.spotlight_boost ?? 0) + (a.visibility_boost ?? 0);
