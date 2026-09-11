@@ -12,9 +12,16 @@
  * No renderiza nada. No compone rutas. No ejecuta side-effects fuera
  * de `sessionStorage`. Toda la política vive en `session-context.ts`.
  */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { subscribeResolvedContext, useResolvedContext } from "@/lib/context-engine";
-import { snapshotFromContext, writeNavigationSession } from "@/lib/navigation/session-context";
+import {
+  isStandaloneDisplay,
+  readLastRoute,
+  snapshotFromContext,
+  writeLastRoute,
+  writeNavigationSession,
+} from "@/lib/navigation/session-context";
 
 /**
  * Modo local: cuando se monta dentro de un `ContextEngineProvider`
