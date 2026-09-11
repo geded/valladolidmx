@@ -207,7 +207,7 @@ export function ExperienceMapBlock({
                           </span>
                         ) : null}
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-foreground">
+                          <p className="line-clamp-2 text-sm font-semibold text-foreground">
                             {p.title}
                           </p>
                           {p.subtitle ? (
