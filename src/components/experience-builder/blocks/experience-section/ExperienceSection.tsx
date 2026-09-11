@@ -43,9 +43,11 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
         </span>
       ) : null}
       {title ? (
-        <Heading className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</Heading>
+        <Heading className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
+          {title}
+        </Heading>
       ) : null}
-      {lead ? <p className="text-lg text-muted-foreground">{lead}</p> : null}
+      {lead ? <p className="text-base text-muted-foreground sm:text-lg">{lead}</p> : null}
       {body ? (
         capabilities.richText ? (
           <div
