@@ -140,10 +140,42 @@ export function ExperienceReviewsBlock({ config }: ExperienceReviewsBlockProps) 
   const items = useMemo<ExperienceReviewItem[]>(() => {
     let base: ExperienceReviewItem[] = [];
     if (cfg.source === "business" && business) {
-      // `MarketplaceBusinessDetail` no expone `reviews` todavía.
-      // Al agregarse (I2.d+), mapear aquí con un adapter dedicado
-      // — el contrato del bloque no cambia.
-      base = [];
+      // Reputación acreditada publicada en la ficha (`business.reviews`).
+      base = (business.reviews?.items ?? [])
+        .map((r) => ({
+          id: r.id,
+          platform: "internal" as const,
+          externalUrl: null,
+          rating: Number(r.rating ?? 0),
+          ratingScale: 5,
+          title: r.title,
+          body: (r.body ?? "").trim() || (r.title ?? "").trim(),
+          language: r.language ?? null,
+          publishedAt: r.published_at,
+          author: {
+            displayName: r.author_display_name?.trim() || "Viajero",
+            avatarUrl: null,
+            location: null,
+            travelerType: null,
+            verified: Boolean(r.verified_source && r.verified_source !== "declared_visitor"),
+          },
+          helpfulCount: r.helpful_count ?? null,
+          travelerType: null,
+          tags: [],
+          response:
+            r.business_response && r.business_response.trim()
+              ? {
+                  authorName: business.display_name,
+                  authorRole: null,
+                  body: r.business_response,
+                  publishedAt: r.business_response_at,
+                }
+              : null,
+          moderationStatus: "approved" as const,
+          featured: false,
+          aluxRationale: null,
+        }))
+        .filter((it) => it.body.length > 0);
     } else {
       base = cfg.items;
     }

@@ -324,6 +324,7 @@ function businessToSurfaceContractInput(
     longitude: business.primary_location?.longitude ?? null,
     verified: business.verified,
     relatedCount: businessRelatedCount(related),
+    publishedReviewCount: business.reviews?.count ?? 0,
   };
 }
 

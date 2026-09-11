@@ -16,6 +16,11 @@ export interface BusinessSurfaceContractInput {
   longitude: number | null;
   verified: boolean;
   relatedCount: number;
+  /**
+   * Reseñas publicadas acreditadas de la entidad. Ausente o 0 mantiene la
+   * omisión histórica de `reputation` (sin reputación inventada).
+   */
+  publishedReviewCount?: number;
 }
 
 export type BusinessSurfaceProvenanceKind = "fixture" | "governed_source";
@@ -38,13 +43,8 @@ export function createBusinessVerticalSurfaceContract(
   )
     return null;
 
-  const omissions: OmxdsSurfaceOmission[] = [
-    "offer",
-    "price",
-    "availability",
-    "reservation",
-    "reputation",
-  ];
+  const omissions: OmxdsSurfaceOmission[] = ["offer", "price", "availability", "reservation"];
+  if ((input.publishedReviewCount ?? 0) <= 0) omissions.push("reputation");
 
   if (!input.coverUrl) omissions.push("media");
   if (input.latitude === null || input.longitude === null) omissions.push("map");
