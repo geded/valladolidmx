@@ -58,7 +58,7 @@ import {
 } from "@/lib/alux/floating-bus";
 import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
-import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
+import { useTravelIntent, markNudgeShown, surfaceStarters } from "@/lib/alux/travel-intent";
 import {
   Sheet,
   SheetContent,
