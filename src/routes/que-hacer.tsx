@@ -84,15 +84,18 @@ function QueHacerRoute() {
         showFavorite
       />
 
-      <section className="mt-10">
-        <h2 className="mb-4 text-xl font-semibold">Temas</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mt-8 border-t border-border pt-6">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+          <h2 className="min-w-0 truncate text-xl font-semibold">Temas</h2>
+          <p className="shrink-0 text-xs text-muted-foreground">Explora por interés</p>
+        </div>
+        <ul className="mt-3 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
           {TEMAS.map((t) => (
-            <li key={t.slug}>
+            <li key={t.slug} className="w-[82%] shrink-0 snap-start sm:w-auto">
               <Link
                 to="/que-hacer"
                 search={{ tema: t.slug }}
-                className="block rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:bg-accent"
+                className="block h-full rounded-2xl border border-border bg-card p-4 transition hover:border-primary/40 hover:bg-accent"
               >
                 <p className="text-sm font-semibold text-foreground">{t.label}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{t.description}</p>
