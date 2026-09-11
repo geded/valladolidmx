@@ -64,18 +64,22 @@ export function DistanceBadge({
           className="h-10 max-w-full justify-start px-2.5"
           onClick={request}
           disabled={status === "prompting"}
+          title={
+            status === "denied"
+              ? "Permitiste no compartir la ubicación. Actívala en los permisos del navegador y vuelve a intentarlo."
+              : undefined
+          }
         >
           <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
           <span className="truncate">
             {status === "prompting"
               ? "Solicitando ubicación…"
-              : status === "denied"
-                ? "Activa la ubicación"
-                : status === "unavailable"
-                  ? "Ubicación no disponible"
-                  : "Compartir mi ubicación"}
+              : status === "denied" || status === "unavailable"
+                ? "Reintentar ubicación"
+                : "Compartir mi ubicación"}
           </span>
         </Button>
+
       );
     }
 
