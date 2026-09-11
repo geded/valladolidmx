@@ -90,7 +90,7 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
       aria-label={ariaLabel ?? undefined}
       data-eb-block="experience-section"
       data-eb-anchor={capabilities.anchor ? (title ?? undefined) : undefined}
-      className={cn("w-full py-10 sm:py-14", TONE[tone], className)}
+      className={cn("w-full py-6 sm:py-10 lg:py-14", TONE[tone], className)}
     >
       {variant === "split" && media ? (
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 md:grid-cols-2">
