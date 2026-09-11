@@ -283,6 +283,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                 ? {
                     entityRef: props.selection.entityRef,
                     title: props.selection.title,
+                    summary: props.selection.summary,
                     destinationSlug: props.selection.destinationSlug,
                     destinationLabel: props.selection.destinationLabel,
                     familySlug: props.selection.familySlug,
@@ -691,9 +692,11 @@ function AssistantTurn({
               Propuesta por día
             </p>
             <ol className="mt-1.5 space-y-1 text-[12px] text-foreground">
-              {res.sequence.map((step) => (
-                <li key={step.day} className="flex gap-2">
-                  <span className="shrink-0 font-semibold">Día {step.day}</span>
+              {res.sequence.map((step, index) => (
+                <li key={step.day ?? `unassigned-${index}`} className="flex gap-2">
+                  <span className="shrink-0 font-semibold">
+                    {step.day === null ? "Sin día asignado" : `Día ${step.day}`}
+                  </span>
                   <span className="text-muted-foreground">
                     {step.refs.map((r) => r.title).join(" → ")}
                   </span>

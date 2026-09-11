@@ -29,6 +29,7 @@ import {
   type AluxConverseEntityType,
   type AluxConverseFamily,
   type AluxConverseRecommendation,
+  type AluxConverseSequenceGroundingRef,
   type AluxConverseResponse,
   type AluxConverseSequenceStep,
   type AluxConverseTripItem,
@@ -263,13 +264,17 @@ export function groundModelOutput(
   output: AluxModelOutput,
   candidates: readonly AluxConverseCandidate[],
   ctx: GroundingContext,
+  sequenceGroundingRefs: readonly AluxConverseSequenceGroundingRef[] = candidates,
 ): GroundedResult {
   const byId = new Map<string, AluxConverseCandidate>();
+  const sequenceById = new Map<string, AluxConverseSequenceGroundingRef>();
   const factIndex = new Map<string, { text: string; owner: string }>();
   for (const c of candidates) {
     byId.set(c.entityId, c);
+    sequenceById.set(c.entityId, c);
     for (const f of c.facts) factIndex.set(f.id, { text: f.text, owner: c.entityId });
   }
+  for (const ref of sequenceGroundingRefs) sequenceById.set(ref.entityId, ref);
   const saved = tripKeySet(ctx.tripItems);
   let rejected = 0;
 
@@ -304,14 +309,18 @@ export function groundModelOutput(
   let sequence: AluxConverseSequenceStep[] | null = null;
   if (output.sequence && output.sequence.length > 0) {
     const steps: AluxConverseSequenceStep[] = [];
-    const usedDays = new Set<number>();
+    const usedDays = new Set<number | null>();
     const ordered = output.sequence
-      .map((s, i) => ({ day: s.day ?? i + 1, ids: s.ids }))
-      .sort((a, b) => a.day - b.day);
+      .map((s, index) => ({ day: s.day, ids: s.ids, index }))
+      .sort(
+        (a, b) =>
+          (a.day === null ? Number.POSITIVE_INFINITY : a.day) -
+            (b.day === null ? Number.POSITIVE_INFINITY : b.day) || a.index - b.index,
+      );
     for (const s of ordered) {
       if (usedDays.has(s.day)) continue;
       const refs = s.ids
-        .map((id) => byId.get(id.trim()))
+        .map((id) => sequenceById.get(id.trim()))
         .filter((c): c is AluxConverseCandidate => Boolean(c))
         .map((c) => ({ entityType: c.entityType, entityId: c.entityId, title: c.title }));
       rejected += s.ids.length - refs.length;

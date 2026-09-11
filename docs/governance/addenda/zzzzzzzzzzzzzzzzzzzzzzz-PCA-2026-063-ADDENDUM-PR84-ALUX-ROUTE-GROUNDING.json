@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR84-ALUX-ROUTE-GROUNDING",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para que Personalizar con Alux conserve y secuencie todas las paradas canónicas de la ruta elegida.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/alux/converse-grounding.ts",
+    "previous_sha256": "638cf0420f9dfa11b5a9920e3800ed254f15182782b1a86ff3b0fce93c43b57a",
+    "current_sha256": "af9ea6fdc7fbaf89e379be4cf4ac8cfc9717a676f78a32fe1ef582a6190f2f5a",
+    "semantic_change": "Separa el grounding acotado de paradas seleccionadas del presupuesto de entidades recomendables para preservar secuencias largas sin ampliar recomendaciones ni hechos citables.",
+    "authority": "Founder · grounding completo de paradas de ruta para Alux · 2026-09-10"
+  },
+  "invariants": [
+    "Máximo de 24 candidatos recomendables preservado",
+    "Referencias adicionales sólo habilitadas para conservar o secuenciar paradas canónicas",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

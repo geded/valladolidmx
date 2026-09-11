@@ -33,6 +33,8 @@ export const ALUX_CONVERSE_LIMITS = {
   maxHistoryChars: 700,
   /** Candidatos máximos que se muestran al modelo (tras ranking determinístico). */
   maxCandidatesForModel: 24,
+  /** Paradas máximas de una ruta seleccionada que pueden preservarse en una secuencia. */
+  maxSelectedRouteStopsForGrounding: 60,
   /** Recomendaciones máximas por respuesta. */
   maxRecommendations: 6,
   /** Preguntas aclaratorias máximas. */
@@ -149,6 +151,7 @@ export const AluxConverseSelectionSchema = z
   .object({
     entityRef: z.string().max(160).optional(),
     title: z.string().max(200).optional(),
+    summary: z.string().max(1000).optional(),
     destinationSlug: z.string().max(120).optional(),
     destinationLabel: z.string().max(160).optional(),
     familySlug: z.string().max(80).optional(),
@@ -242,9 +245,17 @@ export interface AluxConverseRecommendation {
   readonly day: number | null;
 }
 
+export type AluxConverseSequenceEntityType = AluxConverseEntityType | "route_stop";
+
+export interface AluxConverseSequenceGroundingRef {
+  readonly entityType: AluxConverseSequenceEntityType;
+  readonly entityId: string;
+  readonly title: string;
+}
+
 export interface AluxConverseSequenceStep {
-  readonly day: number;
-  readonly refs: readonly { entityType: AluxConverseEntityType; entityId: string; title: string }[];
+  readonly day: number | null;
+  readonly refs: readonly AluxConverseSequenceGroundingRef[];
 }
 
 export interface AluxConverseReorderProposal {
@@ -327,6 +338,13 @@ const numOrNull = (min: number, max: number, int = false) =>
     )
     .catch(null);
 
+const positiveIntOrNull = z
+  .preprocess(
+    (v) => (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : v),
+    z.number().int().positive().nullable(),
+  )
+  .catch(null);
+
 const ModelStageSchema = z
   .preprocess(
     (v) => {
@@ -364,15 +382,30 @@ export const AluxModelOutputSchema = z.object({
   ),
   sequence: z
     .preprocess(
-      (v) =>
-        Array.isArray(v)
-          ? v
-              .filter(
-                (s) => s && typeof s === "object" && Array.isArray((s as { ids?: unknown }).ids),
-              )
-              .slice(0, 7)
-          : null,
-      z.array(z.object({ day: numOrNull(1, 14, true), ids: clampArr(clampStr(64), 6) })).nullable(),
+      (v) => {
+        if (!Array.isArray(v)) return null;
+        const steps: unknown[] = [];
+        let remaining = ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding;
+        for (const step of v) {
+          if (!step || typeof step !== "object") continue;
+          const ids = (step as { ids?: unknown }).ids;
+          if (!Array.isArray(ids)) continue;
+          const boundedIds = ids.slice(0, remaining);
+          if (boundedIds.length === 0) continue;
+          steps.push({ ...step, ids: boundedIds });
+          remaining -= boundedIds.length;
+          if (remaining === 0) break;
+        }
+        return steps;
+      },
+      z
+        .array(
+          z.object({
+            day: positiveIntOrNull,
+            ids: clampArr(clampStr(64), ALUX_CONVERSE_LIMITS.maxSelectedRouteStopsForGrounding),
+          }),
+        )
+        .nullable(),
     )
     .catch(null),
   reorder: z

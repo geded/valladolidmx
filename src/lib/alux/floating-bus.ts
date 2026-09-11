@@ -21,6 +21,8 @@ export interface AluxOpenSelection {
   readonly entityRef?: string;
   /** Título editorial de la entidad seleccionada. */
   readonly title?: string;
+  /** Contexto editorial necesario para adaptar la selección sin perder su secuencia. */
+  readonly summary?: string;
   /** Slug del destino territorial al que pertenece la selección. */
   readonly destinationSlug?: string;
   /** Etiqueta legible del destino (CMS), nunca inventada. */

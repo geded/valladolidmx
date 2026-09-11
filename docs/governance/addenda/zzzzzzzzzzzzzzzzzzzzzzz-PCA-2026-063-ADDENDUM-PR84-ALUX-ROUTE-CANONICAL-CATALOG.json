@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR84-ALUX-ROUTE-CANONICAL-CATALOG.json",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para completar la conexión CMS canónica de Personalizar con Alux y fusionar el PR #84 a main.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/alux/canonical-catalog.server.ts",
+    "previous_sha256": "33ffcc6d83d9d90a2de4fb13cc8e116b2ee1e72535dff84742bbf02817809105",
+    "current_sha256": "78509c1d4c8b5f917db2bf780570d97eed8efaa2a07dfe32c3c3931b8db50237",
+    "semantic_change": "carga dirigida por IDs manteniendo los filtros públicos fail-closed",
+    "authority": "Founder · cierre canónico Home → Alux · 2026-09-10"
+  },
+  "invariants": [
+    "Sin rediseño de la plantilla Premium",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}
+

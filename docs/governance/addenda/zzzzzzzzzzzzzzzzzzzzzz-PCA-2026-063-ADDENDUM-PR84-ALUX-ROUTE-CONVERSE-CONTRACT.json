@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR84-ALUX-ROUTE-CONVERSE-CONTRACT",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para que Personalizar con Alux consuma la descripción y secuencia completa de la ruta elegida.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/alux/converse-contract.ts",
+    "previous_sha256": "26953bc4cdd48721e30420cc306b30a79665c0a5aafd7e703022da297c899f0a",
+    "current_sha256": "d37294fd3f16acea659dd0cb7c635f2f218dcba3ba733b6a13c3e59d8d076f59",
+    "semantic_change": "Transporta el contexto editorial completo de la ruta seleccionada hasta la conversación de Alux.",
+    "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+  },
+  "invariants": [
+    "Catálogo y rutas canónicas preservados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

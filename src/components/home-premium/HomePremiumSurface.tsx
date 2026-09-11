@@ -60,6 +60,25 @@ import {
 export type HomePremiumLayout = "asimetrica" | "cuadricula" | "carrusel";
 export type HomePremiumHeroVariant = "editorial" | "cinematic";
 
+const ALUX_ROUTE_SUMMARY_MAX = 1000;
+
+function buildAluxRouteSummary(route: HomePremiumRoute): string {
+  const metadata = `Duración: ${route.duration}. Estilo: ${route.vibe}.`;
+  if (metadata.length >= ALUX_ROUTE_SUMMARY_MAX) {
+    return `${metadata.slice(0, ALUX_ROUTE_SUMMARY_MAX - 1).trimEnd()}…`;
+  }
+
+  const label = " Descripción: ";
+  const available = ALUX_ROUTE_SUMMARY_MAX - metadata.length - label.length;
+  if (available <= 0 || !route.description.trim()) return metadata;
+  const description = route.description.trim();
+  const boundedDescription =
+    description.length > available
+      ? `${description.slice(0, Math.max(0, available - 1)).trimEnd()}…`
+      : description;
+  return `${metadata}${label}${boundedDescription}`;
+}
+
 export interface HomePremiumSurfaceProps {
   content?: HomePremiumContent;
   heroVariant?: HomePremiumHeroVariant;
@@ -569,6 +588,19 @@ function RoutesSection({
                     onClick={() => {
                       onSelectRoute(route.id);
                       onAdd();
+                      openAluxFloating({
+                        reason: "manual",
+                        selection: {
+                          entityRef: `route:${route.id}`,
+                          title: route.title,
+                          summary: buildAluxRouteSummary(route),
+                          familySlug: "rutas",
+                        },
+                        hint: buildAluxStageAwareHint(
+                          `Ayúdame a personalizar esta ruta: ${route.title}. ${route.description}`,
+                          `${route.duration} · ${route.stops} paradas · ${route.vibe}`,
+                        ),
+                      });
                     }}
                     className="h-auto min-h-11 whitespace-normal rounded-pill px-3 py-2 leading-tight"
                   >

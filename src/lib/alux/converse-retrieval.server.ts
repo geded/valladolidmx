@@ -48,8 +48,18 @@ export interface ConverseDestination {
 
 export interface ConverseRetrievalInput {
   readonly destinationSlug: string | null;
+  /** Territorios declarados por la ruta, incluso si aún no tienen una parada entity-backed. */
+  readonly declaredDestinationIds?: readonly string[];
   /** Destinos adicionales mencionados (se rotulan como cercanía). */
   readonly extraDestinationSlugs?: readonly string[];
+  /** Límite ampliable para rutas publicadas que abarcan varios territorios canónicos. */
+  readonly maxExtraDestinationSlugs?: number;
+  /** Una ruta seleccionada exige resolver todas sus paradas con la elegibilidad canónica. */
+  readonly selectedRoute?: boolean;
+  readonly selectedRefs?: readonly {
+    entityType: AluxConverseCandidate["entityType"];
+    entityId: string;
+  }[];
   readonly nowIso?: string;
 }
 
@@ -59,6 +69,44 @@ export interface ConverseRetrievalResult {
   readonly knownDestinations: readonly ConverseDestination[];
   readonly familiesLoaded: readonly string[];
   readonly scope: "destination" | "region" | "none";
+}
+
+async function resolveSelectedDestinationIds(
+  sb: SupabaseClient,
+  refs: ConverseRetrievalInput["selectedRefs"],
+): Promise<Set<string>> {
+  const idsOf = (type: AluxConverseCandidate["entityType"]) =>
+    refs?.filter((ref) => ref.entityType === type).map((ref) => ref.entityId) ?? [];
+  const businessIds = idsOf("business");
+  const placeIds = idsOf("place");
+  const eventIds = idsOf("event");
+  const productIds = idsOf("product");
+  const [businesses, places, events, products] = await Promise.all([
+    businessIds.length
+      ? sb.from("businesses").select("destination_id").in("id", businessIds)
+      : Promise.resolve({ data: [] }),
+    placeIds.length
+      ? sb.from("points_of_interest").select("destination_id").in("id", placeIds)
+      : Promise.resolve({ data: [] }),
+    eventIds.length
+      ? sb.from("events").select("destination_id").in("id", eventIds)
+      : Promise.resolve({ data: [] }),
+    productIds.length
+      ? sb.from("products").select("businesses!inner(destination_id)").in("id", productIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const destinationIds = new Set(idsOf("destination"));
+  for (const result of [businesses, places, events]) {
+    for (const row of (result.data ?? []) as Array<{ destination_id?: string }>) {
+      if (row.destination_id) destinationIds.add(row.destination_id);
+    }
+  }
+  for (const row of (products.data ?? []) as Array<{
+    businesses?: { destination_id?: string } | null;
+  }>) {
+    if (row.businesses?.destination_id) destinationIds.add(row.businesses.destination_id);
+  }
+  return destinationIds;
 }
 
 /* ─────────────────────────── helpers ─────────────────────────── */
@@ -211,12 +259,13 @@ async function loadBusinessesFor(
   destination: ConverseDestination,
   scope: AluxConverseScope,
   limit: number,
+  requiredIds?: readonly string[],
 ): Promise<{
   candidates: AluxConverseCandidate[];
   ids: string[];
   index: Map<string, { slug: string; categorySlug: string; name: string }>;
 }> {
-  const { data, error } = await sb
+  let query = sb
     .from("businesses")
     .select(
       "id, slug, display_name, tagline, description, filter_attributes, business_categories!businesses_primary_category_id_fkey ( slug, name )",
@@ -225,8 +274,9 @@ async function loadBusinessesFor(
     .eq("status", "published")
     .is("deleted_at", null)
     .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
-    .order("display_name", { ascending: true })
-    .limit(limit);
+    .order("display_name", { ascending: true });
+  if (requiredIds) query = query.in("id", [...requiredIds]);
+  const { data, error } = await query.limit(requiredIds ? Math.max(1, requiredIds.length) : limit);
   if (error || !data) return { candidates: [], ids: [], index: new Map() };
 
   const rows = (data as Array<Record<string, unknown>>).map((row) => {
@@ -693,8 +743,27 @@ async function loadDestinationBundle(
   destination: ConverseDestination,
   scope: AluxConverseScope,
   limits: { businesses: number; perFamily: number },
+  selectedRefs?: ConverseRetrievalInput["selectedRefs"],
 ): Promise<AluxConverseCandidate[]> {
-  const biz = await loadBusinessesFor(sb, destination, scope, limits.businesses);
+  const idsOf = (type: AluxConverseCandidate["entityType"]) =>
+    selectedRefs?.filter((ref) => ref.entityType === type).map((ref) => ref.entityId) ?? [];
+  const productIds = idsOf("product");
+  const { data: ownerRows } = productIds.length
+    ? await sb.from("products").select("business_id").in("id", productIds)
+    : { data: [] };
+  const requiredBusinessIds = Array.from(
+    new Set([
+      ...idsOf("business"),
+      ...((ownerRows ?? []) as Array<{ business_id: string }>).map((row) => row.business_id),
+    ]),
+  );
+  const biz = await loadBusinessesFor(
+    sb,
+    destination,
+    scope,
+    limits.businesses,
+    selectedRefs ? requiredBusinessIds : undefined,
+  );
   const catalog = await loadAluxCanonicalCandidates(sb, {
     destinationId: destination.id,
     destinationSlug: destination.slug,
@@ -702,6 +771,13 @@ async function loadDestinationBundle(
     businessIndex: biz.index,
     limitPerFamily: limits.perFamily,
     includeDemoSeed: true,
+    requiredEntityIds: selectedRefs
+      ? {
+          place: idsOf("place"),
+          product: productIds,
+          event: idsOf("event"),
+        }
+      : undefined,
   });
   const enriched = await enrichCatalog(
     sb,
@@ -724,14 +800,43 @@ export async function retrieveConverseCandidates(
     .is("deleted_at", null)
     .order("name", { ascending: true })
     .limit(40);
-  const knownDestinations: ConverseDestination[] = (
+  const sampledDestinations: ConverseDestination[] = (
     (destRows ?? []) as Array<Record<string, unknown>>
   )
     .map((r) => ({ id: String(r["id"]), slug: String(r["slug"]), name: String(r["name"]) }))
     .filter((d) => d.id && d.slug && d.name);
+  const selectedDestinationIds = await resolveSelectedDestinationIds(sb, input.selectedRefs);
+  for (const destinationId of input.declaredDestinationIds ?? []) {
+    if (destinationId) selectedDestinationIds.add(destinationId);
+  }
+  const { data: selectedDestinationRows } = selectedDestinationIds.size
+    ? await sb
+        .from("destinations")
+        .select("id, slug, name")
+        .in("id", Array.from(selectedDestinationIds))
+        .eq("status", "published")
+        .is("deleted_at", null)
+    : { data: [] };
+  const selectedDestinations = ((selectedDestinationRows ?? []) as Array<Record<string, unknown>>)
+    .map((row) => ({
+      id: String(row["id"]),
+      slug: String(row["slug"]),
+      name: String(row["name"]),
+    }))
+    .filter((destination) => destination.id && destination.slug && destination.name);
+  const knownDestinations = Array.from(
+    new Map(
+      [...sampledDestinations, ...selectedDestinations].map((destination) => [
+        destination.id,
+        destination,
+      ]),
+    ).values(),
+  );
   const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
-
-  const destination = input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null;
+  const destination =
+    (input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null) ??
+    knownDestinations.find((d) => selectedDestinationIds.has(d.id)) ??
+    null;
   const familiesLoaded = new Set<string>();
   const collect = (list: readonly AluxConverseCandidate[]) => {
     for (const c of list) familiesLoaded.add(c.entityType);
@@ -740,27 +845,63 @@ export async function retrieveConverseCandidates(
 
   if (destination) {
     // Cercanías rotuladas: sólo destinos mencionados explícitamente.
-    const extras = (input.extraDestinationSlugs ?? [])
-      .filter((s) => s !== destination.slug)
+    const selectedDestinationSlugs = knownDestinations
+      .filter((candidate) => selectedDestinationIds.has(candidate.id))
+      .map((candidate) => candidate.slug);
+    const requestedExtraSlugs = Array.from(
+      new Set([...(input.extraDestinationSlugs ?? []), ...selectedDestinationSlugs]),
+    );
+    const filteredExtraSlugs = requestedExtraSlugs.filter((slug) => slug !== destination.slug);
+    const maxExtras = input.selectedRoute
+      ? filteredExtraSlugs.length
+      : (input.maxExtraDestinationSlugs ?? 2);
+    const extras = filteredExtraSlugs
       .map((s) => bySlug.get(s))
       .filter((d): d is ConverseDestination => Boolean(d))
-      .slice(0, 2);
+      .slice(0, Math.max(0, Math.min(maxExtras, 39)));
     // Otros destinos publicados como opción de región (planear salidas).
     const others = knownDestinations.filter((d) => d.id !== destination.id).slice(0, 8);
 
+    const routeLimits = { businesses: 60, perFamily: 10 };
+    const nearbyLimits = { businesses: 12, perFamily: 4 };
+    const requiredLimits = { businesses: 60, perFamily: 60 };
+    const requiredDestinations = knownDestinations.filter((d) => selectedDestinationIds.has(d.id));
+    const requiredBundles = input.selectedRefs
+      ? await Promise.all(
+          requiredDestinations.map((required) =>
+            loadDestinationBundle(
+              sb,
+              required,
+              required.id === destination.id ? "destination" : "nearby",
+              requiredLimits,
+              input.selectedRefs,
+            ),
+          ),
+        )
+      : [];
     const [own, routes, destCandidates, ...extraBundles] = await Promise.all([
-      loadDestinationBundle(sb, destination, "destination", { businesses: 60, perFamily: 10 }),
+      loadDestinationBundle(sb, destination, "destination", routeLimits),
       loadRoutes(sb, knownDestinations, destination, "destination", 6),
       loadDestinationCandidates(sb, others),
       ...extras.map(async (extra) => [
-        ...(await loadDestinationBundle(sb, extra, "nearby", { businesses: 12, perFamily: 4 })),
+        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits)),
         ...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)),
       ]),
     ]);
+    const selectedDestinations = input.selectedRefs
+      ? knownDestinations.filter((d) =>
+          input.selectedRefs?.some(
+            (ref) => ref.entityType === "destination" && ref.entityId === d.id,
+          ),
+        )
+      : [];
+    const selectedDestinationCandidates = await loadDestinationCandidates(sb, selectedDestinations);
     const candidates = renumberFacts([
       ...collect(own),
       ...collect(routes),
       ...extraBundles.flatMap((b) => collect(b)),
+      ...requiredBundles.flatMap((b) => collect(b)),
+      ...collect(selectedDestinationCandidates),
       ...collect(destCandidates),
     ]);
     return {
