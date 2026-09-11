@@ -403,9 +403,7 @@ function HeroCopy({
       </h1>
       <p className="mt-3 text-lg text-foreground/80 sm:text-xl">{content.hero.subtitle}</p>
       {content.hero.description ? (
-        <p className="mt-4 max-w-xl text-base text-muted-foreground">
-          {content.hero.description}
-        </p>
+        <p className="mt-4 max-w-xl text-base text-muted-foreground">{content.hero.description}</p>
       ) : null}
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Button size="lg" className="rounded-pill px-6" asChild>
@@ -538,9 +536,7 @@ function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
       aria-labelledby="descubre-destino"
       className={cn(
         "border-y border-border py-10 sm:py-14",
-        hasMedia
-          ? "grid gap-8 md:grid-cols-12 md:items-center lg:gap-16"
-          : "grid gap-8",
+        hasMedia ? "grid gap-8 md:grid-cols-12 md:items-center lg:gap-16" : "grid gap-8",
       )}
     >
       {hasMedia ? (

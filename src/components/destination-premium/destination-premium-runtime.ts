@@ -88,8 +88,7 @@ export function buildDestinationPremiumRuntime(input: {
         : null,
       regionBadge: "Oriente Maya de Yucatán",
       title: destination.name,
-      subtitle:
-        heroDescription || `Descubre ${destination.name} en el Oriente Maya de Yucatán`,
+      subtitle: heroDescription || `Descubre ${destination.name} en el Oriente Maya de Yucatán`,
       description: "",
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Explorar servicios", href: "#servicios-destino" },
