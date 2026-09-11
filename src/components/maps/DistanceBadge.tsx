@@ -98,7 +98,11 @@ export function DistanceBadge({
 
   if (isLoading) {
     return (
-      <p className={compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
+      <p
+        className={
+          compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"
+        }
+      >
         Calculando distancia…
       </p>
     );
@@ -106,7 +110,11 @@ export function DistanceBadge({
 
   if (isError || !data?.ok || data.distanceMeters == null) {
     return (
-      <p className={compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
+      <p
+        className={
+          compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"
+        }
+      >
         Ruta no disponible
       </p>
     );
