@@ -161,7 +161,9 @@ export function AluxFloatingTrigger() {
      se conserva mientras el dock está abierto y se consume como contexto vivo
      (nunca se degrada a texto libre ni se inventa). */
   const [selection, setSelection] = useState<AluxOpenSelection | null>(null);
-  const [selectionTask, setSelectionTask] = useState<string | null>(null);
+  /* La instrucción operativa se conserva sólo como contexto interno; nunca se
+     muestra al viajero (Founder Concierge Voice). */
+  const [, setSelectionTask] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
 
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
@@ -713,6 +715,9 @@ export function AluxFloatingTrigger() {
             stage={unified.trip.stage}
             coords={geo.status === "granted" && geo.location ? geo.location : null}
             locale={locale}
+            {...(selection?.quickActions && selection.quickActions.length > 0
+              ? { starters: selection.quickActions }
+              : {})}
           />
 
 
