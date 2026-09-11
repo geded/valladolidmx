@@ -638,7 +638,13 @@ export function AluxFloatingTrigger() {
         )}
       </div>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet
+        open={open && !minimized}
+        onOpenChange={(v) => {
+          setMinimized(false);
+          setOpen(v);
+        }}
+      >
         <SheetContent side="right" className="flex w-full max-w-md flex-col gap-6 overflow-y-auto">
           <SheetHeader className="text-left">
             <div className="flex items-center gap-2">
