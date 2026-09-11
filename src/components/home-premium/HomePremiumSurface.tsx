@@ -146,6 +146,11 @@ export function HomePremiumSurface({
         ? payload.entityRef.slice("route:".length)
         : null;
       if (id && routes.some((route) => route.id === id)) setSelectedRoute(id);
+      setProposalSequence(
+        payload.variant === "proposal" && payload.sequenceTitles?.length
+          ? payload.sequenceTitles
+          : null,
+      );
       if (typeof document === "undefined") return;
       const target = document.getElementById(payload.anchor ?? "mapa");
       target?.scrollIntoView({ behavior: "smooth", block: "start" });
