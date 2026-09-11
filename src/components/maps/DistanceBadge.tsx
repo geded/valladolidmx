@@ -79,10 +79,8 @@ export function DistanceBadge({
                 : "Compartir mi ubicación"}
           </span>
         </Button>
-
       );
     }
-
 
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -91,12 +89,11 @@ export function DistanceBadge({
         <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"}>
           {status === "prompting"
             ? "Solicitando…"
-            : status === "denied"
-              ? "Permiso denegado"
-              : status === "unavailable"
-                ? "No disponible"
-                : "Compartir mi ubicación"}
+            : status === "denied" || status === "unavailable"
+              ? "Reintentar ubicación"
+              : "Compartir mi ubicación"}
         </Button>
+
       </div>
     );
   }
