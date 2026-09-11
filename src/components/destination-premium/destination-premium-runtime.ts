@@ -45,13 +45,11 @@ export function buildDestinationPremiumRuntime(input: {
     ...gallery.map(mediaOf),
     ...approvedConceptual.slice(1),
   ];
-  // La descripción CMS ya se muestra en la portada. Repetirla en
-  // "Descubre" duplicaba el mismo texto en la misma pantalla.
-  const heroDescription =
-    destination.description?.trim() ||
-    `Explora ${destination.name} y prepara tu recorrido por el Oriente Maya de Yucatán.`;
+  const heroDescription = destination.tagline?.trim() ?? "";
   const descubreText = destination.description?.trim() ?? "";
-  const paragraphs = descubreText && descubreText !== heroDescription ? [descubreText] : [];
+  const paragraphs = descubreText ? [descubreText] : [];
+  const narrativeMedia = gallery.map(mediaOf).slice(0, 3);
+  const remainingGallery = gallery.map(mediaOf).slice(narrativeMedia.length);
   const mapItems = [
     ...(destination.latitude != null && destination.longitude != null
       ? [
@@ -90,8 +88,9 @@ export function buildDestinationPremiumRuntime(input: {
         : null,
       regionBadge: "Oriente Maya de Yucatán",
       title: destination.name,
-      subtitle: destination.tagline ?? "Descubre este destino del Oriente Maya de Yucatán",
-      description: heroDescription,
+      subtitle:
+        heroDescription || `Descubre ${destination.name} en el Oriente Maya de Yucatán`,
+      description: "",
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Explorar servicios", href: "#servicios-destino" },
       cover: allMedia[0] ?? { url: "", alt: "" },
@@ -125,7 +124,7 @@ export function buildDestinationPremiumRuntime(input: {
       kicker: "El destino",
       title: `Descubre ${destination.name}`,
       paragraphs,
-      media: allMedia.slice(1, 4),
+      media: narrativeMedia,
     },
     gallery: {
       kicker: "Galería",
@@ -133,7 +132,7 @@ export function buildDestinationPremiumRuntime(input: {
       note: cover
         ? "Fotografías acreditadas para uso público."
         : "Visuales conceptuales temporales, reemplazables desde Medios.",
-      items: allMedia,
+      items: remainingGallery,
     },
     servicePreview: {
       actionLabel: "Ver todo",
