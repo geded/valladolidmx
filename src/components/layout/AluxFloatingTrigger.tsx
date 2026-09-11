@@ -165,12 +165,27 @@ export function AluxFloatingTrigger() {
      muestra al viajero (Founder Concierge Voice). */
   const [, setSelectionTask] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  /* La sesión sigue viva mientras el viajero consulta el mapa: el panel sólo
+     se repliega a una barra compacta y se restaura con el mismo diálogo. */
+  const [minimized, setMinimized] = useState(false);
+  /* Última secuencia propuesta por Alux (títulos canónicos, en orden). */
+  const [proposalTitles, setProposalTitles] = useState<readonly string[] | null>(null);
+  const [mapVariant, setMapVariant] = useState<"original" | "proposal">("original");
 
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
   useEffect(() => {
     return onAluxFloatingOpen((payload) => {
-      setSelection(payload.selection ?? null);
+      setSelection((prev) => {
+        const next = payload.selection ?? null;
+        // Cambiar de ruta reinicia la propuesta; reabrir la misma la conserva.
+        if ((prev?.entityRef ?? null) !== (next?.entityRef ?? null)) {
+          setProposalTitles(null);
+          setMapVariant("original");
+        }
+        return next;
+      });
       setSelectionTask(payload.hint ?? null);
+      setMinimized(false);
       setOpen(true);
     });
   }, []);
@@ -180,6 +195,9 @@ export function AluxFloatingTrigger() {
     if (!open) {
       setSelection(null);
       setSelectionTask(null);
+      setMinimized(false);
+      setProposalTitles(null);
+      setMapVariant("original");
     }
   }, [open]);
 
