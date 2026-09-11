@@ -772,6 +772,16 @@ export function AluxFloatingTrigger() {
             />
           ) : null}
 
+          {/* Sugerencia proactiva consolidada: mismo Alux, dentro del panel. */}
+          {nudge ? (
+            <p className="rounded-2xl border border-primary/25 bg-primary/5 px-3 py-2 text-[12px] font-medium text-foreground">
+              <span className="mr-1 text-primary" aria-hidden>
+                ✨
+              </span>
+              {nudge.message}
+            </p>
+          ) : null}
+
           {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
           <AluxConverseChat
             region={ctx.region}
