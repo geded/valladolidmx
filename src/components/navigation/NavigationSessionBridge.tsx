@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { subscribeResolvedContext, useResolvedContext } from "@/lib/context-engine";
 import {
+  isLovablePreviewFrame,
   isStandaloneDisplay,
   readLastRoute,
   snapshotFromContext,
