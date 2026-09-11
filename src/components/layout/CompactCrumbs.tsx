@@ -77,7 +77,7 @@ export function CompactCrumbs({
   if (!current) return null;
 
   return (
-    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-1.5 text-[13px] text-muted-foreground sm:hidden">
+    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-0.5 overflow-hidden text-[10px] font-medium text-muted-foreground sm:hidden">
       <li className="flex shrink-0 items-center">
         <Link
           to="/"
@@ -89,8 +89,8 @@ export function CompactCrumbs({
       </li>
 
       {hidden.length > 0 ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+        <li className="flex shrink-0 items-center gap-0.5">
+          <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
           <Popover>
             <PopoverTrigger
               aria-label="Mostrar niveles intermedios de la ruta"
@@ -124,18 +124,18 @@ export function CompactCrumbs({
       ) : null}
 
       {anchorCrumb ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+        <li className="flex shrink-0 items-center gap-0.5">
+          <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
           {anchorCrumb.to ? (
             <Link
               to={anchorCrumb.to}
               params={anchorCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[22vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-11 max-w-[21vw] items-center truncate rounded-md px-0.5 hover:bg-accent hover:text-accent-foreground"
             >
               {anchorCrumb.label}
             </Link>
           ) : (
-            <span className="inline-flex min-h-11 max-w-[22vw] items-center truncate px-1">
+            <span className="inline-flex min-h-11 max-w-[21vw] items-center truncate px-0.5">
               {anchorCrumb.label}
             </span>
           )}
@@ -143,30 +143,30 @@ export function CompactCrumbs({
       ) : null}
 
       {contextCrumb ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+        <li className="flex shrink-0 items-center gap-0.5">
+          <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
           {contextCrumb.to ? (
             <Link
               to={contextCrumb.to}
               params={contextCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[26vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-11 max-w-[24vw] items-center truncate rounded-md px-0.5 hover:bg-accent hover:text-accent-foreground"
             >
               {contextCrumb.label}
             </Link>
           ) : (
-            <span className="inline-flex min-h-11 max-w-[26vw] items-center truncate px-1">
+            <span className="inline-flex min-h-11 max-w-[24vw] items-center truncate px-0.5">
               {contextCrumb.label}
             </span>
           )}
         </li>
       ) : null}
 
-      <li className="flex min-w-0 items-center gap-1.5">
-        <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+      <li className="flex min-w-0 items-center gap-0.5">
+        <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
         <span
           aria-current="page"
           title={current.label}
-          className="block max-w-[30vw] truncate font-medium text-foreground"
+          className="block max-w-[27vw] truncate font-semibold text-foreground"
         >
           {current.label}
         </span>
