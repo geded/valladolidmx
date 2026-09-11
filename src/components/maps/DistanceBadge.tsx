@@ -60,24 +60,25 @@ export function DistanceBadge({
       return (
         <Button
           size="sm"
-          variant="ghost"
-          className="h-10 max-w-full justify-start px-2 text-muted-foreground"
+          variant="outline"
+          className="h-10 max-w-full justify-start px-2.5"
           onClick={request}
           disabled={status === "prompting"}
         >
-          <MapPin className="h-4 w-4 shrink-0" aria-hidden />
+          <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
           <span className="truncate">
             {status === "prompting"
-              ? "Calculando…"
+              ? "Solicitando ubicación…"
               : status === "denied"
-                ? "Sin permiso"
+                ? "Activa la ubicación"
                 : status === "unavailable"
-                  ? "No disponible"
-                  : "Calcular distancia"}
+                  ? "Ubicación no disponible"
+                  : "Compartir mi ubicación"}
           </span>
         </Button>
       );
     }
+
 
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
