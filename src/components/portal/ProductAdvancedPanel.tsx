@@ -18,6 +18,7 @@ import {
   registerPortalProductMedia,
   removePortalProductMedia,
 } from "@/lib/portal/portal-product-media.functions";
+import { prepareImageForRole } from "@/lib/cms/image-upload";
 import {
   listPortalProductFaqs,
   createPortalProductFaq,
