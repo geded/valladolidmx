@@ -932,7 +932,7 @@ function ListingCard({
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm transition hover:shadow-md">
       <div
         className={`relative w-full overflow-hidden bg-[var(--brand-surface-soft)] ${
-          !item.image && compactFallback ? "aspect-[16/9]" : "aspect-[4/3]"
+          !item.image && compactFallback ? "h-36 sm:h-40" : "aspect-[4/3]"
         }`}
       >
         {item.image ? (
