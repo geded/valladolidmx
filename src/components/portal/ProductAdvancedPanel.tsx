@@ -81,10 +81,11 @@ function MediaSection({ productId }: { productId: string }) {
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  async function upload(role: "cover" | "gallery", file: File) {
+  async function upload(role: "cover" | "gallery", original: File) {
     setErr(null);
     setUploading(true);
     try {
+      const file = await prepareImageForRole(original, role);
       const { path, token, bucket } = await signFn({
         data: { productId, filename: file.name, contentType: file.type },
       });
