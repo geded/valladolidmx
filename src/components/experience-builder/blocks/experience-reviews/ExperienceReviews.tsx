@@ -8,7 +8,6 @@
  */
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   clampRating,
   ratingLabel,
@@ -345,7 +344,6 @@ export function ExperienceReviews({
     capabilities,
   } = dto;
 
-  const isMobile = useIsMobile();
   const [expanded, setExpanded] = useState(false);
 
   const showAggregate = capabilities.showAggregate && aggregate != null && aggregate.count > 0;
@@ -497,16 +495,19 @@ export function ExperienceReviews({
 
   const renderBody = (list: ExperienceReviewItem[]): ReactNode => {
     if (list.length === 0) return null;
-    const visible = isMobile && !expanded ? list.slice(0, 1) : list;
-    const showMore = isMobile && list.length > 1;
-    const body: ReactNode = (() => {
-      if (variant === "grid") return bodyGrid(visible);
-      if (variant === "carousel") return bodyCarousel(visible);
-      if (variant === "compact") return bodyCompact(visible);
-      if (variant === "featured") return bodyFeatured(visible);
-      if (variant === "wall") return bodyWall(visible);
-      return bodyList(visible);
-    })();
+    const showMore = list.length > 1;
+    // Cuando está colapsado, se muestra una sola tarjeta a ancho completo
+    // (independiente del variant) para evitar huecos en grid/carousel.
+    const body: ReactNode = !expanded
+      ? bodyList([list[0]])
+      : (() => {
+          if (variant === "grid") return bodyGrid(list);
+          if (variant === "carousel") return bodyCarousel(list);
+          if (variant === "compact") return bodyCompact(list);
+          if (variant === "featured") return bodyFeatured(list);
+          if (variant === "wall") return bodyWall(list);
+          return bodyList(list);
+        })();
     if (!showMore) return body;
     return (
       <div className="flex flex-col gap-3">
