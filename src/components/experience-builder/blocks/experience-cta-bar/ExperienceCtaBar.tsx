@@ -154,9 +154,9 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
           const iconOnly = !a.label && Boolean(a.iconKey);
 
           const classes = cn(
-            "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-pill text-sm font-semibold transition",
+            "inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-pill text-[13px] font-semibold transition sm:text-sm",
             "focus-visible:outline-none focus-visible:ring-focus",
-            iconOnly ? "px-3" : "px-4",
+            iconOnly ? "px-3" : "px-3.5 sm:px-4",
             a.emphasis === "primary"
               ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft"
               : a.emphasis === "ghost"
