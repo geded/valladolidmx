@@ -1194,9 +1194,15 @@ function MapSection({
       .filter((point) => point.kind === "destination")
       .map((point) => [normalizeLabel(point.title), point]),
   );
-  const routePoints = (route?.sequence ?? [])
+  const proposalPoints = (proposalSequence ?? [])
     .map((title) => pointByTitle.get(normalizeLabel(title)))
     .filter((point): point is NonNullable<typeof point> => Boolean(point));
+  const showingProposal = proposalPoints.length >= 2;
+  const routePoints = showingProposal
+    ? proposalPoints
+    : (route?.sequence ?? [])
+        .map((title) => pointByTitle.get(normalizeLabel(title)))
+        .filter((point): point is NonNullable<typeof point> => Boolean(point));
   const mapDto = {
     ...content.mapa.dto,
     center: null,
