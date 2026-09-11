@@ -793,6 +793,10 @@ export function AluxFloatingTrigger() {
             {...(selection?.quickActions && selection.quickActions.length > 0
               ? { starters: selection.quickActions }
               : {})}
+            onProposal={(titles) => {
+              setProposalTitles(titles);
+              setMapVariant("proposal");
+            }}
           />
 
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
