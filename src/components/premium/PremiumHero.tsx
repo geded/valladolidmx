@@ -90,11 +90,11 @@ export function PremiumHero({
         // D-05 · sin medio gobernado no se muestra un rectángulo negro:
         // degradado cálido piedra/caliza que conserva contraste AA.
         hasMedia ? "bg-stone-950" : "bg-gradient-to-br from-stone-800 via-stone-700 to-amber-900",
-        // Móvil ≤639px: proporción ~4:5 acotada a 500px para evitar el
-        // hero-tira; desde `sm` se conserva la altura aprobada.
+        // Móvil ≤639px: portada más compacta para mostrar contenido útil en
+        // el primer viewport; desde `sm` se conserva la altura aprobada.
         cinematic
           ? "min-h-[min(125vw,500px)] sm:min-h-[78svh]"
-          : "min-h-[min(125vw,500px)] sm:min-h-[34rem] lg:min-h-[42rem]",
+          : "min-h-[min(108vw,430px)] sm:min-h-[34rem] lg:min-h-[42rem]",
       )}
     >
       {vm.media ? (

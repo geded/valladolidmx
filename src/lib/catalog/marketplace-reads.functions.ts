@@ -1018,6 +1018,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       { data: promos, error: prErr },
       { data: locations },
       { data: reviewRows },
+      { data: businessMedia },
     ] = await Promise.all([
       supabase
         .from("products")
@@ -1057,6 +1058,15 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         .is("deleted_at", null)
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(24),
+      supabase
+        .from("business_media")
+        .select(
+          "role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, alt_text, status, deleted_at )",
+        )
+        .eq("business_id", String(biz.id))
+        .eq("role", "cover")
+        .order("sort_order", { ascending: true })
+        .limit(1),
     ]);
     if (pErr) throw new Error(`marketplace_products_failed: ${pErr.message}`);
     if (prErr) throw new Error(`marketplace_promos_failed: ${prErr.message}`);
@@ -1138,6 +1148,36 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         }
       : null;
 
+    /* La ficha usa la misma portada CMS que los listados. Antes, la lectura
+       de detalle nunca consultaba `business_media`, por lo que una portada
+       correctamente asociada desaparecía al abrir la empresa. */
+    let detailCoverUrl: string | null = null;
+    const detailCoverRow = (businessMedia?.[0] ?? null) as {
+      media_assets?: {
+        storage_bucket?: string | null;
+        storage_path?: string | null;
+        status?: string | null;
+        deleted_at?: string | null;
+      } | null;
+    } | null;
+    const detailCoverAsset = detailCoverRow?.media_assets;
+    if (
+      detailCoverAsset?.storage_bucket &&
+      detailCoverAsset.storage_path &&
+      detailCoverAsset.status === "published" &&
+      detailCoverAsset.deleted_at === null
+    ) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: signed } = await supabaseAdmin.storage
+          .from(detailCoverAsset.storage_bucket)
+          .createSignedUrl(detailCoverAsset.storage_path, 3600);
+        detailCoverUrl = signed?.signedUrl ?? null;
+      } catch {
+        detailCoverUrl = null;
+      }
+    }
+
     return {
       id: String(biz.id),
       slug: String(biz.slug),
@@ -1148,6 +1188,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       provenance: "published",
       reviews: reviewsSummary,
       verified: Boolean(biz.verified),
+      cover_url: detailCoverUrl,
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
       category_family_key: typeof catFamily === "string" && catFamily.trim() ? catFamily : null,
