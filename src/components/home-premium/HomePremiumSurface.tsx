@@ -224,7 +224,13 @@ export function HomePremiumSurface({
     if (key === "servicios") return <ServicesSection content={content} />;
     if (key === "eventos") return <EventsSection content={content} />;
     if (key === "queHacer") return <EditorialSection content={content} cinematic={cinematic} />;
-    return <MapSection content={content} selectedRoute={selectedRoute} />;
+    return (
+      <MapSection
+        content={content}
+        selectedRoute={selectedRoute}
+        proposalSequence={proposalSequence}
+      />
+    );
   };
 
   return (
