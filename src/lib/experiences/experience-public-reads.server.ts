@@ -34,6 +34,7 @@ import type {
   ProductAttributeItem,
 } from "@/lib/catalog/marketplace-reads.functions";
 import {
+import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
   EXPERIENCE_ATTRIBUTE_FAMILY,
   EXPERIENCE_TYPE_ATTRIBUTE_KEY,
 } from "@/lib/experiences/experience-attributes";
