@@ -541,7 +541,10 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       </div>
 
       {/* Sugerencias iniciales */}
-      {hydrated && messages.length === 0 && !thinking && !planBlocked ? (
+      {/* Acciones rápidas contextuales: cuando la superficie entrega las suyas
+          permanecen disponibles durante toda la conversación (ciclo iterativo);
+          las sugerencias genéricas siguen apareciendo sólo con el hilo vacío. */}
+      {hydrated && !thinking && !planBlocked && (props.starters?.length || messages.length === 0) ? (
         <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Preguntas sugeridas">
           {starters.map((s) => (
             <button
