@@ -501,6 +501,16 @@ function RoutesSection({
   onSelectRoute: (value: string) => void;
   onAdd: () => void;
 }) {
+  // Reutiliza el mapa YA EXISTENTE del Home (`#mapa`): la tarjeta sólo
+  // selecciona la ruta activa y desplaza suavemente hasta esa sección.
+  const focusExistingMap = (routeId: string) => {
+    onSelectRoute(routeId);
+    if (typeof document === "undefined") return;
+    const target = document.getElementById("mapa");
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <section id="rutas" aria-labelledby="routes-title">
       <SectionHead
@@ -511,7 +521,7 @@ function RoutesSection({
         actionHref={content.rutas.actionHref}
       />
       <div
-        className="grid grid-flow-col auto-cols-[84%] items-start gap-3 overflow-x-auto pb-2 md:auto-cols-[46%] lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0"
+        className="-mx-4 grid snap-x snap-mandatory grid-flow-col auto-cols-[80%] items-stretch gap-3 overflow-x-auto px-4 pb-3 sm:auto-cols-[62%] md:auto-cols-[46%] lg:mx-0 lg:grid-flow-row lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0"
         tabIndex={0}
         aria-label="Rutas recomendadas"
       >
@@ -521,70 +531,56 @@ function RoutesSection({
             <article
               key={route.id}
               className={cn(
-                "self-start overflow-hidden rounded-2xl border bg-card",
+                "flex h-full min-w-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card transition",
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
-              <div className="grid grid-cols-[7rem_1fr] border-b border-border">
+              <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/10]">
                 <EditorialMediaFrame
                   media={route.media}
                   label={route.title}
-                  className="h-full min-h-32 w-full object-cover"
+                  className="size-full object-cover"
                 />
-                <div className="p-4">
-                  <div className="flex flex-wrap gap-2">
-                    {active ? (
-                      <span className="rounded-pill bg-primary/15 px-2 py-1 text-[10px] font-semibold text-foreground">
-                        Seleccionada
-                      </span>
-                    ) : null}
-                  </div>
-                  <h3 className="mt-3 font-display text-xl">
-                    {route.href ? (
-                      <Link to={route.href} className="underline-offset-4 hover:underline">
-                        {route.title}
-                      </Link>
-                    ) : (
-                      route.title
-                    )}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {route.duration} · {route.stops} paradas · {route.vibe}
-                  </p>
-                </div>
+                {active ? (
+                  <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2 py-1 text-[10px] font-semibold text-foreground shadow-soft">
+                    Seleccionada
+                  </span>
+                ) : null}
               </div>
-              <div className="p-3 lg:p-4">
-                <p className="hidden text-sm leading-relaxed text-muted-foreground lg:block">
+              <div className="flex min-w-0 flex-1 flex-col gap-2 p-3 sm:p-4">
+                <h3 className="min-w-0 font-display text-base leading-tight sm:text-lg">
+                  {route.href ? (
+                    <Link to={route.href} className="underline-offset-4 hover:underline">
+                      {route.title}
+                    </Link>
+                  ) : (
+                    route.title
+                  )}
+                </h3>
+                <p className="min-w-0 truncate text-xs text-muted-foreground">
+                  {route.duration} · {route.stops} paradas · {route.vibe}
+                </p>
+                <p className="line-clamp-2 hidden text-sm leading-relaxed text-muted-foreground lg:block">
                   {route.description}
                 </p>
                 <ol
-                  className="mt-4 hidden space-y-2 lg:block"
+                  className="hidden flex-wrap gap-1.5 lg:flex"
                   aria-label={`Paradas de ${route.title}`}
                 >
-                  {route.sequence.map((stop, index) => (
-                    <li key={stop} className="flex items-center gap-3 text-sm">
-                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary font-semibold">
-                        {index + 1}
-                      </span>
-                      <span className="min-w-0 flex-1">{stop}</span>
-                      {index < route.sequence.length - 1 ? (
-                        <span className="h-px w-5 bg-primary" aria-hidden />
-                      ) : null}
+                  {route.sequence.slice(0, 4).map((stop, index) => (
+                    <li
+                      key={stop}
+                      className="rounded-pill border border-border/70 px-2 py-0.5 text-[11px] text-muted-foreground"
+                    >
+                      {index + 1}. {stop}
                     </li>
                   ))}
                 </ol>
-                <div className="grid grid-cols-1 gap-2 lg:mt-5 xl:grid-cols-2">
+                <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
                   <Button
                     type="button"
-                    variant={active ? "default" : "outline"}
-                    onClick={() => onSelectRoute(route.id)}
-                    className="h-auto min-h-11 whitespace-normal rounded-pill px-3 py-2 leading-tight"
-                  >
-                    {content.rutas.selectLabel}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
+                    size="sm"
+                    variant={active ? "default" : "secondary"}
                     onClick={() => {
                       onSelectRoute(route.id);
                       onAdd();
@@ -602,9 +598,18 @@ function RoutesSection({
                         ),
                       });
                     }}
-                    className="h-auto min-h-11 whitespace-normal rounded-pill px-3 py-2 leading-tight"
+                    className="min-h-10 flex-1 rounded-pill px-3 text-xs sm:text-sm"
                   >
                     Personalizar con Alux
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => focusExistingMap(route.id)}
+                    className="min-h-10 shrink-0 rounded-pill px-3 text-xs text-muted-foreground hover:text-foreground sm:text-sm"
+                  >
+                    {content.rutas.selectLabel}
                   </Button>
                 </div>
               </div>
