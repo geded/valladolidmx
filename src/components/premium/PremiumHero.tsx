@@ -86,7 +86,7 @@ export function PremiumHero({
       data-premium-presentation={vm.presentation}
       data-premium-media={hasMedia ? "governed" : "fallback"}
       className={cn(
-        "relative isolate overflow-hidden text-white",
+        "relative isolate overflow-hidden rounded-[1.5rem] text-white shadow-soft sm:rounded-none sm:shadow-none",
         // D-05 · sin medio gobernado no se muestra un rectángulo negro:
         // degradado cálido piedra/caliza que conserva contraste AA.
         hasMedia ? "bg-stone-950" : "bg-gradient-to-br from-stone-800 via-stone-700 to-amber-900",
