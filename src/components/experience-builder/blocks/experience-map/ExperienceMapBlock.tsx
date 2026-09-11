@@ -167,11 +167,11 @@ export function ExperienceMapBlock({
         >
           <ul
             className={cn(
-              "space-y-3",
+              "grid gap-3 sm:grid-cols-2 lg:grid-cols-1 lg:space-y-0",
               isMulti
                 ? immersive
-                  ? "max-h-[36rem] overflow-y-auto pr-1"
-                  : "max-h-[560px] overflow-y-auto pr-1"
+                  ? "lg:max-h-[36rem] lg:overflow-y-auto lg:pr-1"
+                  : "lg:max-h-[560px] lg:overflow-y-auto lg:pr-1"
                 : undefined,
             )}
             aria-label="Puntos en el mapa"
