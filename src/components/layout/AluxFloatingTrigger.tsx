@@ -44,13 +44,18 @@ import {
   Navigation,
   Users,
   Headset,
+  Share2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
-import { onAluxFloatingOpen, type AluxOpenSelection } from "@/lib/alux/floating-bus";
+import {
+  onAluxFloatingOpen,
+  requestAluxMapFocus,
+  type AluxOpenSelection,
+} from "@/lib/alux/floating-bus";
 import { usePublishedDestinations } from "@/lib/destinations/destination-labels";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
@@ -89,6 +94,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
 import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
@@ -155,7 +161,10 @@ export function AluxFloatingTrigger() {
      se conserva mientras el dock está abierto y se consume como contexto vivo
      (nunca se degrada a texto libre ni se inventa). */
   const [selection, setSelection] = useState<AluxOpenSelection | null>(null);
-  const [selectionTask, setSelectionTask] = useState<string | null>(null);
+  /* La instrucción operativa se conserva sólo como contexto interno; nunca se
+     muestra al viajero (Founder Concierge Voice). */
+  const [, setSelectionTask] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // A13 · Escuchar apertura programática desde banners/cards proactivos.
   useEffect(() => {
@@ -648,12 +657,51 @@ export function AluxFloatingTrigger() {
                   ) : null}
                 </div>
               ) : null}
-              {selectionTask ? (
+              {/* Sólo resumen turístico: nunca instrucciones internas ni prompts. */}
+              {selection.facts && selection.facts.length > 0 ? (
                 <p className="mt-2 text-[12px] leading-snug text-muted-foreground">
-                  {selectionTask}
+                  {selection.facts.join(" · ")}
                 </p>
               ) : null}
+              {selection.mapAnchor ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    requestAluxMapFocus({
+                      ...(selection.entityRef ? { entityRef: selection.entityRef } : {}),
+                      anchor: selection.mapAnchor!,
+                    });
+                    setOpen(false);
+                  }}
+                  className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+                >
+                  <MapPin className="size-3.5" aria-hidden />
+                  Ver mi ruta en el mapa
+                </button>
+              ) : null}
+              {selection.title ? (
+                <button
+                  type="button"
+                  onClick={() => setShareOpen(true)}
+                  className="ml-2 mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <Share2 className="size-3.5" aria-hidden />
+                  Compartir ruta
+                </button>
+              ) : null}
             </section>
+          ) : null}
+
+          {selection?.title ? (
+            <ShareSheet
+              open={shareOpen}
+              onOpenChange={setShareOpen}
+              title={selection.title}
+              url={selection.href ?? (typeof window !== "undefined" ? window.location.href : "/")}
+              {...(selection.facts && selection.facts.length > 0
+                ? { text: selection.facts.join(" · ") }
+                : {})}
+            />
           ) : null}
 
           {/* Lote 3K · Conversación IA anclada al catálogo (mismo dock, mismas acciones de Mi Viaje). */}
@@ -667,9 +715,10 @@ export function AluxFloatingTrigger() {
             stage={unified.trip.stage}
             coords={geo.status === "granted" && geo.location ? geo.location : null}
             locale={locale}
+            {...(selection?.quickActions && selection.quickActions.length > 0
+              ? { starters: selection.quickActions }
+              : {})}
           />
-
-
 
           {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
           {territory?.is_returning &&
