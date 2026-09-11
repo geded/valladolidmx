@@ -182,7 +182,7 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     forcedCategorySlug: null,
     hero: {
       eyebrow: "Editorial",
-      title: "¿Qué hacer en el Oriente Maya?",
+      title: "¿Qué hacer en el Oriente Maya de Yucatán?",
       subtitle: "Cultura, naturaleza, aventura, gastronomía y eventos para inspirar tu viaje.",
     },
     emptyMessage:
