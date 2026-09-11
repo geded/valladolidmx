@@ -122,6 +122,8 @@ export function HomePremiumSurface({
   const cinematic = heroVariant === "cinematic";
   const routes = content.rutas.items;
   const [selectedRoute, setSelectedRoute] = useState<string>(routes[0]?.id ?? "");
+  /* Secuencia propuesta por Alux para el mapa existente (títulos canónicos). */
+  const [proposalSequence, setProposalSequence] = useState<readonly string[] | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState(content.alux.prompts[0] ?? "");
   const anonymousTrip = useAnonymousTrip();
   const [selectedParty, setSelectedParty] = useState<PartyComposition | null>(null);
