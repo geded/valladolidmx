@@ -681,6 +681,31 @@ export function AluxFloatingTrigger() {
                   {selection.facts.join(" · ")}
                 </p>
               ) : null}
+              {/* Ruta original vs propuesta de Alux — sólo cuando ya existe
+                  una secuencia propuesta con paradas canónicas. */}
+              {proposalTitles && proposalTitles.length > 0 ? (
+                <div
+                  role="group"
+                  aria-label="Qué mostrar en el mapa"
+                  className="mt-3 inline-flex rounded-full border border-primary/25 bg-background p-0.5"
+                >
+                  {(["original", "proposal"] as const).map((variant) => (
+                    <button
+                      key={variant}
+                      type="button"
+                      aria-pressed={mapVariant === variant}
+                      onClick={() => setMapVariant(variant)}
+                      className={
+                        mapVariant === variant
+                          ? "inline-flex min-h-8 items-center rounded-full bg-primary/15 px-3 text-[11px] font-semibold text-primary"
+                          : "inline-flex min-h-8 items-center rounded-full px-3 text-[11px] font-medium text-muted-foreground"
+                      }
+                    >
+                      {variant === "original" ? "Ruta original" : "Tu propuesta con Alux"}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               {selection.mapAnchor ? (
                 <button
                   type="button"
@@ -688,8 +713,14 @@ export function AluxFloatingTrigger() {
                     requestAluxMapFocus({
                       ...(selection.entityRef ? { entityRef: selection.entityRef } : {}),
                       anchor: selection.mapAnchor!,
+                      variant: mapVariant,
+                      ...(mapVariant === "proposal" && proposalTitles
+                        ? { sequenceTitles: proposalTitles }
+                        : {}),
                     });
-                    setOpen(false);
+                    /* La conversación NO se destruye: el panel se repliega y
+                       el viajero puede continuar donde iba. */
+                    setMinimized(true);
                   }}
                   className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
                 >
