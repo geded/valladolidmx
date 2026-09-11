@@ -834,7 +834,7 @@ export async function retrieveConverseCandidates(
   );
   const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
   const destination =
-    (input.destinationSlug ? (bySlug.get(input.destinationSlug) ?? null) : null) ??
+    (input.destinationSlug ? bySlug.get(input.destinationSlug) : undefined) ??
     knownDestinations.find((d) => selectedDestinationIds.has(d.id)) ??
     null;
   const familiesLoaded = new Set<string>();
