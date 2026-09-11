@@ -491,6 +491,7 @@ function TerritorialListingBody({
   setSecondary: (v: string) => void;
   facets: FacetDef[];
 }) {
+  const compactDiscovery = profile.family === "que-hacer";
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [activeFacets, setActiveFacets] = useState<Record<string, string>>({});
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
@@ -524,7 +525,7 @@ function TerritorialListingBody({
   return (
     <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
-        <ListingIntro profile={profile} />
+        <ListingIntro profile={profile} compact={compactDiscovery} />
         <AluxBar profile={profile} />
         <Filters
           profile={profile}
@@ -544,12 +545,15 @@ function TerritorialListingBody({
           setActiveFacets={setActiveFacets}
           hasMap={mappedItems.length > 0}
           onShowMap={() => setShowMapMobile(true)}
+          compact={compactDiscovery}
         />
 
         <div
-          className={`mt-5 grid items-start gap-6 ${
+          className={`${compactDiscovery ? "mt-4" : "mt-5"} grid items-start gap-6 ${
             mappedItems.length
-              ? "lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]"
+              ? compactDiscovery
+                ? "lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,.65fr)] xl:grid-cols-[minmax(0,1.45fr)_minmax(22rem,.55fr)]"
+                : "lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]"
               : "grid-cols-1"
           }`}
         >
@@ -568,7 +572,13 @@ function TerritorialListingBody({
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
-                <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
+                <ListingCard
+                  key={item.name}
+                  item={item}
+                  featured={index === 0}
+                  profile={profile}
+                  compactFallback={compactDiscovery}
+                />
               ))}
               {!filteredItems.length ? (
                 <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
@@ -586,6 +596,7 @@ function TerritorialListingBody({
               items={mappedItems}
               showMobile={showMapMobile}
               onClose={() => setShowMapMobile(false)}
+              compact={compactDiscovery}
             />
           ) : null}
         </div>
@@ -678,7 +689,7 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
  * tokens del sistema). Esta superficie ya no renderiza uno paralelo.
  */
 
-function ListingIntro({ profile }: { profile: ListingProfile }) {
+function ListingIntro({ profile, compact = false }: { profile: ListingProfile; compact?: boolean }) {
   const Icon =
     profile.family === "eventos"
       ? CalendarDays
@@ -690,13 +701,21 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
             ? Home
             : BedDouble;
   return (
-    <header className="grid gap-5 border-y border-[var(--border)] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
+    <header
+      className={`grid border-y border-[var(--border)] sm:grid-cols-[1fr_auto] sm:items-end ${
+        compact ? "gap-3 py-4 sm:py-5" : "gap-5 py-6 sm:py-8"
+      }`}
+    >
       <div className="max-w-3xl">
         <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[var(--brand-primary-strong)]">
           <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
-        <h1 className="mt-3 font-display text-display-hero">{profile.title}</h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--muted-foreground)] sm:text-lg">
+        <h1 className={`${compact ? "mt-2" : "mt-3"} font-display text-display-hero`}>
+          {profile.title}
+        </h1>
+        <p
+          className={`${compact ? "mt-2" : "mt-3"} max-w-2xl text-base leading-6 text-[var(--muted-foreground)] sm:text-lg sm:leading-7`}
+        >
           {profile.description}
         </p>
       </div>
@@ -764,6 +783,7 @@ function Filters({
   setActiveFacets,
   hasMap,
   onShowMap,
+  compact = false,
 }: {
   profile: ListingProfile;
   query: string;
@@ -782,6 +802,7 @@ function Filters({
   setActiveFacets: (value: Record<string, string>) => void;
   hasMap: boolean;
   onShowMap: () => void;
+  compact?: boolean;
 }) {
   const selects = [
     { label: profile.filters[0], value: zone, setValue: setZone, options: zones },
@@ -794,8 +815,10 @@ function Filters({
     },
   ];
   return (
-    <section className="mt-4 rounded-2xl border border-[var(--border)] bg-card p-3 shadow-sm sm:p-4">
-      <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
+    <section
+      className={`${compact ? "mt-3 p-2.5 sm:p-3" : "mt-4 p-3 sm:p-4"} rounded-2xl border border-[var(--border)] bg-card shadow-sm`}
+    >
+      <div className="flex snap-x gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto] lg:pb-0">
         <label className="relative min-w-[12.5rem] lg:min-w-0">
           <Search
             className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--muted-foreground)]"
@@ -813,7 +836,7 @@ function Filters({
           <button
             type="button"
             onClick={onShowMap}
-            className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[var(--selva)] px-4 text-sm font-semibold text-white sm:hidden"
+            className={`inline-flex min-h-11 min-w-max snap-start items-center justify-center gap-2 rounded-xl bg-[var(--selva)] px-4 text-sm font-semibold text-white ${compact ? "lg:hidden" : "sm:hidden"}`}
           >
             <Map className="size-4" aria-hidden /> Ver mapa
           </button>
@@ -891,15 +914,21 @@ function ListingCard({
   item,
   featured,
   profile,
+  compactFallback = false,
 }: {
   item: ListingItem;
   featured: boolean;
   profile: ListingProfile;
+  compactFallback?: boolean;
 }) {
   const tags = item.tags.slice(0, 3);
   return (
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm transition hover:shadow-md">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--brand-surface-soft)]">
+      <div
+        className={`relative w-full overflow-hidden bg-[var(--brand-surface-soft)] ${
+          !item.image && compactFallback ? "aspect-[16/9]" : "aspect-[4/3]"
+        }`}
+      >
         {item.image ? (
           <img
             src={item.image}
@@ -1021,11 +1050,13 @@ function MapPanel({
   items,
   showMobile,
   onClose,
+  compact = false,
 }: {
   profile: ListingProfile;
   items: ListingItem[];
   showMobile: boolean;
   onClose: () => void;
+  compact?: boolean;
 }) {
   const points = items.flatMap((item) => {
     const coordinates = item.source?.coordinates;
@@ -1037,7 +1068,9 @@ function MapPanel({
   if (!first) return null;
   return (
     <aside
-      className={`${showMobile ? "block" : "hidden"} order-first sm:block lg:order-none lg:sticky lg:top-24`}
+      className={`${showMobile ? "block" : "hidden"} order-first ${
+        compact ? "lg:order-none lg:block" : "sm:block lg:order-none"
+      } lg:sticky lg:top-24`}
     >
       <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
@@ -1058,7 +1091,9 @@ function MapPanel({
         </div>
         <Suspense
           fallback={
-            <div className="h-64 animate-pulse bg-[var(--brand-surface-soft)] sm:h-80 lg:h-[31rem]" />
+            <div
+              className={`h-64 animate-pulse bg-[var(--brand-surface-soft)] sm:h-80 ${compact ? "lg:h-[26rem]" : "lg:h-[31rem]"}`}
+            />
           }
         >
           <InteractiveMap
@@ -1072,7 +1107,7 @@ function MapPanel({
               title: item.name,
               href: item.href,
             }))}
-            className="h-64 sm:h-80 lg:h-[31rem]"
+            className={`h-64 sm:h-80 ${compact ? "lg:h-[26rem]" : "lg:h-[31rem]"}`}
           />
         </Suspense>
         <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] p-4 text-sm">
