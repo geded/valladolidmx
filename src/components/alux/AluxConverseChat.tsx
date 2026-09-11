@@ -136,6 +136,12 @@ export interface AluxConverseChatProps {
   readonly locale: AluxConverseInput["locale"];
   /** Preguntas sugeridas cuando el hilo está vacío. */
   readonly starters?: readonly string[];
+  /**
+   * Notifica la última secuencia propuesta por Alux (títulos canónicos en
+   * orden) para que la superficie invocante pueda ofrecer verla en su mapa.
+   * No crea otro motor: sólo transporta lo que la respuesta ya contiene.
+   */
+  readonly onProposal?: (titles: readonly string[]) => void;
 }
 
 /* ─────────────────────────── componente ─────────────────────────── */
