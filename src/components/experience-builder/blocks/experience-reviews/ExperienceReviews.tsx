@@ -496,15 +496,18 @@ export function ExperienceReviews({
   const renderBody = (list: ExperienceReviewItem[]): ReactNode => {
     if (list.length === 0) return null;
     const showMore = list.length > 1;
-    const visible = !expanded ? list.slice(0, 1) : list;
-    const body: ReactNode = (() => {
-      if (variant === "grid") return bodyGrid(visible);
-      if (variant === "carousel") return bodyCarousel(visible);
-      if (variant === "compact") return bodyCompact(visible);
-      if (variant === "featured") return bodyFeatured(visible);
-      if (variant === "wall") return bodyWall(visible);
-      return bodyList(visible);
-    })();
+    // Cuando está colapsado, se muestra una sola tarjeta a ancho completo
+    // (independiente del variant) para evitar huecos en grid/carousel.
+    const body: ReactNode = !expanded
+      ? bodyList([list[0]])
+      : (() => {
+          if (variant === "grid") return bodyGrid(list);
+          if (variant === "carousel") return bodyCarousel(list);
+          if (variant === "compact") return bodyCompact(list);
+          if (variant === "featured") return bodyFeatured(list);
+          if (variant === "wall") return bodyWall(list);
+          return bodyList(list);
+        })();
     if (!showMore) return body;
     return (
       <div className="flex flex-col gap-3">
