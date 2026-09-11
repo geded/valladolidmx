@@ -1226,7 +1226,9 @@ function MapSection({
         </div>
         {route ? (
           <div className="rounded-xl bg-muted p-4">
-            <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
+            <p className="text-[10px] font-semibold uppercase text-primary">
+              {showingProposal ? "Tu propuesta con Alux" : "Ruta activa"}
+            </p>
             <p className="mt-1 font-display text-lg">{route.title}</p>
             <p className="text-xs text-muted-foreground">{describeRoute(route, false)}</p>
           </div>
