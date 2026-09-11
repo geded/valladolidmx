@@ -566,7 +566,7 @@ function TerritorialListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -881,6 +881,12 @@ function Filters({
   );
 }
 
+/**
+ * Autoridad visual compartida de las tarjetas de listado territorial.
+ * Con portada acreditada: imagen protagonista arriba (4:3), favorito sobre
+ * la imagen y ficha compacta debajo. Sin portada: marcador editorial
+ * aprobado con altura controlada (nunca un hueco vacío ni fotografía ajena).
+ */
 function ListingCard({
   item,
   featured,
@@ -890,70 +896,74 @@ function ListingCard({
   featured: boolean;
   profile: ListingProfile;
 }) {
+  const tags = item.tags.slice(0, 3);
   return (
-    <article
-      className={`group grid min-w-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm ${
-        item.image
-          ? "grid-cols-[7.25rem_minmax(0,1fr)] sm:grid-cols-[13rem_minmax(0,1fr)]"
-          : "grid-cols-1"
-      }`}
-    >
-      {item.image ? (
-        <div className="relative min-h-[10rem] overflow-hidden bg-[var(--border)] sm:min-h-[13rem]">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm transition hover:shadow-md">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--brand-surface-soft)]">
+        {item.image ? (
           <img
             src={item.image}
             alt={item.name}
-            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
           />
-          {featured ? (
-            <span className="absolute left-2 top-2 rounded-full bg-[var(--primary)] px-2 py-1 text-[10px] font-bold text-[var(--brand-territory-deep)]">
-              Recomendado
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      <div className="flex min-w-0 flex-col p-3 sm:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand-primary-strong)]">
-              {item.type}
+        ) : (
+          <div className="absolute inset-0 flex items-end p-4">
+            <p className="line-clamp-3 font-display text-lg leading-snug text-[var(--muted-foreground)]">
+              {item.name}
             </p>
-            <h3 className="mt-1 font-display text-xl leading-tight sm:text-2xl">{item.name}</h3>
           </div>
-          <button
-            aria-label={`Guardar ${item.name}`}
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--border)]"
-          >
-            <Heart className="size-4" aria-hidden />
-          </button>
-        </div>
+        )}
+        {featured ? (
+          <span className="absolute left-2 top-2 rounded-full bg-[var(--primary)] px-2 py-1 text-[10px] font-bold text-[var(--brand-territory-deep)]">
+            Recomendado
+          </span>
+        ) : null}
+        <button
+          type="button"
+          aria-label={`Guardar ${item.name}`}
+          className="absolute right-2 top-2 grid size-9 place-items-center rounded-full border border-[var(--border)] bg-card/90 backdrop-blur"
+        >
+          <Heart className="size-4" aria-hidden />
+        </button>
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand-primary-strong)]">
+          {item.type}
+        </p>
+        <h3 className="mt-1 line-clamp-2 font-display text-lg leading-tight sm:text-xl">
+          {item.name}
+        </h3>
         <p className="mt-1 flex items-center gap-1 text-xs text-[var(--muted-foreground)]">
-          <MapPin className="size-3" aria-hidden /> {item.zone}
+          <MapPin className="size-3 shrink-0" aria-hidden />
+          <span className="truncate">{item.zone}</span>
         </p>
-        <p className="mt-3 hidden text-sm leading-6 text-[var(--muted-foreground)] sm:block">
-          {item.copy}
-        </p>
-        <div className="mt-3 hidden flex-wrap gap-2 md:flex">
-          {item.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-[var(--background)] px-2.5 py-1 text-[11px]">
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="mt-auto flex items-center gap-2 pt-3">
+        {tags.length ? (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-[var(--background)] px-2 py-0.5 text-[11px] text-[var(--muted-foreground)]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
           {item.href ? (
             <a
               href={item.href}
-              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm"
+              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white"
             >
               Ver {profile.itemLabel}
             </a>
           ) : (
-            <button className="min-h-10 rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
+            <button className="min-h-10 rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white">
               Ver {profile.itemLabel}
             </button>
           )}
-          <button className="hidden min-h-11 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] sm:inline-flex sm:items-center">
+          <button className="inline-flex min-h-10 items-center rounded-full border border-[var(--selva)] px-3 text-xs font-semibold text-[var(--selva)]">
             Agregar a mi viaje
           </button>
         </div>
@@ -1356,7 +1366,7 @@ function EventListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1380,7 +1390,7 @@ function EventListingBody({
                 <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                   Se muestran aparte y no cuentan dentro de la agenda local.
                 </p>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {nearbyItems.slice(0, 6).map((card) => (
                     <ListingCard
                       key={card.id}
@@ -1923,7 +1933,7 @@ function PlaceListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1948,7 +1958,7 @@ function PlaceListingBody({
                   Pertenecen a otros destinos por proximidad territorial: no son una subzona de{" "}
                   {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {nearbyItems.slice(0, 6).map((card) => (
                     <ListingCard
                       key={card.id}
