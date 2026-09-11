@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { subscribeResolvedContext, useResolvedContext } from "@/lib/context-engine";
 import {
+  isLovablePreviewFrame,
   isStandaloneDisplay,
   readLastRoute,
   snapshotFromContext,
@@ -64,12 +65,13 @@ export function GlobalNavigationSessionBridge() {
     writeLastRoute(`${location.pathname}${location.searchStr ?? ""}`);
   }, [location.pathname, location.searchStr]);
 
-  // Arranque en frío de la app instalada: el sistema relanza en "/" y el
-  // explorador perdía su ubicación. Restauramos la última ruta pública.
+  // Arranque en frío de la app instalada (relanza en "/") y recarga del
+  // panel de vista previa de Lovable (también arranca en "/"): en ambos
+  // casos restauramos la última ruta pública visitada.
   useEffect(() => {
     if (restored.current) return;
     restored.current = true;
-    if (!isStandaloneDisplay()) return;
+    if (!isStandaloneDisplay() && !isLovablePreviewFrame()) return;
     if (location.pathname !== "/" || (location.searchStr ?? "") !== "") return;
     const last = readLastRoute();
     if (!last) return;
