@@ -4,7 +4,7 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
-import { ORIENTE_MAYA } from "@/config/regions";
+import { categoryAncestors } from "@/lib/navigation/category-context";
 import {
   publishedDestinationsQueryOptions,
   useDestinationLabel,
@@ -16,22 +16,7 @@ function buildEventosContext(
   destino: string | undefined,
   destinationLabel: (slug: string) => string,
 ): RouteContextDeclaration {
-  const explicitAncestors = destino
-    ? [
-        {
-          kind: "region" as const,
-          slug: ORIENTE_MAYA.slug,
-          label: ORIENTE_MAYA.name,
-          href: "/oriente-maya",
-        },
-        {
-          kind: "destination" as const,
-          slug: destino,
-          label: destinationLabel(destino),
-          href: `/oriente-maya/${destino}`,
-        },
-      ]
-    : [];
+  const explicitAncestors = categoryAncestors(destino, destinationLabel);
   return defineRouteContext({
     current: { kind: "category", slug: "eventos", label: "Eventos", href: "/eventos" },
     ancestors: explicitAncestors,
