@@ -78,19 +78,19 @@ export function BusinessLocationBlock({
         )}
       </div>
 
-      <aside className="grid gap-3 self-start rounded-2xl border border-border bg-card p-5 sm:grid-cols-2 lg:grid-cols-1 lg:gap-4">
-        <div className="sm:col-span-2 lg:col-span-1">
-          <DistanceBadge destLat={lat} destLng={lng} />
+      <aside className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 self-start rounded-2xl border border-border bg-card p-2.5 sm:p-3 lg:grid-cols-1 lg:items-stretch lg:gap-3 lg:p-4">
+        <div className="min-w-0">
+          <DistanceBadge destLat={lat} destLng={lng} compact />
         </div>
 
-        <Button asChild className="w-full">
+        <Button asChild size="sm" className="h-10 shrink-0 px-3 lg:w-full">
           <a
             href={directionsHref}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Cómo llegar a ${name}`}
           >
-            <Navigation className="mr-2 h-4 w-4" aria-hidden />
+            <Navigation className="mr-1.5 h-4 w-4" aria-hidden />
             Cómo llegar
           </a>
         </Button>
@@ -99,7 +99,8 @@ export function BusinessLocationBlock({
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            size="sm"
+            className="col-span-2 h-10 w-full lg:col-span-1"
             onClick={() => setShowInteractive((s) => !s)}
           >
             <MapIcon className="mr-2 h-4 w-4" aria-hidden />
