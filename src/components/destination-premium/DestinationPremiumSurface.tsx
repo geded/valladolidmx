@@ -192,12 +192,18 @@ export function DestinationPremiumSurface({
                 </Container>
               </div>
             );
-          case "descubre":
+          case "descubre": {
+            // Sin párrafos propios y sin medios la sección sólo aportaba
+            // espacio en blanco: no se renderiza.
+            const hasDescubreText = content.descubre.paragraphs.some((p) => p.trim().length > 0);
+            const hasDescubreMedia = content.descubre.media.some((m) => Boolean(m.url));
+            if (!hasDescubreText && !hasDescubreMedia) return null;
             return (
               <Container key={key} className="mt-14">
                 <DescubreDestino content={content} />
               </Container>
             );
+          }
           case "gallery":
             return (
               <Container key={key} className="mt-14">
