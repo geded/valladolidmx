@@ -1173,9 +1173,13 @@ function describeRoute(
 function MapSection({
   content,
   selectedRoute,
+  proposalSequence,
 }: {
   content: HomePremiumContent;
   selectedRoute: string;
+  /* Secuencia propuesta por Alux (títulos canónicos). Sólo se representa con
+     puntos ya publicados del mismo mapa; nunca se inventan coordenadas. */
+  proposalSequence?: readonly string[] | null;
 }) {
   const route =
     content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
