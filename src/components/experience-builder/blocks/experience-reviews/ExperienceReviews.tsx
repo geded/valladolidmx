@@ -495,8 +495,8 @@ export function ExperienceReviews({
 
   const renderBody = (list: ExperienceReviewItem[]): ReactNode => {
     if (list.length === 0) return null;
-    const visible = isMobile && !expanded ? list.slice(0, 1) : list;
-    const showMore = isMobile && list.length > 1;
+    const showMore = list.length > 1;
+    const visible = !expanded ? list.slice(0, 1) : list;
     const body: ReactNode = (() => {
       if (variant === "grid") return bodyGrid(visible);
       if (variant === "carousel") return bodyCarousel(visible);
