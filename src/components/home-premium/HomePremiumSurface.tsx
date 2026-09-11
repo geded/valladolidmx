@@ -36,7 +36,7 @@ import { PremiumAluxBar } from "./shared/PremiumShowcase";
 import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
 
-import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { openAluxFloating, onAluxMapFocus } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { recordAluxSignal } from "@/lib/alux/memory-store";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
@@ -79,6 +79,31 @@ function buildAluxRouteSummary(route: HomePremiumRoute): string {
   return `${metadata}${label}${boundedDescription}`;
 }
 
+/** Resumen turístico legible que ve el viajero en el dock (sin texto técnico). */
+function buildRouteFacts(route: HomePremiumRoute): string[] {
+  const facts: string[] = [];
+  if (route.duration?.trim()) facts.push(route.duration.trim());
+  if (Number.isFinite(route.stops) && route.stops > 0) {
+    facts.push(`${route.stops} ${route.stops === 1 ? "parada" : "paradas"}`);
+  }
+  if (route.vibe?.trim()) facts.push(route.vibe.trim());
+  const first = route.sequence?.[0];
+  const last = route.sequence?.[route.sequence.length - 1];
+  if (first && last && first !== last) facts.push(`${first} → ${last}`);
+  else if (first) facts.push(first);
+  return facts;
+}
+
+/** Acciones rápidas que alimentan el Alux conversacional existente. */
+const ROUTE_QUICK_ACTIONS = [
+  "Hacerla más tranquila",
+  "Cambiar una parada",
+  "Más naturaleza",
+  "Para ir con niños",
+  "Ajustar días",
+  "Ver otras opciones",
+] as const;
+
 export interface HomePremiumSurfaceProps {
   content?: HomePremiumContent;
   heroVariant?: HomePremiumHeroVariant;
@@ -112,6 +137,20 @@ export function HomePremiumSurface({
         : compositionFromPartySize(count.adults + (count.children ?? 0)),
     );
   }, [anonymousTrip.trip?.travelerCount, selectedParty]);
+
+  /* El dock de Alux puede pedir enfocar la ruta en el mapa YA EXISTENTE del
+     Home (`#mapa`). No se crea otro mapa: sólo se selecciona y se desplaza. */
+  useEffect(() => {
+    return onAluxMapFocus((payload) => {
+      const id = payload.entityRef?.startsWith("route:")
+        ? payload.entityRef.slice("route:".length)
+        : null;
+      if (id && routes.some((route) => route.id === id)) setSelectedRoute(id);
+      if (typeof document === "undefined") return;
+      const target = document.getElementById(payload.anchor ?? "mapa");
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [routes]);
 
   const selectParty = (party: PartyComposition) => {
     const option = PARTY_OPTIONS.find((item) => item.value === party);
@@ -590,6 +629,10 @@ function RoutesSection({
                           title: route.title,
                           summary: buildAluxRouteSummary(route),
                           familySlug: "rutas",
+                          facts: buildRouteFacts(route),
+                          quickActions: ROUTE_QUICK_ACTIONS,
+                          mapAnchor: "mapa",
+                          ...(route.href ? { href: route.href } : {}),
                         },
                         hint: buildAluxStageAwareHint(
                           `Ayúdame a personalizar esta ruta: ${route.title}. ${route.description}`,
