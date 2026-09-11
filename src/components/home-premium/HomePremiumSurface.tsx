@@ -521,7 +521,7 @@ function RoutesSection({
         actionHref={content.rutas.actionHref}
       />
       <div
-        className="-mx-4 grid snap-x snap-mandatory grid-flow-col auto-cols-[80%] items-stretch gap-3 overflow-x-auto px-4 pb-3 sm:auto-cols-[62%] md:auto-cols-[46%] lg:mx-0 lg:grid-flow-row lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0"
+        className="-mx-4 grid snap-x snap-mandatory grid-flow-col auto-cols-[86%] items-stretch gap-3 overflow-x-auto px-4 pb-3 sm:auto-cols-[52%] md:auto-cols-[38%] xl:mx-0 xl:grid-flow-row xl:grid-cols-4 xl:gap-4 xl:overflow-visible xl:px-0 xl:pb-0"
         tabIndex={0}
         aria-label="Rutas recomendadas"
       >
@@ -531,11 +531,11 @@ function RoutesSection({
             <article
               key={route.id}
               className={cn(
-                "flex h-full min-w-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card transition",
+                "flex h-full min-w-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition",
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
-              <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/10]">
+              <div className="relative aspect-[16/11] overflow-hidden">
                 <EditorialMediaFrame
                   media={route.media}
                   label={route.title}
@@ -547,8 +547,8 @@ function RoutesSection({
                   </span>
                 ) : null}
               </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-2 p-3 sm:p-4">
-                <h3 className="min-w-0 font-display text-base leading-tight sm:text-lg">
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-3">
+                <h3 className="min-w-0 truncate font-display text-[15px] leading-tight sm:text-base">
                   {route.href ? (
                     <Link to={route.href} className="underline-offset-4 hover:underline">
                       {route.title}
@@ -557,30 +557,29 @@ function RoutesSection({
                     route.title
                   )}
                 </h3>
-                <p className="min-w-0 truncate text-xs text-muted-foreground">
+                <p className="min-w-0 truncate text-[11px] text-muted-foreground sm:text-xs">
                   {route.duration} · {route.stops} paradas · {route.vibe}
                 </p>
-                <p className="line-clamp-2 hidden text-sm leading-relaxed text-muted-foreground lg:block">
-                  {route.description}
-                </p>
-                <ol
-                  className="hidden flex-wrap gap-1.5 lg:flex"
-                  aria-label={`Paradas de ${route.title}`}
-                >
-                  {route.sequence.slice(0, 4).map((stop, index) => (
-                    <li
-                      key={stop}
-                      className="rounded-pill border border-border/70 px-2 py-0.5 text-[11px] text-muted-foreground"
-                    >
-                      {index + 1}. {stop}
-                    </li>
-                  ))}
-                </ol>
-                <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
+                {route.description ? (
+                  <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                    {route.description}
+                  </p>
+                ) : null}
+                <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
+                  <button
+                    type="button"
+                    onClick={() => focusExistingMap(route.id)}
+                    className="inline-flex min-h-9 min-w-0 items-center gap-1.5 rounded-pill px-1 text-[11px] font-medium text-muted-foreground transition hover:text-foreground sm:text-xs"
+                  >
+                    <MapPin className="size-3.5 shrink-0" aria-hidden />
+                    <span className="truncate">{content.rutas.selectLabel}</span>
+                  </button>
                   <Button
                     type="button"
                     size="sm"
                     variant={active ? "default" : "secondary"}
+                    aria-label={`Personalizar con Alux: ${route.title}`}
+                    title="Personalizar con Alux"
                     onClick={() => {
                       onSelectRoute(route.id);
                       onAdd();
@@ -598,18 +597,10 @@ function RoutesSection({
                         ),
                       });
                     }}
-                    className="min-h-10 flex-1 rounded-pill px-3 text-xs sm:text-sm"
+                    className="h-9 shrink-0 gap-1.5 rounded-pill px-3 text-[11px] sm:text-xs"
                   >
-                    Personalizar con Alux
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => focusExistingMap(route.id)}
-                    className="min-h-10 shrink-0 rounded-pill px-3 text-xs text-muted-foreground hover:text-foreground sm:text-sm"
-                  >
-                    {content.rutas.selectLabel}
+                    <Sparkles className="size-3.5" aria-hidden />
+                    <span>Alux</span>
                   </Button>
                 </div>
               </div>
