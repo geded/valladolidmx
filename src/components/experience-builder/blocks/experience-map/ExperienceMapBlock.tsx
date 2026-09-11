@@ -103,9 +103,7 @@ export function ExperienceMapBlock({
           "grid gap-6",
           immersive
             ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start"
-            : isMulti
-              ? "md:grid-cols-[minmax(0,1fr)_320px]"
-              : "md:grid-cols-[minmax(0,1fr)_320px]",
+            : "lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start",
         )}
       >
         <div className="min-w-0 space-y-3">
