@@ -750,27 +750,45 @@ export function BusinessSurface({
         <section
           data-eb-anchor
           className="mx-auto mt-6 w-full max-w-7xl px-5 sm:px-8 lg:px-12"
-          aria-label="Precio orientativo"
+          aria-label="Tarifa orientativa"
         >
-          <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:flex sm:items-center sm:justify-between sm:gap-6">
-            <div>
-              <p className="text-2xl font-semibold text-foreground">
-                {stayFromPriceLabel}{" "}
-                <span className="text-base font-normal text-muted-foreground">por noche</span>
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Precio orientativo publicado por el anfitrión. Sin cobro en línea.
-              </p>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-elevated">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="min-w-0">
+                <p className="text-3xl font-semibold tracking-tight text-foreground">
+                  {stayFromPriceLabel}{" "}
+                  <span className="text-base font-normal text-muted-foreground">por noche</span>
+                </p>
+                {stayHighlightLine ? (
+                  <p className="mt-2 text-sm text-muted-foreground">{stayHighlightLine}</p>
+                ) : null}
+                {b.reviews && b.reviews.count > 0 ? (
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-foreground">
+                    <Star className="h-4 w-4 shrink-0 fill-current text-primary" aria-hidden />
+                    <span className="font-medium">{b.reviews.average.toFixed(1)}</span>
+                    <span className="text-muted-foreground">
+                      · {b.reviews.count} {b.reviews.count === 1 ? "reseña" : "reseñas"}
+                    </span>
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:flex-col lg:min-w-[15rem]">
+                <AddToTravelPlanButton
+                  kind="business"
+                  targetId={b.id}
+                  title={b.display_name}
+                  slug={b.slug}
+                  {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+                />
+                <div className="flex gap-2">
+                  <FavoriteButton entityKind="business" entityId={b.id} />
+                  <ShareButton title={b.display_name} />
+                </div>
+              </div>
             </div>
-            <div className="mt-4 sm:mt-0">
-              <AddToTravelPlanButton
-                kind="business"
-                targetId={b.id}
-                title={b.display_name}
-                slug={b.slug}
-                {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
-              />
-            </div>
+            <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+              Tarifa orientativa publicada por el anfitrión. Sin cobro ni reservación en línea.
+            </p>
           </div>
         </section>
       ) : null}
