@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Compass, Map as MapIcon, MapPin, Palmtree, Search } from "lucide-react";
+import { ArrowRight, Compass, Map as MapIcon, Palmtree, Search } from "lucide-react";
 
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { Container } from "@/components/layout/Container";
