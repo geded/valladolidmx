@@ -15,6 +15,7 @@ import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 import { TerritorialSwitcherMount } from "@/components/navigation/TerritorialSwitcherMount";
 import { CompactCrumbs, shouldCompactCrumbs } from "@/components/layout/CompactCrumbs";
+import { ORIENTE_MAYA } from "@/config/regions";
 
 interface Props {
   /**
@@ -111,6 +112,13 @@ export function BreadcrumbTerritorial({
           </li>
           {effectiveCrumbs.map((c, i) => {
             const isLast = i === effectiveCrumbs.length - 1;
+            /**
+             * La región ya es el contexto implícito de toda la plataforma:
+             * en cadenas profundas se colapsa a "…" conservando el enlace y
+             * la etiqueta completa para lectores de pantalla.
+             */
+            const isRegion = c.to === `/${ORIENTE_MAYA.slug}`;
+            const collapseRegion = isRegion && !isLast && effectiveCrumbs.length > 2;
             return (
               <li
                 key={`${c.label}-${i}`}
@@ -125,9 +133,17 @@ export function BreadcrumbTerritorial({
                   <Link
                     to={c.to}
                     params={c.params as never}
+                    title={collapseRegion ? c.label : undefined}
                     className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
                   >
-                    {c.label}
+                    {collapseRegion ? (
+                      <>
+                        <span aria-hidden>…</span>
+                        <span className="sr-only">{c.label}</span>
+                      </>
+                    ) : (
+                      c.label
+                    )}
                   </Link>
                 ) : (
                   <span
@@ -155,7 +171,7 @@ export function BreadcrumbTerritorial({
       <div
         role="group"
         aria-label="Cambiar de destino"
-        className={cn("shrink-0", compact ? "hidden sm:block" : null)}
+        className="shrink-0"
       >
         <TerritorialSwitcherMount className="h-9 w-full min-w-0 text-xs sm:h-8 sm:w-auto sm:max-w-56" />
       </div>
