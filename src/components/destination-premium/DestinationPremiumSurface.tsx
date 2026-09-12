@@ -403,23 +403,26 @@ function HeroCopy({
   return (
     <div className={compact ? "" : "max-w-2xl"}>
       <DestinationIdentity content={content} />
-      <h1 className="mt-4 font-serif text-display-hero tracking-tight text-foreground">
+      <h1 className="mt-3 text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
         {content.hero.title}
       </h1>
-      <p className="mt-3 text-lg text-foreground/80 sm:text-xl">{content.hero.subtitle}</p>
+      <p className="mt-2.5 text-base text-foreground/80 sm:text-lg">{content.hero.subtitle}</p>
       {content.hero.description ? (
-        <p className="mt-4 max-w-xl text-base text-muted-foreground">{content.hero.description}</p>
+        <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground">
+          {content.hero.description}
+        </p>
       ) : null}
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button size="lg" className="rounded-pill px-6" asChild>
+      {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <Button size="sm" className="h-10 rounded-pill px-4 text-sm" asChild>
           <a href={content.hero.primaryCta.href}>
             {content.hero.primaryCta.label}
-            <ArrowRight className="ml-2 size-4" aria-hidden />
+            <ArrowRight className="ml-1.5 size-4" aria-hidden />
           </a>
         </Button>
-        <Button size="lg" variant="outline" className="rounded-pill px-6" asChild>
+        <Button size="sm" variant="outline" className="h-10 rounded-pill px-4 text-sm" asChild>
           <a href={content.hero.secondaryCta.href}>
-            <Images className="mr-2 size-4" aria-hidden />
+            <Images className="mr-1.5 size-4" aria-hidden />
             {content.hero.secondaryCta.label}
           </a>
         </Button>
@@ -444,35 +447,43 @@ function HeroEditorial({
   useHeroAutoplay(slides.length, setIndex);
   const active = slides[index] ?? content.hero.cover;
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <HeroCopy content={content} heroAction={heroAction} />
-      <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}>
-        <figure className="relative overflow-hidden rounded-3xl shadow-elevated">
-          <EditorialMediaFrame
-            media={active}
-            label={content.hero.title}
-            loading="eager"
-            className="h-56 w-full object-cover sm:h-80 lg:h-[26rem]"
-            markerClassName="shadow-soft"
-          />
-          {slides.length > 1 ? (
-            <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
-              {slides.map((slide, i) => (
-                <button
-                  key={slide.url || `slide-${i}`}
-                  type="button"
-                  aria-label={`Ver fotografía ${i + 1} de ${content.hero.title}`}
-                  aria-current={i === index}
-                  onClick={() => setIndex(i)}
-                  className={cn(
-                    "size-2.5 rounded-full ring-focus transition",
-                    i === index ? "bg-background" : "bg-background/50",
-                  )}
-                />
-              ))}
-            </div>
-          ) : null}
-        </figure>
+    // Misma composición editorial que la guía (Home): tarjeta única 43/57.
+    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+      <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
+        <div className="order-2 flex flex-col justify-center p-5 sm:p-7 lg:order-1 lg:p-10">
+          <HeroCopy content={content} compact heroAction={heroAction} />
+        </div>
+        <div
+          className="order-1 lg:order-2"
+          data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}
+        >
+          <figure className="relative h-full min-h-[15rem] overflow-hidden sm:min-h-[20rem] lg:min-h-[30rem]">
+            <EditorialMediaFrame
+              media={active}
+              label={content.hero.title}
+              loading="eager"
+              className="absolute inset-0 size-full object-cover"
+              markerClassName="shadow-soft"
+            />
+            {slides.length > 1 ? (
+              <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
+                {slides.map((slide, i) => (
+                  <button
+                    key={slide.url || `slide-${i}`}
+                    type="button"
+                    aria-label={`Ver fotografía ${i + 1} de ${content.hero.title}`}
+                    aria-current={i === index}
+                    onClick={() => setIndex(i)}
+                    className={cn(
+                      "size-2.5 rounded-full ring-focus transition",
+                      i === index ? "bg-background" : "bg-background/50",
+                    )}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </figure>
+        </div>
       </div>
     </section>
   );
