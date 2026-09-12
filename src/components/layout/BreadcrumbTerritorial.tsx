@@ -62,8 +62,16 @@ export function BreadcrumbTerritorial({
   className,
 }: Props) {
   const ctx = useResolvedContext();
-  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+  const sourceCrumbs: readonly BreadcrumbCrumb[] =
     useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);
+  /**
+   * La casita ya enlaza a "/". Si la primera miga también es Inicio,
+   * se omite para no duplicar el mismo destino de navegación.
+   */
+  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+    sourceCrumbs.length > 1 && sourceCrumbs[0]?.to === "/"
+      ? sourceCrumbs.slice(1)
+      : sourceCrumbs;
 
   if (effectiveCrumbs.length === 0) return null;
 
