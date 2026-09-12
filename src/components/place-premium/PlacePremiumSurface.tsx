@@ -87,6 +87,11 @@ export function PlacePremiumSurface({
     .filter(Boolean)
     .join(" · ");
 
+  /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
+  const primaryPoint = content.map.points[0] ?? null;
+  const placeAddressLine =
+    content.essentials.facts.find((f) => f.key === "address")?.value ?? null;
+
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
       variant: "cluster",
