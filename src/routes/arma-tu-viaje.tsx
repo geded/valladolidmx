@@ -12,17 +12,26 @@ import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
+interface TripPlannerSearch {
+  destination?: string;
+  destinationLabel?: string;
+}
+
 export const Route = createFileRoute("/arma-tu-viaje")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    destination:
+  validateSearch: (search: Record<string, unknown>): TripPlannerSearch => {
+    const destination =
       typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination)
         ? search.destination
-        : undefined,
-    destinationLabel:
+        : undefined;
+    const destinationLabel =
       typeof search.destinationLabel === "string" && search.destinationLabel.trim()
         ? search.destinationLabel.trim().slice(0, 80)
-        : undefined,
-  }),
+        : undefined;
+    return {
+      ...(destination ? { destination } : {}),
+      ...(destinationLabel ? { destinationLabel } : {}),
+    };
+  },
   loader: async () => {
     const composition = await getPublishedCompositionBySlug({
       data: { slug: "arma-tu-viaje" },

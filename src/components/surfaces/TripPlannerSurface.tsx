@@ -161,8 +161,8 @@ function TripPlannerHero({
     <header className="border-b border-border/70 pb-8 pt-2 sm:pb-10 sm:pt-4">
       {returnDestination ? (
         <Link
-          to="/oriente-maya/$destination"
-          params={{ destination: returnDestination.slug }}
+          to="/oriente-maya/$destino"
+          params={{ destino: returnDestination.slug }}
           className="mb-5 inline-flex min-h-10 items-center gap-2 rounded-full px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:mb-6"
         >
           <ArrowLeft className="size-4" aria-hidden />
@@ -202,8 +202,8 @@ function TripPlannerHero({
         {state === "authed-empty" || state === "empty" ? (
           <Button size="sm" className="h-10 rounded-full px-4" asChild>
             <Link
-              to={returnDestination ? "/oriente-maya/$destination" : "/oriente-maya"}
-              params={returnDestination ? { destination: returnDestination.slug } : undefined}
+              to={returnDestination ? "/oriente-maya/$destino" : "/oriente-maya"}
+              params={returnDestination ? { destino: returnDestination.slug } : undefined}
             >
               <Compass className="size-4" aria-hidden />
               {returnDestination ? `Explorar ${returnDestination.label}` : "Empezar a explorar"}
@@ -213,8 +213,8 @@ function TripPlannerHero({
 
         <Button size="sm" variant="outline" className="h-10 rounded-full px-4 shadow-none" asChild>
           <Link
-            to={returnDestination ? "/oriente-maya/$destination" : "/oriente-maya"}
-            params={returnDestination ? { destination: returnDestination.slug } : undefined}
+            to={returnDestination ? "/oriente-maya/$destino" : "/oriente-maya"}
+            params={returnDestination ? { destino: returnDestination.slug } : undefined}
           >
             Seguir descubriendo
           </Link>
