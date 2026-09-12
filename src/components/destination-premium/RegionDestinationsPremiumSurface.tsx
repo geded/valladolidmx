@@ -353,18 +353,18 @@ export function RegionDestinationsPremiumSurface({
 
 function DestinationCard({ destination }: { destination: Destination }) {
   return (
-    <article
-      className={cn(
-        "group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background",
-      )}
-    >
-      <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-
+    <article className="group flex min-w-0 flex-col">
+      <Link
+        to="/oriente-maya/$destino"
+        params={{ destino: destination.slug }}
+        className="block min-w-0"
+      >
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
           {destination.image_url ? (
             <img
               src={destination.image_url}
               alt={destination.name}
+              loading="lazy"
               className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
           ) : (
@@ -373,27 +373,23 @@ function DestinationCard({ destination }: { destination: Destination }) {
             </div>
           )}
           {PUEBLOS_MAGICOS.has(destination.slug) ? (
-            <span className="absolute right-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[9px] font-semibold uppercase text-primary-foreground">
+            <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[9px] font-semibold uppercase text-primary-foreground">
               Pueblo Mágico
             </span>
-          ) : null}
-          {COASTAL.has(destination.slug) ? (
-            <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-[9px] font-semibold uppercase text-selva">
+          ) : COASTAL.has(destination.slug) ? (
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-[9px] font-semibold uppercase text-selva">
               <Palmtree className="size-3" /> Costa
             </span>
           ) : null}
         </div>
-        <div className="p-3">
-          <h3 className="font-serif text-xl">{destination.name}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+        <div className="mt-2 min-w-0">
+          <h3 className="truncate font-serif text-lg leading-tight">{destination.name}</h3>
+          <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
             {destination.tagline || "Descubre este destino del Oriente Maya de Yucatán."}
           </p>
-          <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-selva">
-            Descubrir destino <MapPin className="size-3.5" />
-          </span>
         </div>
       </Link>
-      <div className="mt-auto border-t border-border p-3">
+      <div className="mt-2">
         <AddToTravelPlanButton
           kind="destination"
           targetId={destination.id}
@@ -402,7 +398,7 @@ function DestinationCard({ destination }: { destination: Destination }) {
           imageUrl={destination.image_url}
           subtitle={destination.tagline}
           eligibilityMode="legacy"
-          className="min-h-11 rounded-full"
+          className="h-9 min-h-9 rounded-full px-3 text-xs"
         />
       </div>
     </article>
