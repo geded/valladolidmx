@@ -97,8 +97,8 @@ export function buildDestinationPremiumRuntime(input: {
       description: "",
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Explorar servicios", href: "#servicios-destino" },
-      cover: allMedia[0] ?? { url: "", alt: "" },
-      supporting: allMedia.slice(1, 3),
+      cover: heroMedia,
+      supporting: heroSupporting,
     },
     services: [
       { key: "hoteles", label: "Hoteles", hint: "Dónde dormir", media: { url: "", alt: "" } },
