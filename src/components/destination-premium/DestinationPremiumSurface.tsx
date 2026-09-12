@@ -18,6 +18,7 @@
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
 import { useMemo, useState, type ReactNode } from "react";
+import { useHeroAutoplay } from "@/components/premium/use-hero-autoplay";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
