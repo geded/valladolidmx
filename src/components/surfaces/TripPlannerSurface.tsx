@@ -157,18 +157,18 @@ function TripPlannerHero({
         : "No es un carrito de compras. Es tu planificador personal: guarda lugares, experiencias y notas, organiza tu recorrido y — cuando estés listo — un concierge humano te ayuda a hacerlo realidad.";
 
   return (
-    <header className="border-b border-border/70 pb-8 pt-2 sm:pb-10 sm:pt-4">
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary sm:text-xs">
+    <header className="border-b border-border/70 pb-6 pt-1 sm:pb-10 sm:pt-4">
+      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary sm:text-xs">
         {eyebrow}
       </p>
-      <h1 className="max-w-3xl text-balance font-serif text-[2rem] font-semibold leading-[1.08] sm:text-4xl lg:text-[2.75rem]">
+      <h1 className="max-w-3xl text-balance font-serif text-[1.5rem] font-semibold leading-[1.15] sm:text-4xl sm:leading-[1.08] lg:text-[2.75rem]">
         {title}
       </h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+      <p className="mt-2 max-w-2xl text-[13px] leading-5 text-muted-foreground sm:mt-3 sm:text-base sm:leading-7">
         {subtitle}
       </p>
 
-      <div className="mt-5 flex flex-wrap items-center gap-2 sm:gap-3">
+      <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
         {state === "authed-active" ? (
           <Button size="sm" className="h-10 rounded-full px-4" asChild>
             <Link to="/cuenta/mi-viaje">
