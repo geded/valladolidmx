@@ -278,6 +278,12 @@ export function DestinationSurfaceContractBoundary({
     );
     const serviceHrefByKey = Object.fromEntries(
       content.services.flatMap((service) => {
+        // Lugares y sitios de interés tiene ruta territorial propia y estable.
+        if (service.key === "lugares") {
+          return [
+            [service.key, `/oriente-maya/${encodeURIComponent(destinationSlug)}/lugares`],
+          ] as [string, string][];
+        }
         const family: ListingFamilyId | null = isListingFamilyId(service.key) ? service.key : null;
         if (!family) return [];
         const cmsSlugs = listingFamilyTaxonomy.taxonomy[family] ?? [];
