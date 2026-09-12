@@ -108,8 +108,15 @@ export function EditorialRouteEditor({ id }: { id?: string }) {
       listQueryKey="editorial-routes"
       fields={fields}
       renderExtras={({ id: entityId }) =>
-        entityId ? <EditorialRouteStopsPanel routeId={entityId} /> : null
+        entityId ? (
+          <EditorialRouteStopsPanel routeId={entityId} />
+        ) : (
+          <p className="rounded-xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+            Guarda la ruta como borrador para agregar sus paradas y verlas en el mapa.
+          </p>
+        )
       }
+
     />
   );
 }
