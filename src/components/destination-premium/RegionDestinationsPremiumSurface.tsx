@@ -180,8 +180,8 @@ export function RegionDestinationsPremiumSurface({
           compact
         />
 
-        <section className="mt-5 rounded-3xl border border-border bg-card p-3 shadow-sm">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <section className="mt-5 rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
+          <div className="grid gap-2 sm:gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
             <label className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <span className="sr-only">Buscar destino</span>
@@ -192,11 +192,11 @@ export function RegionDestinationsPremiumSurface({
                   setVisible(PAGE_SIZE);
                 }}
                 placeholder="Buscar destino, playa, cenote o cultura"
-                className="min-h-12 rounded-full pl-11"
+                className="min-h-11 rounded-full pl-11 text-sm sm:min-h-12"
               />
             </label>
             <div
-              className="flex gap-2 overflow-x-auto pb-1"
+              className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
               aria-label="Filtrar destinos"
               tabIndex={0}
             >
@@ -216,7 +216,7 @@ export function RegionDestinationsPremiumSurface({
                   }}
                   aria-pressed={filter === key}
                   className={cn(
-                    "min-h-11 shrink-0 rounded-full border px-4 text-sm",
+                    "h-10 shrink-0 rounded-full border px-3.5 text-[13px] sm:px-4 sm:text-sm",
                     filter === key
                       ? "border-selva bg-selva text-selva-foreground"
                       : "border-border bg-background text-foreground",
