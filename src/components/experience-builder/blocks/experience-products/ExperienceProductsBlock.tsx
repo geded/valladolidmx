@@ -17,6 +17,7 @@ import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { ProductActions, type ProductActionsProduct } from "@/components/commerce/ProductActions";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
 import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
+import { isLodgingBusiness } from "@/lib/experience-builder/adapters/business-to-blocks";
 import {
   buildExperienceProductsPreviewDTO,
   experienceProductsConfigSchema,
