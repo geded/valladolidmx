@@ -491,6 +491,7 @@ export function BusinessSurface({
     anchors: subnavDto.anchors.filter((anchor) => {
       // Ningún ancla visible puede apuntar a una sección que no se renderiza.
       if (anchor.id === "contacto" && !contactSource) return false;
+      if (anchor.id === "galeria" && !activePremium) return false;
       if (anchor.id === "ubicacion" && !hasLocation) return false;
       if (anchor.id === "descubre" && !hasRelated) return false;
       if (anchor.id === "promociones" && !showPromotions) return false;

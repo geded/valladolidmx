@@ -58,6 +58,20 @@ describe("I3-B Business vertical surface contracts", () => {
     expect(adaptRestaurantSurfaceContract(fictionalBusiness, "fixture")).toBeNull();
   });
 
+  test("exposes only published offer and reputation capabilities", () => {
+    const contract = createBusinessSurfaceContract(
+      {
+        ...fictionalBusiness,
+        publishedProductCount: 2,
+        publishedPromotionCount: 1,
+        publishedReviewCount: 3,
+      },
+      "fixture",
+    );
+    expect(contract?.omissions).not.toContain("offer");
+    expect(contract?.omissions).not.toContain("reputation");
+  });
+
   test("omits absent media, map, collection and trust without inventing data", () => {
     const contract = createBusinessSurfaceContract(
       {
