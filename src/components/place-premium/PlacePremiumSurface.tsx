@@ -60,6 +60,8 @@ export interface PlacePremiumSurfaceProps {
   aluxSlot?: ReactNode;
   /** Lote 3J.1 · Acción real de Mi Viaje (persistencia por ID canónico). */
   tripSlot?: ReactNode;
+  /** Botón oficial "Guardar" (favoritos) del lugar. */
+  saveSlot?: ReactNode;
   /**
    * G4-PLACES · cuando la ruta ya renderiza el breadcrumb territorial
    * compartido (`PublicShell`), la superficie no debe duplicarlo.
@@ -76,6 +78,7 @@ export function PlacePremiumSurface({
   draftNotice = null,
   aluxSlot = null,
   tripSlot = null,
+  saveSlot = null,
   showBreadcrumbs = true,
   className,
 }: PlacePremiumSurfaceProps) {
@@ -228,6 +231,7 @@ export function PlacePremiumSurface({
           bloque oficial de ubicación. */}
       <PlaceContainer className="mt-4 flex flex-wrap justify-end gap-2">
         <PlaceShareButton title={content.identity.title} />
+        {saveSlot}
         {tripSlot ?? (
           <Button
             type="button"
