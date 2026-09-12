@@ -238,21 +238,17 @@ export function businessToStayAmenitiesDTO(
   );
 }
 
-/** Condiciones de la estancia: llegada, salida, mínimo, cancelación, anfitrión. */
+/**
+ * Condiciones de la estancia: llegada, salida, mínimo, anfitrión y reglas.
+ * No se muestra política de cancelación: la plataforma no opera reservación
+ * ni cobro en línea, y ese dato sólo tiene sentido con un pago de por medio.
+ */
 export function businessToStayPolicyDTO(
   b: MarketplaceBusinessDetail,
 ): ExperienceInfoGridDTO | null {
   return attributesGridDTO(
     b,
-    [
-      "check_in",
-      "check_out",
-      "min_nights",
-      "cancellation_policy",
-      "host_languages",
-      "house_rules",
-      "traveler_profile",
-    ],
+    ["check_in", "check_out", "min_nights", "host_languages", "house_rules", "traveler_profile"],
     "Tu estancia",
     "cards",
     3,
