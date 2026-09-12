@@ -284,6 +284,7 @@ export function TourismListingSurface({
                 onClick={() =>
                   openAluxFloating({
                     reason: "manual",
+                    prompt,
                     hint: `Ayúdame a comparar ${familyLabel}. Mi prioridad es: ${prompt}.`,
                   })
                 }

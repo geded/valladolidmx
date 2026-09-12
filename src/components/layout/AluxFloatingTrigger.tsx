@@ -164,6 +164,9 @@ export function AluxFloatingTrigger() {
   /* La instrucción operativa se conserva sólo como contexto interno; nunca se
      muestra al viajero (Founder Concierge Voice). */
   const [, setSelectionTask] = useState<string | null>(null);
+  /* Preferencia marcada por el viajero en la superficie: se envía al chat
+     como primer turno real para que la recomendación la considere. */
+  const [autoAsk, setAutoAsk] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   /* La sesión sigue viva mientras el viajero consulta el mapa: el panel sólo
      se repliega a una barra compacta y se restaura con el mismo diálogo. */
@@ -185,6 +188,7 @@ export function AluxFloatingTrigger() {
         return next;
       });
       setSelectionTask(payload.hint ?? null);
+      setAutoAsk(payload.prompt?.trim() ? payload.prompt.trim() : null);
       setMinimized(false);
       setOpen(true);
     });
@@ -195,6 +199,7 @@ export function AluxFloatingTrigger() {
     if (!open) {
       setSelection(null);
       setSelectionTask(null);
+      setAutoAsk(null);
       setMinimized(false);
       setProposalTitles(null);
       setMapVariant("original");
@@ -796,6 +801,7 @@ export function AluxFloatingTrigger() {
             business={ctx.business}
             product={ctx.product}
             selection={selection}
+            {...(autoAsk ? { autoAsk } : {})}
             stage={unified.trip.stage}
             coords={geo.status === "granted" && geo.location ? geo.location : null}
             locale={locale}
