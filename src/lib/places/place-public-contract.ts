@@ -59,6 +59,21 @@ export interface PublicPlaceRelatedDTO {
   media: PublicPlaceMediaDTO | null;
 }
 
+/** Empresa publicada cercana por coordenadas reales (CMS). */
+export interface PublicPlaceNearbyBusinessDTO {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  categorySlug: string | null;
+  categoryLabel: string | null;
+  href: string | null;
+  distanceKm: number;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  groupKey: "comer" | "dormir" | "hacer" | "comprar" | "otros";
+}
+
 export interface PublicPlaceDTO {
   id: string;
   slug: string;
