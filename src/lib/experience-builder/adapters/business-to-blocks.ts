@@ -356,13 +356,14 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
   const variant = resolveBusinessVariant(b.category_slug);
   const isLodging = isLodgingBusiness(b);
   return {
-    variant: "grid",
+    /* Hospedaje: una sola fila horizontal deslizable (habitaciones
+       compactas) para armonizar con el resto de la ficha. */
+    variant: isLodging ? "carousel" : "grid",
     heading: variant.productsHeading,
     subheading: null,
     emptyMessage: variant.productsEmpty,
-    /* Hospedaje: habitaciones en cuadrícula densa y escaneable (3 por fila
-       en escritorio, 2 en tablet) para armonizar con el resto de la ficha. */
     columns: isLodging ? 3 : 2,
+
     groupBy: "none",
     ariaLabel: variant.productsHeading,
     items: b.products.map((p) => {
