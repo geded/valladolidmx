@@ -125,6 +125,12 @@ export function buildDestinationPremiumRuntime(input: {
         media: { url: "", alt: "" },
       },
       { key: "eventos", label: "Eventos", hint: "Agenda del destino", media: { url: "", alt: "" } },
+      {
+        key: "lugares",
+        label: "Lugares y sitios de interés",
+        hint: "Puntos emblemáticos",
+        media: { url: "", alt: "" },
+      },
     ],
     servicesNote: "Selecciona una categoría para descubrir opciones publicadas en este destino.",
     descubre: {
