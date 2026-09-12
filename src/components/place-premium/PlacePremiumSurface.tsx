@@ -162,7 +162,9 @@ export function PlacePremiumSurface({
           dirección visual. */}
       <div className="mt-3 sm:mt-4">
         <PremiumHero
+          layout="entity"
           vm={{
+
             presentation: DEFAULT_PREMIUM_PRESENTATION,
             eyebrow: heroEyebrow,
             title: content.identity.title,
