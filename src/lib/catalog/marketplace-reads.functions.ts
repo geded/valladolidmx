@@ -125,7 +125,18 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * la superficie omite la sección de reputación. Nunca se inventan datos.
    */
   reviews?: MarketplaceBusinessReviews | null;
+  /**
+   * Atributos turísticos administrables de la empresa
+   * (`businesses.filter_attributes`) resueltos contra el catálogo activo de
+   * su familia (`tourism_attribute_definitions/_options`). Sólo claves con
+   * valor real y opción activa; nunca se inventan datos ni se muestran
+   * claves crudas.
+   */
+  attributes?: BusinessAttributeItem[];
 }
+
+/** Atributo administrable resuelto (misma forma que el de producto). */
+export type BusinessAttributeItem = ProductAttributeItem;
 
 export interface MarketplaceBusinessReviewItem {
   id: string;
