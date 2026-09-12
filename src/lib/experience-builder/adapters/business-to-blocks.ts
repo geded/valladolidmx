@@ -97,6 +97,29 @@ export function businessToDescriptionSectionDTO(
 /* ------------------------------------------------------------------ *
  * Info-grid — datos rápidos.
  * ------------------------------------------------------------------ */
+/** Iconografía oficial por eje administrable (sin datos, sólo presentación). */
+const ATTRIBUTE_ICON_BY_KEY: Record<string, string> = {
+  property_type: "home",
+  capacity: "users",
+  bedrooms: "bed",
+  beds: "bed",
+  bathrooms: "droplet",
+  zone: "map-pin",
+  amenities: "sparkles",
+  spaces: "layout",
+  includes: "check",
+  stay_features: "star",
+  traveler_profile: "heart",
+  accessibility: "accessibility",
+  check_in: "log-in",
+  check_out: "log-out",
+  min_nights: "calendar",
+  cancellation_policy: "shield",
+  host_languages: "languages",
+  house_rules: "info",
+  price_level: "tag",
+};
+
 function humanizeSlug(slug: string): string {
   const clean = slug.trim().replace(/-/g, " ").toLowerCase();
   if (!clean) return "";
