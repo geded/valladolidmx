@@ -12,6 +12,7 @@
  * (fail-closed, cero texto libre, cero PII).
  */
 import { emitAluxSignal } from "./signal-emitter";
+import { openAluxFloating, type AluxOpenSelection } from "./floating-bus";
 import { getAluxSignalSummary } from "./memory-store";
 import type { AluxSignalSummary } from "./behavior-signals";
 
@@ -160,4 +161,25 @@ export function travelPreferenceContextLine(summary?: AluxSignalSummary): string
   return `Contexto recordado de este viajero: ${preferences
     .map((preference) => preference.phrase)
     .join("; ")}. Tenlo en cuenta al recomendar.`;
+}
+
+/**
+ * Invocación de Alux con memoria de preferencias: registra lo que el
+ * viajero acaba de marcar y añade al contexto lo ya recordado, sin crear
+ * un segundo bus ni un segundo motor de conversación.
+ */
+export function askAluxWithPreferenceMemory(input: {
+  readonly surface: string;
+  readonly hint: string;
+  readonly prompt?: string | undefined;
+  readonly selection?: AluxOpenSelection | undefined;
+}): void {
+  if (input.prompt) rememberTravelPreference(input.prompt, input.surface);
+  const line = travelPreferenceContextLine();
+  openAluxFloating({
+    reason: "manual",
+    hint: line ? `${input.hint} ${line}` : input.hint,
+    ...(input.prompt ? { prompt: input.prompt } : {}),
+    ...(input.selection ? { selection: input.selection } : {}),
+  });
 }
