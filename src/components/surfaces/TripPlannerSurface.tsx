@@ -40,8 +40,18 @@ import { useAluxContext } from "@/lib/alux/use-alux-context";
 import { GuestPlanPreview } from "@/components/traveler/GuestPlanPreview";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
+import { Button } from "@/components/ui/button";
 
-export function TripPlannerSurface() {
+interface ReturnDestination {
+  slug: string;
+  label: string;
+}
+
+export function TripPlannerSurface({
+  returnDestination = null,
+}: {
+  returnDestination?: ReturnDestination | null;
+}) {
   const { user } = useAuth();
   const fetchActive = useServerFn(getMyActivePlan);
   const anonymous = useAnonymousTrip();
@@ -81,6 +91,7 @@ export function TripPlannerSurface() {
         loadingPlan={loadingPlan && Boolean(user)}
         aluxReason={alux.hasContext ? alux.reason : null}
         aluxCanonical={alux.canonical ?? null}
+        returnDestination={returnDestination}
       />
 
       {state === "guest" ? <GuestSection guestCount={guestCount} /> : null}
@@ -112,6 +123,7 @@ function TripPlannerHero({
   loadingPlan,
   aluxReason,
   aluxCanonical,
+  returnDestination,
 }: {
   state: "empty" | "guest" | "authed-empty" | "authed-active";
   user: boolean;
@@ -121,6 +133,7 @@ function TripPlannerHero({
   loadingPlan: boolean;
   aluxReason: string | null;
   aluxCanonical: string | null;
+  returnDestination: ReturnDestination | null;
 }) {
   const eyebrow =
     state === "authed-active"
@@ -144,20 +157,25 @@ function TripPlannerHero({
         : "No es un carrito de compras. Es tu planificador personal: guarda lugares, experiencias y notas, organiza tu recorrido y — cuando estés listo — un concierge humano te ayuda a hacerlo realidad.";
 
   return (
-    <header className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-10">
-      <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
-      <h1 className="text-balance text-3xl font-semibold sm:text-4xl">{title}</h1>
-      <p className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">{subtitle}</p>
+    <header className="border-b border-border/70 pb-8 pt-2 sm:pb-10 sm:pt-4">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary sm:text-xs">
+        {eyebrow}
+      </p>
+      <h1 className="max-w-3xl text-balance font-serif text-[2rem] font-semibold leading-[1.08] sm:text-4xl lg:text-[2.75rem]">
+        {title}
+      </h1>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+        {subtitle}
+      </p>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="mt-5 flex flex-wrap items-center gap-2 sm:gap-3">
         {state === "authed-active" ? (
-          <Link
-            to="/cuenta/mi-viaje"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-          >
-            Abrir Mi Viaje
-            <ArrowRight className="size-4" aria-hidden />
-          </Link>
+          <Button size="sm" className="h-10 rounded-full px-4" asChild>
+            <Link to="/cuenta/mi-viaje">
+              Abrir Mi Viaje
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </Button>
         ) : null}
 
         {state === "guest" ? (
@@ -171,24 +189,31 @@ function TripPlannerHero({
         ) : null}
 
         {state === "authed-empty" || state === "empty" ? (
-          <Link
-            to="/oriente-maya"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-          >
-            <Compass className="size-4" aria-hidden />
-            Empezar a explorar
-          </Link>
+          <Button size="sm" className="h-10 rounded-full px-4" asChild>
+            <Link
+              to={returnDestination ? "/oriente-maya/$destino" : "/oriente-maya"}
+              params={returnDestination ? { destino: returnDestination.slug } : undefined}
+            >
+              <Compass className="size-4" aria-hidden />
+              {returnDestination ? `Explorar ${returnDestination.label}` : "Empezar a explorar"}
+            </Link>
+          </Button>
         ) : null}
 
-        <Link
-          to="/oriente-maya"
-          className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
-        >
-          Seguir descubriendo
-        </Link>
+        <Button size="sm" variant="outline" className="h-10 rounded-full px-4 shadow-none" asChild>
+          <Link
+            to={returnDestination ? "/oriente-maya/$destino" : "/oriente-maya"}
+            params={returnDestination ? { destino: returnDestination.slug } : undefined}
+          >
+            Seguir descubriendo
+          </Link>
+        </Button>
 
         {!user ? (
-          <Link to="/auth" className="text-sm font-medium text-primary hover:underline">
+          <Link
+            to="/auth"
+            className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-primary hover:underline"
+          >
             Ya tengo cuenta
           </Link>
         ) : null}

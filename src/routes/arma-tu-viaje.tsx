@@ -4,7 +4,8 @@
  * @context-engine legacy — herramienta transversal sin territorio
  * (I7 · fila 9). No monta `ContextEngineProvider`.
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -12,7 +13,26 @@ import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
+interface TripPlannerSearch {
+  destination?: string;
+  destinationLabel?: string;
+}
+
 export const Route = createFileRoute("/arma-tu-viaje")({
+  validateSearch: (search: Record<string, unknown>): TripPlannerSearch => {
+    const destination =
+      typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination)
+        ? search.destination
+        : undefined;
+    const destinationLabel =
+      typeof search.destinationLabel === "string" && search.destinationLabel.trim()
+        ? search.destinationLabel.trim().slice(0, 80)
+        : undefined;
+    return {
+      ...(destination ? { destination } : {}),
+      ...(destinationLabel ? { destinationLabel } : {}),
+    };
+  },
   loader: async () => {
     const composition = await getPublishedCompositionBySlug({
       data: { slug: "arma-tu-viaje" },
@@ -50,19 +70,39 @@ function hasRenderableBlocks(tree: unknown): boolean {
 
 function AYVPage() {
   const { composition } = Route.useLoaderData();
+  const { destination, destinationLabel } = Route.useSearch();
   const snapshot = composition?.snapshot;
+  const returnDestination = destination
+    ? { slug: destination, label: destinationLabel ?? destination }
+    : null;
+  const crumbs = returnDestination
+    ? [
+        { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+        {
+          label: returnDestination.label,
+          href: `/oriente-maya/${returnDestination.slug}`,
+        },
+        { label: "Arma tu Viaje" },
+      ]
+    : [{ label: "Arma tu Viaje" }];
   return (
-    <PublicShell
-      eyebrow="Plataforma"
-      title="Arma tu Viaje"
-      description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
-      crumbs={[{ label: "Arma tu Viaje" }]}
-      titleAsText
-    >
+    <PublicShell variant="hero" crumbs={crumbs} compactCrumbsOnMobile>
+      {returnDestination ? (
+        <div className="mx-auto w-full max-w-[1200px] px-4 pt-2 sm:px-6 lg:px-8">
+          <Link
+            to="/oriente-maya/$destino"
+            params={{ destino: returnDestination.slug }}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            Volver a {returnDestination.label}
+          </Link>
+        </div>
+      ) : null}
       {composition && snapshot && hasRenderableBlocks(snapshot) ? (
         <CompositionRenderer tree={snapshot} />
       ) : (
-        <TripPlannerSurface />
+        <TripPlannerSurface returnDestination={returnDestination} />
       )}
     </PublicShell>
   );
