@@ -360,7 +360,9 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
     heading: variant.productsHeading,
     subheading: null,
     emptyMessage: variant.productsEmpty,
-    columns: 2,
+    /* Hospedaje: habitaciones en cuadrícula densa y escaneable (3 por fila
+       en escritorio, 2 en tablet) para armonizar con el resto de la ficha. */
+    columns: isLodging ? 3 : 2,
     groupBy: "none",
     ariaLabel: variant.productsHeading,
     items: b.products.map((p) => {
@@ -378,7 +380,7 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
          llega firmada en el DTO: la tarjeta oficial la muestra y, sin
          medio acreditado, usa su fallback editorial aprobado. */
       showMedia: true,
-      compact: false,
+      compact: isLodging,
       contextAware: false,
       livePricing: false,
       liveAvailability: false,

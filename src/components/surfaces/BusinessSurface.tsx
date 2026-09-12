@@ -920,7 +920,10 @@ export function BusinessSurface({
               variant: "grid",
               heading: variant.productsHeading,
               emptyMessage: variant.productsEmpty,
-              columns: 2,
+              /* Hospedaje: habitaciones en cuadrícula densa y escaneable
+                 (3 por fila en escritorio, 2 en tablet). */
+              columns: isLodging ? 3 : 2,
+              capabilities: { compact: isLodging },
             }}
           />
         </section>
