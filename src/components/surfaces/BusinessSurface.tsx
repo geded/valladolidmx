@@ -132,7 +132,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
   },
   restaurante: {
     eyebrow: "Gastronomía",
-    productsHeading: "Menú y reservaciones",
+    productsHeading: "Menú de la casa",
     productsEmpty: "Sin menú publicado.",
   },
   cafeteria: {
@@ -193,12 +193,12 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
   /* Slugs reales declarados en el CMS (`business_categories.slug`). */
   restaurantes: {
     eyebrow: "Gastronomía",
-    productsHeading: "Menú y reservaciones",
+    productsHeading: "Menú de la casa",
     productsEmpty: "Sin menú publicado.",
   },
   gastronomia: {
     eyebrow: "Gastronomía",
-    productsHeading: "Menú y reservaciones",
+    productsHeading: "Menú de la casa",
     productsEmpty: "Sin menú publicado.",
   },
   hoteles: {
