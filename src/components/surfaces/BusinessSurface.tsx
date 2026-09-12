@@ -917,14 +917,15 @@ export function BusinessSurface({
           <ExperienceProductsBlock
             config={{
               source: "business",
-              variant: "grid",
+              /* Hospedaje: una sola fila horizontal deslizable con
+                 habitaciones compactas. */
+              variant: isLodging ? "carousel" : "grid",
               heading: variant.productsHeading,
               emptyMessage: variant.productsEmpty,
-              /* Hospedaje: habitaciones en cuadrícula densa y escaneable
-                 (3 por fila en escritorio, 2 en tablet). */
               columns: isLodging ? 3 : 2,
               capabilities: { compact: isLodging },
             }}
+
           />
         </section>
       ) : null}

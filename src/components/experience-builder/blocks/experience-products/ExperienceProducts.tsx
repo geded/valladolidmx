@@ -161,7 +161,7 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
               className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]"
             >
               {g.items.map((it) => (
-                <li key={it.id} className="min-w-[260px] max-w-[300px] shrink-0 snap-start">
+                <li className="w-[74%] min-w-[200px] max-w-[300px] shrink-0 snap-start sm:w-[44%] lg:w-[30%]" key={it.id}>
                   <TourismCard
                     vm={productItemToVM(it)}
                     capabilities={vmCaps}
