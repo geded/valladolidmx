@@ -203,10 +203,26 @@ async function readNearbyBusinesses(
       categoryById.set(c.id, { slug: c.slug, name: c.name });
   }
 
-  /* Portada: sólo activos CMS publicados; se firma en servidor. */
-  const coverIds = selected
-    .map((row) => row.business.cover_media_id)
-    .filter((v): v is string => Boolean(v));
+  /* Portada: `cover_media_id` y, si no existe, la primera imagen publicada
+     de la galería CMS de la empresa. Sólo activos CMS; se firma en servidor. */
+  const coverByBusiness = new Map<string, string>();
+  for (const row of selected)
+    if (row.business.cover_media_id)
+      coverByBusiness.set(row.business.id, row.business.cover_media_id);
+  const missingCover = selected
+    .map((row) => row.business.id)
+    .filter((id) => !coverByBusiness.has(id));
+  if (missingCover.length) {
+    const { data: galleryLinks } = await sb
+      .from("business_media")
+      .select("business_id, media_asset_id, role, sort_order")
+      .in("business_id", missingCover)
+      .order("sort_order");
+    for (const link of (galleryLinks ?? []) as Array<any>)
+      if (!coverByBusiness.has(link.business_id))
+        coverByBusiness.set(link.business_id, link.media_asset_id);
+  }
+  const coverIds = [...coverByBusiness.values()];
   const coverById = new Map<string, { url: string | null; alt: string | null }>();
   if (coverIds.length) {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -235,7 +251,8 @@ async function readNearbyBusinesses(
     const category = business.primary_category_id
       ? (categoryById.get(business.primary_category_id) ?? null)
       : null;
-    const cover = business.cover_media_id ? (coverById.get(business.cover_media_id) ?? null) : null;
+    const coverId = coverByBusiness.get(business.id) ?? null;
+    const cover = coverId ? (coverById.get(coverId) ?? null) : null;
     return {
       id: business.id,
       slug: business.slug,
