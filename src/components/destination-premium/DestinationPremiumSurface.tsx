@@ -99,6 +99,7 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   experiencias: Sparkles,
   eventos: CalendarDays,
   promociones: Tag,
+  lugares: MapPin,
 };
 
 export function DestinationPremiumSurface({
