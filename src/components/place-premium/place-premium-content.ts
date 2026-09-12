@@ -54,6 +54,27 @@ export interface PlacePremiumNearby {
   media: PlacePremiumMedia;
 }
 
+/**
+ * "Qué hay cerca" — empresas publicadas cuya ubicación real (latitud y
+ * longitud capturadas en CMS, Geolocation Mandatory Rule) está a pocos
+ * metros del lugar. Nunca se infiere por texto de la descripción.
+ */
+export type PlacePremiumNearbyGroupKey = "comer" | "dormir" | "hacer" | "comprar" | "otros";
+
+export interface PlacePremiumNearbyBusiness {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string | null;
+  categorySlug: string | null;
+  categoryLabel: string | null;
+  href: string | null;
+  distanceKm: number;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  groupKey: PlacePremiumNearbyGroupKey;
+}
+
 export interface PlacePremiumMapPoint {
   id: string;
   kind: "destination" | "business";
@@ -119,6 +140,8 @@ export interface PlacePremiumContent {
   /** Vacío a propósito: demuestra el ocultamiento correcto de módulos. */
   events: PlacePremiumRelated[];
   nearby: PlacePremiumNearby[];
+  /** Empresas publicadas cercanas por coordenadas reales (CMS). */
+  nearbyBusinesses: PlacePremiumNearbyBusiness[];
   trip: {
     title: string;
     description: string;
@@ -329,6 +352,7 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     },
   ],
   events: [],
+  nearbyBusinesses: [],
   nearby: [
     {
       id: "near-1",

@@ -8,7 +8,13 @@
  *  - el modo público exige `status = 'published'`;
  *  - nunca se completa un campo ausente con datos de otro lugar.
  */
-import type { PublicPlaceCard, PublicPlaceDTO, PublicPlaceMediaDTO } from "./place-public-contract";
+import type {
+  PublicPlaceCard,
+  PublicPlaceDTO,
+  PublicPlaceMediaDTO,
+  PublicPlaceNearbyBusinessDTO,
+} from "./place-public-contract";
+import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { resolvePlaceAttractionFamily } from "./place-taxonomy";
 
@@ -98,6 +104,176 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
     });
   }
   return out;
+}
+
+
+/* ------------------------------------------------------------------ *
+ * "Qué hay cerca" — empresas publicadas del mismo destino cuya ubicación
+ * real (latitud/longitud capturadas en CMS) está dentro del radio a pie
+ * del lugar. La cercanía JAMÁS se infiere del texto de la descripción.
+ * ------------------------------------------------------------------ */
+
+const NEARBY_RADIUS_KM = 1.2;
+const NEARBY_LIMIT = 8;
+
+function haversineKm(
+  aLat: number,
+  aLng: number,
+  bLat: number,
+  bLng: number,
+): number {
+  const R = 6371;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const lat1 = (aLat * Math.PI) / 180;
+  const lat2 = (bLat * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+function nearbyGroupKey(categorySlug: string | null): PublicPlaceNearbyBusinessDTO["groupKey"] {
+  const slug = (categorySlug ?? "").toLowerCase();
+  if (/(restaurante|comida|gastronom|cafeter|bar)/.test(slug)) return "comer";
+  if (/(hotel|hospedaje|alojamiento|casas?-de-vacaciones)/.test(slug)) return "dormir";
+  if (/(tienda|compra|artesan|boutique|mercado)/.test(slug)) return "comprar";
+  if (/(experiencia|tour|cenote|aventura|cultura|bienestar|spa)/.test(slug)) return "hacer";
+  return "otros";
+}
+
+async function readNearbyBusinesses(
+  sb: any,
+  args: {
+    destinationId: string;
+    destinationSlug: string;
+    latitude: number | null;
+    longitude: number | null;
+  },
+): Promise<PublicPlaceNearbyBusinessDTO[]> {
+  if (args.latitude == null || args.longitude == null) return [];
+
+  const { data: bizRows } = await sb
+    .from("businesses")
+    .select("id, slug, display_name, tagline, cover_media_id, primary_category_id")
+    .eq("destination_id", args.destinationId)
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .limit(400);
+  const businesses = (bizRows ?? []) as Array<any>;
+  if (businesses.length === 0) return [];
+
+  const { data: locRows } = await sb
+    .from("business_locations")
+    .select("business_id, latitude, longitude")
+    .in(
+      "business_id",
+      businesses.map((b) => b.id),
+    );
+  const distanceById = new Map<string, number>();
+  for (const loc of (locRows ?? []) as Array<any>) {
+    if (loc.latitude == null || loc.longitude == null) continue;
+    const km = haversineKm(
+      Number(args.latitude),
+      Number(args.longitude),
+      Number(loc.latitude),
+      Number(loc.longitude),
+    );
+    const previous = distanceById.get(loc.business_id);
+    if (previous == null || km < previous) distanceById.set(loc.business_id, km);
+  }
+
+  const selected = businesses
+    .map((b) => ({ business: b, km: distanceById.get(b.id) }))
+    .filter((row): row is { business: any; km: number } => typeof row.km === "number")
+    .filter((row) => row.km <= NEARBY_RADIUS_KM)
+    .sort((a, b) => a.km - b.km)
+    .slice(0, NEARBY_LIMIT);
+  if (selected.length === 0) return [];
+
+  const categoryIds = selected
+    .map((row) => row.business.primary_category_id)
+    .filter((v): v is string => Boolean(v));
+  const categoryById = new Map<string, { slug: string; name: string }>();
+  if (categoryIds.length) {
+    const { data: cats } = await sb
+      .from("business_categories")
+      .select("id, slug, name")
+      .in("id", categoryIds);
+    for (const c of (cats ?? []) as Array<any>)
+      categoryById.set(c.id, { slug: c.slug, name: c.name });
+  }
+
+  /* Portada: `cover_media_id` y, si no existe, la primera imagen publicada
+     de la galería CMS de la empresa. Sólo activos CMS; se firma en servidor. */
+  const coverByBusiness = new Map<string, string>();
+  for (const row of selected)
+    if (row.business.cover_media_id)
+      coverByBusiness.set(row.business.id, row.business.cover_media_id);
+  const missingCover = selected
+    .map((row) => row.business.id)
+    .filter((id) => !coverByBusiness.has(id));
+  if (missingCover.length) {
+    const { data: galleryLinks } = await sb
+      .from("business_media")
+      .select("business_id, media_asset_id, role, sort_order")
+      .in("business_id", missingCover)
+      .order("sort_order");
+    for (const link of (galleryLinks ?? []) as Array<any>)
+      if (!coverByBusiness.has(link.business_id))
+        coverByBusiness.set(link.business_id, link.media_asset_id);
+  }
+  const coverIds = [...coverByBusiness.values()];
+  const coverById = new Map<string, { url: string | null; alt: string | null }>();
+  if (coverIds.length) {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
+    const { data: assets } = await supabaseAdmin
+      .from("media_assets")
+      .select(
+        "id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, status, deleted_at",
+      )
+      .in("id", coverIds);
+    for (const asset of ((assets ?? []) as Array<any>).filter(
+      (a) => !a.deleted_at && a.status === "published",
+    )) {
+      let url: string | null = null;
+      if (asset.storage_bucket && asset.storage_path) {
+        const { data: signed } = await supabaseAdmin.storage
+          .from(asset.storage_bucket)
+          .createSignedUrl(asset.storage_path, 60 * 60);
+        url = signed?.signedUrl ?? null;
+      }
+      coverById.set(asset.id, { url, alt: resolveMediaAlt(asset, { fallback: "" }) || null });
+    }
+  }
+
+  return selected.map(({ business, km }) => {
+    const category = business.primary_category_id
+      ? (categoryById.get(business.primary_category_id) ?? null)
+      : null;
+    const coverId = coverByBusiness.get(business.id) ?? null;
+    const cover = coverId ? (coverById.get(coverId) ?? null) : null;
+    return {
+      id: business.id,
+      slug: business.slug,
+      name: business.display_name,
+      tagline: (business.tagline ?? "").trim() || null,
+      categorySlug: category?.slug ?? null,
+      categoryLabel: category?.name ?? null,
+      href: category
+        ? resolveCanonicalPath({
+            kind: "business",
+            destination: args.destinationSlug,
+            category: category.slug,
+            slug: business.slug,
+          })
+        : null,
+      distanceKm: Math.round(km * 100) / 100,
+      imageUrl: cover?.url ?? null,
+      imageAlt: cover?.alt ?? business.display_name,
+      groupKey: nearbyGroupKey(category?.slug ?? null),
+    };
+  });
 }
 
 export interface ReadPlaceInput {
@@ -288,6 +464,12 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
   }
 
   const media = await signPlaceMedia(sb, place.id);
+  const nearbyBusinesses = await readNearbyBusinesses(sb, {
+    destinationId: destination.id,
+    destinationSlug: destination.slug,
+    latitude: place.latitude ?? null,
+    longitude: place.longitude ?? null,
+  });
 
   return {
     id: place.id,
@@ -340,6 +522,7 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
     authorities,
     products,
     events,
+    nearbyBusinesses,
     presentationMode: presentationFromMetadata(place.metadata),
     seo: seoRes.data
       ? {
