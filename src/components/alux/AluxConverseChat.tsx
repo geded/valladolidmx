@@ -363,16 +363,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
     if (isAuthed && (isPlanPending || isPlanError)) return;
     autoAskSentRef.current = ask;
     void send(ask);
-  }, [
-    props.autoAsk,
-    hydrated,
-    sessionKey,
-    status,
-    isAuthed,
-    isPlanPending,
-    isPlanError,
-    send,
-  ]);
+  }, [props.autoAsk, hydrated, sessionKey, status, isAuthed, isPlanPending, isPlanError, send]);
 
   const lastFailed = [...messages].reverse().find((m) => m.role === "user" && m.failed);
 
