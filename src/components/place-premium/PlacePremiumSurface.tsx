@@ -214,11 +214,6 @@ export function PlacePremiumSurface({
           {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
         </Container>
       ) : null}
-      {hasGallery ? (
-        <Container className="mt-8 sm:mt-12">
-          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
-        </Container>
-      ) : null}
 
       {hasMap ? (
         <Container className="mt-10 sm:mt-16">
