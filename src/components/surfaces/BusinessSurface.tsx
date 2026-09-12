@@ -746,6 +746,35 @@ export function BusinessSurface({
         </section>
       ) : null}
 
+      {isVacationRental && stayFromPriceLabel ? (
+        <section
+          data-eb-anchor
+          className="mx-auto mt-6 w-full max-w-7xl px-5 sm:px-8 lg:px-12"
+          aria-label="Precio orientativo"
+        >
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:flex sm:items-center sm:justify-between sm:gap-6">
+            <div>
+              <p className="text-2xl font-semibold text-foreground">
+                {stayFromPriceLabel}{" "}
+                <span className="text-base font-normal text-muted-foreground">por noche</span>
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Precio orientativo publicado por el anfitrión. Sin cobro en línea.
+              </p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <AddToTravelPlanButton
+                kind="business"
+                targetId={b.id}
+                title={b.display_name}
+                slug={b.slug}
+                {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
       {isVacationRental ? (
