@@ -18,6 +18,7 @@ import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { cn } from "@/lib/utils";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import {
   askAluxWithPreferenceMemory,
