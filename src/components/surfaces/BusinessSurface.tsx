@@ -625,6 +625,30 @@ export function BusinessSurface({
   const stayEssentialsDto = isVacationRental ? businessToStayEssentialsDTO(b) : null;
   const stayAmenitiesDto = isVacationRental ? businessToStayAmenitiesDTO(b) : null;
   const stayPolicyDto = isVacationRental ? businessToStayPolicyDTO(b) : null;
+  /* Precio orientativo "desde": se toma exclusivamente del catálogo publicado
+     en CMS (`products.price_amount`). Sin precio real no se renderiza nada y
+     nunca se ofrece cobro ni reservación en línea: la acción es Mi Viaje. */
+  const stayFromPrice = (() => {
+    if (!isVacationRental) return null;
+    const priced = (b.products ?? []).filter(
+      (p) => typeof p.price_amount === "number" && (p.price_amount as number) > 0,
+    );
+    if (priced.length === 0) return null;
+    const cheapest = priced.reduce((min, p) =>
+      (p.price_amount as number) < (min.price_amount as number) ? p : min,
+    );
+    return {
+      amount: cheapest.price_amount as number,
+      currency: cheapest.price_currency || "MXN",
+    };
+  })();
+  const stayFromPriceLabel = stayFromPrice
+    ? new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: stayFromPrice.currency,
+        maximumFractionDigits: 0,
+      }).format(stayFromPrice.amount)
+    : null;
 
   return (
     <PublicShell
@@ -719,6 +743,35 @@ export function BusinessSurface({
       {isVacationRental && galleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24">
           <ExperienceGallery dto={galleryDto} />
+        </section>
+      ) : null}
+
+      {isVacationRental && stayFromPriceLabel ? (
+        <section
+          data-eb-anchor
+          className="mx-auto mt-6 w-full max-w-7xl px-5 sm:px-8 lg:px-12"
+          aria-label="Precio orientativo"
+        >
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:flex sm:items-center sm:justify-between sm:gap-6">
+            <div>
+              <p className="text-2xl font-semibold text-foreground">
+                {stayFromPriceLabel}{" "}
+                <span className="text-base font-normal text-muted-foreground">por noche</span>
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Precio orientativo publicado por el anfitrión. Sin cobro en línea.
+              </p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <AddToTravelPlanButton
+                kind="business"
+                targetId={b.id}
+                title={b.display_name}
+                slug={b.slug}
+                {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+              />
+            </div>
+          </div>
         </section>
       ) : null}
 
