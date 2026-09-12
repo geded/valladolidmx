@@ -4,8 +4,7 @@
  * @context-engine legacy — herramienta transversal sin territorio
  * (I7 · fila 9). No monta `ContextEngineProvider`.
  */
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
