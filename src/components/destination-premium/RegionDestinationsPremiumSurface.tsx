@@ -246,8 +246,9 @@ export function RegionDestinationsPremiumSurface({
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {shown.map((destination, index) => (
-                <DestinationCard key={destination.slug} destination={destination} index={index} />
+              {shown.map((destination) => (
+                <DestinationCard key={destination.slug} destination={destination} />
+
               ))}
             </div>
             {!shown.length ? (
@@ -350,17 +351,16 @@ export function RegionDestinationsPremiumSurface({
   );
 }
 
-function DestinationCard({ destination, index }: { destination: Destination; index: number }) {
-  const isFeatured = index === 0;
+function DestinationCard({ destination }: { destination: Destination }) {
   return (
     <article
       className={cn(
         "group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background",
-        isFeatured && "sm:col-span-2 lg:col-span-1",
       )}
     >
       <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }} className="block">
-        <div className={cn("relative overflow-hidden bg-muted", isFeatured ? "h-64" : "h-40")}>
+        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+
           {destination.image_url ? (
             <img
               src={destination.image_url}
@@ -372,9 +372,6 @@ function DestinationCard({ destination, index }: { destination: Destination; ind
               <Compass className="size-10" />
             </div>
           )}
-          <span className="absolute left-3 top-3 grid size-8 place-items-center rounded-full bg-selva text-xs font-bold text-selva-foreground">
-            {index + 1}
-          </span>
           {PUEBLOS_MAGICOS.has(destination.slug) ? (
             <span className="absolute right-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[9px] font-semibold uppercase text-primary-foreground">
               Pueblo Mágico
