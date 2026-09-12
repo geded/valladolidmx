@@ -67,7 +67,9 @@ export function CompactCrumbs({
   // En fichas territoriales profundas mantenemos visible también el nivel
   // inmediatamente posterior al destino (normalmente la categoría). Así la
   // cadena móvil conserva Destino → Categoría → Ficha sin expandir el menú.
-  const contextIndex = anchor + 1 < lastIndex ? anchor + 1 : -1;
+  // En cadenas largas la categoría se pliega dentro del menú "…" para que el
+  // nombre de la ficha actual se lea completo en móvil.
+  const contextIndex = anchor + 1 < lastIndex && crumbs.length <= 3 ? anchor + 1 : -1;
   const contextCrumb = contextIndex >= 0 ? crumbs[contextIndex] : undefined;
   // La casita ya cubre Home: no se repite dentro del menú.
   const hidden = crumbs.filter(
