@@ -19,6 +19,7 @@ import {
 } from "@/lib/cms/writes.functions";
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
+import { MediaIdField } from "@/components/cms/MediaIdField";
 
 export type FieldType =
   | "text"
@@ -28,7 +29,8 @@ export type FieldType =
   | "multiselect"
   | "tags"
   | "datetime"
-  | "boolean";
+  | "boolean"
+  | "media";
 
 export interface EditorField {
   name: string;
@@ -350,6 +352,17 @@ export function EntityEditor(props: Props) {
 
 function FieldInput(props: { field: EditorField; value: string; onChange: (v: string) => void }) {
   const { field, value, onChange } = props;
+  if (field.type === "media") {
+    return (
+      <MediaIdField
+        label={field.label}
+        value={value}
+        onChange={onChange}
+        helpText={field.helpText}
+        required={field.required}
+      />
+    );
+  }
   const common =
     "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary";
   return (

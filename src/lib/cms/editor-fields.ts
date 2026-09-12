@@ -247,8 +247,8 @@ export const EVENT_FIELDS: EditorField[] = [
   { name: "external_url", label: "URL externa", type: "text" },
   {
     name: "cover_media_id",
-    label: "Portada (media id)",
-    type: "text",
-    helpText: "Identificador del medio aprobado que se usará como portada.",
+    label: "Portada",
+    type: "media",
+    helpText: "Selecciona una imagen de la Biblioteca o sube una nueva desde aquí.",
   },
 ];
