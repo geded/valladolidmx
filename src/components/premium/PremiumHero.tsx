@@ -7,12 +7,68 @@ export function PremiumHero({
   layout = "default",
 }: {
   vm: PremiumHeroVM;
-  /** La variante listing pertenece al mismo bloque; no crea otro hero. */
-  layout?: "default" | "listing";
+  /** Las variantes pertenecen al mismo bloque; no crean otro hero. */
+  layout?: "default" | "listing" | "entity";
 }) {
   const cinematic = vm.presentation === "cinematic";
   const hasMedia = Boolean(vm.media);
   const listing = layout === "listing";
+
+  if (layout === "entity") {
+    return (
+      <section
+        data-premium-presentation={vm.presentation}
+        data-premium-media={hasMedia ? "governed" : "fallback"}
+        data-premium-layout="entity"
+        className="overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
+      >
+        <div className={cn("grid", hasMedia && "lg:grid-cols-[.84fr_1.16fr]")}>
+          <div
+            className={cn(
+              "order-2 flex min-h-72 flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 lg:order-1 lg:px-12",
+              hasMedia ? "lg:min-h-[30rem]" : "lg:min-h-80",
+            )}
+          >
+            {vm.eyebrow ? (
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                {vm.eyebrow}
+              </p>
+            ) : null}
+            <h1 className="mt-3 text-balance font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-6xl">
+              {vm.title}
+            </h1>
+            {vm.description ? (
+              <p className="mt-4 max-w-xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
+                {vm.description}
+              </p>
+            ) : null}
+            {vm.badges?.length ? (
+              <ul className="mt-5 flex flex-wrap gap-2" aria-label="Distinciones">
+                {vm.badges.map((badge) => (
+                  <li
+                    key={badge.label}
+                    className="rounded-pill border border-border bg-muted px-3 py-1 text-xs text-foreground"
+                  >
+                    {badge.label}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          {vm.media ? (
+            <figure className="order-1 min-h-64 overflow-hidden bg-muted sm:min-h-80 lg:order-2 lg:min-h-[30rem]">
+              <img src={vm.media.url} alt={vm.media.alt ?? ""} className="size-full object-cover" />
+              {vm.media.caption || vm.media.credit ? (
+                <figcaption className="sr-only">
+                  {[vm.media.caption, vm.media.credit].filter(Boolean).join(" · ")}
+                </figcaption>
+              ) : null}
+            </figure>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
 
   if (listing) {
     return (
