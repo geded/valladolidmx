@@ -23,7 +23,12 @@ export function PremiumHero({
         className="overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
       >
         <div className={cn("grid", hasMedia && "lg:grid-cols-[.84fr_1.16fr]")}>
-          <div className="order-2 flex min-h-72 flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 lg:order-1 lg:min-h-[30rem] lg:px-12">
+          <div
+            className={cn(
+              "order-2 flex min-h-72 flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 lg:order-1 lg:px-12",
+              hasMedia ? "lg:min-h-[30rem]" : "lg:min-h-80",
+            )}
+          >
             {vm.eyebrow ? (
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                 {vm.eyebrow}
