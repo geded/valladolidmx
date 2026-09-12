@@ -431,29 +431,43 @@ function HeroEditorial({
   content: DestinationPremiumContent;
   heroAction?: ReactNode;
 }) {
-  const [a, b] = content.hero.supporting;
   const hasCover = Boolean(content.hero.cover.url);
+  const slides = [content.hero.cover, ...content.hero.supporting].filter((m) =>
+    Boolean(m?.url),
+  ) as DestinationPremiumMedia[];
+  const [index, setIndex] = useState(0);
+  useHeroAutoplay(slides.length, setIndex);
+  const active = slides[index] ?? content.hero.cover;
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
       <HeroCopy content={content} heroAction={heroAction} />
-      <div
-        data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}
-        className="grid grid-cols-2 gap-3 sm:gap-4"
-      >
-        <EditorialMediaFrame
-          media={content.hero.cover}
-          label={content.hero.title}
-          loading="eager"
-          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
-          markerClassName="shadow-soft"
-        />
-        {[a, b].filter(Boolean).map((m, index) => (
+      <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}>
+        <figure className="relative overflow-hidden rounded-3xl shadow-elevated">
           <EditorialMediaFrame
-            key={(m as DestinationPremiumMedia).url || `neutral-${index}`}
-            media={m as DestinationPremiumMedia}
-            className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
+            media={active}
+            label={content.hero.title}
+            loading="eager"
+            className="h-56 w-full object-cover sm:h-80 lg:h-[26rem]"
+            markerClassName="shadow-soft"
           />
-        ))}
+          {slides.length > 1 ? (
+            <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
+              {slides.map((slide, i) => (
+                <button
+                  key={slide.url || `slide-${i}`}
+                  type="button"
+                  aria-label={`Ver fotografía ${i + 1} de ${content.hero.title}`}
+                  aria-current={i === index}
+                  onClick={() => setIndex(i)}
+                  className={cn(
+                    "size-2.5 rounded-full ring-focus transition",
+                    i === index ? "bg-background" : "bg-background/50",
+                  )}
+                />
+              ))}
+            </div>
+          ) : null}
+        </figure>
       </div>
     </section>
   );
