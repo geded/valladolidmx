@@ -50,3 +50,10 @@
 - [x] Lote 3N-A · P2 de accesibilidad, semántica, foco, CLS y preview expirado cerrados sobre integración: responsive 13 superficies × 1440/834/430/390 sin overflow ni errores de página; Región CLS máximo 0.0049; preview expirado HTTP 404 con `main` y un `h1`. Sin publicación, PR, merge ni despliegue.
 - [ ] Carril B · siguiente candidato: migrar `eb-process-scheduled-publish` (job 54, falla 401 desde antes) al mismo `handleCronHook` + `cron_hooks_invoke`.
 - Lote 3H o siguiente: a la espera de autorización del Founder.
+
+## Reconciliación de fichas Premium (2026-09-12)
+
+- [ ] Casa de vacaciones: reconciliar ruta pública con autoridad Premium aprobada, incluyendo compartir, mapa/reseñas condicionales y QA completo.
+- [ ] Hotel: reconciliar ruta pública con autoridad Premium aprobada y QA completo.
+- [ ] Restaurante: reconciliar ruta pública con autoridad Premium aprobada y QA completo.
+- [ ] Gates finales: lint dirigido, typecheck, pruebas, build, Route Inventory, Governance Integrity y matriz responsive 1440/834/430/390.
