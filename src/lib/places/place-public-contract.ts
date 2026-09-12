@@ -354,8 +354,9 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     .map((m) => toSurfaceMedia(m, placeholderLabel));
 
   const galleryItems = dto.media
-    .filter((m) => m.url)
+    .filter((m) => m.url && m.approved)
     .map((m) => toSurfaceMedia(m, placeholderLabel));
+
 
   const facts: PlacePremiumContent["essentials"]["facts"] = [];
   /* La familia es METADATA declarada, nunca un selector visual de estilo. */
