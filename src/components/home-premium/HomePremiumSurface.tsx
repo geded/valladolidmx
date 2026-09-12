@@ -6,7 +6,7 @@
  * consumen la preview G4, el fixture de validación, el canvas de Studio y el
  * renderer público. Prohibido mantener una copia aproximada por superficie.
  */
-import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+import { useHeroAutoplay } from "@/components/premium/use-hero-autoplay";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroSearchPill } from "@/components/home/HeroSearchPill";
