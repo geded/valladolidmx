@@ -331,9 +331,13 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
 export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
   /* Hospedaje: la tarifa publicada es por noche. Se declara como pista de
-     precio (dato real del CMS), nunca como cobro ni reservación en línea. */
-  const isLodging =
-    b.category_family_key === "hotel" || b.category_family_key === "vacation_rental";
+     precio (dato real del CMS), nunca como cobro ni reservación en línea.
+     La familia se resuelve con la misma autoridad que la Plantilla Business. */
+  const lodgingFamily = resolveApprovedBusinessFamily(
+    b.category_family_key,
+    b.category_slug ?? "",
+  );
+  const isLodging = lodgingFamily === "hotel" || lodgingFamily === "vacation_rental";
   return {
     variant: "grid",
     heading: variant.productsHeading,
