@@ -372,9 +372,6 @@ function DestinationCard({ destination }: { destination: Destination }) {
               <Compass className="size-10" />
             </div>
           )}
-          <span className="absolute left-3 top-3 grid size-8 place-items-center rounded-full bg-selva text-xs font-bold text-selva-foreground">
-            {index + 1}
-          </span>
           {PUEBLOS_MAGICOS.has(destination.slug) ? (
             <span className="absolute right-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[9px] font-semibold uppercase text-primary-foreground">
               Pueblo Mágico
