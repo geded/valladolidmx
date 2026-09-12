@@ -8,7 +8,13 @@
  */
 import { Copy, Facebook, Mail, MessageCircle, Share2 } from "lucide-react";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
@@ -104,6 +110,9 @@ export function ShareSheet({
       <SheetContent side="bottom" className="gap-4 rounded-t-3xl p-4 sm:p-6">
         <SheetHeader className="text-left">
           <SheetTitle className="text-base">{heading}</SheetTitle>
+          <SheetDescription className="sr-only">
+            Elige cómo compartir {title}.
+          </SheetDescription>
         </SheetHeader>
         <p className="line-clamp-2 text-[13px] text-muted-foreground">{title}</p>
 

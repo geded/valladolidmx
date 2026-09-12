@@ -844,28 +844,13 @@ export function BusinessSurface({
  */
 function ShareButton({ title }: { title: string }) {
   const [open, setOpen] = useState(false);
-
-  async function handleShare() {
-    if (typeof navigator === "undefined") return;
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    try {
-      const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
-      if (nav.share) {
-        await nav.share({ title, url });
-        return;
-      }
-      setOpen(true);
-    } catch {
-      /* usuario canceló */
-    }
-  }
   return (
     <>
       <Button
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => void handleShare()}
+        onClick={() => setOpen(true)}
         aria-label="Compartir perfil"
         className="rounded-pill border border-border bg-background shadow-soft"
       >
