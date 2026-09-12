@@ -866,7 +866,7 @@ export function BusinessSurface({
           bloque de estancia, no se repite la tarjeta genérica de producto.
           Con dos o más servicios publicados el catálogo se mantiene. */}
       {!activeContract?.omissions.includes("offer") &&
-      !(isVacationRental && (b.products ?? []).length <= 1 && stayFromPriceLabel) ? (
+      !hidesGenericOffer ? (
         <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceProductsBlock
             config={{
