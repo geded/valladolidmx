@@ -344,7 +344,10 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
       showFavorite: true,
       showActions: true,
       showBusiness: false,
-      showMedia: false,
+      /* La portada CMS de cada producto (`product_media` role=cover) ya
+         llega firmada en el DTO: la tarjeta oficial la muestra y, sin
+         medio acreditado, usa su fallback editorial aprobado. */
+      showMedia: true,
       compact: false,
       contextAware: false,
       livePricing: false,
