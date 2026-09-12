@@ -171,7 +171,6 @@ function TripPlannerHero({
 
       <RememberedPreferences />
 
-
       <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
         {state === "authed-active" ? (
           <Button size="sm" className="h-10 rounded-full px-4" asChild>
