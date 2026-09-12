@@ -18,7 +18,13 @@ import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { cn } from "@/lib/utils";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import {
+  askAluxWithPreferenceMemory,
+  normalizeTravelPreference,
+} from "@/lib/alux/travel-preferences";
+import { useTravelPreferences } from "@/lib/alux/use-travel-preferences";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import type { FavoriteEntityKind } from "@/lib/traveler/traveler-favorites.functions";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
@@ -738,6 +744,12 @@ function ListingIntro({
 }
 
 function AluxBar({ profile }: { profile: ListingProfile }) {
+  /* Alux ya recuerda la intención del viajero: la opción vigente se marca. */
+  const remembered = useTravelPreferences();
+  const isRemembered = (option: string) => {
+    const canonical = normalizeTravelPreference(option);
+    return Boolean(canonical && remembered.some((p) => p.slug === canonical.slug));
+  };
   return (
     <section
       className="mt-5 overflow-hidden rounded-2xl border border-[var(--selva)]/20 bg-[var(--selva)]/[.06] text-[var(--brand-territory-deep)]"
@@ -763,13 +775,19 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
                 key={option}
                 type="button"
                 onClick={() =>
-                  openAluxFloating({
-                    reason: "manual",
+                  askAluxWithPreferenceMemory({
+                    surface: "territorial-listing",
                     prompt: option,
                     hint: `Ayúdame con ${profile.itemLabel}. Mi preferencia es: ${option}. Usa Mi Viaje y explica cada recomendación.`,
                   })
                 }
-                className="relative h-8 shrink-0 rounded-full border border-[var(--selva)]/25 bg-card/70 px-3 text-xs font-medium text-[var(--brand-territory-deep)] transition hover:border-[var(--selva)]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
+                aria-pressed={isRemembered(option)}
+                className={cn(
+                  "relative h-8 shrink-0 rounded-full border px-3 text-xs font-medium text-[var(--brand-territory-deep)] transition hover:border-[var(--selva)]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']",
+                  isRemembered(option)
+                    ? "border-[var(--selva)] bg-[var(--selva)]/15 font-semibold"
+                    : "border-[var(--selva)]/25 bg-card/70",
+                )}
               >
                 {option}
               </button>
@@ -779,8 +797,8 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
         <button
           type="button"
           onClick={() =>
-            openAluxFloating({
-              reason: "manual",
+            askAluxWithPreferenceMemory({
+              surface: "territorial-listing",
               hint: `Ayúdame a elegir entre estas opciones (${profile.itemLabel}) usando el contexto real de Mi Viaje.`,
             })
           }

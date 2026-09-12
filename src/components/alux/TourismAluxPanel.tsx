@@ -6,6 +6,7 @@ import { useRegisterAluxEmbedded } from "@/lib/alux/embedded-presence";
 
 import { useBrand } from "@/lib/brand/brand-context";
 import { openAluxFloating, type AluxOpenSelection } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { cn } from "@/lib/utils";
 import { AluxMark } from "./AluxMark";
 
@@ -57,8 +58,8 @@ export function TourismAluxPanel({
     [prompts],
   );
   const ask = (preference?: string) =>
-    openAluxFloating({
-      reason: "manual",
+    askAluxWithPreferenceMemory({
+      surface: "tourism-alux-panel",
       hint: buildAluxStageAwareHint(task, preference),
       ...(preference ? { prompt: preference } : {}),
       ...(selection ? { selection } : {}),

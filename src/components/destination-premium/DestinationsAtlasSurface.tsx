@@ -42,6 +42,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ACTIVE_BRAND } from "@/config/brand";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
 import {
   PARTY_OPTIONS,
@@ -302,8 +303,8 @@ export function DestinationsAtlasSurface({
     ]
       .filter(Boolean)
       .join(". ");
-    openAluxFloating({
-      reason: "manual",
+    askAluxWithPreferenceMemory({
+      surface: "destinations-atlas",
       ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir destinos del Oriente Maya desde Valladolid por afinidad y cercanía, y convertirlos en una ruta que pueda guardar en Mi Viaje.",

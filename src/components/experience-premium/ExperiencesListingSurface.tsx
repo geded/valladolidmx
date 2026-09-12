@@ -28,6 +28,7 @@ import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButt
 
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
@@ -201,8 +202,8 @@ export function ExperiencesListingSurface({
   const rest = filtered.slice(4);
 
   const askAlux = (preference?: string) =>
-    openAluxFloating({
-      reason: "manual",
+    askAluxWithPreferenceMemory({
+      surface: "experiences-listing",
       ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir experiencias reales publicadas en el Oriente Maya.",
