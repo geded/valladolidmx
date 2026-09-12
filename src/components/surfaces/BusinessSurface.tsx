@@ -487,6 +487,13 @@ export function BusinessSurface({
       : null;
   const hasLocation = b.primary_location?.latitude != null && b.primary_location?.longitude != null;
   const hasGalleryMedia = Boolean(activePremium) || (b.media ?? []).length >= 2;
+  const isVacationRental = approvedFamily === "vacation_rental";
+  /* Casa de vacaciones con una sola tarifa publicada: la tarifa vive en el
+     bloque de estancia y no se repite como tarjeta genérica de producto. */
+  const hidesGenericOffer =
+    isVacationRental &&
+    (b.products ?? []).length <= 1 &&
+    (b.products ?? []).some((p) => typeof p.price_amount === "number" && p.price_amount > 0);
   const hasRelated = Boolean(
     related && (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0),
   );
