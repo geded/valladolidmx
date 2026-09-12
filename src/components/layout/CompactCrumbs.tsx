@@ -161,12 +161,12 @@ export function CompactCrumbs({
         </li>
       ) : null}
 
-      <li className="flex min-w-0 items-center gap-0.5">
+      <li className="flex min-w-0 flex-1 items-center gap-0.5">
         <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
         <span
           aria-current="page"
           title={current.label}
-          className="block max-w-[32vw] truncate font-semibold text-foreground"
+          className="block min-w-0 flex-1 truncate font-semibold text-foreground"
         >
           {current.label}
         </span>
