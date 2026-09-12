@@ -37,6 +37,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getMyActivePlan } from "@/lib/traveler/travel-plans.functions";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { useAluxContext } from "@/lib/alux/use-alux-context";
+import { useTravelPreferences } from "@/lib/alux/use-travel-preferences";
 import { GuestPlanPreview } from "@/components/traveler/GuestPlanPreview";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
@@ -533,5 +534,30 @@ function NextStepSection({
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Muestra, sin crear almacenamiento nuevo, lo que Alux ya recuerda de este
+ * viajero (memoria funcional local + resumen de su cuenta) para que el
+ * planificador continúe con la misma intención de viaje.
+ */
+function RememberedPreferences() {
+  const preferences = useTravelPreferences();
+  if (!preferences.length) return null;
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        Alux recuerda
+      </span>
+      {preferences.map((preference) => (
+        <span
+          key={preference.slug}
+          className="rounded-full border border-[var(--selva)]/25 bg-[var(--selva)]/[0.06] px-2.5 py-1 text-[11px] font-medium text-[var(--brand-territory-deep)]"
+        >
+          {preference.label}
+        </span>
+      ))}
+    </div>
   );
 }
