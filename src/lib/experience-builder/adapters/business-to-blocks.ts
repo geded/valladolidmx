@@ -332,12 +332,20 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
   const variant = resolveBusinessVariant(b.category_slug);
   /* Hospedaje: la tarifa publicada es por noche. Se declara como pista de
      precio (dato real del CMS), nunca como cobro ni reservación en línea.
-     La familia se resuelve con la misma autoridad que la Plantilla Business. */
-  const lodgingFamily = resolveApprovedBusinessFamily(
-    b.category_family_key,
-    b.category_slug ?? "",
-  );
-  const isLodging = lodgingFamily === "hotel" || lodgingFamily === "vacation_rental";
+     Se usan las mismas claves CMS/categoría que la Plantilla Business. */
+  const lodgingKeys = new Set([
+    "hotel",
+    "hoteles",
+    "hospedaje",
+    "hospedajes",
+    "alojamiento",
+    "vacation_rental",
+    "casas-de-vacaciones",
+    "casa-de-vacaciones",
+  ]);
+  const isLodging =
+    lodgingKeys.has((b.category_family_key ?? "").trim().toLowerCase()) ||
+    lodgingKeys.has((b.category_slug ?? "").trim().toLowerCase());
   return {
     variant: "grid",
     heading: variant.productsHeading,
