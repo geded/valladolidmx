@@ -351,17 +351,16 @@ export function RegionDestinationsPremiumSurface({
   );
 }
 
-function DestinationCard({ destination, index }: { destination: Destination; index: number }) {
-  const isFeatured = index === 0;
+function DestinationCard({ destination }: { destination: Destination }) {
   return (
     <article
       className={cn(
         "group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background",
-        isFeatured && "sm:col-span-2 lg:col-span-1",
       )}
     >
       <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }} className="block">
-        <div className={cn("relative overflow-hidden bg-muted", isFeatured ? "h-64" : "h-40")}>
+        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+
           {destination.image_url ? (
             <img
               src={destination.image_url}
