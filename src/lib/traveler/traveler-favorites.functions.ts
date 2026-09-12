@@ -13,9 +13,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type FavoriteEntityKind = "business" | "product" | "promotion";
+export type FavoriteEntityKind = "business" | "product" | "promotion" | "place";
 
-const KINDS = new Set<FavoriteEntityKind>(["business", "product", "promotion"]);
+const KINDS = new Set<FavoriteEntityKind>(["business", "product", "promotion", "place"]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface FavoriteRow {
@@ -64,6 +64,7 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       business: [],
       product: [],
       promotion: [],
+      place: [],
     };
     for (const r of rows) byKind[r.entity_kind].push(r.entity_id);
 
@@ -111,6 +112,21 @@ export const listMyFavorites = createServerFn({ method: "GET" })
           title: visible ? pr.title : "",
           slug: visible ? pr.slug : null,
           subtitle: visible ? (pr.description ?? null) : null,
+        });
+      }
+    }
+
+    if (byKind.place.length > 0) {
+      const { data } = await context.supabase
+        .from("points_of_interest")
+        .select("id, slug, name, short_description, status")
+        .in("id", byKind.place);
+      for (const pl of data ?? []) {
+        const visible = pl.status === "published";
+        lookup.set(`place:${pl.id}`, {
+          title: visible ? pl.name : "",
+          slug: visible ? pl.slug : null,
+          subtitle: visible ? (pl.short_description ?? null) : null,
         });
       }
     }

@@ -125,7 +125,11 @@ export function prepareAnonymousDraftImport(
         kind: favorite.kind,
         targetId: favorite.id,
       });
-    } else if (favorite.kind === "destination" || favorite.kind === "event") {
+    } else if (
+      favorite.kind === "destination" ||
+      favorite.kind === "event" ||
+      favorite.kind === "place"
+    ) {
       addTargetItem(favorite.kind, favorite.id, {
         ...(favorite.title ? { title: favorite.title } : {}),
         ...(favorite.slug ? { slug: favorite.slug } : {}),
