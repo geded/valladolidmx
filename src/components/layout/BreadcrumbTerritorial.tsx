@@ -15,6 +15,7 @@ import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 import { TerritorialSwitcherMount } from "@/components/navigation/TerritorialSwitcherMount";
 import { CompactCrumbs, shouldCompactCrumbs } from "@/components/layout/CompactCrumbs";
+import { ORIENTE_MAYA } from "@/config/regions";
 
 interface Props {
   /**
