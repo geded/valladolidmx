@@ -183,29 +183,16 @@ export function PlacePremiumSurface({
                 }
               : null,
             badges: content.identity.badges.map((label) => ({ label })),
-            primaryAction: {
-              label: content.hero.primaryCta.label,
-              // 3J.2 · el CTA del hero delega SIEMPRE en la acción real de
-              // Mi Viaje (`tripSlot`); no duplica la lógica de persistencia.
-              onClick: () => {
-                document
-                  .getElementById("place-trip-action")
-                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
-              },
-            },
-            secondaryAction: {
-              label: content.hero.secondaryCta.label,
-              href: content.hero.secondaryCta.href,
-            },
           }}
         />
       </div>
-      {/* Paridad con hotel y restaurante: bajo el encabezado sólo vive la
-          acción principal de Mi Viaje. "Cómo llegar" pertenece al bloque de
-          ubicación compartido, igual que en las fichas de empresa. */}
-      <Container className="mt-4 flex flex-wrap justify-end gap-2">
+      {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
+          emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
+          bloque oficial de ubicación. */}
+      <Container className="mt-4 flex justify-end gap-2">
+        <PlaceShareButton title={content.identity.title} />
         <Button
-          variant="outline"
+          type="button"
           onClick={() => {
             document
               .getElementById("place-trip-action")
