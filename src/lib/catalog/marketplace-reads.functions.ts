@@ -1139,6 +1139,26 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
 
+    /* Atributos administrables resueltos contra el catálogo activo de la
+       familia declarada en CMS. Sin familia o sin catálogo, la ficha
+       simplemente no muestra la sección: nunca claves crudas. */
+    const attributeFamilyKey = typeof catFamily === "string" && catFamily.trim() ? catFamily : null;
+    let businessAttributes: BusinessAttributeItem[] = [];
+    if (attributeFamilyKey) {
+      const { data: attrDefs } = await supabase
+        .from("tourism_attribute_definitions")
+        .select(
+          "attribute_key, label, filter_group, sort_order, tourism_attribute_options(value,label,sort_order,active)",
+        )
+        .eq("family_key", attributeFamilyKey)
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      businessAttributes = resolveProductAttributes(
+        biz.filter_attributes,
+        (attrDefs ?? []) as Array<Record<string, unknown>>,
+      );
+    }
+
     const detailLocationRow = (
       (locations ?? []) as Array<{
         label: string | null;
