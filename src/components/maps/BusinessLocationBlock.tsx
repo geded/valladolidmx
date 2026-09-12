@@ -76,7 +76,11 @@ export function BusinessLocationBlock({
               lat={lat}
               lng={lng}
               markerTitle={name}
-              className="h-[400px] w-full rounded-2xl border border-border"
+              className={
+                stacked
+                  ? "h-[320px] w-full rounded-2xl border border-border sm:h-[420px] lg:h-[480px]"
+                  : "h-[400px] w-full rounded-2xl border border-border"
+              }
             />
           </Suspense>
         ) : (
@@ -91,7 +95,13 @@ export function BusinessLocationBlock({
         )}
       </div>
 
-      <aside className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 self-start rounded-2xl border border-border bg-card p-2.5 sm:p-3 lg:grid-cols-1 lg:items-stretch lg:gap-3 lg:p-4">
+      <aside
+        className={
+          stacked
+            ? "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border bg-card p-3 sm:p-4"
+            : "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 self-start rounded-2xl border border-border bg-card p-2.5 sm:p-3 lg:grid-cols-1 lg:items-stretch lg:gap-3 lg:p-4"
+        }
+      >
         <div className="min-w-0">
           <DistanceBadge destLat={lat} destLng={lng} compact />
         </div>
