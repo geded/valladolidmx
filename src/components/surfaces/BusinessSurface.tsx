@@ -50,7 +50,7 @@ import {
   businessToStayPolicyDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
-import { Share2 } from "lucide-react";
+import { Share2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
