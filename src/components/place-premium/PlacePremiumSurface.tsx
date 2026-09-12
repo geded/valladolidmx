@@ -96,7 +96,6 @@ export function PlacePremiumSurface({
       kind: "image" as const,
       url: media.url as string,
       alt: media.alt || content.identity.title,
-      ...(media.caption ? { caption: media.caption } : {}),
     }));
   const galleryDto =
     galleryItems.length >= 2
@@ -110,7 +109,7 @@ export function PlacePremiumSurface({
           ariaLabel: `Galería de ${content.identity.title}`,
           capabilities: {
             lightbox: true,
-            captions: galleryItems.some((item) => "caption" in item),
+            captions: false,
             video: false,
             panorama360: false,
             model3d: false,
