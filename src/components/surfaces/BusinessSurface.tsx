@@ -567,6 +567,38 @@ export function BusinessSurface({
         },
       }
     : null;
+  /* Sin composición Premium activa, la ficha conserva su galería editorial a
+     partir de las fotografías publicadas en CMS (`business_media`). Sin
+     fotografías no se renderiza nada: jamás se inventan medios. */
+  const cmsGalleryItems = (b.media ?? [])
+    .filter((m) => Boolean(m.url))
+    .map((m) => ({
+      kind: "image" as const,
+      url: m.url,
+      alt: m.alt || b.display_name,
+    }));
+  const galleryDto =
+    premiumGalleryDto ??
+    (cmsGalleryItems.length >= 2
+      ? {
+          variant: "mosaic" as const,
+          heading: `Conoce ${b.display_name}`,
+          subheading: null,
+          items: cmsGalleryItems,
+          maxVisible: 5,
+          aspect: "landscape" as const,
+          ariaLabel: `Galería de ${b.display_name}`,
+          capabilities: {
+            lightbox: true,
+            captions: false,
+            video: false,
+            panorama360: false,
+            model3d: false,
+            ar: false,
+            ugc: false,
+          },
+        }
+      : null);
   const premiumContactDto = contactSource
     ? {
         variant: "cards" as const,
