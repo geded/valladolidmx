@@ -1,7 +1,7 @@
 /**
  * H-03 · Ola I1.c — `vmx.experience.info-grid` (Capa 1: Presentación).
  */
-import { Clock, MapPin, Phone, Star, Tag, Users, type LucideIcon } from "lucide-react";
+import { Check, Clock, MapPin, Phone, Star, Tag, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 
@@ -66,6 +66,45 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
             );
           })}
         </ul>
+      ) : variant === "checklist" ? (
+        /* Amenidades y servicios: cada dato se lee como un elemento propio,
+           agrupado por su eje administrable del CMS. */
+        <div className="space-y-6">
+          {Array.from(
+            items.reduce((acc, it) => {
+              const group = acc.get(it.label) ?? [];
+              group.push(it);
+              acc.set(it.label, group);
+              return acc;
+            }, new Map<string, typeof items>()),
+          ).map(([groupLabel, groupItems]) => (
+            <div key={groupLabel}>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                {groupLabel}
+              </p>
+              <ul className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2" role="list">
+                {groupItems.map((it, i) => {
+                  const I = it.iconKey ? ICONS[it.iconKey] : null;
+                  return (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 border-b border-border pb-3 last:border-b-0 sm:last:border-b-0"
+                    >
+                      {I ? (
+                        <I className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                      ) : (
+                        <Check className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                      )}
+                      <span className={cn("min-w-0 text-sm leading-snug", TONE[it.tone])}>
+                        {it.value}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
       ) : variant === "list" ? (
         <ul
           className="divide-y divide-border rounded-lg border border-border bg-background"

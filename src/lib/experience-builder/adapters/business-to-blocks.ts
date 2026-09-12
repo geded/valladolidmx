@@ -229,13 +229,31 @@ export function businessToStayEssentialsDTO(
 export function businessToStayAmenitiesDTO(
   b: MarketplaceBusinessDetail,
 ): ExperienceInfoGridDTO | null {
-  return attributesGridDTO(
-    b,
-    ["amenities", "spaces", "includes", "stay_features", "accessibility"],
-    "Amenidades y espacios",
-    "list",
-    2,
-  );
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of ["amenities", "spaces", "includes", "stay_features", "accessibility"]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    /* Cada amenidad se lee como un elemento propio, no como una cadena
+       concatenada; el eje CMS se conserva como título del grupo. */
+    for (const value of attribute.values) {
+      items.push({
+        iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+        label: attribute.label,
+        value: value.label,
+        tone: "default",
+      });
+    }
+  }
+  if (items.length === 0) return null;
+  return {
+    variant: "checklist",
+    heading: "Amenidades y espacios",
+    columns: 2,
+    items,
+    ariaLabel: "Amenidades y espacios",
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
 }
 
 /**

@@ -27,6 +27,7 @@ export const experienceInfoGridVariantSchema = z.enum([
   "cards", // Cada dato en una tarjeta (default).
   "list", // Lista compacta con separadores.
   "inline", // Fila horizontal (chips).
+  "checklist", // Grupos con viñetas de verificación (amenidades, servicios).
 ]);
 
 /**
