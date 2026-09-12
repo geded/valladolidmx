@@ -168,7 +168,7 @@ function TripPlannerHero({
         {subtitle}
       </p>
 
-      <div className="mt-5 flex flex-wrap items-center gap-2 sm:gap-3">
+      <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
         {state === "authed-active" ? (
           <Button size="sm" className="h-10 rounded-full px-4" asChild>
             <Link to="/cuenta/mi-viaje">
