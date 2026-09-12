@@ -497,6 +497,20 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     })),
     // Q2D-B no infiere cercanías: sin fuente gobernada, la sección se oculta.
     nearby: [],
+    /* Cercanía real por coordenadas CMS (nunca inferida por texto). */
+    nearbyBusinesses: dto.nearbyBusinesses.map((b) => ({
+      id: b.id,
+      slug: b.slug,
+      title: b.name,
+      tagline: b.tagline,
+      categorySlug: b.categorySlug,
+      categoryLabel: b.categoryLabel,
+      href: b.href,
+      distanceKm: b.distanceKm,
+      imageUrl: b.imageUrl,
+      imageAlt: b.imageAlt,
+      groupKey: b.groupKey,
+    })),
     trip: {
       title: "Agrega este lugar a Mi Viaje",
       description: "Guárdalo en tu itinerario y Alux lo integrará a tu plan del Oriente Maya.",
