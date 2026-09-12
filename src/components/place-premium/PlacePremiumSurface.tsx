@@ -162,7 +162,9 @@ export function PlacePremiumSurface({
           dirección visual. */}
       <div className="mt-3 sm:mt-4">
         <PremiumHero
+          layout="entity"
           vm={{
+
             presentation: DEFAULT_PREMIUM_PRESENTATION,
             eyebrow: heroEyebrow,
             title: content.identity.title,
@@ -192,16 +194,42 @@ export function PlacePremiumSurface({
           }}
         />
       </div>
+      {/* Paridad con hotel y restaurante: el hero entity no incluye acciones,
+          se emiten en la fila inmediata bajo el encabezado. */}
+      <Container className="mt-4 flex flex-wrap justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            document
+              .getElementById("place-trip-action")
+              ?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
+        >
+          {content.hero.primaryCta.label}
+        </Button>
+        <Button variant="ghost" asChild>
+          <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
+        </Button>
+      </Container>
       {content.hero.cover.url ? null : (
         <Container className="mt-3">
           <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
         </Container>
       )}
 
+
       <Container className="mt-5 sm:mt-8">
         <IdentityStrip content={content} dense={cinematic} />
       </Container>
       {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
+      {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
+          lectura, justo después del encabezado y antes del relato. */}
+      {hasGallery ? (
+        <Container className="mt-6 sm:mt-8">
+          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
+        </Container>
+      ) : null}
+
       {hasIntro ? (
         <Container className="mt-8 sm:mt-12">
           {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
@@ -210,11 +238,6 @@ export function PlacePremiumSurface({
       {hasEssentials ? (
         <Container className="mt-8 sm:mt-12">
           {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
-        </Container>
-      ) : null}
-      {hasGallery ? (
-        <Container className="mt-8 sm:mt-12">
-          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
         </Container>
       ) : null}
 
