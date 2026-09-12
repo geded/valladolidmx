@@ -1,0 +1,1 @@
+ALTER TYPE public.favorite_entity_kind ADD VALUE IF NOT EXISTS 'place';

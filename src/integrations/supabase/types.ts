@@ -9347,7 +9347,7 @@ export type Database = {
         | "block"
         | "composition"
         | "revision"
-      favorite_entity_kind: "business" | "product" | "promotion"
+      favorite_entity_kind: "business" | "product" | "promotion" | "place"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
@@ -9640,7 +9640,7 @@ export const Constants = {
         "composition",
         "revision",
       ],
-      favorite_entity_kind: ["business", "product", "promotion"],
+      favorite_entity_kind: ["business", "product", "promotion", "place"],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],
       invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
