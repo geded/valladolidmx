@@ -18,6 +18,7 @@ import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import type { FavoriteEntityKind } from "@/lib/traveler/traveler-favorites.functions";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
@@ -760,6 +761,14 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
             {profile.aluxOptions.map((option) => (
               <button
                 key={option}
+                type="button"
+                onClick={() =>
+                  openAluxFloating({
+                    reason: "manual",
+                    prompt: option,
+                    hint: `Ayúdame con ${profile.itemLabel}. Mi preferencia es: ${option}. Usa Mi Viaje y explica cada recomendación.`,
+                  })
+                }
                 className="relative h-8 shrink-0 rounded-full border border-[var(--selva)]/25 bg-card/70 px-3 text-xs font-medium text-[var(--brand-territory-deep)] transition hover:border-[var(--selva)]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
               >
                 {option}
@@ -767,7 +776,16 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
             ))}
           </div>
         </div>
-        <button className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10 lg:inline-flex">
+        <button
+          type="button"
+          onClick={() =>
+            openAluxFloating({
+              reason: "manual",
+              hint: `Ayúdame a elegir entre estas opciones (${profile.itemLabel}) usando el contexto real de Mi Viaje.`,
+            })
+          }
+          className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10 lg:inline-flex"
+        >
           Recomiéndame <Sparkles className="size-4" aria-hidden />
         </button>
       </div>
