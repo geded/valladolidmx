@@ -48,10 +48,7 @@ export function createBusinessVerticalSurfaceContract(
     return null;
 
   const omissions: OmxdsSurfaceOmission[] = ["price", "availability", "reservation"];
-  if (
-    (input.publishedProductCount ?? 0) <= 0 &&
-    (input.publishedPromotionCount ?? 0) <= 0
-  )
+  if ((input.publishedProductCount ?? 0) <= 0 && (input.publishedPromotionCount ?? 0) <= 0)
     omissions.push("offer");
   if ((input.publishedReviewCount ?? 0) <= 0) omissions.push("reputation");
 
