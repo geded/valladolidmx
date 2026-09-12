@@ -205,12 +205,16 @@ export function DestinationPremiumSurface({
               </Container>
             );
           }
-          case "gallery":
+          case "gallery": {
+            // Sin fotografías propias la galería sólo aportaba espacio en blanco.
+            const hasGalleryMedia = content.gallery.items.some((m) => Boolean(m.url));
+            if (!hasGalleryMedia) return null;
             return (
               <Container key={key} className="mt-14">
                 <GaleriaEditorial content={content} layout={galleryLayout} />
               </Container>
             );
+          }
           case "servicePreview":
             return service ? (
               <Container key={key} className="mt-14">
