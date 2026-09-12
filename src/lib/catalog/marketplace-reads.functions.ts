@@ -1069,15 +1069,18 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         .is("deleted_at", null)
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(24),
+      /* Portada + galería administradas en CMS. La ficha necesita todas las
+         fotografías asociadas para su mosaico; sin filas simplemente no se
+         renderiza galería (nunca se inventan medios). */
       supabase
         .from("business_media")
         .select(
           "role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, alt_text, status, deleted_at )",
         )
         .eq("business_id", String(biz.id))
-        .eq("role", "cover")
+        .order("role", { ascending: true })
         .order("sort_order", { ascending: true })
-        .limit(1),
+        .limit(12),
     ]);
     if (pErr) throw new Error(`marketplace_products_failed: ${pErr.message}`);
     if (prErr) throw new Error(`marketplace_promos_failed: ${prErr.message}`);
