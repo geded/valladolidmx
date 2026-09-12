@@ -135,7 +135,7 @@ export function BreadcrumbTerritorial({
                     className={cn(
                       "block truncate",
                       // El nombre actual puede truncarse en móvil.
-                      isLast ? "max-w-[46vw] font-medium text-foreground sm:max-w-none" : "",
+                      isLast ? "max-w-[46vw] font-medium text-foreground lg:max-w-none" : "",
                     )}
                   >
                     {c.label}
