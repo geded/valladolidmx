@@ -76,10 +76,11 @@ function AYVPage() {
     : null;
   const crumbs = returnDestination
     ? [
-        { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+        { label: "Oriente Maya de Yucatán", to: "/oriente-maya" },
         {
           label: returnDestination.label,
-          href: `/oriente-maya/${returnDestination.slug}`,
+          to: "/oriente-maya/$destino",
+          params: { destino: returnDestination.slug },
         },
         { label: "Arma tu Viaje" },
       ]
