@@ -204,6 +204,14 @@ export function PlacePremiumSurface({
         <IdentityStrip content={content} dense={cinematic} />
       </Container>
       {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
+      {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
+          lectura, justo después del encabezado y antes del relato. */}
+      {hasGallery ? (
+        <Container className="mt-6 sm:mt-8">
+          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
+        </Container>
+      ) : null}
+
       {hasIntro ? (
         <Container className="mt-8 sm:mt-12">
           {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
