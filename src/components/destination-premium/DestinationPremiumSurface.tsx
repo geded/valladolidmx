@@ -563,7 +563,7 @@ function ServiciosStrip({
         onSelect={navigates ? undefined : onSelect}
         showCounts={false}
         variant="standard"
-        desktopColumnsClassName="lg:grid-cols-6"
+        desktopColumnsClassName={services.length > 6 ? "lg:grid-cols-4" : "lg:grid-cols-6"}
       />
       {content.servicesNote ? (
         <p className="mt-2 text-xs text-muted-foreground">{content.servicesNote}</p>
