@@ -77,7 +77,7 @@ export function CompactCrumbs({
   if (!current) return null;
 
   return (
-    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-0.5 overflow-hidden text-[10px] font-medium text-muted-foreground sm:hidden">
+    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-1 overflow-hidden text-xs font-medium text-muted-foreground sm:hidden">
       <li className="flex shrink-0 items-center">
         <Link
           to="/"
