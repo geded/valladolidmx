@@ -63,7 +63,14 @@ const BASE_FIELDS: EditorField[] = [
   { name: "interests", label: "Intereses", type: "tags" },
   { name: "audiences", label: "Público", type: "tags" },
   { name: "seasons", label: "Temporadas", type: "tags" },
+  {
+    name: "cover_media_id",
+    label: "Imagen de la ruta",
+    type: "media",
+    helpText: "Selecciona una imagen de la Biblioteca o sube una nueva desde aquí.",
+  },
 ];
+
 
 export function EditorialRouteEditor({ id }: { id?: string }) {
   const destinationsFn = useServerFn(listDestinationsForSelect);
