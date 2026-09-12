@@ -97,6 +97,29 @@ export function businessToDescriptionSectionDTO(
 /* ------------------------------------------------------------------ *
  * Info-grid — datos rápidos.
  * ------------------------------------------------------------------ */
+/** Iconografía oficial por eje administrable (sin datos, sólo presentación). */
+const ATTRIBUTE_ICON_BY_KEY: Record<string, string> = {
+  property_type: "home",
+  capacity: "users",
+  bedrooms: "bed",
+  beds: "bed",
+  bathrooms: "droplet",
+  zone: "map-pin",
+  amenities: "sparkles",
+  spaces: "layout",
+  includes: "check",
+  stay_features: "star",
+  traveler_profile: "heart",
+  accessibility: "accessibility",
+  check_in: "log-in",
+  check_out: "log-out",
+  min_nights: "calendar",
+  cancellation_policy: "shield",
+  host_languages: "languages",
+  house_rules: "info",
+  price_level: "tag",
+};
+
 function humanizeSlug(slug: string): string {
   const clean = slug.trim().replace(/-/g, " ").toLowerCase();
   if (!clean) return "";
@@ -130,21 +153,16 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     value: b.verified ? "Verificado" : "Publicado",
     tone: b.verified ? "primary" : "default",
   });
-  const attributeLabels: Record<string, string> = {
-    property_type: "Tipo de propiedad",
-    capacity: "Capacidad",
-    bedrooms: "Dormitorios",
-    amenities: "Amenidades",
-    stay_features: "Características",
-  };
-  for (const [key, label] of Object.entries(attributeLabels)) {
-    const raw = b.filter_attributes?.[key];
-    const values = Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : [];
-    if (!values.length) continue;
+  /* Atributos administrables: siempre con la etiqueta del catálogo CMS.
+     Sin catálogo resuelto no se muestran claves crudas. */
+  const resolved = b.attributes ?? [];
+  for (const key of ["property_type", "capacity", "bedrooms", "amenities", "stay_features"]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
     items.push({
-      iconKey: key === "capacity" ? "users" : key === "bedrooms" ? "bed" : "home",
-      label,
-      value: values.map((value) => value.replace(/-/g, " ")).join(" · "),
+      iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "home",
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
       tone: "default",
     });
   }
@@ -157,6 +175,88 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     ariaLabel: "Información clave",
     capabilities: { copyable: false, livePricing: false, liveAvailability: false },
   };
+}
+
+/* ------------------------------------------------------------------ *
+ * Composición Casa de vacaciones — agrupaciones editoriales sobre el
+ * MISMO bloque oficial `vmx.experience.info-grid`. Sin bloques nuevos,
+ * sin datos inventados: sólo ejes administrables con etiqueta CMS.
+ * ------------------------------------------------------------------ */
+function attributesGridDTO(
+  b: MarketplaceBusinessDetail,
+  keys: readonly string[],
+  heading: string,
+  variant: "cards" | "list" | "inline",
+  columns: number,
+): ExperienceInfoGridDTO | null {
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of keys) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    items.push({
+      iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
+      tone: "default",
+    });
+  }
+  if (items.length === 0) return null;
+  return {
+    variant,
+    heading,
+    columns: Math.min(columns, Math.max(1, items.length)),
+    items,
+    ariaLabel: heading,
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
+}
+
+/** Lo esencial del alojamiento (capacidad, dormitorios, camas, baños…). */
+export function businessToStayEssentialsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["property_type", "capacity", "bedrooms", "beds", "bathrooms", "zone"],
+    "Lo esencial del alojamiento",
+    "cards",
+    3,
+  );
+}
+
+/** Amenidades, espacios y lo que incluye la estancia. */
+export function businessToStayAmenitiesDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["amenities", "spaces", "includes", "stay_features", "accessibility"],
+    "Amenidades y espacios",
+    "list",
+    2,
+  );
+}
+
+/** Condiciones de la estancia: llegada, salida, mínimo, cancelación, anfitrión. */
+export function businessToStayPolicyDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    [
+      "check_in",
+      "check_out",
+      "min_nights",
+      "cancellation_policy",
+      "host_languages",
+      "house_rules",
+      "traveler_profile",
+    ],
+    "Tu estancia",
+    "cards",
+    3,
+  );
 }
 
 /* ------------------------------------------------------------------ *

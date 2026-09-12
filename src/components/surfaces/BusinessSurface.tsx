@@ -45,6 +45,9 @@ import {
   businessToDescriptionSectionDTO,
   businessToInfoGridDTO,
   businessToCtaBarDTO,
+  businessToStayEssentialsDTO,
+  businessToStayAmenitiesDTO,
+  businessToStayPolicyDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
@@ -582,6 +585,13 @@ export function BusinessSurface({
       }
     : null;
   const descriptionBeforeGallery = approvedFamily === "restaurant";
+  /* Casa de vacaciones: composición editorial propia de la familia sobre
+     los mismos bloques oficiales. Sin ejes administrables capturados, cada
+     sección simplemente no se renderiza. */
+  const isVacationRental = approvedFamily === "vacation_rental";
+  const stayEssentialsDto = isVacationRental ? businessToStayEssentialsDTO(b) : null;
+  const stayAmenitiesDto = isVacationRental ? businessToStayAmenitiesDTO(b) : null;
+  const stayPolicyDto = isVacationRental ? businessToStayPolicyDTO(b) : null;
 
   return (
     <PublicShell
@@ -673,7 +683,16 @@ export function BusinessSurface({
 
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
-      {descriptionBeforeGallery && descriptionSection ? (
+      {isVacationRental ? (
+        stayEssentialsDto || descriptionSection ? (
+          <section id="resumen" data-eb-anchor className="scroll-mt-24">
+            {stayEssentialsDto ? <ExperienceInfoGrid dto={stayEssentialsDto} /> : null}
+            {descriptionSection ? (
+              <ExperienceSection dto={descriptionSection} className="mt-8" />
+            ) : null}
+          </section>
+        ) : null
+      ) : descriptionBeforeGallery && descriptionSection ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
           <ExperienceSection dto={descriptionSection} />
           {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
@@ -690,9 +709,21 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {!descriptionBeforeGallery && descriptionSection ? (
+      {!isVacationRental && !descriptionBeforeGallery && descriptionSection ? (
         <section data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceSection dto={descriptionSection} />
+        </section>
+      ) : null}
+
+      {stayAmenitiesDto ? (
+        <section data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceInfoGrid dto={stayAmenitiesDto} />
+        </section>
+      ) : null}
+
+      {stayPolicyDto ? (
+        <section data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceInfoGrid dto={stayPolicyDto} />
         </section>
       ) : null}
 

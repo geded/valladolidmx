@@ -125,7 +125,18 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * la superficie omite la sección de reputación. Nunca se inventan datos.
    */
   reviews?: MarketplaceBusinessReviews | null;
+  /**
+   * Atributos turísticos administrables de la empresa
+   * (`businesses.filter_attributes`) resueltos contra el catálogo activo de
+   * su familia (`tourism_attribute_definitions/_options`). Sólo claves con
+   * valor real y opción activa; nunca se inventan datos ni se muestran
+   * claves crudas.
+   */
+  attributes?: BusinessAttributeItem[];
 }
+
+/** Atributo administrable resuelto (misma forma que el de producto). */
+export type BusinessAttributeItem = ProductAttributeItem;
 
 export interface MarketplaceBusinessReviewItem {
   id: string;
@@ -1128,6 +1139,26 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
 
+    /* Atributos administrables resueltos contra el catálogo activo de la
+       familia declarada en CMS. Sin familia o sin catálogo, la ficha
+       simplemente no muestra la sección: nunca claves crudas. */
+    const attributeFamilyKey = typeof catFamily === "string" && catFamily.trim() ? catFamily : null;
+    let businessAttributes: BusinessAttributeItem[] = [];
+    if (attributeFamilyKey) {
+      const { data: attrDefs } = await supabase
+        .from("tourism_attribute_definitions")
+        .select(
+          "attribute_key, label, filter_group, sort_order, tourism_attribute_options(value,label,sort_order,active)",
+        )
+        .eq("family_key", attributeFamilyKey)
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      businessAttributes = resolveProductAttributes(
+        biz.filter_attributes,
+        (attrDefs ?? []) as Array<Record<string, unknown>>,
+      );
+    }
+
     const detailLocationRow = (
       (locations ?? []) as Array<{
         label: string | null;
@@ -1193,6 +1224,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       category_slug: typeof catSlug === "string" ? catSlug : "",
       category_family_key: typeof catFamily === "string" && catFamily.trim() ? catFamily : null,
       filter_attributes: normalizeFilterAttributes(biz.filter_attributes),
+      attributes: businessAttributes,
       plan_tier: planTier,
       products: (products ?? []).map((p) => ({
         id: p.id,
