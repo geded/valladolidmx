@@ -136,7 +136,7 @@ export function buildDestinationPremiumRuntime(input: {
       note: cover
         ? "Fotografías acreditadas para uso público."
         : "Visuales conceptuales temporales, reemplazables desde Medios.",
-      items: remainingGallery,
+      items: galleryItems,
     },
     servicePreview: {
       actionLabel: "Ver todo",
