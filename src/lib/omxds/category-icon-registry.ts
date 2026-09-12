@@ -141,6 +141,13 @@ export const CATEGORY_ICON_REGISTRY: Readonly<Record<string, CategoryIconEntry>>
   bienestar: entry("bienestar", "Bienestar", "hoja y ondas", "ceibaGreen", "waterTurquoise"),
   "vida-nocturna": entry("vida-nocturna", "Vida nocturna", "luna", "deepIndigo", null),
   mapas: entry("mapas", "Mapas", "mapa plegado", "turquoise", null),
+  lugares: entry(
+    "lugares",
+    "Lugares y sitios de interés",
+    "arco colonial con pin",
+    "valladolidMagenta",
+    null,
+  ),
 });
 
 export const CATEGORY_ICON_SLUGS = Object.keys(CATEGORY_ICON_REGISTRY);
