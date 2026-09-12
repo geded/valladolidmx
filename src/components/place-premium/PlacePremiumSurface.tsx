@@ -26,6 +26,7 @@ import {
   Ticket,
 } from "lucide-react";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -86,7 +87,38 @@ export function PlacePremiumSurface({
     content.essentials.facts.length > 0 ||
     content.essentials.recommendations.length > 0 ||
     content.essentials.accessibility.length > 0;
-  const hasGallery = content.gallery.items.length > 0;
+  /* Galería: mismo bloque oficial `vmx.experience.gallery` (variante mosaico)
+     que las fichas de hotel, restaurante y casa de vacaciones. Sólo medios
+     publicados en CMS; sin fotografías no se renderiza nada. */
+  const galleryItems = content.gallery.items
+    .filter((media) => Boolean(media.url))
+    .map((media) => ({
+      kind: "image" as const,
+      url: media.url as string,
+      alt: media.alt || content.identity.title,
+      ...(media.caption ? { caption: media.caption } : {}),
+    }));
+  const galleryDto =
+    galleryItems.length >= 2
+      ? {
+          variant: "mosaic" as const,
+          heading: `Conoce ${content.identity.title}`,
+          subheading: null,
+          items: galleryItems,
+          maxVisible: 5,
+          aspect: "landscape" as const,
+          ariaLabel: `Galería de ${content.identity.title}`,
+          capabilities: {
+            lightbox: true,
+            captions: galleryItems.some((item) => "caption" in item),
+            video: false,
+            panorama360: false,
+            model3d: false,
+            ar: false,
+            ugc: false,
+          },
+        }
+      : null;
   const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
   /* Destino y, cuando el dato real la declara, subzona del destino. */
   const heroEyebrow = [
@@ -225,10 +257,10 @@ export function PlacePremiumSurface({
       {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
       {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
           lectura, justo después del encabezado y antes del relato. */}
-      {hasGallery ? (
-        <Container className="mt-6 sm:mt-8">
-          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
-        </Container>
+      {galleryDto ? (
+        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
       ) : null}
 
       {hasIntro ? (
