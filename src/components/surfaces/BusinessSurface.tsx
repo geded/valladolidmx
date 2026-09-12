@@ -659,10 +659,13 @@ export function BusinessSurface({
       .filter((attribute): attribute is NonNullable<typeof attribute> =>
         Boolean(attribute && attribute.values.length > 0),
       )
-      .map(
-        (attribute) =>
-          `${attribute.values.map((value) => value.label).join(" · ")} ${attribute.label.toLowerCase()}`,
-      );
+      .map((attribute) => {
+        const value = attribute.values.map((item) => item.label).join(" · ");
+        const label = attribute.label.toLowerCase();
+        /* El valor administrable puede venir ya redactado ("3 dormitorios").
+           En ese caso no se repite la etiqueta del catálogo. */
+        return value.toLowerCase().includes(label) ? value : `${value} ${label}`;
+      });
     return parts.length > 0 ? parts.join(" · ") : null;
   })();
   const stayFromPriceLabel = stayFromPrice
