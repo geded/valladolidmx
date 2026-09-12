@@ -1224,6 +1224,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       category_slug: typeof catSlug === "string" ? catSlug : "",
       category_family_key: typeof catFamily === "string" && catFamily.trim() ? catFamily : null,
       filter_attributes: normalizeFilterAttributes(biz.filter_attributes),
+      attributes: businessAttributes,
       plan_tier: planTier,
       products: (products ?? []).map((p) => ({
         id: p.id,
