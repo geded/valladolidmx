@@ -263,7 +263,7 @@ export function PlacePremiumSurface({
             badges: content.identity.badges.map((label) => ({ label })),
           }}
         />
-      </div>
+      </PlaceContainer>
       {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
           emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
           bloque oficial de ubicación. */}
