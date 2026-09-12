@@ -346,16 +346,6 @@ function HeroSearch() {
   );
 }
 
-function useHeroAutoplay(slides: number, setIndex: Dispatch<SetStateAction<number>>) {
-  useEffect(() => {
-    if (slides < 2 || typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = window.setInterval(() => {
-      setIndex((current: number) => (current + 1) % slides);
-    }, 6500);
-    return () => window.clearInterval(timer);
-  }, [setIndex, slides]);
-}
 
 function HeroEditorial({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
