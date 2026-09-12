@@ -40,16 +40,21 @@ export function buildDestinationPremiumRuntime(input: {
           },
         ]
       : [];
-  const allMedia = [
-    ...(cover ? [mediaOf(cover)] : approvedConceptual.slice(0, 1)),
-    ...gallery.map(mediaOf),
-    ...approvedConceptual.slice(1),
-  ];
+  const heroRole = media.filter((item) => item.role === "hero").map(mediaOf);
+  // Pool editorial: cada sección consume fotografías distintas.
+  // Prioridad: medios con rol "hero", luego galería, y sólo al final la portada.
+  const editorialPool = [...heroRole, ...gallery.map(mediaOf), ...approvedConceptual];
+  const coverMedia = cover ? mediaOf(cover) : (approvedConceptual[0] ?? null);
+  const heroMedia = editorialPool[0] ?? coverMedia ?? { url: "", alt: "" };
+  const afterHero = editorialPool.slice(1);
+  const narrativeMedia = afterHero.slice(0, 2);
+  const remainingGallery = afterHero.slice(narrativeMedia.length);
+  const heroSupporting = remainingGallery.length > 2 ? remainingGallery.slice(-2) : [];
+  const galleryItems =
+    heroSupporting.length > 0 ? remainingGallery.slice(0, -2) : remainingGallery;
   const heroDescription = destination.tagline?.trim() ?? "";
   const descubreText = destination.description?.trim() ?? "";
   const paragraphs = descubreText ? [descubreText] : [];
-  const narrativeMedia = gallery.map(mediaOf).slice(0, 3);
-  const remainingGallery = gallery.map(mediaOf).slice(narrativeMedia.length);
   const mapItems = [
     ...(destination.latitude != null && destination.longitude != null
       ? [
