@@ -256,9 +256,9 @@ export function PlacePremiumSurface({
       {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
           lectura, justo después del encabezado y antes del relato. */}
       {galleryDto ? (
-        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
+        <PlaceContainer id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
           <ExperienceGallery dto={galleryDto} />
-        </section>
+        </PlaceContainer>
       ) : null}
 
       {hasIntro ? (
