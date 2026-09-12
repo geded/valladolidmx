@@ -784,6 +784,7 @@ export function BusinessSurface({
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
               <div className="min-w-0">
                 <p className="text-3xl font-semibold tracking-tight text-foreground">
+                  <span className="text-base font-normal text-muted-foreground">Desde </span>
                   {stayFromPriceLabel}{" "}
                   <span className="text-base font-normal text-muted-foreground">por noche</span>
                 </p>
