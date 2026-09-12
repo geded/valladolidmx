@@ -26,6 +26,11 @@ export interface BusinessLocationBlockProps {
   heading?: string;
   /** La ficha Premium abre el mapa real directamente; la estándar conserva el fallback estático. */
   presentation?: "standard" | "premium";
+  /**
+   * `split` conserva el mapa con la columna de datos al costado.
+   * `stacked` muestra el mapa a todo el ancho y los datos de ubicación debajo.
+   */
+  layout?: "split" | "stacked";
 }
 
 export function BusinessLocationBlock({
@@ -36,13 +41,21 @@ export function BusinessLocationBlock({
   addressLine2,
   heading = "Ubicación",
   presentation = "standard",
+  layout = "split",
 }: BusinessLocationBlockProps) {
   const [showInteractive, setShowInteractive] = useState(presentation === "premium");
+  const stacked = layout === "stacked";
 
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+    <div
+      className={
+        stacked
+          ? "flex flex-col gap-4"
+          : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start"
+      }
+    >
       <div className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold text-foreground">{heading}</h2>
