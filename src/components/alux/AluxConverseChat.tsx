@@ -351,6 +351,29 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
     ],
   );
 
+  /* ── preferencia marcada en la superficie → primer turno real ──
+     Sin esto la opción elegida sólo abría el panel y nunca llegaba a la
+     recomendación. Cada preferencia se envía una única vez. */
+  const autoAskSentRef = useRef<string | null>(null);
+  useEffect(() => {
+    const ask = props.autoAsk?.trim();
+    if (!ask || !hydrated || !sessionKey) return;
+    if (autoAskSentRef.current === ask) return;
+    if (status === "thinking") return;
+    if (isAuthed && (isPlanPending || isPlanError)) return;
+    autoAskSentRef.current = ask;
+    void send(ask);
+  }, [
+    props.autoAsk,
+    hydrated,
+    sessionKey,
+    status,
+    isAuthed,
+    isPlanPending,
+    isPlanError,
+    send,
+  ]);
+
   const lastFailed = [...messages].reverse().find((m) => m.role === "user" && m.failed);
 
   /* ── quitar (canónico) ── */
