@@ -178,6 +178,88 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
 }
 
 /* ------------------------------------------------------------------ *
+ * Composición Casa de vacaciones — agrupaciones editoriales sobre el
+ * MISMO bloque oficial `vmx.experience.info-grid`. Sin bloques nuevos,
+ * sin datos inventados: sólo ejes administrables con etiqueta CMS.
+ * ------------------------------------------------------------------ */
+function attributesGridDTO(
+  b: MarketplaceBusinessDetail,
+  keys: readonly string[],
+  heading: string,
+  variant: "cards" | "list" | "inline",
+  columns: number,
+): ExperienceInfoGridDTO | null {
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of keys) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    items.push({
+      iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
+      tone: "default",
+    });
+  }
+  if (items.length === 0) return null;
+  return {
+    variant,
+    heading,
+    columns: Math.min(columns, Math.max(1, items.length)),
+    items,
+    ariaLabel: heading,
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
+}
+
+/** Lo esencial del alojamiento (capacidad, dormitorios, camas, baños…). */
+export function businessToStayEssentialsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["property_type", "capacity", "bedrooms", "beds", "bathrooms", "zone"],
+    "Lo esencial del alojamiento",
+    "cards",
+    3,
+  );
+}
+
+/** Amenidades, espacios y lo que incluye la estancia. */
+export function businessToStayAmenitiesDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["amenities", "spaces", "includes", "stay_features", "accessibility"],
+    "Amenidades y espacios",
+    "list",
+    2,
+  );
+}
+
+/** Condiciones de la estancia: llegada, salida, mínimo, cancelación, anfitrión. */
+export function businessToStayPolicyDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    [
+      "check_in",
+      "check_out",
+      "min_nights",
+      "cancellation_policy",
+      "host_languages",
+      "house_rules",
+      "traveler_profile",
+    ],
+    "Tu estancia",
+    "cards",
+    3,
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * CTA Bar mobile — barra inferior persistente.
  * ------------------------------------------------------------------ */
 export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCtaBarDTO {
