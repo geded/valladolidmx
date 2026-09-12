@@ -248,9 +248,6 @@ export function PlacePremiumSurface({
       )}
 
 
-      <Container className="mt-5 sm:mt-8">
-        <IdentityStrip content={content} dense={cinematic} />
-      </Container>
       {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
       {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
           lectura, justo después del encabezado y antes del relato. */}

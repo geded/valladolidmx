@@ -119,11 +119,17 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         </ul>
       ) : (
         // mosaic
-        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl auto-rows-[45vw] sm:auto-rows-auto sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
+        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl auto-rows-[34vw] sm:auto-rows-auto sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
           {visible.map((it, i) => (
             <div
               key={i}
-              className={cn("relative min-w-0", i === 0 && "sm:col-span-2 sm:row-span-2")}
+              className={cn(
+                "relative min-w-0",
+                /* Móvil: la portada ocupa el ancho completo para que las
+                   miniaturas no se vean amontonadas (paridad en todas las
+                   fichas). Escritorio conserva el mosaico aprobado. */
+                i === 0 && "col-span-2 row-span-1 sm:col-span-2 sm:row-span-2",
+              )}
             >
               <Thumb
                 item={it}
