@@ -423,12 +423,46 @@ function DemoNotice({ text }: { text: string }) {
   );
 }
 
+/* Tipografía de sección idéntica a las fichas de hotel, restaurante y casa
+   (`ExperienceInfoGrid`/`BusinessLocationBlock`): título sobrio, sin escala
+   editorial mayor que el resto de la plataforma. */
 function SectionHeading({ id, kicker, title }: { id: string; kicker: string; title: string }) {
   return (
     <header id={id}>
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{kicker}</p>
-      <h2 className="mt-1.5 text-balance font-serif text-2xl sm:mt-2 sm:text-4xl">{title}</h2>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {kicker}
+      </p>
+      <h2 className="mt-1.5 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+        {title}
+      </h2>
     </header>
+  );
+}
+
+/* Compartir: mismo patrón que la ficha de empresa (Web Share + ShareSheet). */
+function PlaceShareButton({ title }: { title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setOpen(true)}
+        aria-label="Compartir lugar"
+        className="rounded-pill border border-border bg-background shadow-soft"
+      >
+        <Share2 className="h-5 w-5" aria-hidden="true" />
+      </Button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descubre este lugar en el Oriente Maya."
+        heading="Compartir lugar"
+      />
+    </>
   );
 }
 
