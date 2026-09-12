@@ -241,12 +241,24 @@ export function PlacePremiumSurface({
       ) : null}
 
       {hasMap ? (
-        <Container className="mt-10 sm:mt-16">
-          <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
-          {/* Paridad con hospedaje y restaurante: mapa a todo lo ancho y la
-              información de cómo llegar debajo. */}
-          <div className="mt-6 space-y-5">
-            {content.map.points.length ? <ExperienceMapBlock dto={mapDto} /> : null}
+        <Container className="mt-10 sm:mt-16" id="mapa-lugar">
+          {/* Paridad exacta con hotel, restaurante y casa: se reutiliza el
+              bloque oficial de ubicación (mapa a todo lo ancho, distancia y
+              "Cómo llegar" debajo). Sin superficie de mapa paralela. */}
+          <div className="space-y-5">
+            {primaryPoint ? (
+              <BusinessLocationBlock
+                lat={primaryPoint.lat}
+                lng={primaryPoint.lng}
+                name={content.identity.title}
+                addressLine1={placeAddressLine}
+                heading={content.map.heading}
+                presentation="premium"
+                layout="stacked"
+              />
+            ) : content.map.points.length ? (
+              <ExperienceMapBlock dto={mapDto} />
+            ) : null}
             {content.map.directions.length ? (
               <ul className="grid gap-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
                 {content.map.directions.map((line, index) => (
