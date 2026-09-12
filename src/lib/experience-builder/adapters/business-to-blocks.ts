@@ -118,6 +118,9 @@ const ATTRIBUTE_ICON_BY_KEY: Record<string, string> = {
   host_languages: "languages",
   house_rules: "info",
   price_level: "tag",
+  hotel_type: "home",
+  services: "concierge-bell",
+  policies: "info",
 };
 
 function humanizeSlug(slug: string): string {
@@ -218,7 +221,16 @@ export function businessToStayEssentialsDTO(
 ): ExperienceInfoGridDTO | null {
   return attributesGridDTO(
     b,
-    ["property_type", "capacity", "bedrooms", "beds", "bathrooms", "zone"],
+    [
+      "property_type",
+      "hotel_type",
+      "capacity",
+      "bedrooms",
+      "beds",
+      "bathrooms",
+      "zone",
+      "price_level",
+    ],
     "Lo esencial del alojamiento",
     "cards",
     3,
@@ -231,7 +243,14 @@ export function businessToStayAmenitiesDTO(
 ): ExperienceInfoGridDTO | null {
   const resolved = b.attributes ?? [];
   const items: ExperienceInfoGridDTO["items"] = [];
-  for (const key of ["amenities", "spaces", "includes", "stay_features", "accessibility"]) {
+  for (const key of [
+    "amenities",
+    "services",
+    "spaces",
+    "includes",
+    "stay_features",
+    "accessibility",
+  ]) {
     const attribute = resolved.find((item) => item.key === key);
     if (!attribute || attribute.values.length === 0) continue;
     /* Cada amenidad se lee como un elemento propio, no como una cadena
@@ -266,7 +285,15 @@ export function businessToStayPolicyDTO(
 ): ExperienceInfoGridDTO | null {
   return attributesGridDTO(
     b,
-    ["check_in", "check_out", "min_nights", "host_languages", "house_rules", "traveler_profile"],
+    [
+      "check_in",
+      "check_out",
+      "min_nights",
+      "host_languages",
+      "house_rules",
+      "policies",
+      "traveler_profile",
+    ],
     "Tu estancia",
     "cards",
     3,

@@ -659,7 +659,11 @@ export function BusinessSurface({
   const stayHighlightLine = (() => {
     if (!isLodging) return null;
     const resolved = b.attributes ?? [];
-    const parts = ["capacity", "bedrooms", "beds", "bathrooms"]
+    const parts = (
+      isVacationRental
+        ? ["capacity", "bedrooms", "beds", "bathrooms"]
+        : ["hotel_type", "zone", "services", "price_level"]
+    )
       .map((key) => resolved.find((item) => item.key === key))
       .filter((attribute): attribute is NonNullable<typeof attribute> =>
         Boolean(attribute && attribute.values.length > 0),
@@ -821,7 +825,8 @@ export function BusinessSurface({
               </div>
             </div>
             <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-              Tarifa orientativa publicada por el anfitrión. Sin cobro ni reservación en línea.
+              Tarifa orientativa publicada por {isVacationRental ? "el anfitrión" : "el hotel"}.
+              Sin cobro ni reservación en línea.
             </p>
           </div>
         </section>
