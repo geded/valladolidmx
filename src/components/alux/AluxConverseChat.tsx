@@ -137,6 +137,12 @@ export interface AluxConverseChatProps {
   /** Preguntas sugeridas cuando el hilo está vacío. */
   readonly starters?: readonly string[];
   /**
+   * Preferencia que el viajero acaba de marcar en la superficie invocante.
+   * Se envía una sola vez como primer turno real de la conversación para que
+   * la recomendación la tome en cuenta. Cada valor se envía una única vez.
+   */
+  readonly autoAsk?: string | null;
+  /**
    * Notifica la última secuencia propuesta por Alux (títulos canónicos en
    * orden) para que la superficie invocante pueda ofrecer verla en su mapa.
    * No crea otro motor: sólo transporta lo que la respuesta ya contiene.
