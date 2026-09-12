@@ -1,7 +1,7 @@
 /**
  * H-03 · Ola I1.c — `vmx.experience.info-grid` (Capa 1: Presentación).
  */
-import { Clock, MapPin, Phone, Star, Tag, Users, type LucideIcon } from "lucide-react";
+import { Check, Clock, MapPin, Phone, Star, Tag, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 
