@@ -194,11 +194,29 @@ export function PlacePremiumSurface({
           }}
         />
       </div>
+      {/* Paridad con hotel y restaurante: el hero entity no incluye acciones,
+          se emiten en la fila inmediata bajo el encabezado. */}
+      <Container className="mt-4 flex flex-wrap justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            document
+              .getElementById("place-trip-action")
+              ?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
+        >
+          {content.hero.primaryCta.label}
+        </Button>
+        <Button variant="ghost" asChild>
+          <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
+        </Button>
+      </Container>
       {content.hero.cover.url ? null : (
         <Container className="mt-3">
           <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
         </Container>
       )}
+
 
       <Container className="mt-5 sm:mt-8">
         <IdentityStrip content={content} dense={cinematic} />
