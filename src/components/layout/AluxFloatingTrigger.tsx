@@ -188,6 +188,7 @@ export function AluxFloatingTrigger() {
         return next;
       });
       setSelectionTask(payload.hint ?? null);
+      setAutoAsk(payload.prompt?.trim() ? payload.prompt.trim() : null);
       setMinimized(false);
       setOpen(true);
     });
@@ -198,6 +199,7 @@ export function AluxFloatingTrigger() {
     if (!open) {
       setSelection(null);
       setSelectionTask(null);
+      setAutoAsk(null);
       setMinimized(false);
       setProposalTitles(null);
       setMapVariant("original");
@@ -799,6 +801,7 @@ export function AluxFloatingTrigger() {
             business={ctx.business}
             product={ctx.product}
             selection={selection}
+            {...(autoAsk ? { autoAsk } : {})}
             stage={unified.trip.stage}
             coords={geo.status === "granted" && geo.location ? geo.location : null}
             locale={locale}
