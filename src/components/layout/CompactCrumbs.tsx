@@ -77,7 +77,7 @@ export function CompactCrumbs({
   if (!current) return null;
 
   return (
-    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-0.5 overflow-hidden text-[10px] font-medium text-muted-foreground sm:hidden">
+    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-1 overflow-hidden text-xs font-medium text-muted-foreground sm:hidden">
       <li className="flex shrink-0 items-center">
         <Link
           to="/"
@@ -130,12 +130,12 @@ export function CompactCrumbs({
             <Link
               to={anchorCrumb.to}
               params={anchorCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[21vw] items-center truncate rounded-md px-0.5 hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-11 max-w-[24vw] items-center truncate rounded-md px-0.5 hover:bg-accent hover:text-accent-foreground"
             >
               {anchorCrumb.label}
             </Link>
           ) : (
-            <span className="inline-flex min-h-11 max-w-[21vw] items-center truncate px-0.5">
+            <span className="inline-flex min-h-11 max-w-[24vw] items-center truncate px-0.5">
               {anchorCrumb.label}
             </span>
           )}
@@ -166,7 +166,7 @@ export function CompactCrumbs({
         <span
           aria-current="page"
           title={current.label}
-          className="block max-w-[27vw] truncate font-semibold text-foreground"
+          className="block max-w-[32vw] truncate font-semibold text-foreground"
         >
           {current.label}
         </span>
