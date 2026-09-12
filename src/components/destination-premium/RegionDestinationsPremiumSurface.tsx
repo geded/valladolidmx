@@ -64,6 +64,7 @@ export function RegionDestinationsPremiumSurface({
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("todos");
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [mapOpen, setMapOpen] = useState(false);
   const ordered = useMemo(() => orderedDestinations(destinations), [destinations]);
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase("es");
