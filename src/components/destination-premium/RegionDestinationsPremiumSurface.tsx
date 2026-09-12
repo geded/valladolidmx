@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Compass, Map as MapIcon, MapPin, Palmtree, Search } from "lucide-react";
+import { ArrowRight, Compass, Map as MapIcon, Palmtree, Search } from "lucide-react";
 
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { Container } from "@/components/layout/Container";
@@ -64,6 +64,7 @@ export function RegionDestinationsPremiumSurface({
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("todos");
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [mapOpen, setMapOpen] = useState(false);
   const ordered = useMemo(() => orderedDestinations(destinations), [destinations]);
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase("es");
@@ -179,8 +180,8 @@ export function RegionDestinationsPremiumSurface({
           compact
         />
 
-        <section className="mt-5 rounded-3xl border border-border bg-card p-3 shadow-sm">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <section className="mt-5 rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
+          <div className="grid gap-2 sm:gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
             <label className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <span className="sr-only">Buscar destino</span>
@@ -191,11 +192,11 @@ export function RegionDestinationsPremiumSurface({
                   setVisible(PAGE_SIZE);
                 }}
                 placeholder="Buscar destino, playa, cenote o cultura"
-                className="min-h-12 rounded-full pl-11"
+                className="min-h-11 rounded-full pl-11 text-sm sm:min-h-12"
               />
             </label>
             <div
-              className="flex gap-2 overflow-x-auto pb-1"
+              className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
               aria-label="Filtrar destinos"
               tabIndex={0}
             >
@@ -215,7 +216,7 @@ export function RegionDestinationsPremiumSurface({
                   }}
                   aria-pressed={filter === key}
                   className={cn(
-                    "min-h-11 shrink-0 rounded-full border px-4 text-sm",
+                    "h-10 shrink-0 rounded-full border px-3.5 text-[13px] sm:px-4 sm:text-sm",
                     filter === key
                       ? "border-selva bg-selva text-selva-foreground"
                       : "border-border bg-background text-foreground",
@@ -230,25 +231,26 @@ export function RegionDestinationsPremiumSurface({
 
         <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(26rem,.96fr)]">
           <section
-            className="min-w-0 rounded-3xl border border-border bg-card p-4 shadow-sm"
+            className="min-w-0 rounded-3xl border-border bg-transparent sm:border sm:bg-card sm:p-4 sm:shadow-sm"
             aria-labelledby="destination-list-heading"
           >
-            <div className="flex items-end justify-between gap-4">
-              <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
                   Descubre el territorio
                 </p>
-                <h2 id="destination-list-heading" className="mt-1 font-serif text-3xl">
+                <h2 id="destination-list-heading" className="mt-1 font-serif text-2xl sm:text-3xl">
                   Destinos del Oriente Maya
                 </h2>
               </div>
-              <span className="text-sm text-muted-foreground">{filtered.length} destinos</span>
+              <span className="shrink-0 text-sm text-muted-foreground">
+                {filtered.length} destinos
+              </span>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
               {shown.map((destination) => (
                 <DestinationCard key={destination.slug} destination={destination} />
-
               ))}
             </div>
             {!shown.length ? (
@@ -269,42 +271,57 @@ export function RegionDestinationsPremiumSurface({
           </section>
 
           <section
-            className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-sm xl:sticky xl:top-24 xl:self-start"
+            className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-sm sm:p-4 xl:sticky xl:top-24 xl:self-start"
             aria-labelledby="territory-map-heading"
           >
-            <div className="mb-3 flex items-center justify-between">
-              <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
                   Mapa del territorio
                 </p>
-                <h2 id="territory-map-heading" className="font-serif text-2xl">
+                <h2 id="territory-map-heading" className="truncate font-serif text-xl sm:text-2xl">
                   Valladolid conecta tu ruta
                 </h2>
               </div>
-              <MapIcon className="size-5 text-selva" />
+              <button
+                type="button"
+                onClick={() => setMapOpen((current) => !current)}
+                aria-expanded={mapOpen}
+                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-border px-3.5 text-[13px] font-semibold xl:hidden"
+              >
+                <MapIcon className="size-4 text-selva" />
+                {mapOpen ? "Ocultar mapa" : "Ver mapa"}
+              </button>
+              <MapIcon className="hidden size-5 shrink-0 text-selva xl:block" />
             </div>
-            {mapped.length ? (
-              <Suspense fallback={<div className="h-[34rem] animate-pulse rounded-2xl bg-muted" />}>
-                <InteractiveMap
-                  lat={20.6896}
-                  lng={-88.2011}
-                  zoom={8}
-                  markerTitle="Oriente Maya"
-                  markers={mapped.map((destination) => ({
-                    lat: destination.latitude as number,
-                    lng: destination.longitude as number,
-                    title: destination.name,
-                    href: `/oriente-maya/${destination.slug}`,
-                  }))}
-                  className="h-[34rem] rounded-2xl"
-                />
-              </Suspense>
-            ) : (
-              <div className="grid h-[28rem] place-items-center rounded-2xl bg-muted p-8 text-center text-sm text-muted-foreground">
-                El mapa aparecerá cuando los destinos tengan coordenadas verificadas.
-              </div>
-            )}
-            <div className="mt-3 rounded-2xl bg-secondary p-4 text-sm text-secondary-foreground">
+            <div className={cn("mt-3", mapOpen ? "block" : "hidden xl:block")}>
+              {mapped.length ? (
+                <Suspense
+                  fallback={
+                    <div className="h-[22rem] animate-pulse rounded-2xl bg-muted xl:h-[34rem]" />
+                  }
+                >
+                  <InteractiveMap
+                    lat={20.6896}
+                    lng={-88.2011}
+                    zoom={8}
+                    markerTitle="Oriente Maya"
+                    markers={mapped.map((destination) => ({
+                      lat: destination.latitude as number,
+                      lng: destination.longitude as number,
+                      title: destination.name,
+                      href: `/oriente-maya/${destination.slug}`,
+                    }))}
+                    className="h-[22rem] rounded-2xl xl:h-[34rem]"
+                  />
+                </Suspense>
+              ) : (
+                <div className="grid h-[18rem] place-items-center rounded-2xl bg-muted p-6 text-center text-sm text-muted-foreground xl:h-[28rem]">
+                  El mapa aparecerá cuando los destinos tengan coordenadas verificadas.
+                </div>
+              )}
+            </div>
+            <div className="mt-3 rounded-2xl bg-secondary p-3 text-sm text-secondary-foreground sm:p-4">
               <strong>Tu plan de viaje:</strong> guarda destinos y Alux los ordenará por tiempo,
               distancia y días disponibles.
             </div>
@@ -353,18 +370,18 @@ export function RegionDestinationsPremiumSurface({
 
 function DestinationCard({ destination }: { destination: Destination }) {
   return (
-    <article
-      className={cn(
-        "group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background",
-      )}
-    >
-      <Link to="/oriente-maya/$destino" params={{ destino: destination.slug }} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-
+    <article className="group flex min-w-0 flex-col">
+      <Link
+        to="/oriente-maya/$destino"
+        params={{ destino: destination.slug }}
+        className="block min-w-0"
+      >
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
           {destination.image_url ? (
             <img
               src={destination.image_url}
               alt={destination.name}
+              loading="lazy"
               className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
           ) : (
@@ -373,27 +390,23 @@ function DestinationCard({ destination }: { destination: Destination }) {
             </div>
           )}
           {PUEBLOS_MAGICOS.has(destination.slug) ? (
-            <span className="absolute right-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[9px] font-semibold uppercase text-primary-foreground">
+            <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[9px] font-semibold uppercase text-primary-foreground">
               Pueblo Mágico
             </span>
-          ) : null}
-          {COASTAL.has(destination.slug) ? (
-            <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-[9px] font-semibold uppercase text-selva">
+          ) : COASTAL.has(destination.slug) ? (
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-[9px] font-semibold uppercase text-selva">
               <Palmtree className="size-3" /> Costa
             </span>
           ) : null}
         </div>
-        <div className="p-3">
-          <h3 className="font-serif text-xl">{destination.name}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+        <div className="mt-2 min-w-0">
+          <h3 className="truncate font-serif text-lg leading-tight">{destination.name}</h3>
+          <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
             {destination.tagline || "Descubre este destino del Oriente Maya de Yucatán."}
           </p>
-          <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-selva">
-            Descubrir destino <MapPin className="size-3.5" />
-          </span>
         </div>
       </Link>
-      <div className="mt-auto border-t border-border p-3">
+      <div className="mt-2">
         <AddToTravelPlanButton
           kind="destination"
           targetId={destination.id}
@@ -402,7 +415,7 @@ function DestinationCard({ destination }: { destination: Destination }) {
           imageUrl={destination.image_url}
           subtitle={destination.tagline}
           eligibilityMode="legacy"
-          className="min-h-11 rounded-full"
+          className="h-9 min-h-9 rounded-full px-3 text-xs"
         />
       </div>
     </article>
