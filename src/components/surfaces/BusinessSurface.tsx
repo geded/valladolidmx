@@ -628,7 +628,6 @@ export function BusinessSurface({
   /* Casa de vacaciones: composición editorial propia de la familia sobre
      los mismos bloques oficiales. Sin ejes administrables capturados, cada
      sección simplemente no se renderiza. */
-  const isVacationRental = approvedFamily === "vacation_rental";
   const stayEssentialsDto = isVacationRental ? businessToStayEssentialsDTO(b) : null;
   const stayAmenitiesDto = isVacationRental ? businessToStayAmenitiesDTO(b) : null;
   const stayPolicyDto = isVacationRental ? businessToStayPolicyDTO(b) : null;
