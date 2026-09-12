@@ -73,7 +73,7 @@ export function BreadcrumbTerritorial({
   return (
     <div
       className={cn(
-        "flex flex-col items-stretch gap-3 text-sm lg:flex-row lg:items-start lg:justify-between",
+        "flex flex-col items-stretch gap-2 text-xs sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:text-sm",
         className,
       )}
     >
@@ -143,7 +143,7 @@ export function BreadcrumbTerritorial({
         aria-label="Cambiar de destino"
         className={cn("shrink-0", compact ? "hidden sm:block" : null)}
       >
-        <TerritorialSwitcherMount className="h-11 w-full min-w-40 text-xs lg:h-8 lg:w-auto lg:max-w-64" />
+        <TerritorialSwitcherMount className="h-9 w-full min-w-0 text-xs sm:h-8 sm:w-auto sm:max-w-56" />
       </div>
     </div>
   );
