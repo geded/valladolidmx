@@ -414,7 +414,11 @@ function HeroCopy({
       ) : null}
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
       <div className="mt-5 flex flex-wrap items-center gap-2 gap-y-2.5">
-        <Button size="sm" className="h-9 rounded-pill px-4 text-[13px] font-medium sm:h-10 sm:px-5 sm:text-sm" asChild>
+        <Button
+          size="sm"
+          className="h-9 rounded-pill px-4 text-[13px] font-medium sm:h-10 sm:px-5 sm:text-sm"
+          asChild
+        >
           <Link
             to="/arma-tu-viaje"
             search={{ destination: content.slug, destinationLabel: content.hero.title }}
@@ -423,7 +427,12 @@ function HeroCopy({
             <ArrowRight className="ml-1.5 size-4" aria-hidden />
           </Link>
         </Button>
-        <Button size="sm" variant="ghost" className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm" asChild>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm"
+          asChild
+        >
           <a href={content.hero.secondaryCta.href}>
             <Images className="mr-1.5 size-4" aria-hidden />
             {content.hero.secondaryCta.label}

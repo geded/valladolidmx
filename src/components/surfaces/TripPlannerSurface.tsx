@@ -30,7 +30,6 @@ import {
   Route as RouteIcon,
   MessageCircle,
   ArrowRight,
-  ArrowLeft,
   PlusCircle,
   ShieldCheck,
 } from "lucide-react";
@@ -159,16 +158,6 @@ function TripPlannerHero({
 
   return (
     <header className="border-b border-border/70 pb-8 pt-2 sm:pb-10 sm:pt-4">
-      {returnDestination ? (
-        <Link
-          to="/oriente-maya/$destino"
-          params={{ destino: returnDestination.slug }}
-          className="mb-5 inline-flex min-h-10 items-center gap-2 rounded-full px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:mb-6"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Volver a {returnDestination.label}
-        </Link>
-      ) : null}
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary sm:text-xs">
         {eyebrow}
       </p>
@@ -221,7 +210,10 @@ function TripPlannerHero({
         </Button>
 
         {!user ? (
-          <Link to="/auth" className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-primary hover:underline">
+          <Link
+            to="/auth"
+            className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-primary hover:underline"
+          >
             Ya tengo cuenta
           </Link>
         ) : null}
