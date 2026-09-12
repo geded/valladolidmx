@@ -580,3 +580,35 @@ export const importUrlToStudioMedia = createServerFn({ method: "POST" })
       url: publicProxyUrl(asset.storage_path as string),
     };
   });
+
+/* ──────────────  Resolver un activo por id (previsualización CMS)  ────────── */
+
+/**
+ * Devuelve la URL estable y el ALT de un `media_asset` del bucket
+ * `studio-media`. Sólo lectura y sólo para roles editoriales: permite que
+ * los editores del CMS vean la miniatura de la portada seleccionada sin
+ * copiar identificadores a mano.
+ */
+export const getStudioMediaAssetById = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { mediaId: string }) => {
+    if (!d?.mediaId) throw new Error("invalid_input");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+    const { data: row, error } = await context.supabase
+      .from("media_assets")
+      .select("id, storage_path, storage_bucket, alt_text, title, review_state")
+      .eq("id", data.mediaId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (error) throw error;
+    if (!row || row.storage_bucket !== BUCKET) return null;
+    return {
+      id: row.id as string,
+      url: publicProxyUrl(row.storage_path as string),
+      alt: (row.alt_text as string | null) ?? (row.title as string | null) ?? null,
+      reviewState: (row.review_state as string | null) ?? "unreviewed",
+    };
+  });
