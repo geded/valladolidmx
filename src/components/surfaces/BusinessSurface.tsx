@@ -506,6 +506,7 @@ export function BusinessSurface({
       if (anchor.id === "ubicacion" && !hasLocation) return false;
       if (anchor.id === "descubre" && !hasRelated) return false;
       if (anchor.id === "promociones" && !showPromotions) return false;
+      if (anchor.id === "servicios" && hidesGenericOffer) return false;
       if (!activeContract) return true;
       if (
         activeContract.omissions.includes("offer") &&
