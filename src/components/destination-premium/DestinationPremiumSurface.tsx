@@ -28,6 +28,7 @@ import {
   Hotel,
   Images,
   Map as MapIcon,
+  MapPin,
   Search,
   Sparkles,
   Tag,
