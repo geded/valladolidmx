@@ -120,13 +120,9 @@ export function PlacePremiumSurface({
       : null;
   const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
   /* Destino y, cuando el dato real la declara, subzona del destino. */
-  const heroEyebrow = [
-    content.identity.eyebrow,
-    content.identity.destinationLabel,
-    content.identity.zoneLabel || null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  /* Paridad con hotel/restaurante/casa: el eyebrow es corto (una sola
+     etiqueta). Destino y zona ya viven en el breadcrumb y en IdentityStrip. */
+  const heroEyebrow = content.identity.eyebrow;
 
   /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
   const primaryPoint = content.map.points[0] ?? null;
@@ -230,18 +226,20 @@ export function PlacePremiumSurface({
       {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
           emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
           bloque oficial de ubicación. */}
-      <Container className="mt-4 flex justify-end gap-2">
+      <Container className="mt-4 flex flex-wrap justify-end gap-2">
         <PlaceShareButton title={content.identity.title} />
-        <Button
-          type="button"
-          onClick={() => {
-            document
-              .getElementById("place-trip-action")
-              ?.scrollIntoView({ behavior: "smooth", block: "center" });
-          }}
-        >
-          {content.hero.primaryCta.label}
-        </Button>
+        {tripSlot ?? (
+          <Button
+            type="button"
+            onClick={() => {
+              document
+                .getElementById("place-trip-action")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+          >
+            {content.hero.primaryCta.label}
+          </Button>
+        )}
       </Container>
       {content.hero.cover.url ? null : (
         <Container className="mt-3">
