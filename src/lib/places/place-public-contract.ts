@@ -263,16 +263,37 @@ export function placeCanonicalPath(dto: { destination: { slug: string }; slug: s
 
 const DAY_LABELS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+/** `08:00:00` → `08:00` (el dato de segundos no aporta al visitante). */
+function hhmm(value: string): string {
+  const match = /^(\d{2}):(\d{2})/u.exec(value.trim());
+  return match ? `${match[1]}:${match[2]}` : value.trim();
+}
+
+function hoursValue(h: PublicPlaceHoursDTO): string {
+  if (h.isClosed) return "cerrado";
+  if (h.opensAt && h.closesAt) {
+    const opens = hhmm(h.opensAt);
+    const closes = hhmm(h.closesAt);
+    /* Paseo público abierto 24 h: se dice en lenguaje del visitante. */
+    if (opens === "00:00" && (closes === "23:59" || closes === "24:00")) return "abierto todo el día";
+    return `${opens} – ${closes}`;
+  }
+  return h.notes?.trim() || "horario por confirmar";
+}
+
 export function formatPlaceHours(hours: readonly PublicPlaceHoursDTO[]): string[] {
-  return hours
-    .slice()
-    .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
-    .map((h) => {
-      const day = DAY_LABELS[h.dayOfWeek] ?? `Día ${h.dayOfWeek}`;
-      if (h.isClosed) return `${day}: cerrado`;
-      if (h.opensAt && h.closesAt) return `${day}: ${h.opensAt} – ${h.closesAt}`;
-      return `${day}: ${h.notes?.trim() || "horario por confirmar"}`;
-    });
+  const sorted = hours.slice().sort((a, b) => a.dayOfWeek - b.dayOfWeek);
+  if (sorted.length === 0) return [];
+  /* Cuando los siete días son idénticos se resume en una sola línea en vez de
+     repetir siete tarjetas iguales. */
+  const values = sorted.map(hoursValue);
+  if (sorted.length === 7 && values.every((v) => v === values[0])) {
+    return [`Todos los días: ${values[0]}`];
+  }
+  return sorted.map((h, index) => {
+    const day = DAY_LABELS[h.dayOfWeek] ?? `Día ${h.dayOfWeek}`;
+    return `${day}: ${values[index]}`;
+  });
 }
 
 const ADMISSION_LABELS: Record<string, string> = {
