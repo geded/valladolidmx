@@ -130,21 +130,16 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     value: b.verified ? "Verificado" : "Publicado",
     tone: b.verified ? "primary" : "default",
   });
-  const attributeLabels: Record<string, string> = {
-    property_type: "Tipo de propiedad",
-    capacity: "Capacidad",
-    bedrooms: "Dormitorios",
-    amenities: "Amenidades",
-    stay_features: "Características",
-  };
-  for (const [key, label] of Object.entries(attributeLabels)) {
-    const raw = b.filter_attributes?.[key];
-    const values = Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : [];
-    if (!values.length) continue;
+  /* Atributos administrables: siempre con la etiqueta del catálogo CMS.
+     Sin catálogo resuelto no se muestran claves crudas. */
+  const resolved = b.attributes ?? [];
+  for (const key of ["property_type", "capacity", "bedrooms", "amenities", "stay_features"]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
     items.push({
-      iconKey: key === "capacity" ? "users" : key === "bedrooms" ? "bed" : "home",
-      label,
-      value: values.map((value) => value.replace(/-/g, " ")).join(" · "),
+      iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "home",
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
       tone: "default",
     });
   }
