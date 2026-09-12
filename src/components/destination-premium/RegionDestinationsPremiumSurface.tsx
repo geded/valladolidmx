@@ -231,25 +231,26 @@ export function RegionDestinationsPremiumSurface({
 
         <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(26rem,.96fr)]">
           <section
-            className="min-w-0 rounded-3xl border border-border bg-card p-4 shadow-sm"
+            className="min-w-0 rounded-3xl border-border bg-transparent sm:border sm:bg-card sm:p-4 sm:shadow-sm"
             aria-labelledby="destination-list-heading"
           >
-            <div className="flex items-end justify-between gap-4">
-              <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
                   Descubre el territorio
                 </p>
-                <h2 id="destination-list-heading" className="mt-1 font-serif text-3xl">
+                <h2 id="destination-list-heading" className="mt-1 font-serif text-2xl sm:text-3xl">
                   Destinos del Oriente Maya
                 </h2>
               </div>
-              <span className="text-sm text-muted-foreground">{filtered.length} destinos</span>
+              <span className="shrink-0 text-sm text-muted-foreground">
+                {filtered.length} destinos
+              </span>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
               {shown.map((destination) => (
                 <DestinationCard key={destination.slug} destination={destination} />
-
               ))}
             </div>
             {!shown.length ? (
