@@ -49,7 +49,7 @@ export function buildDestinationPremiumRuntime(input: {
   // Reparto editorial: el hero rota entre sus propias fotografías,
   // "Descubre" usa otras y la galería se queda con el resto.
   const poolSize = editorialPool.length;
-  const heroCount = poolSize >= 6 ? 3 : poolSize >= 4 ? 2 : 1;
+  const heroCount = poolSize >= 6 ? 3 : poolSize >= 3 ? 2 : 1;
   const heroSupporting = editorialPool.slice(1, heroCount);
   const afterHero = editorialPool.slice(heroCount);
   const narrativeCount = afterHero.length >= 4 ? 2 : afterHero.length >= 1 ? 1 : 0;
