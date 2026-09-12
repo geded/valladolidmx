@@ -784,6 +784,7 @@ export function BusinessSurface({
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
               <div className="min-w-0">
                 <p className="text-3xl font-semibold tracking-tight text-foreground">
+                  <span className="text-base font-normal text-muted-foreground">Desde </span>
                   {stayFromPriceLabel}{" "}
                   <span className="text-base font-normal text-muted-foreground">por noche</span>
                 </p>
@@ -819,6 +820,36 @@ export function BusinessSurface({
             </p>
           </div>
         </section>
+      ) : null}
+
+      {/* Móvil: barra inferior persistente con la tarifa orientativa y la
+          acción principal de la ficha. No hay reserva ni cobro en línea. */}
+      {isVacationRental && stayFromPriceLabel ? (
+        <>
+          <div aria-hidden className="h-24 lg:hidden" />
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-5 py-3 shadow-floating backdrop-blur lg:hidden">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-base font-semibold text-foreground">
+                  <span className="font-normal text-muted-foreground">Desde </span>
+                  {stayFromPriceLabel}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  por noche · sin cobro en línea
+                </p>
+              </div>
+              <div className="shrink-0">
+                <AddToTravelPlanButton
+                  kind="business"
+                  targetId={b.id}
+                  title={b.display_name}
+                  slug={b.slug}
+                  {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+                />
+              </div>
+            </div>
+          </div>
+        </>
       ) : null}
 
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
