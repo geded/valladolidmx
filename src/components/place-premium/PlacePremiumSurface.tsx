@@ -221,10 +221,12 @@ export function PlacePremiumSurface({
       {hasMap ? (
         <Container className="mt-10 sm:mt-16">
           <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
-          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          {/* Paridad con hospedaje y restaurante: mapa a todo lo ancho y la
+              información de cómo llegar debajo. */}
+          <div className="mt-6 space-y-5">
             {content.map.points.length ? <ExperienceMapBlock dto={mapDto} /> : null}
             {content.map.directions.length ? (
-              <ul className="space-y-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground">
+              <ul className="grid gap-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
                 {content.map.directions.map((line, index) => (
                   <li key={`dir-${index}`} className="flex gap-2">
                     <Compass className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
@@ -234,6 +236,7 @@ export function PlacePremiumSurface({
               </ul>
             ) : null}
           </div>
+
         </Container>
       ) : null}
 
