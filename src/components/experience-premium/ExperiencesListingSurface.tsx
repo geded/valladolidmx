@@ -203,6 +203,7 @@ export function ExperiencesListingSurface({
   const askAlux = (preference?: string) =>
     openAluxFloating({
       reason: "manual",
+      ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir experiencias reales publicadas en el Oriente Maya.",
         [preference, party ? `Viajo ${party}` : null].filter(Boolean).join(" · ") || undefined,

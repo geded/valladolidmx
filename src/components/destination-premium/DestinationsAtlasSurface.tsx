@@ -304,6 +304,7 @@ export function DestinationsAtlasSurface({
       .join(". ");
     openAluxFloating({
       reason: "manual",
+      ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir destinos del Oriente Maya desde Valladolid por afinidad y cercanía, y convertirlos en una ruta que pueda guardar en Mi Viaje.",
         preference || undefined,

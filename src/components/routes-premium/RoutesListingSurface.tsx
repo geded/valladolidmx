@@ -159,6 +159,7 @@ export function RoutesListingSurface({
   const askAlux = (preference?: string) =>
     openAluxFloating({
       reason: "manual",
+      ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir una ruta publicada del Oriente Maya.",
         [preference, territory, party ? `Viajo ${party}` : null].filter(Boolean).join(" · ") ||
