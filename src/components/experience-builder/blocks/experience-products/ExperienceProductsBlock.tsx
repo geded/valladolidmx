@@ -130,6 +130,10 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
           secondary_action_mode: p.secondary_action_mode,
           secondary_action_label: p.secondary_action_label,
           accepts_online_payment: p.accepts_online_payment,
+          name: p.name,
+          slug: p.slug ?? null,
+          imageUrl: p.cover_url ?? null,
+          subtitle: p.tagline ?? null,
         });
         const item = marketplaceProductToItem(p);
         return lodging && item.priceAmount != null
