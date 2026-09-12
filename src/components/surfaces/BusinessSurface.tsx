@@ -625,6 +625,30 @@ export function BusinessSurface({
   const stayEssentialsDto = isVacationRental ? businessToStayEssentialsDTO(b) : null;
   const stayAmenitiesDto = isVacationRental ? businessToStayAmenitiesDTO(b) : null;
   const stayPolicyDto = isVacationRental ? businessToStayPolicyDTO(b) : null;
+  /* Precio orientativo "desde": se toma exclusivamente del catálogo publicado
+     en CMS (`products.price_amount`). Sin precio real no se renderiza nada y
+     nunca se ofrece cobro ni reservación en línea: la acción es Mi Viaje. */
+  const stayFromPrice = (() => {
+    if (!isVacationRental) return null;
+    const priced = (b.products ?? []).filter(
+      (p) => typeof p.price_amount === "number" && (p.price_amount as number) > 0,
+    );
+    if (priced.length === 0) return null;
+    const cheapest = priced.reduce((min, p) =>
+      (p.price_amount as number) < (min.price_amount as number) ? p : min,
+    );
+    return {
+      amount: cheapest.price_amount as number,
+      currency: cheapest.price_currency || "MXN",
+    };
+  })();
+  const stayFromPriceLabel = stayFromPrice
+    ? new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: stayFromPrice.currency,
+        maximumFractionDigits: 0,
+      }).format(stayFromPrice.amount)
+    : null;
 
   return (
     <PublicShell
