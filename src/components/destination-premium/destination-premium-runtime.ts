@@ -46,12 +46,15 @@ export function buildDestinationPremiumRuntime(input: {
   const editorialPool = [...heroRole, ...gallery.map(mediaOf), ...approvedConceptual];
   const coverMedia = cover ? mediaOf(cover) : (approvedConceptual[0] ?? null);
   const heroMedia = editorialPool[0] ?? coverMedia ?? { url: "", alt: "" };
-  const afterHero = editorialPool.slice(1);
-  const narrativeMedia = afterHero.slice(0, 2);
-  const remainingGallery = afterHero.slice(narrativeMedia.length);
-  const heroSupporting = remainingGallery.length > 2 ? remainingGallery.slice(-2) : [];
-  const galleryItems =
-    heroSupporting.length > 0 ? remainingGallery.slice(0, -2) : remainingGallery;
+  // Reparto editorial: el hero rota entre sus propias fotografías,
+  // "Descubre" usa otras y la galería se queda con el resto.
+  const poolSize = editorialPool.length;
+  const heroCount = poolSize >= 6 ? 3 : poolSize >= 3 ? 2 : 1;
+  const heroSupporting = editorialPool.slice(1, heroCount);
+  const afterHero = editorialPool.slice(heroCount);
+  const narrativeCount = afterHero.length >= 4 ? 2 : afterHero.length >= 1 ? 1 : 0;
+  const narrativeMedia = afterHero.slice(0, narrativeCount);
+  const galleryItems = afterHero.slice(narrativeCount);
   const heroDescription = destination.tagline?.trim() ?? "";
   const descubreText = destination.description?.trim() ?? "";
   const paragraphs = descubreText ? [descubreText] : [];
