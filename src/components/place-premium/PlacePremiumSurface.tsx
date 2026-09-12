@@ -14,8 +14,18 @@
  *  - `editorial`: lectura tipo revista territorial (historia primero).
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
-import { useMemo, type ReactNode } from "react";
-import { Accessibility, CalendarDays, Clock, Compass, Heart, ImageOff, Ticket } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
+import {
+  Accessibility,
+  CalendarDays,
+  Clock,
+  Compass,
+  Heart,
+  ImageOff,
+  Share2,
+  Ticket,
+} from "lucide-react";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
