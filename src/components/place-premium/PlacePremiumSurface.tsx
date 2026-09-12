@@ -26,6 +26,7 @@ import {
   Ticket,
 } from "lucide-react";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -86,7 +87,37 @@ export function PlacePremiumSurface({
     content.essentials.facts.length > 0 ||
     content.essentials.recommendations.length > 0 ||
     content.essentials.accessibility.length > 0;
-  const hasGallery = content.gallery.items.length > 0;
+  /* Galería: mismo bloque oficial `vmx.experience.gallery` (variante mosaico)
+     que las fichas de hotel, restaurante y casa de vacaciones. Sólo medios
+     publicados en CMS; sin fotografías no se renderiza nada. */
+  const galleryItems = content.gallery.items
+    .filter((media) => Boolean(media.url))
+    .map((media) => ({
+      kind: "image" as const,
+      url: media.url as string,
+      alt: media.alt || content.identity.title,
+    }));
+  const galleryDto =
+    galleryItems.length >= 2
+      ? {
+          variant: "mosaic" as const,
+          heading: `Conoce ${content.identity.title}`,
+          subheading: null,
+          items: galleryItems,
+          maxVisible: 5,
+          aspect: "landscape" as const,
+          ariaLabel: `Galería de ${content.identity.title}`,
+          capabilities: {
+            lightbox: true,
+            captions: false,
+            video: false,
+            panorama360: false,
+            model3d: false,
+            ar: false,
+            ugc: false,
+          },
+        }
+      : null;
   const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
   /* Destino y, cuando el dato real la declara, subzona del destino. */
   const heroEyebrow = [
@@ -225,10 +256,10 @@ export function PlacePremiumSurface({
       {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
       {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
           lectura, justo después del encabezado y antes del relato. */}
-      {hasGallery ? (
-        <Container className="mt-6 sm:mt-8">
-          {cinematic ? <GalleryFilmstrip content={content} /> : <GalleryMosaic content={content} />}
-        </Container>
+      {galleryDto ? (
+        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
       ) : null}
 
       {hasIntro ? (
@@ -713,55 +744,4 @@ function EssentialList({
   );
 }
 
-function GalleryMosaic({ content }: { content: PlacePremiumContent }) {
-  const [first, ...rest] = content.gallery.items;
-  return (
-    <section aria-labelledby="galeria-lugar-title">
-      <SectionHeading
-        id="galeria-lugar"
-        kicker={content.gallery.kicker}
-        title={content.gallery.title}
-      />
-      <p className="mt-3 max-w-2xl text-sm text-muted-foreground" id="galeria-lugar-title">
-        {content.gallery.note}
-      </p>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {first ? (
-          <DemoImage
-            media={first}
-            className="aspect-[4/3] rounded-3xl sm:col-span-2 sm:row-span-2 lg:aspect-auto lg:h-full"
-          />
-        ) : null}
-        {rest.map((media, index) => (
-          <DemoImage key={`media-${index}`} media={media} className="aspect-[4/3] rounded-3xl" />
-        ))}
-      </div>
-    </section>
-  );
-}
 
-function GalleryFilmstrip({ content }: { content: PlacePremiumContent }) {
-  return (
-    <section aria-labelledby="galeria-lugar-title">
-      <SectionHeading
-        id="galeria-lugar"
-        kicker={content.gallery.kicker}
-        title={content.gallery.title}
-      />
-      <p className="mt-3 max-w-2xl text-sm text-muted-foreground" id="galeria-lugar-title">
-        {content.gallery.note}
-      </p>
-      <ul
-        className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2"
-        tabIndex={0}
-        aria-label="Galería del lugar"
-      >
-        {content.gallery.items.map((media, index) => (
-          <li key={`media-${index}`} className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]">
-            <DemoImage media={media} className="aspect-[16/10] rounded-3xl" />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
