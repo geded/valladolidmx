@@ -104,12 +104,23 @@ function SecondaryAction({ product }: { product: ProductActionsProduct }) {
   );
 }
 
-export function ProductActions({ product }: { product: ProductActionsProduct }) {
+export function ProductActions({
+  product,
+  compact = false,
+}: {
+  product: ProductActionsProduct;
+  /**
+   * Modo compacto (tarjetas de hospedaje): conserva la acción principal y la
+   * secundaria del CMS, y omite el apoyo de concierge, que ya se ofrece en la
+   * banda final de la ficha. No altera la Estrategia de Conversión.
+   */
+  compact?: boolean;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PrimaryButton product={product} />
       <SecondaryAction product={product} />
-      <RequestConciergeButton kind="product" productId={product.id} />
+      {compact ? null : <RequestConciergeButton kind="product" productId={product.id} />}
     </div>
   );
 }
