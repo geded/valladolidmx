@@ -87,18 +87,6 @@ function AYVPage() {
     : [{ label: "Arma tu Viaje" }];
   return (
     <PublicShell variant="hero" crumbs={crumbs} compactCrumbsOnMobile>
-      {returnDestination ? (
-        <div className="mx-auto w-full max-w-[1200px] px-4 pt-2 sm:px-6 lg:px-8">
-          <Link
-            to="/oriente-maya/$destino"
-            params={{ destino: returnDestination.slug }}
-            className="inline-flex min-h-10 items-center gap-2 rounded-full px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Volver a {returnDestination.label}
-          </Link>
-        </div>
-      ) : null}
       {composition && snapshot && hasRenderableBlocks(snapshot) ? (
         <CompositionRenderer tree={snapshot} />
       ) : (
