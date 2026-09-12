@@ -53,7 +53,7 @@
 
 ## Reconciliación de fichas Premium (2026-09-12)
 
-- [ ] Casa de vacaciones: reconciliar ruta pública con autoridad Premium aprobada, incluyendo compartir, mapa/reseñas condicionales y QA completo.
-- [ ] Hotel: reconciliar ruta pública con autoridad Premium aprobada y QA completo.
-- [ ] Restaurante: reconciliar ruta pública con autoridad Premium aprobada y QA completo.
-- [ ] Gates finales: lint dirigido, typecheck, pruebas, build, Route Inventory, Governance Integrity y matriz responsive 1440/834/430/390.
+- [x] Casa de vacaciones: reconciliada con la autoridad Premium aprobada; compartir, mapa/reseñas condicionales y QA 1440/834/430/390 en PASS.
+- [x] Hotel: reconciliado con la autoridad Premium aprobada; estado sin reseñas/medios adicionales no inventa contenido y QA 1440/834/430/390 en PASS.
+- [x] Restaurante: reconciliado con la autoridad Premium aprobada; compartir, mapa/reseñas condicionales y QA 1440/834/430/390 en PASS.
+- [ ] Gates finales: lint dirigido, typecheck, pruebas propias (22/22) y Route Inventory (249/249) en PASS. Bloqueado el cierre global por deuda previa fuera de alcance: lint baseline reporta 5 errores nuevos en 4 archivos ajenos y Governance Integrity reporta artefactos/fingerprints acumulados no registrados; no se amplía alcance.
