@@ -709,9 +709,21 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {!descriptionBeforeGallery && descriptionSection ? (
+      {!isVacationRental && !descriptionBeforeGallery && descriptionSection ? (
         <section data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceSection dto={descriptionSection} />
+        </section>
+      ) : null}
+
+      {stayAmenitiesDto ? (
+        <section data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceInfoGrid dto={stayAmenitiesDto} />
+        </section>
+      ) : null}
+
+      {stayPolicyDto ? (
+        <section data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceInfoGrid dto={stayPolicyDto} />
         </section>
       ) : null}
 
