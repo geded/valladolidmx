@@ -85,6 +85,13 @@ export function onAluxMapFocus(handler: (payload: AluxMapFocusPayload) => void):
 export interface AluxOpenPayload {
   reason: AluxOpenReason;
   hint?: string;
+  /**
+   * Preferencia legible que el viajero acaba de marcar en la superficie
+   * (ej. «En pareja»). El dock la envía como primer turno real de la
+   * conversación para que Alux la use al recomendar. Nunca contiene
+   * instrucciones internas.
+   */
+  prompt?: string;
   /** Contexto estructurado que el dock consume tal cual (Lote 3J.1). */
   selection?: AluxOpenSelection;
 }
