@@ -352,6 +352,7 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     },
   ],
   events: [],
+  nearbyBusinesses: [],
   nearby: [
     {
       id: "near-1",
