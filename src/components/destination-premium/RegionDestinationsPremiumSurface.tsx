@@ -271,42 +271,57 @@ export function RegionDestinationsPremiumSurface({
           </section>
 
           <section
-            className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-sm xl:sticky xl:top-24 xl:self-start"
+            className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-sm sm:p-4 xl:sticky xl:top-24 xl:self-start"
             aria-labelledby="territory-map-heading"
           >
-            <div className="mb-3 flex items-center justify-between">
-              <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
                   Mapa del territorio
                 </p>
-                <h2 id="territory-map-heading" className="font-serif text-2xl">
+                <h2 id="territory-map-heading" className="truncate font-serif text-xl sm:text-2xl">
                   Valladolid conecta tu ruta
                 </h2>
               </div>
-              <MapIcon className="size-5 text-selva" />
+              <button
+                type="button"
+                onClick={() => setMapOpen((current) => !current)}
+                aria-expanded={mapOpen}
+                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-border px-3.5 text-[13px] font-semibold xl:hidden"
+              >
+                <MapIcon className="size-4 text-selva" />
+                {mapOpen ? "Ocultar mapa" : "Ver mapa"}
+              </button>
+              <MapIcon className="hidden size-5 shrink-0 text-selva xl:block" />
             </div>
-            {mapped.length ? (
-              <Suspense fallback={<div className="h-[34rem] animate-pulse rounded-2xl bg-muted" />}>
-                <InteractiveMap
-                  lat={20.6896}
-                  lng={-88.2011}
-                  zoom={8}
-                  markerTitle="Oriente Maya"
-                  markers={mapped.map((destination) => ({
-                    lat: destination.latitude as number,
-                    lng: destination.longitude as number,
-                    title: destination.name,
-                    href: `/oriente-maya/${destination.slug}`,
-                  }))}
-                  className="h-[34rem] rounded-2xl"
-                />
-              </Suspense>
-            ) : (
-              <div className="grid h-[28rem] place-items-center rounded-2xl bg-muted p-8 text-center text-sm text-muted-foreground">
-                El mapa aparecerá cuando los destinos tengan coordenadas verificadas.
-              </div>
-            )}
-            <div className="mt-3 rounded-2xl bg-secondary p-4 text-sm text-secondary-foreground">
+            <div className={cn("mt-3", mapOpen ? "block" : "hidden xl:block")}>
+              {mapped.length ? (
+                <Suspense
+                  fallback={
+                    <div className="h-[22rem] animate-pulse rounded-2xl bg-muted xl:h-[34rem]" />
+                  }
+                >
+                  <InteractiveMap
+                    lat={20.6896}
+                    lng={-88.2011}
+                    zoom={8}
+                    markerTitle="Oriente Maya"
+                    markers={mapped.map((destination) => ({
+                      lat: destination.latitude as number,
+                      lng: destination.longitude as number,
+                      title: destination.name,
+                      href: `/oriente-maya/${destination.slug}`,
+                    }))}
+                    className="h-[22rem] rounded-2xl xl:h-[34rem]"
+                  />
+                </Suspense>
+              ) : (
+                <div className="grid h-[18rem] place-items-center rounded-2xl bg-muted p-6 text-center text-sm text-muted-foreground xl:h-[28rem]">
+                  El mapa aparecerá cuando los destinos tengan coordenadas verificadas.
+                </div>
+              )}
+            </div>
+            <div className="mt-3 rounded-2xl bg-secondary p-3 text-sm text-secondary-foreground sm:p-4">
               <strong>Tu plan de viaje:</strong> guarda destinos y Alux los ordenará por tiempo,
               distancia y días disponibles.
             </div>
