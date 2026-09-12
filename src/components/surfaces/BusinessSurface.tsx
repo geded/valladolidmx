@@ -806,6 +806,7 @@ export function BusinessSurface({
             addressLine1={b.primary_location.address_line1}
             addressLine2={b.primary_location.address_line2}
             presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}
+            layout={usesApprovedFamilyTemplate ? "stacked" : "split"}
           />
         </section>
       ) : null}
