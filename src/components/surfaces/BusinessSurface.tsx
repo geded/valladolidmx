@@ -855,7 +855,11 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {!activeContract?.omissions.includes("offer") ? (
+      {/* Casa de vacaciones: si la única tarifa publicada ya se presenta en el
+          bloque de estancia, no se repite la tarjeta genérica de producto.
+          Con dos o más servicios publicados el catálogo se mantiene. */}
+      {!activeContract?.omissions.includes("offer") &&
+      !(isVacationRental && (b.products ?? []).length <= 1 && stayFromPriceLabel) ? (
         <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceProductsBlock
             config={{
