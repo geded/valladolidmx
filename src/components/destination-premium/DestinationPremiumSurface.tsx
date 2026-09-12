@@ -413,14 +413,14 @@ function HeroCopy({
         </p>
       ) : null}
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className="mt-5 flex flex-wrap items-center gap-2">
-        <Button size="sm" className="h-9 rounded-pill px-3.5 text-[13px] sm:h-10 sm:px-4 sm:text-sm" asChild>
+      <div className="mt-5 flex flex-wrap items-center gap-2 gap-y-2.5">
+        <Button size="sm" className="h-9 rounded-pill px-4 text-[13px] font-medium sm:h-10 sm:px-5 sm:text-sm" asChild>
           <a href={content.hero.primaryCta.href}>
             {content.hero.primaryCta.label}
             <ArrowRight className="ml-1.5 size-4" aria-hidden />
           </a>
         </Button>
-        <Button size="sm" variant="outline" className="h-9 rounded-pill px-3.5 text-[13px] sm:h-10 sm:px-4 sm:text-sm" asChild>
+        <Button size="sm" variant="ghost" className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm" asChild>
           <a href={content.hero.secondaryCta.href}>
             <Images className="mr-1.5 size-4" aria-hidden />
             {content.hero.secondaryCta.label}

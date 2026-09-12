@@ -324,7 +324,7 @@ export function DestinationSurfaceContractBoundary({
                   slug={destinationSlug}
                   imageUrl={content.hero.cover.url || null}
                   subtitle={premiumDestination.tagline}
-                  variant="full"
+                  variant="compact"
                   eligibilityMode="legacy"
                 />
               ) : null
