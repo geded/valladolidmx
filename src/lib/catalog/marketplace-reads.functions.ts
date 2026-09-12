@@ -1236,6 +1236,51 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       detailCoverUrl = detailMedia.find((m) => m.role === "cover")?.url ?? null;
     }
 
+    /* Portada CMS de cada producto (`product_media` role=cover → media_assets).
+       Sin fila acreditada la tarjeta conserva su fallback editorial: nunca se
+       inventan medios ni se construyen URLs fuera del pipeline. */
+    const productCovers = new Map<string, string>();
+    const productIds = (products ?? []).map((p) => String(p.id));
+    if (productIds.length > 0) {
+      try {
+        const { data: pmedia } = await supabase
+          .from("product_media")
+          .select(
+            "product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, status, deleted_at )",
+          )
+          .in("product_id", productIds)
+          .eq("role", "cover")
+          .order("sort_order", { ascending: true });
+        const validRows = ((pmedia ?? []) as Array<Record<string, unknown>>).filter((r) => {
+          const a = r.media_assets as {
+            storage_bucket?: string | null;
+            storage_path?: string | null;
+            status?: string | null;
+            deleted_at?: string | null;
+          } | null;
+          return Boolean(
+            a?.storage_bucket && a.storage_path && a.status === "published" && a.deleted_at === null,
+          );
+        });
+        if (validRows.length > 0) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          for (const row of validRows) {
+            const pid = String(row.product_id);
+            if (productCovers.has(pid)) continue;
+            const a = row.media_assets as { storage_bucket: string; storage_path: string };
+            const { data: signed } = await supabaseAdmin.storage
+              .from(a.storage_bucket)
+              .createSignedUrl(a.storage_path, 3600);
+            if (signed?.signedUrl) productCovers.set(pid, signed.signedUrl);
+          }
+        }
+      } catch {
+        /* Sin credencial de firma las tarjetas usan su fallback aprobado. */
+      }
+    }
+
+
+
     return {
       id: String(biz.id),
       media: detailMedia,
