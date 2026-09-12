@@ -140,6 +140,8 @@ export interface PlacePremiumContent {
   /** Vacío a propósito: demuestra el ocultamiento correcto de módulos. */
   events: PlacePremiumRelated[];
   nearby: PlacePremiumNearby[];
+  /** Empresas publicadas cercanas por coordenadas reales (CMS). */
+  nearbyBusinesses: PlacePremiumNearbyBusiness[];
   trip: {
     title: string;
     description: string;
