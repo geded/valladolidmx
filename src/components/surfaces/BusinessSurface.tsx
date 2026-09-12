@@ -1040,7 +1040,35 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      <ExperienceCtaBar dto={ctaBarDto} />
+      {/* Casas de vacaciones no ofrecen reserva ni cobro en línea: la acción
+          final invita a sumar el hospedaje a Mi Viaje para que el concierge
+          arme el itinerario completo. */}
+      {isVacationRental ? (
+        <section className="mx-auto mt-10 w-full max-w-7xl px-5 pb-4 sm:px-8 lg:px-12">
+          <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-lg font-semibold text-foreground">
+                Suma {b.display_name} a tu viaje
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Un concierge arma tu itinerario incluyendo este hospedaje. Sin cobro en línea.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <AddToTravelPlanButton
+                kind="business"
+                targetId={b.id}
+                title={b.display_name}
+                slug={b.slug}
+                {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+              />
+              <ShareButton title={b.display_name} />
+            </div>
+          </div>
+        </section>
+      ) : (
+        <ExperienceCtaBar dto={ctaBarDto} />
+      )}
     </PublicShell>
   );
 }
