@@ -164,6 +164,9 @@ export function AluxFloatingTrigger() {
   /* La instrucción operativa se conserva sólo como contexto interno; nunca se
      muestra al viajero (Founder Concierge Voice). */
   const [, setSelectionTask] = useState<string | null>(null);
+  /* Preferencia marcada por el viajero en la superficie: se envía al chat
+     como primer turno real para que la recomendación la considere. */
+  const [autoAsk, setAutoAsk] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   /* La sesión sigue viva mientras el viajero consulta el mapa: el panel sólo
      se repliega a una barra compacta y se restaura con el mismo diálogo. */
