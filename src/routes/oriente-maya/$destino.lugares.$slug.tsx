@@ -16,6 +16,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { PublicShell } from "@/components/discovery";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
@@ -164,6 +165,9 @@ function PlaceRoute() {
             builderNotice={projection.resolution.builderNotice}
             draftNotice={isDraft ? "Borrador · no publicado" : null}
             showBreadcrumbs={false}
+            saveSlot={
+              <FavoriteButton entityKind="place" entityId={dto.id} entityTitle={dto.name} entitySlug={slug} />
+            }
             tripSlot={
               <AddToTravelPlanButton
                 kind="place"

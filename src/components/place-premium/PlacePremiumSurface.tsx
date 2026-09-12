@@ -60,6 +60,8 @@ export interface PlacePremiumSurfaceProps {
   aluxSlot?: ReactNode;
   /** Lote 3J.1 · Acción real de Mi Viaje (persistencia por ID canónico). */
   tripSlot?: ReactNode;
+  /** Botón oficial "Guardar" (favoritos) del lugar. */
+  saveSlot?: ReactNode;
   /**
    * G4-PLACES · cuando la ruta ya renderiza el breadcrumb territorial
    * compartido (`PublicShell`), la superficie no debe duplicarlo.
@@ -76,6 +78,7 @@ export function PlacePremiumSurface({
   draftNotice = null,
   aluxSlot = null,
   tripSlot = null,
+  saveSlot = null,
   showBreadcrumbs = true,
   className,
 }: PlacePremiumSurfaceProps) {
@@ -171,7 +174,7 @@ export function PlacePremiumSurface({
       data-alux-safe-zone="true"
       className={cn("pb-24", className)}
     >
-      <Container className="pt-3 sm:pt-6">
+      <PlaceContainer className="pt-3 sm:pt-6">
         {content.demoNotice ? <DemoNotice text={content.demoNotice} /> : null}
         {draftNotice ? (
           <p
@@ -191,12 +194,12 @@ export function PlacePremiumSurface({
             {builderNotice}
           </p>
         ) : null}
-      </Container>
+      </PlaceContainer>
 
       {showBreadcrumbs ? (
-        <Container className="mt-4">
+        <PlaceContainer className="mt-4">
           <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} compactOnMobile />
-        </Container>
+        </PlaceContainer>
       ) : null}
 
       {/* Hero: misma familia y proporción aprobadas en las fichas Premium
@@ -226,8 +229,9 @@ export function PlacePremiumSurface({
       {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
           emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
           bloque oficial de ubicación. */}
-      <Container className="mt-4 flex flex-wrap justify-end gap-2">
+      <PlaceContainer className="mt-4 flex flex-wrap justify-end gap-2">
         <PlaceShareButton title={content.identity.title} />
+        {saveSlot}
         {tripSlot ?? (
           <Button
             type="button"
@@ -240,39 +244,36 @@ export function PlacePremiumSurface({
             {content.hero.primaryCta.label}
           </Button>
         )}
-      </Container>
+      </PlaceContainer>
       {content.hero.cover.url ? null : (
-        <Container className="mt-3">
+        <PlaceContainer className="mt-3">
           <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
-        </Container>
+        </PlaceContainer>
       )}
 
 
-      <Container className="mt-5 sm:mt-8">
-        <IdentityStrip content={content} dense={cinematic} />
-      </Container>
-      {aluxSlot ? <Container className="mt-5 sm:mt-6">{aluxSlot}</Container> : null}
+      {aluxSlot ? <PlaceContainer className="mt-5 sm:mt-6">{aluxSlot}</PlaceContainer> : null}
       {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
           lectura, justo después del encabezado y antes del relato. */}
       {galleryDto ? (
-        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
+        <PlaceContainer id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
           <ExperienceGallery dto={galleryDto} />
-        </section>
+        </PlaceContainer>
       ) : null}
 
       {hasIntro ? (
-        <Container className="mt-8 sm:mt-12">
+        <PlaceContainer className="mt-8 sm:mt-12">
           {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
-        </Container>
+        </PlaceContainer>
       ) : null}
       {hasEssentials ? (
-        <Container className="mt-8 sm:mt-12">
+        <PlaceContainer className="mt-8 sm:mt-12">
           {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
-        </Container>
+        </PlaceContainer>
       ) : null}
 
       {hasMap ? (
-        <Container className="mt-10 sm:mt-16" id="mapa-lugar">
+        <PlaceContainer className="mt-10 sm:mt-16" id="mapa-lugar">
           {/* Paridad exacta con hotel, restaurante y casa: se reutiliza el
               bloque oficial de ubicación (mapa a todo lo ancho, distancia y
               "Cómo llegar" debajo). Sin superficie de mapa paralela. */}
@@ -302,11 +303,11 @@ export function PlacePremiumSurface({
             ) : null}
           </div>
 
-        </Container>
+        </PlaceContainer>
       ) : null}
 
       {content.services.length ? (
-        <Container className="mt-10 sm:mt-16">
+        <PlaceContainer className="mt-10 sm:mt-16">
           <SectionHeading id="servicios-lugar" kicker="Servicios" title="Servicios disponibles" />
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {content.services.map((service) => (
@@ -319,11 +320,11 @@ export function PlacePremiumSurface({
               </li>
             ))}
           </ul>
-        </Container>
+        </PlaceContainer>
       ) : null}
 
       {content.experiences.length ? (
-        <Container className="mt-10 sm:mt-16">
+        <PlaceContainer className="mt-10 sm:mt-16">
           <SectionHeading
             id="experiencias-lugar"
             kicker="Planea tu visita"
@@ -352,12 +353,12 @@ export function PlacePremiumSurface({
               </li>
             ))}
           </ul>
-        </Container>
+        </PlaceContainer>
       ) : null}
 
       {/* Eventos: sin contenido → el módulo se oculta por completo. */}
       {content.events.length ? (
-        <Container className="mt-10 sm:mt-16">
+        <PlaceContainer className="mt-10 sm:mt-16">
           <SectionHeading id="eventos-lugar" kicker="Agenda" title="Eventos relacionados" />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {content.events.map((item) => (
@@ -368,11 +369,11 @@ export function PlacePremiumSurface({
               </li>
             ))}
           </ul>
-        </Container>
+        </PlaceContainer>
       ) : null}
 
       {content.nearby.length ? (
-        <Container className="mt-10 sm:mt-16">
+        <PlaceContainer className="mt-10 sm:mt-16">
           <SectionHeading id="cerca-lugar" kicker="Alrededor" title="Lugares cercanos" />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2">
             {content.nearby.map((item) => (
@@ -394,10 +395,10 @@ export function PlacePremiumSurface({
               </li>
             ))}
           </ul>
-        </Container>
+        </PlaceContainer>
       ) : null}
 
-      <Container className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-10 sm:mt-16">
         <div
           className={cn(
             "grid gap-5",
@@ -428,7 +429,7 @@ export function PlacePremiumSurface({
             )}
           </section>
         </div>
-      </Container>
+      </PlaceContainer>
 
       {/* Zona segura: reserva vertical para el dock flotante de Alux
           (incluye el área segura del dispositivo). Ningún contenido de la
@@ -443,6 +444,18 @@ export function PlacePremiumSurface({
 }
 
 /* ------------------------------------------------------------------ */
+
+/**
+ * PlaceContainer — mismo gutter que las fichas de hotel, restaurante y casa
+ * (`max-w-7xl px-5 sm:px-8 lg:px-12`). Un solo margen para toda la
+ * plataforma: no hay contenedor propio de Lugares.
+ */
+function PlaceContainer({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <Container className={cn("px-5 sm:px-8 lg:px-12", className)} {...props} />;
+}
 
 function DemoNotice({ text }: { text: string }) {
   return (
@@ -539,40 +552,6 @@ function DemoImage({
         </figcaption>
       )}
     </figure>
-  );
-}
-
-function IdentityStrip({
-  content,
-  dense = false,
-}: {
-  content: PlacePremiumContent;
-  dense?: boolean;
-}) {
-  const rows = [
-    { label: "Tipo", value: content.identity.typeLabel },
-    { label: "Destino", value: content.identity.destinationLabel },
-    { label: "Región", value: content.identity.regionLabel },
-  ];
-  return (
-    <section
-      aria-label="Identidad y clasificación"
-      /* Móvil: fila compacta de tres datos (no tarjeta vertical alta). */
-      className={cn("rounded-3xl border border-border bg-card p-3 sm:p-6", dense && "sm:p-4")}
-    >
-      <dl className="grid grid-cols-3 gap-2 sm:gap-4">
-        {rows.map((row) => (
-          <div key={row.label} className="min-w-0">
-            <dt className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-xs sm:tracking-[0.16em]">
-              {row.label}
-            </dt>
-            <dd className="mt-0.5 truncate text-sm font-medium sm:mt-1 sm:text-base">
-              {row.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
   );
 }
 

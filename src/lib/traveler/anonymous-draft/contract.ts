@@ -21,6 +21,8 @@ export const AnonymousFavoriteKindSchema = z.enum([
   "promotion",
   "event",
   "destination",
+  /* Lugares y sitios de interés: paridad con el Travel Plan. */
+  "place",
 ]);
 export type AnonymousFavoriteKind = z.infer<typeof AnonymousFavoriteKindSchema>;
 
