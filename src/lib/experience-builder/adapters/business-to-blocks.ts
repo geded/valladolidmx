@@ -328,8 +328,33 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
  * por `vmx.experience.products`. La Plantilla Business no vuelve a
  * pintar `<ul>` — sólo orquesta bloques oficiales.
  * ------------------------------------------------------------------ */
+/* Hospedaje: la tarifa publicada del CMS es por noche. Sólo se declara como
+   pista de precio; nunca implica cobro ni reservación en línea. Las claves son
+   las mismas que usa la Plantilla Business aprobada. */
+const LODGING_KEYS = new Set([
+  "hotel",
+  "hoteles",
+  "hospedaje",
+  "hospedajes",
+  "alojamiento",
+  "vacation_rental",
+  "casas-de-vacaciones",
+  "casa-de-vacaciones",
+]);
+
+export function isLodgingBusiness(b: {
+  category_family_key?: string | null;
+  category_slug?: string | null;
+}): boolean {
+  return (
+    LODGING_KEYS.has((b.category_family_key ?? "").trim().toLowerCase()) ||
+    LODGING_KEYS.has((b.category_slug ?? "").trim().toLowerCase())
+  );
+}
+
 export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
+  const isLodging = isLodgingBusiness(b);
   return {
     variant: "grid",
     heading: variant.productsHeading,
@@ -338,13 +363,21 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
     columns: 2,
     groupBy: "none",
     ariaLabel: variant.productsHeading,
-    items: b.products.map(marketplaceProductToItem),
+    items: b.products.map((p) => {
+      const item = marketplaceProductToItem(p);
+      return isLodging && item.priceAmount != null
+        ? { ...item, priceHint: "por noche" }
+        : item;
+    }),
     capabilities: {
       showPrice: true,
       showFavorite: true,
       showActions: true,
       showBusiness: false,
-      showMedia: false,
+      /* La portada CMS de cada producto (`product_media` role=cover) ya
+         llega firmada en el DTO: la tarjeta oficial la muestra y, sin
+         medio acreditado, usa su fallback editorial aprobado. */
+      showMedia: true,
       compact: false,
       contextAware: false,
       livePricing: false,

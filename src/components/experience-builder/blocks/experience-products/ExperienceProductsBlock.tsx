@@ -17,6 +17,7 @@ import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { ProductActions, type ProductActionsProduct } from "@/components/commerce/ProductActions";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
 import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
+import { isLodgingBusiness } from "@/lib/experience-builder/adapters/business-to-blocks";
 import {
   buildExperienceProductsPreviewDTO,
   experienceProductsConfigSchema,
@@ -41,8 +42,8 @@ export function marketplaceProductToItem(p: MarketplaceProductCard): ExperienceP
     productType: p.product_type || null,
     entityKind: "product",
     href: p.business_slug && p.slug ? `/marketplace/${p.business_slug}#p-${p.slug}` : null,
-    mediaUrl: null,
-    mediaAlt: null,
+    mediaUrl: p.cover_url ?? null,
+    mediaAlt: p.cover_url ? p.name : null,
     priceAmount: p.price_amount != null ? Number(p.price_amount) : null,
     priceCurrency: p.price_currency || "MXN",
     priceHint: null,
@@ -119,6 +120,8 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
     if (cfg.source === "business" && business) {
       const filtered =
         cfg.filters?.businessId && cfg.filters.businessId !== business.id ? [] : business.products;
+      /* Hospedaje: la tarifa CMS se lee por noche (sin cobro en línea). */
+      const lodging = isLodgingBusiness(business);
       baseItems = filtered.map((p) => {
         interactive.set(p.id, {
           id: p.id,
@@ -127,8 +130,15 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
           secondary_action_mode: p.secondary_action_mode,
           secondary_action_label: p.secondary_action_label,
           accepts_online_payment: p.accepts_online_payment,
+          name: p.name,
+          slug: p.slug ?? null,
+          imageUrl: p.cover_url ?? null,
+          subtitle: p.tagline ?? null,
         });
-        return marketplaceProductToItem(p);
+        const item = marketplaceProductToItem(p);
+        return lodging && item.priceAmount != null
+          ? { ...item, priceHint: "por noche" }
+          : item;
       });
     } else {
       baseItems = cfg.items;
