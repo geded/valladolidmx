@@ -642,6 +642,22 @@ export function BusinessSurface({
       currency: cheapest.price_currency || "MXN",
     };
   })();
+  /* Resumen escaneable de la estancia: sólo ejes administrables con valor
+     real en CMS; sin dato capturado la línea simplemente no se muestra. */
+  const stayHighlightLine = (() => {
+    if (!isVacationRental) return null;
+    const resolved = b.attributes ?? [];
+    const parts = ["capacity", "bedrooms", "beds", "bathrooms"]
+      .map((key) => resolved.find((item) => item.key === key))
+      .filter((attribute): attribute is NonNullable<typeof attribute> =>
+        Boolean(attribute && attribute.values.length > 0),
+      )
+      .map(
+        (attribute) =>
+          `${attribute.values.map((value) => value.label).join(" · ")} ${attribute.label.toLowerCase()}`,
+      );
+    return parts.length > 0 ? parts.join(" · ") : null;
+  })();
   const stayFromPriceLabel = stayFromPrice
     ? new Intl.NumberFormat("es-MX", {
         style: "currency",
