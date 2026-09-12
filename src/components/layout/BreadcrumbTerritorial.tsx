@@ -111,6 +111,13 @@ export function BreadcrumbTerritorial({
           </li>
           {effectiveCrumbs.map((c, i) => {
             const isLast = i === effectiveCrumbs.length - 1;
+            /**
+             * La región ya es el contexto implícito de toda la plataforma:
+             * en cadenas profundas se colapsa a "…" conservando el enlace y
+             * la etiqueta completa para lectores de pantalla.
+             */
+            const isRegion = c.to === `/${ORIENTE_MAYA.slug}`;
+            const collapseRegion = isRegion && !isLast && effectiveCrumbs.length > 2;
             return (
               <li
                 key={`${c.label}-${i}`}
@@ -125,9 +132,17 @@ export function BreadcrumbTerritorial({
                   <Link
                     to={c.to}
                     params={c.params as never}
+                    title={collapseRegion ? c.label : undefined}
                     className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
                   >
-                    {c.label}
+                    {collapseRegion ? (
+                      <>
+                        <span aria-hidden>…</span>
+                        <span className="sr-only">{c.label}</span>
+                      </>
+                    ) : (
+                      c.label
+                    )}
                   </Link>
                 ) : (
                   <span
