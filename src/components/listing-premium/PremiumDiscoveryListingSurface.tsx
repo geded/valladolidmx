@@ -270,6 +270,7 @@ function askAlux(profile: FamilyProfile, preference: string) {
         : "elegir dónde hospedarme";
   openAluxFloating({
     reason: "manual",
+    prompt: preference,
     hint: `Ayúdame a ${task}. Preferencia inicial: ${preference}. Primero determina si estoy planeando el viaje o si ya estoy en Valladolid o el Oriente Maya. Si planeo, pregunta fechas, acompañantes y presupuesto; pide ubicación sólo si ya estoy en destino y con permiso. Usa Mi Viaje y explica por qué recomiendas cada opción.`,
   });
 }

@@ -60,6 +60,7 @@ export function TourismAluxPanel({
     openAluxFloating({
       reason: "manual",
       hint: buildAluxStageAwareHint(task, preference),
+      ...(preference ? { prompt: preference } : {}),
       ...(selection ? { selection } : {}),
     });
 
