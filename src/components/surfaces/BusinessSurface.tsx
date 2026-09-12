@@ -50,7 +50,7 @@ import {
   businessToStayPolicyDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
-import { Share2 } from "lucide-react";
+import { Share2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
@@ -487,6 +487,13 @@ export function BusinessSurface({
       : null;
   const hasLocation = b.primary_location?.latitude != null && b.primary_location?.longitude != null;
   const hasGalleryMedia = Boolean(activePremium) || (b.media ?? []).length >= 2;
+  const isVacationRental = approvedFamily === "vacation_rental";
+  /* Casa de vacaciones con una sola tarifa publicada: la tarifa vive en el
+     bloque de estancia y no se repite como tarjeta genérica de producto. */
+  const hidesGenericOffer =
+    isVacationRental &&
+    (b.products ?? []).length <= 1 &&
+    (b.products ?? []).some((p) => typeof p.price_amount === "number" && p.price_amount > 0);
   const hasRelated = Boolean(
     related && (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0),
   );
@@ -499,6 +506,7 @@ export function BusinessSurface({
       if (anchor.id === "ubicacion" && !hasLocation) return false;
       if (anchor.id === "descubre" && !hasRelated) return false;
       if (anchor.id === "promociones" && !showPromotions) return false;
+      if (anchor.id === "servicios" && hidesGenericOffer) return false;
       if (!activeContract) return true;
       if (
         activeContract.omissions.includes("offer") &&
@@ -621,7 +629,6 @@ export function BusinessSurface({
   /* Casa de vacaciones: composición editorial propia de la familia sobre
      los mismos bloques oficiales. Sin ejes administrables capturados, cada
      sección simplemente no se renderiza. */
-  const isVacationRental = approvedFamily === "vacation_rental";
   const stayEssentialsDto = isVacationRental ? businessToStayEssentialsDTO(b) : null;
   const stayAmenitiesDto = isVacationRental ? businessToStayAmenitiesDTO(b) : null;
   const stayPolicyDto = isVacationRental ? businessToStayPolicyDTO(b) : null;
@@ -641,6 +648,27 @@ export function BusinessSurface({
       amount: cheapest.price_amount as number,
       currency: cheapest.price_currency || "MXN",
     };
+  })();
+  /* Resumen escaneable de la estancia: sólo ejes administrables con valor
+     real en CMS; sin dato capturado la línea simplemente no se muestra. */
+  const stayHighlightLine = (() => {
+    if (!isVacationRental) return null;
+    const resolved = b.attributes ?? [];
+    const parts = ["capacity", "bedrooms", "beds", "bathrooms"]
+      .map((key) => resolved.find((item) => item.key === key))
+      .filter((attribute): attribute is NonNullable<typeof attribute> =>
+        Boolean(attribute && attribute.values.length > 0),
+      )
+      .map((attribute) => {
+        const value = attribute.values.map((item) => item.label).join(" · ");
+        const label = attribute.label.toLowerCase();
+        /* El valor administrable suele venir ya redactado ("3 dormitorios",
+           "5–6 huéspedes"). Sólo se añade la etiqueta del catálogo cuando el
+           valor es puramente numérico y quedaría sin contexto. */
+        const numericOnly = /^[\d\s.,/–-]+$/.test(value);
+        return numericOnly ? `${value} ${label}` : value;
+      });
+    return parts.length > 0 ? parts.join(" · ") : null;
   })();
   const stayFromPriceLabel = stayFromPrice
     ? new Intl.NumberFormat("es-MX", {
@@ -750,27 +778,45 @@ export function BusinessSurface({
         <section
           data-eb-anchor
           className="mx-auto mt-6 w-full max-w-7xl px-5 sm:px-8 lg:px-12"
-          aria-label="Precio orientativo"
+          aria-label="Tarifa orientativa"
         >
-          <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:flex sm:items-center sm:justify-between sm:gap-6">
-            <div>
-              <p className="text-2xl font-semibold text-foreground">
-                {stayFromPriceLabel}{" "}
-                <span className="text-base font-normal text-muted-foreground">por noche</span>
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Precio orientativo publicado por el anfitrión. Sin cobro en línea.
-              </p>
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-elevated">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="min-w-0">
+                <p className="text-3xl font-semibold tracking-tight text-foreground">
+                  {stayFromPriceLabel}{" "}
+                  <span className="text-base font-normal text-muted-foreground">por noche</span>
+                </p>
+                {stayHighlightLine ? (
+                  <p className="mt-2 text-sm text-muted-foreground">{stayHighlightLine}</p>
+                ) : null}
+                {b.reviews && b.reviews.count > 0 ? (
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-foreground">
+                    <Star className="h-4 w-4 shrink-0 fill-current text-primary" aria-hidden />
+                    <span className="font-medium">{b.reviews.average.toFixed(1)}</span>
+                    <span className="text-muted-foreground">
+                      · {b.reviews.count} {b.reviews.count === 1 ? "reseña" : "reseñas"}
+                    </span>
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:flex-col lg:min-w-[15rem]">
+                <AddToTravelPlanButton
+                  kind="business"
+                  targetId={b.id}
+                  title={b.display_name}
+                  slug={b.slug}
+                  {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+                />
+                <div className="flex gap-2">
+                  <FavoriteButton entityKind="business" entityId={b.id} />
+                  <ShareButton title={b.display_name} />
+                </div>
+              </div>
             </div>
-            <div className="mt-4 sm:mt-0">
-              <AddToTravelPlanButton
-                kind="business"
-                targetId={b.id}
-                title={b.display_name}
-                slug={b.slug}
-                {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
-              />
-            </div>
+            <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+              Tarifa orientativa publicada por el anfitrión. Sin cobro ni reservación en línea.
+            </p>
           </div>
         </section>
       ) : null}
@@ -821,7 +867,11 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {!activeContract?.omissions.includes("offer") ? (
+      {/* Casa de vacaciones: si la única tarifa publicada ya se presenta en el
+          bloque de estancia, no se repite la tarjeta genérica de producto.
+          Con dos o más servicios publicados el catálogo se mantiene. */}
+      {!activeContract?.omissions.includes("offer") &&
+      !hidesGenericOffer ? (
         <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceProductsBlock
             config={{
