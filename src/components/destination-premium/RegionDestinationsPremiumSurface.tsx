@@ -246,8 +246,9 @@ export function RegionDestinationsPremiumSurface({
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {shown.map((destination, index) => (
-                <DestinationCard key={destination.slug} destination={destination} index={index} />
+              {shown.map((destination) => (
+                <DestinationCard key={destination.slug} destination={destination} />
+
               ))}
             </div>
             {!shown.length ? (
