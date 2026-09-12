@@ -125,6 +125,8 @@ export interface PublicPlaceDTO {
   authorities: Array<{ kind: string; name: string; isPrimary: boolean }>;
   products: PublicPlaceRelatedDTO[];
   events: PublicPlaceRelatedDTO[];
+  /** Empresas publicadas cercanas (distancia real, nunca texto libre). */
+  nearbyBusinesses: PublicPlaceNearbyBusinessDTO[];
   /** Dirección persistida por el administrador (`metadata.presentation_mode`). */
   presentationMode: PremiumPresentation | null;
   seo: { title: string | null; description: string | null } | null;
