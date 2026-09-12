@@ -673,7 +673,16 @@ export function BusinessSurface({
 
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
-      {descriptionBeforeGallery && descriptionSection ? (
+      {isVacationRental ? (
+        stayEssentialsDto || descriptionSection ? (
+          <section id="resumen" data-eb-anchor className="scroll-mt-24">
+            {stayEssentialsDto ? <ExperienceInfoGrid dto={stayEssentialsDto} /> : null}
+            {descriptionSection ? (
+              <ExperienceSection dto={descriptionSection} className="mt-8" />
+            ) : null}
+          </section>
+        ) : null
+      ) : descriptionBeforeGallery && descriptionSection ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
           <ExperienceSection dto={descriptionSection} />
           {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
