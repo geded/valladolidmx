@@ -16,6 +16,10 @@ export interface BusinessSurfaceContractInput {
   longitude: number | null;
   verified: boolean;
   relatedCount: number;
+  /** Oferta publicada real de la entidad; 0 mantiene la sección oculta. */
+  publishedProductCount?: number;
+  /** Promociones publicadas reales; 0 mantiene la sección oculta. */
+  publishedPromotionCount?: number;
   /**
    * Reseñas publicadas acreditadas de la entidad. Ausente o 0 mantiene la
    * omisión histórica de `reputation` (sin reputación inventada).
@@ -43,7 +47,12 @@ export function createBusinessVerticalSurfaceContract(
   )
     return null;
 
-  const omissions: OmxdsSurfaceOmission[] = ["offer", "price", "availability", "reservation"];
+  const omissions: OmxdsSurfaceOmission[] = ["price", "availability", "reservation"];
+  if (
+    (input.publishedProductCount ?? 0) <= 0 &&
+    (input.publishedPromotionCount ?? 0) <= 0
+  )
+    omissions.push("offer");
   if ((input.publishedReviewCount ?? 0) <= 0) omissions.push("reputation");
 
   if (!input.coverUrl) omissions.push("media");

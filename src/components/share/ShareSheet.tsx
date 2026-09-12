@@ -21,6 +21,8 @@ export interface ShareSheetProps {
   readonly url: string;
   /** Texto breve turístico opcional. */
   readonly text?: string;
+  /** Encabezado contextual de la hoja. */
+  readonly heading?: string;
 }
 
 function absoluteUrl(url: string): string {
@@ -29,7 +31,14 @@ function absoluteUrl(url: string): string {
   return new URL(url, window.location.origin).toString();
 }
 
-export function ShareSheet({ open, onOpenChange, title, url, text }: ShareSheetProps) {
+export function ShareSheet({
+  open,
+  onOpenChange,
+  title,
+  url,
+  text,
+  heading = "Compartir",
+}: ShareSheetProps) {
   const href = absoluteUrl(url);
   const message = `${title} — ${text ? `${text} ` : ""}Valladolid.mx · Oriente Maya`;
   const shareText = `${message}\n${href}`;
@@ -94,7 +103,7 @@ export function ShareSheet({ open, onOpenChange, title, url, text }: ShareSheetP
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="gap-4 rounded-t-3xl p-4 sm:p-6">
         <SheetHeader className="text-left">
-          <SheetTitle className="text-base">Compartir ruta</SheetTitle>
+          <SheetTitle className="text-base">{heading}</SheetTitle>
         </SheetHeader>
         <p className="line-clamp-2 text-[13px] text-muted-foreground">{title}</p>
 

@@ -23,7 +23,7 @@
  * empresa en el loader — patrón consistente con Region/Destination).
  */
 /* eslint-disable react-refresh/only-export-components -- I3-B keeps the legacy contexts and pure category resolver in the authorized surface module. */
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
@@ -48,6 +48,8 @@ import {
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
@@ -324,6 +326,8 @@ function businessToSurfaceContractInput(
     longitude: business.primary_location?.longitude ?? null,
     verified: business.verified,
     relatedCount: businessRelatedCount(related),
+    publishedProductCount: business.products.length,
+    publishedPromotionCount: business.promotions.length,
     publishedReviewCount: business.reviews?.count ?? 0,
   };
 }
@@ -453,7 +457,9 @@ export function BusinessSurface({
   const variant = resolveBusinessVariant(b.category_slug);
   const tier = b.plan_tier;
   const showPromotions =
-    !activeContract && planAllows(tier, "promotions") && b.promotions.length > 0;
+    planAllows(tier, "promotions") &&
+    b.promotions.length > 0 &&
+    !activeContract?.omissions.includes("offer");
 
   // H-03 · Ola I2.d — Refactor final: BusinessSurface es orquestador
   // puro. Cero JSX visual propio. Toda la presentación proviene
@@ -574,6 +580,7 @@ export function BusinessSurface({
         capabilities: { copyable: true, livePricing: false, liveAvailability: false },
       }
     : null;
+  const descriptionBeforeGallery = approvedFamily === "restaurant";
 
   return (
     <PublicShell
@@ -584,6 +591,7 @@ export function BusinessSurface({
       {usesApprovedFamilyTemplate ? (
         <>
           <PremiumHero
+            layout="entity"
             vm={{
               presentation: DEFAULT_PREMIUM_PRESENTATION,
               // D-03 · La ruta territorial navegable la emite PublicShell.
@@ -664,16 +672,26 @@ export function BusinessSurface({
 
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
-      {descriptionSection || infoGridDto ? (
+      {descriptionBeforeGallery && descriptionSection ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
-          {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
+          <ExperienceSection dto={descriptionSection} />
           {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
+        </section>
+      ) : infoGridDto ? (
+        <section id="resumen" data-eb-anchor className="scroll-mt-24">
+          <ExperienceInfoGrid dto={infoGridDto} />
         </section>
       ) : null}
 
       {premiumGalleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceGallery dto={premiumGalleryDto} />
+        </section>
+      ) : null}
+
+      {!descriptionBeforeGallery && descriptionSection ? (
+        <section data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceSection dto={descriptionSection} />
         </section>
       ) : null}
 
@@ -691,6 +709,19 @@ export function BusinessSurface({
         </section>
       ) : null}
 
+      {showPromotions ? (
+        <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperiencePromotionsBlock
+            config={{
+              source: "business",
+              variant: "grid",
+              heading: "Promociones vigentes",
+              columns: 2,
+            }}
+          />
+        </section>
+      ) : null}
+
       {!activeContract?.omissions.includes("map") &&
       b.primary_location?.latitude != null &&
       b.primary_location?.longitude != null ? (
@@ -702,19 +733,6 @@ export function BusinessSurface({
             addressLine1={b.primary_location.address_line1}
             addressLine2={b.primary_location.address_line2}
             presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}
-          />
-        </section>
-      ) : null}
-
-      {showPromotions ? (
-        <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
-          <ExperiencePromotionsBlock
-            config={{
-              source: "business",
-              variant: "grid",
-              heading: "Promociones vigentes",
-              columns: 2,
-            }}
           />
         </section>
       ) : null}
@@ -824,6 +842,8 @@ export function BusinessSurface({
  * clipboard). Se usa en el overlay del Hero "gallery".
  */
 function ShareButton({ title }: { title: string }) {
+  const [open, setOpen] = useState(false);
+
   async function handleShare() {
     if (typeof navigator === "undefined") return;
     const url = typeof window !== "undefined" ? window.location.href : "";
@@ -833,21 +853,31 @@ function ShareButton({ title }: { title: string }) {
         await nav.share({ title, url });
         return;
       }
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      }
+      setOpen(true);
     } catch {
       /* usuario canceló */
     }
   }
   return (
-    <button
-      type="button"
-      onClick={handleShare}
-      aria-label="Compartir"
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur-sm transition hover:bg-background focus-visible:outline-none focus-visible:ring-focus"
-    >
-      <Share2 className="h-5 w-5" aria-hidden="true" />
-    </button>
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => void handleShare()}
+        aria-label="Compartir perfil"
+        className="rounded-pill border border-border bg-background shadow-soft"
+      >
+        <Share2 className="h-5 w-5" aria-hidden="true" />
+      </Button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descubre este perfil en el Oriente Maya."
+        heading="Compartir perfil"
+      />
+    </>
   );
 }
