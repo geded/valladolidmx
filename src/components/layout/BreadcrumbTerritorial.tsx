@@ -96,7 +96,7 @@ export function BreadcrumbTerritorial({
         {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
         <ol
           className={cn(
-            "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
+            "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] lg:flex-wrap lg:whitespace-normal",
             compact ? "hidden sm:flex" : null,
           )}
         >
