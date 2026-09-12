@@ -62,3 +62,4 @@
 
 - [ ] Casa de vacaciones (`BusinessSurface`, familia `vacation_rental`): mosaico de galería CMS tipo Airbnb, datos escaneables y mapa full-width en escritorio con ubicación debajo (paridad con hoteles).
 - [ ] Sin reserva en línea ni pagos: la acción principal es "Agregar a Mi Viaje"; prohibido mostrar precio de reserva, desglose de cobro o políticas de cancelación de pago mientras no exista el sistema de reservación.
+- [ ] Consulta del Founder (2026-09-12): definir si la ficha muestra precio orientativo por noche (dato CMS opcional, sin cobro en línea). Pendiente de decisión; por defecto no se muestra.
