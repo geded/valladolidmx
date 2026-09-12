@@ -87,7 +87,7 @@ function entry(
   };
 }
 
-/** Las 22 categorías canónicas — orden estable de catálogo. */
+/** Las 23 categorías canónicas — orden estable de catálogo. */
 export const CATEGORY_ICON_REGISTRY: Readonly<Record<string, CategoryIconEntry>> = Object.freeze({
   hoteles: entry("hoteles", "Hoteles", "cama", "cenoteTeal", null),
   restaurantes: entry("restaurantes", "Restaurantes", "tenedor y cuchillo", "terracotta", null),
