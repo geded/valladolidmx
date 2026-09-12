@@ -121,6 +121,13 @@ const ATTRIBUTE_ICON_BY_KEY: Record<string, string> = {
   hotel_type: "home",
   services: "concierge-bell",
   policies: "info",
+  cuisine_type: "utensils",
+  dining_experience: "sparkles",
+  dietary_options: "leaf",
+  meal_period: "clock",
+  reservation_policy: "calendar",
+  languages: "languages",
+  dress_code: "shirt",
 };
 
 function humanizeSlug(slug: string): string {
@@ -301,6 +308,67 @@ export function businessToStayPolicyDTO(
 }
 
 /* ------------------------------------------------------------------ *
+ * Composición Restaurante — misma gramática editorial que hospedaje,
+ * sobre el MISMO bloque oficial `vmx.experience.info-grid`. Sin bloques
+ * nuevos ni datos inventados: sólo ejes administrables con etiqueta CMS.
+ * ------------------------------------------------------------------ */
+
+/** Lo esencial del restaurante (cocina, zona, experiencia, precio). */
+export function businessToDiningEssentialsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["cuisine_type", "dining_experience", "zone", "price_level"],
+    "Lo esencial del restaurante",
+    "cards",
+    3,
+  );
+}
+
+/** Servicios, opciones alimentarias y accesibilidad, como lista escaneable. */
+export function businessToDiningAmenitiesDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of ["services", "dietary_options", "accessibility", "traveler_profile"]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    for (const value of attribute.values) {
+      items.push({
+        iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+        label: attribute.label,
+        value: value.label,
+        tone: "default",
+      });
+    }
+  }
+  if (items.length === 0) return null;
+  return {
+    variant: "checklist",
+    heading: "Servicios y opciones",
+    columns: 2,
+    items,
+    ariaLabel: "Servicios y opciones",
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
+}
+
+/** Condiciones de la visita: horarios de consumo, reservaciones, idiomas. */
+export function businessToDiningVisitDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["meal_period", "reservation_policy", "languages", "dress_code", "policies"],
+    "Tu visita",
+    "cards",
+    3,
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * CTA Bar mobile — barra inferior persistente.
  * ------------------------------------------------------------------ */
 export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCtaBarDTO {
@@ -352,25 +420,47 @@ export function isLodgingBusiness(b: {
   );
 }
 
+/* Restaurantes: la tarifa publicada del CMS corresponde a un platillo del
+   menú. Igual que en hospedaje, es sólo pista de precio: nunca implica cobro
+   ni reservación en línea. */
+const DINING_KEYS = new Set([
+  "restaurant",
+  "restaurante",
+  "restaurantes",
+  "gastronomia",
+  "gastronomía",
+]);
+
+export function isDiningBusiness(b: {
+  category_family_key?: string | null;
+  category_slug?: string | null;
+}): boolean {
+  return (
+    DINING_KEYS.has((b.category_family_key ?? "").trim().toLowerCase()) ||
+    DINING_KEYS.has((b.category_slug ?? "").trim().toLowerCase())
+  );
+}
+
 export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
   const isLodging = isLodgingBusiness(b);
+  const isDining = isDiningBusiness(b);
+  const compact = isLodging || isDining;
+  const priceHint = isLodging ? "por noche" : isDining ? "por platillo" : null;
   return {
-    /* Hospedaje: una sola fila horizontal deslizable (habitaciones
-       compactas) para armonizar con el resto de la ficha. */
-    variant: isLodging ? "carousel" : "grid",
+    /* Hospedaje y restaurante: una sola fila horizontal deslizable con
+       tarjetas compactas para armonizar con el resto de la ficha. */
+    variant: compact ? "carousel" : "grid",
     heading: variant.productsHeading,
     subheading: null,
     emptyMessage: variant.productsEmpty,
-    columns: isLodging ? 3 : 2,
+    columns: compact ? 3 : 2,
 
     groupBy: "none",
     ariaLabel: variant.productsHeading,
     items: b.products.map((p) => {
       const item = marketplaceProductToItem(p);
-      return isLodging && item.priceAmount != null
-        ? { ...item, priceHint: "por noche" }
-        : item;
+      return priceHint && item.priceAmount != null ? { ...item, priceHint } : item;
     }),
     capabilities: {
       showPrice: true,
@@ -381,7 +471,7 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
          llega firmada en el DTO: la tarjeta oficial la muestra y, sin
          medio acreditado, usa su fallback editorial aprobado. */
       showMedia: true,
-      compact: isLodging,
+      compact,
       contextAware: false,
       livePricing: false,
       liveAvailability: false,
