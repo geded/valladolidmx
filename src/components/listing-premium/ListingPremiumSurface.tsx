@@ -179,6 +179,7 @@ export function ListingPremiumSurfaceFromDTO({
   if (
     dto.family === "hoteles" ||
     dto.family === "restaurantes" ||
+    dto.family === "experiencias" ||
     dto.family === "casas-de-vacaciones" ||
     dto.family === "eventos" ||
     dto.family === "lugares" ||
@@ -190,6 +191,7 @@ export function ListingPremiumSurfaceFromDTO({
           dto.family as
             | "hoteles"
             | "restaurantes"
+            | "experiencias"
             | "casas-de-vacaciones"
             | "eventos"
             | "lugares"
@@ -212,7 +214,7 @@ export function ListingPremiumSurfaceFromDTO({
     (item): item is TourismCardVM & { coordinates: { lat: number; lng: number } } =>
       item.coordinates?.lat != null && item.coordinates?.lng != null,
   );
-  const family = FAMILY_EXPERIENCE[dto.family];
+  const family = FAMILY_EXPERIENCE[dto.family as keyof typeof FAMILY_EXPERIENCE];
   const defaultFacets = [
     buildDestinationFacet([...dto.items]),
     buildEntityKindFacet([...dto.items]),
