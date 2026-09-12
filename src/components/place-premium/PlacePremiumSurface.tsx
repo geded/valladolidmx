@@ -14,11 +14,22 @@
  *  - `editorial`: lectura tipo revista territorial (historia primero).
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
-import { useMemo, type ReactNode } from "react";
-import { Accessibility, CalendarDays, Clock, Compass, Heart, ImageOff, Ticket } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
+import {
+  Accessibility,
+  CalendarDays,
+  Clock,
+  Compass,
+  Heart,
+  ImageOff,
+  Share2,
+  Ticket,
+} from "lucide-react";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { PremiumHero, PremiumTerritorialBreadcrumb } from "@/components/premium";
 import {
@@ -85,6 +96,11 @@ export function PlacePremiumSurface({
   ]
     .filter(Boolean)
     .join(" · ");
+
+  /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
+  const primaryPoint = content.map.points[0] ?? null;
+  const placeAddressLine =
+    content.essentials.facts.find((f) => f.key === "address")?.value ?? null;
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
@@ -177,28 +193,16 @@ export function PlacePremiumSurface({
                 }
               : null,
             badges: content.identity.badges.map((label) => ({ label })),
-            primaryAction: {
-              label: content.hero.primaryCta.label,
-              // 3J.2 · el CTA del hero delega SIEMPRE en la acción real de
-              // Mi Viaje (`tripSlot`); no duplica la lógica de persistencia.
-              onClick: () => {
-                document
-                  .getElementById("place-trip-action")
-                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
-              },
-            },
-            secondaryAction: {
-              label: content.hero.secondaryCta.label,
-              href: content.hero.secondaryCta.href,
-            },
           }}
         />
       </div>
-      {/* Paridad con hotel y restaurante: el hero entity no incluye acciones,
-          se emiten en la fila inmediata bajo el encabezado. */}
-      <Container className="mt-4 flex flex-wrap justify-end gap-2">
+      {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
+          emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
+          bloque oficial de ubicación. */}
+      <Container className="mt-4 flex justify-end gap-2">
+        <PlaceShareButton title={content.identity.title} />
         <Button
-          variant="outline"
+          type="button"
           onClick={() => {
             document
               .getElementById("place-trip-action")
@@ -206,9 +210,6 @@ export function PlacePremiumSurface({
           }}
         >
           {content.hero.primaryCta.label}
-        </Button>
-        <Button variant="ghost" asChild>
-          <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
         </Button>
       </Container>
       {content.hero.cover.url ? null : (
@@ -242,12 +243,24 @@ export function PlacePremiumSurface({
       ) : null}
 
       {hasMap ? (
-        <Container className="mt-10 sm:mt-16">
-          <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
-          {/* Paridad con hospedaje y restaurante: mapa a todo lo ancho y la
-              información de cómo llegar debajo. */}
-          <div className="mt-6 space-y-5">
-            {content.map.points.length ? <ExperienceMapBlock dto={mapDto} /> : null}
+        <Container className="mt-10 sm:mt-16" id="mapa-lugar">
+          {/* Paridad exacta con hotel, restaurante y casa: se reutiliza el
+              bloque oficial de ubicación (mapa a todo lo ancho, distancia y
+              "Cómo llegar" debajo). Sin superficie de mapa paralela. */}
+          <div className="space-y-5">
+            {primaryPoint ? (
+              <BusinessLocationBlock
+                lat={primaryPoint.lat}
+                lng={primaryPoint.lng}
+                name={content.identity.title}
+                addressLine1={placeAddressLine}
+                heading={content.map.heading}
+                presentation="premium"
+                layout="stacked"
+              />
+            ) : content.map.points.length ? (
+              <ExperienceMapBlock dto={mapDto} />
+            ) : null}
             {content.map.directions.length ? (
               <ul className="grid gap-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
                 {content.map.directions.map((line, index) => (
@@ -301,7 +314,7 @@ export function PlacePremiumSurface({
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                       {item.eyebrow}
                     </p>
-                    <h3 className="mt-2 font-serif text-xl leading-tight">{item.title}</h3>
+                    <h3 className="mt-2 text-base font-semibold leading-snug">{item.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {item.description}
                     </p>
@@ -321,7 +334,7 @@ export function PlacePremiumSurface({
             {content.events.map((item) => (
               <li key={item.id} className="rounded-3xl border border-border bg-card p-5">
                 <CalendarDays className="size-4 text-primary" aria-hidden />
-                <h3 className="mt-2 font-serif text-xl">{item.title}</h3>
+                <h3 className="mt-2 text-base font-semibold">{item.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
               </li>
             ))}
@@ -345,7 +358,7 @@ export function PlacePremiumSurface({
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                       {item.distance}
                     </p>
-                    <h3 className="mt-1 truncate font-serif text-xl">{item.title}</h3>
+                    <h3 className="mt-1 truncate text-base font-semibold">{item.title}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">{item.tagline}</p>
                   </div>
                 </article>
@@ -369,7 +382,7 @@ export function PlacePremiumSurface({
             className="rounded-3xl border border-primary/30 bg-primary/5 p-6"
           >
             <Heart className="size-5 text-primary" aria-hidden />
-            <h2 id="mi-viaje-title" className="mt-3 font-serif text-2xl">
+            <h2 id="mi-viaje-title" className="mt-3 text-xl font-semibold tracking-tight">
               {content.trip.title}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -410,12 +423,46 @@ function DemoNotice({ text }: { text: string }) {
   );
 }
 
+/* Tipografía de sección idéntica a las fichas de hotel, restaurante y casa
+   (`ExperienceInfoGrid`/`BusinessLocationBlock`): título sobrio, sin escala
+   editorial mayor que el resto de la plataforma. */
 function SectionHeading({ id, kicker, title }: { id: string; kicker: string; title: string }) {
   return (
     <header id={id}>
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{kicker}</p>
-      <h2 className="mt-1.5 text-balance font-serif text-2xl sm:mt-2 sm:text-4xl">{title}</h2>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {kicker}
+      </p>
+      <h2 className="mt-1.5 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+        {title}
+      </h2>
     </header>
+  );
+}
+
+/* Compartir: mismo patrón que la ficha de empresa (Web Share + ShareSheet). */
+function PlaceShareButton({ title }: { title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setOpen(true)}
+        aria-label="Compartir lugar"
+        className="rounded-pill border border-border bg-background shadow-soft"
+      >
+        <Share2 className="h-5 w-5" aria-hidden="true" />
+      </Button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descubre este lugar en el Oriente Maya."
+        heading="Compartir lugar"
+      />
+    </>
   );
 }
 
@@ -508,7 +555,7 @@ function IntroEditorial({ content }: { content: PlacePremiumContent }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             {content.intro.kicker}
           </p>
-          <h2 id="intro-lugar-title" className="mt-2 text-balance font-serif text-3xl sm:text-4xl">
+          <h2 id="intro-lugar-title" className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
             {content.intro.title}
           </h2>
           <blockquote className="mt-6 border-l-2 border-primary/50 pl-4 font-serif text-lg italic leading-7 text-muted-foreground">
@@ -539,7 +586,7 @@ function IntroCentered({ content }: { content: PlacePremiumContent }) {
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {content.intro.kicker}
       </p>
-      <h2 id="intro-lugar-title" className="mt-2 text-balance font-serif text-3xl sm:text-4xl">
+      <h2 id="intro-lugar-title" className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
         {content.intro.title}
       </h2>
       <div className="mt-6 space-y-5 text-left">
@@ -562,7 +609,7 @@ function EssentialsPanel({ content }: { content: PlacePremiumContent }) {
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {content.essentials.kicker}
       </p>
-      <h2 id="esencial-lugar-title" className="mt-2 font-serif text-3xl">
+      <h2 id="esencial-lugar-title" className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
         {content.essentials.title}
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -575,7 +622,7 @@ function EssentialsPanel({ content }: { content: PlacePremiumContent }) {
               <Clock className="size-3.5" aria-hidden />
               {fact.label}
             </dt>
-            <dd className="mt-2 font-serif text-xl">
+            <dd className="mt-2 text-base font-semibold">
               {fact.value}
               {fact.hint ? (
                 <span className="mt-1 block font-sans text-xs text-muted-foreground">
@@ -617,7 +664,7 @@ function EssentialsBand({ content }: { content: PlacePremiumContent }) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               {fact.label}
             </p>
-            <p className="mt-1 font-serif text-lg leading-tight">{fact.value}</p>
+            <p className="mt-1 text-base font-semibold leading-snug">{fact.value}</p>
           </li>
         ))}
       </ul>
