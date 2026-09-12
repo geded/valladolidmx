@@ -179,6 +179,7 @@ export function ListingPremiumSurfaceFromDTO({
   if (
     dto.family === "hoteles" ||
     dto.family === "restaurantes" ||
+    dto.family === "experiencias" ||
     dto.family === "casas-de-vacaciones" ||
     dto.family === "eventos" ||
     dto.family === "lugares" ||
@@ -190,6 +191,7 @@ export function ListingPremiumSurfaceFromDTO({
           dto.family as
             | "hoteles"
             | "restaurantes"
+            | "experiencias"
             | "casas-de-vacaciones"
             | "eventos"
             | "lugares"

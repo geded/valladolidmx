@@ -38,6 +38,7 @@ const InteractiveMap = lazy(() =>
 type TerritorialListingFamily =
   | "hoteles"
   | "restaurantes"
+  | "experiencias"
   | "casas-de-vacaciones"
   | "eventos"
   | "lugares"
