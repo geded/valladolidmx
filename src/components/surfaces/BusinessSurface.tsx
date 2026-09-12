@@ -662,9 +662,11 @@ export function BusinessSurface({
       .map((attribute) => {
         const value = attribute.values.map((item) => item.label).join(" · ");
         const label = attribute.label.toLowerCase();
-        /* El valor administrable puede venir ya redactado ("3 dormitorios").
-           En ese caso no se repite la etiqueta del catálogo. */
-        return value.toLowerCase().includes(label) ? value : `${value} ${label}`;
+        /* El valor administrable suele venir ya redactado ("3 dormitorios",
+           "5–6 huéspedes"). Sólo se añade la etiqueta del catálogo cuando el
+           valor es puramente numérico y quedaría sin contexto. */
+        const numericOnly = /^[\d\s.,/–-]+$/.test(value);
+        return numericOnly ? `${value} ${label}` : value;
       });
     return parts.length > 0 ? parts.join(" · ") : null;
   })();
