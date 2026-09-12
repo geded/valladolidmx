@@ -46,12 +46,11 @@ export function buildDestinationPremiumRuntime(input: {
   const editorialPool = [...heroRole, ...gallery.map(mediaOf), ...approvedConceptual];
   const coverMedia = cover ? mediaOf(cover) : (approvedConceptual[0] ?? null);
   const heroMedia = editorialPool[0] ?? coverMedia ?? { url: "", alt: "" };
-  const afterHero = editorialPool.slice(1);
+  // Hero: fotografías que rotan automáticamente (portada + apoyos).
+  const heroSupporting = editorialPool.slice(1, 3);
+  const afterHero = editorialPool.slice(1 + heroSupporting.length);
   const narrativeMedia = afterHero.slice(0, 2);
-  const remainingGallery = afterHero.slice(narrativeMedia.length);
-  const heroSupporting = remainingGallery.length > 2 ? remainingGallery.slice(-2) : [];
-  const galleryItems =
-    heroSupporting.length > 0 ? remainingGallery.slice(0, -2) : remainingGallery;
+  const galleryItems = afterHero.slice(narrativeMedia.length);
   const heroDescription = destination.tagline?.trim() ?? "";
   const descubreText = destination.description?.trim() ?? "";
   const paragraphs = descubreText ? [descubreText] : [];
