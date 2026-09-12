@@ -26,6 +26,11 @@ export interface BusinessLocationBlockProps {
   heading?: string;
   /** La ficha Premium abre el mapa real directamente; la estándar conserva el fallback estático. */
   presentation?: "standard" | "premium";
+  /**
+   * `split` conserva el mapa con la columna de datos al costado.
+   * `stacked` muestra el mapa a todo el ancho y los datos de ubicación debajo.
+   */
+  layout?: "split" | "stacked";
 }
 
 export function BusinessLocationBlock({
@@ -36,13 +41,21 @@ export function BusinessLocationBlock({
   addressLine2,
   heading = "Ubicación",
   presentation = "standard",
+  layout = "split",
 }: BusinessLocationBlockProps) {
   const [showInteractive, setShowInteractive] = useState(presentation === "premium");
+  const stacked = layout === "stacked";
 
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+    <div
+      className={
+        stacked
+          ? "flex flex-col gap-4"
+          : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start"
+      }
+    >
       <div className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold text-foreground">{heading}</h2>
@@ -63,7 +76,11 @@ export function BusinessLocationBlock({
               lat={lat}
               lng={lng}
               markerTitle={name}
-              className="h-[400px] w-full rounded-2xl border border-border"
+              className={
+                stacked
+                  ? "h-[320px] w-full rounded-2xl border border-border sm:h-[420px] lg:h-[480px]"
+                  : "h-[400px] w-full rounded-2xl border border-border"
+              }
             />
           </Suspense>
         ) : (
@@ -78,7 +95,13 @@ export function BusinessLocationBlock({
         )}
       </div>
 
-      <aside className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 self-start rounded-2xl border border-border bg-card p-2.5 sm:p-3 lg:grid-cols-1 lg:items-stretch lg:gap-3 lg:p-4">
+      <aside
+        className={
+          stacked
+            ? "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border bg-card p-3 sm:p-4"
+            : "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 self-start rounded-2xl border border-border bg-card p-2.5 sm:p-3 lg:grid-cols-1 lg:items-stretch lg:gap-3 lg:p-4"
+        }
+      >
         <div className="min-w-0">
           <DistanceBadge destLat={lat} destLng={lng} compact />
         </div>

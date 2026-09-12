@@ -486,6 +486,7 @@ export function BusinessSurface({
       ? `${destinationHref}/${encodeURIComponent(b.category_slug)}`
       : null;
   const hasLocation = b.primary_location?.latitude != null && b.primary_location?.longitude != null;
+  const hasGalleryMedia = Boolean(activePremium) || (b.media ?? []).length >= 2;
   const hasRelated = Boolean(
     related && (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0),
   );
@@ -494,7 +495,7 @@ export function BusinessSurface({
     anchors: subnavDto.anchors.filter((anchor) => {
       // Ningún ancla visible puede apuntar a una sección que no se renderiza.
       if (anchor.id === "contacto" && !contactSource) return false;
-      if (anchor.id === "galeria" && !activePremium) return false;
+      if (anchor.id === "galeria" && !hasGalleryMedia) return false;
       if (anchor.id === "ubicacion" && !hasLocation) return false;
       if (anchor.id === "descubre" && !hasRelated) return false;
       if (anchor.id === "promociones" && !showPromotions) return false;
@@ -567,6 +568,38 @@ export function BusinessSurface({
         },
       }
     : null;
+  /* Sin composición Premium activa, la ficha conserva su galería editorial a
+     partir de las fotografías publicadas en CMS (`business_media`). Sin
+     fotografías no se renderiza nada: jamás se inventan medios. */
+  const cmsGalleryItems = (b.media ?? [])
+    .filter((m) => Boolean(m.url))
+    .map((m) => ({
+      kind: "image" as const,
+      url: m.url,
+      alt: m.alt || b.display_name,
+    }));
+  const galleryDto =
+    premiumGalleryDto ??
+    (cmsGalleryItems.length >= 2
+      ? {
+          variant: "mosaic" as const,
+          heading: `Conoce ${b.display_name}`,
+          subheading: null,
+          items: cmsGalleryItems,
+          maxVisible: 5,
+          aspect: "landscape" as const,
+          ariaLabel: `Galería de ${b.display_name}`,
+          capabilities: {
+            lightbox: true,
+            captions: false,
+            video: false,
+            panorama360: false,
+            model3d: false,
+            ar: false,
+            ugc: false,
+          },
+        }
+      : null);
   const premiumContactDto = contactSource
     ? {
         variant: "cards" as const,
@@ -681,6 +714,14 @@ export function BusinessSurface({
         longitude={b.primary_location?.longitude ?? b.longitude ?? null}
       />
 
+      {/* Casa de vacaciones: la fotografía encabeza la lectura, como en las
+          fichas de alojamiento de referencia, antes de los datos. */}
+      {isVacationRental && galleryDto ? (
+        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
+      ) : null}
+
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
       {isVacationRental ? (
@@ -703,9 +744,9 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {premiumGalleryDto ? (
+      {!isVacationRental && galleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
-          <ExperienceGallery dto={premiumGalleryDto} />
+          <ExperienceGallery dto={galleryDto} />
         </section>
       ) : null}
 
@@ -765,6 +806,7 @@ export function BusinessSurface({
             addressLine1={b.primary_location.address_line1}
             addressLine2={b.primary_location.address_line2}
             presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}
+            layout={usesApprovedFamilyTemplate ? "stacked" : "split"}
           />
         </section>
       ) : null}
