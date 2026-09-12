@@ -488,6 +488,11 @@ export function BusinessSurface({
   const hasLocation = b.primary_location?.latitude != null && b.primary_location?.longitude != null;
   const hasGalleryMedia = Boolean(activePremium) || (b.media ?? []).length >= 2;
   const isVacationRental = approvedFamily === "vacation_rental";
+  /* Hospedaje (hotel y casa de vacaciones) comparten la misma composición
+     editorial de alojamiento sobre la plantilla madre: fotografía primero,
+     tarifa orientativa "desde", datos de estancia y Mi Viaje como acción.
+     Ninguna de las dos familias ofrece reserva ni cobro en línea. */
+  const isLodging = isVacationRental || approvedFamily === "hotel";
   /* Casa de vacaciones con una sola tarifa publicada: la tarifa vive en el
      bloque de estancia y no se repite como tarjeta genérica de producto. */
   const hidesGenericOffer =
@@ -629,14 +634,14 @@ export function BusinessSurface({
   /* Casa de vacaciones: composición editorial propia de la familia sobre
      los mismos bloques oficiales. Sin ejes administrables capturados, cada
      sección simplemente no se renderiza. */
-  const stayEssentialsDto = isVacationRental ? businessToStayEssentialsDTO(b) : null;
-  const stayAmenitiesDto = isVacationRental ? businessToStayAmenitiesDTO(b) : null;
-  const stayPolicyDto = isVacationRental ? businessToStayPolicyDTO(b) : null;
+  const stayEssentialsDto = isLodging ? businessToStayEssentialsDTO(b) : null;
+  const stayAmenitiesDto = isLodging ? businessToStayAmenitiesDTO(b) : null;
+  const stayPolicyDto = isLodging ? businessToStayPolicyDTO(b) : null;
   /* Precio orientativo "desde": se toma exclusivamente del catálogo publicado
      en CMS (`products.price_amount`). Sin precio real no se renderiza nada y
      nunca se ofrece cobro ni reservación en línea: la acción es Mi Viaje. */
   const stayFromPrice = (() => {
-    if (!isVacationRental) return null;
+    if (!isLodging) return null;
     const priced = (b.products ?? []).filter(
       (p) => typeof p.price_amount === "number" && (p.price_amount as number) > 0,
     );
@@ -652,7 +657,7 @@ export function BusinessSurface({
   /* Resumen escaneable de la estancia: sólo ejes administrables con valor
      real en CMS; sin dato capturado la línea simplemente no se muestra. */
   const stayHighlightLine = (() => {
-    if (!isVacationRental) return null;
+    if (!isLodging) return null;
     const resolved = b.attributes ?? [];
     const parts = ["capacity", "bedrooms", "beds", "bathrooms"]
       .map((key) => resolved.find((item) => item.key === key))
@@ -768,13 +773,13 @@ export function BusinessSurface({
 
       {/* Casa de vacaciones: la fotografía encabeza la lectura, como en las
           fichas de alojamiento de referencia, antes de los datos. */}
-      {isVacationRental && galleryDto ? (
+      {isLodging && galleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24">
           <ExperienceGallery dto={galleryDto} />
         </section>
       ) : null}
 
-      {isVacationRental && stayFromPriceLabel ? (
+      {isLodging && stayFromPriceLabel ? (
         <section
           data-eb-anchor
           className="mx-auto mt-6 w-full max-w-7xl px-5 sm:px-8 lg:px-12"
@@ -824,7 +829,7 @@ export function BusinessSurface({
 
       {/* Móvil: barra inferior persistente con la tarifa orientativa y la
           acción principal de la ficha. No hay reserva ni cobro en línea. */}
-      {isVacationRental && stayFromPriceLabel ? (
+      {isLodging && stayFromPriceLabel ? (
         <>
           <div aria-hidden className="h-24 lg:hidden" />
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-5 py-3 shadow-floating backdrop-blur lg:hidden">
@@ -854,7 +859,7 @@ export function BusinessSurface({
 
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
-      {isVacationRental ? (
+      {isLodging ? (
         stayEssentialsDto || descriptionSection ? (
           <section id="resumen" data-eb-anchor className="scroll-mt-24">
             {stayEssentialsDto ? <ExperienceInfoGrid dto={stayEssentialsDto} /> : null}
@@ -874,13 +879,13 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {!isVacationRental && galleryDto ? (
+      {!isLodging && galleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceGallery dto={galleryDto} />
         </section>
       ) : null}
 
-      {!isVacationRental && !descriptionBeforeGallery && descriptionSection ? (
+      {!isLodging && !descriptionBeforeGallery && descriptionSection ? (
         <section data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceSection dto={descriptionSection} />
         </section>
@@ -1043,7 +1048,7 @@ export function BusinessSurface({
       {/* Casas de vacaciones no ofrecen reserva ni cobro en línea: la acción
           final invita a sumar el hospedaje a Mi Viaje para que el concierge
           arme el itinerario completo. */}
-      {isVacationRental ? (
+      {isLodging ? (
         <section className="mx-auto mt-10 w-full max-w-7xl px-5 pb-4 sm:px-8 lg:px-12">
           <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
