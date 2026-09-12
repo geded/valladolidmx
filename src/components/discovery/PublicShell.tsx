@@ -122,7 +122,7 @@ function PublicShellBody({
     return (
       <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
         {hasCrumbs ? (
-          <Container className="py-3">
+          <Container className="pb-1 pt-2 sm:pb-2 sm:pt-3">
             <BreadcrumbTerritorial
               crumbs={crumbs}
               useContextCrumbs={useContextCrumbs}
