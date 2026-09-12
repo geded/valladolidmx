@@ -330,6 +330,10 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
  * ------------------------------------------------------------------ */
 export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
+  /* Hospedaje: la tarifa publicada es por noche. Se declara como pista de
+     precio (dato real del CMS), nunca como cobro ni reservación en línea. */
+  const isLodging =
+    b.category_family_key === "hotel" || b.category_family_key === "vacation_rental";
   return {
     variant: "grid",
     heading: variant.productsHeading,
@@ -338,7 +342,12 @@ export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceP
     columns: 2,
     groupBy: "none",
     ariaLabel: variant.productsHeading,
-    items: b.products.map(marketplaceProductToItem),
+    items: b.products.map((p) => {
+      const item = marketplaceProductToItem(p);
+      return isLodging && item.priceAmount != null
+        ? { ...item, priceHint: "por noche" }
+        : item;
+    }),
     capabilities: {
       showPrice: true,
       showFavorite: true,
