@@ -62,8 +62,16 @@ export function BreadcrumbTerritorial({
   className,
 }: Props) {
   const ctx = useResolvedContext();
-  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+  const sourceCrumbs: readonly BreadcrumbCrumb[] =
     useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);
+  /**
+   * La casita ya enlaza a "/". Si la primera miga también es Inicio,
+   * se omite para no duplicar el mismo destino de navegación.
+   */
+  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+    sourceCrumbs.length > 1 && sourceCrumbs[0]?.to === "/"
+      ? sourceCrumbs.slice(1)
+      : sourceCrumbs;
 
   if (effectiveCrumbs.length === 0) return null;
 
@@ -88,7 +96,7 @@ export function BreadcrumbTerritorial({
         {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
         <ol
           className={cn(
-            "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal",
+            "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] lg:flex-wrap lg:whitespace-normal",
             compact ? "hidden sm:flex" : null,
           )}
         >
@@ -104,7 +112,13 @@ export function BreadcrumbTerritorial({
           {effectiveCrumbs.map((c, i) => {
             const isLast = i === effectiveCrumbs.length - 1;
             return (
-              <li key={`${c.label}-${i}`} className="flex min-w-0 shrink-0 items-center gap-1.5">
+              <li
+                key={`${c.label}-${i}`}
+                className={cn(
+                  "flex min-w-0 items-center gap-1.5",
+                  isLast ? "shrink" : "shrink-0",
+                )}
+              >
                 <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
 
                 {c.to && !isLast ? (
@@ -121,7 +135,7 @@ export function BreadcrumbTerritorial({
                     className={cn(
                       "block truncate",
                       // El nombre actual puede truncarse en móvil.
-                      isLast ? "max-w-[46vw] font-medium text-foreground sm:max-w-none" : "",
+                      isLast ? "max-w-[46vw] font-medium text-foreground lg:max-w-none" : "",
                     )}
                   >
                     {c.label}
