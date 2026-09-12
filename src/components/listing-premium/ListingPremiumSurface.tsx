@@ -214,7 +214,7 @@ export function ListingPremiumSurfaceFromDTO({
     (item): item is TourismCardVM & { coordinates: { lat: number; lng: number } } =>
       item.coordinates?.lat != null && item.coordinates?.lng != null,
   );
-  const family = FAMILY_EXPERIENCE[dto.family];
+  const family = FAMILY_EXPERIENCE[dto.family as keyof typeof FAMILY_EXPERIENCE];
   const defaultFacets = [
     buildDestinationFacet([...dto.items]),
     buildEntityKindFacet([...dto.items]),

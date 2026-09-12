@@ -288,6 +288,28 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: RESTAURANT_ITEMS,
     nearby: RESTAURANT_NEARBY,
   },
+  experiencias: {
+    family: "experiencias",
+    breadcrumb: "Experiencias",
+    eyebrow: "Vive el Oriente Maya",
+    title: "Experiencias en Valladolid",
+    description:
+      "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
+    resultsTitle: "Experiencias en Valladolid",
+    itemLabel: "experiencia",
+    searchLabel: "Buscar experiencia",
+    searchPlaceholder: "Buscar experiencia, tipo o zona",
+    aluxQuestion: "¿Qué experiencia buscas?",
+    aluxOptions: ["Naturaleza", "Cultura maya", "Con guía local", "En familia", "Aventura"],
+    filters: ["Zona", "Tipo de experiencia", "Ideal para"],
+    nearbyTitle: "Experiencias cerca de Valladolid",
+    mapTitle: "Experiencias en Valladolid",
+    aluxMapTitle: "Cada experiencia abre una nueva ruta.",
+    aluxMapDescription:
+      "Guarda tus favoritas y Alux las combinará con traslados, tiempos y otros descubrimientos cercanos.",
+    items: [],
+    nearby: [],
+  },
   "casas-de-vacaciones": {
     family: "casas-de-vacaciones",
     breadcrumb: "Casas de vacaciones",
