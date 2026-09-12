@@ -171,7 +171,7 @@ export function BreadcrumbTerritorial({
       <div
         role="group"
         aria-label="Cambiar de destino"
-        className={cn("shrink-0", compact ? "hidden sm:block" : null)}
+        className="shrink-0"
       >
         <TerritorialSwitcherMount className="h-9 w-full min-w-0 text-xs sm:h-8 sm:w-auto sm:max-w-56" />
       </div>
