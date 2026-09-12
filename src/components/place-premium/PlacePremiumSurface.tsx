@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
+import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -126,6 +127,43 @@ export function PlacePremiumSurface({
   /* Paridad con hotel/restaurante/casa: el eyebrow es corto (una sola
      etiqueta). Destino y zona ya viven en el breadcrumb y en IdentityStrip. */
   const heroEyebrow = content.identity.eyebrow;
+
+  /* "Qué hay cerca": empresas publicadas cuya ubicación real (CMS) está a
+     pocos metros. Se agrupan por intención de viaje; un grupo sin datos
+     simplemente no se renderiza. Nunca se infiere por texto. */
+  const nearbyGroups = useMemo(() => {
+    const definitions = [
+      { key: "comer", id: "cerca-comer", heading: "Dónde comer" },
+      { key: "dormir", id: "cerca-dormir", heading: "Dónde dormir" },
+      { key: "hacer", id: "cerca-hacer", heading: "Qué hacer" },
+      { key: "comprar", id: "cerca-comprar", heading: "Compras y artesanía" },
+      { key: "otros", id: "cerca-otros", heading: "Más cerca de aquí" },
+    ] as const;
+    return definitions
+      .map((definition) => ({
+        id: definition.id,
+        entityKind: "business" as const,
+        heading: definition.heading,
+        items: content.nearbyBusinesses
+          .filter((business) => business.groupKey === definition.key)
+          .map((business) => ({
+            id: business.id,
+            kind: "business" as const,
+            title: business.title,
+            subtitle: business.categoryLabel,
+            description: business.tagline,
+            href: business.href,
+            imageUrl: business.imageUrl,
+            imageAlt: business.imageAlt,
+            location: {
+              label: business.categoryLabel ?? content.identity.destinationLabel,
+              distanceKm: business.distanceKm,
+            },
+            categorySlug: business.categorySlug,
+          })),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [content.nearbyBusinesses, content.identity.destinationLabel]);
 
   /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
   const primaryPoint = content.map.points[0] ?? null;
@@ -369,6 +407,33 @@ export function PlacePremiumSurface({
               </li>
             ))}
           </ul>
+        </PlaceContainer>
+      ) : null}
+
+      {nearbyGroups.length ? (
+        <PlaceContainer className="mt-10 sm:mt-16">
+          <ExperienceRelatedCollectionBlock
+            config={{
+              source: "manual",
+              entityKind: "business",
+              variant: "carousel",
+              columns: 4,
+              density: "compact",
+              heading: `Qué hay cerca de ${content.identity.title}`,
+              subheading:
+                "Lugares para comer, dormir y seguir explorando a pocos pasos, según su ubicación real.",
+              ariaLabel: `Qué hay cerca de ${content.identity.title}`,
+              groups: nearbyGroups,
+              capabilities: {
+                showPrice: false,
+                showDate: false,
+                showKindBadge: false,
+                showFavorite: false,
+                showSecondaryAction: false,
+                showDistance: true,
+              },
+            }}
+          />
         </PlaceContainer>
       ) : null}
 
