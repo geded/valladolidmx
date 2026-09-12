@@ -194,8 +194,9 @@ export function PlacePremiumSurface({
           }}
         />
       </div>
-      {/* Paridad con hotel y restaurante: el hero entity no incluye acciones,
-          se emiten en la fila inmediata bajo el encabezado. */}
+      {/* Paridad con hotel y restaurante: bajo el encabezado sólo vive la
+          acción principal de Mi Viaje. "Cómo llegar" pertenece al bloque de
+          ubicación compartido, igual que en las fichas de empresa. */}
       <Container className="mt-4 flex flex-wrap justify-end gap-2">
         <Button
           variant="outline"
@@ -206,9 +207,6 @@ export function PlacePremiumSurface({
           }}
         >
           {content.hero.primaryCta.label}
-        </Button>
-        <Button variant="ghost" asChild>
-          <a href={content.hero.secondaryCta.href}>{content.hero.secondaryCta.label}</a>
         </Button>
       </Container>
       {content.hero.cover.url ? null : (
