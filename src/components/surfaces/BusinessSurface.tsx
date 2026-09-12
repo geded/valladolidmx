@@ -45,6 +45,9 @@ import {
   businessToDescriptionSectionDTO,
   businessToInfoGridDTO,
   businessToCtaBarDTO,
+  businessToStayEssentialsDTO,
+  businessToStayAmenitiesDTO,
+  businessToStayPolicyDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
