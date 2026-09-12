@@ -328,24 +328,33 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
  * por `vmx.experience.products`. La Plantilla Business no vuelve a
  * pintar `<ul>` — sólo orquesta bloques oficiales.
  * ------------------------------------------------------------------ */
+/* Hospedaje: la tarifa publicada del CMS es por noche. Sólo se declara como
+   pista de precio; nunca implica cobro ni reservación en línea. Las claves son
+   las mismas que usa la Plantilla Business aprobada. */
+const LODGING_KEYS = new Set([
+  "hotel",
+  "hoteles",
+  "hospedaje",
+  "hospedajes",
+  "alojamiento",
+  "vacation_rental",
+  "casas-de-vacaciones",
+  "casa-de-vacaciones",
+]);
+
+export function isLodgingBusiness(b: {
+  category_family_key?: string | null;
+  category_slug?: string | null;
+}): boolean {
+  return (
+    LODGING_KEYS.has((b.category_family_key ?? "").trim().toLowerCase()) ||
+    LODGING_KEYS.has((b.category_slug ?? "").trim().toLowerCase())
+  );
+}
+
 export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
-  /* Hospedaje: la tarifa publicada es por noche. Se declara como pista de
-     precio (dato real del CMS), nunca como cobro ni reservación en línea.
-     Se usan las mismas claves CMS/categoría que la Plantilla Business. */
-  const lodgingKeys = new Set([
-    "hotel",
-    "hoteles",
-    "hospedaje",
-    "hospedajes",
-    "alojamiento",
-    "vacation_rental",
-    "casas-de-vacaciones",
-    "casa-de-vacaciones",
-  ]);
-  const isLodging =
-    lodgingKeys.has((b.category_family_key ?? "").trim().toLowerCase()) ||
-    lodgingKeys.has((b.category_slug ?? "").trim().toLowerCase());
+  const isLodging = isLodgingBusiness(b);
   return {
     variant: "grid",
     heading: variant.productsHeading,
