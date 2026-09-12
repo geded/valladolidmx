@@ -13,6 +13,16 @@ import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-r
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
 export const Route = createFileRoute("/arma-tu-viaje")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    destination:
+      typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination)
+        ? search.destination
+        : undefined,
+    destinationLabel:
+      typeof search.destinationLabel === "string" && search.destinationLabel.trim()
+        ? search.destinationLabel.trim().slice(0, 80)
+        : undefined,
+  }),
   loader: async () => {
     const composition = await getPublishedCompositionBySlug({
       data: { slug: "arma-tu-viaje" },
@@ -50,19 +60,31 @@ function hasRenderableBlocks(tree: unknown): boolean {
 
 function AYVPage() {
   const { composition } = Route.useLoaderData();
+  const { destination, destinationLabel } = Route.useSearch();
   const snapshot = composition?.snapshot;
+  const returnDestination = destination
+    ? { slug: destination, label: destinationLabel ?? destination }
+    : null;
+  const crumbs = returnDestination
+    ? [
+        { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+        {
+          label: returnDestination.label,
+          href: `/oriente-maya/${returnDestination.slug}`,
+        },
+        { label: "Arma tu Viaje" },
+      ]
+    : [{ label: "Arma tu Viaje" }];
   return (
     <PublicShell
-      eyebrow="Plataforma"
-      title="Arma tu Viaje"
-      description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
-      crumbs={[{ label: "Arma tu Viaje" }]}
-      titleAsText
+      variant="hero"
+      crumbs={crumbs}
+      compactCrumbsOnMobile
     >
       {composition && snapshot && hasRenderableBlocks(snapshot) ? (
         <CompositionRenderer tree={snapshot} />
       ) : (
-        <TripPlannerSurface />
+        <TripPlannerSurface returnDestination={returnDestination} />
       )}
     </PublicShell>
   );
