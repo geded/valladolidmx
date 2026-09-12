@@ -1186,34 +1186,47 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
        de detalle nunca consultaba `business_media`, por lo que una portada
        correctamente asociada desaparecía al abrir la empresa. */
     let detailCoverUrl: string | null = null;
-    const detailCoverRow = (businessMedia?.[0] ?? null) as {
+    const detailMedia: MarketplaceBusinessMediaItem[] = [];
+    const detailMediaRows = ((businessMedia ?? []) as Array<{
+      role?: string | null;
+      sort_order?: number | null;
       media_assets?: {
         storage_bucket?: string | null;
         storage_path?: string | null;
+        alt_text?: string | null;
         status?: string | null;
         deleted_at?: string | null;
       } | null;
-    } | null;
-    const detailCoverAsset = detailCoverRow?.media_assets;
-    if (
-      detailCoverAsset?.storage_bucket &&
-      detailCoverAsset.storage_path &&
-      detailCoverAsset.status === "published" &&
-      detailCoverAsset.deleted_at === null
-    ) {
+    }>).filter((r) => {
+      const a = r.media_assets;
+      return Boolean(
+        a?.storage_bucket && a.storage_path && a.status === "published" && a.deleted_at === null,
+      );
+    });
+    if (detailMediaRows.length > 0) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: signed } = await supabaseAdmin.storage
-          .from(detailCoverAsset.storage_bucket)
-          .createSignedUrl(detailCoverAsset.storage_path, 3600);
-        detailCoverUrl = signed?.signedUrl ?? null;
+        for (const row of detailMediaRows) {
+          const a = row.media_assets!;
+          const { data: signed } = await supabaseAdmin.storage
+            .from(a.storage_bucket!)
+            .createSignedUrl(a.storage_path!, 3600);
+          if (!signed?.signedUrl) continue;
+          detailMedia.push({
+            role: typeof row.role === "string" ? row.role : "gallery",
+            url: signed.signedUrl,
+            alt: typeof a.alt_text === "string" ? a.alt_text : null,
+          });
+        }
       } catch {
-        detailCoverUrl = null;
+        /* Sin credencial de firma la ficha simplemente no muestra medios. */
       }
+      detailCoverUrl = detailMedia.find((m) => m.role === "cover")?.url ?? null;
     }
 
     return {
       id: String(biz.id),
+      media: detailMedia,
       slug: String(biz.slug),
       display_name: String(biz.display_name),
       tagline: typeof biz.tagline === "string" ? biz.tagline : "",
