@@ -222,14 +222,46 @@ function assertEditableTable(t: string): asserts t is EditableTable {
   }
 }
 
+/**
+ * Columnas NOT NULL con valor por defecto en la base. El formulario envía
+ * `null` cuando el editor deja el campo vacío; en esas columnas eso rompe
+ * el guardado. Se normaliza al valor neutro (arreglo vacío) o se omite la
+ * clave para que la base aplique su propio default.
+ */
+const NON_NULLABLE_DEFAULTS: Partial<
+  Record<EditableTable, Record<string, "omit" | "empty_array">>
+> = {
+  editorial_routes: {
+    duration_days: "omit",
+    region_slug: "omit",
+    destination_ids: "empty_array",
+    zone_ids: "empty_array",
+    interests: "empty_array",
+    audiences: "empty_array",
+    seasons: "empty_array",
+  },
+};
+
 function sanitizePayload(table: EditableTable, payload: Record<string, unknown>) {
   const allowed = EDITABLE_COLUMNS[table];
+  const rules = NON_NULLABLE_DEFAULTS[table] ?? {};
   const out: Record<string, unknown> = {};
   for (const k of allowed) {
-    if (k in payload) out[k] = payload[k];
+    if (!(k in payload)) continue;
+    const value = payload[k];
+    if (value === null || value === undefined) {
+      const rule = rules[k];
+      if (rule === "omit") continue;
+      if (rule === "empty_array") {
+        out[k] = [];
+        continue;
+      }
+    }
+    out[k] = value;
   }
   return out;
 }
+
 
 /* ─────────────────  Capa conceptual reservada  ─────────────────────── */
 /**
