@@ -24,6 +24,7 @@ import {
   type FilterSelection,
 } from "@/components/experience-premium/ExperienceFiltersBar";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import type { PartyComposition } from "@/lib/traveler/party-composition";
 import {
@@ -157,8 +158,8 @@ export function RoutesListingSurface({
   const territory = lockedDestinationLabel ?? destinationLabel ?? null;
 
   const askAlux = (preference?: string) =>
-    openAluxFloating({
-      reason: "manual",
+    askAluxWithPreferenceMemory({
+      surface: "routes-listing",
       ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir una ruta publicada del Oriente Maya.",

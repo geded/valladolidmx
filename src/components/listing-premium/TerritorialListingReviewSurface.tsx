@@ -19,6 +19,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import type { FavoriteEntityKind } from "@/lib/traveler/traveler-favorites.functions";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
@@ -763,8 +764,8 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
                 key={option}
                 type="button"
                 onClick={() =>
-                  openAluxFloating({
-                    reason: "manual",
+                  askAluxWithPreferenceMemory({
+                    surface: "territorial-listing",
                     prompt: option,
                     hint: `Ayúdame con ${profile.itemLabel}. Mi preferencia es: ${option}. Usa Mi Viaje y explica cada recomendación.`,
                   })
@@ -779,8 +780,8 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
         <button
           type="button"
           onClick={() =>
-            openAluxFloating({
-              reason: "manual",
+            askAluxWithPreferenceMemory({
+              surface: "territorial-listing",
               hint: `Ayúdame a elegir entre estas opciones (${profile.itemLabel}) usando el contexto real de Mi Viaje.`,
             })
           }

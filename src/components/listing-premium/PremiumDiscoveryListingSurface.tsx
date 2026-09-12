@@ -26,6 +26,7 @@ import { RequestConciergeButton } from "@/components/concierge/RequestConciergeB
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
@@ -268,8 +269,8 @@ function askAlux(profile: FamilyProfile, preference: string) {
       : profile.family === "casas-de-vacaciones"
         ? "elegir una casa de vacaciones"
         : "elegir dónde hospedarme";
-  openAluxFloating({
-    reason: "manual",
+  askAluxWithPreferenceMemory({
+    surface: "premium-discovery-listing",
     prompt: preference,
     hint: `Ayúdame a ${task}. Preferencia inicial: ${preference}. Primero determina si estoy planeando el viaje o si ya estoy en Valladolid o el Oriente Maya. Si planeo, pregunta fechas, acompañantes y presupuesto; pide ubicación sólo si ya estoy en destino y con permiso. Usa Mi Viaje y explica por qué recomiendas cada opción.`,
   });
