@@ -112,7 +112,13 @@ export function BreadcrumbTerritorial({
           {effectiveCrumbs.map((c, i) => {
             const isLast = i === effectiveCrumbs.length - 1;
             return (
-              <li key={`${c.label}-${i}`} className="flex min-w-0 shrink-0 items-center gap-1.5">
+              <li
+                key={`${c.label}-${i}`}
+                className={cn(
+                  "flex min-w-0 items-center gap-1.5",
+                  isLast ? "shrink" : "shrink-0",
+                )}
+              >
                 <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
 
                 {c.to && !isLast ? (
