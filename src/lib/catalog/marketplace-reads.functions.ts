@@ -1319,6 +1319,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         accepts_online_payment: Boolean((p as Record<string, unknown>).accepts_online_payment),
         requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
         visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
+        cover_url: productCovers.get(String(p.id)) ?? null,
       })),
       promotions: (promos ?? []).map((p) => ({
         id: p.id,
