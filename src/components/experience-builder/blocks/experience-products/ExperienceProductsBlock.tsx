@@ -119,6 +119,8 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
     if (cfg.source === "business" && business) {
       const filtered =
         cfg.filters?.businessId && cfg.filters.businessId !== business.id ? [] : business.products;
+      /* Hospedaje: la tarifa CMS se lee por noche (sin cobro en línea). */
+      const lodging = isLodgingBusiness(business);
       baseItems = filtered.map((p) => {
         interactive.set(p.id, {
           id: p.id,
@@ -128,7 +130,10 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
           secondary_action_label: p.secondary_action_label,
           accepts_online_payment: p.accepts_online_payment,
         });
-        return marketplaceProductToItem(p);
+        const item = marketplaceProductToItem(p);
+        return lodging && item.priceAmount != null
+          ? { ...item, priceHint: "por noche" }
+          : item;
       });
     } else {
       baseItems = cfg.items;
