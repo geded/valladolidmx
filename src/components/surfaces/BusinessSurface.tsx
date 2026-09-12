@@ -662,7 +662,7 @@ export function BusinessSurface({
     const parts = (
       isVacationRental
         ? ["capacity", "bedrooms", "beds", "bathrooms"]
-        : ["hotel_type", "zone", "services", "price_level"]
+        : ["hotel_type", "zone", "price_level"]
     )
       .map((key) => resolved.find((item) => item.key === key))
       .filter((attribute): attribute is NonNullable<typeof attribute> =>
