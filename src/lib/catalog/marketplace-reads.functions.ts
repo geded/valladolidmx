@@ -133,6 +133,18 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * claves crudas.
    */
   attributes?: BusinessAttributeItem[];
+  /**
+   * Fotografías administradas en CMS (`business_media` → `media_assets`),
+   * ya firmadas. Sólo medios publicados y no eliminados; nunca placeholders.
+   */
+  media?: MarketplaceBusinessMediaItem[];
+}
+
+/** Medio CMS de una empresa (portada o galería) con URL firmada. */
+export interface MarketplaceBusinessMediaItem {
+  role: string;
+  url: string;
+  alt: string | null;
 }
 
 /** Atributo administrable resuelto (misma forma que el de producto). */
