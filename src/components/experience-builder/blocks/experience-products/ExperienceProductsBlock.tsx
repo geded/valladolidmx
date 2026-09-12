@@ -158,7 +158,7 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
           <>
             {showFav ? <FavoriteButton entityKind="product" entityId={item.id} /> : null}
             {dto.capabilities.showActions && interactive ? (
-              <ProductActions product={interactive} />
+              <ProductActions product={interactive} compact={dto.capabilities.compact} />
             ) : null}
           </>
         );

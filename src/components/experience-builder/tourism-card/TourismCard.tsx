@@ -505,7 +505,16 @@ export function TourismCard({
             secondary={caps.showSecondaryAction ? vm.secondaryAction : null}
           />
           {caps.showFavorite && renderActions ? (
-            <div className="mt-2 flex flex-col gap-2">{renderActions(vm)}</div>
+            <div
+              className={cn(
+                "mt-2 flex gap-2",
+                /* Compacta (hospedaje): acciones en una sola línea que envuelve,
+                   para que la ficha no crezca en tablet y celular. */
+                caps.compact ? "flex-wrap items-center" : "flex-col",
+              )}
+            >
+              {renderActions(vm)}
+            </div>
           ) : null}
         </div>
       </div>
