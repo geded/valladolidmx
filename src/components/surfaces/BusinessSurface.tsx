@@ -714,6 +714,14 @@ export function BusinessSurface({
         longitude={b.primary_location?.longitude ?? b.longitude ?? null}
       />
 
+      {/* Casa de vacaciones: la fotografía encabeza la lectura, como en las
+          fichas de alojamiento de referencia, antes de los datos. */}
+      {isVacationRental && galleryDto ? (
+        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
+      ) : null}
+
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
       {isVacationRental ? (
@@ -736,9 +744,9 @@ export function BusinessSurface({
         </section>
       ) : null}
 
-      {premiumGalleryDto ? (
+      {!isVacationRental && galleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
-          <ExperienceGallery dto={premiumGalleryDto} />
+          <ExperienceGallery dto={galleryDto} />
         </section>
       ) : null}
 
