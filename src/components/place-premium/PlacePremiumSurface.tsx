@@ -19,6 +19,7 @@ import { Accessibility, CalendarDays, Clock, Compass, Heart, ImageOff, Ticket } 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { PremiumHero, PremiumTerritorialBreadcrumb } from "@/components/premium";
 import {
