@@ -81,7 +81,7 @@ export function TripPlannerSurface({
       : "empty";
 
   return (
-    <div className="space-y-12 sm:space-y-16">
+    <div className="mx-auto w-full max-w-[1200px] space-y-10 px-4 pb-4 sm:space-y-14 sm:px-6 lg:px-8">
       <TripPlannerHero
         state={state}
         user={Boolean(user)}
