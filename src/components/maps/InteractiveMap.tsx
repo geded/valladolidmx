@@ -303,7 +303,15 @@ export function InteractiveMap({
           }
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
-        if (list.length > 1) map.fitBounds(bounds, 88);
+        const focus = fitPoints && fitPoints.length > 1 ? fitPoints : null;
+        if (focus) {
+          const fb = new google.maps.LatLngBounds();
+          focus.forEach((p) => fb.extend({ lat: p.lat, lng: p.lng }));
+          map.fitBounds(fb, fitPadding);
+        } else if (list.length > 1) {
+          map.fitBounds(bounds, fitPadding);
+        }
+
 
         /* Capa de ruta: sólo con la capacidad real del proveedor. */
         const stops =
