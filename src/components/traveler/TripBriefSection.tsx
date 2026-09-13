@@ -184,8 +184,25 @@ export function TripBriefSection() {
           ¿Falta algo? Escríbelo
         </label>
         <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
-          Por ejemplo: vida nocturna, romance, fotografía. Sin datos personales.
+          Elige a qué pregunta pertenece y escríbelo. Sin datos personales.
         </p>
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          {GROUPS.map((group) => (
+            <button
+              key={group.id}
+              type="button"
+              aria-pressed={draftGroup === group.id}
+              onClick={() => setDraftGroup(group.id)}
+              className={`inline-flex min-h-9 items-center rounded-full border px-3 text-[13px] font-medium transition-colors ${
+                draftGroup === group.id
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              {group.title}
+            </button>
+          ))}
+        </div>
         <div className="mt-2.5 flex flex-wrap gap-2">
           <input
             id="ayv-brief-otro"
@@ -210,21 +227,6 @@ export function TripBriefSection() {
             Agregar
           </button>
         </div>
-        {notes.length ? (
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            {notes.map((note) => (
-              <button
-                key={note}
-                type="button"
-                onClick={() => setNotes((prev) => prev.filter((item) => item !== note))}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary bg-primary px-3 text-[13px] font-medium text-primary-foreground"
-              >
-                {note}
-                <X className="size-3.5" aria-hidden />
-              </button>
-            ))}
-          </div>
-        ) : null}
       </div>
 
       <div className="mt-6 rounded-xl border border-primary/25 bg-primary/5 p-4">
