@@ -577,6 +577,8 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                     }
                   : {})}
                 {...(fitPoints ? { fitPoints, fitPadding: 48 } : {})}
+                restriction={YUCATAN_BOUNDS}
+                minZoom={8}
                 className="h-[42vh] w-full rounded-2xl border border-border lg:h-[560px]"
               />
             </Suspense>
