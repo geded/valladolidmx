@@ -112,7 +112,12 @@ const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
 
 export function FloatingTravelPlanDock() {
   const { user } = useAuth();
-  const { trip: anonymousTrip } = useAnonymousTrip();
+  const {
+    trip: anonymousTrip,
+    status: anonymousStatus,
+    hasReturningTrip,
+    acknowledgeReturn,
+  } = useAnonymousTrip();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHiddenRoute = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
   const enabled = !!user && !isHiddenRoute;
@@ -135,6 +140,9 @@ export function FloatingTravelPlanDock() {
   });
 
   const [open, setOpen] = useState(false);
+  /* Founder Decision: el retorno se reconoce con un aviso breve en el
+     botón de Mi Viaje; nunca con un bloque que tape la portada. */
+  const [showReturnHint, setShowReturnHint] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const { locale: rawLocale } = useTranslation();
@@ -155,6 +163,27 @@ export function FloatingTravelPlanDock() {
     });
   }, [enabled, q, confirmedQ]);
 
+  /* Aviso de continuidad: aparece una sola vez al volver y se cierra solo. */
+  useEffect(() => {
+    if (user || isHiddenRoute) return;
+    if (anonymousStatus !== "returning" || !hasReturningTrip) return;
+    if (anonymousItems.length === 0) return;
+    setShowReturnHint(true);
+    const timer = window.setTimeout(() => {
+      setShowReturnHint(false);
+      void acknowledgeReturn();
+    }, 8000);
+    return () => window.clearTimeout(timer);
+  }, [
+    user,
+    isHiddenRoute,
+    anonymousStatus,
+    hasReturningTrip,
+    anonymousItems.length,
+    acknowledgeReturn,
+  ]);
+
+
   // El dock depende de estado local del navegador (borrador anónimo /
   // sesión). Antes de hidratar no renderizamos nada para que el markup
   // del servidor y el del cliente coincidan.
@@ -172,9 +201,33 @@ export function FloatingTravelPlanDock() {
 
     return (
       <>
+        {showReturnHint ? (
+          <button
+            type="button"
+            onClick={() => {
+              setShowReturnHint(false);
+              void acknowledgeReturn();
+              setOpen(true);
+            }}
+            className="fixed bottom-[4.5rem] left-4 z-40 max-w-[16rem] rounded-2xl border border-primary/30 bg-card/95 px-3.5 py-2.5 text-left shadow-elevated backdrop-blur md:left-6"
+          >
+            <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <Sparkles className="size-3.5" aria-hidden />
+              Alux te acompaña
+            </span>
+            <span className="mt-0.5 block text-sm font-semibold leading-snug text-foreground">
+              Continuemos tu viaje
+            </span>
+            <span className="block text-xs text-muted-foreground">{description}</span>
+          </button>
+        ) : null}
+
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setShowReturnHint(false);
+            setOpen(true);
+          }}
           aria-label={`${ANON_COPY.dock.button} (${count})`}
           className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-3.5 py-2.5 text-sm font-semibold text-foreground shadow-elevated backdrop-blur transition-colors hover:bg-card md:left-6"
         >
