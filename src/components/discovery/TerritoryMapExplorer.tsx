@@ -582,6 +582,24 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
         </div>
       </div>
 
+      {/* Puente con Arma tu Viaje */}
+      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-secondary/40 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-serif text-base font-semibold text-foreground">
+            ¿Quieres encadenar varios destinos?
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Arma tu Viaje ordena tus destinos por cercanía y tu concierge humano revisa el
+            expediente.
+          </p>
+        </div>
+        <Button asChild className="rounded-pill">
+          <Link to="/arma-tu-viaje" search={{ destination: origin.key, from: "mapa" as const }}>
+            Armar una ruta con estos destinos
+          </Link>
+        </Button>
+      </div>
+
       {/* Barra fija del recorrido en celular */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden">
         <Sheet open={routeOpen} onOpenChange={setRouteOpen}>
