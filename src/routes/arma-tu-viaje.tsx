@@ -82,19 +82,9 @@ function AYVPage() {
     ? { slug: destination, label: destinationLabel ?? destination }
     : null;
   /**
-   * La ruta territorial SIEMPRE parte de la región. Si el explorador
-   * viene de un destino (por search param o por la sesión territorial
-   * vigente), ese destino se conserva como nivel intermedio.
-   */
-  const contextDestination =
-    (from === "mapa" ? null : returnDestination) ??
-    (session?.destination
-      ? { slug: session.destination.slug, label: session.destination.label }
-      : null);
-  /**
    * Continuidad de ruta: si el explorador llegó desde el Mapa territorial,
-   * ese paso permanece visible en la ruta (no el destino de origen del
-   * cálculo de distancias, que no es contexto territorial).
+   * ese paso permanece visible en la ruta. El `destination` que envía el
+   * Mapa es el origen del cálculo de distancias, no contexto territorial.
    */
   const [cameFromMap, setCameFromMap] = useState(false);
   useEffect(() => {
@@ -102,6 +92,17 @@ function AYVPage() {
     setCameFromMap(Boolean(prev && prev.startsWith("/mapa")));
   }, []);
   const showMapStep = from === "mapa" || cameFromMap;
+  /**
+   * La ruta territorial SIEMPRE parte de la región. Si el explorador
+   * viene de un destino (por search param o por la sesión territorial
+   * vigente), ese destino se conserva como nivel intermedio.
+   */
+  const contextDestination = showMapStep
+    ? null
+    : (returnDestination ??
+      (session?.destination
+        ? { slug: session.destination.slug, label: session.destination.label }
+        : null));
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" },
     ...(showMapStep ? [{ label: "Mapa", to: "/mapa" as const }] : []),
