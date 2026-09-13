@@ -211,6 +211,44 @@ export function isLovablePreviewFrame(): boolean {
   }
 }
 
+/**
+ * Rastro de navegación (ruta anterior → ruta actual).
+ *
+ * La navegación del router es client-side, por lo que `document.referrer`
+ * no refleja el paso previo. Guardamos únicamente el pathname anterior
+ * para que superficies transversales (Alux, Arma tu Viaje) puedan
+ * conservar el paso desde el que llegó el explorador en su ruta
+ * territorial. Sin impacto SSR ni SEO.
+ */
+const ROUTE_TRAIL_KEY = "vll:nav:route-trail:v1";
+
+export function trackRouteTrail(path: string): void {
+  if (!hasWindow()) return;
+  try {
+    const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
+    const parsed = raw ? (JSON.parse(raw) as { prev?: string; cur?: string }) : {};
+    if (parsed.cur === path) return;
+    sessionStorage.setItem(
+      ROUTE_TRAIL_KEY,
+      JSON.stringify({ prev: parsed.cur ?? null, cur: path }),
+    );
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+export function readPreviousRoute(): string | null {
+  if (!hasWindow()) return null;
+  try {
+    const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { prev?: string | null };
+    return typeof parsed.prev === "string" ? parsed.prev : null;
+  } catch {
+    return null;
+  }
+}
+
 export function clearNavigationSession(): void {
   if (!hasWindow()) return;
   try {
