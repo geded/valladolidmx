@@ -28,7 +28,7 @@ import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/exper
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicEventDetail, PublicEventCard } from "@/lib/events/public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
-import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
+import { recurrenceLabel, scheduleLabel, upcomingEventOccurrences } from "@/lib/events/recurrence";
 
 const EVENT_TIME_ZONE = "America/Merida";
 
@@ -49,6 +49,22 @@ function formatTime(iso?: string | null): string | null {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
   return new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit", timeZone: EVENT_TIME_ZONE }).format(date);
+}
+
+function formatWeekday(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("es-MX", { weekday: "short", timeZone: EVENT_TIME_ZONE })
+    .format(date)
+    .replace(".", "");
+}
+
+function formatShortDay(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", timeZone: EVENT_TIME_ZONE })
+    .format(date)
+    .replace(".", "");
 }
 
 function eventCardToVM(card: PublicEventCard): TourismCardVM {
@@ -102,6 +118,7 @@ export function EventPremiumSurface({
   const admission = attributeValues(attrs.admission_type)[0];
   const recurrence = recurrenceLabel(event);
   const scheduledTimes = scheduleLabel(event.schedule_times);
+  const upcoming = upcomingEventOccurrences(event, 10);
 
   /* ---- InfoGrid: datos clave del evento ---- */
   const infoItems: ExperienceInfoGridDTO["items"] = [
@@ -268,6 +285,40 @@ export function EventPremiumSurface({
         </section>
       ) : null}
 
+      {/* ---- Próximas fechas (carrusel horizontal estilo Airbnb) ---- */}
+      {upcoming.length > 0 ? (
+        <section
+          id="proximas-fechas"
+          data-eb-anchor
+          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24 px-5 sm:px-8 lg:px-12"
+        >
+          <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
+            Próximas fechas
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Elige el día que mejor encaje en tu viaje. Horario del Oriente Maya.
+          </p>
+          <ul className="-mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 [&::-webkit-scrollbar]:hidden">
+            {upcoming.map((slot) => (
+              <li
+                key={slot.startsAt}
+                className="min-w-[9.5rem] shrink-0 snap-start rounded-2xl border border-border bg-card px-4 py-3 shadow-soft"
+              >
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {formatWeekday(slot.startsAt)}
+                </p>
+                <p className="mt-0.5 text-base font-semibold text-foreground">
+                  {formatShortDay(slot.startsAt)}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {slot.time} h{slot.label ? ` · ${slot.label}` : ""}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {/* ---- Descripción editorial ---- */}
       {descriptionSection ? (
         <section data-eb-anchor className="mt-10 scroll-mt-24">
@@ -291,14 +342,14 @@ export function EventPremiumSurface({
       {/* ---- Eventos cercanos ---- */}
       {related.length > 0 ? (
         <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24 px-5 sm:px-8 lg:px-12">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             Explora cerca de {event.title}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Otros eventos del destino para continuar tu viaje por el Oriente Maya.
           </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {related.slice(0, 4).map((card) => (
+          <div className="-mx-5 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
+            {related.slice(0, 8).map((card) => (
               <TourismCard
                 key={card.id}
                 vm={eventCardToVM(card)}
