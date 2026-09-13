@@ -113,6 +113,7 @@ export function TripPlannerSurface({
         aluxReason={alux.hasContext ? alux.reason : null}
         aluxCanonical={alux.canonical ?? null}
         returnDestination={returnDestination}
+        authReturnPath={authReturnPath}
       />
 
       {state === "guest" ? <GuestSection guestCount={guestCount} /> : null}
@@ -147,6 +148,7 @@ function TripPlannerHero({
   aluxReason,
   aluxCanonical,
   returnDestination,
+  authReturnPath,
 }: {
   state: "empty" | "guest" | "authed-empty" | "authed-active";
   user: boolean;
@@ -157,6 +159,7 @@ function TripPlannerHero({
   aluxReason: string | null;
   aluxCanonical: string | null;
   returnDestination: ReturnDestination | null;
+  authReturnPath: string;
 }) {
   const eyebrow =
     state === "authed-active"
