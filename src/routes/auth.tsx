@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -8,6 +9,12 @@ import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { resolveRoleHome } from "@/types/auth";
 import { useTranslation } from "@/i18n/context";
+import { useNavigationSession } from "@/lib/navigation";
+import {
+  consumeAuthReturnPath,
+  hasVisitedTravelPlanner,
+  readAuthReturnPath,
+} from "@/lib/navigation/session-context";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -36,23 +43,21 @@ function AuthRoute() {
   const [googleBusy, setGoogleBusy] = useState(false);
   const [googleMode, setGoogleMode] = useState<"popup" | "redirect">("popup");
   const [welcomeName, setWelcomeName] = useState<string | null>(null);
+  const [returnTarget, setReturnTarget] = useState<string | null>(null);
+  const [fromPlanner, setFromPlanner] = useState(false);
+  const session = useNavigationSession();
+
+  useEffect(() => {
+    setReturnTarget(readAuthReturnPath());
+    setFromPlanner(hasVisitedTravelPlanner());
+  }, []);
 
   useEffect(() => {
     if (!loading && user) {
       // Session hydrated — close the "Conectando con Google…" modal if it was open.
       setGoogleBusy(false);
       // Preserve "next" across sign-in / OAuth round-trip.
-      let next: string | null = null;
-      if (typeof window !== "undefined") {
-        try {
-          next = window.sessionStorage.getItem("vmx.auth.next");
-          if (next) window.sessionStorage.removeItem("vmx.auth.next");
-        } catch {
-          /* noop */
-        }
-      }
-      const target =
-        next && next.startsWith("/") && !next.startsWith("//") ? next : resolveRoleHome(roles);
+      const target = consumeAuthReturnPath() ?? resolveRoleHome(roles);
       // Splash "¡Bienvenido, {nombre}!" antes de saltar al destino.
       const meta = (user.user_metadata ?? {}) as {
         full_name?: string;
@@ -144,14 +149,49 @@ function AuthRoute() {
     forgot: t("auth.forgot"),
   };
 
+  const returnIsAlux = Boolean(returnTarget?.startsWith("/alux"));
+  const returnIsPlanner = Boolean(returnTarget?.startsWith("/arma-tu-viaje"));
+  const returnLabel = returnIsAlux
+    ? "Alux"
+    : returnIsPlanner
+      ? "Arma tu Viaje"
+      : "la página anterior";
+  const crumbs = [
+    { label: "Oriente Maya", to: "/oriente-maya" },
+    ...(session?.destination
+      ? [
+          {
+            label: session.destination.label,
+            to: "/oriente-maya/$destino",
+            params: { destino: session.destination.slug },
+          },
+        ]
+      : []),
+    ...(returnIsPlanner || (returnIsAlux && fromPlanner)
+      ? [{ label: "Arma tu Viaje", to: "/arma-tu-viaje" }]
+      : []),
+    ...(returnIsAlux ? [{ label: "Alux", to: "/alux" }] : []),
+    { label: t("auth.eyebrow") },
+  ];
+
   return (
     <PublicShell
       eyebrow={t("auth.eyebrow")}
       title={titles[mode]}
       description={t("auth.subtitle")}
-      crumbs={[{ label: t("auth.eyebrow") }]}
+      crumbs={crumbs}
+      compactCrumbsOnMobile
     >
       <div className="mx-auto max-w-md space-y-6 rounded-2xl border border-border bg-card p-6 sm:p-8">
+        {returnTarget ? (
+          <Link
+            to={returnTarget}
+            className="inline-flex min-h-10 items-center gap-2 text-sm font-medium text-primary hover:underline"
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            Volver a {returnLabel}
+          </Link>
+        ) : null}
         {mode !== "forgot" ? (
           <>
             <button

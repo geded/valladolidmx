@@ -30,6 +30,7 @@ import { toast } from "@/lib/toast";
 import { useTranslation } from "@/i18n/context";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
+import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -342,7 +343,11 @@ export function PublicAluxChat() {
         {error && (
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
             {error}{" "}
-            <Link to="/auth" className="underline font-medium">
+            <Link
+              to="/auth"
+              onClick={() => rememberAuthReturnPath("/alux")}
+              className="underline font-medium"
+            >
               Crear cuenta gratuita
             </Link>
           </div>
@@ -384,7 +389,11 @@ export function PublicAluxChat() {
       <p className="px-5 pb-4 pt-2 text-[11px] text-muted-foreground bg-muted/30">
         Alux es una guía inspiracional. Nunca reserva ni cotiza sin tu confirmación. Para armar tu
         viaje completo,{" "}
-        <Link to="/auth" className="underline">
+        <Link
+          to="/auth"
+          onClick={() => rememberAuthReturnPath("/alux")}
+          className="underline"
+        >
           crea tu cuenta gratuita
         </Link>
         .

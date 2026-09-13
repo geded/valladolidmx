@@ -20,7 +20,7 @@
  *  · authed-empty   → usuario autenticado sin ítems en plan activo.
  *  · authed-active  → usuario autenticado con plan activo poblado.
  */
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -43,6 +43,7 @@ import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { TripBriefSection } from "@/components/traveler/TripBriefSection";
 import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
 import { Button } from "@/components/ui/button";
+import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 
 /**
  * Escala tipográfica y de componentes ÚNICA de esta superficie.
@@ -70,6 +71,8 @@ export function TripPlannerSurface({
 }: {
   returnDestination?: ReturnDestination | null;
 }) {
+  const location = useRouterState({ select: (s) => s.location });
+  const authReturnPath = `${location.pathname}${location.searchStr ?? ""}`;
   const { user } = useAuth();
   const fetchActive = useServerFn(getMyActivePlan);
   const anonymous = useAnonymousTrip();
@@ -237,6 +240,7 @@ function TripPlannerHero({
         {!user ? (
           <Link
             to="/auth"
+            onClick={() => rememberAuthReturnPath(authReturnPath)}
             className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-primary hover:underline"
           >
             Ya tengo cuenta
