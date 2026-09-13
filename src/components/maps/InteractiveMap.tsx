@@ -24,6 +24,8 @@ import {
   subscribeGoogleMapsAuthFailure,
 } from "@/lib/maps/google-maps-loader";
 import { MapUnavailableFallback } from "./MapUnavailableFallback";
+import { StaticMap } from "./StaticMap";
+
 
 /** Resultado de la capa de ruta, reportado a la superficie consumidora. */
 export interface MapRouteStatus {
