@@ -463,7 +463,7 @@ function MobileMenu({
           <Search className="size-4" aria-hidden />
         </span>
         <span className="min-w-0">
-          <span className="block text-[0.95rem] font-semibold leading-tight tracking-tight text-foreground">
+          <span className="block text-[0.95rem] font-medium leading-snug text-foreground">
             ¿A dónde vas?
           </span>
           <span className="block truncate text-[0.8125rem] text-muted-foreground">
