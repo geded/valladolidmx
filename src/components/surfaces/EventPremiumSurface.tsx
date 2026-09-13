@@ -28,7 +28,7 @@ import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/exper
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicEventDetail, PublicEventCard } from "@/lib/events/public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
-import { recurrenceLabel, scheduleLabel, upcomingEventOccurrences } from "@/lib/events/recurrence";
+import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
 
 const EVENT_TIME_ZONE = "America/Merida";
 
@@ -51,21 +51,6 @@ function formatTime(iso?: string | null): string | null {
   return new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit", timeZone: EVENT_TIME_ZONE }).format(date);
 }
 
-function formatWeekday(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("es-MX", { weekday: "short", timeZone: EVENT_TIME_ZONE })
-    .format(date)
-    .replace(".", "");
-}
-
-function formatShortDay(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", timeZone: EVENT_TIME_ZONE })
-    .format(date)
-    .replace(".", "");
-}
 
 function eventCardToVM(card: PublicEventCard): TourismCardVM {
   const startDay = formatDay(card.starts_at);
@@ -118,7 +103,6 @@ export function EventPremiumSurface({
   const admission = attributeValues(attrs.admission_type)[0];
   const recurrence = recurrenceLabel(event);
   const scheduledTimes = scheduleLabel(event.schedule_times);
-  const upcoming = upcomingEventOccurrences(event, 10);
 
   /* ---- InfoGrid: datos clave del evento ---- */
   const infoItems: ExperienceInfoGridDTO["items"] = [
@@ -282,40 +266,6 @@ export function EventPremiumSurface({
       {infoGridDto ? (
         <section data-eb-anchor className="mt-6 scroll-mt-24">
           <ExperienceInfoGrid dto={infoGridDto} />
-        </section>
-      ) : null}
-
-      {/* ---- Próximas fechas (carrusel horizontal estilo Airbnb) ---- */}
-      {upcoming.length > 0 ? (
-        <section
-          id="proximas-fechas"
-          data-eb-anchor
-          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24"
-        >
-          <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
-            Próximas fechas
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Elige el día que mejor encaje en tu viaje. Horario del Oriente Maya.
-          </p>
-          <ul className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {upcoming.map((slot) => (
-              <li
-                key={slot.startsAt}
-                className="min-w-[9.5rem] shrink-0 snap-start rounded-2xl border border-border bg-card px-4 py-3 shadow-soft"
-              >
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {formatWeekday(slot.startsAt)}
-                </p>
-                <p className="mt-0.5 text-base font-semibold text-foreground">
-                  {formatShortDay(slot.startsAt)}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {slot.time} h{slot.label ? ` · ${slot.label}` : ""}
-                </p>
-              </li>
-            ))}
-          </ul>
         </section>
       ) : null}
 
