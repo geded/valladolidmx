@@ -237,12 +237,19 @@ export function trackRouteTrail(path: string): void {
   }
 }
 
+/**
+ * Devuelve el pathname anterior al actual. Los efectos de la página se
+ * ejecutan antes que el puente global, por lo que el rastro puede no
+ * haberse actualizado todavía: en ese caso `cur` ES la ruta anterior.
+ */
 export function readPreviousRoute(): string | null {
   if (!hasWindow()) return null;
   try {
     const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { prev?: string | null };
+    const parsed = JSON.parse(raw) as { prev?: string | null; cur?: string | null };
+    const here = window.location.pathname;
+    if (typeof parsed.cur === "string" && parsed.cur !== here) return parsed.cur;
     return typeof parsed.prev === "string" ? parsed.prev : null;
   } catch {
     return null;
