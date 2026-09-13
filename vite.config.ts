@@ -18,9 +18,11 @@ export default defineConfig({
     plugins: [
       mcpPlugin(),
       VitePWA({
-        // TanStack Start/Nitro publica los assets finales en `.output/public`.
-        // Sin este destino Workbox escaneaba `dist` y generaba 0 entradas.
-        outDir: ".output/public",
+        // Verificado 2026-09-13: el bundle cliente publicado queda en
+        // `dist/client` (assets, og, favicon). `.output/public` sólo recibía
+        // el propio sw.js, por lo que el Service Worker no se servía y el
+        // precache quedaba vacío. Este destino es el que realmente se publica.
+        outDir: "dist/client",
         strategies: "generateSW",
         registerType: "autoUpdate",
         injectRegister: null,
