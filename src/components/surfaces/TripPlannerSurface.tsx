@@ -199,10 +199,7 @@ function TripPlannerHero({
         ) : null}
 
         {state === "guest" ? (
-          <ProgressiveRegistrationButton
-            reason="save_permanently"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-          >
+          <ProgressiveRegistrationButton reason="save_permanently" className={BTN_PRIMARY}>
             <ShieldCheck className="size-4" aria-hidden />
             Guardar mi viaje
           </ProgressiveRegistrationButton>
