@@ -464,10 +464,10 @@ function MobileMenu({
         </span>
         <span className="min-w-0">
           <span className="block text-[0.95rem] font-medium leading-snug text-foreground">
-            ¿A dónde vas?
+            ¿Donde empezamos?
           </span>
-          <span className="block truncate text-[0.8125rem] text-muted-foreground">
-            Explora los destinos del Oriente Maya
+          <span className="block text-[0.8125rem] leading-snug text-muted-foreground">
+            Explora el Oriente Maya de Yucatán
           </span>
         </span>
         <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground" aria-hidden />

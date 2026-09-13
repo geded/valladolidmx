@@ -73,3 +73,9 @@
 - [x] Generar/cargar portada original, validar CMS y ficha pública en 1440/834/430/390: evento publicado y ligado a portada temporal aprobada; recurrencia diaria, horarios, Mi Viaje, Alux y JSON-LD visibles; un H1, sin overflow ni errores de página. Home, agenda, micrositio, destino y Mi Viaje conservan sus autoridades existentes y consumen el mismo contrato público.
 - [x] Adaptar EventPremiumSurface al formato Premium de hoteles/restaurantes/casas (hero → compartir/agregar a Mi Viaje → Alux → descripción y datos → ubicación/cómo llegar/qué hay cerca) sin crear superficie nueva, sin reserva ni pagos. Validado en 1440/834/430/390.
 - [x] Conectar la ficha de Lugares y sitios de interés al constructor: plantilla oficial "Plantilla · Lugar" (__tpl_place__) con textos de sección editables; ficha pública lee la composición publicada con respaldo a los textos aprobados. Validado en 1440/834/430/390.
+
+## Menú móvil · Refinamiento Airbnb (2026-09-13)
+
+- [ ] Texto del buscador: "¿Donde empezamos?" con subtítulo "Explora el Oriente Maya de Yucatán" visible en móvil.
+- [ ] Botones CTA del drawer móvil ("Arma tu Viaje", "Iniciar sesión"): estilo Airbnb — sin relleno ocre sólido; usar foreground/outline refinado.
+- [ ] Validar en 393x852 (móvil) y typecheck limpio.
