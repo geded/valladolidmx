@@ -13,7 +13,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown } from "lucide-react";
+import {
+  BedDouble,
+  CalendarDays,
+  ChevronDown,
+  ChevronRight,
+  Home,
+  MapPin,
+  Search,
+  Sparkles,
+  UtensilsCrossed,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 
@@ -411,13 +422,17 @@ function DesktopMenu({
 
 /* ─────────────────────────── Mobile ─────────────────────────── */
 
-const MOBILE_PRIMARY: MenuLink[] = [
-  { label: "Hoteles", href: "/hoteles" },
-  { label: "Restaurantes", href: "/restaurantes" },
-  { label: "Casas de vacaciones", href: "/casas-de-vacaciones" },
-  { label: "Experiencias", href: "/experiencias" },
-  { label: "¿Qué hacer?", href: "/que-hacer" },
-  { label: "Eventos", href: "/eventos" },
+interface MobileItem extends MenuLink {
+  icon: LucideIcon;
+}
+
+const MOBILE_PRIMARY: MobileItem[] = [
+  { label: "Hoteles", href: "/hoteles", hint: "Dónde dormir", icon: BedDouble },
+  { label: "Restaurantes", href: "/restaurantes", hint: "Dónde comer", icon: UtensilsCrossed },
+  { label: "Casas de vacaciones", href: "/casas-de-vacaciones", hint: "Estancias completas", icon: Home },
+  { label: "Experiencias", href: "/experiencias", hint: "Tours y actividades", icon: Sparkles },
+  { label: "¿Qué hacer?", href: "/que-hacer", hint: "Lugares y sitios de interés", icon: MapPin },
+  { label: "Eventos", href: "/eventos", hint: "Agenda del destino", icon: CalendarDays },
 ];
 
 const MOBILE_SECONDARY: MenuLink[] = [
@@ -438,35 +453,67 @@ function MobileMenu({
 }) {
   const populares = popularDestinos(destinos);
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-7 pb-2">
       <a
         href="/oriente-maya"
         onClick={() => onNavigate?.()}
-        className="flex items-center gap-3 rounded-2xl border border-border/70 bg-background px-4 py-3.5 shadow-soft transition-colors hover:bg-accent/50"
+        className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-colors hover:bg-accent/40"
       >
-        <span className="text-[0.95rem] font-semibold tracking-tight text-foreground">
-          ¿A dónde vas?
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/60 text-foreground">
+          <Search className="size-4" aria-hidden />
         </span>
-        <span className="ml-auto text-[0.8125rem] text-muted-foreground">Explorar destinos</span>
+        <span className="min-w-0">
+          <span className="block text-[0.95rem] font-semibold leading-tight tracking-tight text-foreground">
+            ¿A dónde vas?
+          </span>
+          <span className="block truncate text-[0.8125rem] text-muted-foreground">
+            Explora los destinos del Oriente Maya
+          </span>
+        </span>
+        <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground" aria-hidden />
       </a>
 
-      <ul className="flex flex-col">
-        {MOBILE_PRIMARY.map((link) => (
-          <li key={link.href} className="border-b border-border/50 last:border-b-0">
-            <a
-              href={hrefWithActiveDestination(link.href, activeDestination)}
-              onClick={() => onNavigate?.()}
-              className="block rounded-xl px-2 py-3.5 text-[1.0625rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:bg-accent/60"
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div>
+        <p className="mb-2 px-1 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          Descubre
+        </p>
+        <ul className="flex flex-col">
+          {MOBILE_PRIMARY.map((link) => {
+            const Icon = link.icon;
+            return (
+              <li key={link.href} className="border-b border-border/40 last:border-b-0">
+                <a
+                  href={hrefWithActiveDestination(link.href, activeDestination)}
+                  onClick={() => onNavigate?.()}
+                  className="flex items-center gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-accent/40"
+                >
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/40 text-foreground">
+                    <Icon className="size-[1.05rem]" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[1rem] font-semibold leading-tight tracking-tight text-foreground">
+                      {link.label}
+                    </span>
+                    {link.hint ? (
+                      <span className="block truncate text-[0.8125rem] text-muted-foreground">
+                        {link.hint}
+                      </span>
+                    ) : null}
+                  </span>
+                  <ChevronRight
+                    className="ml-auto size-4 shrink-0 text-muted-foreground/70"
+                    aria-hidden
+                  />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       {populares.length ? (
         <div>
-          <p className="mb-2 px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          <p className="mb-2 px-1 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Destinos populares
           </p>
           <div className="flex flex-wrap gap-2">
@@ -484,19 +531,21 @@ function MobileMenu({
         </div>
       ) : null}
 
-      <ul className="flex flex-wrap gap-x-5 gap-y-1 px-2">
-        {MOBILE_SECONDARY.map((link) => (
-          <li key={link.href}>
-            <a
-              href={link.href}
-              onClick={() => onNavigate?.()}
-              className="inline-block py-2 text-[0.9375rem] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div className="border-t border-border/50 pt-3">
+        <ul className="flex flex-wrap gap-x-5 gap-y-0.5 px-1">
+          {MOBILE_SECONDARY.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                onClick={() => onNavigate?.()}
+                className="inline-block py-2 text-[0.9375rem] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
