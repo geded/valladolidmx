@@ -412,7 +412,19 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [shouldMount, lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+  }, [
+    shouldMount,
+    lat,
+    lng,
+    zoom,
+    markerTitle,
+    markers,
+    connectByRoad,
+    routeStops,
+    optimizeRoute,
+    restriction,
+    minZoom,
+  ]);
 
   if (failed) {
     const points = (
