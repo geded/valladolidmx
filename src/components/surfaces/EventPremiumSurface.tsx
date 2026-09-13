@@ -111,7 +111,7 @@ export function EventPremiumSurface({
           iconKey: "calendar",
           label: recurrence ? "Próxima función" : "Fecha",
           value: endDay && endDay !== startDay ? `${startDay} – ${endDay}` : startDay,
-          tone: "default",
+          tone: "default" as const,
         }
       : null,
     scheduledTimes || startTime
@@ -119,11 +119,11 @@ export function EventPremiumSurface({
           iconKey: "clock",
           label: "Horario",
           value: scheduledTimes ?? (endTime ? `${startTime}–${endTime} h` : `${startTime} h`),
-          tone: "default",
+          tone: "default" as const,
         }
       : null,
     event.venue_name
-      ? { iconKey: "map-pin", label: "Sede", value: event.venue_name, tone: "default" }
+      ? { iconKey: "map-pin", label: "Sede", value: event.venue_name, tone: "default" as const }
       : null,
     {
       iconKey: "ticket",
@@ -133,14 +133,14 @@ export function EventPremiumSurface({
         : event.is_free
           ? "Entrada libre"
           : "Entrada de pago",
-      tone: "default",
+      tone: "default" as const,
     },
     recurrence
       ? {
           iconKey: "repeat",
           label: "Recurrencia",
           value: `${recurrence}${event.recurrence_until ? ` · hasta ${formatDay(`${event.recurrence_until}T12:00:00-06:00`)}` : " · programación permanente"}`,
-          tone: "primary",
+          tone: "primary" as const,
         }
       : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null);
