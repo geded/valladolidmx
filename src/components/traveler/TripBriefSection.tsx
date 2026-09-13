@@ -122,7 +122,11 @@ export function TripBriefSection() {
       rememberTravelPreference(known.label, SURFACE);
       return;
     }
-    setNotes((prev) => (prev.includes(clean) || prev.length >= 3 ? prev : [...prev, clean]));
+    setNotes((prev) =>
+      prev.some((note) => note.text === clean) || prev.length >= 3
+        ? prev
+        : [...prev, { text: clean, groupId: draftGroup }],
+    );
   }
 
 
