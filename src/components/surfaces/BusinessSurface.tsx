@@ -871,6 +871,7 @@ export function BusinessSurface({
           acción principal de la ficha. No hay reserva ni cobro en línea. */}
       {isImmersive && stayFromPriceLabel ? (
         <>
+          <MobileStickyCtaRegistrar />
           <div aria-hidden className="h-24 lg:hidden" />
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-5 py-3 shadow-floating backdrop-blur lg:hidden">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
