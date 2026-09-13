@@ -30,6 +30,11 @@ import type { TourismCardVM } from "@/components/experience-builder/tourism-card
 import type { PublicEventDetail, PublicEventCard } from "@/lib/events/public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
+import {
+  EVENT_PREMIUM_COPY_DEFAULTS,
+  fillEventCopy,
+  type EventPremiumCopy,
+} from "./event-premium-copy";
 
 const EVENT_TIME_ZONE = "America/Merida";
 
@@ -87,11 +92,13 @@ export function EventPremiumSurface({
   related = [],
   readOnlyPreview = false,
   previewCover,
+  copy = EVENT_PREMIUM_COPY_DEFAULTS,
 }: {
   event: PublicEventDetail;
   related?: PublicEventCard[];
   readOnlyPreview?: boolean;
   previewCover?: ReactNode;
+  copy?: EventPremiumCopy;
 }) {
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -150,7 +157,7 @@ export function EventPremiumSurface({
     infoItems.length > 0
       ? {
           variant: "cards",
-          heading: "Datos del evento",
+          heading: copy.infoHeading,
           columns: 3,
           items: infoItems,
           ariaLabel: "Información clave del evento",
@@ -163,8 +170,8 @@ export function EventPremiumSurface({
   const descriptionSection: ExperienceSectionDTO | null = event.body
     ? {
         variant: "editorial",
-        eyebrow: "La experiencia",
-        title: "Qué vas a vivir",
+        eyebrow: copy.descriptionKicker,
+        title: copy.descriptionTitle,
         lead: event.summary ?? null,
         body: event.body
           .replace(/\\n/g, "\n")
@@ -261,8 +268,8 @@ export function EventPremiumSurface({
       {/* ---- Alux contextual ---- */}
       <TourismAluxPanel
         className="mx-auto mt-4 w-full max-w-7xl"
-        title={`Planear con ${event.title}`}
-        description="Alux te ayuda a integrar este evento en tu viaje por el Oriente Maya."
+        title={fillEventCopy(copy.aluxTitle, event.title)}
+        description={copy.aluxDescription}
         task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya.`}
         selection={{
           entityRef: `event:${event.id}`,
@@ -303,11 +310,9 @@ export function EventPremiumSurface({
       {related.length > 0 ? (
         <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24">
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
-            Explora cerca de {event.title}
+            {fillEventCopy(copy.relatedHeading, event.title)}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Otros eventos del destino para continuar tu viaje por el Oriente Maya.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{copy.relatedSubheading}</p>
           <div className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
             {related.slice(0, 8).map((card) => (
               <TourismCard
@@ -345,11 +350,9 @@ export function EventPremiumSurface({
         <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-lg font-semibold text-foreground">
-              Suma {event.title} a tu viaje
+              {fillEventCopy(copy.ctaTitle, event.title)}
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Un concierge arma tu itinerario incluyendo este evento. Sin cobro en línea.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{copy.ctaSubtitle}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
             {!readOnlyPreview ? (
