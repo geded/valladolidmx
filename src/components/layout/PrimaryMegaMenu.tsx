@@ -412,7 +412,6 @@ function DesktopMenu({
 /* ─────────────────────────── Mobile ─────────────────────────── */
 
 const MOBILE_PRIMARY: MenuLink[] = [
-  { label: "Oriente Maya", href: "/oriente-maya" },
   { label: "Hoteles", href: "/hoteles" },
   { label: "Restaurantes", href: "/restaurantes" },
   { label: "Casas de vacaciones", href: "/casas-de-vacaciones" },
