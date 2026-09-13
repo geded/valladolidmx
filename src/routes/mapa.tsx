@@ -5,8 +5,9 @@
  * Candidato a evaluación en H-02 · Épica 2 (posible slot territorial).
  * No monta `ContextEngineProvider` en I7.
  */
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
+import { TerritoryMapExplorer } from "@/components/discovery/TerritoryMapExplorer";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
