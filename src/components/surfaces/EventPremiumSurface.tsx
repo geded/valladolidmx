@@ -164,7 +164,12 @@ export function EventPremiumSurface({
         eyebrow: "La experiencia",
         title: "Qué vas a vivir",
         lead: event.summary ?? null,
-        body: event.body,
+        body: event.body
+          .split(/\n\n+/)
+          .map((p) p.trim())
+          .filter(Boolean)
+          .map((p) => `<p>${p.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">")}</p>`)
+          .join(""),
         media: null,
         attribution: null,
         ctas: event.external_url
@@ -173,7 +178,7 @@ export function EventPremiumSurface({
         align: "left",
         tone: "default",
         ariaLabel: null,
-        capabilities: { anchor: true, seoHeading: true, richText: false },
+        capabilities: { anchor: true, seoHeading: true, richText: true },
       }
     : null;
 
