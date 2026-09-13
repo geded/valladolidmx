@@ -13,7 +13,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown } from "lucide-react";
+import {
+  BedDouble,
+  CalendarDays,
+  ChevronDown,
+  ChevronRight,
+  Home,
+  MapPin,
+  Search,
+  Sparkles,
+  UtensilsCrossed,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 
