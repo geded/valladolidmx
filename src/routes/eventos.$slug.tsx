@@ -11,6 +11,11 @@ import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/
 import { SITE } from "@/config/site";
 import { getEventBySlug, getEventRelated, type PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import {
+  EVENT_PREMIUM_BLOCK_TYPE,
+  resolveEventPremiumCopyFromTree,
+} from "@/lib/events/event-copy-resolution";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -59,10 +64,24 @@ export const Route = createFileRoute("/eventos/$slug")({
   loader: async ({ params }) => {
     const event = await getEventBySlug({ data: { slug: params.slug } });
     if (!event) throw notFound();
-    const related = await getEventRelated({
-      data: { eventId: event.id, destinationId: event.destination_id, limit: 4 },
-    });
-    return { event, related };
+    /* Composition-first para TEXTOS (mismo patrón que empresa y lugar):
+       primero la composición específica del evento y, en su ausencia, la
+       plantilla oficial de la familia. Nunca sustituye la autoridad visual
+       aprobada: sólo aporta encabezados editables. */
+    const [related, specific, template] = await Promise.all([
+      getEventRelated({
+        data: { eventId: event.id, destinationId: event.destination_id, limit: 4 },
+      }),
+      getPublishedCompositionBySlug({
+        data: { slug: `event-${params.slug}`, variant_key: params.slug },
+      }).catch(() => null),
+      getPublishedCompositionBySlug({ data: { slug: "__tpl_event__" } }).catch(() => null),
+    ]);
+    const copy = resolveEventPremiumCopyFromTree(
+      (specific ?? template)?.snapshot ?? null,
+      EVENT_PREMIUM_BLOCK_TYPE,
+    );
+    return { event, related, copy };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -152,11 +171,11 @@ export const Route = createFileRoute("/eventos/$slug")({
 });
 
 function EventoPage() {
-  const { event, related } = Route.useLoaderData();
+  const { event, related, copy } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
-      <EventPremiumSurface event={event} related={related} />
+      <EventPremiumSurface event={event} related={related} copy={copy} />
     </ContextEngineProvider>
   );
 }
