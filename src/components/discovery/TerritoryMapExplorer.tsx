@@ -232,9 +232,18 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
     ? {
         lat: (origin.lat + stops.reduce((a, s) => a + s.latitude, 0) / stops.length) / 2,
         lng: (origin.lng + stops.reduce((a, s) => a + s.longitude, 0) / stops.length) / 2,
-        zoom: stops.length > 1 ? 9 : 10,
+        zoom: stops.length > 1 ? 10 : 12,
       }
-    : { lat: origin.lat, lng: origin.lng, zoom: 9 };
+    : { lat: origin.lat, lng: origin.lng, zoom: 11 };
+
+  /** Encuadre cercano: se ajusta a las paradas marcadas, no a todo el territorio. */
+  const fitPoints = stops.length
+    ? [
+        { lat: origin.lat, lng: origin.lng },
+        ...stops.map((s) => ({ lat: s.latitude, lng: s.longitude })),
+      ]
+    : undefined;
+
 
   /** Panel del recorrido, reutilizado en escritorio y en la hoja móvil. */
   const routePanel = (
@@ -564,12 +573,24 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                       ],
                     }
                   : {})}
+                {...(fitPoints ? { fitPoints, fitPadding: 48 } : {})}
                 className="h-[42vh] w-full rounded-2xl border border-border lg:h-[560px]"
               />
             </Suspense>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Toca un pin para marcarlo o quitarlo del recorrido.
-            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <p className="text-xs text-muted-foreground">
+                Toca un pin para marcarlo o quitarlo del recorrido.
+              </p>
+              {googleRouteUrl ? (
+                <Button asChild size="sm" variant="secondary" className="rounded-pill">
+                  <a href={googleRouteUrl} target="_blank" rel="noopener noreferrer">
+                    <Navigation className="mr-1 h-3.5 w-3.5" aria-hidden />
+                    Abrir recorrido completo
+                  </a>
+                </Button>
+              ) : null}
+            </div>
+
 
             {/* Recorrido en escritorio */}
             <div className="mt-4 hidden rounded-2xl border border-border bg-card p-4 lg:block">

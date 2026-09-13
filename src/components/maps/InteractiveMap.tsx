@@ -203,6 +203,11 @@ export interface InteractiveMapProps {
   onRouteStatus?: (status: MapRouteStatus) => void;
   /** Selección de un marcador desde el mapa. */
   onMarkerSelect?: (key: string) => void;
+  /** Puntos a los que se ajusta el encuadre; por defecto todos los pines. */
+  fitPoints?: Array<{ lat: number; lng: number }>;
+  /** Margen del encuadre en píxeles. */
+  fitPadding?: number;
+
 }
 
 function labelForIndex(i: number) {
@@ -241,6 +246,9 @@ export function InteractiveMap({
   optimizeRoute = false,
   onRouteStatus,
   onMarkerSelect,
+  fitPoints,
+  fitPadding = 88,
+
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [failed, setFailed] = useState(false);
@@ -303,7 +311,15 @@ export function InteractiveMap({
           }
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
-        if (list.length > 1) map.fitBounds(bounds, 88);
+        const focus = fitPoints && fitPoints.length > 1 ? fitPoints : null;
+        if (focus) {
+          const fb = new google.maps.LatLngBounds();
+          focus.forEach((p) => fb.extend({ lat: p.lat, lng: p.lng }));
+          map.fitBounds(fb, fitPadding);
+        } else if (list.length > 1) {
+          map.fitBounds(bounds, fitPadding);
+        }
+
 
         /* Capa de ruta: sólo con la capacidad real del proveedor. */
         const stops =
