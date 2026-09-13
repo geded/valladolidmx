@@ -243,7 +243,8 @@ function hrefWithActiveDestination(href: string, activeDestination: string | nul
 }
 
 export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
-  const sections = useSections();
+  const destinos = usePublishedDestinos();
+  const sections = buildSections(destinos);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [browserPathname, setBrowserPathname] = useState<string | null>(null);
   useEffect(() => {
