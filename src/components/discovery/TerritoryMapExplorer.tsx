@@ -246,6 +246,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
       </div>
 
       {/* Mapa territorial */}
+      <div id="mapa-recorrido" className="scroll-mt-24" />
       <Suspense
         fallback={<div className="h-[360px] w-full animate-pulse rounded-2xl bg-muted md:h-[480px]" />}
       >
