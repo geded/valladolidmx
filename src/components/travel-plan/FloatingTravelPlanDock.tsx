@@ -19,6 +19,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useHasStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {

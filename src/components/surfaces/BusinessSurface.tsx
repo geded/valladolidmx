@@ -23,7 +23,7 @@
  * empresa en el loader — patrón consistente con Region/Destination).
  */
 /* eslint-disable react-refresh/only-export-components -- I3-B keeps the legacy contexts and pure category resolver in the authorized surface module. */
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
