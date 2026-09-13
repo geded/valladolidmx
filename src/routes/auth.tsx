@@ -12,10 +12,12 @@ import { useTranslation } from "@/i18n/context";
 import { useNavigationSession } from "@/lib/navigation";
 import {
   consumeAuthReturnPath,
-  hasVisitedTravelPlanner,
+  describeJourneyStep,
   readAuthReturnPath,
+  readJourneyPrefix,
   readPreviousRoute,
   rememberAuthReturnPath,
+  type JourneyStep,
 } from "@/lib/navigation/session-context";
 
 type Mode = "signin" | "signup" | "forgot";
