@@ -603,7 +603,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
       {/* Barra fija del recorrido en celular */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden">
         <Sheet open={routeOpen} onOpenChange={setRouteOpen}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pr-28">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-foreground">
                 Tu recorrido · {stops.length} parada{stops.length === 1 ? "" : "s"}
