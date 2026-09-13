@@ -23,7 +23,7 @@
  * empresa en el loader — patrón consistente con Region/Destination).
  */
 /* eslint-disable react-refresh/only-export-components -- I3-B keeps the legacy contexts and pure category resolver in the authorized surface module. */
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
@@ -34,6 +34,7 @@ import { ExperienceSubnav } from "@/components/experience-builder/blocks/experie
 import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
+import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
@@ -870,6 +871,7 @@ export function BusinessSurface({
           acción principal de la ficha. No hay reserva ni cobro en línea. */}
       {isImmersive && stayFromPriceLabel ? (
         <>
+          <MobileStickyCtaRegistrar />
           <div aria-hidden className="h-24 lg:hidden" />
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-5 py-3 shadow-floating backdrop-blur lg:hidden">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -1146,4 +1148,18 @@ function ShareButton({ title }: { title: string }) {
       />
     </>
   );
+}
+
+/**
+ * MobileStickyCtaRegistrar — registra la barra inferior móvil de la ficha
+ * (tarifa + Agregar a Mi Viaje) en el canal de presencia de CTAs stickies,
+ * para que el dock flotante de Mi Viaje y Alux se eleven sobre ella sin
+ * solaparse. Patrón idéntico al de `ExperienceCtaBar`.
+ */
+function MobileStickyCtaRegistrar() {
+  useEffect(() => {
+    const release = registerStickyCta();
+    return release;
+  }, []);
+  return null;
 }
