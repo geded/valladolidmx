@@ -533,27 +533,21 @@ function NextStepSection({
       : { to: "/oriente-maya" as const, label: "Explorar el Oriente Maya" };
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+    <section className={CARD}>
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold sm:text-2xl">¿Listo para dar el siguiente paso?</h2>
-          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+        <div className="min-w-0">
+          <h2 className={H2}>¿Listo para dar el siguiente paso?</h2>
+          <p className={`mt-1.5 max-w-xl ${BODY}`}>
             El expediente es tuyo. Nadie contacta al concierge hasta que tú lo decides — este es tu
             espacio para planear con calma.
           </p>
         </div>
         {state === "guest" ? (
-          <ProgressiveRegistrationButton
-            reason="save_permanently"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95"
-          >
+          <ProgressiveRegistrationButton reason="save_permanently" className={BTN_PRIMARY}>
             Guardar mi viaje <ArrowRight className="size-4" aria-hidden />
           </ProgressiveRegistrationButton>
         ) : (
-          <Link
-            to={cta.to}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95"
-          >
+          <Link to={cta.to} className={BTN_PRIMARY}>
             {cta.label}
             <ArrowRight className="size-4" aria-hidden />
           </Link>
