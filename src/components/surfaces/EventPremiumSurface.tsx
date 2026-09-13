@@ -166,7 +166,7 @@ export function EventPremiumSurface({
         lead: event.summary ?? null,
         body: event.body
           .split(/\n\n+/)
-          .map((p) p.trim())
+          .map((p) => p.trim())
           .filter(Boolean)
           .map((p) => `<p>${p.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">")}</p>`)
           .join(""),
