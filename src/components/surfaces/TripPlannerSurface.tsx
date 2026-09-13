@@ -44,6 +44,22 @@ import { TripBriefSection } from "@/components/traveler/TripBriefSection";
 import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Escala tipográfica y de componentes ÚNICA de esta superficie.
+ * Delta de armonización: no cambia contenido ni estados, sólo unifica
+ * jerarquía, pesos, radios y alturas de acción en toda la página.
+ */
+const EYEBROW = "text-[11px] font-semibold uppercase tracking-[0.14em] text-primary";
+const H2 =
+  "font-serif text-[1.25rem] font-semibold leading-[1.2] tracking-[-0.01em] sm:text-[1.6rem]";
+const H3 = "text-[15px] font-semibold leading-snug sm:text-base";
+const BODY = "text-[13px] leading-6 text-muted-foreground sm:text-sm";
+const CARD = "rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-7";
+const BTN_PRIMARY =
+  "inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-95";
+const BTN_SECONDARY =
+  "inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent";
+
 interface ReturnDestination {
   slug: string;
   label: string;
