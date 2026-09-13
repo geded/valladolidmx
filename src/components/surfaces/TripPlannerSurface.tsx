@@ -40,6 +40,7 @@ import { useAluxContext } from "@/lib/alux/use-alux-context";
 import { useTravelPreferences } from "@/lib/alux/use-travel-preferences";
 import { GuestPlanPreview } from "@/components/traveler/GuestPlanPreview";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
+import { TripBriefSection } from "@/components/traveler/TripBriefSection";
 import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
 import { Button } from "@/components/ui/button";
 
