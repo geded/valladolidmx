@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { useNavigationSession } from "@/lib/navigation";
-import { readPreviousRoute } from "@/lib/navigation/session-context";
+import { hasVisitedTravelPlanner, readPreviousRoute } from "@/lib/navigation/session-context";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { AluxSurface } from "@/components/surfaces/AluxSurface";
@@ -40,7 +40,7 @@ function AluxPage() {
   const [fromPlanner, setFromPlanner] = useState(false);
   useEffect(() => {
     const prev = readPreviousRoute();
-    setFromPlanner(Boolean(prev && prev.startsWith("/arma-tu-viaje")));
+    setFromPlanner(Boolean(prev && prev.startsWith("/arma-tu-viaje")) || hasVisitedTravelPlanner());
   }, []);
 
   const crumbs = [
