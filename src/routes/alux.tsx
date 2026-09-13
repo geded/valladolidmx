@@ -44,7 +44,7 @@ function AluxPage() {
   }, []);
 
   const crumbs = [
-    { label: "Oriente Maya de Yucatán", to: "/oriente-maya" },
+    { label: "Oriente Maya", to: "/oriente-maya" },
     ...(session?.destination
       ? [
           {
