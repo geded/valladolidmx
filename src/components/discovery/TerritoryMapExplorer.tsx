@@ -244,6 +244,9 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
       ]
     : undefined;
 
+  /** El mapa nunca sale del estado de Yucatán. */
+  const YUCATAN_BOUNDS = { north: 21.75, south: 19.45, east: -87.35, west: -90.55 };
+
 
   /** Panel del recorrido, reutilizado en escritorio y en la hoja móvil. */
   const routePanel = (
