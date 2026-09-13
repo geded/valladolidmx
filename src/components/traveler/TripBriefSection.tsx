@@ -253,7 +253,7 @@ export function TripBriefSection() {
                 selectedPreferences.length || notes.length
                   ? `Con base en mi brief (${[
                       ...selectedPreferences.map((preference) => preference.label),
-                      ...notes,
+                      ...notes.map((note) => note.text),
                     ].join(", ")}), ¿qué me falta para completar mi viaje?`
                   : "Ayúdame a definir cómo quiero viajar por el Oriente Maya.",
             })
