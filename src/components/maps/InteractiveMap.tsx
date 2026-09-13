@@ -416,8 +416,8 @@ export function InteractiveMap({
           lat={lat}
           lng={lng}
           zoom={zoom}
-          width={900}
-          height={500}
+          width={640}
+          height={380}
           alt={markerTitle ? `Mapa de ${markerTitle}` : "Mapa del territorio"}
           markers={points.map((p) => ({ lat: p.lat, lng: p.lng }))}
           className={className}
