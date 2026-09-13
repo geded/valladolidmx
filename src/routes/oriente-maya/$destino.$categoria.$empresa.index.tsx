@@ -35,6 +35,7 @@ import {
   BUSINESS_PREMIUM_BLOCK_TYPE,
   resolveBusinessPremiumCopyFromTree,
 } from "@/lib/businesses/business-copy-resolution";
+import { BUSINESS_PREMIUM_COPY_DEFAULTS } from "@/components/surfaces/business-premium-copy";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
 import { ZazilTunichPremiumSurface } from "@/routes/lovable/founder-zazil-premium-preview";
 
@@ -219,6 +220,18 @@ function EmpresaTerritorialPage() {
     );
   }
 
+  /* Textos de sección editables desde el constructor. Cuando la
+     composición publicada declara el bloque `vmx.business.premium`, la
+     autoridad visual sigue siendo `BusinessSurface` y sólo se aplican sus
+     encabezados; fail-closed a los textos aprobados. */
+  const businessCopy = resolveBusinessPremiumCopyFromTree(
+    composition?.snapshot ?? null,
+    BUSINESS_PREMIUM_BLOCK_TYPE,
+  );
+  const compositionHasPremiumBlock =
+    businessCopy !== BUSINESS_PREMIUM_COPY_DEFAULTS &&
+    JSON.stringify(businessCopy) !== JSON.stringify(BUSINESS_PREMIUM_COPY_DEFAULTS);
+
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
@@ -228,10 +241,10 @@ function EmpresaTerritorialPage() {
           related={related}
           premiumEligibility={premiumEnabled ? premiumEligibility : null}
           legacy={
-            composition ? (
+            composition && !compositionHasPremiumBlock ? (
               <CompositionRenderer tree={composition.snapshot} />
             ) : (
-              <BusinessSurface />
+              <BusinessSurface copy={businessCopy} />
             )
           }
         />
