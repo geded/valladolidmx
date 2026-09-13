@@ -9,7 +9,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
+import { getEventBySlug, getEventRelated, type PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
 import {
   ContextEngineProvider,
