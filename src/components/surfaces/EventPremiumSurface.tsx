@@ -206,7 +206,7 @@ export function EventPremiumSurface({
               ? { url: event.cover_url, alt: event.title }
               : null,
           badges: event.destination_name
-            ? [{ label: `${event.destination_name} · Oriente Maya`, tone: "default" }]
+            ? [{ label: `${event.destination_name} · Oriente Maya`, tone: "neutral" as const }]
             : [],
         }}
       >
