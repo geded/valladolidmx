@@ -74,6 +74,11 @@ export function useAluxFloatingPresence(): AluxFloatingPresence {
   if (pathname === "/oriente-maya" || pathname === "/oriente-maya/") {
     return { shouldHide: true, reason: "alux-embedded", bottomOffset: 0 };
   }
+  // Las fichas de evento ya integran el panel canónico de Alux en el flujo.
+  // Mantener el dock visible sobre su cabecera tapa horario y sede en móvil.
+  if (/^\/eventos\/[^/]+\/?$/.test(pathname)) {
+    return { shouldHide: true, reason: "alux-embedded", bottomOffset: 0 };
+  }
   if (ficha === "product") return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
   if (ficha === "business") return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
   if (HIDDEN_PATH_PREFIXES.some((p) => pathname.startsWith(p))) {
