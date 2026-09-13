@@ -163,6 +163,27 @@ export function FloatingTravelPlanDock() {
     });
   }, [enabled, q, confirmedQ]);
 
+  /* Aviso de continuidad: aparece una sola vez al volver y se cierra solo. */
+  useEffect(() => {
+    if (user || isHiddenRoute) return;
+    if (anonymousStatus !== "returning" || !hasReturningTrip) return;
+    if (anonymousItems.length === 0) return;
+    setShowReturnHint(true);
+    const timer = window.setTimeout(() => {
+      setShowReturnHint(false);
+      void acknowledgeReturn();
+    }, 8000);
+    return () => window.clearTimeout(timer);
+  }, [
+    user,
+    isHiddenRoute,
+    anonymousStatus,
+    hasReturningTrip,
+    anonymousItems.length,
+    acknowledgeReturn,
+  ]);
+
+
   // El dock depende de estado local del navegador (borrador anónimo /
   // sesión). Antes de hidratar no renderizamos nada para que el markup
   // del servidor y el del cliente coincidan.
