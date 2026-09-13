@@ -507,6 +507,7 @@ function PlacePremiumQ2dRender({ node }: BlockPreviewProps): ReactNode {
       presentation={resolved.presentation}
       variant={resolved.variant}
       builderNotice={resolved.builderNotice}
+      copy={resolved.copy}
     />
   );
 }

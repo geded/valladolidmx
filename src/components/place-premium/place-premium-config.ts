@@ -19,6 +19,11 @@
  */
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PLACE_PREMIUM_DEMO_CONTENT, type PlacePremiumContent } from "./place-premium-content";
+import {
+  placePremiumCopyDefaultConfig,
+  resolvePlacePremiumCopy,
+  type PlacePremiumCopy,
+} from "./place-premium-copy";
 
 export const PLACE_PREMIUM_TEMPLATE_ID = "premium-entity-place" as const;
 export const PLACE_PREMIUM_BLOCK_TYPE = "vmx.place.premium-q2d" as const;
@@ -161,6 +166,8 @@ export interface PlacePremiumResolved {
   readonly requestedPresentation: PremiumPresentation;
   readonly fallbackApplied: boolean;
   readonly builderNotice: string | null;
+  /** G8-Q2D-C · textos de sección resueltos (editables en el constructor). */
+  readonly copy: PlacePremiumCopy;
 }
 
 /** Configuración inicial del bloque al crear la composición. */
@@ -174,6 +181,7 @@ export function placePremiumDefaultConfig(variant: string = "zona-arqueologica")
     hero_media_alt: "",
     hero_media_credit: "",
     hero_media_approved: false,
+    ...placePremiumCopyDefaultConfig(),
   };
 }
 
@@ -222,5 +230,6 @@ export function resolvePlacePremiumQ2d(config: Cfg = {}): PlacePremiumResolved {
     requestedPresentation: resolution.requested,
     fallbackApplied: resolution.fallbackApplied,
     builderNotice: resolution.builderNotice,
+    copy: resolvePlacePremiumCopy(config),
   };
 }
