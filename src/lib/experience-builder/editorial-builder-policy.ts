@@ -1720,6 +1720,134 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           max_length: 300,
           writable_by: ["founder_admin", "territorial_editor"],
         },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_gallery_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_services_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_services_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_experiences_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_experiences_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_events_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_events_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_businesses_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_businesses_subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_comer",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_dormir",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_hacer",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_comprar",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_otros",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_places_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_places_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
       ],
     },
     {

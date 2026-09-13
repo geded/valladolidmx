@@ -44,6 +44,11 @@ import {
   type PlacePremiumContent,
   type PlacePremiumMedia,
 } from "./place-premium-content";
+import {
+  PLACE_PREMIUM_COPY_DEFAULTS,
+  fillPlaceCopy,
+  type PlacePremiumCopy,
+} from "./place-premium-copy";
 
 export interface PlacePremiumSurfaceProps {
   content?: PlacePremiumContent;
@@ -68,6 +73,11 @@ export interface PlacePremiumSurfaceProps {
    * compartido (`PublicShell`), la superficie no debe duplicarlo.
    */
   showBreadcrumbs?: boolean;
+  /**
+   * G8-Q2D-C · Textos de sección editables desde el Experience Builder.
+   * Ausente o parcial ⇒ se conservan los textos aprobados.
+   */
+  copy?: PlacePremiumCopy;
   className?: string;
 }
 
@@ -81,6 +91,7 @@ export function PlacePremiumSurface({
   tripSlot = null,
   saveSlot = null,
   showBreadcrumbs = true,
+  copy = PLACE_PREMIUM_COPY_DEFAULTS,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
@@ -105,7 +116,7 @@ export function PlacePremiumSurface({
     galleryItems.length >= 2
       ? {
           variant: "mosaic" as const,
-          heading: `Conoce ${content.identity.title}`,
+          heading: fillPlaceCopy(copy.galleryHeading, content.identity.title),
           subheading: null,
           items: galleryItems,
           maxVisible: 5,
@@ -133,11 +144,11 @@ export function PlacePremiumSurface({
      simplemente no se renderiza. Nunca se infiere por texto. */
   const nearbyGroups = useMemo(() => {
     const definitions = [
-      { key: "comer", id: "cerca-comer", heading: "Dónde comer" },
-      { key: "dormir", id: "cerca-dormir", heading: "Dónde dormir" },
-      { key: "hacer", id: "cerca-hacer", heading: "Qué hacer" },
-      { key: "comprar", id: "cerca-comprar", heading: "Compras y artesanía" },
-      { key: "otros", id: "cerca-otros", heading: "Más cerca de aquí" },
+      { key: "comer", id: "cerca-comer", heading: copy.nearbyGroupComer },
+      { key: "dormir", id: "cerca-dormir", heading: copy.nearbyGroupDormir },
+      { key: "hacer", id: "cerca-hacer", heading: copy.nearbyGroupHacer },
+      { key: "comprar", id: "cerca-comprar", heading: copy.nearbyGroupComprar },
+      { key: "otros", id: "cerca-otros", heading: copy.nearbyGroupOtros },
     ] as const;
     return definitions
       .map((definition) => ({
@@ -163,7 +174,7 @@ export function PlacePremiumSurface({
           })),
       }))
       .filter((group) => group.items.length > 0);
-  }, [content.nearbyBusinesses, content.identity.destinationLabel]);
+  }, [content.nearbyBusinesses, content.identity.destinationLabel, copy]);
 
   /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
   const primaryPoint = content.map.points[0] ?? null;
@@ -346,7 +357,11 @@ export function PlacePremiumSurface({
 
       {content.services.length ? (
         <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading id="servicios-lugar" kicker="Servicios" title="Servicios disponibles" />
+          <SectionHeading
+            id="servicios-lugar"
+            kicker={copy.servicesKicker}
+            title={copy.servicesTitle}
+          />
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {content.services.map((service) => (
               <li
@@ -365,8 +380,8 @@ export function PlacePremiumSurface({
         <PlaceContainer className="mt-10 sm:mt-16">
           <SectionHeading
             id="experiencias-lugar"
-            kicker="Planea tu visita"
-            title="Experiencias y tours relacionados"
+            kicker={copy.experiencesKicker}
+            title={copy.experiencesTitle}
           />
           <ul
             className={cn(
@@ -397,7 +412,11 @@ export function PlacePremiumSurface({
       {/* Eventos: sin contenido → el módulo se oculta por completo. */}
       {content.events.length ? (
         <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading id="eventos-lugar" kicker="Agenda" title="Eventos relacionados" />
+          <SectionHeading
+            id="eventos-lugar"
+            kicker={copy.eventsKicker}
+            title={copy.eventsTitle}
+          />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {content.events.map((item) => (
               <li key={item.id} className="rounded-3xl border border-border bg-card p-5">
@@ -419,9 +438,8 @@ export function PlacePremiumSurface({
               variant: "carousel",
               columns: 4,
               density: "compact",
-              heading: `Qué hay cerca de ${content.identity.title}`,
-              subheading:
-                "Lugares para comer, dormir y seguir explorando a pocos pasos, según su ubicación real.",
+              heading: fillPlaceCopy(copy.nearbyBusinessesHeading, content.identity.title),
+              subheading: copy.nearbyBusinessesSubheading,
               ariaLabel: `Qué hay cerca de ${content.identity.title}`,
               groups: nearbyGroups,
               capabilities: {
@@ -439,7 +457,11 @@ export function PlacePremiumSurface({
 
       {content.nearby.length ? (
         <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading id="cerca-lugar" kicker="Alrededor" title="Lugares cercanos" />
+          <SectionHeading
+            id="cerca-lugar"
+            kicker={copy.nearbyPlacesKicker}
+            title={copy.nearbyPlacesTitle}
+          />
           <ul className="mt-6 grid gap-5 sm:grid-cols-2">
             {content.nearby.map((item) => (
               <li key={item.id}>
