@@ -109,6 +109,75 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           );
         }
 
+        // 1.b Authorization gate (fail-closed).
+        // Un usuario autenticado sólo puede disparar correos hacia:
+        //   a) destinatarios fijos definidos por la plantilla en el servidor,
+        //   b) su propia dirección,
+        //   c) cualquier dirección si es staff de plataforma (admin/super_admin),
+        //   d) un viajero con cupón vigente de un negocio donde el remitente
+        //      tiene rol operativo (editor/manager/owner).
+        {
+          const callerEmail = (user.email ?? "").toLowerCase();
+          const target = effectiveRecipient.toLowerCase();
+          let authorized = Boolean(template.to) || (callerEmail !== "" && target === callerEmail);
+
+          if (!authorized) {
+            const { data: isAdmin } = await supabase.rpc("has_role", {
+              _user_id: user.id,
+              _role: "admin",
+            });
+            if (isAdmin) {
+              authorized = true;
+            } else {
+              const { data: isSuper } = await supabase.rpc("has_role", {
+                _user_id: user.id,
+                _role: "super_admin",
+              });
+              authorized = Boolean(isSuper);
+            }
+          }
+
+          if (!authorized) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("user_id")
+              .ilike("email", target)
+              .maybeSingle();
+            const travelerId = profile?.user_id ?? null;
+            if (travelerId) {
+              const { data: memberships } = await supabase
+                .from("business_users")
+                .select("business_id")
+                .eq("user_id", user.id)
+                .eq("status", "active")
+                .in("role", ["editor", "manager", "owner"]);
+              const businessIds = (memberships ?? [])
+                .map((m: { business_id: string | null }) => m.business_id)
+                .filter((id: string | null): id is string => Boolean(id));
+              if (businessIds.length > 0) {
+                const { data: coupon } = await supabase
+                  .from("traveler_coupons")
+                  .select("id")
+                  .eq("user_id", travelerId)
+                  .in("business_id", businessIds)
+                  .limit(1)
+                  .maybeSingle();
+                authorized = Boolean(coupon);
+              }
+            }
+          }
+
+          if (!authorized) {
+            console.warn("Blocked unauthorized transactional email", {
+              templateName,
+              recipient_redacted: redactEmail(effectiveRecipient),
+            });
+            return Response.json({ error: "Forbidden" }, { status: 403 });
+          }
+        }
+
+
+
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
           .from("suppressed_emails")
