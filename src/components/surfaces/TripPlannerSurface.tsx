@@ -178,13 +178,11 @@ function TripPlannerHero({
 
   return (
     <header className="border-b border-border/70 pb-6 pt-1 sm:pb-10 sm:pt-4">
-      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary sm:text-xs">
-        {eyebrow}
-      </p>
-      <h1 className="max-w-3xl text-balance font-serif text-[1.5rem] font-semibold leading-[1.15] sm:text-4xl sm:leading-[1.08] lg:text-[2.75rem]">
+      <p className={`mb-1.5 ${EYEBROW}`}>{eyebrow}</p>
+      <h1 className="max-w-3xl text-balance font-serif text-[1.65rem] font-semibold leading-[1.12] tracking-[-0.015em] sm:text-[2.25rem] sm:leading-[1.08] lg:text-[2.6rem]">
         {title}
       </h1>
-      <p className="mt-2 max-w-2xl text-[13px] leading-5 text-muted-foreground sm:mt-3 sm:text-base sm:leading-7">
+      <p className="mt-2.5 max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-3 sm:text-[15px] sm:leading-7">
         {subtitle}
       </p>
 
