@@ -20,6 +20,7 @@ import {
   isStandaloneDisplay,
   readLastRoute,
   snapshotFromContext,
+  trackRouteTrail,
   writeLastRoute,
   writeNavigationSession,
 } from "@/lib/navigation/session-context";
@@ -63,6 +64,7 @@ export function GlobalNavigationSessionBridge() {
   // Continuidad de ubicación: recuerda la última ruta pública visitada.
   useEffect(() => {
     writeLastRoute(`${location.pathname}${location.searchStr ?? ""}`);
+    trackRouteTrail(location.pathname);
   }, [location.pathname, location.searchStr]);
 
   // Arranque en frío de la app instalada (relanza en "/") y recarga del
