@@ -457,13 +457,13 @@ function MobileMenu({
       <a
         href="/oriente-maya"
         onClick={() => onNavigate?.()}
-        className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-colors hover:bg-accent/40"
+        className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-colors hover:bg-foreground/[0.04]"
       >
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/60 text-foreground">
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/[0.06] text-muted-foreground">
           <Search className="size-4" aria-hidden />
         </span>
         <span className="min-w-0">
-          <span className="block text-[0.95rem] font-semibold leading-tight tracking-tight text-foreground">
+          <span className="block text-[0.95rem] font-medium leading-snug text-foreground">
             ¿A dónde vas?
           </span>
           <span className="block truncate text-[0.8125rem] text-muted-foreground">
@@ -474,7 +474,7 @@ function MobileMenu({
       </a>
 
       <div>
-        <p className="mb-2 px-1 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">
           Descubre
         </p>
         <ul className="flex flex-col">
@@ -485,13 +485,13 @@ function MobileMenu({
                 <a
                   href={hrefWithActiveDestination(link.href, activeDestination)}
                   onClick={() => onNavigate?.()}
-                  className="flex items-center gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-accent/40"
+                  className="flex items-center gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-foreground/[0.04]"
                 >
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/40 text-foreground">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/[0.06] text-muted-foreground">
                     <Icon className="size-[1.05rem]" aria-hidden />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-[1rem] font-semibold leading-tight tracking-tight text-foreground">
+                    <span className="block text-[1rem] font-medium leading-snug text-foreground">
                       {link.label}
                     </span>
                     {link.hint ? (
@@ -513,7 +513,7 @@ function MobileMenu({
 
       {populares.length ? (
         <div>
-          <p className="mb-2 px-1 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">
             Destinos populares
           </p>
           <div className="flex flex-wrap gap-2">
@@ -522,7 +522,7 @@ function MobileMenu({
                 key={d.slug}
                 href={`/oriente-maya/${d.slug}`}
                 onClick={() => onNavigate?.()}
-                className="rounded-pill border border-border/70 px-3.5 py-2 text-[0.875rem] font-medium text-foreground transition-colors hover:bg-accent/60"
+                className="rounded-pill border border-border/70 px-3.5 py-2 text-[0.875rem] font-normal text-foreground transition-colors hover:bg-accent/60"
               >
                 {d.name}
               </a>
@@ -538,7 +538,7 @@ function MobileMenu({
               <a
                 href={link.href}
                 onClick={() => onNavigate?.()}
-                className="inline-block py-2 text-[0.9375rem] text-muted-foreground transition-colors hover:text-foreground"
+                className="inline-block py-2 text-[0.9375rem] font-normal text-muted-foreground transition-colors hover:text-foreground"
               >
                 {link.label}
               </a>
