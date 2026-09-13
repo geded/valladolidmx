@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
@@ -17,6 +18,53 @@ export const Route = createFileRoute("/offline")({
 });
 
 function OfflinePage() {
+  // Autorreparación: si el navegador SÍ tiene red, esta pantalla es un falso
+  // positivo servido por un Service Worker antiguo. Se limpian cachés, se
+  // desregistra el SW y se vuelve a cargar contra la red una sola vez.
+  const [recovering, setRecovering] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.top !== window.self) return;
+    if (!navigator.onLine) return;
+    let key = "";
+    try {
+      key = window.sessionStorage.getItem("vmx.offline.recovered") ?? "";
+    } catch {
+      /* noop */
+    }
+    if (key === "1") return;
+    setRecovering(true);
+    void (async () => {
+      try {
+        window.sessionStorage.setItem("vmx.offline.recovered", "1");
+      } catch {
+        /* noop */
+      }
+      try {
+        if ("caches" in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map((n) => caches.delete(n)));
+        }
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map((r) => r.unregister()));
+        }
+      } catch {
+        /* noop */
+      }
+      window.location.replace("/");
+    })();
+  }, []);
+
+  if (recovering) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
+        <p className="text-sm text-muted-foreground">Recuperando conexión…</p>
+      </div>
+    );
+  }
+
   return (
     <PublicShell>
       <section className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-6 py-16 text-center">
