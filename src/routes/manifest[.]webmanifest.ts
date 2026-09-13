@@ -39,7 +39,7 @@ export const Route = createFileRoute("/manifest.webmanifest")({
         return new Response(JSON.stringify(manifest, null, 2), {
           headers: {
             "Content-Type": "application/manifest+json; charset=utf-8",
-            "Cache-Control": "public, max-age=3600",
+            "Cache-Control": "public, max-age=600, s-maxage=600",
           },
         });
       },
