@@ -64,3 +64,10 @@
 - [ ] Sin reserva en línea ni pagos: la acción principal es "Agregar a Mi Viaje"; prohibido mostrar precio de reserva, desglose de cobro o políticas de cancelación de pago mientras no exista el sistema de reservación.
 - [x] Decisión del Founder (2026-09-12): la ficha muestra precio orientativo "desde … por noche" al estilo de las fichas de alojamiento de referencia, tomado del catálogo publicado en CMS, con acción principal "Agregar a Mi Viaje" y sin cobro ni reservación en línea. Sin tarifa publicada el bloque no se renderiza.
 - [x] Demo Pack (lote `demo-2026-09-12`): Casa Colonial Sisal con 4 fotografías CMS (`business_media` → `media_assets`, bucket privado firmado), tarifa demo publicada ($2,400 MXN/noche) y 3 reseñas demo publicadas con respuesta del anfitrión. Datos temporales: no eliminar hasta autorización literal del Founder.
+
+## Eventos recurrentes · Video Mapping Valladolid en la Historia (2026-09-13)
+
+- [ ] Ampliar el alta existente de eventos con recurrencia diaria, semanal, mensual y anual, múltiples funciones y fechas suspendidas.
+- [ ] Conectar recurrencia a agenda, Home y ficha Premium sin crear superficies nuevas.
+- [ ] Sembrar “Valladolid en la Historia” en la iglesia de San Gervasio, Centro Histórico, con funciones 20:30 español y 21:00 inglés.
+- [ ] Generar/cargar portada original, validar CMS y superficies públicas en 1440/834/430/390.
