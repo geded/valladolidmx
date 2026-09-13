@@ -254,6 +254,8 @@ export function InteractiveMap({
   onMarkerSelect,
   fitPoints,
   fitPadding = 88,
+  restriction,
+  minZoom,
 
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
