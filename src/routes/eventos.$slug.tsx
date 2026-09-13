@@ -9,7 +9,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
+import { getEventBySlug, getEventRelated, type PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
 import {
   ContextEngineProvider,
@@ -43,7 +43,10 @@ export const Route = createFileRoute("/eventos/$slug")({
   loader: async ({ params }) => {
     const event = await getEventBySlug({ data: { slug: params.slug } });
     if (!event) throw notFound();
-    return { event };
+    const related = await getEventRelated({
+      data: { eventId: event.id, destinationId: event.destination_id, limit: 4 },
+    });
+    return { event, related };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -133,11 +136,11 @@ export const Route = createFileRoute("/eventos/$slug")({
 });
 
 function EventoPage() {
-  const { event } = Route.useLoaderData();
+  const { event, related } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
-      <EventPremiumSurface event={event} />
+      <EventPremiumSurface event={event} related={related} />
     </ContextEngineProvider>
   );
 }
