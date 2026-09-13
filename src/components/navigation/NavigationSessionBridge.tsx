@@ -20,6 +20,7 @@ import {
   isStandaloneDisplay,
   readLastRoute,
   snapshotFromContext,
+  trackRouteTrail,
   writeLastRoute,
   writeNavigationSession,
 } from "@/lib/navigation/session-context";
