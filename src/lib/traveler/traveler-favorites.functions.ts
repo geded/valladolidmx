@@ -13,9 +13,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type FavoriteEntityKind = "business" | "product" | "promotion" | "place";
+export type FavoriteEntityKind = "business" | "product" | "promotion" | "place" | "event";
 
-const KINDS = new Set<FavoriteEntityKind>(["business", "product", "promotion", "place"]);
+const KINDS = new Set<FavoriteEntityKind>([
+  "business",
+  "product",
+  "promotion",
+  "place",
+  "event",
+]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface FavoriteRow {
