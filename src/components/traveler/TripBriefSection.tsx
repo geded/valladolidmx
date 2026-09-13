@@ -83,8 +83,9 @@ export function TripBriefSection() {
   const remembered = useTravelPreferences();
   /** El brief lo controla el viajero: `marked` manda sobre lo recordado. */
   const [marked, setMarked] = useState<Readonly<Record<string, boolean>>>({});
-  const [notes, setNotes] = useState<readonly string[]>([]);
+  const [notes, setNotes] = useState<readonly BriefNote[]>([]);
   const [draft, setDraft] = useState("");
+  const [draftGroup, setDraftGroup] = useState<string>("interes");
 
   const selected = useMemo(() => {
     const slugs = new Set<string>();
