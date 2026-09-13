@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { useNavigationSession } from "@/lib/navigation";
-import { hasVisitedTravelPlanner, readPreviousRoute } from "@/lib/navigation/session-context";
+import {
+  hasVisitedTravelPlanner,
+  readJourneyPrefix,
+  readPreviousRoute,
+  type JourneyStep,
+} from "@/lib/navigation/session-context";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { AluxSurface } from "@/components/surfaces/AluxSurface";
@@ -37,10 +42,18 @@ function AluxPage() {
    * Continuidad de ruta: si el explorador llegó desde "Arma tu Viaje",
    * ese paso permanece visible en la ruta territorial.
    */
-  const [fromPlanner, setFromPlanner] = useState(false);
+  const [journey, setJourney] = useState<JourneyStep[]>([]);
   useEffect(() => {
+    const trail = readJourneyPrefix("/alux");
     const prev = readPreviousRoute();
-    setFromPlanner(Boolean(prev && prev.startsWith("/arma-tu-viaje")) || hasVisitedTravelPlanner());
+    const cameFromPlanner =
+      Boolean(prev && prev.startsWith("/arma-tu-viaje")) || hasVisitedTravelPlanner();
+    const hasPlanner = trail.some((s) => s.path === "/arma-tu-viaje");
+    setJourney(
+      cameFromPlanner && !hasPlanner
+        ? [...trail, { path: "/arma-tu-viaje", label: "Arma tu Viaje" }]
+        : trail,
+    );
   }, []);
 
   const crumbs = [
@@ -54,7 +67,7 @@ function AluxPage() {
           },
         ]
       : []),
-    ...(fromPlanner ? [{ label: "Arma tu Viaje", to: "/arma-tu-viaje" }] : []),
+    ...journey.map((step) => ({ label: step.label, to: step.path })),
     { label: "Alux" },
   ];
 

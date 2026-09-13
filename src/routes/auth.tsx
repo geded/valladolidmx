@@ -12,10 +12,12 @@ import { useTranslation } from "@/i18n/context";
 import { useNavigationSession } from "@/lib/navigation";
 import {
   consumeAuthReturnPath,
-  hasVisitedTravelPlanner,
+  describeJourneyStep,
   readAuthReturnPath,
+  readJourneyPrefix,
   readPreviousRoute,
   rememberAuthReturnPath,
+  type JourneyStep,
 } from "@/lib/navigation/session-context";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -46,16 +48,17 @@ function AuthRoute() {
   const [googleMode, setGoogleMode] = useState<"popup" | "redirect">("popup");
   const [welcomeName, setWelcomeName] = useState<string | null>(null);
   const [returnTarget, setReturnTarget] = useState<string | null>(null);
-  const [fromPlanner, setFromPlanner] = useState(false);
+  const [journey, setJourney] = useState<JourneyStep[]>([]);
   const session = useNavigationSession();
 
   useEffect(() => {
     // El retorno explícito tiene prioridad. El rastro público cubre cualquier
     // otro llamado existente a /auth sin exigir lógica duplicada por enlace.
-    const target = readAuthReturnPath() ?? readPreviousRoute();
+    const trail = readJourneyPrefix("/auth");
+    const target = readAuthReturnPath() ?? readPreviousRoute() ?? trail.at(-1)?.path ?? null;
     if (target) rememberAuthReturnPath(target);
     setReturnTarget(target);
-    setFromPlanner(hasVisitedTravelPlanner());
+    setJourney(trail);
   }, []);
 
   useEffect(() => {
@@ -155,13 +158,8 @@ function AuthRoute() {
     forgot: t("auth.forgot"),
   };
 
-  const returnIsAlux = Boolean(returnTarget?.startsWith("/alux"));
-  const returnIsPlanner = Boolean(returnTarget?.startsWith("/arma-tu-viaje"));
-  const returnLabel = returnIsAlux
-    ? "Alux"
-    : returnIsPlanner
-      ? "Arma tu Viaje"
-      : "la página anterior";
+  const returnLabel =
+    (returnTarget ? describeJourneyStep(returnTarget)?.label : null) ?? "la página anterior";
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" },
     ...(session?.destination
@@ -173,10 +171,8 @@ function AuthRoute() {
           },
         ]
       : []),
-    ...(returnIsPlanner || (returnIsAlux && fromPlanner)
-      ? [{ label: "Arma tu Viaje", to: "/arma-tu-viaje" }]
-      : []),
-    ...(returnIsAlux ? [{ label: "Alux", to: "/alux" }] : []),
+    // Recorrido real del explorador (Arma tu Viaje, Alux, Mapa…) antes del acceso.
+    ...journey.map((step) => ({ label: step.label, to: step.path })),
     { label: t("auth.eyebrow") },
   ];
 
