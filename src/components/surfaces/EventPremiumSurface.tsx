@@ -16,7 +16,6 @@ import { PublicShell } from "@/components/discovery";
 import { Button } from "@/components/ui/button";
 import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
-import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { ShareSheet } from "@/components/share/ShareSheet";
