@@ -209,6 +209,10 @@ export interface InteractiveMapProps {
   fitPoints?: Array<{ lat: number; lng: number }>;
   /** Margen del encuadre en píxeles. */
   fitPadding?: number;
+  /** Limita el desplazamiento del mapa a un área geográfica. */
+  restriction?: { north: number; south: number; east: number; west: number };
+  /** Zoom mínimo permitido (evita alejarse fuera del área). */
+  minZoom?: number;
 
 }
 
