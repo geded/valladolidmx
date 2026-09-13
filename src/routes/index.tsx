@@ -101,9 +101,6 @@ function HomePage() {
 
   return (
     <PublicShell variant="hero">
-      <Suspense fallback={null}>
-        <ContinuityWelcomeSurface />
-      </Suspense>
       <HomePremiumRenderer tree={authorityTree} wrap={editWrap} />
     </PublicShell>
   );
