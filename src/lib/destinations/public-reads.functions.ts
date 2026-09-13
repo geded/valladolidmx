@@ -389,7 +389,6 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
 
     // H2·P1 — Overrides, businesses y events son independientes entre
     // sí: sólo dependen de `dest.id`. Se lanzan en paralelo.
-    const nowIso = new Date().toISOString();
     const [overridesRes, bizRes, evsRes] = await Promise.all([
       sb
         .from("related_overrides")
@@ -676,7 +675,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     if (!eErr && evs) {
       grouped.eventos = evs
         .filter((e) => !hidden.event.has(e.id as string))
-        .map((e) => {
+        .map<PublicEventCard | null>((e) => {
           const scheduleTimes = normalizeScheduleTimes(e.schedule_times);
           const exceptionDates = normalizeExceptionDates(e.exception_dates);
           const next = nextEventOccurrence({
