@@ -44,6 +44,11 @@ import {
   type PlacePremiumContent,
   type PlacePremiumMedia,
 } from "./place-premium-content";
+import {
+  PLACE_PREMIUM_COPY_DEFAULTS,
+  fillPlaceCopy,
+  type PlacePremiumCopy,
+} from "./place-premium-copy";
 
 export interface PlacePremiumSurfaceProps {
   content?: PlacePremiumContent;
