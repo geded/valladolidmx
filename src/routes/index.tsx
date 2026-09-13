@@ -1,20 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense, lazy } from "react";
 import { queryOptions } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { HomePremiumRenderer } from "@/lib/experience-builder/home-premium-renderer";
 import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { PublicShell } from "@/components/discovery";
-// H2·P3 — `ContinuityWelcomeSurface` sólo se muestra a viajeros con
-// estado de continuidad (visita previa detectada). Para el primer
-// visitante y para SSR renderiza null: lo diferimos para no cargarlo
-// en el entry principal. Fallback: null (sin CLS).
-const ContinuityWelcomeSurface = lazy(() =>
-  import("@/components/traveler/ContinuityWelcomeSurface").then((m) => ({
-    default: m.ContinuityWelcomeSurface,
-  })),
-);
+// Founder Decision (2026-09-13): la continuidad del viaje NO interrumpe
+// la portada. El retorno se reconoce con un aviso breve en el botón
+// flotante de Mi Viaje (`FloatingTravelPlanDock`), que se cierra solo.
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import {
