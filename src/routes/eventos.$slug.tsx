@@ -43,7 +43,10 @@ export const Route = createFileRoute("/eventos/$slug")({
   loader: async ({ params }) => {
     const event = await getEventBySlug({ data: { slug: params.slug } });
     if (!event) throw notFound();
-    return { event };
+    const related = await getEventRelated({
+      data: { eventId: event.id, destinationId: event.destination_id, limit: 4 },
+    });
+    return { event, related };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
