@@ -112,7 +112,12 @@ const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
 
 export function FloatingTravelPlanDock() {
   const { user } = useAuth();
-  const { trip: anonymousTrip } = useAnonymousTrip();
+  const {
+    trip: anonymousTrip,
+    status: anonymousStatus,
+    hasReturningTrip,
+    acknowledgeReturn,
+  } = useAnonymousTrip();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHiddenRoute = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
   const enabled = !!user && !isHiddenRoute;
