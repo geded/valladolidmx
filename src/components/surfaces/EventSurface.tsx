@@ -28,6 +28,7 @@ function fmt(iso?: string | null): string {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "America/Merida",
     }).format(new Date(iso));
   } catch {
     return iso;

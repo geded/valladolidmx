@@ -29,11 +29,11 @@ Todo opcional: si no se marca nada, el evento sigue comportándose exactamente c
 
 ### 3. Siembra del Video Mapping "Valladolid en la Historia"
 
-- Sede: Convento de San Bernardino de Siena, Valladolid.
+- Sede: iglesia de San Gervasio, Centro Histórico de Valladolid.
 - Repetición: todos los días, sin fecha de fin.
 - Horarios: 20:30 (español) y 21:00 (inglés).
 - Entrada libre, descripción editorial propia.
-- **Portada:** no tomo fotos de internet (derechos de autor y la política de medios del proyecto exige originales propios). Genero una imagen de portada original del convento iluminado con proyección nocturna y la subo a la Biblioteca de medios como cualquier otra portada. Si prefieres una foto real, envíamela y la cargo tal cual.
+- **Portada:** no tomo fotos de internet (derechos de autor y la política de medios del proyecto exige originales propios). Genero una imagen conceptual de portada de la iglesia iluminada con proyección nocturna y la subo a la Biblioteca de medios marcada como IA y temporal. Si prefieres una foto real, envíamela y la cargo tal cual.
 - Datos marcados como siembra demo, para poder retirarlos cuando lo indiques.
 
 ## Detalles técnicos

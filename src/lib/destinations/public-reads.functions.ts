@@ -10,6 +10,11 @@ import type {
   MarketplaceProductCard,
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+} from "@/lib/events/recurrence";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
@@ -384,7 +389,6 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
 
     // H2·P1 — Overrides, businesses y events son independientes entre
     // sí: sólo dependen de `dest.id`. Se lanzan en paralelo.
-    const nowIso = new Date().toISOString();
     const [overridesRes, bizRes, evsRes] = await Promise.all([
       sb
         .from("related_overrides")
@@ -406,14 +410,13 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .limit(60),
       sb
         .from("events")
-        .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
+        .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone")
         .eq("status", "published")
         .is("deleted_at", null)
         .eq("destination_id", dest.id)
 
-        .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
-        .limit(6),
+        .limit(100),
     ]);
     const overridesRows = overridesRes.data;
     const biz = bizRes.data;
@@ -672,13 +675,28 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     if (!eErr && evs) {
       grouped.eventos = evs
         .filter((e) => !hidden.event.has(e.id as string))
-        .map((e) => ({
+        .map<PublicEventCard | null>((e) => {
+          const scheduleTimes = normalizeScheduleTimes(e.schedule_times);
+          const exceptionDates = normalizeExceptionDates(e.exception_dates);
+          const next = nextEventOccurrence({
+            starts_at: e.starts_at as string,
+            ends_at: e.ends_at as string | null,
+            recurrence_frequency: e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null,
+            recurrence_interval: e.recurrence_interval as number,
+            recurrence_weekdays: e.recurrence_weekdays as number[],
+            recurrence_until: e.recurrence_until as string | null,
+            schedule_times: scheduleTimes,
+            exception_dates: exceptionDates,
+            event_timezone: e.event_timezone as string,
+          });
+          if (!next) return null;
+          return {
           id: e.id as string,
           slug: e.slug as string,
           title: e.title as string,
           summary: (e.summary as string | null) ?? null,
-          starts_at: e.starts_at as string,
-          ends_at: (e.ends_at as string | null) ?? null,
+          starts_at: next.startsAt,
+          ends_at: e.recurrence_frequency ? null : ((e.ends_at as string | null) ?? null),
           venue_name: (e.venue_name as string | null) ?? null,
           is_free: Boolean(e.is_free),
           destination_slug: dest.slug,
@@ -687,8 +705,18 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           latitude: null,
           longitude: null,
           cover_url: null,
-
-        }));
+          recurrence_frequency: (e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null) ?? null,
+          recurrence_interval: Number(e.recurrence_interval ?? 1),
+          recurrence_weekdays: (e.recurrence_weekdays as number[]) ?? [],
+          recurrence_until: (e.recurrence_until as string | null) ?? null,
+          schedule_times: scheduleTimes,
+          exception_dates: exceptionDates,
+          event_timezone: (e.event_timezone as string | null) ?? "America/Merida",
+          } satisfies PublicEventCard;
+        })
+        .filter((event): event is PublicEventCard => event !== null)
+        .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
+        .slice(0, 6);
       if (pinnedIds.event.length > 0) {
         const byId = new Map(grouped.eventos.map((c) => [c.id, c] as const));
         const pinnedCards = pinnedIds.event

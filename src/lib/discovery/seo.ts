@@ -532,6 +532,14 @@ export function eventJsonLd(input: {
   /** Organizador referenciado por `@id` (opcional). */
   organizerId?: string;
   organizerName?: string;
+  /** Repetición visible y publicada. Se emite como `eventSchedule`. */
+  schedule?: {
+    repeatFrequency: "daily" | "weekly" | "monthly" | "yearly";
+    repeatInterval?: number;
+    startDate: string;
+    endDate?: string | null;
+    times?: ReadonlyArray<{ time: string; label?: string | null }>;
+  } | null;
 }): Record<string, unknown> {
   const url = absoluteUrl(input.path);
   const attendanceMap = {
@@ -592,6 +600,28 @@ export function eventJsonLd(input: {
     node.organizer = { "@id": input.organizerId };
   } else if (input.organizerName) {
     node.organizer = { "@type": "Organization", name: input.organizerName };
+  }
+  if (input.schedule) {
+    const frequency = {
+      daily: "P1D",
+      weekly: "P1W",
+      monthly: "P1M",
+      yearly: "P1Y",
+    }[input.schedule.repeatFrequency];
+    const repeatFrequency =
+      (input.schedule.repeatInterval ?? 1) > 1
+        ? frequency.replace("1", String(input.schedule.repeatInterval))
+        : frequency;
+    node.eventSchedule = (input.schedule.times?.length ? input.schedule.times : [{ time: input.startDate.slice(11, 16) }]).map(
+      (item) => ({
+        "@type": "Schedule",
+        startDate: input.schedule!.startDate.slice(0, 10),
+        startTime: item.time,
+        repeatFrequency,
+        scheduleTimezone: "America/Merida",
+        ...(input.schedule!.endDate ? { endDate: input.schedule!.endDate } : {}),
+      }),
+    );
   }
   return node;
 }

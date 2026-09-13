@@ -17,6 +17,9 @@ import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
+import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
+
+const EVENT_TIME_ZONE = "America/Merida";
 
 function formatDay(iso?: string | null): string | null {
   if (!iso) return null;
@@ -26,6 +29,7 @@ function formatDay(iso?: string | null): string | null {
     day: "2-digit",
     month: "long",
     year: "numeric",
+    timeZone: EVENT_TIME_ZONE,
   }).format(date);
 }
 
@@ -33,7 +37,7 @@ function formatTime(iso?: string | null): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit" }).format(date);
+  return new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit", timeZone: EVENT_TIME_ZONE }).format(date);
 }
 
 const TAG_KEYS = [
@@ -60,20 +64,22 @@ export function EventPremiumSurface({
   const startTime = formatTime(event.starts_at);
   const endTime = formatTime(event.ends_at);
   const admission = attributeValues(attrs.admission_type)[0];
+  const recurrence = recurrenceLabel(event);
+  const scheduledTimes = scheduleLabel(event.schedule_times);
 
   const facts = [
     startDay
       ? {
           icon: CalendarDays,
-          label: "Fecha",
+          label: recurrence ? "Próxima función" : "Fecha",
           value: endDay && endDay !== startDay ? `${startDay} – ${endDay}` : startDay,
         }
       : null,
-    startTime
+    scheduledTimes || startTime
       ? {
           icon: Clock3,
           label: "Horario",
-          value: endTime ? `${startTime}–${endTime} h` : `${startTime} h`,
+          value: scheduledTimes ?? (endTime ? `${startTime}–${endTime} h` : `${startTime} h`),
         }
       : null,
     event.venue_name ? { icon: MapPin, label: "Sede", value: event.venue_name } : null,
@@ -115,7 +121,7 @@ export function EventPremiumSurface({
                 ) : null}
                 {event.destination_name ? (
                   <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[var(--muted-foreground)]">
-                    {event.destination_name} · Oriente Maya de Yucatán
+                    {event.destination_name} · Oriente Maya
                   </span>
                 ) : null}
               </div>
@@ -145,6 +151,7 @@ export function EventPremiumSurface({
                   ))}
                 </dl>
               ) : null}
+              {recurrence ? <p className="mt-4 text-sm font-semibold text-[var(--brand-primary-strong)]">{recurrence}{event.recurrence_until ? ` · hasta ${formatDay(`${event.recurrence_until}T12:00:00-06:00`)}` : " · programación permanente"}</p> : null}
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 {!readOnlyPreview ? (
                   <AddToTravelPlanButton

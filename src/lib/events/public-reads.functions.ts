@@ -8,13 +8,21 @@
  * Sin backend nuevo: reutiliza el patrón del publishable client
  * (`SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`) ya usado por
  * `destinations/public-reads.functions.ts`. Proyecta sólo columnas
- * seguras del esquema vigente de `events` (sin nuevas columnas).
+ * seguras del esquema vigente de `events`, incluida su recurrencia.
  */
 import { createServerFn } from "@tanstack/react-start";
 import {
   normalizeFilterAttributes,
   type TourismFilterAttributes,
 } from "@/lib/business-attributes/types";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+  type EventExceptionDate,
+  type EventRecurrenceFrequency,
+  type EventScheduleTime,
+} from "@/lib/events/recurrence";
 
 export interface PublicEventCard {
   id: string;
@@ -37,6 +45,13 @@ export interface PublicEventCard {
   filter_attributes: TourismFilterAttributes;
   latitude: number | null;
   longitude: number | null;
+  recurrence_frequency: EventRecurrenceFrequency | null;
+  recurrence_interval: number;
+  recurrence_weekdays: number[];
+  recurrence_until: string | null;
+  schedule_times: EventScheduleTime[];
+  exception_dates: EventExceptionDate[];
+  event_timezone: string;
 }
 
 
@@ -88,7 +103,7 @@ function isSlug(s: unknown): s is string {
 }
 
 const SELECT_CARD =
-  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, filter_attributes, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
+  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, filter_attributes, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
 
 type CardRow = {
   id: string;
@@ -102,6 +117,13 @@ type CardRow = {
   filter_attributes?: unknown;
   destination_id: string | null;
   cover_media_id: string | null;
+  recurrence_frequency?: EventRecurrenceFrequency | null;
+  recurrence_interval?: number | null;
+  recurrence_weekdays?: number[] | null;
+  recurrence_until?: string | null;
+  schedule_times?: unknown;
+  exception_dates?: unknown;
+  event_timezone?: string | null;
   destinations?: {
     slug?: string | null;
     name?: string | null;
@@ -112,26 +134,48 @@ type CardRow = {
 };
 
 async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEventCard[]> {
-  return Promise.all(
-    rows.map(async (r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      summary: r.summary ?? null,
-      starts_at: r.starts_at,
-      ends_at: r.ends_at ?? null,
-      venue_name: r.venue_name ?? null,
-      is_free: Boolean(r.is_free),
-      destination_slug: r.destinations?.slug ?? null,
-      destination_name: r.destinations?.name ?? null,
-      filter_attributes: normalizeFilterAttributes(r.filter_attributes),
-      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
-      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
-      cover_url: withCover
-        ? await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path)
-        : null,
-    })),
+  const cards = await Promise.all(
+    rows.map(async (r) => {
+      const scheduleTimes = normalizeScheduleTimes(r.schedule_times);
+      const exceptionDates = normalizeExceptionDates(r.exception_dates);
+      const next = nextEventOccurrence({ ...r, schedule_times: scheduleTimes, exception_dates: exceptionDates });
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        summary: r.summary ?? null,
+        starts_at: next?.startsAt ?? r.starts_at,
+        ends_at: r.recurrence_frequency ? null : (r.ends_at ?? null),
+        venue_name: r.venue_name ?? null,
+        is_free: Boolean(r.is_free),
+        destination_slug: r.destinations?.slug ?? null,
+        destination_name: r.destinations?.name ?? null,
+        filter_attributes: normalizeFilterAttributes(r.filter_attributes),
+        latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
+        longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
+        recurrence_frequency: r.recurrence_frequency ?? null,
+        recurrence_interval: r.recurrence_interval ?? 1,
+        recurrence_weekdays: r.recurrence_weekdays ?? [],
+        recurrence_until: r.recurrence_until ?? null,
+        schedule_times: scheduleTimes,
+        exception_dates: exceptionDates,
+        event_timezone: r.event_timezone ?? "America/Merida",
+        cover_url: withCover
+          ? await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path)
+          : null,
+      };
+    }),
   );
+  return cards;
+}
+
+function isUpcomingEvent(event: PublicEventCard, now = new Date()): boolean {
+  if (event.recurrence_frequency) return nextEventOccurrence(event, now) !== null;
+  return new Date(event.starts_at).getTime() >= now.getTime();
+}
+
+function sortByNextOccurrence(events: PublicEventCard[]): PublicEventCard[] {
+  return [...events].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 }
 
 
@@ -168,15 +212,15 @@ export const listPublishedEvents = createServerFn({ method: "GET" })
       .eq("status", "published")
       .is("deleted_at", null)
       .order("starts_at", { ascending: true })
-      .limit(data.limit);
-    if (data.upcomingOnly) q = q.gte("starts_at", new Date().toISOString());
+      .limit(data.upcomingOnly ? 200 : data.limit);
     if (destinationId) q = q.eq("destination_id", destinationId);
     const { data: rows, error } = await q;
     if (error) {
       console.error("[listPublishedEvents]", error);
       return [];
     }
-    return mapCards((rows ?? []) as unknown as CardRow[], false);
+    const cards = await mapCards((rows ?? []) as unknown as CardRow[], true);
+    return sortByNextOccurrence(data.upcomingOnly ? cards.filter((event) => isUpcomingEvent(event)) : cards).slice(0, data.limit);
   });
 
 export const listEventsForDestination = createServerFn({ method: "GET" })
@@ -194,14 +238,14 @@ export const listEventsForDestination = createServerFn({ method: "GET" })
       .eq("status", "published")
       .is("deleted_at", null)
       .eq("destination_id", data.destinationId)
-      .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })
-      .limit(data.limit);
+      .limit(200);
     if (error) {
       console.error("[listEventsForDestination]", error);
       return [];
     }
-    return mapCards((rows ?? []) as unknown as CardRow[], false);
+    const cards = await mapCards((rows ?? []) as unknown as CardRow[], true);
+    return sortByNextOccurrence(cards.filter((event) => isUpcomingEvent(event))).slice(0, data.limit);
   });
 
 /**
@@ -245,9 +289,8 @@ export const getEventRelated = createServerFn({ method: "GET" })
       .eq("status", "published")
       .is("deleted_at", null)
       .neq("id", data.eventId)
-      .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })
-      .limit(Math.max(data.limit * 4, 24));
+      .limit(200);
     if (data.destinationId) q = q.eq("destination_id", data.destinationId);
     const { data: rows, error } = await q;
     if (error) {
@@ -255,7 +298,7 @@ export const getEventRelated = createServerFn({ method: "GET" })
       return [];
     }
     const filtered = ((rows ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id));
-    const cards = await mapCards(filtered, false);
+    const cards = sortByNextOccurrence((await mapCards(filtered, true)).filter((event) => isUpcomingEvent(event)));
 
     // Fallback: si no hay suficientes en el destino, completa con próximos globales.
     let out = cards;
@@ -267,14 +310,13 @@ export const getEventRelated = createServerFn({ method: "GET" })
         .eq("status", "published")
         .is("deleted_at", null)
         .neq("id", data.eventId)
-        .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
-        .limit(data.limit * 2);
+        .limit(200);
       const extraCards = await mapCards(
         ((extra ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id) && !seen.has(r.id)),
-        false,
+        true,
       );
-      out = [...out, ...extraCards];
+      out = [...out, ...extraCards.filter((event) => isUpcomingEvent(event))];
     }
 
     // Aplica pins (prepend).
@@ -298,7 +340,13 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("events")
       .select(
-        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, filter_attributes, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path ), businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
+        `id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, filter_attributes,
+         recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until,
+         schedule_times, exception_dates, event_timezone,
+         external_url, destination_id, business_id, cover_media_id, published_at, updated_at,
+         destinations:destination_id ( slug, name, latitude, longitude ),
+         media_assets:cover_media_id ( storage_bucket, storage_path ),
+         businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )`,
       )
 
       .eq("slug", data.slug)
@@ -338,6 +386,9 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const organizer_category_slug = bizIsPublished
       ? (biz!.business_categories?.slug ?? null)
       : null;
+    const scheduleTimes = normalizeScheduleTimes(r.schedule_times);
+    const exceptionDates = normalizeExceptionDates(r.exception_dates);
+    const next = nextEventOccurrence({ ...r, schedule_times: scheduleTimes, exception_dates: exceptionDates });
     return {
       filter_attributes: normalizeFilterAttributes(r.filter_attributes),
       latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
@@ -348,8 +399,8 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       title: r.title,
       summary: r.summary ?? null,
       body: r.body ?? null,
-      starts_at: r.starts_at,
-      ends_at: r.ends_at ?? null,
+      starts_at: next?.startsAt ?? r.starts_at,
+      ends_at: r.recurrence_frequency ? null : (r.ends_at ?? null),
       venue_name: r.venue_name ?? null,
       is_free: Boolean(r.is_free),
       external_url: r.external_url ?? null,
@@ -360,6 +411,13 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       cover_url: cover,
       published_at: r.published_at ?? null,
       updated_at: r.updated_at ?? null,
+      recurrence_frequency: r.recurrence_frequency ?? null,
+      recurrence_interval: r.recurrence_interval ?? 1,
+      recurrence_weekdays: r.recurrence_weekdays ?? [],
+      recurrence_until: r.recurrence_until ?? null,
+      schedule_times: scheduleTimes,
+      exception_dates: exceptionDates,
+      event_timezone: r.event_timezone ?? "America/Merida",
       organizer_business_slug,
       organizer_business_name,
       organizer_destination_slug,
