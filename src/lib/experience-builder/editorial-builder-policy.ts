@@ -1665,6 +1665,97 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       ],
     },
     {
+      // Ficha premium de Empresa (hotel, restaurante, casa de vacaciones)
+      // — textos de sección editables. La autoridad visual sigue siendo
+      // `BusinessSurface`.
+      type: "vmx.business.premium",
+      mode: "authorable",
+      family: "destination",
+      variants: ["empresa-premium-approved"],
+      allowed_sources: ["routing.canonical", "media.registry"],
+      surfaces: ["landing"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "copy_alux_title",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_alux_description",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_gallery_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_promotions_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_reviews_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_reviews_empty",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_contact_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_related_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_related_subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_cta_title",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_cta_subtitle",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
       // Ficha premium de Evento — textos de sección editables.
       type: "vmx.event.premium",
       mode: "authorable",

@@ -304,6 +304,12 @@ export function resolveApprovedBusinessFamily(
  * Surface
  * ------------------------------------------------------------------ */
 
+import {
+  BUSINESS_PREMIUM_COPY_DEFAULTS,
+  fillBusinessCopy,
+  type BusinessPremiumCopy,
+} from "./business-premium-copy";
+
 export interface BusinessSurfaceProps {
   /** Cuando falta, se lee del `BusinessSurfaceContext`. */
   business?: MarketplaceBusinessDetail | null;
@@ -311,6 +317,8 @@ export interface BusinessSurfaceProps {
   surfaceContract?: OmxdsSurfaceContract;
   /** I3-D · presentación Premium sólo después de elegibilidad SSR completa. */
   premiumEligibility?: BusinessPremiumEligibilityResult | null;
+  /** Textos de sección editables desde el constructor. Fail-closed. */
+  copy?: BusinessPremiumCopy;
 }
 
 function businessRelatedCount(related?: BusinessRelatedDTO | null): number {
@@ -401,6 +409,7 @@ export function BusinessSurface({
   business: propBusiness,
   surfaceContract,
   premiumEligibility,
+  copy = BUSINESS_PREMIUM_COPY_DEFAULTS,
 }: BusinessSurfaceProps = {}) {
   const ctxBusiness = useContext(BusinessSurfaceContext);
   const sourceBusiness = propBusiness ?? ctxBusiness;
@@ -566,7 +575,7 @@ export function BusinessSurface({
   const premiumGalleryDto = activePremium
     ? {
         variant: "mosaic" as const,
-        heading: `Conoce ${b.display_name}`,
+        heading: fillBusinessCopy(copy.galleryHeading, b.display_name),
         subheading: null,
         items: [activePremium.cover, ...activePremium.gallery]
           .filter((item): item is NonNullable<typeof item> => item !== null)
@@ -607,7 +616,7 @@ export function BusinessSurface({
     (cmsGalleryItems.length >= 2
       ? {
           variant: "mosaic" as const,
-          heading: `Conoce ${b.display_name}`,
+          heading: fillBusinessCopy(copy.galleryHeading, b.display_name),
           subheading: null,
           items: cmsGalleryItems,
           maxVisible: 5,
@@ -627,7 +636,7 @@ export function BusinessSurface({
   const premiumContactDto = contactSource
     ? {
         variant: "cards" as const,
-        heading: "Contacto",
+        heading: copy.contactHeading,
         columns: 1,
         items: [
           {
@@ -780,8 +789,8 @@ export function BusinessSurface({
 
       <TourismAluxPanel
         className="mx-auto mt-4 w-full max-w-7xl"
-        title={`Planear con ${b.display_name}`}
-        description="Alux te ayuda a integrar esta opción en tu viaje por el Oriente Maya."
+        title={fillBusinessCopy(copy.aluxTitle, b.display_name)}
+        description={copy.aluxDescription}
         task={`Ayúdame a integrar ${b.display_name} en mi viaje por el Oriente Maya.`}
         selection={{
           entityRef: `business:${b.id}`,
@@ -961,7 +970,7 @@ export function BusinessSurface({
             config={{
               source: "business",
               variant: "grid",
-              heading: "Promociones vigentes",
+              heading: copy.promotionsHeading,
               columns: 2,
             }}
           />
@@ -990,9 +999,8 @@ export function BusinessSurface({
             config={{
               source: "business",
               variant: "list",
-              heading: "Opiniones de viajeros",
-              emptyMessage:
-                "Aún no hay reseñas publicadas de esta empresa. Sé la primera persona en compartir tu experiencia.",
+              heading: copy.reviewsHeading,
+              emptyMessage: copy.reviewsEmpty,
             }}
           />
         </section>
@@ -1010,10 +1018,10 @@ export function BusinessSurface({
               columns: usesApprovedFamilyTemplate ? 4 : 2,
               density: usesApprovedFamilyTemplate ? "compact" : "comfortable",
               heading: usesApprovedFamilyTemplate
-                ? `Explora cerca de ${b.display_name}`
+                ? fillBusinessCopy(copy.relatedHeading, b.display_name)
                 : "Sigue descubriendo",
               subheading: usesApprovedFamilyTemplate
-                ? `Opciones del mismo destino para continuar tu viaje por ${b.destination_slug || "el Oriente Maya"}.`
+                ? copy.relatedSubheading
                 : `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
               emptyMessage: "Aún no hay empresas hermanas publicadas en este destino.",
               ariaLabel: `Descubrimiento contextual desde ${b.display_name}`,
@@ -1087,11 +1095,9 @@ export function BusinessSurface({
           <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-lg font-semibold text-foreground">
-                Suma {b.display_name} a tu viaje
+                {fillBusinessCopy(copy.ctaTitle, b.display_name)}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Un concierge arma tu itinerario incluyendo {isDining ? "esta mesa" : "este hospedaje"}. Sin cobro en línea.
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{copy.ctaSubtitle}</p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
               <AddToTravelPlanButton
