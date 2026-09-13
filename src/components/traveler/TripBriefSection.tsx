@@ -13,7 +13,7 @@
  *  · Alux se invoca con el bus existente (`askAluxWithPreferenceMemory`).
  */
 import { useMemo, useState } from "react";
-import { ClipboardList, Sparkles, ArrowRight } from "lucide-react";
+import { ClipboardList, Sparkles, ArrowRight, Plus, X } from "lucide-react";
 import {
   TRAVEL_PREFERENCE_VOCABULARY,
   rememberTravelPreference,
