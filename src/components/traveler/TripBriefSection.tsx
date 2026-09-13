@@ -176,11 +176,65 @@ export function TripBriefSection() {
         ))}
       </div>
 
+      <div className="mt-5 min-w-0">
+        <label
+          htmlFor="ayv-brief-otro"
+          className="text-[15px] font-semibold leading-snug sm:text-base"
+        >
+          ¿Falta algo? Escríbelo
+        </label>
+        <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+          Por ejemplo: vida nocturna, romance, fotografía. Sin datos personales.
+        </p>
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          <input
+            id="ayv-brief-otro"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                addNote();
+              }
+            }}
+            maxLength={60}
+            placeholder="Escribe tu interés"
+            className="min-h-10 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm outline-none ring-focus placeholder:text-muted-foreground"
+          />
+          <button
+            type="button"
+            onClick={addNote}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent"
+          >
+            <Plus className="size-4" aria-hidden />
+            Agregar
+          </button>
+        </div>
+        {notes.length ? (
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {notes.map((note) => (
+              <button
+                key={note}
+                type="button"
+                onClick={() => setNotes((prev) => prev.filter((item) => item !== note))}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary bg-primary px-3 text-[13px] font-medium text-primary-foreground"
+              >
+                {note}
+                <X className="size-3.5" aria-hidden />
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
       <div className="mt-6 rounded-xl border border-primary/25 bg-primary/5 p-4">
         <p className="text-[15px] font-semibold leading-snug sm:text-base">Esto es lo que verá tu concierge</p>
         <p className="mt-1 text-[13px] leading-6 text-muted-foreground sm:text-sm">
-          {selectedPreferences.length
-            ? `Viajeros que ${selectedPreferences.map((preference) => preference.phrase).join("; ")}.`
+          {selectedPreferences.length || notes.length
+            ? `Viajeros que ${[
+                ...selectedPreferences.map((preference) => preference.phrase),
+                ...(notes.length ? [`además mencionan: ${notes.join(", ")}`] : []),
+              ].join("; ")}.`
             : "Aún no has marcado nada. En cuanto marques una opción, aparecerá aquí el resumen que acompaña a tu expediente."}
         </p>
         <button
@@ -189,11 +243,13 @@ export function TripBriefSection() {
             askAluxWithPreferenceMemory({
               surface: SURFACE,
               hint: "El explorador está completando el brief de su expediente en Arma tu Viaje.",
-              prompt: selectedPreferences.length
-                ? `Con base en mi brief (${selectedPreferences
-                    .map((preference) => preference.label)
-                    .join(", ")}), ¿qué me falta para completar mi viaje?`
-                : "Ayúdame a definir cómo quiero viajar por el Oriente Maya.",
+              prompt:
+                selectedPreferences.length || notes.length
+                  ? `Con base en mi brief (${[
+                      ...selectedPreferences.map((preference) => preference.label),
+                      ...notes,
+                    ].join(", ")}), ¿qué me falta para completar mi viaje?`
+                  : "Ayúdame a definir cómo quiero viajar por el Oriente Maya.",
             })
           }
           className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-95"
