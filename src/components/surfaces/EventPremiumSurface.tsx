@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
@@ -235,6 +236,15 @@ export function EventPremiumSurface({
           text="Descubre este evento en el Oriente Maya."
           heading="Compartir evento"
         />
+        {!readOnlyPreview ? (
+          <FavoriteButton
+            entityKind="event"
+            entityId={event.id}
+            entityTitle={event.title}
+            {...(event.slug ? { entitySlug: event.slug } : {})}
+            {...(event.cover_url ? { entityImageUrl: event.cover_url } : {})}
+          />
+        ) : null}
         {!readOnlyPreview ? (
           <AddToTravelPlanButton
             kind="event"

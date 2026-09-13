@@ -13,9 +13,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type FavoriteEntityKind = "business" | "product" | "promotion" | "place";
+export type FavoriteEntityKind = "business" | "product" | "promotion" | "place" | "event";
 
-const KINDS = new Set<FavoriteEntityKind>(["business", "product", "promotion", "place"]);
+const KINDS = new Set<FavoriteEntityKind>([
+  "business",
+  "product",
+  "promotion",
+  "place",
+  "event",
+]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface FavoriteRow {
@@ -65,6 +71,7 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       product: [],
       promotion: [],
       place: [],
+      event: [],
     };
     for (const r of rows) byKind[r.entity_kind].push(r.entity_id);
 
@@ -130,6 +137,22 @@ export const listMyFavorites = createServerFn({ method: "GET" })
         });
       }
     }
+
+    if (byKind.event.length > 0) {
+      const { data } = await context.supabase
+        .from("events")
+        .select("id, slug, title, summary, status, deleted_at")
+        .in("id", byKind.event);
+      for (const ev of data ?? []) {
+        const visible = ev.status === "published" && !ev.deleted_at;
+        lookup.set(`event:${ev.id}`, {
+          title: visible ? ev.title : "",
+          slug: visible ? ev.slug : null,
+          subtitle: visible ? (ev.summary ?? null) : null,
+        });
+      }
+    }
+
 
     return rows.map((r) => {
       const hit = lookup.get(`${r.entity_kind}:${r.entity_id}`);

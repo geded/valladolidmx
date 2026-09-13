@@ -35,7 +35,23 @@ function buildEventContext(e: PublicEventDetail): RouteContextDeclaration {
     },
     inherit: ["region", "destination", "category"],
     canonical: `/eventos/${e.slug}`,
-    kindDefaults: [{ kind: "site_section", label: "Eventos", href: "/eventos" }],
+    // Paridad con hoteles/restaurantes/casas/lugares: la cadena
+    // territorial completa (Inicio → Oriente Maya → Destino → Eventos)
+    // se declara aquí cuando el evento publicó su destino.
+    kindDefaults: [
+      { kind: "region", slug: "oriente-maya", label: "Oriente Maya", href: "/oriente-maya" },
+      ...(e.destination_slug && e.destination_name
+        ? [
+            {
+              kind: "destination" as const,
+              slug: e.destination_slug,
+              label: e.destination_name,
+              href: `/oriente-maya/${e.destination_slug}`,
+            },
+          ]
+        : []),
+      { kind: "site_section", label: "Eventos", href: "/eventos" },
+    ],
   });
 }
 
