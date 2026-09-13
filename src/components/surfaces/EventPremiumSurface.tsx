@@ -290,7 +290,7 @@ export function EventPremiumSurface({
         <section
           id="proximas-fechas"
           data-eb-anchor
-          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24 px-4 sm:px-6 lg:px-8"
+          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24"
         >
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             Próximas fechas
@@ -298,7 +298,7 @@ export function EventPremiumSurface({
           <p className="mt-1 text-sm text-muted-foreground">
             Elige el día que mejor encaje en tu viaje. Horario del Oriente Maya.
           </p>
-          <ul className="-mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [&::-webkit-scrollbar]:hidden">
+          <ul className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {upcoming.map((slot) => (
               <li
                 key={slot.startsAt}
