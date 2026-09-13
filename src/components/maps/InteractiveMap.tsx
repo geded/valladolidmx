@@ -241,6 +241,9 @@ export function InteractiveMap({
   optimizeRoute = false,
   onRouteStatus,
   onMarkerSelect,
+  fitPoints,
+  fitPadding = 88,
+
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [failed, setFailed] = useState(false);
