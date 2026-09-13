@@ -38,7 +38,8 @@ function MapaRoute() {
       eyebrow="Territorio"
       title="Mapa del Oriente Maya"
       description="Reconoce el territorio: caminos, distancias y tiempos reales entre los destinos del Oriente Maya."
-      crumbs={[{ label: "Mapa" }]}
+      crumbs={[{ label: "Oriente Maya", to: "/oriente-maya" }, { label: "Mapa" }]}
+      compactCrumbsOnMobile
     >
       {destinos.length === 0 ? (
         <p className="text-sm text-muted-foreground">Los destinos se están actualizando.</p>
