@@ -140,6 +140,9 @@ export function FloatingTravelPlanDock() {
   });
 
   const [open, setOpen] = useState(false);
+  /* Founder Decision: el retorno se reconoce con un aviso breve en el
+     botón de Mi Viaje; nunca con un bloque que tape la portada. */
+  const [showReturnHint, setShowReturnHint] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const { locale: rawLocale } = useTranslation();
