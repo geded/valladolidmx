@@ -201,9 +201,33 @@ export function FloatingTravelPlanDock() {
 
     return (
       <>
+        {showReturnHint ? (
+          <button
+            type="button"
+            onClick={() => {
+              setShowReturnHint(false);
+              void acknowledgeReturn();
+              setOpen(true);
+            }}
+            className="fixed bottom-[4.5rem] left-4 z-40 max-w-[16rem] rounded-2xl border border-primary/30 bg-card/95 px-3.5 py-2.5 text-left shadow-elevated backdrop-blur md:left-6"
+          >
+            <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <Sparkles className="size-3.5" aria-hidden />
+              Alux te acompaña
+            </span>
+            <span className="mt-0.5 block text-sm font-semibold leading-snug text-foreground">
+              Continuemos tu viaje
+            </span>
+            <span className="block text-xs text-muted-foreground">{description}</span>
+          </button>
+        ) : null}
+
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setShowReturnHint(false);
+            setOpen(true);
+          }}
           aria-label={`${ANON_COPY.dock.button} (${count})`}
           className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-3.5 py-2.5 text-sm font-semibold text-foreground shadow-elevated backdrop-blur transition-colors hover:bg-card md:left-6"
         >
