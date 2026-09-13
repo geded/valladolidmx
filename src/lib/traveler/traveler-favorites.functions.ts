@@ -71,6 +71,7 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       product: [],
       promotion: [],
       place: [],
+      event: [],
     };
     for (const r of rows) byKind[r.entity_kind].push(r.entity_id);
 
