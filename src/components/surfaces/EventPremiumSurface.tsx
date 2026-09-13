@@ -200,18 +200,14 @@ export function EventPremiumSurface({
           eyebrow: eventType ? humanizeAttributeValue(eventType) : "Evento",
           title: event.title,
           description: event.summary ?? undefined,
-          media: previewCover
-            ? null
-            : event.cover_url
-              ? { url: event.cover_url, alt: event.title }
-              : null,
+          media: event.cover_url
+            ? { url: event.cover_url, alt: event.title }
+            : null,
           badges: event.destination_name
             ? [{ label: `${event.destination_name} · Oriente Maya`, tone: "neutral" as const }]
             : [],
         }}
-      >
-        {previewCover}
-      </PremiumHero>
+      />
 
       {/* ---- Fila de acciones: compartir, guardar, agregar a Mi Viaje ---- */}
       <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
