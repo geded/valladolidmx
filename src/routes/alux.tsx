@@ -38,15 +38,8 @@ function AluxPage() {
    */
   const [fromPlanner, setFromPlanner] = useState(false);
   useEffect(() => {
-    try {
-      const ref = document.referrer;
-      if (!ref) return;
-      const url = new URL(ref);
-      if (url.origin !== window.location.origin) return;
-      setFromPlanner(url.pathname.startsWith("/arma-tu-viaje"));
-    } catch {
-      // referrer no disponible → ruta base
-    }
+    const prev = readPreviousRoute();
+    setFromPlanner(Boolean(prev && prev.startsWith("/arma-tu-viaje")));
   }, []);
 
   const crumbs = [
