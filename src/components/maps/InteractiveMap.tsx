@@ -296,6 +296,10 @@ export function InteractiveMap({
           mapTypeControl: false,
           fullscreenControl: true,
           gestureHandling: "cooperative",
+          ...(restriction
+            ? { restriction: { latLngBounds: restriction, strictBounds: false } }
+            : {}),
+          ...(typeof minZoom === "number" ? { minZoom } : {}),
         });
         const list: InteractiveMapMarker[] =
           markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
