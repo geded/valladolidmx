@@ -79,10 +79,18 @@ function mergeDestinos(published: DestinoLite[]): { featured: DestinoLite[]; res
   return { featured, rest };
 }
 
+/** Destinos reales publicados para el menú móvil (máx. 6). */
+function popularDestinos(destinos: DestinoLite[]): DestinoLite[] {
+  const published = new Set(destinos.map((d) => d.slug));
+  const ordered = FEATURED_DESTINOS.filter((d) => published.has(d.slug));
+  const rest = destinos.filter((d) => !ordered.some((o) => o.slug === d.slug));
+  return [...ordered, ...rest].slice(0, 6);
+}
+
 function buildSections(destinos: DestinoLite[]): MenuSection[] {
   const { featured, rest } = mergeDestinos(destinos);
   const destinosLinks: MenuLink[] = [
-    { label: `Ver los ${Math.max(destinos.length, 23)} destinos`, href: "/oriente-maya" },
+    { label: "Ver todos los destinos", href: "/oriente-maya" },
     ...featured.map((d) => ({ label: d.name, href: `/oriente-maya/${d.slug}` })),
   ];
   const otrosDestinos: MenuLink[] = rest.slice(0, 12).map((d) => ({
