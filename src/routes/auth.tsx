@@ -48,16 +48,17 @@ function AuthRoute() {
   const [googleMode, setGoogleMode] = useState<"popup" | "redirect">("popup");
   const [welcomeName, setWelcomeName] = useState<string | null>(null);
   const [returnTarget, setReturnTarget] = useState<string | null>(null);
-  const [fromPlanner, setFromPlanner] = useState(false);
+  const [journey, setJourney] = useState<JourneyStep[]>([]);
   const session = useNavigationSession();
 
   useEffect(() => {
     // El retorno explícito tiene prioridad. El rastro público cubre cualquier
     // otro llamado existente a /auth sin exigir lógica duplicada por enlace.
-    const target = readAuthReturnPath() ?? readPreviousRoute();
+    const trail = readJourneyPrefix("/auth");
+    const target = readAuthReturnPath() ?? readPreviousRoute() ?? trail.at(-1)?.path ?? null;
     if (target) rememberAuthReturnPath(target);
     setReturnTarget(target);
-    setFromPlanner(hasVisitedTravelPlanner());
+    setJourney(trail);
   }, []);
 
   useEffect(() => {
