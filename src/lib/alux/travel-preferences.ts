@@ -79,7 +79,7 @@ export const TRAVEL_PREFERENCE_VOCABULARY: readonly TravelPreference[] = [
     slug: "cenotes-naturaleza",
     label: "Cenotes y naturaleza",
     phrase: "buscan cenotes y naturaleza",
-    match: /\b(cenote|naturaleza|selva|aves|ecotur)\b/i,
+    match: /\b(cenote|naturaleza|selva|aves)\b/i,
   },
   {
     slug: "cultura-maya",
@@ -119,9 +119,39 @@ export const TRAVEL_PREFERENCE_VOCABULARY: readonly TravelPreference[] = [
   },
   {
     slug: "bienestar",
-    label: "Bienestar",
+    label: "Bienestar / Wellness",
     phrase: "buscan bienestar",
     match: /\b(bienestar|wellness|temazcal|yoga|masaje)\b/i,
+  },
+  {
+    slug: "ecoturismo",
+    label: "Ecoturismo",
+    phrase: "buscan ecoturismo y conservación",
+    match: /\b(ecoturis|conservaci[oó]n|reserva\s+natural|avistamiento)\b/i,
+  },
+  {
+    slug: "turismo-rural",
+    label: "Turismo rural",
+    phrase: "buscan turismo rural y comunitario",
+    match: /\b(rural|comunitari|pueblo|milpa|rancho|hacienda)\b/i,
+  },
+  {
+    slug: "turismo-salud",
+    label: "Salud",
+    phrase: "viajan por motivos de salud",
+    match: /\b(salud|m[eé]dic|cl[ií]nic|dental|tratamiento)\b/i,
+  },
+  {
+    slug: "estilo-mochilero",
+    label: "Mochilero",
+    phrase: "viajan en estilo mochilero",
+    match: /\b(mochiler|backpack|hostal|hostel)\b/i,
+  },
+  {
+    slug: "viaje-con-mascotas",
+    label: "Viajo con mascotas",
+    phrase: "viajan con mascotas",
+    match: /\b(mascota|perro|gato|pet\s*friendly)\b/i,
   },
   {
     slug: "artesanias-compras",
