@@ -492,17 +492,18 @@ function AluxTeaserSection({ authed }: { authed: boolean }) {
   return (
     <section
       aria-labelledby="ayv-alux-teaser-h"
-      className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-8"
+      className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-5 shadow-soft sm:p-7"
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 sm:gap-4">
         <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
           <Sparkles className="size-5" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 id="ayv-alux-teaser-h" className="text-xl font-semibold sm:text-2xl">
+          <p className={EYEBROW}>Copiloto</p>
+          <h2 id="ayv-alux-teaser-h" className={`mt-0.5 ${H2}`}>
             Alux, tu copiloto de viaje
           </h2>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          <p className={`mt-1.5 max-w-2xl ${BODY}`}>
             {authed
               ? "Cuando tu expediente tenga al menos un elemento, Alux analiza el ritmo, detecta huecos y sugiere hoteles, restaurantes y experiencias del catálogo — sin modificar nada sin tu confirmación."
               : "Alux puede acompañarte desde ahora: revisa el contexto de tu recorrido y te ayuda a elegir el siguiente paso. Nunca modifica tu viaje sin tu confirmación."}
@@ -510,7 +511,7 @@ function AluxTeaserSection({ authed }: { authed: boolean }) {
           <div className="mt-4">
             <Link
               to={authed ? "/oriente-maya" : "/alux"}
-              className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-background px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+              className={`${BTN_SECONDARY} border-primary/30 text-primary hover:bg-primary/5`}
             >
               {authed ? "Empezar a explorar" : "Continuar con Alux"}
               <ArrowRight className="size-4" aria-hidden />
