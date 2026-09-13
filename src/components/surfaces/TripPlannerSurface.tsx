@@ -283,63 +283,58 @@ function GuestSection({ guestCount }: { guestCount: number }) {
   return (
     <section aria-labelledby="ayv-guest-h">
       <div className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <h2 id="ayv-guest-h" className="text-xl font-semibold sm:text-2xl">
+        <div className="min-w-0">
+          <p className={EYEBROW}>Tu expediente</p>
+          <h2 id="ayv-guest-h" className={`mt-0.5 ${H2}`}>
             En tu expediente ({guestCount})
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className={`mt-1.5 ${BODY}`}>
             Guardaste esto sin iniciar sesión. Vive en este navegador hasta que lo guardes en tu
             cuenta.
           </p>
         </div>
         <ProgressiveRegistrationButton
           reason="save_permanently"
-          className="hidden shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 sm:inline-flex"
+          className={`hidden shrink-0 sm:inline-flex ${BTN_PRIMARY}`}
         >
           Guardar mi viaje
         </ProgressiveRegistrationButton>
       </div>
       <GuestPlanPreview limit={6} />
-      <div className="mt-4 flex flex-col gap-3 rounded-xl border border-primary/25 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-medium">Tu siguiente mejor paso</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+      <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-primary/25 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="min-w-0">
+          <p className={H3}>Tu siguiente mejor paso</p>
+          <p className={`mt-1 ${BODY}`}>
             Alux puede revisar lo que elegiste y sugerirte qué falta según el destino, el tiempo y
             el ritmo de tu viaje.
           </p>
         </div>
-        <Link
-          to="/alux"
-          className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-95"
-        >
+        <Link to="/alux" className={`shrink-0 ${BTN_PRIMARY}`}>
           Continuar con Alux
           <ArrowRight className="size-4" aria-hidden />
         </Link>
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
         <ProgressiveRegistrationButton
           reason="other_device"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-accent"
+          className={`justify-center ${BTN_SECONDARY}`}
         >
           Continuar en otro dispositivo
         </ProgressiveRegistrationButton>
-        <ProgressiveRegistrationButton
-          reason="share"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-accent"
-        >
+        <ProgressiveRegistrationButton reason="share" className={`justify-center ${BTN_SECONDARY}`}>
           Compartir mi viaje
         </ProgressiveRegistrationButton>
         <ProgressiveRegistrationButton
           reason="reminders"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-accent"
+          className={`justify-center ${BTN_SECONDARY}`}
         >
           Recibir recordatorios
         </ProgressiveRegistrationButton>
       </div>
-      <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm text-foreground">
+      <div className="mt-3 rounded-2xl border border-warning/35 bg-warning/10 p-4 text-[13px] leading-6 text-foreground sm:text-sm">
         <p>
-          <strong>Importante:</strong> si borras el historial del navegador perderás este
-          expediente. Guárdalo en tu cuenta con un solo paso.
+          <strong className="font-semibold">Importante:</strong> si borras el historial del
+          navegador perderás este expediente. Guárdalo en tu cuenta con un solo paso.
         </p>
       </div>
     </section>
