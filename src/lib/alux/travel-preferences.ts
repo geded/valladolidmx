@@ -79,7 +79,7 @@ export const TRAVEL_PREFERENCE_VOCABULARY: readonly TravelPreference[] = [
     slug: "cenotes-naturaleza",
     label: "Cenotes y naturaleza",
     phrase: "buscan cenotes y naturaleza",
-    match: /\b(cenote|naturaleza|selva|aves|ecotur)\b/i,
+    match: /\b(cenote|naturaleza|selva|aves)\b/i,
   },
   {
     slug: "cultura-maya",
