@@ -232,7 +232,7 @@ export function EventPremiumSurface({
       />
 
       {/* ---- Fila de acciones: compartir, guardar, agregar a Mi Viaje ---- */}
-      <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
+      <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-4 sm:px-6 lg:px-8">
         <Button
           type="button"
           variant="ghost"
@@ -290,7 +290,7 @@ export function EventPremiumSurface({
         <section
           id="proximas-fechas"
           data-eb-anchor
-          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24 px-5 sm:px-8 lg:px-12"
+          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24 px-4 sm:px-6 lg:px-8"
         >
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             Próximas fechas
@@ -298,7 +298,7 @@ export function EventPremiumSurface({
           <p className="mt-1 text-sm text-muted-foreground">
             Elige el día que mejor encaje en tu viaje. Horario del Oriente Maya.
           </p>
-          <ul className="-mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 [&::-webkit-scrollbar]:hidden">
+          <ul className="-mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [&::-webkit-scrollbar]:hidden">
             {upcoming.map((slot) => (
               <li
                 key={slot.startsAt}
@@ -341,14 +341,14 @@ export function EventPremiumSurface({
 
       {/* ---- Eventos cercanos ---- */}
       {related.length > 0 ? (
-        <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24 px-5 sm:px-8 lg:px-12">
+        <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24 px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             Explora cerca de {event.title}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Otros eventos del destino para continuar tu viaje por el Oriente Maya.
           </p>
-          <div className="-mx-5 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
+          <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
             {related.slice(0, 8).map((card) => (
               <TourismCard
                 key={card.id}
@@ -381,7 +381,7 @@ export function EventPremiumSurface({
       ) : null}
 
       {/* ---- CTA final ---- */}
-      <section className="mx-auto mt-10 w-full max-w-7xl px-5 pb-4 sm:px-8 lg:px-12">
+      <section className="mx-auto mt-10 w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-lg font-semibold text-foreground">
