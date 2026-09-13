@@ -41,6 +41,9 @@ const InteractiveMap = lazy(() =>
 );
 
 type Origin = { key: string; label: string; lat: number; lng: number };
+/** El mapa nunca sale del estado de Yucatán. */
+const YUCATAN_BOUNDS = { north: 21.75, south: 19.45, east: -87.35, west: -90.55 };
+
 type LocatedDestination = Destination & { latitude: number; longitude: number };
 
 const BASE_SLUG = "valladolid";
@@ -243,6 +246,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
         ...stops.map((s) => ({ lat: s.latitude, lng: s.longitude })),
       ]
     : undefined;
+
 
 
   /** Panel del recorrido, reutilizado en escritorio y en la hoja móvil. */
@@ -574,6 +578,8 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                     }
                   : {})}
                 {...(fitPoints ? { fitPoints, fitPadding: 48 } : {})}
+                restriction={YUCATAN_BOUNDS}
+                minZoom={8}
                 className="h-[42vh] w-full rounded-2xl border border-border lg:h-[560px]"
               />
             </Suspense>

@@ -209,6 +209,10 @@ export interface InteractiveMapProps {
   fitPoints?: Array<{ lat: number; lng: number }>;
   /** Margen del encuadre en píxeles. */
   fitPadding?: number;
+  /** Limita el desplazamiento del mapa a un área geográfica. */
+  restriction?: { north: number; south: number; east: number; west: number };
+  /** Zoom mínimo permitido (evita alejarse fuera del área). */
+  minZoom?: number;
 
 }
 
@@ -250,6 +254,8 @@ export function InteractiveMap({
   onMarkerSelect,
   fitPoints,
   fitPadding = 88,
+  restriction,
+  minZoom,
 
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -290,6 +296,10 @@ export function InteractiveMap({
           mapTypeControl: false,
           fullscreenControl: true,
           gestureHandling: "cooperative",
+          ...(restriction
+            ? { restriction: { latLngBounds: restriction, strictBounds: false } }
+            : {}),
+          ...(typeof minZoom === "number" ? { minZoom } : {}),
         });
         const list: InteractiveMapMarker[] =
           markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
@@ -402,7 +412,19 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [shouldMount, lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+  }, [
+    shouldMount,
+    lat,
+    lng,
+    zoom,
+    markerTitle,
+    markers,
+    connectByRoad,
+    routeStops,
+    optimizeRoute,
+    restriction,
+    minZoom,
+  ]);
 
   if (failed) {
     const points = (
