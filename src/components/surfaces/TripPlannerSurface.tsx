@@ -203,14 +203,22 @@ function TripPlannerHero({
           </Button>
         ) : null}
 
-        <Button size="sm" variant="outline" className="h-10 rounded-full px-4 shadow-none" asChild>
-          <Link
-            to={returnDestination ? "/oriente-maya/$destino" : "/oriente-maya"}
-            params={returnDestination ? { destino: returnDestination.slug } : undefined}
+        {state === "authed-active" || state === "guest" ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-10 rounded-full px-4 shadow-none"
+            asChild
           >
-            Seguir descubriendo
-          </Link>
-        </Button>
+            <Link
+              to={returnDestination ? "/oriente-maya/$destino" : "/oriente-maya"}
+              params={returnDestination ? { destino: returnDestination.slug } : undefined}
+            >
+              Seguir descubriendo
+            </Link>
+          </Button>
+        ) : null}
+
 
         {!user ? (
           <Link
