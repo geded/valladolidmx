@@ -354,29 +354,23 @@ function AuthedActiveSection({ planTitle, itemCount }: { planTitle: string; item
   return (
     <section
       aria-labelledby="ayv-active-h"
-      className="rounded-2xl border border-primary/30 bg-primary/5 p-6 sm:p-8"
+      className="rounded-2xl border border-primary/25 bg-primary/5 p-5 shadow-soft sm:p-7"
     >
-      <p className="text-xs uppercase tracking-wide text-primary">Expediente activo</p>
-      <h2 id="ayv-active-h" className="mt-1 text-2xl font-semibold">
+      <p className={EYEBROW}>Expediente activo</p>
+      <h2 id="ayv-active-h" className={`mt-0.5 ${H2}`}>
         {planTitle}
       </h2>
-      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+      <p className={`mt-1.5 max-w-2xl ${BODY}`}>
         {itemCount} elemento{itemCount === 1 ? "" : "s"} guardado
         {itemCount === 1 ? "" : "s"}. Organiza el recorrido, añade notas y — cuando esté listo —
         envíalo a tu concierge humano desde Mi Viaje.
       </p>
-      <div className="mt-5 flex flex-wrap gap-3">
-        <Link
-          to="/cuenta/mi-viaje"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-95"
-        >
+      <div className="mt-5 flex flex-wrap gap-2 sm:gap-3">
+        <Link to="/cuenta/mi-viaje" className={BTN_PRIMARY}>
           Abrir Mi Viaje
           <ArrowRight className="size-4" aria-hidden />
         </Link>
-        <Link
-          to="/oriente-maya"
-          className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
-        >
+        <Link to="/oriente-maya" className={BTN_SECONDARY}>
           Añadir más experiencias
         </Link>
       </div>
