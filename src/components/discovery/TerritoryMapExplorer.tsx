@@ -232,9 +232,18 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
     ? {
         lat: (origin.lat + stops.reduce((a, s) => a + s.latitude, 0) / stops.length) / 2,
         lng: (origin.lng + stops.reduce((a, s) => a + s.longitude, 0) / stops.length) / 2,
-        zoom: stops.length > 1 ? 9 : 10,
+        zoom: stops.length > 1 ? 10 : 12,
       }
-    : { lat: origin.lat, lng: origin.lng, zoom: 9 };
+    : { lat: origin.lat, lng: origin.lng, zoom: 11 };
+
+  /** Encuadre cercano: se ajusta a las paradas marcadas, no a todo el territorio. */
+  const fitPoints = stops.length
+    ? [
+        { lat: origin.lat, lng: origin.lng },
+        ...stops.map((s) => ({ lat: s.latitude, lng: s.longitude })),
+      ]
+    : undefined;
+
 
   /** Panel del recorrido, reutilizado en escritorio y en la hoja móvil. */
   const routePanel = (
