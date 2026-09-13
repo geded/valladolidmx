@@ -155,13 +155,8 @@ function AuthRoute() {
     forgot: t("auth.forgot"),
   };
 
-  const returnIsAlux = Boolean(returnTarget?.startsWith("/alux"));
-  const returnIsPlanner = Boolean(returnTarget?.startsWith("/arma-tu-viaje"));
-  const returnLabel = returnIsAlux
-    ? "Alux"
-    : returnIsPlanner
-      ? "Arma tu Viaje"
-      : "la página anterior";
+  const returnLabel =
+    (returnTarget ? describeJourneyStep(returnTarget)?.label : null) ?? "la página anterior";
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" },
     ...(session?.destination
@@ -173,10 +168,8 @@ function AuthRoute() {
           },
         ]
       : []),
-    ...(returnIsPlanner || (returnIsAlux && fromPlanner)
-      ? [{ label: "Arma tu Viaje", to: "/arma-tu-viaje" }]
-      : []),
-    ...(returnIsAlux ? [{ label: "Alux", to: "/alux" }] : []),
+    // Recorrido real del explorador (Arma tu Viaje, Alux, Mapa…) antes del acceso.
+    ...journey.map((step) => ({ label: step.label, to: step.path })),
     { label: t("auth.eyebrow") },
   ];
 
