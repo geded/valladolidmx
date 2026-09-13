@@ -66,12 +66,32 @@ const GROUPS: ReadonlyArray<{ id: string; title: string; help: string; slugs: re
 
 const BY_SLUG = new Map(TRAVEL_PREFERENCE_VOCABULARY.map((p) => [p.slug, p] as const));
 
+/** Nota libre saneada: sin cifras, correos, enlaces ni PII, máx. 60 caracteres. */
+function sanitizeNote(raw: string): string {
+  return raw
+    .replace(/https?:\/\/\S+/gi, " ")
+    .replace(/\S+@\S+/g, " ")
+    .replace(/[0-9]+/g, " ")
+    .replace(/[^\p{L}\s,·-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+}
+
 export function TripBriefSection() {
   const remembered = useTravelPreferences();
-  const [marked, setMarked] = useState<readonly string[]>([]);
+  /** El brief lo controla el viajero: `marked` manda sobre lo recordado. */
+  const [marked, setMarked] = useState<Readonly<Record<string, boolean>>>({});
+  const [notes, setNotes] = useState<readonly string[]>([]);
+  const [draft, setDraft] = useState("");
 
   const selected = useMemo(() => {
-    const slugs = new Set<string>([...remembered.map((p) => p.slug), ...marked]);
+    const slugs = new Set<string>();
+    for (const preference of remembered) slugs.add(preference.slug);
+    for (const [slug, isOn] of Object.entries(marked)) {
+      if (isOn) slugs.add(slug);
+      else slugs.delete(slug);
+    }
     return slugs;
   }, [remembered, marked]);
 
@@ -86,13 +106,23 @@ export function TripBriefSection() {
 
   function toggle(preference: TravelPreference) {
     const isOn = selected.has(preference.slug);
-    if (isOn) {
-      setMarked((prev) => prev.filter((slug) => slug !== preference.slug));
+    setMarked((prev) => ({ ...prev, [preference.slug]: !isOn }));
+    if (!isOn) rememberTravelPreference(preference.label, SURFACE);
+  }
+
+  function addNote() {
+    const clean = sanitizeNote(draft);
+    if (!clean) return;
+    setDraft("");
+    const known = BY_SLUG_MATCH(clean);
+    if (known) {
+      setMarked((prev) => ({ ...prev, [known.slug]: true }));
+      rememberTravelPreference(known.label, SURFACE);
       return;
     }
-    setMarked((prev) => (prev.includes(preference.slug) ? prev : [...prev, preference.slug]));
-    rememberTravelPreference(preference.label, SURFACE);
+    setNotes((prev) => (prev.includes(clean) || prev.length >= 3 ? prev : [...prev, clean]));
   }
+
 
   return (
     <section aria-labelledby="ayv-brief-h" className="rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-7">
