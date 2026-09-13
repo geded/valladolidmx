@@ -301,13 +301,13 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                 <a
                   href={ctaHref}
                   onClick={() => setOpen(false)}
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-[0.9375rem] font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-[0.9375rem] font-medium text-background transition-all hover:opacity-90 active:scale-[0.98]"
                 >
                   <Compass className="size-4" aria-hidden />
                   {ctaLabel}
                 </a>
                 {showUserMenu ? (
-                  <div className="[&_a]:w-full [&_a]:justify-center [&_button]:w-full [&_button]:justify-center sm:hidden">
+                  <div className="[&_a]:w-full [&_a]:justify-center [&_a]:rounded-full [&_a]:border [&_a]:border-border [&_a]:bg-transparent [&_a]:text-foreground [&_a]:hover:bg-accent/10 [&_button]:w-full [&_button]:justify-center [&_button]:rounded-full [&_button]:border [&_button]:border-border [&_button]:bg-transparent [&_button]:text-foreground [&_button]:hover:bg-accent/10 sm:hidden">
                     <UserMenu />
                   </div>
                 ) : null}
