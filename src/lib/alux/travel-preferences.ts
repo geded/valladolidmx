@@ -31,7 +31,7 @@ export const TRAVEL_PREFERENCE_VOCABULARY: readonly TravelPreference[] = [
     slug: "viaje-en-pareja",
     label: "En pareja",
     phrase: "viajan en pareja",
-    match: /\b(en\s+pareja|parejas?|romántic|romantic|luna\s+de\s+miel)\b/i,
+    match: /\b(en\s+pareja|parejas?)\b/i,
   },
   {
     slug: "viaje-en-familia",
@@ -98,6 +98,48 @@ export const TRAVEL_PREFERENCE_VOCABULARY: readonly TravelPreference[] = [
     label: "Cerca del centro",
     phrase: "prefieren estar cerca del centro",
     match: /\b(centro|c[eé]ntric|caminar)\b/i,
+  },
+  {
+    slug: "vida-nocturna",
+    label: "Vida nocturna",
+    phrase: "buscan vida nocturna",
+    match: /\b(vida\s+nocturna|noche|nocturn|bar(es)?|antro|fiesta)\b/i,
+  },
+  {
+    slug: "romance",
+    label: "Romance",
+    phrase: "viajan por romance",
+    match: /\b(romance|rom[aá]ntic|luna\s+de\s+miel|aniversario)\b/i,
+  },
+  {
+    slug: "aventura",
+    label: "Aventura",
+    phrase: "buscan aventura",
+    match: /\b(aventura|tirolesa|rapel|kayak|bici|ciclis|senderis)\b/i,
+  },
+  {
+    slug: "bienestar",
+    label: "Bienestar",
+    phrase: "buscan bienestar",
+    match: /\b(bienestar|wellness|temazcal|yoga|masaje)\b/i,
+  },
+  {
+    slug: "artesanias-compras",
+    label: "Artesanías y compras",
+    phrase: "les interesan las artesanías y las compras",
+    match: /\b(artesan|compras|mercado|bordad|hamaca)\b/i,
+  },
+  {
+    slug: "fiestas-eventos",
+    label: "Fiestas y eventos",
+    phrase: "buscan fiestas y eventos",
+    match: /\b(evento|festival|feria|concierto|vaquer)\b/i,
+  },
+  {
+    slug: "fotografia",
+    label: "Fotografía",
+    phrase: "viajan por la fotografía",
+    match: /\b(fotograf|foto|paisaj)\b/i,
   },
 ];
 

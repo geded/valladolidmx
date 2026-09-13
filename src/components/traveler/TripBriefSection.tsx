@@ -13,10 +13,11 @@
  *  · Alux se invoca con el bus existente (`askAluxWithPreferenceMemory`).
  */
 import { useMemo, useState } from "react";
-import { ClipboardList, Sparkles, ArrowRight } from "lucide-react";
+import { ClipboardList, Sparkles, ArrowRight, Plus, X } from "lucide-react";
 import {
   TRAVEL_PREFERENCE_VOCABULARY,
   rememberTravelPreference,
+  normalizeTravelPreference,
   askAluxWithPreferenceMemory,
   type TravelPreference,
 } from "@/lib/alux/travel-preferences";
@@ -36,7 +37,19 @@ const GROUPS: ReadonlyArray<{ id: string; title: string; help: string; slugs: re
       id: "interes",
       title: "¿Qué quieres vivir?",
       help: "Ordena las experiencias del Oriente Maya según lo que más te mueve.",
-      slugs: ["cultura-maya", "cenotes-naturaleza", "gastronomia", "descanso"],
+      slugs: [
+        "cultura-maya",
+        "cenotes-naturaleza",
+        "gastronomia",
+        "descanso",
+        "vida-nocturna",
+        "romance",
+        "aventura",
+        "bienestar",
+        "artesanias-compras",
+        "fiestas-eventos",
+        "fotografia",
+      ],
     },
     {
       id: "estilo",
@@ -54,12 +67,32 @@ const GROUPS: ReadonlyArray<{ id: string; title: string; help: string; slugs: re
 
 const BY_SLUG = new Map(TRAVEL_PREFERENCE_VOCABULARY.map((p) => [p.slug, p] as const));
 
+/** Nota libre saneada: sin cifras, correos, enlaces ni PII, máx. 60 caracteres. */
+function sanitizeNote(raw: string): string {
+  return raw
+    .replace(/https?:\/\/\S+/gi, " ")
+    .replace(/\S+@\S+/g, " ")
+    .replace(/[0-9]+/g, " ")
+    .replace(/[^\p{L}\s,·-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+}
+
 export function TripBriefSection() {
   const remembered = useTravelPreferences();
-  const [marked, setMarked] = useState<readonly string[]>([]);
+  /** El brief lo controla el viajero: `marked` manda sobre lo recordado. */
+  const [marked, setMarked] = useState<Readonly<Record<string, boolean>>>({});
+  const [notes, setNotes] = useState<readonly string[]>([]);
+  const [draft, setDraft] = useState("");
 
   const selected = useMemo(() => {
-    const slugs = new Set<string>([...remembered.map((p) => p.slug), ...marked]);
+    const slugs = new Set<string>();
+    for (const preference of remembered) slugs.add(preference.slug);
+    for (const [slug, isOn] of Object.entries(marked)) {
+      if (isOn) slugs.add(slug);
+      else slugs.delete(slug);
+    }
     return slugs;
   }, [remembered, marked]);
 
@@ -74,13 +107,23 @@ export function TripBriefSection() {
 
   function toggle(preference: TravelPreference) {
     const isOn = selected.has(preference.slug);
-    if (isOn) {
-      setMarked((prev) => prev.filter((slug) => slug !== preference.slug));
+    setMarked((prev) => ({ ...prev, [preference.slug]: !isOn }));
+    if (!isOn) rememberTravelPreference(preference.label, SURFACE);
+  }
+
+  function addNote() {
+    const clean = sanitizeNote(draft);
+    if (!clean) return;
+    setDraft("");
+    const known = normalizeTravelPreference(clean);
+    if (known) {
+      setMarked((prev) => ({ ...prev, [known.slug]: true }));
+      rememberTravelPreference(known.label, SURFACE);
       return;
     }
-    setMarked((prev) => (prev.includes(preference.slug) ? prev : [...prev, preference.slug]));
-    rememberTravelPreference(preference.label, SURFACE);
+    setNotes((prev) => (prev.includes(clean) || prev.length >= 3 ? prev : [...prev, clean]));
   }
+
 
   return (
     <section aria-labelledby="ayv-brief-h" className="rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-7">
@@ -133,11 +176,65 @@ export function TripBriefSection() {
         ))}
       </div>
 
+      <div className="mt-5 min-w-0">
+        <label
+          htmlFor="ayv-brief-otro"
+          className="text-[15px] font-semibold leading-snug sm:text-base"
+        >
+          ¿Falta algo? Escríbelo
+        </label>
+        <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+          Por ejemplo: vida nocturna, romance, fotografía. Sin datos personales.
+        </p>
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          <input
+            id="ayv-brief-otro"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                addNote();
+              }
+            }}
+            maxLength={60}
+            placeholder="Escribe tu interés"
+            className="min-h-10 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm outline-none ring-focus placeholder:text-muted-foreground"
+          />
+          <button
+            type="button"
+            onClick={addNote}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent"
+          >
+            <Plus className="size-4" aria-hidden />
+            Agregar
+          </button>
+        </div>
+        {notes.length ? (
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {notes.map((note) => (
+              <button
+                key={note}
+                type="button"
+                onClick={() => setNotes((prev) => prev.filter((item) => item !== note))}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary bg-primary px-3 text-[13px] font-medium text-primary-foreground"
+              >
+                {note}
+                <X className="size-3.5" aria-hidden />
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
       <div className="mt-6 rounded-xl border border-primary/25 bg-primary/5 p-4">
         <p className="text-[15px] font-semibold leading-snug sm:text-base">Esto es lo que verá tu concierge</p>
         <p className="mt-1 text-[13px] leading-6 text-muted-foreground sm:text-sm">
-          {selectedPreferences.length
-            ? `Viajeros que ${selectedPreferences.map((preference) => preference.phrase).join("; ")}.`
+          {selectedPreferences.length || notes.length
+            ? `Viajeros que ${[
+                ...selectedPreferences.map((preference) => preference.phrase),
+                ...(notes.length ? [`además mencionan: ${notes.join(", ")}`] : []),
+              ].join("; ")}.`
             : "Aún no has marcado nada. En cuanto marques una opción, aparecerá aquí el resumen que acompaña a tu expediente."}
         </p>
         <button
@@ -146,11 +243,13 @@ export function TripBriefSection() {
             askAluxWithPreferenceMemory({
               surface: SURFACE,
               hint: "El explorador está completando el brief de su expediente en Arma tu Viaje.",
-              prompt: selectedPreferences.length
-                ? `Con base en mi brief (${selectedPreferences
-                    .map((preference) => preference.label)
-                    .join(", ")}), ¿qué me falta para completar mi viaje?`
-                : "Ayúdame a definir cómo quiero viajar por el Oriente Maya.",
+              prompt:
+                selectedPreferences.length || notes.length
+                  ? `Con base en mi brief (${[
+                      ...selectedPreferences.map((preference) => preference.label),
+                      ...notes,
+                    ].join(", ")}), ¿qué me falta para completar mi viaje?`
+                  : "Ayúdame a definir cómo quiero viajar por el Oriente Maya.",
             })
           }
           className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-95"
