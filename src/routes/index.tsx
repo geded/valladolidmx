@@ -84,6 +84,7 @@ export const Route = createFileRoute("/")({
       // Lote 3E — Categorías destacadas reales de CMS en SSR: el buscador del
       // Hero y la sección de categorías ya no dependen de `CATEGORIAS_MOCK`.
       context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
+      context.queryClient.ensureQueryData(homeRealContentQuery).catch(() => null),
     ]);
     const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
     const stableAuthorityTree = authorityTree ?? HOME_PREMIUM_FALLBACK_TREE;
