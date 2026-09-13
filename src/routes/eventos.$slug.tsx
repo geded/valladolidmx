@@ -136,11 +136,11 @@ export const Route = createFileRoute("/eventos/$slug")({
 });
 
 function EventoPage() {
-  const { event } = Route.useLoaderData();
+  const { event, related } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
-      <EventPremiumSurface event={event} />
+      <EventPremiumSurface event={event} related={related} />
     </ContextEngineProvider>
   );
 }
