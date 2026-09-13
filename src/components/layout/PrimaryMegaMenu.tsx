@@ -212,7 +212,7 @@ function buildSections(destinos: DestinoLite[]): MenuSection[] {
   ];
 }
 
-function useSections(): MenuSection[] {
+function usePublishedDestinos(): DestinoLite[] {
   const { data } = useQuery({
     queryKey: ["primary-menu", "destinations"],
     queryFn: async () => {
@@ -221,7 +221,7 @@ function useSections(): MenuSection[] {
     },
     staleTime: 5 * 60_000,
   });
-  return buildSections(data ?? []);
+  return data ?? [];
 }
 
 function activeDestinationFromPath(pathname: string): string | null {
