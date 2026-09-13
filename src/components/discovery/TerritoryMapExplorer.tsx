@@ -147,6 +147,17 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
   const stops = selected
     .map((slug) => located.find((d) => d.slug === slug))
     .filter((d): d is Destination & { latitude: number; longitude: number } => Boolean(d));
+  const googleRouteUrl = stops.length
+    ? `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}` +
+      `&destination=${stops[stops.length - 1]!.latitude},${stops[stops.length - 1]!.longitude}` +
+      (stops.length > 1
+        ? `&waypoints=${stops
+            .slice(0, -1)
+            .map((s) => `${s.latitude},${s.longitude}`)
+            .join("|")}`
+        : "") +
+      `&travelmode=driving`
+    : null;
   const markers = [
     { lat: origin.lat, lng: origin.lng, title: `${origin.label} · punto de partida`, href: null },
     ...visible.map((r) => ({
