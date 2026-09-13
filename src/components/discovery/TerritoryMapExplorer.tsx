@@ -382,6 +382,23 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                   )}
 
                   <div className="mt-auto flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant={isSelected ? "default" : "outline"}
+                      className="rounded-pill"
+                      aria-pressed={isSelected}
+                      onClick={() => {
+                        toggleStop(d.slug);
+                        if (!isSelected) {
+                          document
+                            .getElementById("mapa-recorrido")
+                            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }}
+                    >
+                      <RouteIcon className="mr-1 h-3.5 w-3.5" aria-hidden />
+                      {isSelected ? "Quitar de la ruta" : "Marcar para la ruta"}
+                    </Button>
                     <Button asChild size="sm" variant="secondary" className="rounded-pill">
                       <Link to="/oriente-maya/$destino" params={{ destino: d.slug }}>
                         Ver destino
