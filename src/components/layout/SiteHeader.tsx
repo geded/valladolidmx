@@ -8,7 +8,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Menu,
   X,
@@ -136,6 +136,14 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setMounted(true), []);
+
+  // El drawer se cierra al cambiar de ruta. Sin esto, al pulsar "Iniciar
+  // sesión" la navegación era cliente-side y el panel quedaba abierto
+  // encima de /auth.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (variant !== "overlay") return;
@@ -270,35 +278,40 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               aria-label="Navegación principal"
               tabIndex={-1}
               style={{ backgroundColor: "var(--background)" }}
-              className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(86vw,23rem)] flex-col overflow-y-auto rounded-[1.75rem] border border-border/70 shadow-2xl outline-none lg:hidden"
+              className="fixed inset-x-2 bottom-2 top-2 z-[999] flex flex-col overflow-hidden rounded-[1.75rem] border border-border/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)] outline-none sm:inset-x-auto sm:right-3 sm:w-[min(86vw,24rem)] lg:hidden"
             >
-              <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
+              <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-5">
                 <BrandLogo tone="dark" size="sm" />
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Cerrar menú"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all active:scale-[0.98]"
+                  className="inline-flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent active:scale-[0.98]"
                 >
-                  <X className="size-4" />
+                  <X className="size-5" />
                 </button>
               </div>
-              <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
+              <nav
+                aria-label="Menú móvil"
+                className="flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+              >
                 <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
+              </nav>
+              <div className="shrink-0 space-y-3 border-t border-border/60 bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
                 <a
                   href={ctaHref}
                   onClick={() => setOpen(false)}
-                  className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-[0.9375rem] font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
                 >
                   <Compass className="size-4" aria-hidden />
                   {ctaLabel}
                 </a>
                 {showUserMenu ? (
-                  <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
+                  <div className="[&_a]:w-full [&_a]:justify-center [&_button]:w-full [&_button]:justify-center sm:hidden">
                     <UserMenu />
                   </div>
                 ) : null}
-              </nav>
+              </div>
             </aside>
           </>,
           document.body,

@@ -413,18 +413,18 @@ function MobileMenu({
 }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
-    <ul className="flex flex-col gap-0.5">
+    <ul className="flex flex-col">
       {sections.map((section) => {
         const isOpen = open === section.id;
         const cols = Array.isArray(section.columns) ? section.columns : [];
         return (
-          <li key={section.id} className="border-b border-border/40 last:border-b-0">
-            <div className="flex items-stretch">
+          <li key={section.id} className="border-b border-border/50 last:border-b-0">
+            <div className="flex items-stretch gap-1">
               {section.expandOnly ? (
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? null : section.id)}
-                  className="flex-1 rounded-lg px-3 py-2.5 text-left text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
+                  className="flex-1 rounded-xl px-2 py-3.5 text-left text-[1.0625rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:bg-accent/60"
                 >
                   {section.label}
                 </button>
@@ -432,7 +432,7 @@ function MobileMenu({
                 <a
                   href={hrefWithActiveDestination(section.href, activeDestination)}
                   onClick={() => onNavigate?.()}
-                  className="flex-1 rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
+                  className="flex-1 rounded-xl px-2 py-3.5 text-[1.0625rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:bg-accent/60"
                 >
                   {section.label}
                 </a>
@@ -442,28 +442,30 @@ function MobileMenu({
                 aria-label={isOpen ? `Cerrar ${section.label}` : `Abrir ${section.label}`}
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : section.id)}
-                className="inline-flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+                className="inline-flex size-10 shrink-0 items-center justify-center self-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 <ChevronDown
-                  className={cn("size-4 transition-transform", isOpen && "rotate-180")}
+                  className={cn("size-4 transition-transform duration-200", isOpen && "rotate-180")}
                   aria-hidden
                 />
               </button>
             </div>
             {isOpen ? (
-              <div className="pb-3 pl-3">
+              <div className="pb-3">
                 {cols.map((col, idx) => (
-                  <div key={idx} className="mt-2">
+                  <div key={idx} className="mt-1">
                     {col.title ? (
-                      <p className="text-caption mb-1 px-2 text-muted-foreground">{col.title}</p>
+                      <p className="mb-1 px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                        {col.title}
+                      </p>
                     ) : null}
-                    <ul className="flex flex-col gap-0.5">
+                    <ul className="flex flex-col">
                       {col.links.map((link) => (
                         <li key={link.href + link.label}>
                           <a
                             href={hrefWithActiveDestination(link.href, activeDestination)}
                             onClick={() => onNavigate?.()}
-                            className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground"
+                            className="block rounded-xl px-2 py-2.5 text-[0.9375rem] text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
                           >
                             {link.label}
                           </a>
