@@ -103,6 +103,8 @@ export function TripPlannerSurface({
       {state === "authed-empty" ? <AuthedEmptySection /> : null}
 
       {state === "authed-active" ? <AluxTravelerPanel /> : null}
+
+      <TripBriefSection />
       {state !== "authed-active" ? <AluxTeaserSection authed={Boolean(user)} /> : null}
 
       <HowItWorksSection />
