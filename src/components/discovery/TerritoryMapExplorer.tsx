@@ -362,7 +362,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           </p>
         </div>
         <Button asChild className="rounded-pill">
-          <Link to="/arma-tu-viaje" search={{ destination: origin.key }}>
+          <Link to="/arma-tu-viaje" search={{ destination: origin.key, from: "mapa" as const }}>
             Armar una ruta con estos destinos
           </Link>
         </Button>

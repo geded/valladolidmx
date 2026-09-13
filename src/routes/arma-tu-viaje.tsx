@@ -4,6 +4,7 @@
  * @context-engine legacy — herramienta transversal sin territorio
  * (I7 · fila 9). No monta `ContextEngineProvider`.
  */
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
@@ -12,10 +13,13 @@ import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { useNavigationSession } from "@/lib/navigation";
+import { readPreviousRoute } from "@/lib/navigation/session-context";
 
 interface TripPlannerSearch {
   destination?: string;
   destinationLabel?: string;
+  /** Paso previo del recorrido cuando no es un destino territorial. */
+  from?: "mapa";
 }
 
 export const Route = createFileRoute("/arma-tu-viaje")({
@@ -28,9 +32,11 @@ export const Route = createFileRoute("/arma-tu-viaje")({
       typeof search.destinationLabel === "string" && search.destinationLabel.trim()
         ? search.destinationLabel.trim().slice(0, 80)
         : undefined;
+    const from = search.from === "mapa" ? ("mapa" as const) : undefined;
     return {
       ...(destination ? { destination } : {}),
       ...(destinationLabel ? { destinationLabel } : {}),
+      ...(from ? { from } : {}),
     };
   },
   loader: async () => {
@@ -70,24 +76,37 @@ function hasRenderableBlocks(tree: unknown): boolean {
 
 function AYVPage() {
   const { composition } = Route.useLoaderData();
-  const { destination, destinationLabel } = Route.useSearch();
+  const { destination, destinationLabel, from } = Route.useSearch();
   const session = useNavigationSession();
   const snapshot = composition?.snapshot;
   const returnDestination = destination
     ? { slug: destination, label: destinationLabel ?? destination }
     : null;
   /**
+   * Continuidad de ruta: si el explorador llegó desde el Mapa territorial,
+   * ese paso permanece visible en la ruta. El `destination` que envía el
+   * Mapa es el origen del cálculo de distancias, no contexto territorial.
+   */
+  const [cameFromMap, setCameFromMap] = useState(false);
+  useEffect(() => {
+    const prev = readPreviousRoute();
+    setCameFromMap(Boolean(prev && prev.startsWith("/mapa")));
+  }, []);
+  const showMapStep = from === "mapa" || cameFromMap;
+  /**
    * La ruta territorial SIEMPRE parte de la región. Si el explorador
    * viene de un destino (por search param o por la sesión territorial
    * vigente), ese destino se conserva como nivel intermedio.
    */
-  const contextDestination =
-    returnDestination ??
-    (session?.destination
-      ? { slug: session.destination.slug, label: session.destination.label }
-      : null);
+  const contextDestination = showMapStep
+    ? null
+    : (returnDestination ??
+      (session?.destination
+        ? { slug: session.destination.slug, label: session.destination.label }
+        : null));
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" },
+    ...(showMapStep ? [{ label: "Mapa", to: "/mapa" as const }] : []),
     ...(contextDestination
       ? [
           {
