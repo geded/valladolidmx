@@ -262,7 +262,7 @@ export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
   }
   return (
     <MobileMenu
-      sections={sections}
+      destinos={destinos}
       activeDestination={activeDestination}
       onNavigate={props.onNavigate}
     />
