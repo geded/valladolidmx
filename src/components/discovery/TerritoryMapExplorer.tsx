@@ -349,7 +349,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                       {d.name}
                     </p>
                     <p className="mt-1 text-xs font-medium text-primary">
-                      {isSelected ? "Quitar del recorrido" : "Agregar al recorrido en el mapa"}
+                      {isSelected ? `Parada ${stopIndex + 1} de tu ruta` : "Toca para marcarlo"}
                     </p>
                     {d.tagline ? (
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{d.tagline}</p>
