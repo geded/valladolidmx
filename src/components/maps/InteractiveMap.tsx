@@ -203,6 +203,11 @@ export interface InteractiveMapProps {
   onRouteStatus?: (status: MapRouteStatus) => void;
   /** Selección de un marcador desde el mapa. */
   onMarkerSelect?: (key: string) => void;
+  /** Puntos a los que se ajusta el encuadre; por defecto todos los pines. */
+  fitPoints?: Array<{ lat: number; lng: number }>;
+  /** Margen del encuadre en píxeles. */
+  fitPadding?: number;
+
 }
 
 function labelForIndex(i: number) {
