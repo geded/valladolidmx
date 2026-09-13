@@ -70,21 +70,34 @@ function hasRenderableBlocks(tree: unknown): boolean {
 function AYVPage() {
   const { composition } = Route.useLoaderData();
   const { destination, destinationLabel } = Route.useSearch();
+  const session = useNavigationSession();
   const snapshot = composition?.snapshot;
   const returnDestination = destination
     ? { slug: destination, label: destinationLabel ?? destination }
     : null;
-  const crumbs = returnDestination
-    ? [
-        { label: "Oriente Maya de Yucatán", to: "/oriente-maya" },
-        {
-          label: returnDestination.label,
-          to: "/oriente-maya/$destino",
-          params: { destino: returnDestination.slug },
-        },
-        { label: "Arma tu Viaje" },
-      ]
-    : [{ label: "Arma tu Viaje" }];
+  /**
+   * La ruta territorial SIEMPRE parte de la región. Si el explorador
+   * viene de un destino (por search param o por la sesión territorial
+   * vigente), ese destino se conserva como nivel intermedio.
+   */
+  const contextDestination =
+    returnDestination ??
+    (session?.destination
+      ? { slug: session.destination.slug, label: session.destination.label }
+      : null);
+  const crumbs = [
+    { label: "Oriente Maya de Yucatán", to: "/oriente-maya" },
+    ...(contextDestination
+      ? [
+          {
+            label: contextDestination.label,
+            to: "/oriente-maya/$destino",
+            params: { destino: contextDestination.slug },
+          },
+        ]
+      : []),
+    { label: "Arma tu Viaje" },
+  ];
   return (
     <PublicShell variant="hero" crumbs={crumbs} compactCrumbsOnMobile>
       {composition && snapshot && hasRenderableBlocks(snapshot) ? (
