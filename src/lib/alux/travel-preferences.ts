@@ -31,7 +31,7 @@ export const TRAVEL_PREFERENCE_VOCABULARY: readonly TravelPreference[] = [
     slug: "viaje-en-pareja",
     label: "En pareja",
     phrase: "viajan en pareja",
-    match: /\b(en\s+pareja|parejas?|romántic|romantic|luna\s+de\s+miel)\b/i,
+    match: /\b(en\s+pareja|parejas?)\b/i,
   },
   {
     slug: "viaje-en-familia",
