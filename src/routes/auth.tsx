@@ -190,10 +190,6 @@ function AuthRoute() {
           <p className="mt-5 max-w-lg text-lg leading-8 text-muted-foreground">
             {t("auth.subtitle")}
           </p>
-          <div className="mt-8 hidden border-t border-border pt-6 text-sm leading-6 text-muted-foreground md:block">
-            <p>Tu viaje continúa donde lo dejaste.</p>
-            <p>Tu información permanece bajo tu control.</p>
-          </div>
         </header>
 
         <section
@@ -375,9 +371,6 @@ function AuthRoute() {
               </Button>
             )}
           </div>
-          <p className="mt-6 border-t border-border pt-5 text-xs leading-5 text-muted-foreground md:hidden">
-            Tu viaje continúa donde lo dejaste y tu información permanece bajo tu control.
-          </p>
         </section>
       </div>
 
