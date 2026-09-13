@@ -296,11 +296,19 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           >
             Limpiar recorrido
           </button>
+          {googleRouteUrl ? (
+            <Button asChild size="sm" variant="secondary" className="rounded-pill">
+              <a href={googleRouteUrl} target="_blank" rel="noopener noreferrer">
+                <Navigation className="mr-1 h-3.5 w-3.5" aria-hidden />
+                Abrir recorrido completo
+              </a>
+            </Button>
+          ) : null}
         </div>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Marca uno o varios destinos en la lista y el mapa dibuja el camino desde tu punto de
-          partida, en el orden en que los elijas.
+          Toca un pin en el mapa o el botón <strong>Marcar para la ruta</strong> de cada tarjeta: el
+          mapa dibuja el camino desde tu punto de partida, en el orden en que los elijas.
         </p>
       )}
 
