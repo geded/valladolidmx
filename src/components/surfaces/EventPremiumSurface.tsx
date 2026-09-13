@@ -230,15 +230,6 @@ export function EventPremiumSurface({
           heading="Compartir evento"
         />
         {!readOnlyPreview ? (
-          <FavoriteButton
-            entityKind="event"
-            entityId={event.id}
-            entityTitle={event.title}
-            entitySlug={event.slug}
-            entityImageUrl={event.cover_url ?? undefined}
-          />
-        ) : null}
-        {!readOnlyPreview ? (
           <AddToTravelPlanButton
             kind="event"
             targetId={event.id}
