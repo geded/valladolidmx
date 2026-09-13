@@ -457,9 +457,9 @@ function MobileMenu({
       <a
         href="/oriente-maya"
         onClick={() => onNavigate?.()}
-        className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-colors hover:bg-accent/40"
+        className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-colors hover:bg-foreground/[0.04]"
       >
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/40 text-muted-foreground">
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/[0.06] text-muted-foreground">
           <Search className="size-4" aria-hidden />
         </span>
         <span className="min-w-0">
@@ -485,9 +485,9 @@ function MobileMenu({
                 <a
                   href={hrefWithActiveDestination(link.href, activeDestination)}
                   onClick={() => onNavigate?.()}
-                  className="flex items-center gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-accent/40"
+                  className="flex items-center gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-foreground/[0.04]"
                 >
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/40 text-muted-foreground">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/[0.06] text-muted-foreground">
                     <Icon className="size-[1.05rem]" aria-hidden />
                   </span>
                   <span className="min-w-0">
