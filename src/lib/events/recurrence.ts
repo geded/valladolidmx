@@ -24,7 +24,7 @@ export interface EventRecurrenceInput {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
-const MERIDA_OFFSET = "-06:00";
+const EVENT_TIME_ZONE = "America/Merida";
 
 function dateKey(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -66,6 +66,24 @@ function localTimeInMerida(now: Date): string {
     minute: "2-digit",
     hour12: false,
   }).format(now);
+}
+
+function localDateTimeIso(date: string, time: string): string {
+  // Yucatán no observa horario de verano. El offset se obtiene igualmente
+  // desde IANA para que la fuente de verdad sea la zona editorial declarada.
+  const probe = new Date(`${date}T${time}:00.000Z`);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: EVENT_TIME_ZONE,
+    timeZoneName: "longOffset",
+  }).formatToParts(probe);
+  const offset = parts.find((part) => part.type === "timeZoneName")?.value.replace("GMT", "") || "-06:00";
+  return `${date}T${time}:00${offset}`;
+}
+
+function meridaTimeOfIso(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "00:00";
+  return localTimeInMerida(date);
 }
 
 export function normalizeScheduleTimes(value: unknown): EventScheduleTime[] {
@@ -143,7 +161,7 @@ export function nextEventOccurrence(
   const currentTime = localTimeInMerida(now);
   const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
   const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
-  const fallbackTime = `${String(base.getHours()).padStart(2, "0")}:${String(base.getMinutes()).padStart(2, "0")}`;
+  const fallbackTime = meridaTimeOfIso(input.starts_at);
   const times = normalizeScheduleTimes(input.schedule_times);
   const schedule = times.length ? times : [{ time: fallbackTime, label: null }];
 
@@ -153,7 +171,7 @@ export function nextEventOccurrence(
     if (excluded.has(candidate) || !isOccurrenceDate(input, candidate, startDate)) continue;
     const nextTime = schedule.find((item) => offset > 0 || item.time >= currentTime);
     if (!nextTime) continue;
-    const startsAt = `${candidate}T${nextTime.time}:00${MERIDA_OFFSET}`;
+    const startsAt = localDateTimeIso(candidate, nextTime.time);
     return { startsAt, endsAt: null, date: candidate };
   }
   return null;

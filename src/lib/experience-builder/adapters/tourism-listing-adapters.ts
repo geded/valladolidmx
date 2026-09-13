@@ -13,6 +13,7 @@ import type {
   MarketplacePromotionCard,
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
 import type { PublicPlaceCard } from "@/lib/places/place-public-contract";
 import type { Destination } from "@/types/territory";
 import type {
@@ -189,7 +190,11 @@ function formatDate(iso: string | null | undefined): string | null {
 
 export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
   const destinationLabel = e.destination_name || humanizeSlug(e.destination_slug);
-  const dateLabel = formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
+  const recurrence = recurrenceLabel(e);
+  const schedule = scheduleLabel(e.schedule_times);
+  const dateLabel = recurrence
+    ? [recurrence, schedule].filter(Boolean).join(" · ")
+    : formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
   return {
     id: e.id,
     entityKind: "event",

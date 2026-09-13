@@ -8,7 +8,7 @@
  * Sin backend nuevo: reutiliza el patrón del publishable client
  * (`SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`) ya usado por
  * `destinations/public-reads.functions.ts`. Proyecta sólo columnas
- * seguras del esquema vigente de `events` (sin nuevas columnas).
+ * seguras del esquema vigente de `events`, incluida su recurrencia.
  */
 import { createServerFn } from "@tanstack/react-start";
 import {
@@ -134,38 +134,39 @@ type CardRow = {
 };
 
 async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEventCard[]> {
-  return Promise.all(
+  const cards = await Promise.all(
     rows.map(async (r) => {
       const scheduleTimes = normalizeScheduleTimes(r.schedule_times);
       const exceptionDates = normalizeExceptionDates(r.exception_dates);
       const next = nextEventOccurrence({ ...r, schedule_times: scheduleTimes, exception_dates: exceptionDates });
       return {
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      summary: r.summary ?? null,
-      starts_at: next?.startsAt ?? r.starts_at,
-      ends_at: r.recurrence_frequency ? null : (r.ends_at ?? null),
-      venue_name: r.venue_name ?? null,
-      is_free: Boolean(r.is_free),
-      destination_slug: r.destinations?.slug ?? null,
-      destination_name: r.destinations?.name ?? null,
-      filter_attributes: normalizeFilterAttributes(r.filter_attributes),
-      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
-      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
-      recurrence_frequency: r.recurrence_frequency ?? null,
-      recurrence_interval: r.recurrence_interval ?? 1,
-      recurrence_weekdays: r.recurrence_weekdays ?? [],
-      recurrence_until: r.recurrence_until ?? null,
-      schedule_times: scheduleTimes,
-      exception_dates: exceptionDates,
-      event_timezone: r.event_timezone ?? "America/Merida",
-      cover_url: withCover
-        ? await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path)
-        : null,
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        summary: r.summary ?? null,
+        starts_at: next?.startsAt ?? r.starts_at,
+        ends_at: r.recurrence_frequency ? null : (r.ends_at ?? null),
+        venue_name: r.venue_name ?? null,
+        is_free: Boolean(r.is_free),
+        destination_slug: r.destinations?.slug ?? null,
+        destination_name: r.destinations?.name ?? null,
+        filter_attributes: normalizeFilterAttributes(r.filter_attributes),
+        latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
+        longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
+        recurrence_frequency: r.recurrence_frequency ?? null,
+        recurrence_interval: r.recurrence_interval ?? 1,
+        recurrence_weekdays: r.recurrence_weekdays ?? [],
+        recurrence_until: r.recurrence_until ?? null,
+        schedule_times: scheduleTimes,
+        exception_dates: exceptionDates,
+        event_timezone: r.event_timezone ?? "America/Merida",
+        cover_url: withCover
+          ? await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path)
+          : null,
       };
     }),
   );
+  return cards;
 }
 
 function isUpcomingEvent(event: PublicEventCard, now = new Date()): boolean {
@@ -218,7 +219,7 @@ export const listPublishedEvents = createServerFn({ method: "GET" })
       console.error("[listPublishedEvents]", error);
       return [];
     }
-    const cards = await mapCards((rows ?? []) as unknown as CardRow[], false);
+    const cards = await mapCards((rows ?? []) as unknown as CardRow[], true);
     return sortByNextOccurrence(data.upcomingOnly ? cards.filter((event) => isUpcomingEvent(event)) : cards).slice(0, data.limit);
   });
 
@@ -243,7 +244,7 @@ export const listEventsForDestination = createServerFn({ method: "GET" })
       console.error("[listEventsForDestination]", error);
       return [];
     }
-    const cards = await mapCards((rows ?? []) as unknown as CardRow[], false);
+    const cards = await mapCards((rows ?? []) as unknown as CardRow[], true);
     return sortByNextOccurrence(cards.filter((event) => isUpcomingEvent(event))).slice(0, data.limit);
   });
 
@@ -297,7 +298,7 @@ export const getEventRelated = createServerFn({ method: "GET" })
       return [];
     }
     const filtered = ((rows ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id));
-    const cards = sortByNextOccurrence((await mapCards(filtered, false)).filter((event) => isUpcomingEvent(event)));
+    const cards = sortByNextOccurrence((await mapCards(filtered, true)).filter((event) => isUpcomingEvent(event)));
 
     // Fallback: si no hay suficientes en el destino, completa con próximos globales.
     let out = cards;
@@ -313,7 +314,7 @@ export const getEventRelated = createServerFn({ method: "GET" })
         .limit(200);
       const extraCards = await mapCards(
         ((extra ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id) && !seen.has(r.id)),
-        false,
+        true,
       );
       out = [...out, ...extraCards.filter((event) => isUpcomingEvent(event))];
     }
