@@ -68,6 +68,11 @@ export interface PlacePremiumSurfaceProps {
    * compartido (`PublicShell`), la superficie no debe duplicarlo.
    */
   showBreadcrumbs?: boolean;
+  /**
+   * G8-Q2D-C · Textos de sección editables desde el Experience Builder.
+   * Ausente o parcial ⇒ se conservan los textos aprobados.
+   */
+  copy?: PlacePremiumCopy;
   className?: string;
 }
 
@@ -81,6 +86,7 @@ export function PlacePremiumSurface({
   tripSlot = null,
   saveSlot = null,
   showBreadcrumbs = true,
+  copy = PLACE_PREMIUM_COPY_DEFAULTS,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
