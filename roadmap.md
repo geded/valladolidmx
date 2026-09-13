@@ -80,4 +80,4 @@
 - [ ] Botones CTA del drawer móvil ("Arma tu Viaje", "Iniciar sesión"): estilo Airbnb — sin relleno ocre sólido; usar foreground/outline refinado.
 - [ ] Validar en 393x852 (móvil) y typecheck limpio.
 
-- [ ] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
+- [x] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
