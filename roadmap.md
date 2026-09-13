@@ -79,3 +79,5 @@
 - [ ] Texto del buscador: "¿Donde empezamos?" con subtítulo "Explora el Oriente Maya de Yucatán" visible en móvil.
 - [ ] Botones CTA del drawer móvil ("Arma tu Viaje", "Iniciar sesión"): estilo Airbnb — sin relleno ocre sólido; usar foreground/outline refinado.
 - [ ] Validar en 393x852 (móvil) y typecheck limpio.
+
+- [x] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
