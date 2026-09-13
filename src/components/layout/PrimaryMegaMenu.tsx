@@ -411,83 +411,100 @@ function DesktopMenu({
 
 /* ─────────────────────────── Mobile ─────────────────────────── */
 
+const MOBILE_PRIMARY: MenuLink[] = [
+  { label: "Oriente Maya", href: "/oriente-maya" },
+  { label: "Hoteles", href: "/hoteles" },
+  { label: "Restaurantes", href: "/restaurantes" },
+  { label: "Casas de vacaciones", href: "/casas-de-vacaciones" },
+  { label: "Experiencias", href: "/experiencias" },
+  { label: "¿Qué hacer?", href: "/que-hacer" },
+  { label: "Eventos", href: "/eventos" },
+];
+
+const MOBILE_SECONDARY: MenuLink[] = [
+  { label: "Promociones", href: "/promociones" },
+  { label: "Mapa", href: "/mapa" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contacto", href: "/contacto" },
+];
+
 function MobileMenu({
-  sections,
+  destinos,
   activeDestination,
   onNavigate,
 }: {
-  sections: MenuSection[];
+  destinos: DestinoLite[];
   activeDestination: string | null;
   onNavigate?: () => void;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
+  const populares = popularDestinos(destinos);
   return (
-    <ul className="flex flex-col">
-      {sections.map((section) => {
-        const isOpen = open === section.id;
-        const cols = Array.isArray(section.columns) ? section.columns : [];
-        return (
-          <li key={section.id} className="border-b border-border/50 last:border-b-0">
-            <div className="flex items-stretch gap-1">
-              {section.expandOnly ? (
-                <button
-                  type="button"
-                  onClick={() => setOpen(isOpen ? null : section.id)}
-                  className="flex-1 rounded-xl px-2 py-3.5 text-left text-[1.0625rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:bg-accent/60"
-                >
-                  {section.label}
-                </button>
-              ) : (
-                <a
-                  href={hrefWithActiveDestination(section.href, activeDestination)}
-                  onClick={() => onNavigate?.()}
-                  className="flex-1 rounded-xl px-2 py-3.5 text-[1.0625rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:bg-accent/60"
-                >
-                  {section.label}
-                </a>
-              )}
-              <button
-                type="button"
-                aria-label={isOpen ? `Cerrar ${section.label}` : `Abrir ${section.label}`}
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : section.id)}
-                className="inline-flex size-10 shrink-0 items-center justify-center self-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              >
-                <ChevronDown
-                  className={cn("size-4 transition-transform duration-200", isOpen && "rotate-180")}
-                  aria-hidden
-                />
-              </button>
-            </div>
-            {isOpen ? (
-              <div className="pb-3">
-                {cols.map((col, idx) => (
-                  <div key={idx} className="mt-1">
-                    {col.title ? (
-                      <p className="mb-1 px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                        {col.title}
-                      </p>
-                    ) : null}
-                    <ul className="flex flex-col">
-                      {col.links.map((link) => (
-                        <li key={link.href + link.label}>
-                          <a
-                            href={hrefWithActiveDestination(link.href, activeDestination)}
-                            onClick={() => onNavigate?.()}
-                            className="block rounded-xl px-2 py-2.5 text-[0.9375rem] text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
-                          >
-                            {link.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            ) : null}
+    <div className="flex flex-col gap-6">
+      <a
+        href="/oriente-maya"
+        onClick={() => onNavigate?.()}
+        className="flex items-center gap-3 rounded-2xl border border-border/70 bg-background px-4 py-3.5 shadow-soft transition-colors hover:bg-accent/50"
+      >
+        <span className="text-[0.95rem] font-semibold tracking-tight text-foreground">
+          ¿A dónde vas?
+        </span>
+        <span className="ml-auto text-[0.8125rem] text-muted-foreground">Explorar destinos</span>
+      </a>
+
+      <ul className="flex flex-col">
+        {MOBILE_PRIMARY.map((link) => (
+          <li key={link.href} className="border-b border-border/50 last:border-b-0">
+            <a
+              href={hrefWithActiveDestination(link.href, activeDestination)}
+              onClick={() => onNavigate?.()}
+              className="block rounded-xl px-2 py-3.5 text-[1.0625rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:bg-accent/60"
+            >
+              {link.label}
+            </a>
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+
+      {populares.length ? (
+        <div>
+          <p className="mb-2 px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Destinos populares
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {populares.map((d) => (
+              <a
+                key={d.slug}
+                href={`/oriente-maya/${d.slug}`}
+                onClick={() => onNavigate?.()}
+                className="rounded-pill border border-border/70 px-3.5 py-2 text-[0.875rem] font-medium text-foreground transition-colors hover:bg-accent/60"
+              >
+                {d.name}
+              </a>
+            ))}
+            <a
+              href="/oriente-maya"
+              onClick={() => onNavigate?.()}
+              className="rounded-pill bg-accent/60 px-3.5 py-2 text-[0.875rem] font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              Ver todos los destinos
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      <ul className="flex flex-wrap gap-x-5 gap-y-1 px-2">
+        {MOBILE_SECONDARY.map((link) => (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              onClick={() => onNavigate?.()}
+              className="inline-block py-2 text-[0.9375rem] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
