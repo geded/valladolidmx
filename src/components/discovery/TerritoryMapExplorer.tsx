@@ -147,6 +147,17 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
   const stops = selected
     .map((slug) => located.find((d) => d.slug === slug))
     .filter((d): d is Destination & { latitude: number; longitude: number } => Boolean(d));
+  const googleRouteUrl = stops.length
+    ? `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}` +
+      `&destination=${stops[stops.length - 1]!.latitude},${stops[stops.length - 1]!.longitude}` +
+      (stops.length > 1
+        ? `&waypoints=${stops
+            .slice(0, -1)
+            .map((s) => `${s.latitude},${s.longitude}`)
+            .join("|")}`
+        : "") +
+      `&travelmode=driving`
+    : null;
   const markers = [
     { lat: origin.lat, lng: origin.lng, title: `${origin.label} · punto de partida`, href: null },
     ...visible.map((r) => ({
@@ -235,6 +246,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
       </div>
 
       {/* Mapa territorial */}
+      <div id="mapa-recorrido" className="scroll-mt-24" />
       <Suspense
         fallback={<div className="h-[360px] w-full animate-pulse rounded-2xl bg-muted md:h-[480px]" />}
       >
@@ -284,11 +296,19 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           >
             Limpiar recorrido
           </button>
+          {googleRouteUrl ? (
+            <Button asChild size="sm" variant="secondary" className="rounded-pill">
+              <a href={googleRouteUrl} target="_blank" rel="noopener noreferrer">
+                <Navigation className="mr-1 h-3.5 w-3.5" aria-hidden />
+                Abrir recorrido completo
+              </a>
+            </Button>
+          ) : null}
         </div>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Marca uno o varios destinos en la lista y el mapa dibuja el camino desde tu punto de
-          partida, en el orden en que los elijas.
+          Toca un pin en el mapa o el botón <strong>Marcar para la ruta</strong> de cada tarjeta: el
+          mapa dibuja el camino desde tu punto de partida, en el orden en que los elijas.
         </p>
       )}
 
@@ -329,7 +349,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                       {d.name}
                     </p>
                     <p className="mt-1 text-xs font-medium text-primary">
-                      {isSelected ? "Quitar del recorrido" : "Agregar al recorrido en el mapa"}
+                      {isSelected ? `Parada ${stopIndex + 1} de tu ruta` : "Toca para marcarlo"}
                     </p>
                     {d.tagline ? (
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{d.tagline}</p>
@@ -362,6 +382,23 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                   )}
 
                   <div className="mt-auto flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant={isSelected ? "default" : "outline"}
+                      className="rounded-pill"
+                      aria-pressed={isSelected}
+                      onClick={() => {
+                        toggleStop(d.slug);
+                        if (!isSelected) {
+                          document
+                            .getElementById("mapa-recorrido")
+                            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }}
+                    >
+                      <RouteIcon className="mr-1 h-3.5 w-3.5" aria-hidden />
+                      {isSelected ? "Quitar de la ruta" : "Marcar para la ruta"}
+                    </Button>
                     <Button asChild size="sm" variant="secondary" className="rounded-pill">
                       <Link to="/oriente-maya/$destino" params={{ destino: d.slug }}>
                         Ver destino
