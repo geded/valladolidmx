@@ -73,7 +73,10 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
   const { location, status, request } = useVisitorGeolocation();
   const [originKey, setOriginKey] = useState<string>(BASE_SLUG);
   const [band, setBand] = useState<(typeof BANDS)[number]["id"]>("all");
-  const [selected, setSelected] = useState<string | null>(null);
+  /** Recorrido: paradas elegidas, en el orden en que se marcaron. */
+  const [selected, setSelected] = useState<string[]>([]);
+  const toggleStop = (slug: string) =>
+    setSelected((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]));
 
   const origin: Origin | null = useMemo(() => {
     if (originKey === "me" && location) {
@@ -141,7 +144,9 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
     );
   }
 
-  const selectedDestination = visible.find((r) => r.destination.slug === selected)?.destination;
+  const stops = selected
+    .map((slug) => located.find((d) => d.slug === slug))
+    .filter((d): d is Destination & { latitude: number; longitude: number } => Boolean(d));
   const markers = [
     { lat: origin.lat, lng: origin.lng, title: `${origin.label} · punto de partida`, href: null },
     ...visible.map((r) => ({
@@ -153,11 +158,11 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
     })),
   ];
 
-  const center = selectedDestination
+  const center = stops.length
     ? {
-        lat: (origin.lat + selectedDestination.latitude) / 2,
-        lng: (origin.lng + selectedDestination.longitude) / 2,
-        zoom: 10,
+        lat: (origin.lat + stops.reduce((a, s) => a + s.latitude, 0) / stops.length) / 2,
+        lng: (origin.lng + stops.reduce((a, s) => a + s.longitude, 0) / stops.length) / 2,
+        zoom: stops.length > 1 ? 9 : 10,
       }
     : { lat: origin.lat, lng: origin.lng, zoom: 9 };
 
@@ -175,7 +180,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
               type="button"
               onClick={() => {
                 setOriginKey(d.slug);
-                setSelected(null);
+                setSelected([]);
               }}
               className={`rounded-pill border px-3 py-1.5 text-sm transition-colors ${
                 originKey === d.slug
@@ -239,27 +244,53 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           zoom={center.zoom}
           markerTitle={origin.label}
           markers={markers}
-          onMarkerSelect={(key) => setSelected(key)}
-          {...(selectedDestination
+          onMarkerSelect={(key) => toggleStop(key)}
+          {...(stops.length
             ? {
                 routeStops: [
                   { lat: origin.lat, lng: origin.lng, key: origin.key },
-                  {
-                    lat: selectedDestination.latitude,
-                    lng: selectedDestination.longitude,
-                    key: selectedDestination.slug,
-                  },
+                  ...stops.map((s) => ({ lat: s.latitude, lng: s.longitude, key: s.slug })),
                 ],
               }
             : {})}
           className="h-[360px] w-full rounded-2xl border border-border md:h-[480px]"
         />
       </Suspense>
-      <p className="text-xs text-muted-foreground">
-        {selectedDestination
-          ? `Camino de ${origin.label} a ${selectedDestination.name}. Elige otro destino para ver su ruta.`
-          : "Elige un destino de la lista para dibujar el camino desde tu punto de partida."}
-      </p>
+      {stops.length ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Tu recorrido
+          </span>
+          <span className="rounded-pill border border-border bg-card px-3 py-1 text-sm text-foreground">
+            {origin.label}
+          </span>
+          {stops.map((s) => (
+            <span key={s.slug} className="inline-flex items-center gap-1 text-sm text-foreground">
+              <span aria-hidden>→</span>
+              <button
+                type="button"
+                onClick={() => toggleStop(s.slug)}
+                className="rounded-pill border border-primary bg-primary px-3 py-1 text-sm text-primary-foreground"
+                aria-label={`Quitar ${s.name} del recorrido`}
+              >
+                {s.name} ✕
+              </button>
+            </span>
+          ))}
+          <button
+            type="button"
+            onClick={() => setSelected([])}
+            className="text-xs text-muted-foreground underline underline-offset-4"
+          >
+            Limpiar recorrido
+          </button>
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Marca uno o varios destinos en la lista y el mapa dibuja el camino desde tu punto de
+          partida, en el orden en que los elijas.
+        </p>
+      )}
 
       {/* Distancias y tiempos */}
       <div className="space-y-4">
@@ -274,7 +305,8 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((row) => {
               const d = row.destination;
-              const isSelected = selected === d.slug;
+              const stopIndex = selected.indexOf(d.slug);
+              const isSelected = stopIndex >= 0;
               return (
                 <li
                   key={d.slug}
@@ -284,10 +316,21 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                 >
                   <button
                     type="button"
-                    onClick={() => setSelected(isSelected ? null : d.slug)}
+                    onClick={() => toggleStop(d.slug)}
                     className="text-left"
+                    aria-pressed={isSelected}
                   >
-                    <p className="font-serif text-base font-semibold text-foreground">{d.name}</p>
+                    <p className="font-serif text-base font-semibold text-foreground">
+                      {isSelected ? (
+                        <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                          {stopIndex + 1}
+                        </span>
+                      ) : null}
+                      {d.name}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-primary">
+                      {isSelected ? "Quitar del recorrido" : "Agregar al recorrido en el mapa"}
+                    </p>
                     {d.tagline ? (
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{d.tagline}</p>
                     ) : null}
