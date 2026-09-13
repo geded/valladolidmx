@@ -406,8 +406,25 @@ export function InteractiveMap({
     const points = (
       markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }]
     ).map((m) => ({ lat: m.lat, lng: m.lng, title: m.title ?? markerTitle ?? null }));
-    return <MapUnavailableFallback points={points} />;
+    /* Mismo respaldo visual que las fichas de hotel, restaurante y casa:
+       el mapa estático server-rendered, más la lista de ubicaciones. */
+    return (
+      <div className="w-full space-y-3">
+        <StaticMap
+          lat={lat}
+          lng={lng}
+          zoom={zoom}
+          width={900}
+          height={500}
+          alt={markerTitle ? `Mapa de ${markerTitle}` : "Mapa del territorio"}
+          markers={points.map((p) => ({ lat: p.lat, lng: p.lng }))}
+          className={className}
+        />
+        <MapUnavailableFallback points={points} />
+      </div>
+    );
   }
+
 
   return (
     <div
