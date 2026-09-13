@@ -559,7 +559,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           <div className="sticky top-20">
             <Suspense
               fallback={
-                <div className="h-[42vh] w-full animate-pulse rounded-2xl bg-muted lg:h-[560px]" />
+                <div className="h-[58vh] min-h-[380px] w-full animate-pulse rounded-2xl bg-muted lg:h-[560px]" />
               }
             >
               <InteractiveMap
@@ -580,7 +580,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                 {...(fitPoints ? { fitPoints, fitPadding: 48 } : {})}
                 restriction={YUCATAN_BOUNDS}
                 minZoom={8}
-                className="h-[42vh] w-full rounded-2xl border border-border lg:h-[560px]"
+                className="h-[58vh] min-h-[380px] w-full rounded-2xl border border-border lg:h-[560px]"
               />
             </Suspense>
             <div className="mt-2 flex flex-wrap items-center gap-3">
