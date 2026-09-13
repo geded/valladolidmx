@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
+import { useNavigationSession } from "@/lib/navigation";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { AluxSurface } from "@/components/surfaces/AluxSurface";
