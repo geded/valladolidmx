@@ -633,9 +633,7 @@ export function AluxFloatingTrigger() {
 
           <span className="hidden sm:inline">Alux</span>
           <span className="hidden text-xs text-muted-foreground sm:inline">· Concierge IA</span>
-          <span className="ml-1 truncate text-xs text-muted-foreground sm:hidden">
-            {triggerLabel}
-          </span>
+          <span className="ml-1 text-xs text-muted-foreground sm:hidden">Alux</span>
         </button>
         {/* Consolidación Alux: la sugerencia proactiva ya NO se pinta como un
             segundo globo flotante. Vive dentro del mismo panel (nota + pistas)
