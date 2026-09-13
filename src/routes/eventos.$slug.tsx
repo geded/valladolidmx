@@ -89,6 +89,15 @@ export const Route = createFileRoute("/eventos/$slug")({
       isFree: e.is_free,
       organizerId,
       organizerName,
+      schedule: e.recurrence_frequency
+        ? {
+            repeatFrequency: e.recurrence_frequency,
+            repeatInterval: e.recurrence_interval,
+            startDate: e.starts_at,
+            endDate: e.recurrence_until,
+            times: e.schedule_times,
+          }
+        : null,
     });
     return buildPublicHead({
       title: `${e.title} · Eventos — ${SITE.name}`,

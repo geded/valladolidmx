@@ -66,7 +66,7 @@ export function EventRecurrencePanel({ eventId }: { eventId: string }) {
     <section className="rounded-lg border border-border bg-card p-5">
       <p className="text-xs font-semibold uppercase text-primary">Repetición</p>
       <h2 className="mt-2 text-2xl">Funciones y días suspendidos</h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">Configura la programación confirmada. Si no se repite, la fecha principal se conserva como hoy.</p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">Configura la programación confirmada. Si no se repite, se conserva la fecha principal del evento.</p>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2">
         <label className="block text-sm font-semibold">Se repite
@@ -74,8 +74,9 @@ export function EventRecurrencePanel({ eventId }: { eventId: string }) {
             <option value="">No se repite</option><option value="daily">Todos los días</option><option value="weekly">Cada semana</option><option value="monthly">Cada mes</option><option value="yearly">Cada año</option>
           </select>
         </label>
-        <label className="block text-sm font-semibold">Cada
+        <label className="block text-sm font-semibold">Intervalo
           <input type="number" min={1} max={99} value={values.recurrenceInterval} onChange={(event) => set({ recurrenceInterval: Number(event.target.value) || 1 })} className="mt-2 min-h-11 w-full rounded-md border border-border bg-background px-3 font-normal" />
+          <span className="mt-1 block text-xs font-normal text-muted-foreground">1 significa cada día, semana, mes o año.</span>
         </label>
         <label className="block text-sm font-semibold">Hasta
           <input type="date" value={values.recurrenceUntil ?? ""} onChange={(event) => set({ recurrenceUntil: event.target.value || null })} className="mt-2 min-h-11 w-full rounded-md border border-border bg-background px-3 font-normal" />

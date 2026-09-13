@@ -121,7 +121,7 @@ export function EventPremiumSurface({
                 ) : null}
                 {event.destination_name ? (
                   <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[var(--muted-foreground)]">
-                    {event.destination_name} · Oriente Maya de Yucatán
+                    {event.destination_name} · Oriente Maya
                   </span>
                 ) : null}
               </div>
