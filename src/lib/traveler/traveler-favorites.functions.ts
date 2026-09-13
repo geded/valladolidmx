@@ -138,6 +138,22 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       }
     }
 
+    if (byKind.event.length > 0) {
+      const { data } = await context.supabase
+        .from("events")
+        .select("id, slug, title, summary, status, deleted_at")
+        .in("id", byKind.event);
+      for (const ev of data ?? []) {
+        const visible = ev.status === "published" && !ev.deleted_at;
+        lookup.set(`event:${ev.id}`, {
+          title: visible ? ev.title : "",
+          slug: visible ? ev.slug : null,
+          subtitle: visible ? (ev.summary ?? null) : null,
+        });
+      }
+    }
+
+
     return rows.map((r) => {
       const hit = lookup.get(`${r.entity_kind}:${r.entity_id}`);
       return {
