@@ -137,6 +137,14 @@ export function SiteHeader({ variant = "solid", config }: Props) {
 
   useEffect(() => setMounted(true), []);
 
+  // El drawer se cierra al cambiar de ruta. Sin esto, al pulsar "Iniciar
+  // sesión" la navegación era cliente-side y el panel quedaba abierto
+  // encima de /auth.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   useEffect(() => {
     if (variant !== "overlay") return;
     // 18.54 · El scroll se observa sobre la ventana propietaria del header.
