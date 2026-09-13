@@ -233,7 +233,13 @@ export function TripBriefSection() {
           {selectedPreferences.length || notes.length
             ? `Viajeros que ${[
                 ...selectedPreferences.map((preference) => preference.phrase),
-                ...(notes.length ? [`además mencionan: ${notes.join(", ")}`] : []),
+                ...(notes.length
+                  ? [
+                      `además mencionan: ${notes
+                        .map((note) => `${note.text} (${GROUP_LABEL.get(note.groupId) ?? ""})`)
+                        .join(", ")}`,
+                    ]
+                  : []),
               ].join("; ")}.`
             : "Aún no has marcado nada. En cuanto marques una opción, aparecerá aquí el resumen que acompaña a tu expediente."}
         </p>
