@@ -121,7 +121,12 @@ export function FloatingTravelPlanDock() {
   } = useAnonymousTrip();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHiddenRoute = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
+  const hasStickyCta = useHasStickyCta();
   const enabled = !!user && !isHiddenRoute;
+  /* Cuando hay una barra sticky (ficha con CTA comercial), elevar el dock
+     por encima de ella. La barra mide ~65px + safe-area; usamos el mismo
+     offset que Alux (88px = 5.5rem). */
+  const dockBottom = hasStickyCta ? "5.5rem" : "1rem";
 
   const anonymousItems = useMemo(() => selectAnonymousTravelItems(anonymousTrip), [anonymousTrip]);
 
