@@ -31,6 +31,10 @@ import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contr
 import { getBusinessPremiumEligibility } from "@/lib/omxds/surfaces/business-premium-eligibility.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import {
+  BUSINESS_PREMIUM_BLOCK_TYPE,
+  resolveBusinessPremiumCopyFromTree,
+} from "@/lib/businesses/business-copy-resolution";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
 import { ZazilTunichPremiumSurface } from "@/routes/lovable/founder-zazil-premium-preview";
 
@@ -224,7 +228,11 @@ function EmpresaTerritorialPage() {
           related={related}
           premiumEligibility={premiumEnabled ? premiumEligibility : null}
           legacy={
-            composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
+            composition ? (
+              <CompositionRenderer tree={composition.snapshot} />
+            ) : (
+              <BusinessSurface />
+            )
           }
         />
       </BusinessSurfaceProvider>
