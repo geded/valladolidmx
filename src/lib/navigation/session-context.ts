@@ -23,6 +23,7 @@ import type { ContextNode, ResolvedContext } from "@/lib/context-engine";
 const STORAGE_KEY = "vll:nav:session:v1";
 const TTL_MS = 30 * 60_000;
 const SCHEMA_VERSION = 1;
+const AUTH_RETURN_KEY = "vmx.auth.next";
 
 /** Slot territorial mínimo persistido. */
 export interface NavigationSessionSlot {
@@ -45,6 +46,48 @@ export interface NavigationSessionSnapshot {
 
 function hasWindow(): boolean {
   return typeof window !== "undefined" && typeof sessionStorage !== "undefined";
+}
+
+/**
+ * Valida destinos internos usados al volver de autenticación. Nunca acepta
+ * URLs externas, endpoints ni la propia pantalla de acceso.
+ */
+export function isSafeAuthReturnPath(path: string | null | undefined): path is string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return false;
+  return !/^\/(?:auth|~oauth|api)(?:\/|$|\?)/.test(path);
+}
+
+/** Registra la superficie que invocó el acceso para volver tras autenticar. */
+export function rememberAuthReturnPath(path: string): void {
+  if (!hasWindow() || !isSafeAuthReturnPath(path)) return;
+  try {
+    sessionStorage.setItem(AUTH_RETURN_KEY, path);
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+/** Consulta el retorno sin consumirlo; permite mostrar una salida en /auth. */
+export function readAuthReturnPath(): string | null {
+  if (!hasWindow()) return null;
+  try {
+    const path = sessionStorage.getItem(AUTH_RETURN_KEY);
+    return isSafeAuthReturnPath(path) ? path : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Consume el retorno únicamente cuando la sesión ya fue autenticada. */
+export function consumeAuthReturnPath(): string | null {
+  const path = readAuthReturnPath();
+  if (!hasWindow()) return path;
+  try {
+    sessionStorage.removeItem(AUTH_RETURN_KEY);
+  } catch {
+    // storage bloqueado → silencioso
+  }
+  return path;
 }
 
 function toSlot(node: ContextNode | undefined): NavigationSessionSlot | undefined {
@@ -226,6 +269,9 @@ const PLANNER_VISITED_KEY = "vll:nav:planner-visited:v1";
 
 export function trackRouteTrail(path: string): void {
   if (!hasWindow()) return;
+  // La pantalla de acceso es una transición, no un nuevo origen público.
+  // Ignorarla conserva Arma tu Viaje/Alux como paso real del recorrido.
+  if (path === "/auth" || path.startsWith("/auth?")) return;
   try {
     if (path === "/arma-tu-viaje" || path.startsWith("/arma-tu-viaje/")) {
       sessionStorage.setItem(PLANNER_VISITED_KEY, "1");

@@ -27,6 +27,7 @@ import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { ProfileModeSwitcher } from "@/components/layout/ProfileModeSwitcher";
 import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
+import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 
 type MenuLink = {
   to: "/admin" | "/cms" | "/portal" | "/portal/ficha" | "/concierge" | "/mi-viaje" | "/cuenta";
@@ -91,7 +92,8 @@ export function UserMenu() {
     staleTime: 60_000,
   });
   const activeMode: ProfileMode = modeQ.data?.active ?? "traveler";
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useRouterState({ select: (s) => s.location });
+  const pathname = location.pathname;
   // Contexto: ¿estamos dentro de un workspace autenticado o en la parte pública?
   const WORKSPACE_PREFIXES = ["/cuenta", "/portal", "/concierge", "/admin", "/cms", "/mi-viaje"];
   const inWorkspace = WORKSPACE_PREFIXES.some(
@@ -214,6 +216,7 @@ export function UserMenu() {
   return (
     <Link
       to="/auth"
+      onClick={() => rememberAuthReturnPath(`${location.pathname}${location.searchStr ?? ""}`)}
       className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
       title={t("nav.sign_in")}
     >
