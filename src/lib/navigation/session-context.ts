@@ -276,6 +276,7 @@ export function trackRouteTrail(path: string): void {
     if (path === "/arma-tu-viaje" || path.startsWith("/arma-tu-viaje/")) {
       sessionStorage.setItem(PLANNER_VISITED_KEY, "1");
     }
+    pushJourneyStep(path);
     const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
     const parsed = raw ? (JSON.parse(raw) as { prev?: string; cur?: string }) : {};
     if (parsed.cur === path) return;
