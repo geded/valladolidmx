@@ -49,21 +49,31 @@ const GROUPS: ReadonlyArray<{ id: string; title: string; help: string; slugs: re
         "artesanias-compras",
         "fiestas-eventos",
         "fotografia",
+        "ecoturismo",
+        "turismo-rural",
+        "turismo-salud",
       ],
     },
     {
       id: "estilo",
       title: "¿Qué estilo buscas?",
       help: "Ayuda al concierge a proponer opciones dentro de tu rango.",
-      slugs: ["presupuesto-economico", "experiencia-premium"],
+      slugs: ["presupuesto-economico", "experiencia-premium", "estilo-mochilero"],
     },
     {
       id: "necesidades",
       title: "¿Algo que debamos considerar?",
       help: "Condiciones prácticas que cambian la propuesta antes de enviarla.",
-      slugs: ["viaje-accesible", "centro-historico"],
+      slugs: ["viaje-accesible", "centro-historico", "viaje-con-mascotas"],
     },
   ];
+
+const GROUP_LABEL = new Map(GROUPS.map((group) => [group.id, group.title] as const));
+
+interface BriefNote {
+  readonly text: string;
+  readonly groupId: string;
+}
 
 const BY_SLUG = new Map(TRAVEL_PREFERENCE_VOCABULARY.map((p) => [p.slug, p] as const));
 
