@@ -456,27 +456,25 @@ function HowItWorksSection() {
 
   return (
     <section aria-labelledby="ayv-how-h">
-      <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-          Cómo funciona
-        </p>
-        <h2 id="ayv-how-h" className="mt-1 text-2xl font-semibold sm:text-3xl">
+      <div className="mb-5 sm:mb-6">
+        <p className={EYEBROW}>Cómo funciona</p>
+        <h2 id="ayv-how-h" className={`mt-0.5 ${H2}`}>
           De inspiración a viaje real, en tres pasos
         </h2>
       </div>
-      <ol className="grid gap-4 md:grid-cols-3">
+      <ol className="grid gap-3 sm:gap-4 md:grid-cols-3">
         {steps.map(({ n, Icon, title, body }) => (
-          <li key={n} className="rounded-2xl border border-border bg-card p-6">
+          <li key={n} className="rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-6">
             <div className="flex items-center gap-3">
               <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="size-5" aria-hidden />
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground">
+              <span className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground">
                 {n}
               </span>
             </div>
-            <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+            <h3 className={`mt-4 ${H3}`}>{title}</h3>
+            <p className={`mt-1.5 ${BODY}`}>{body}</p>
           </li>
         ))}
       </ol>
