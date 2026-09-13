@@ -16,6 +16,17 @@ import {
 } from "@/components/home-premium/home-premium-config";
 import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
 import { homeFeaturedCategoriesQueryOptions } from "@/lib/cms/home-featured-categories-query";
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
+
+// El contenido real de la Home (destinos, eventos, negocios acreditados) se
+// resuelve en SSR con la MISMA clave que consume `HomePremiumRenderer`, para
+// que el visitante no vea un segundo pintado al hidratar y los buscadores
+// reciban la portada completa. La página de destino ya usa este patrón.
+const homeRealContentQuery = queryOptions({
+  queryKey: ["home-premium-real-content"],
+  queryFn: () => resolveHomePremiumRealContent(),
+  staleTime: 60_000,
+});
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
