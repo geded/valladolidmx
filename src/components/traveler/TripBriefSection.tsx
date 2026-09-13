@@ -17,6 +17,7 @@ import { ClipboardList, Sparkles, ArrowRight } from "lucide-react";
 import {
   TRAVEL_PREFERENCE_VOCABULARY,
   rememberTravelPreference,
+  normalizeTravelPreference,
   askAluxWithPreferenceMemory,
   type TravelPreference,
 } from "@/lib/alux/travel-preferences";
@@ -114,7 +115,7 @@ export function TripBriefSection() {
     const clean = sanitizeNote(draft);
     if (!clean) return;
     setDraft("");
-    const known = BY_SLUG_MATCH(clean);
+    const known = normalizeTravelPreference(clean);
     if (known) {
       setMarked((prev) => ({ ...prev, [known.slug]: true }));
       rememberTravelPreference(known.label, SURFACE);
