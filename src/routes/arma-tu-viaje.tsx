@@ -12,7 +12,8 @@ import { SITE } from "@/config/site";
 import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import { useNavigationSession, readPreviousRoute } from "@/lib/navigation";
+import { useNavigationSession } from "@/lib/navigation";
+import { readPreviousRoute } from "@/lib/navigation/session-context";
 
 interface TripPlannerSearch {
   destination?: string;
