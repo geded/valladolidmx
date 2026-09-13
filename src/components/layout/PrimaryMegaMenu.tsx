@@ -412,7 +412,6 @@ function DesktopMenu({
 /* ─────────────────────────── Mobile ─────────────────────────── */
 
 const MOBILE_PRIMARY: MenuLink[] = [
-  { label: "Oriente Maya", href: "/oriente-maya" },
   { label: "Hoteles", href: "/hoteles" },
   { label: "Restaurantes", href: "/restaurantes" },
   { label: "Casas de vacaciones", href: "/casas-de-vacaciones" },
@@ -481,13 +480,6 @@ function MobileMenu({
                 {d.name}
               </a>
             ))}
-            <a
-              href="/oriente-maya"
-              onClick={() => onNavigate?.()}
-              className="rounded-pill bg-accent/60 px-3.5 py-2 text-[0.875rem] font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              Ver todos los destinos
-            </a>
           </div>
         </div>
       ) : null}
