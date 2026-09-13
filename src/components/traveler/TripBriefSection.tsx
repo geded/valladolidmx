@@ -83,7 +83,7 @@ export function TripBriefSection() {
   }
 
   return (
-    <section aria-labelledby="ayv-brief-h" className="rounded-2xl border border-border bg-card p-5 sm:p-7">
+    <section aria-labelledby="ayv-brief-h" className="rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-7">
       <div className="flex items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
           <ClipboardList className="size-5" aria-hidden />
@@ -92,10 +92,10 @@ export function TripBriefSection() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
             Brief del expediente
           </p>
-          <h2 id="ayv-brief-h" className="mt-0.5 text-xl font-semibold sm:text-2xl">
+          <h2 id="ayv-brief-h" className="mt-0.5 font-serif text-[1.25rem] font-semibold leading-[1.2] tracking-[-0.01em] sm:text-[1.6rem]">
             Cuéntanos cómo quieres viajar
           </h2>
-          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
+          <p className="mt-1.5 max-w-2xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
             Marca las opciones que apliquen. No pedimos datos personales: sólo el contexto que tu
             concierge humano necesita para responderte con propuestas reales del Oriente Maya.
           </p>
@@ -105,7 +105,7 @@ export function TripBriefSection() {
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         {GROUPS.map((group) => (
           <fieldset key={group.id} className="min-w-0">
-            <legend className="text-sm font-semibold">{group.title}</legend>
+            <legend className="text-[15px] font-semibold leading-snug sm:text-base">{group.title}</legend>
             <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{group.help}</p>
             <div className="mt-2.5 flex flex-wrap gap-2">
               {group.slugs.map((slug) => {
@@ -134,8 +134,8 @@ export function TripBriefSection() {
       </div>
 
       <div className="mt-6 rounded-xl border border-primary/25 bg-primary/5 p-4">
-        <p className="text-sm font-medium">Esto es lo que verá tu concierge</p>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+        <p className="text-[15px] font-semibold leading-snug sm:text-base">Esto es lo que verá tu concierge</p>
+        <p className="mt-1 text-[13px] leading-6 text-muted-foreground sm:text-sm">
           {selectedPreferences.length
             ? `Viajeros que ${selectedPreferences.map((preference) => preference.phrase).join("; ")}.`
             : "Aún no has marcado nada. En cuanto marques una opción, aparecerá aquí el resumen que acompaña a tu expediente."}
