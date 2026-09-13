@@ -171,6 +171,22 @@ export function TripBriefSection() {
                   </button>
                 );
               })}
+              {notes
+                .filter((note) => note.groupId === group.id)
+                .map((note) => (
+                  <button
+                    key={note.text}
+                    type="button"
+                    aria-label={`Quitar ${note.text}`}
+                    onClick={() =>
+                      setNotes((prev) => prev.filter((item) => item.text !== note.text))
+                    }
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary bg-primary px-3 text-[13px] font-medium text-primary-foreground"
+                  >
+                    {note.text}
+                    <X className="size-3.5" aria-hidden />
+                  </button>
+                ))}
             </div>
           </fieldset>
         ))}
