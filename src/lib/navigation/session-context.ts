@@ -322,6 +322,101 @@ export function readPreviousRoute(): string | null {
   }
 }
 
+/**
+ * Recorrido del explorador (journey trail).
+ *
+ * Rastro ordenado de las superficies transversales por las que pasó el
+ * visitante en esta sesión (Arma tu Viaje, Alux, Mapa, Mi Viaje, Cuenta…).
+ * Permite que cualquier superficie reconstruya "de dónde vengo" y lo
+ * agregue a su ruta territorial sin inventar niveles, y que Alux disponga
+ * del recorrido real por el territorio.
+ *
+ * · Sólo pathnames públicos conocidos (vocabulario cerrado).
+ * · Sin PII, sin query strings, máximo 5 pasos.
+ * · sessionStorage, SSR-safe, cero impacto SEO.
+ */
+const JOURNEY_KEY = "vll:nav:journey:v1";
+const JOURNEY_MAX = 5;
+
+/** Vocabulario cerrado de superficies transversales rastreables. */
+const JOURNEY_STEPS: ReadonlyArray<{ path: string; label: string }> = [
+  { path: "/arma-tu-viaje", label: "Arma tu Viaje" },
+  { path: "/alux", label: "Alux" },
+  { path: "/cuenta/mi-viaje", label: "Mi Viaje" },
+  { path: "/cuenta", label: "Mi Cuenta" },
+  { path: "/mapa", label: "Mapa" },
+  { path: "/rutas", label: "Rutas" },
+  { path: "/que-hacer", label: "Qué hacer" },
+  { path: "/eventos", label: "Eventos" },
+  { path: "/hoteles", label: "Hoteles" },
+  { path: "/restaurantes", label: "Restaurantes" },
+  { path: "/casas-de-vacaciones", label: "Casas de vacaciones" },
+  { path: "/experiencias", label: "Experiencias" },
+  { path: "/lugares", label: "Lugares y sitios de interés" },
+  { path: "/promociones", label: "Promociones" },
+  { path: "/empresas", label: "Empresas" },
+];
+
+export interface JourneyStep {
+  readonly path: string;
+  readonly label: string;
+}
+
+/** Describe una ruta transversal conocida; `null` si no forma parte del vocabulario. */
+export function describeJourneyStep(path: string): JourneyStep | null {
+  const clean = path.split("?")[0].replace(/\/+$/, "") || "/";
+  const match = JOURNEY_STEPS.find((s) => clean === s.path || clean.startsWith(`${s.path}/`));
+  return match ? { path: match.path, label: match.label } : null;
+}
+
+function writeJourney(steps: readonly JourneyStep[]): void {
+  try {
+    sessionStorage.setItem(JOURNEY_KEY, JSON.stringify(steps.slice(-JOURNEY_MAX)));
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+/** Registra la superficie actual en el recorrido, sin duplicar ni retroceder. */
+export function pushJourneyStep(path: string): void {
+  if (!hasWindow()) return;
+  const step = describeJourneyStep(path);
+  if (!step) return;
+  const trail = readJourneyTrail();
+  const existing = trail.findIndex((s) => s.path === step.path);
+  // Si vuelve a un paso ya recorrido, el recorrido se trunca ahí (sin bucles).
+  const next = existing >= 0 ? trail.slice(0, existing + 1) : [...trail, step];
+  writeJourney(next);
+}
+
+/** Recorrido vigente del explorador en esta sesión. */
+export function readJourneyTrail(): JourneyStep[] {
+  if (!hasWindow()) return [];
+  try {
+    const raw = sessionStorage.getItem(JOURNEY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as JourneyStep[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (s) => s && typeof s.path === "string" && typeof s.label === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Pasos previos del recorrido para componer una ruta territorial: excluye
+ * la superficie actual y todo lo posterior a ella.
+ */
+export function readJourneyPrefix(currentPath: string): JourneyStep[] {
+  const current = describeJourneyStep(currentPath);
+  const trail = readJourneyTrail();
+  if (!current) return trail;
+  const idx = trail.findIndex((s) => s.path === current.path);
+  return idx >= 0 ? trail.slice(0, idx) : trail;
+}
+
 export function clearNavigationSession(): void {
   if (!hasWindow()) return;
   try {
