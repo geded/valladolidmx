@@ -84,7 +84,12 @@ export default defineConfig({
               handler: "NetworkFirst",
               options: {
                 cacheName: "html-pages",
-                networkTimeoutSeconds: 4,
+                /* Sin timeout corto: con 4 s, una respuesta SSR algo lenta
+                   se interpretaba como "sin red" y el visitante veía un
+                   parpadeo de la pantalla "Estás sin conexión" antes de que
+                   cargara la categoría. El fallback offline debe activarse
+                   sólo cuando la red realmente falla. */
+                networkTimeoutSeconds: 20,
                 expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
               },
             },
