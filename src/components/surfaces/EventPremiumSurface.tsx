@@ -165,6 +165,7 @@ export function EventPremiumSurface({
         title: "Qué vas a vivir",
         lead: event.summary ?? null,
         body: event.body
+          .replace(/\\n/g, "\n")
           .split(/\n\n+/)
           .map((p) => p.trim())
           .filter(Boolean)
