@@ -392,30 +392,25 @@ function AuthedEmptySection() {
   return (
     <section
       aria-labelledby="ayv-authempty-h"
-      className="rounded-2xl border border-dashed border-border bg-card/60 p-8 text-center"
+      className="rounded-2xl border border-dashed border-border bg-card/60 p-6 text-center sm:p-8"
     >
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
         <PlusCircle className="size-3" aria-hidden /> Tu expediente está vacío
       </span>
-      <h2 id="ayv-authempty-h" className="mt-4 text-2xl font-semibold">
+      <h2 id="ayv-authempty-h" className={`mt-4 ${H2}`}>
         Empieza por lo que te llama la atención
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+      <p className={`mx-auto mt-2 max-w-md ${BODY}`}>
         Recorre destinos, hoteles, restaurantes y experiencias. En cada tarjeta pulsa{" "}
-        <strong>➕ Agregar a Mi Viaje</strong> — se guarda directamente en tu expediente.
+        <strong className="font-semibold text-foreground">Agregar a Mi Viaje</strong> — se guarda
+        directamente en tu expediente.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          to="/oriente-maya"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-        >
+        <Link to="/oriente-maya" className={BTN_PRIMARY}>
           <Compass className="size-4" aria-hidden />
           Explorar destinos
         </Link>
-        <Link
-          to="/cuenta/mi-viaje"
-          className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
-        >
+        <Link to="/cuenta/mi-viaje" className={BTN_SECONDARY}>
           Ir a Mi Viaje
         </Link>
       </div>
