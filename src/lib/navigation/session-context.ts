@@ -222,9 +222,14 @@ export function isLovablePreviewFrame(): boolean {
  */
 const ROUTE_TRAIL_KEY = "vll:nav:route-trail:v1";
 
+const PLANNER_VISITED_KEY = "vll:nav:planner-visited:v1";
+
 export function trackRouteTrail(path: string): void {
   if (!hasWindow()) return;
   try {
+    if (path === "/arma-tu-viaje" || path.startsWith("/arma-tu-viaje/")) {
+      sessionStorage.setItem(PLANNER_VISITED_KEY, "1");
+    }
     const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
     const parsed = raw ? (JSON.parse(raw) as { prev?: string; cur?: string }) : {};
     if (parsed.cur === path) return;
@@ -236,6 +241,21 @@ export function trackRouteTrail(path: string): void {
     // storage bloqueado → silencioso
   }
 }
+
+/**
+ * Indica si el visitante ya pasó por Arma tu Viaje en esta sesión.
+ * Sobrevive a recargas y a la restauración de ruta del preview, donde el
+ * rastro inmediato se pierde.
+ */
+export function hasVisitedTravelPlanner(): boolean {
+  if (!hasWindow()) return false;
+  try {
+    return sessionStorage.getItem(PLANNER_VISITED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 
 /**
  * Devuelve el pathname anterior al actual. Los efectos de la página se
