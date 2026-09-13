@@ -194,3 +194,53 @@ export function scheduleLabel(value: unknown): string | null {
   if (!times.length) return null;
   return times.map((item) => `${item.time} h${item.label ? ` (${item.label})` : ""}`).join(" y ");
 }
+/**
+ * Próximas funciones del evento (recurrente o de fecha única).
+ * Reutiliza exclusivamente la lógica de ocurrencia ya aprobada.
+ */
+export function upcomingEventOccurrences(
+  input: EventRecurrenceInput,
+  limit = 8,
+  now = new Date(),
+): { startsAt: string; date: string; time: string; label: string | null }[] {
+  const base = new Date(input.starts_at);
+  if (Number.isNaN(base.getTime())) return [];
+
+  if (!input.recurrence_frequency) {
+    if (base.getTime() < now.getTime()) return [];
+    return [
+      {
+        startsAt: input.starts_at,
+        date: input.starts_at.slice(0, 10),
+        time: meridaTimeOfIso(input.starts_at),
+        label: null,
+      },
+    ];
+  }
+
+  const startDate = input.starts_at.slice(0, 10);
+  const today = localDateInMerida(now);
+  const currentTime = localTimeInMerida(now);
+  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
+  const times = normalizeScheduleTimes(input.schedule_times);
+  const schedule = times.length ? times : [{ time: meridaTimeOfIso(input.starts_at), label: null }];
+
+  const out: { startsAt: string; date: string; time: string; label: string | null }[] = [];
+  for (let offset = 0; offset <= 3660 && out.length < limit; offset += 1) {
+    const candidate = addDays(today, offset);
+    if (until && candidate > until) break;
+    if (excluded.has(candidate) || !isOccurrenceDate(input, candidate, startDate)) continue;
+    for (const item of schedule) {
+      if (offset === 0 && item.time < currentTime) continue;
+      out.push({
+        startsAt: localDateTimeIso(candidate, item.time),
+        date: candidate,
+        time: item.time,
+        label: item.label ?? null,
+      });
+      if (out.length >= limit) break;
+    }
+  }
+  return out;
+}
