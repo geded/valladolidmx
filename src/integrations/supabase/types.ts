@@ -3434,6 +3434,8 @@ export type Database = {
           demo_source_url: string | null
           destination_id: string | null
           ends_at: string | null
+          event_timezone: string
+          exception_dates: Json
           external_url: string | null
           filter_attributes: Json
           id: string
@@ -3441,6 +3443,11 @@ export type Database = {
           is_free: boolean
           locale: Database["public"]["Enums"]["locale_code"]
           published_at: string | null
+          recurrence_frequency: string | null
+          recurrence_interval: number
+          recurrence_until: string | null
+          recurrence_weekdays: number[]
+          schedule_times: Json
           slug: string
           starts_at: string
           status: Database["public"]["Enums"]["content_status"]
@@ -3462,6 +3469,8 @@ export type Database = {
           demo_source_url?: string | null
           destination_id?: string | null
           ends_at?: string | null
+          event_timezone?: string
+          exception_dates?: Json
           external_url?: string | null
           filter_attributes?: Json
           id?: string
@@ -3469,6 +3478,11 @@ export type Database = {
           is_free?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           published_at?: string | null
+          recurrence_frequency?: string | null
+          recurrence_interval?: number
+          recurrence_until?: string | null
+          recurrence_weekdays?: number[]
+          schedule_times?: Json
           slug: string
           starts_at: string
           status?: Database["public"]["Enums"]["content_status"]
@@ -3490,6 +3504,8 @@ export type Database = {
           demo_source_url?: string | null
           destination_id?: string | null
           ends_at?: string | null
+          event_timezone?: string
+          exception_dates?: Json
           external_url?: string | null
           filter_attributes?: Json
           id?: string
@@ -3497,6 +3513,11 @@ export type Database = {
           is_free?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           published_at?: string | null
+          recurrence_frequency?: string | null
+          recurrence_interval?: number
+          recurrence_until?: string | null
+          recurrence_weekdays?: number[]
+          schedule_times?: Json
           slug?: string
           starts_at?: string
           status?: Database["public"]["Enums"]["content_status"]
