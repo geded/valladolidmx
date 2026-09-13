@@ -215,7 +215,8 @@ export function FloatingTravelPlanDock() {
               void acknowledgeReturn();
               setOpen(true);
             }}
-            className="fixed bottom-[4.5rem] left-4 z-40 max-w-[16rem] rounded-2xl border border-primary/30 bg-card/95 px-3.5 py-2.5 text-left shadow-elevated backdrop-blur md:left-6"
+            className="fixed left-4 z-40 max-w-[16rem] rounded-2xl border border-primary/30 bg-card/95 px-3.5 py-2.5 text-left shadow-elevated backdrop-blur md:left-6"
+            style={{ bottom: `calc(${dockBottom} + 3.5rem)` }}
           >
             <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               <Sparkles className="size-3.5" aria-hidden />
@@ -235,7 +236,8 @@ export function FloatingTravelPlanDock() {
             setOpen(true);
           }}
           aria-label={`${ANON_COPY.dock.button} (${count})`}
-          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-3.5 py-2.5 text-sm font-semibold text-foreground shadow-elevated backdrop-blur transition-colors hover:bg-card md:left-6"
+          className="fixed left-4 z-40 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-3.5 py-2.5 text-sm font-semibold text-foreground shadow-elevated backdrop-blur transition-colors hover:bg-card md:left-6"
+          style={{ bottom: dockBottom }}
         >
           <span className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground">
             <Luggage className="h-4 w-4" aria-hidden />
@@ -334,11 +336,12 @@ export function FloatingTravelPlanDock() {
             ? `Viaje confirmado ${confirmed!.folio}`
             : `Tu viaje (${count} ${count === 1 ? "ítem" : "ítems"})`
         }
-        className={`fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-semibold shadow-elevated backdrop-blur transition-colors md:left-6 ${
+        className={`fixed left-4 z-40 inline-flex items-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-semibold shadow-elevated backdrop-blur transition-colors md:left-6 ${
           isConfirmed
             ? "border-success/40 bg-success/10 text-foreground hover:bg-success/15"
             : "border-primary/25 bg-card/95 text-foreground hover:bg-card"
         }`}
+        style={{ bottom: dockBottom }}
       >
         <span
           className={`grid size-7 place-items-center rounded-full ${
