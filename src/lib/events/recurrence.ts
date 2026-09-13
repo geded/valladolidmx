@@ -237,7 +237,7 @@ export function upcomingEventOccurrences(
         startsAt: localDateTimeIso(candidate, item.time),
         date: candidate,
         time: item.time,
-        label: item.label,
+        label: item.label ?? null,
       });
       if (out.length >= limit) break;
     }
