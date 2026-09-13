@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { EventAttributesPanel } from "@/components/cms/EventAttributesPanel";
+import { EventRecurrencePanel } from "@/components/cms/EventRecurrencePanel";
 import { EVENT_FIELDS } from "@/lib/cms/editor-fields";
 import { listDestinationsForSelect } from "@/lib/cms/businesses-media.functions";
 import { listBusinessesForProductSelect } from "@/lib/cms/products-media.functions";
@@ -58,7 +59,12 @@ export function EventEditor({ id }: Props) {
       listQueryKey="events"
       fields={fields}
       renderExtras={({ id: entityId }) =>
-        entityId ? <EventAttributesPanel eventId={entityId} /> : null
+        entityId ? (
+          <div className="space-y-6">
+            <EventRecurrencePanel eventId={entityId} />
+            <EventAttributesPanel eventId={entityId} />
+          </div>
+        ) : null
       }
     />
   );

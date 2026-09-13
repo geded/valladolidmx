@@ -180,6 +180,7 @@ function formatDate(iso: string | null | undefined): string | null {
       day: "2-digit",
       month: "short",
       year: "numeric",
+      timeZone: "America/Merida",
     }).format(new Date(iso));
   } catch {
     return iso;

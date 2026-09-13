@@ -17,6 +17,7 @@ const DATE_FMT = new Intl.DateTimeFormat("es-MX", {
   day: "2-digit",
   month: "short",
   year: "numeric",
+  timeZone: "America/Merida",
 });
 
 function formatDate(iso: string): string {
