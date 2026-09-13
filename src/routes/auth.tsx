@@ -14,6 +14,8 @@ import {
   consumeAuthReturnPath,
   hasVisitedTravelPlanner,
   readAuthReturnPath,
+  readPreviousRoute,
+  rememberAuthReturnPath,
 } from "@/lib/navigation/session-context";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -48,7 +50,11 @@ function AuthRoute() {
   const session = useNavigationSession();
 
   useEffect(() => {
-    setReturnTarget(readAuthReturnPath());
+    // El retorno explícito tiene prioridad. El rastro público cubre cualquier
+    // otro llamado existente a /auth sin exigir lógica duplicada por enlace.
+    const target = readAuthReturnPath() ?? readPreviousRoute();
+    if (target) rememberAuthReturnPath(target);
+    setReturnTarget(target);
     setFromPlanner(hasVisitedTravelPlanner());
   }, []);
 
