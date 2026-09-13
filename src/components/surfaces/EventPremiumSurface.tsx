@@ -341,14 +341,14 @@ export function EventPremiumSurface({
 
       {/* ---- Eventos cercanos ---- */}
       {related.length > 0 ? (
-        <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24 px-4 sm:px-6 lg:px-8">
+        <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24">
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             Explora cerca de {event.title}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Otros eventos del destino para continuar tu viaje por el Oriente Maya.
           </p>
-          <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
+          <div className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
             {related.slice(0, 8).map((card) => (
               <TourismCard
                 key={card.id}
