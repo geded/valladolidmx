@@ -145,7 +145,6 @@ function DocumentoRoute() {
   );
 }
 
-
 function formatMoney(amount: number, currency: string) {
   try {
     return new Intl.NumberFormat("es-MX", {
