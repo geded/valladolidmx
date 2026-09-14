@@ -25,6 +25,7 @@ export interface OfflineDocumentItem {
   title: string;
   description: string | null;
   quantity: number;
+  unit_amount: number;
   subtotal_amount: number;
   currency: string;
 }
@@ -63,6 +64,7 @@ type OrderLike = {
     title: string;
     description: string | null;
     quantity: number;
+    unit_amount: number;
     subtotal_amount: number;
     currency: string;
   }>;
@@ -131,6 +133,7 @@ export function saveOfflineDocuments(order: OrderLike): OfflineDocumentSnapshot 
       title: it.title,
       description: it.description,
       quantity: it.quantity,
+      unit_amount: it.unit_amount,
       subtotal_amount: it.subtotal_amount,
       currency: it.currency,
     })),
