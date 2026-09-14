@@ -53,7 +53,7 @@ import {
   type AluxTravelerSuggestion,
 } from "@/lib/traveler/alux-traveler.functions";
 import { AluxSuggestionCard } from "./AluxSuggestionCard";
-import { useAluxBrand, useBrand } from "@/lib/brand/brand-context";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 // Panel expone todas las capacidades salvo las de fondo (dock / Alux público).
 type PanelCapabilityId = Exclude<AluxTravelerCapability, "narrate_plan">;
