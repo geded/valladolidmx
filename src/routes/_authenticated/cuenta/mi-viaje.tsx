@@ -726,6 +726,7 @@ function MiViajeVistaBody({
               search: { vista: "resumen" },
             }}
           />
+          <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
         </div>
       );
     }
