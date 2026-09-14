@@ -1,6 +1,20 @@
+/**
+ * Zona horaria oficial de la plataforma.
+ *
+ * Valladolid.mx opera siempre en la hora del Oriente Maya de Yucatán
+ * (America/Merida, UTC-6 sin horario de verano). Toda fecha u hora visible
+ * — correos, expedientes, propuestas, reservaciones, itinerarios, recordatorios
+ * y avisos — debe formatearse con estos helpers y NUNCA con la zona horaria
+ * del dispositivo o del servidor: el viajero y el equipo deben ver siempre la
+ * hora del destino.
+ */
 export const MERIDA_TIME_ZONE = "America/Merida";
 
+/** Locale por defecto de la plataforma. */
+export const MERIDA_LOCALE = "es-MX";
+
 export type DestinationDateInput = Date | string | number;
+
 
 function parseDestinationDate(input: DestinationDateInput): Date | null {
   if (input instanceof Date) {
