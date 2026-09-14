@@ -60,6 +60,12 @@ export interface AluxVoice {
   viewTrip: string;
   humanConciergeTitle: string;
   humanConciergeBody: string;
+  conciergeSentTitle: string;
+  conciergeSentBody: string;
+  conciergeWaitingTitle: string;
+  conciergeWaitingBody: string;
+  conciergeProposalReadyTitle: string;
+  conciergeProposalReadyBody: string;
   prepareTrip: string;
   retry: string;
   loadingTrip: string;
@@ -236,7 +242,8 @@ const ES: AluxVoice = {
   conversationTitle: "Conversa con {name}",
   conversationDescription:
     "Pregunta libre. {name} responde sólo con el catálogo publicado y te dice cuándo un dato no está disponible.",
-  publicIntro: "Pregúntame sobre los destinos, experiencias y servicios de {territory}, o cómo armar tu viaje.",
+  publicIntro:
+    "Pregúntame sobre los destinos, experiencias y servicios de {territory}, o cómo armar tu viaje.",
   inputPlaceholder: "¿Qué viaje tienes en mente?",
   sendLabel: "Enviar a {name}",
   newConversation: "Nueva conversación",
@@ -270,6 +277,15 @@ const ES: AluxVoice = {
   humanConciergeTitle: "Cuando quieras hacerlo realidad",
   humanConciergeBody:
     "Tu expediente conserva lo que elegiste. Cuando tú lo decidas, un concierge humano podrá revisarlo contigo, coordinar opciones y ayudarte a convertirlo en un viaje real.",
+  conciergeSentTitle: "Ya compartí tu viaje con el Concierge",
+  conciergeSentBody:
+    "Un concierge humano tiene la información que elegiste. Me quedaré pendiente y te avisaré cuando llegue una respuesta para revisarla juntos.",
+  conciergeWaitingTitle: "Tu Concierge está revisando el viaje",
+  conciergeWaitingBody:
+    "Mientras prepara una respuesta, puedes seguir explorando o añadir una nota. Te avisaré aquí cuando haya una propuesta para ti.",
+  conciergeProposalReadyTitle: "Ya tienes una respuesta de tu Concierge",
+  conciergeProposalReadyBody:
+    "La propuesta está lista. Ábrela para que revisemos juntos qué incluye, su importe y su vigencia antes de que decidas.",
   prepareTrip: "Preparar mi viaje",
   retry: "Reintentar",
   loadingTrip: "Cargando tu viaje antes de conversar…",
@@ -351,7 +367,8 @@ const EN: AluxVoice = {
   conversationTitle: "Chat with {name}",
   conversationDescription:
     "Ask freely. {name} answers only from the published catalog and tells you when information is unavailable.",
-  publicIntro: "Ask me about destinations, experiences and services in {territory}, or how to plan your trip.",
+  publicIntro:
+    "Ask me about destinations, experiences and services in {territory}, or how to plan your trip.",
   inputPlaceholder: "What trip do you have in mind?",
   sendLabel: "Send to {name}",
   newConversation: "New conversation",

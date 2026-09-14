@@ -34,7 +34,10 @@ function TravelerCasePage() {
   const isClosed = ["closed_won", "closed_lost", "archived"].includes(status);
   return (
     <section>
-      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <Link to="/cuenta/concierge" className="text-xs font-medium text-primary hover:underline">
+        ← Mis expedientes
+      </Link>
+      <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         Mi expediente Concierge
       </p>
       <div className="mt-1 mb-6 flex items-center justify-between gap-4">
