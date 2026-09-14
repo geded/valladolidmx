@@ -111,15 +111,22 @@ export function UserMenu() {
   };
 
   if (loading) {
+    // Antes se renderizaba sólo el icono: en móviles lentos quedaba un recuadro
+    // vacío y sin acción. Ahora muestra la etiqueta y ya permite entrar a /auth.
     return (
-      <span
-        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[13px] text-muted-foreground"
+      <Link
+        to="/auth"
+        onClick={() => rememberAuthReturnPath(`${location.pathname}${location.searchStr ?? ""}`)}
+        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium text-muted-foreground"
         aria-busy="true"
+        title={t("nav.sign_in")}
       >
         <UserRound className="size-4 opacity-60" aria-hidden />
-      </span>
+        <span>{t("nav.sign_in")}</span>
+      </Link>
     );
   }
+
 
   if (authUser) {
     const links = inWorkspace ? buildMenuLinks(role, activeMode) : [];
