@@ -19,7 +19,6 @@ import {
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
-import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
   component: CheckoutPage,
@@ -40,16 +39,10 @@ function CheckoutPage() {
   const fetchOrder = useServerFn(getConciergeOrder);
   const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
-  const fetchPaymentsStatus = useServerFn(getPaymentsReadyPublic);
 
   const orderQ = useQuery({
     queryKey: ["concierge-order", orderId],
     queryFn: () => fetchOrder({ data: { orderId } }),
-  });
-  const payQ = useQuery({
-    queryKey: ["payments", "public-status"],
-    queryFn: () => fetchPaymentsStatus(),
-    staleTime: 60_000,
   });
 
   const [busy, setBusy] = useState(false);
@@ -84,8 +77,6 @@ function CheckoutPage() {
   }
 
   const order: ConciergeOrderView = orderQ.data;
-  const demoMode = payQ.data?.demoMode ?? true;
-  const paymentsReady = payQ.data?.ready ?? false;
 
   const isFinal =
     order.status === "paid" ||
