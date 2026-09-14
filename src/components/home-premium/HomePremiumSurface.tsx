@@ -647,38 +647,20 @@ function RoutesSection({
                     <MapPin className="size-3.5 shrink-0" aria-hidden />
                     <span className="truncate">{content.rutas.selectLabel}</span>
                   </button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={active ? "default" : "secondary"}
-                    aria-label={`Personalizar con Alux: ${route.title}`}
-                    title="Personalizar con Alux"
-                    onClick={() => {
-                      onSelectRoute(route.id);
-                      onAdd();
-                      openAluxFloating({
-                        reason: "manual",
-                        selection: {
-                          entityRef: `route:${route.id}`,
-                          title: route.title,
-                          summary: buildAluxRouteSummary(route),
-                          familySlug: "rutas",
-                          facts: buildRouteFacts(route),
-                          quickActions: ROUTE_QUICK_ACTIONS,
-                          mapAnchor: "mapa",
-                          ...(route.href ? { href: route.href } : {}),
-                        },
-                        hint: buildAluxStageAwareHint(
-                          `Ayúdame a personalizar esta ruta: ${route.title}. ${route.description}`,
-                          `${route.duration} · ${route.stops} paradas · ${route.vibe}`,
-                        ),
-                      });
-                    }}
-                    className="h-9 shrink-0 gap-1.5 rounded-pill px-3 text-[11px] sm:text-xs"
-                  >
-                    <Sparkles className="size-3.5" aria-hidden />
-                    <span>Alux</span>
-                  </Button>
+                  {route.href ? (
+                    <Button
+                      asChild
+                      size="sm"
+                      variant={active ? "default" : "secondary"}
+                      className="h-9 shrink-0 gap-1.5 rounded-pill px-3 text-[11px] sm:text-xs"
+                    >
+                      <Link to={route.href} aria-label={`Ver la ruta ${route.title}`}>
+                        <Route className="size-3.5" aria-hidden />
+                        <span>Ver ruta</span>
+                      </Link>
+                    </Button>
+                  ) : null}
+
                 </div>
               </div>
             </article>
