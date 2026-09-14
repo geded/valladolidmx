@@ -1766,6 +1766,24 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
   );
 }
 
+/**
+ * Presentación legible del brief de viaje: composición del grupo,
+ * llegada, transportación y pendientes — en texto humano para el concierge.
+ */
+function TripBriefBlock({ brief }: { brief: TripBrief }) {
+  const rows = briefToDetailRows(brief);
+  return (
+    <dl className="grid gap-1.5 text-xs">
+      {rows.map((r, i) => (
+        <div key={i} className="flex gap-2">
+          <dt className="shrink-0 font-medium text-muted-foreground">{r.label}:</dt>
+          <dd className="text-foreground">{r.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function HandoffBlock({ title, children }: { title: string; children: ReactNode }) {
   return (
     <article className="rounded-md border border-dashed border-border bg-background/60 p-3">
