@@ -1083,12 +1083,37 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
   const items = content.eventos.items;
   const todayKey = meridaToday();
   const queryKey = dateFilter || todayKey;
+  // Un evento recurrente ocurre en muchos días: la coincidencia se resuelve
+  // con la misma autoridad de recurrencia del CMS, no con su próxima función.
+  const occursOn = (event: HomePremiumEvent, dayKey: string): boolean => {
+    if (event.recurrence) return payloadOccursOnDate(event.recurrence, dayKey);
+    return meridaDayKey(event.startsAt) === dayKey;
+  };
+  const occursInMonth = (event: HomePremiumEvent, monthKey: string): boolean => {
+    if (!event.recurrence) return meridaDayKey(event.startsAt)?.slice(0, 7) === monthKey;
+    const [year, month] = monthKey.split("-").map(Number);
+    if (!year || !month) return false;
+    const days = new Date(year, month, 0).getDate();
+    for (let day = 1; day <= days; day += 1) {
+      if (payloadOccursOnDate(event.recurrence, `${monthKey}-${String(day).padStart(2, "0")}`)) {
+        return true;
+      }
+    }
+    return false;
+  };
   const filtered = items.filter((event) => {
-    const eventKey = meridaDayKey(event.startsAt);
-    if (mode === "today") return eventKey === todayKey;
-    if (mode === "date") return eventKey === queryKey;
-    return eventKey?.slice(0, 7) === queryKey.slice(0, 7);
+    if (mode === "today") return occursOn(event, todayKey);
+    if (mode === "date") return occursOn(event, queryKey);
+    return occursInMonth(event, queryKey.slice(0, 7));
   });
+  // La fecha mostrada es la de la consulta cuando el evento se repite.
+  const labelDateFor = (event: HomePremiumEvent): string | null => {
+    if (event.recurrence && mode !== "month") {
+      const key = mode === "today" ? todayKey : queryKey;
+      return meridaDate(`${key}T12:00:00.000Z`) ?? null;
+    }
+    return meridaDate(event.startsAt) ?? null;
+  };
   const pageCount = Math.max(1, Math.ceil(filtered.length / EVENTS_PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   const visible = filtered.slice(safePage * EVENTS_PAGE_SIZE, (safePage + 1) * EVENTS_PAGE_SIZE);
@@ -1202,7 +1227,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 )}
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">
-                    {[meridaDate(event.startsAt) ?? event.day, event.type]
+                    {[labelDateFor(event) ?? event.day, event.type]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
