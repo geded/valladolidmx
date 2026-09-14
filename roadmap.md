@@ -102,3 +102,5 @@
 - [ ] Auditar documentación oficial: contacto, alcance de cotización y autoría de propuesta.
 - [ ] Comparar contrato documentado con captura e implementación actual.
 - [ ] Definir delta mínimo con Scope Gate y Preservation Gate antes de modificar.
+
+- [ ] Confirmar que la implementación de contacto y propuestas respeta las adendas oficiales sincronizadas desde GitHub.
