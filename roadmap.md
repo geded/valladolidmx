@@ -133,7 +133,7 @@
 
 ## Estudio de Propuesta del Concierge (2026-09-14)
 
-- [ ] Propuesta con espacio propio (no dentro del expediente), día/hora/duración por partida y paso al itinerario.
+- [x] Propuesta con espacio propio (no dentro del expediente), día/hora/duración por partida y paso al itinerario.
 - [ ] Velocidad para cientos de propuestas: plantillas reutilizables, alta rápida y atajos de teclado.
 - [ ] Alux copiloto del Concierge con contexto real del destino (horarios, clima, distancias, eventos) vía Context Engine.
 - [ ] Vista del viajero para propuestas largas: resumen por días, secciones plegables y descarga en PDF.
