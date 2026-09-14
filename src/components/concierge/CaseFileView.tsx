@@ -231,6 +231,8 @@ const ITEM_KIND_LABELS: Record<string, string> = {
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
+  "Concierge.Handoff.Context": "Información del viaje compartida con el Concierge",
+  concierge_handoff_context: "Información del viaje compartida con el Concierge",
   "Concierge.Case.Created": "Expediente creado",
   "Concierge.Case.Assigned": "Expediente asignado",
   "Concierge.Case.Reassigned": "Expediente reasignado",
