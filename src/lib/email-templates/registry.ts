@@ -14,6 +14,8 @@ import { template as tripPostTemplate } from "./trip-post";
 import { template as tripConfirmedTemplate } from "./trip-confirmed";
 import { template as conciergeProposalSentTemplate } from "./concierge-proposal-sent";
 import { template as bookingPaidAdminTemplate } from "./booking-paid-admin";
+import { template as proposalPaymentReminderTemplate } from "./proposal-payment-reminder";
+import { template as proposalPaymentStalledTeamTemplate } from "./proposal-payment-stalled-team";
 
 export interface TemplateEntry {
   component: ComponentType<any>;
@@ -48,4 +50,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "trip-confirmed": tripConfirmedTemplate,
   "concierge-proposal-sent": conciergeProposalSentTemplate,
   "booking-paid-admin": bookingPaidAdminTemplate,
+  "proposal-payment-reminder": proposalPaymentReminderTemplate,
+  "proposal-payment-stalled-team": proposalPaymentStalledTeamTemplate,
 };
