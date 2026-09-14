@@ -42,6 +42,7 @@ function CheckoutPage() {
   const fetchOrder = useServerFn(getConciergeOrder);
   const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
+  const notifyAdmin = useServerFn(notifyAdminBookingPaid);
 
   const orderQ = useQuery({
     queryKey: ["concierge-order", orderId],
