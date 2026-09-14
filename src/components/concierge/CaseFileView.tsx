@@ -866,6 +866,11 @@ function ProposalCard({
                     );
                   }
                 }
+                try {
+                  await notifyAdminFn({ data: { orderId } });
+                } catch {
+                  // El aviso interno puede reintentarse; no bloquea el registro del pago.
+                }
                 await router.invalidate();
                 toast.success("Pago en efectivo registrado. El viaje quedó confirmado.");
               } catch (err) {
