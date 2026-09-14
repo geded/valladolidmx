@@ -6,7 +6,9 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Circle, Headset, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAluxBrand } from "@/lib/brand/brand-context";
 import { toast } from "@/lib/toast";
 import {
@@ -16,10 +18,11 @@ import {
   viewConciergeProposal,
   withdrawConciergeProposal,
   createConciergeProposal,
-  assignConciergeCase,
+  assignSelfConciergeCase,
   releaseConciergeCase,
   setConciergeCasePriority,
   getConciergeCaseHandoffContext,
+  requestConciergeQuote,
 } from "@/lib/concierge/concierge.functions";
 import { createOrderFromProposal } from "@/lib/concierge/orders.functions";
 import {
@@ -58,6 +61,7 @@ type CaseFile = {
     status: string;
     source_type: string;
     notes: string | null;
+    business_id?: string | null;
   }>;
   links: Array<{ link_type: string; target_id: string }>;
   businesses: Array<{ id: string; display_name: string; slug: string | null }>;
@@ -339,25 +343,13 @@ export function CaseFileView({
       {internal && <SlaAssignmentPanel f={f} />}
       {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
-      <Section title="Solicitudes">
+      <Section title="Servicios por revisar">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
         ) : (
           <ul className="grid gap-2">
-            {f.requests.map((r) => (
-              <li key={r.id} className="rounded-md border border-border bg-card p-3 text-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium">{r.title}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {labelFor(r.status, REQUEST_STATUS_LABELS)}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {labelFor(r.kind, REQUEST_KIND_LABELS)} · Origen:{" "}
-                  {labelFor(r.source_type, SOURCE_LABELS)}
-                </p>
-                {r.notes ? <p className="mt-1 text-xs text-foreground/80">{r.notes}</p> : null}
-              </li>
+            {f.requests.map((request) => (
+              <RequestCard key={request.id} request={request} f={f} internal={internal} />
             ))}
           </ul>
         )}
@@ -932,15 +924,102 @@ function ActionButton({
   disabled?: boolean;
   variant?: "primary" | "ghost";
 }) {
-  const base = "rounded-md px-3 py-1.5 text-xs font-medium transition disabled:opacity-50";
-  const cls =
-    variant === "primary"
-      ? `${base} bg-primary text-primary-foreground hover:bg-primary/90`
-      : `${base} border border-border bg-background hover:bg-muted`;
   return (
-    <button type="button" className={cls} onClick={onClick} disabled={disabled}>
+    <Button
+      type="button"
+      size="sm"
+      variant={variant === "primary" ? "default" : "outline"}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {label}
-    </button>
+    </Button>
+  );
+}
+
+function readableConciergeError(error: unknown, action: "assign" | "quote") {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (message.includes("forbidden")) {
+    return action === "assign"
+      ? "Tu perfil actual no puede tomar expedientes. Entra con un perfil Concierge, Concierge Lead o Administrador."
+      : "No tienes permiso para solicitar esta cotización desde el perfil actual.";
+  }
+  if (message.includes("already") || message.includes("duplicate") || message.includes("unique")) {
+    return "Esta solicitud ya tiene una cotización en curso.";
+  }
+  return action === "assign"
+    ? "No fue posible asignarte el expediente. Intenta nuevamente."
+    : "No fue posible solicitar la cotización. Intenta nuevamente.";
+}
+
+function RequestCard({
+  request,
+  f,
+  internal,
+}: {
+  request: CaseFile["requests"][number];
+  f: CaseFile;
+  internal: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const requestQuote = useServerFn(requestConciergeQuote);
+  const [busy, setBusy] = useState(false);
+  const quote = f.quotes?.find((item) => item.request_id === request.id);
+  const canRequestQuote = internal && request.business_id && !quote;
+
+  async function onRequestQuote() {
+    if (!request.business_id) return;
+    setBusy(true);
+    try {
+      await requestQuote({
+        data: { requestId: request.id, businessId: request.business_id, validForHours: 72 },
+      });
+      await queryClient.invalidateQueries({ queryKey: ["concierge", "case-file", f.case.id] });
+      toast.success("Solicitud enviada a la empresa. Te avisaremos cuando responda.");
+    } catch (error) {
+      toast.error(readableConciergeError(error, "quote"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <li className="rounded-md border border-border bg-card p-3 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">{request.title}</span>
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+          {quote
+            ? labelFor(quote.status, QUOTE_STATUS_LABELS)
+            : labelFor(request.status, REQUEST_STATUS_LABELS)}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {labelFor(request.kind, REQUEST_KIND_LABELS)} · Origen:{" "}
+        {labelFor(request.source_type, SOURCE_LABELS)}
+      </p>
+      {request.notes ? <p className="mt-1 text-xs text-foreground/80">{request.notes}</p> : null}
+      {internal ? (
+        <div className="mt-3 border-t border-border/60 pt-3">
+          {canRequestQuote ? (
+            <ActionButton
+              label={busy ? "Enviando…" : "Solicitar cotización"}
+              onClick={onRequestQuote}
+              disabled={busy}
+            />
+          ) : quote ? (
+            <p className="text-xs text-muted-foreground">
+              {quote.status === "submitted"
+                ? "La empresa respondió. Ya puedes incluir esta cotización en una propuesta."
+                : "Solicitud enviada a la empresa; esperando su respuesta."}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Este elemento no tiene una empresa vinculada; no requiere cotización empresarial.
+            </p>
+          )}
+        </div>
+      ) : null}
+    </li>
   );
 }
 
@@ -949,7 +1028,8 @@ function ActionButton({
  * ============================================================ */
 function SlaAssignmentPanel({ f }: { f: CaseFile }) {
   const router = useRouter();
-  const assignFn = useServerFn(assignConciergeCase);
+  const queryClient = useQueryClient();
+  const assignFn = useServerFn(assignSelfConciergeCase);
   const releaseFn = useServerFn(releaseConciergeCase);
   const setPriorityFn = useServerFn(setConciergeCasePriority);
   const [busy, setBusy] = useState(false);
@@ -971,8 +1051,13 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
   async function doAssignSelf() {
     setBusy(true);
     try {
-      await assignFn({ data: { caseId: f.case.id, conciergeUserId: viewerId } });
-      router.invalidate();
+      await assignFn({ data: { caseId: f.case.id } });
+      await queryClient.invalidateQueries({ queryKey: ["concierge", "case-file", f.case.id] });
+      await queryClient.invalidateQueries({ queryKey: ["concierge", "cases-ext"] });
+      await router.invalidate();
+      toast.success("El expediente quedó asignado a ti.");
+    } catch (error) {
+      toast.error(readableConciergeError(error, "assign"));
     } finally {
       setBusy(false);
     }

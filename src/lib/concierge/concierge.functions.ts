@@ -424,6 +424,27 @@ export const assignConciergeCase = createServerFn({ method: "POST" })
     return id as string;
   });
 
+/** Autoasignación: la identidad siempre se deriva de la sesión autenticada. */
+export const assignSelfConciergeCase = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        caseId: z.string().uuid(),
+        reason: z.string().max(1000).optional().nullable(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: id, error } = await context.supabase.rpc("concierge_case_assign", {
+      _case_id: data.caseId,
+      _concierge_user_id: context.userId,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return id as string;
+  });
+
 export const reassignConciergeCase = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
