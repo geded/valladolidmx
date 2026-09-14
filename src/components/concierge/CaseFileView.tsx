@@ -993,6 +993,13 @@ function ProposalComposer({
       <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
         Selecciona las cotizaciones que incluirás. El total se calcula con las respuestas elegidas.
       </p>
+      {submittable.length === 0 ? (
+        <p className="rounded-md border border-border/70 bg-background/70 p-2 leading-relaxed text-muted-foreground">
+          Todavía no hay cotizaciones recibidas. Solicita una cotización a las empresas en el
+          apartado &quot;Qué solicita el viajero&quot;; cuando respondan con su precio podrás
+          armar aquí la propuesta económica y enviarla al viajero.
+        </p>
+      ) : null}
       <ul className="grid gap-1">
         {submittable.map((q) => (
           <li key={q.quote_id} className="flex items-center gap-2">
