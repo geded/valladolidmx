@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAluxBrand } from "@/lib/brand/brand-context";
+import { briefToDetailRows, type TripBrief } from "@/lib/traveler/trip-brief";
 import { toast } from "@/lib/toast";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import {
