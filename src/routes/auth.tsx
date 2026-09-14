@@ -55,8 +55,16 @@ function AuthRoute() {
   useEffect(() => {
     // El retorno explícito tiene prioridad. El rastro público cubre cualquier
     // otro llamado existente a /auth sin exigir lógica duplicada por enlace.
-    const trail = readJourneyPrefix("/auth");
-    const target = readAuthReturnPath() ?? readPreviousRoute() ?? trail.at(-1)?.path ?? null;
+    const storedTrail = readJourneyPrefix("/auth");
+    const target = readAuthReturnPath() ?? readPreviousRoute() ?? storedTrail.at(-1)?.path ?? null;
+    const targetStep = target ? describeJourneyStep(target) : null;
+    // La ruta guardada por el enlace del header es la autoridad del origen.
+    // No mezclarla con pasos viejos de la misma pestaña: al abrir Acceso desde
+    // Home, el breadcrumb debe ser Inicio → Cuenta aunque antes se hayan
+    // visitado destinos, Mapa o Arma tu Viaje.
+    const trail = targetStep
+      ? [...readJourneyPrefix(targetStep.path), targetStep]
+      : [];
     if (target) rememberAuthReturnPath(target);
     setReturnTarget(target);
     setJourney(trail);
@@ -169,7 +177,10 @@ function AuthRoute() {
    */
   const territorialOrigin =
     returnTarget?.startsWith("/oriente-maya") === true ||
-    journey.some((s) => s.path === "/mapa" || s.path === "/rutas");
+    returnTarget === "/mapa" ||
+    returnTarget?.startsWith("/mapa/") === true ||
+    returnTarget === "/rutas" ||
+    returnTarget?.startsWith("/rutas/") === true;
   const destinationCrumb =
     territorialOrigin && session?.destination
       ? [
