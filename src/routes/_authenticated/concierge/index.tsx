@@ -50,7 +50,9 @@ export const Route = createFileRoute("/_authenticated/concierge/")({
 });
 
 function ConciergeInboxPage() {
-  const [scope, setScope] = useState<Scope>("concierge");
+  // Los expedientes recién enviados nacen sin asignación; abrir esta cola evita
+  // que parezcan perdidos antes de que un concierge los tome.
+  const [scope, setScope] = useState<Scope>("unassigned");
   const [sort, setSort] = useState<Sort>("sla_status");
   const [priority, setPriority] = useState<string>("");
   const [slaStatus, setSlaStatus] = useState<string>("");
