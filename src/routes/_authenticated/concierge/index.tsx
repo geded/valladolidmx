@@ -88,7 +88,7 @@ export const Route = createFileRoute("/_authenticated/concierge/")({
 });
 
 function ConciergeInboxPage() {
-  const { roles } = useAuth();
+  const { roles, user } = useAuth();
   const isLead = useMemo(() => roles.some((r) => LEAD_ROLES.includes(r)), [roles]);
 
   const [inboxId, setInboxId] = useState<string>("unassigned");
