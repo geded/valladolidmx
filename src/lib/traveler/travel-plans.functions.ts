@@ -74,6 +74,9 @@ export interface TravelPlanItemSnapshot {
   subtitle?: string | null;
 }
 
+/** Origen del horario de una actividad (CV6.7 · Itinerario con horas). */
+export type ItemScheduleSource = "concierge" | "alux" | "traveler";
+
 export interface TravelPlanItem {
   id: string;
   plan_id: string;
@@ -83,6 +86,10 @@ export interface TravelPlanItem {
   day_index: number | null;
   notes: string | null;
   snapshot: TravelPlanItemSnapshot;
+  /** Hora local del destino (America/Merida) en formato HH:MM. */
+  starts_at_local: string | null;
+  duration_minutes: number | null;
+  schedule_source: ItemScheduleSource | null;
   created_at: string;
   updated_at: string;
 }
@@ -203,7 +210,20 @@ function mapPlan(r: PlanRow): TravelPlan {
   };
 }
 
+/** Normaliza `time` de Postgres (`09:00:00`) a `HH:MM`. */
+export function normalizeLocalTime(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const m = /^(\d{1,2}):(\d{2})/.exec(v.trim());
+  if (!m) return null;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (!Number.isFinite(h) || !Number.isFinite(min) || h > 23 || min > 59) return null;
+  return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+}
+
 function mapItem(r: ItemRow): TravelPlanItem {
+  const rec = r as unknown as Record<string, unknown>;
+  const source = rec.schedule_source;
   return {
     id: r.id,
     plan_id: r.plan_id,
@@ -213,6 +233,13 @@ function mapItem(r: ItemRow): TravelPlanItem {
     day_index: r.day_index,
     notes: r.notes,
     snapshot: (r.snapshot as unknown as TravelPlanItemSnapshot) ?? {},
+    starts_at_local: normalizeLocalTime(rec.starts_at_local),
+    duration_minutes:
+      typeof rec.duration_minutes === "number" ? (rec.duration_minutes as number) : null,
+    schedule_source:
+      source === "concierge" || source === "alux" || source === "traveler"
+        ? (source as ItemScheduleSource)
+        : null,
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
@@ -572,9 +599,13 @@ export const removePlanItem = createServerFn({ method: "POST" })
   });
 
 /**
- * updatePlanItem — Actualiza notas / snapshot / day_index de un item.
- * Whitelist estricta; no permite cambiar `plan_id`, `item_kind`,
+ * updatePlanItem — Actualiza notas / snapshot / day_index / horario de un
+ * item. Whitelist estricta; no permite cambiar `plan_id`, `item_kind`,
  * `target_id`, `position` (reorden va por RPC dedicado).
+ *
+ * CV6.7 · Cuando el viajero ajusta la hora o la duración, el horario deja
+ * de ser "sugerido" y queda confirmado (`schedule_source = 'traveler'`),
+ * salvo que el llamador declare otro origen explícito.
  */
 export const updatePlanItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -584,11 +615,17 @@ export const updatePlanItem = createServerFn({ method: "POST" })
       notes?: unknown;
       snapshot?: unknown;
       dayIndex?: unknown;
+      startsAtLocal?: unknown;
+      durationMinutes?: unknown;
+      scheduleSource?: unknown;
     };
     const patch: {
       notes?: string | null;
       snapshot?: Json;
       day_index?: number | null;
+      starts_at_local?: string | null;
+      duration_minutes?: number | null;
+      schedule_source?: string | null;
     } = {};
     if ("notes" in src) patch.notes = clampStr(src.notes, 2000);
     if ("snapshot" in src) patch.snapshot = clampSnapshot(src.snapshot) as unknown as Json;
@@ -597,6 +634,32 @@ export const updatePlanItem = createServerFn({ method: "POST" })
         src.dayIndex === null || src.dayIndex === undefined
           ? null
           : Math.max(0, Math.min(365, Math.round(Number(src.dayIndex) || 0)));
+    }
+    let touchedSchedule = false;
+    if ("startsAtLocal" in src) {
+      if (src.startsAtLocal === null || src.startsAtLocal === "" || src.startsAtLocal === undefined) {
+        patch.starts_at_local = null;
+      } else {
+        const t = normalizeLocalTime(src.startsAtLocal);
+        if (!t) throw new Error("invalid_starts_at_local");
+        patch.starts_at_local = t;
+      }
+      touchedSchedule = true;
+    }
+    if ("durationMinutes" in src) {
+      if (src.durationMinutes === null || src.durationMinutes === undefined) {
+        patch.duration_minutes = null;
+      } else {
+        const n = Math.round(Number(src.durationMinutes));
+        if (!Number.isFinite(n) || n <= 0 || n > 1440) throw new Error("invalid_duration_minutes");
+        patch.duration_minutes = n;
+      }
+      touchedSchedule = true;
+    }
+    if (touchedSchedule) {
+      const s = src.scheduleSource;
+      patch.schedule_source =
+        s === "concierge" || s === "alux" || s === "traveler" ? s : "traveler";
     }
     return {
       itemId: assertUuid(src.itemId, "item_id"),

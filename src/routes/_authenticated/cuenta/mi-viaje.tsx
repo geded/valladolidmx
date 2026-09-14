@@ -73,6 +73,11 @@ import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
 import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
 import { NowNextLaterSurface } from "@/components/traveler/NowNextLaterSurface";
 import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
+import {
+  restorePlanDaySchedule,
+  suggestPlanDaySchedule,
+  type SuggestDayScheduleResult,
+} from "@/lib/traveler/travel-plan-schedule.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
@@ -1037,6 +1042,50 @@ function ItinerarioTimeline({
 
   const reorderFn = useServerFn(reorderPlanItems);
   const optimizeFn = useServerFn(optimizePlanDay);
+  const suggestFn = useServerFn(suggestPlanDaySchedule);
+  const restoreFn = useServerFn(restorePlanDaySchedule);
+  const updateItemFn = useServerFn(updatePlanItem);
+
+  const restoreSchedule = useMutation({
+    mutationFn: (previous: SuggestDayScheduleResult["previous"]) =>
+      restoreFn({ data: { previous } }),
+    onSuccess: () => onChanged(),
+  });
+
+  const suggestSchedule = useMutation({
+    mutationFn: (dayIndex: number | null) => suggestFn({ data: { planId: data.plan.id, dayIndex } }),
+    onSuccess: (res) => {
+      onChanged();
+      if (res.updated === 0) {
+        toast(res.rationale);
+        return;
+      }
+      toast.success("Alux propuso horarios para tu día", {
+        description: res.rationale,
+        duration: 9000,
+        action: {
+          label: "Deshacer",
+          onClick: () => restoreSchedule.mutate(res.previous),
+        },
+      });
+    },
+    onError: (e: unknown) =>
+      toast.error("Alux no pudo proponer horarios", {
+        description: e instanceof Error ? e.message : "Inténtalo de nuevo.",
+      }),
+  });
+
+  const setItemTime = useMutation({
+    mutationFn: (v: { itemId: string; startsAtLocal: string | null }) =>
+      updateItemFn({
+        data: { itemId: v.itemId, startsAtLocal: v.startsAtLocal, scheduleSource: "traveler" },
+      }),
+    onSuccess: () => onChanged(),
+    onError: (e: unknown) =>
+      toast.error("No pudimos guardar la hora", {
+        description: e instanceof Error ? e.message : "Inténtalo de nuevo.",
+      }),
+  });
 
   const reorder = useMutation({
     mutationFn: (orderedItemIds: string[]) =>
@@ -1147,6 +1196,18 @@ function ItinerarioTimeline({
               {typeof key === "number" ? (
                 <DayWeatherChip startDate={startDate} totalDays={totalDays} dayIndex={key} />
               ) : null}
+              {items.length >= 1 ? (
+                <button
+                  type="button"
+                  onClick={() => suggestSchedule.mutate(key === "sin" ? null : (key as number))}
+                  disabled={suggestSchedule.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15 disabled:opacity-60"
+                  title="Alux propone una hora para cada actividad usando horarios de apertura y traslados"
+                >
+                  <Clock className="size-3" aria-hidden />
+                  Sugerir horarios
+                </button>
+              ) : null}
               {items.length >= 2 ? (
                 <button
                   type="button"
@@ -1188,6 +1249,13 @@ function ItinerarioTimeline({
                       {it.notes ? (
                         <p className="mt-1 text-xs text-muted-foreground">{it.notes}</p>
                       ) : null}
+                      <ItemScheduleRow
+                        item={it}
+                        saving={setItemTime.isPending}
+                        onChange={(startsAtLocal) =>
+                          setItemTime.mutate({ itemId: it.id, startsAtLocal })
+                        }
+                      />
                     </div>
                     {items.length > 1 ? (
                       <div className="ml-auto flex shrink-0 flex-col gap-0.5">
@@ -1223,6 +1291,86 @@ function ItinerarioTimeline({
     </div>
   );
 }
+
+/**
+ * CV6.7 · Hora de cada actividad. Muestra la hora local del destino y
+ * permite ajustarla. Cuando el horario viene de Alux se marca como
+ * sugerencia; al ajustarlo, queda confirmado por el viajero.
+ */
+function ItemScheduleRow({
+  item,
+  saving,
+  onChange,
+}: {
+  item: TravelPlanItem;
+  saving: boolean;
+  onChange: (startsAtLocal: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const value = item.starts_at_local ?? "";
+  const suggested = item.schedule_source === "alux";
+  const byConcierge = item.schedule_source === "concierge";
+
+  return (
+    <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
+      {value ? (
+        <span className="inline-flex items-center gap-1 rounded-pill bg-muted px-2 py-0.5 font-medium text-foreground">
+          <Clock className="size-3" aria-hidden />
+          {value}
+          {item.duration_minutes ? (
+            <span className="font-normal text-muted-foreground">· {item.duration_minutes} min</span>
+          ) : null}
+        </span>
+      ) : (
+        <span className="text-muted-foreground">Sin hora</span>
+      )}
+      {suggested ? (
+        <span className="rounded-pill border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
+          Sugerido por Alux
+        </span>
+      ) : null}
+      {byConcierge ? (
+        <span className="rounded-pill border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
+          Definido por tu concierge
+        </span>
+      ) : null}
+      {open ? (
+        <span className="inline-flex items-center gap-1.5">
+          <input
+            type="time"
+            defaultValue={value}
+            aria-label="Hora de inicio"
+            className="h-8 rounded-md border border-border bg-background px-2 text-xs"
+            onBlur={(e) => {
+              const next = e.currentTarget.value || null;
+              setOpen(false);
+              if ((next ?? "") !== value) onChange(next);
+            }}
+            autoFocus
+          />
+          <button
+            type="button"
+            className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+            onClick={() => setOpen(false)}
+          >
+            Cancelar
+          </button>
+        </span>
+      ) : (
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => setOpen(true)}
+          className="text-[11px] text-primary underline-offset-2 hover:underline disabled:opacity-60"
+        >
+          {value ? "Ajustar hora" : "Poner hora"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+
 
 function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
   const fetchGeo = useServerFn(getPlanItemsGeo);
