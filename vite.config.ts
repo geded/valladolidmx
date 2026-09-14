@@ -35,20 +35,14 @@ export default defineConfig({
           // La versión nueva toma control en cuanto termina de instalarse.
           // Evita que Safari móvil conserve HTML que apunta a assets retirados.
           skipWaiting: true,
-          // Fallback autónomo: no depende de React, CSS ni chunks con hash.
-          // Así siempre conserva estilos y puede reparar una caché obsoleta.
-          navigateFallback: "/offline.html",
-          navigateFallbackDenylist: [
-            /^\/~oauth/,
-            /^\/api\//,
-            /^\/auth/,
-            /^\/cms/,
-            /^\/portal/,
-            /^\/admin/,
-            /^\/cuenta/,
-            /^\/concierge/,
-            /^\/empresa/,
-          ],
+          // IMPORTANTE (2026-09-14): NO usar `navigateFallback`.
+          // Workbox registra la NavigationRoute ANTES que `runtimeCaching`,
+          // por lo que atendía TODA navegación pública con `/offline.html`
+          // precacheado aunque hubiera red. El visitante veía "Estás sin
+          // conexión" unos segundos y luego la autorreparación de esa página
+          // recargaba el sitio. El fallback offline ahora vive dentro de la
+          // ruta NetworkFirst de navegación y sólo actúa si la red falla.
+
           // Sólo el cascarón público estable. Los chunks de rutas, CMS,
           // administración y sesiones se solicitan bajo demanda y nunca se
           // incorporan indiscriminadamente al precache.
