@@ -121,6 +121,42 @@ const ALUX_VOICE_LABELS: Record<keyof AluxVoice, string> = {
   workspaceActionTitle: "Título de siguiente acción",
   workspaceOpen: "Abrir conversación",
   unavailable: "Mensaje no disponible",
+  pageEyebrow: "Etiqueta de página",
+  pageTitle: "Título de página",
+  pageDescription: "Descripción de página",
+  nextStepTitle: "Título de siguiente paso",
+  nextStepReview: "Paso: revisar viaje",
+  nextStepDetect: "Paso: detectar faltantes",
+  nextStepNearby: "Paso: sugerir cercanía",
+  viewTrip: "Acción: ver viaje",
+  humanConciergeTitle: "Título de concierge humano",
+  humanConciergeBody: "Descripción de concierge humano",
+  prepareTrip: "Acción: preparar viaje",
+  retry: "Acción: reintentar",
+  loadingTrip: "Estado: cargando viaje",
+  tripLoadError: "Error al cargar viaje",
+  suggestedQuestions: "Etiqueta de preguntas sugeridas",
+  travelerPanelTitle: "Título del panel del viajero",
+  travelerPanelDescription: "Descripción del panel del viajero",
+  profilePromptTitle: "Título para completar perfil",
+  profilePromptBody: "Mensaje para completar perfil",
+  completeProfile: "Acción: completar perfil",
+  completePublicProfile: "Acción: completar perfil público",
+  suggestionReady: "Estado: sugerencia lista",
+  nearbySectionTitle: "Título de cercanía",
+  locationTitle: "Título de ubicación",
+  locationBody: "Mensaje de ubicación",
+  shareLocation: "Acción: compartir ubicación",
+  requestingLocation: "Estado: solicitando ubicación",
+  locationDenied: "Estado: ubicación denegada",
+  locationUnavailable: "Estado: ubicación no disponible",
+  contextTitle: "Título de contexto",
+  exploreNearbyTitle: "Título de exploración cercana",
+  catalogGrounding: "Aviso de procedencia del catálogo",
+  activeCouponsTitle: "Título de cupones activos",
+  promotionsTitle: "Título de promociones",
+  profileAccuracyTitle: "Título de precisión de perfil",
+  profileAccuracyBody: "Mensaje de precisión de perfil",
 };
 
 function BrandSettingsPage() {
@@ -350,9 +386,9 @@ function BrandSettingsPage() {
               <p className="mt-2 text-sm">
                 {fillAluxCopy(form.aluxCopy[aluxLocale].conversationDescription, { name: form.conciergeName, territory: form.tagline })}
               </p>
-              <button type="button" className="mt-4 rounded-full bg-alux px-4 py-2 text-sm font-semibold text-alux-foreground">
+              <Button type="button" className="mt-4 rounded-full bg-alux px-4 py-2 text-sm font-semibold text-alux-foreground hover:bg-alux/90">
                 {fillAluxCopy(form.aluxCopy[aluxLocale].planCta, { name: form.conciergeName, territory: form.tagline })}
-              </button>
+              </Button>
             </div>
           </div>
 

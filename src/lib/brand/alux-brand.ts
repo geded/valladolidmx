@@ -50,6 +50,42 @@ export interface AluxVoice {
   workspaceActionTitle: string;
   workspaceOpen: string;
   unavailable: string;
+  pageEyebrow: string;
+  pageTitle: string;
+  pageDescription: string;
+  nextStepTitle: string;
+  nextStepReview: string;
+  nextStepDetect: string;
+  nextStepNearby: string;
+  viewTrip: string;
+  humanConciergeTitle: string;
+  humanConciergeBody: string;
+  prepareTrip: string;
+  retry: string;
+  loadingTrip: string;
+  tripLoadError: string;
+  suggestedQuestions: string;
+  travelerPanelTitle: string;
+  travelerPanelDescription: string;
+  profilePromptTitle: string;
+  profilePromptBody: string;
+  completeProfile: string;
+  completePublicProfile: string;
+  suggestionReady: string;
+  nearbySectionTitle: string;
+  locationTitle: string;
+  locationBody: string;
+  shareLocation: string;
+  requestingLocation: string;
+  locationDenied: string;
+  locationUnavailable: string;
+  contextTitle: string;
+  exploreNearbyTitle: string;
+  catalogGrounding: string;
+  activeCouponsTitle: string;
+  promotionsTitle: string;
+  profileAccuracyTitle: string;
+  profileAccuracyBody: string;
 }
 
 export const ALUX_VOICE_KEYS = [
@@ -76,6 +112,42 @@ export const ALUX_VOICE_KEYS = [
   "workspaceActionTitle",
   "workspaceOpen",
   "unavailable",
+  "pageEyebrow",
+  "pageTitle",
+  "pageDescription",
+  "nextStepTitle",
+  "nextStepReview",
+  "nextStepDetect",
+  "nextStepNearby",
+  "viewTrip",
+  "humanConciergeTitle",
+  "humanConciergeBody",
+  "prepareTrip",
+  "retry",
+  "loadingTrip",
+  "tripLoadError",
+  "suggestedQuestions",
+  "travelerPanelTitle",
+  "travelerPanelDescription",
+  "profilePromptTitle",
+  "profilePromptBody",
+  "completeProfile",
+  "completePublicProfile",
+  "suggestionReady",
+  "nearbySectionTitle",
+  "locationTitle",
+  "locationBody",
+  "shareLocation",
+  "requestingLocation",
+  "locationDenied",
+  "locationUnavailable",
+  "contextTitle",
+  "exploreNearbyTitle",
+  "catalogGrounding",
+  "activeCouponsTitle",
+  "promotionsTitle",
+  "profileAccuracyTitle",
+  "profileAccuracyBody",
 ] as const satisfies ReadonlyArray<keyof AluxVoice>;
 
 export type AluxCopyByLocale = Record<LocaleCode, AluxVoice>;
@@ -108,6 +180,49 @@ const ES: AluxVoice = {
   workspaceActionTitle: "Próxima acción de alto impacto",
   workspaceOpen: "Abrir conversación con {name}",
   unavailable: "{name} no pudo responder ahora. Inténtalo en un momento.",
+  pageEyebrow: "Inteligencia",
+  pageTitle: "{name}",
+  pageDescription:
+    "La inteligencia que acompaña el trabajo del concierge humano: resume expedientes, sugiere productos y prepara borradores revisables.",
+  nextStepTitle: "Tu siguiente mejor paso",
+  nextStepReview: "Revisar los destinos y experiencias de tu viaje",
+  nextStepDetect: "Detectar qué puede faltar según tu tiempo y ritmo",
+  nextStepNearby: "Sugerir lugares cercanos sin cambiar tu plan",
+  viewTrip: "Ver mi viaje",
+  humanConciergeTitle: "Cuando quieras hacerlo realidad",
+  humanConciergeBody:
+    "Tu expediente conserva lo que elegiste. Cuando tú lo decidas, un concierge humano podrá revisarlo contigo, coordinar opciones y ayudarte a convertirlo en un viaje real.",
+  prepareTrip: "Preparar mi viaje",
+  retry: "Reintentar",
+  loadingTrip: "Cargando tu viaje antes de conversar…",
+  tripLoadError: "No pude cargar tu viaje. {name} no enviará un contexto incompleto.",
+  suggestedQuestions: "Preguntas sugeridas",
+  travelerPanelTitle: "{name} · Copiloto de tu viaje",
+  travelerPanelDescription:
+    "Analiza tu espacio de viaje y sugiere. Nunca modifica ni envía nada sin que tú lo confirmes.",
+  profilePromptTitle: "Ayúdame a asesorarte mejor",
+  profilePromptBody:
+    "Mientras más completo esté tu perfil, más preciso puedo ser al recomendarte opciones de {territory}.",
+  completeProfile: "Completar perfil",
+  completePublicProfile: "Completar tu perfil público",
+  suggestionReady: "Sugerencia lista",
+  nearbySectionTitle: "Cercanía real",
+  locationTitle: "Dónde estás",
+  locationBody:
+    "Compartir tu ubicación me permite priorizar lugares realmente cercanos y calcular tiempos de traslado.",
+  shareLocation: "Compartir mi ubicación",
+  requestingLocation: "Solicitando permiso…",
+  locationDenied: "Permiso denegado — reintentar",
+  locationUnavailable: "Ubicación no disponible",
+  contextTitle: "Qué estás explorando",
+  exploreNearbyTitle: "Qué explorar cerca",
+  catalogGrounding:
+    "Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido, nunca inventadas.",
+  activeCouponsTitle: "Tus cupones activos",
+  promotionsTitle: "Promociones en {destination}",
+  profileAccuracyTitle: "Ayúdame a asesorarte mejor",
+  profileAccuracyBody:
+    "Completa tu perfil de viajero y tu perfil público para recibir recomendaciones más precisas de {territory}.",
 };
 
 const EN: AluxVoice = {

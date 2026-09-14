@@ -17,6 +17,7 @@ import { PublicAluxChat } from "@/components/alux/PublicAluxChat";
 import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 export const Route = createFileRoute("/alux")({
   loader: async () => {
@@ -37,6 +38,7 @@ function AluxPage() {
   const { composition } = Route.useLoaderData();
   const { user, loading } = useAuth();
   const { locale } = useTranslation();
+  const alux = useAluxBrand();
   const session = useNavigationSession();
   /**
    * Continuidad de ruta: si el explorador llegó desde "Arma tu Viaje",
@@ -73,13 +75,13 @@ function AluxPage() {
 
   return (
     <PublicShell
-      eyebrow="Inteligencia"
-      title="Alux"
-      description="La inteligencia que acompaña el trabajo del concierge humano: resume expedientes, sugiere productos y prepara borradores revisables."
+      eyebrow={alux.copy("pageEyebrow")}
+      title={alux.copy("pageTitle")}
+      description={alux.copy("pageDescription")}
       crumbs={crumbs}
       compactCrumbsOnMobile
     >
-      <div className="mx-auto w-full max-w-3xl px-4 mb-10">
+      <div className="mx-auto mb-10 w-full min-w-0 max-w-3xl px-4">
         {loading ? (
           <div className="min-h-48 animate-pulse rounded-2xl border border-border/60 bg-muted/30" />
         ) : user ? (
