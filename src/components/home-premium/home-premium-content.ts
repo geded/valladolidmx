@@ -354,8 +354,8 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   },
   eventos: {
     kicker: "Agenda editorial",
-    title: "El territorio también ocurre hoy",
-    description: "Eventos publicados con fecha acreditada en el CMS.",
+    title: "¿Qué hacer hoy?",
+    description: "Eventos que están ocurriendo en todo el territorio…",
     media: HOME_PREMIUM_MEDIA.plaza,
     items: [],
   },
