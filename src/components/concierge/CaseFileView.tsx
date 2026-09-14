@@ -1709,6 +1709,12 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
 
       {state === "idle" && payload && (
         <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {payload.trip_brief && (
+            <HandoffBlock title="Brief del viaje (confirmado por el viajero)">
+              <TripBriefBlock brief={payload.trip_brief} />
+            </HandoffBlock>
+          )}
+
           <HandoffBlock title="Perfil del viajero">
             {payload.profile ? (
               <ProfileSummary profile={payload.profile} />
