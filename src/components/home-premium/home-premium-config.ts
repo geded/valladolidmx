@@ -294,6 +294,7 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
               typeof row.starts_at === "string" && row.starts_at.trim().length > 0
                 ? row.starts_at.trim()
                 : (item?.startsAt ?? null),
+            recurrence: item?.recurrence ?? null,
             media:
               typeof row.media_url === "string" && row.media_url.trim().length > 0
                 ? { url: row.media_url.trim(), alt: str(row.media_alt, item?.title ?? "") }
