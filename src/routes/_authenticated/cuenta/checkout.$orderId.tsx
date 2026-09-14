@@ -118,6 +118,11 @@ function CheckoutPage() {
       // Modalidad vigente: pago en efectivo con el concierge.
       await payCash({ data: { orderId, note: null } });
       await notifyConfirmed(order);
+      try {
+        await notifyAdmin({ data: { orderId } });
+      } catch {
+        // El aviso interno puede reintentarse; no bloquea la confirmación.
+      }
       await orderQ.refetch();
       toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
       navigate({
