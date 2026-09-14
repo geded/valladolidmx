@@ -81,3 +81,9 @@
 - [ ] Validar en 393x852 (móvil) y typecheck limpio.
 
 - [x] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
+
+## Alux multimarca · configuración desde Marca (2026-09-14)
+
+- [ ] Extender `brand.identity` con paleta de interfaz y textos de Alux configurables por marca, con herencia segura de los valores vigentes.
+- [ ] Conectar la autoridad de Marca a todas las superficies canónicas de Alux, sin cambiar ilustración, comportamiento ni crear configuraciones paralelas.
+- [ ] Ejecutar Scope Gate, Preservation Gate y QA 1440/834/430/390; no publicar sin autorización.
