@@ -62,7 +62,12 @@ export default defineConfig({
             "og/default-1200x630.jpg",
             "assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*",
           ],
-          additionalManifestEntries: [{ url: "/offline", revision: "pwa-offline-v1" }],
+          // La revisión debe cambiar en cada build: con una revisión fija, el
+          // HTML de /offline quedaba congelado en el precache y seguía
+          // apuntando a hashes de assets antiguos (pantalla sin estilos).
+          additionalManifestEntries: [
+            { url: "/offline", revision: `pwa-offline-${Date.now().toString(36)}` },
+          ],
           runtimeCaching: [
             // Rutas sensibles / autenticadas: NUNCA cachear.
             // Se resuelve siempre contra red; sin fallback offline.
@@ -83,7 +88,9 @@ export default defineConfig({
                 ),
               handler: "NetworkFirst",
               options: {
-                cacheName: "html-pages",
+                // v2: purga cachés de navegación envenenadas con la pantalla
+                // "Estás sin conexión" de builds anteriores.
+                cacheName: "html-pages-v2",
                 /* Sin timeout corto: con 4 s, una respuesta SSR algo lenta
                    se interpretaba como "sin red" y el visitante veía un
                    parpadeo de la pantalla "Estás sin conexión" antes de que
