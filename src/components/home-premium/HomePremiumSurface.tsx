@@ -252,6 +252,20 @@ export function HomePremiumSurface({
           )}
         </Container>
 
+        <Container className="mt-6 sm:mt-8" data-home-journey="alux">
+          <AluxPlanner
+            content={content}
+            selectedPrompt={selectedPrompt}
+            onSelectPrompt={selectPrompt}
+            selectedParty={selectedParty}
+            onSelectParty={selectParty}
+            selectedRoute={selectedRoute}
+            onSelectRoute={setSelectedRoute}
+            added={added}
+            onAdd={() => setAdded(true)}
+          />
+        </Container>
+
         {enabled("destinos") ? (
           <Container className="mt-8 lg:mt-12" data-home-journey="territory">
             <div data-cinematic-section={cinematic || undefined}>{renderSection("destinos")}</div>
@@ -280,20 +294,6 @@ export function HomePremiumSurface({
             <div data-cinematic-section={cinematic || undefined}>{renderSection("rutas")}</div>
           </Container>
         ) : null}
-
-        <Container className="mt-6 sm:mt-8" data-home-journey="alux">
-          <AluxPlanner
-            content={content}
-            selectedPrompt={selectedPrompt}
-            onSelectPrompt={selectPrompt}
-            selectedParty={selectedParty}
-            onSelectParty={selectParty}
-            selectedRoute={selectedRoute}
-            onSelectRoute={setSelectedRoute}
-            added={added}
-            onAdd={() => setAdded(true)}
-          />
-        </Container>
 
         <Container className="mt-8 lg:mt-12" data-home-journey="travel-plan">
           <TravelPlanClose
