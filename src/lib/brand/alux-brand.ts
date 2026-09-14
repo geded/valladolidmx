@@ -242,7 +242,8 @@ const ES: AluxVoice = {
   conversationTitle: "Conversa con {name}",
   conversationDescription:
     "Pregunta libre. {name} responde sólo con el catálogo publicado y te dice cuándo un dato no está disponible.",
-  publicIntro: "Pregúntame sobre los destinos, experiencias y servicios de {territory}, o cómo armar tu viaje.",
+  publicIntro:
+    "Pregúntame sobre los destinos, experiencias y servicios de {territory}, o cómo armar tu viaje.",
   inputPlaceholder: "¿Qué viaje tienes en mente?",
   sendLabel: "Enviar a {name}",
   newConversation: "Nueva conversación",
@@ -366,7 +367,8 @@ const EN: AluxVoice = {
   conversationTitle: "Chat with {name}",
   conversationDescription:
     "Ask freely. {name} answers only from the published catalog and tells you when information is unavailable.",
-  publicIntro: "Ask me about destinations, experiences and services in {territory}, or how to plan your trip.",
+  publicIntro:
+    "Ask me about destinations, experiences and services in {territory}, or how to plan your trip.",
   inputPlaceholder: "What trip do you have in mind?",
   sendLabel: "Send to {name}",
   newConversation: "New conversation",

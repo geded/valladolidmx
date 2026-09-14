@@ -375,70 +375,107 @@ function BrandSettingsPage() {
             </p>
             <h2 className="mt-2 text-2xl font-semibold">Color y voz por marca</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Configura la interfaz sin modificar la ilustración, el modelo, las reglas ni los datos.
+              Configura la interfaz sin modificar la ilustración, el modelo, las reglas ni los
+              datos.
             </p>
           </div>
 
           <fieldset className="rounded-2xl border border-border p-4">
             <legend className="px-2 text-sm font-semibold">Paleta de Alux</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              {ALUX_PALETTE_FIELDS.filter((field) => ALUX_PALETTE_KEYS.includes(field.key)).map((field) => (
-                <div key={field.key} className="space-y-2">
-                  <Label htmlFor={`alux-palette-${field.key}`}>{field.label}</Label>
-                  <div className="flex items-center gap-3">
-                    <Input
-                      id={`alux-palette-${field.key}`}
-                      type="color"
-                      className="h-11 w-16 cursor-pointer p-1"
-                      value={form.aluxPalette[field.key]}
-                      onChange={(event) => setForm((previous) => ({
-                        ...previous,
-                        aluxPalette: { ...previous.aluxPalette, [field.key]: event.target.value },
-                      }))}
-                      disabled={brandQ.isLoading || save.isPending}
-                    />
-                    <Input
-                      aria-label={`${field.label} hexadecimal`}
-                      value={form.aluxPalette[field.key]}
-                      pattern="#[0-9a-fA-F]{6}"
-                      maxLength={7}
-                      onChange={(event) => setForm((previous) => ({
-                        ...previous,
-                        aluxPalette: { ...previous.aluxPalette, [field.key]: event.target.value },
-                      }))}
-                      disabled={brandQ.isLoading || save.isPending}
-                    />
+              {ALUX_PALETTE_FIELDS.filter((field) => ALUX_PALETTE_KEYS.includes(field.key)).map(
+                (field) => (
+                  <div key={field.key} className="space-y-2">
+                    <Label htmlFor={`alux-palette-${field.key}`}>{field.label}</Label>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        id={`alux-palette-${field.key}`}
+                        type="color"
+                        className="h-11 w-16 cursor-pointer p-1"
+                        value={form.aluxPalette[field.key]}
+                        onChange={(event) =>
+                          setForm((previous) => ({
+                            ...previous,
+                            aluxPalette: {
+                              ...previous.aluxPalette,
+                              [field.key]: event.target.value,
+                            },
+                          }))
+                        }
+                        disabled={brandQ.isLoading || save.isPending}
+                      />
+                      <Input
+                        aria-label={`${field.label} hexadecimal`}
+                        value={form.aluxPalette[field.key]}
+                        pattern="#[0-9a-fA-F]{6}"
+                        maxLength={7}
+                        onChange={(event) =>
+                          setForm((previous) => ({
+                            ...previous,
+                            aluxPalette: {
+                              ...previous.aluxPalette,
+                              [field.key]: event.target.value,
+                            },
+                          }))
+                        }
+                        disabled={brandQ.isLoading || save.isPending}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </fieldset>
 
           <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
             {aluxContrastChecks.map((check) => (
-              <p key={check.label} className={`rounded-lg px-3 py-2 text-sm ${check.pass ? "bg-muted text-foreground" : "bg-destructive/10 text-destructive"}`}>
+              <p
+                key={check.label}
+                className={`rounded-lg px-3 py-2 text-sm ${check.pass ? "bg-muted text-foreground" : "bg-destructive/10 text-destructive"}`}
+              >
                 {check.pass ? "PASS" : "Revisar"} · {check.label}: {check.ratio.toFixed(2)}:1
               </p>
             ))}
           </div>
 
-          <div className="rounded-2xl border border-border p-5" style={aluxPaletteStyle(form.aluxPalette)}>
+          <div
+            className="rounded-2xl border border-border p-5"
+            style={aluxPaletteStyle(form.aluxPalette)}
+          >
             <div className="rounded-xl border border-alux-border bg-alux-surface p-5 text-alux-surface-foreground">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alux-accent">Vista previa de Alux</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-alux-accent">
+                Vista previa de Alux
+              </p>
               <h3 className="mt-2 text-xl font-semibold">
-                {fillAluxCopy(form.aluxCopy[aluxLocale].conversationTitle, { name: form.conciergeName, territory: form.tagline })}
+                {fillAluxCopy(form.aluxCopy[aluxLocale].conversationTitle, {
+                  name: form.conciergeName,
+                  territory: form.tagline,
+                })}
               </h3>
               <p className="mt-2 text-sm">
-                {fillAluxCopy(form.aluxCopy[aluxLocale].conversationDescription, { name: form.conciergeName, territory: form.tagline })}
+                {fillAluxCopy(form.aluxCopy[aluxLocale].conversationDescription, {
+                  name: form.conciergeName,
+                  territory: form.tagline,
+                })}
               </p>
-              <Button type="button" className="mt-4 rounded-full bg-alux px-4 py-2 text-sm font-semibold text-alux-foreground hover:bg-alux/90">
-                {fillAluxCopy(form.aluxCopy[aluxLocale].planCta, { name: form.conciergeName, territory: form.tagline })}
+              <Button
+                type="button"
+                className="mt-4 rounded-full bg-alux px-4 py-2 text-sm font-semibold text-alux-foreground hover:bg-alux/90"
+              >
+                {fillAluxCopy(form.aluxCopy[aluxLocale].planCta, {
+                  name: form.conciergeName,
+                  territory: form.tagline,
+                })}
               </Button>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="flex flex-wrap gap-2" role="tablist" aria-label="Idioma de la voz de Alux">
+            <div
+              className="flex flex-wrap gap-2"
+              role="tablist"
+              aria-label="Idioma de la voz de Alux"
+            >
               {ACTIVE_LOCALES.map((locale) => (
                 <button
                   key={locale.code}
@@ -446,14 +483,19 @@ function BrandSettingsPage() {
                   role="tab"
                   aria-selected={aluxLocale === locale.code}
                   onClick={() => setAluxLocale(locale.code)}
-                  className={aluxLocale === locale.code ? "rounded-full bg-foreground px-3 py-2 text-xs font-semibold text-background" : "rounded-full border border-border px-3 py-2 text-xs font-medium"}
+                  className={
+                    aluxLocale === locale.code
+                      ? "rounded-full bg-foreground px-3 py-2 text-xs font-semibold text-background"
+                      : "rounded-full border border-border px-3 py-2 text-xs font-medium"
+                  }
                 >
                   {locale.native_label}
                 </button>
               ))}
             </div>
             <p className="text-xs text-muted-foreground">
-              Variables disponibles: {"{name}"}, {"{territory}"}, {"{destination}"}, {"{count}"} y {"{distance}"}. Español es la reserva segura.
+              Variables disponibles: {"{name}"}, {"{territory}"}, {"{destination}"}, {"{count}"} y{" "}
+              {"{distance}"}. Español es la reserva segura.
             </p>
             <div className="grid gap-4">
               {ALUX_VOICE_KEYS.map((key) => (
@@ -464,13 +506,18 @@ function BrandSettingsPage() {
                     value={form.aluxCopy[aluxLocale][key]}
                     maxLength={500}
                     rows={form.aluxCopy[aluxLocale][key].length > 100 ? 3 : 2}
-                    onChange={(event) => setForm((previous) => ({
-                      ...previous,
-                      aluxCopy: {
-                        ...previous.aluxCopy,
-                        [aluxLocale]: { ...previous.aluxCopy[aluxLocale], [key]: event.target.value },
-                      },
-                    }))}
+                    onChange={(event) =>
+                      setForm((previous) => ({
+                        ...previous,
+                        aluxCopy: {
+                          ...previous.aluxCopy,
+                          [aluxLocale]: {
+                            ...previous.aluxCopy[aluxLocale],
+                            [key]: event.target.value,
+                          },
+                        },
+                      }))
+                    }
                     disabled={brandQ.isLoading || save.isPending}
                     className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                   />
@@ -483,7 +530,9 @@ function BrandSettingsPage() {
         <div className="flex flex-wrap gap-3 pt-2">
           <Button
             type="submit"
-            disabled={save.isPending || brandQ.isLoading || !paletteIsAccessible || !aluxPaletteIsAccessible}
+            disabled={
+              save.isPending || brandQ.isLoading || !paletteIsAccessible || !aluxPaletteIsAccessible
+            }
           >
             {save.isPending ? "Guardando…" : "Guardar cambios"}
           </Button>

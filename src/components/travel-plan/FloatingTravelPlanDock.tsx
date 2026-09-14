@@ -205,7 +205,6 @@ export function FloatingTravelPlanDock() {
     acknowledgeReturn,
   ]);
 
-
   // El dock depende de estado local del navegador (borrador anónimo /
   // sesión). Antes de hidratar no renderizamos nada para que el markup
   // del servidor y el del cliente coincidan.
@@ -359,15 +358,15 @@ export function FloatingTravelPlanDock() {
           hasConciergeResponse
             ? "Ya tienes una respuesta de tu Concierge humano"
             : isConfirmed
-            ? `Viaje confirmado ${confirmed!.folio}`
-            : `Tu viaje (${count} ${count === 1 ? "ítem" : "ítems"})`
+              ? `Viaje confirmado ${confirmed!.folio}`
+              : `Tu viaje (${count} ${count === 1 ? "ítem" : "ítems"})`
         }
         className={`fixed left-4 z-40 inline-flex items-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-semibold shadow-elevated backdrop-blur transition-colors md:left-6 ${
           hasConciergeResponse
             ? "border-alux-border bg-alux-surface text-alux-surface-foreground hover:opacity-95"
             : isConfirmed
-            ? "border-success/40 bg-success/10 text-foreground hover:bg-success/15"
-            : "border-primary/25 bg-card/95 text-foreground hover:bg-card"
+              ? "border-success/40 bg-success/10 text-foreground hover:bg-success/15"
+              : "border-primary/25 bg-card/95 text-foreground hover:bg-card"
         }`}
         style={{ bottom: dockBottom }}
       >
@@ -376,14 +375,18 @@ export function FloatingTravelPlanDock() {
             hasConciergeResponse
               ? "bg-alux text-alux-foreground"
               : isConfirmed
-              ? "bg-success text-success-foreground"
-              : "bg-primary text-primary-foreground"
+                ? "bg-success text-success-foreground"
+                : "bg-primary text-primary-foreground"
           }`}
         >
           <Luggage className="h-4 w-4" aria-hidden />
         </span>
         <span className="hidden sm:inline">
-          {hasConciergeResponse ? "Respuesta del Concierge" : isConfirmed ? "Viaje confirmado" : "Tu viaje"}
+          {hasConciergeResponse
+            ? "Respuesta del Concierge"
+            : isConfirmed
+              ? "Viaje confirmado"
+              : "Tu viaje"}
         </span>
         {hasConciergeResponse ? (
           <span className="relative flex size-5 items-center justify-center" aria-hidden>

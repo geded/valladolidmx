@@ -22,7 +22,10 @@ const CASE_STATUS: Record<string, { label: string; detail: string }> = {
     label: "Consultando disponibilidad",
     detail: "Estamos esperando respuestas para completar tu propuesta",
   },
-  waiting_customer: { label: "Necesitamos tu respuesta", detail: "Revisa el expediente y responde" },
+  waiting_customer: {
+    label: "Necesitamos tu respuesta",
+    detail: "Revisa el expediente y responde",
+  },
   resolved: { label: "Atendido", detail: "Tu solicitud ya fue atendida" },
   closed_won: { label: "Viaje confirmado", detail: "Tu propuesta fue confirmada" },
   closed_lost: { label: "Finalizado", detail: "Este expediente ha finalizado" },
@@ -114,7 +117,10 @@ function TravelerConciergePage() {
                         </span>
                         <span className="inline-flex items-center gap-1 font-medium text-primary">
                           Ver seguimiento
-                          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                          <ArrowRight
+                            className="size-3.5 transition-transform group-hover:translate-x-0.5"
+                            aria-hidden
+                          />
                         </span>
                       </div>
                       <p className="mt-2 text-[10px] text-muted-foreground">

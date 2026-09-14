@@ -571,7 +571,9 @@ export function AluxFloatingTrigger() {
       : "Contexto reciente"
     : "Modo descubrimiento";
 
-  const triggerLabel = ctx.hasContext ? (current?.label ?? alux.copy("shortDescriptor")) : t("alux_floating");
+  const triggerLabel = ctx.hasContext
+    ? (current?.label ?? alux.copy("shortDescriptor"))
+    : t("alux_floating");
 
   return (
     <>
@@ -634,7 +636,9 @@ export function AluxFloatingTrigger() {
           </span>
 
           <span className="hidden sm:inline">{alux.name}</span>
-          <span className="hidden text-xs text-muted-foreground sm:inline">· {alux.copy("shortDescriptor")}</span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">
+            · {alux.copy("shortDescriptor")}
+          </span>
           <span className="ml-1 text-xs text-muted-foreground sm:hidden">{alux.name}</span>
         </button>
         {/* Consolidación Alux: la sugerencia proactiva ya NO se pinta como un
@@ -656,7 +660,9 @@ export function AluxFloatingTrigger() {
                 <AluxMark family="avatar" size={28} decorative loading="eager" />
               </span>
               <div>
-                <SheetTitle className="text-lg">{alux.name} · {alux.copy("territorialDescriptor")}</SheetTitle>
+                <SheetTitle className="text-lg">
+                  {alux.name} · {alux.copy("territorialDescriptor")}
+                </SheetTitle>
                 <SheetDescription className="text-xs text-muted-foreground">
                   {originLabel} · te acompaña mientras exploras el destino.
                 </SheetDescription>
@@ -965,9 +971,7 @@ export function AluxFloatingTrigger() {
               </p>
             ) : (
               <>
-                <p className="mt-2 text-sm text-foreground">
-                  {alux.copy("locationBody")}
-                </p>
+                <p className="mt-2 text-sm text-foreground">{alux.copy("locationBody")}</p>
                 <button
                   type="button"
                   onClick={geo.request}
@@ -993,7 +997,7 @@ export function AluxFloatingTrigger() {
               <section aria-labelledby="alux-where">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   <MapPin className="size-3.5" aria-hidden />
-                   <span id="alux-where">{alux.copy("locationTitle")}</span>
+                  <span id="alux-where">{alux.copy("locationTitle")}</span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {chain.map((slot) => (
@@ -1009,7 +1013,7 @@ export function AluxFloatingTrigger() {
               >
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   <Compass className="size-3.5" aria-hidden />
-                   <span id="alux-what">{alux.copy("contextTitle")}</span>
+                  <span id="alux-what">{alux.copy("contextTitle")}</span>
                 </div>
                 <p className="mt-2 text-sm text-foreground">{ctx.reason}</p>
                 {current?.href && (
@@ -1031,11 +1035,9 @@ export function AluxFloatingTrigger() {
             >
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 <Compass className="size-3.5" aria-hidden />
-                 <span id="alux-discover">{alux.copy("discoveryTitle")}</span>
+                <span id="alux-discover">{alux.copy("discoveryTitle")}</span>
               </div>
-              <p className="mt-2 text-sm text-foreground">
-                {alux.copy("discoveryBody")}
-              </p>
+              <p className="mt-2 text-sm text-foreground">{alux.copy("discoveryBody")}</p>
               {/* Lote 3J.1 · Destinos publicados del CMS (sin lista fija). */}
               {(publishedDestinations ?? []).length > 0 ? (
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -1058,7 +1060,7 @@ export function AluxFloatingTrigger() {
           <section aria-labelledby="alux-next">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <Sparkles className="size-3.5" aria-hidden />
-               <span id="alux-next">{alux.copy("exploreNearbyTitle")}</span>
+              <span id="alux-next">{alux.copy("exploreNearbyTitle")}</span>
               {suggestionsQuery.data?.rationaleSource === "ai" && (
                 <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-alux/10 px-2 py-0.5 text-[10px] font-medium text-alux">
                   <Sparkles className="size-3" aria-hidden />
@@ -1296,7 +1298,7 @@ export function AluxFloatingTrigger() {
             >
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
                 <Ticket className="size-3.5" aria-hidden />
-                 <span id="alux-coupons">{alux.copy("activeCouponsTitle")}</span>
+                <span id="alux-coupons">{alux.copy("activeCouponsTitle")}</span>
               </div>
               <ul className="mt-2 grid gap-1.5">
                 {lens.active_coupons.slice(0, 4).map((c) => (
@@ -1375,9 +1377,7 @@ export function AluxFloatingTrigger() {
               <Sparkles className="size-3.5" aria-hidden />
               <span id="alux-profile">{alux.copy("profileAccuracyTitle")}</span>
             </div>
-            <p className="mt-2 text-sm text-foreground">
-              {alux.copy("profileAccuracyBody")}
-            </p>
+            <p className="mt-2 text-sm text-foreground">{alux.copy("profileAccuracyBody")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <a
                 href="/cuenta/perfil-publico"

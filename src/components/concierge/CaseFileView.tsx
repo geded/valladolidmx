@@ -453,7 +453,9 @@ function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
       </div>
       <h2 className="mt-2 text-lg font-semibold">{f.case.summary ?? "Sin resumen"}</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        {internal ? `Origen: ${labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: ${labelFor(f.case.priority, PRIORITY_LABELS)} · ` : "Recibido "}
+        {internal
+          ? `Origen: ${labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: ${labelFor(f.case.priority, PRIORITY_LABELS)} · `
+          : "Recibido "}
         {new Date(f.case.created_at).toLocaleString("es-MX")}
       </p>
       {internal && f.traveler.display_name && (
@@ -479,16 +481,26 @@ function TravelerConciergeProgress({ f }: { f: CaseFile }) {
   const steps = ["Recibido", "En revisión", "Preparando propuesta", "Propuesta lista"];
 
   return (
-    <section aria-labelledby="traveler-concierge-progress" className="border-y border-alux-border bg-alux-surface px-4 py-5 sm:px-5">
+    <section
+      aria-labelledby="traveler-concierge-progress"
+      className="border-y border-alux-border bg-alux-surface px-4 py-5 sm:px-5"
+    >
       <div className="flex items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-alux text-alux-foreground">
-          {hasReadyProposal ? <Headset className="size-5" aria-hidden /> : <Sparkles className="size-5" aria-hidden />}
+          {hasReadyProposal ? (
+            <Headset className="size-5" aria-hidden />
+          ) : (
+            <Sparkles className="size-5" aria-hidden />
+          )}
         </span>
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-alux-surface-foreground/70">
             {alux.name} · contigo durante la espera
           </p>
-          <h3 id="traveler-concierge-progress" className="mt-1 text-lg font-semibold text-alux-surface-foreground">
+          <h3
+            id="traveler-concierge-progress"
+            className="mt-1 text-lg font-semibold text-alux-surface-foreground"
+          >
             {hasReadyProposal
               ? alux.copy("conciergeProposalReadyTitle")
               : isReviewing
@@ -504,22 +516,40 @@ function TravelerConciergeProgress({ f }: { f: CaseFile }) {
           </p>
         </div>
       </div>
-      <ol className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Avance de tu solicitud">
+      <ol
+        className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4"
+        aria-label="Avance de tu solicitud"
+      >
         {steps.map((step, index) => {
           const complete = index <= activeStep;
           return (
             <li key={step} className="flex items-center gap-2 text-xs">
-              <span className={`grid size-6 shrink-0 place-items-center rounded-full border ${complete ? "border-alux bg-alux text-alux-foreground" : "border-alux-border bg-background text-muted-foreground"}`}>
-                {complete ? <Check className="size-3.5" aria-hidden /> : <Circle className="size-3" aria-hidden />}
+              <span
+                className={`grid size-6 shrink-0 place-items-center rounded-full border ${complete ? "border-alux bg-alux text-alux-foreground" : "border-alux-border bg-background text-muted-foreground"}`}
+              >
+                {complete ? (
+                  <Check className="size-3.5" aria-hidden />
+                ) : (
+                  <Circle className="size-3" aria-hidden />
+                )}
               </span>
-              <span className={complete ? "font-medium text-alux-surface-foreground" : "text-alux-surface-foreground/55"}>{step}</span>
+              <span
+                className={
+                  complete
+                    ? "font-medium text-alux-surface-foreground"
+                    : "text-alux-surface-foreground/55"
+                }
+              >
+                {step}
+              </span>
             </li>
           );
         })}
       </ol>
       {!hasReadyProposal ? (
         <p className="mt-4 border-t border-alux-border pt-3 text-xs text-alux-surface-foreground/70">
-          Cuando esté lista, recibirás un aviso en tu cuenta y podrás revisar qué incluye, el importe y la vigencia antes de decidir.
+          Cuando esté lista, recibirás un aviso en tu cuenta y podrás revisar qué incluye, el
+          importe y la vigencia antes de decidir.
         </p>
       ) : null}
     </section>
