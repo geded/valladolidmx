@@ -7864,6 +7864,14 @@ export type Database = {
         Args: { _proposal_id: string }
         Returns: string
       }
+      concierge_directory: {
+        Args: never
+        Returns: {
+          active: boolean
+          display_name: string
+          user_id: string
+        }[]
+      }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
       concierge_my_workload: { Args: never; Returns: Json }
       concierge_order_has_business_member: {
