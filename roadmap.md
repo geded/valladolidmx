@@ -83,6 +83,7 @@
 - [ ] Validar en 393x852 (móvil) y typecheck limpio.
 
 - [x] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
+- [ ] Afinar exclusivamente `/auth` en móvil sin cambiar su composición: escala tipográfica, ritmo vertical y proporciones compactas; Preservation Gate 1440/834/430/390.
 
 ## Incidencia · Envío de Mi Viaje al Concierge (2026-09-14)
 
