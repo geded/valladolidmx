@@ -201,7 +201,8 @@ export function HomePremiumSurface({
       key !== "destinos" &&
       key !== "rutas" &&
       key !== "eventos" &&
-      key !== "experiencias",
+      key !== "experiencias" &&
+      key !== "mapa",
   );
 
   const renderSection = (key: HomePremiumSectionKey) => {
