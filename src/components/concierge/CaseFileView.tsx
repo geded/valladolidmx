@@ -378,6 +378,7 @@ export function CaseFileView({
       {!internal && <ProposalsSection f={f} internal={false} />}
       {internal && <SlaAssignmentPanel f={f} />}
       {internal && <TravelerContactSection traveler={f.traveler} />}
+      <TravelPlanSection plan={f.travel_plan} />
       {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
       <Section title="Qué solicita el viajero">
