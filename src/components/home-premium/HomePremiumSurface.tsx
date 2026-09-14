@@ -36,7 +36,7 @@ import { ExperienceMapBlock } from "@/components/experience-builder/blocks/exper
 import { PremiumAluxBar } from "./shared/PremiumShowcase";
 import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
-import { MERIDA_TIME_ZONE, meridaDate } from "@/lib/time/merida";
+import { MERIDA_TIME_ZONE, meridaDate, meridaToday } from "@/lib/time/merida";
 
 import { openAluxFloating, onAluxMapFocus } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
