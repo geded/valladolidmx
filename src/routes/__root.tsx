@@ -86,7 +86,7 @@ import {
   BRAND_SETTINGS_DEFAULTS,
   normalizeBrandSettings,
 } from "@/lib/brand/brand-settings.functions";
-import { brandPaletteStyle } from "@/lib/brand/brand-theme";
+import { aluxPaletteStyle, brandPaletteStyle } from "@/lib/brand/brand-theme";
 import {
   institutionalAuthorityQueryOptions,
   useInstitutionalAuthority,
@@ -263,7 +263,11 @@ function RootShell({ children }: { children: ReactNode }) {
       lang="es"
       suppressHydrationWarning
       data-tourism-brand={ACTIVE_BRAND.key}
-      style={{ ...ACTIVE_BRAND_THEME_STYLE, ...brandPaletteStyle(brandSettings.palette) }}
+      style={{
+        ...ACTIVE_BRAND_THEME_STYLE,
+        ...brandPaletteStyle(brandSettings.palette),
+        ...aluxPaletteStyle(brandSettings.aluxPalette),
+      }}
       data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>

@@ -116,7 +116,6 @@ const CAPABILITIES: CapabilityDef[] = [
 ];
 
 export function AluxTravelerPanel() {
-  const brand = useBrand();
   const alux = useAluxBrand();
   const { locale: activeLocale } = useTranslation();
   const rawLocale = (activeLocale ?? "es").toLowerCase().slice(0, 2);
@@ -199,26 +198,23 @@ export function AluxTravelerPanel() {
           <Sparkles className="size-5" aria-hidden />
         </span>
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold">{alux.name} · Copiloto de tu viaje</h2>
+          <h2 className="text-lg font-semibold">{alux.copy("travelerPanelTitle")}</h2>
           <p className="text-xs text-muted-foreground">
-            Analiza tu Travel Workspace y sugiere. Nunca modifica ni envía nada sin que tú lo
-            confirmes.
+            {alux.copy("travelerPanelDescription")}
           </p>
         </div>
       </header>
 
       <div className="mt-3 rounded-xl border border-alux/20 bg-alux/5 p-3 text-xs text-foreground">
-        <p className="font-medium">Ayúdame a asesorarte mejor</p>
+        <p className="font-medium">{alux.copy("profilePromptTitle")}</p>
         <p className="mt-1 text-muted-foreground">
-          Mientras más completo esté tu perfil (estilo, intereses, presupuesto, fechas) y más lo
-          completes como perfil público, más preciso puedo ser al recomendarte hoteles,
-           restaurantes, experiencias y rutas de {brand.tagline}.{" "}
+          {alux.copy("profilePromptBody")} {" "}
           <a href="/cuenta/perfil" className="font-medium text-alux hover:underline">
-            Completar perfil
+            {alux.copy("completeProfile")}
           </a>
           {" · "}
           <a href="/cuenta/perfil-publico" className="font-medium text-alux hover:underline">
-            Completar tu perfil público
+            {alux.copy("completePublicProfile")}
           </a>
         </p>
       </div>
@@ -248,7 +244,7 @@ export function AluxTravelerPanel() {
                 <span className="block text-[11px] text-muted-foreground">{c.description}</span>
                 {hasResult ? (
                   <span className="mt-0.5 inline-block text-[10px] font-semibold uppercase tracking-wide text-alux">
-                    · Sugerencia lista
+                    · {alux.copy("suggestionReady")}
                   </span>
                 ) : null}
               </span>
@@ -294,7 +290,7 @@ export function AluxTravelerPanel() {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-alux/5 disabled:opacity-60"
                 >
                   <RotateCcw className="size-3" aria-hidden />
-                  Reintentar
+                  {alux.copy("retry")}
                 </button>
               </article>
             );
@@ -306,13 +302,13 @@ export function AluxTravelerPanel() {
         {mut.isPending ? (
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
             <Loader2 className="size-3 animate-spin" aria-hidden />
-            Alux está pensando sobre tu viaje…
+            {alux.copy("thinking")}
           </p>
         ) : null}
       </div>
 
       <p className="mt-4 text-[11px] italic text-muted-foreground">
-        Alux no reserva, no contacta empresas y no envía al Concierge. Todas las acciones son tuyas.
+        {alux.copy("disclaimer")}
       </p>
     </section>
   );
