@@ -243,10 +243,23 @@ export const listBusinessConciergeQuotes = createServerFn({ method: "GET" })
  * 14.60.4 — Propuestas Concierge (Customer Case File ↔ Viajero)
  * ============================================================ */
 
-const ProposalItem = z.object({
-  quote_id: z.string().uuid(),
-  notes: z.string().max(1000).optional().nullable(),
-});
+/**
+ * Una partida puede venir de una cotización empresarial recibida
+ * (`quote_id`) o ser una partida propia del Concierge (`title` + importe),
+ * por ejemplo un tour con precio ya acordado con el proveedor.
+ */
+const ProposalItem = z.union([
+  z.object({
+    quote_id: z.string().uuid(),
+    notes: z.string().max(1000).optional().nullable(),
+  }),
+  z.object({
+    title: z.string().trim().min(3).max(200),
+    amount_cents: z.number().int().min(0).max(100_000_000),
+    currency: z.string().length(3).optional(),
+    notes: z.string().max(1000).optional().nullable(),
+  }),
+]);
 
 const ProposalCreateInput = z.object({
   caseId: z.string().uuid(),
