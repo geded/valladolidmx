@@ -289,6 +289,12 @@ export function HomePremiumSurface({
           </section>
         </Container>
 
+        {enabled("eventos") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="eventos">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("eventos")}</div>
+          </Container>
+        ) : null}
+
         {enabled("rutas") ? (
           <Container className="mt-8 lg:mt-12" data-home-journey="routes">
             <div data-cinematic-section={cinematic || undefined}>{renderSection("rutas")}</div>
