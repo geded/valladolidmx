@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   getConciergeOrder,
-  startConciergeOrderCheckout,
+  markConciergeOrderPaidCash,
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
@@ -38,7 +38,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
 
   const fetchOrder = useServerFn(getConciergeOrder);
-  const startCheckout = useServerFn(startConciergeOrderCheckout);
+  const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
   const fetchPaymentsStatus = useServerFn(getPaymentsReadyPublic);
 
