@@ -197,7 +197,11 @@ export function HomePremiumSurface({
   // Nunca cambian jerarquía, orden ni geometría entre sí.
   const presentationOrder: HomePremiumSectionKey[] = order;
   const remainingDiscoveryOrder = presentationOrder.filter(
-    (key) => key !== "destinos" && key !== "rutas" && key !== "eventos",
+    (key) =>
+      key !== "destinos" &&
+      key !== "rutas" &&
+      key !== "eventos" &&
+      key !== "experiencias",
   );
 
   const renderSection = (key: HomePremiumSectionKey) => {
