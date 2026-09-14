@@ -1043,10 +1043,17 @@ function ProposalComposer({
           className="h-10 rounded border border-border bg-background px-2 text-foreground"
         />
       </label>
-      <div className="mt-2 flex justify-end">
+      <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
+        {selectedQuotes.length === 0 ? (
+          <p className="mr-auto max-w-md leading-relaxed text-muted-foreground">
+            {submittable.length === 0
+              ? "El borrador se habilita cuando al menos una empresa responda su cotización."
+              : "Marca al menos una cotización de la lista para habilitar el borrador; los textos y la vigencia por sí solos no arman la propuesta."}
+          </p>
+        ) : null}
         <ActionButton
           label="Crear borrador"
-          disabled={busy || Object.values(selected).every((v) => !v)}
+          disabled={busy || selectedQuotes.length === 0}
           onClick={onCreate}
         />
       </div>
