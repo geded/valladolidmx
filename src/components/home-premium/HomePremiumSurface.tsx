@@ -1188,7 +1188,11 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             ))}
             {visible.length === 0 ? (
               <li className="py-4 text-sm text-muted-foreground">
-                No hay eventos publicados para esa fecha.
+                {mode === "today"
+                  ? "No hay eventos publicados para hoy."
+                  : mode === "date"
+                    ? "No hay eventos publicados para esa fecha."
+                    : "No hay eventos publicados."}
               </li>
             ) : null}
           </ol>
