@@ -78,6 +78,7 @@ import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "luci
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { TripBriefForm } from "@/components/traveler/TripBriefForm";
+import { formatInMerida, meridaDate, meridaDayMonth, meridaLongDate } from "@/lib/time/merida";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
 import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -872,7 +873,7 @@ function AluxWorkspaceHeader({
   const contextBits: string[] = [];
   if (start)
     contextBits.push(
-      `Llegada ${new Date(start + "T00:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`,
+      `Llegada ${meridaDayMonth(start)}`,
     );
   if (party) contextBits.push(`${party} ${party === 1 ? "viajero" : "viajeros"}`);
   contextBits.push(`${itemCount} ${itemCount === 1 ? "parada" : "paradas"} en el plan`);
@@ -1740,11 +1741,7 @@ function ShareExportSection({
             {plan.shared_at ? (
               <p className="mt-2 text-[11px] text-muted-foreground">
                 Activado el{" "}
-                {new Date(plan.shared_at).toLocaleDateString("es-MX", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+                {meridaLongDate(plan.shared_at)}
               </p>
             ) : null}
           </div>
@@ -2212,7 +2209,7 @@ function ConciergeSection({
                 <div className="min-w-0">
                   <p className="truncate text-sm">{c.summary ?? "(sin resumen)"}</p>
                   <p className="text-xs text-muted-foreground">
-                    {c.status} · {c.priority} · {new Date(c.updated_at).toLocaleDateString()}
+                    {c.status} · {c.priority} · {meridaDate(c.updated_at)}
                   </p>
                 </div>
                 <Link
@@ -2445,11 +2442,12 @@ function TripPhaseCard({
   };
 
   const dateFmt = (iso: string) =>
-    new Date(iso).toLocaleDateString("es-MX", {
+    formatInMerida(iso, {
       day: "numeric",
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
 
   return (
