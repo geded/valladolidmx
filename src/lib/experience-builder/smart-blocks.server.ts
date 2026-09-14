@@ -509,7 +509,7 @@ export interface HomeRealContent {
   experiencias: HomeRealCard[];
   stays: HomeRealCard[];
   food: HomeRealCard[];
-  eventos: Array<HomeRealCard & { day: string }>;
+  eventos: Array<HomeRealCard & { day: string; startsAt: string | null }>;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
 }
@@ -579,7 +579,7 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       resolveSmartBlockQuery({
         select: ["slug", "name", "short_description", "cover_image_url", "starts_at", "href"],
         table: "events",
-        limit: 6,
+        limit: 30,
       }),
       resolveTerritoryMapPointsQuery(),
       readPublishedRouteCards({ limit: 6 }),
@@ -635,9 +635,19 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       ...byCategory("cenotes").map((b) => ({ ...b, category: "Cenotes" })),
     ].slice(0, 6);
 
+    // La fecha acreditada del evento viaja hasta la portada para permitir
+    // búsqueda por fecha. Sin `starts_at` publicado, la tarjeta conserva el
+    // orden editorial y no declara fecha (jamás se inventa una).
+    const eventStartsByHref = new Map<string, string>();
+    for (const item of eventRes.items) {
+      if (typeof item.href === "string" && typeof item.starts_at === "string") {
+        eventStartsByHref.set(item.href, item.starts_at);
+      }
+    }
     const eventos = cardsFrom(eventRes, () => "Evento").map((card, index) => ({
       ...card,
       day: String(index + 1).padStart(2, "0"),
+      startsAt: eventStartsByHref.get(card.href) ?? null,
     }));
 
     const value: HomeRealContent = {
