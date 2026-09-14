@@ -11,6 +11,7 @@ import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lu
 import { Button } from "@/components/ui/button";
 import { useAluxBrand } from "@/lib/brand/brand-context";
 import { toast } from "@/lib/toast";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   acceptConciergeProposal,
   rejectConciergeProposal,
@@ -698,7 +699,13 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           ) : (
             <ul className="grid gap-3">
               {proposals.map((p) => (
-                <ProposalCard key={p.proposal_id} p={p} caseId={f.case.id} internal={internal} />
+                <ProposalCard
+                  key={p.proposal_id}
+                  p={p}
+                  caseId={f.case.id}
+                  internal={internal}
+                  traveler={f.traveler}
+                />
               ))}
             </ul>
           )}
@@ -711,12 +718,14 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
 
 function ProposalCard({
   p,
-  caseId: _caseId,
+  caseId,
   internal,
+  traveler,
 }: {
   p: NonNullable<CaseFile["proposals"]>[number];
   caseId: string;
   internal: boolean;
+  traveler?: CaseFile["traveler"];
 }) {
   const router = useRouter();
   const navigate = useNavigate();
@@ -735,6 +744,33 @@ function ProposalCard({
       await router.invalidate();
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function sendAndNotify() {
+    await sendFn({ data: { proposalId: p.proposal_id } });
+    const email = traveler?.email?.trim();
+    if (!email) return;
+    try {
+      await sendTransactionalEmail({
+        templateName: "concierge-proposal-sent",
+        recipientEmail: email,
+        idempotencyKey: `concierge-proposal-sent-${p.proposal_id}`,
+        templateData: {
+          travelerName: traveler?.display_name ?? undefined,
+          caseReference: `Expediente ${caseId.slice(0, 8).toUpperCase()}`,
+          totalLabel: money(p.total_amount_cents, p.currency),
+          validUntilLabel: p.valid_until
+            ? new Date(p.valid_until).toLocaleDateString("es-MX", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : undefined,
+        },
+      });
+    } catch {
+      toast.error("La propuesta se envió, pero el correo de aviso no pudo salir.");
     }
   }
 
@@ -786,7 +822,7 @@ function ProposalCard({
           <ActionButton
             label="Enviar al viajero"
             disabled={busy}
-            onClick={() => run(() => sendFn({ data: { proposalId: p.proposal_id } }))}
+            onClick={() => run(sendAndNotify)}
           />
         )}
         {internal && ["draft", "sent", "viewed"].includes(p.status) && (
