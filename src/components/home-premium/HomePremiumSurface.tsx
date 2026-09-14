@@ -36,7 +36,7 @@ import { ExperienceMapBlock } from "@/components/experience-builder/blocks/exper
 import { PremiumAluxBar } from "./shared/PremiumShowcase";
 import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
-import { MERIDA_TIME_ZONE, meridaDate } from "@/lib/time/merida";
+import { MERIDA_TIME_ZONE, meridaDate, meridaToday } from "@/lib/time/merida";
 
 import { openAluxFloating, onAluxMapFocus } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
@@ -1059,12 +1059,15 @@ function meridaDayKey(iso: string | null | undefined): string | null {
 
 function EventsSection({ content }: { content: HomePremiumContent }) {
   const hasMedia = content.eventos.media.url.trim().length > 0;
+  const [mode, setMode] = useState<"today" | "date" | "all">("today");
   const [dateFilter, setDateFilter] = useState("");
   const [page, setPage] = useState(0);
 
   const items = content.eventos.items;
-  const filtered = dateFilter
-    ? items.filter((event) => meridaDayKey(event.startsAt) === dateFilter)
+  const todayKey = meridaToday();
+  const activeKey = mode === "date" ? dateFilter : mode === "today" ? todayKey : "";
+  const filtered = activeKey
+    ? items.filter((event) => meridaDayKey(event.startsAt) === activeKey)
     : items;
   const pageCount = Math.max(1, Math.ceil(filtered.length / EVENTS_PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
@@ -1098,9 +1101,44 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
               className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
             />
           ) : null}
-          <div className="mt-4 flex flex-wrap items-end gap-2">
-            <label className="flex-1 min-w-[10rem] text-xs font-medium text-muted-foreground">
-              Buscar por fecha
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant={mode === "today" ? "default" : "outline"}
+              size="sm"
+              className="min-h-9 rounded-pill text-xs"
+              onClick={() => {
+                setMode("today");
+                setPage(0);
+              }}
+            >
+              Hoy
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "date" ? "default" : "outline"}
+              size="sm"
+              className="min-h-9 rounded-pill text-xs"
+              onClick={() => {
+                setMode("date");
+                setPage(0);
+              }}
+            >
+              Por fecha
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "all" ? "default" : "outline"}
+              size="sm"
+              className="min-h-9 rounded-pill text-xs"
+              onClick={() => {
+                setMode("all");
+                setPage(0);
+              }}
+            >
+              Todas
+            </Button>
+            {mode === "date" ? (
               <input
                 type="date"
                 value={dateFilter}
@@ -1108,22 +1146,8 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                   setDateFilter(event.target.value);
                   setPage(0);
                 }}
-                className="mt-1 h-11 w-full rounded-pill border border-border bg-background px-3 text-sm text-foreground ring-focus"
+                className="h-9 min-w-[8rem] rounded-pill border border-border bg-background px-3 text-sm text-foreground ring-focus"
               />
-            </label>
-            {dateFilter ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="min-h-11 rounded-pill text-xs"
-                onClick={() => {
-                  setDateFilter("");
-                  setPage(0);
-                }}
-              >
-                Ver todas
-              </Button>
             ) : null}
           </div>
         </div>
@@ -1164,7 +1188,11 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             ))}
             {visible.length === 0 ? (
               <li className="py-4 text-sm text-muted-foreground">
-                No hay eventos publicados para esa fecha.
+                {mode === "today"
+                  ? "No hay eventos publicados para hoy."
+                  : mode === "date"
+                    ? "No hay eventos publicados para esa fecha."
+                    : "No hay eventos publicados."}
               </li>
             ) : null}
           </ol>
