@@ -25,7 +25,10 @@ import {
   getConciergeCaseHandoffContext,
   requestConciergeQuote,
 } from "@/lib/concierge/concierge.functions";
-import { createOrderFromProposal } from "@/lib/concierge/orders.functions";
+import {
+  createOrderFromProposal,
+  markConciergeOrderPaidCash,
+} from "@/lib/concierge/orders.functions";
 import {
   generateAluxSummary,
   generateAluxProducts,
@@ -735,6 +738,7 @@ function ProposalCard({
   const acceptFn = useServerFn(acceptConciergeProposal);
   const rejectFn = useServerFn(rejectConciergeProposal);
   const createOrderFn = useServerFn(createOrderFromProposal);
+  const payCashFn = useServerFn(markConciergeOrderPaidCash);
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<unknown>) {
@@ -833,6 +837,27 @@ function ProposalCard({
             onClick={() =>
               run(() => withdrawFn({ data: { proposalId: p.proposal_id, reason: null } }))
             }
+          />
+        )}
+        {internal && ["sent", "viewed", "accepted"].includes(p.status) && (
+          <ActionButton
+            label="Registrar pago en efectivo"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                const { orderId } = await createOrderFn({ data: { proposalId: p.proposal_id } });
+                await payCashFn({ data: { orderId, note: "Pago en efectivo con el concierge" } });
+                await router.invalidate();
+                toast.success("Pago en efectivo registrado. El viaje quedó confirmado.");
+              } catch (err) {
+                toast.error(
+                  err instanceof Error ? err.message : "No se pudo registrar el pago en efectivo",
+                );
+              } finally {
+                setBusy(false);
+              }
+            }}
           />
         )}
         {!internal && ["sent", "viewed", "accepted"].includes(p.status) && (
