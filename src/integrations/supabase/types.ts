@@ -2399,12 +2399,19 @@ export type Database = {
           amount_cents: number
           created_at: string
           currency: string
+          day_index: number | null
+          duration_minutes: number | null
           id: string
+          is_suggestion: boolean
           notes: string | null
           position: number
           proposal_id: string
           quote_id: string | null
           request_id: string | null
+          source: string
+          starts_at_local: string | null
+          target_id: string | null
+          target_kind: string | null
           title: string | null
           updated_at: string
         }
@@ -2412,12 +2419,19 @@ export type Database = {
           amount_cents?: number
           created_at?: string
           currency?: string
+          day_index?: number | null
+          duration_minutes?: number | null
           id?: string
+          is_suggestion?: boolean
           notes?: string | null
           position?: number
           proposal_id: string
           quote_id?: string | null
           request_id?: string | null
+          source?: string
+          starts_at_local?: string | null
+          target_id?: string | null
+          target_kind?: string | null
           title?: string | null
           updated_at?: string
         }
@@ -2425,12 +2439,19 @@ export type Database = {
           amount_cents?: number
           created_at?: string
           currency?: string
+          day_index?: number | null
+          duration_minutes?: number | null
           id?: string
+          is_suggestion?: boolean
           notes?: string | null
           position?: number
           proposal_id?: string
           quote_id?: string | null
           request_id?: string | null
+          source?: string
+          starts_at_local?: string | null
+          target_id?: string | null
+          target_kind?: string | null
           title?: string | null
           updated_at?: string
         }
@@ -2457,6 +2478,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      concierge_proposal_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          items: Json
+          owner_user_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          owner_user_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          owner_user_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       concierge_proposals: {
         Row: {
@@ -7909,6 +7960,10 @@ export type Database = {
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json
+      }
+      concierge_proposal_apply_schedule_to_plan: {
+        Args: { _proposal_id: string }
+        Returns: number
       }
       concierge_proposal_create: {
         Args: {
