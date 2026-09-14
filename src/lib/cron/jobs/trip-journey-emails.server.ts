@@ -12,6 +12,7 @@
  * crea token, ni se registra, ni se encola, ni se marca. Sólo contadores.
  */
 import * as React from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
 import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
@@ -59,11 +60,13 @@ function generateToken(): string {
 function formatStartDate(iso: string | null, locale: string | null): string | undefined {
   if (!iso) return undefined;
   try {
-    return new Date(iso + "T12:00:00").toLocaleDateString(locale || "es-MX", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    return (
+      formatInMerida(
+        iso,
+        { day: "numeric", month: "long", year: "numeric" },
+        locale || "es-MX",
+      ) || undefined
+    );
   } catch {
     return undefined;
   }

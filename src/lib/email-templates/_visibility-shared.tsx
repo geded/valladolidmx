@@ -1,4 +1,5 @@
 import * as React from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import {
   Body,
   Button,
@@ -60,11 +61,9 @@ export function VisibilityShell({
 export function formatDate(iso?: string | null) {
   if (!iso) return null;
   try {
-    return new Date(iso).toLocaleDateString("es-MX", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
+    return (
+      formatInMerida(iso, { day: "2-digit", month: "long", year: "numeric" }) || null
+    );
   } catch {
     return null;
   }
