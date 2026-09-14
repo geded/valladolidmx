@@ -53,6 +53,7 @@ import {
   type AluxTravelerSuggestion,
 } from "@/lib/traveler/alux-traveler.functions";
 import { AluxSuggestionCard } from "./AluxSuggestionCard";
+import { useAluxBrand, useBrand } from "@/lib/brand/brand-context";
 
 // Panel expone todas las capacidades salvo las de fondo (dock / Alux público).
 type PanelCapabilityId = Exclude<AluxTravelerCapability, "narrate_plan">;
@@ -115,6 +116,8 @@ const CAPABILITIES: CapabilityDef[] = [
 ];
 
 export function AluxTravelerPanel() {
+  const brand = useBrand();
+  const alux = useAluxBrand();
   const { locale: activeLocale } = useTranslation();
   const rawLocale = (activeLocale ?? "es").toLowerCase().slice(0, 2);
   const locale = (["es", "en", "fr", "de", "it", "pt"] as const).includes(rawLocale as never)
@@ -178,7 +181,7 @@ export function AluxTravelerPanel() {
           ? "Alux está sin cuota momentáneamente"
           : kind === "rate_limited"
             ? "Alux está saturado, intenta en un momento"
-            : "Alux no pudo generar la sugerencia";
+            : alux.copy("unavailable");
       toast.error(title, {
         description: kind === "error" ? message : undefined,
       });
@@ -188,15 +191,15 @@ export function AluxTravelerPanel() {
 
   return (
     <section
-      aria-label="Copiloto Alux · Viajero"
-      className="rounded-2xl border border-alux/20 bg-card p-5"
+      aria-label={`${alux.copy("workspaceTitle")} · Viajero`}
+      className="rounded-2xl border border-alux/20 bg-alux-surface p-5 text-alux-surface-foreground"
     >
       <header className="flex items-center gap-3">
         <span className="grid size-10 place-items-center rounded-xl bg-alux/15 text-alux">
           <Sparkles className="size-5" aria-hidden />
         </span>
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold">Alux · Copiloto de tu viaje</h2>
+          <h2 className="text-lg font-semibold">{alux.name} · Copiloto de tu viaje</h2>
           <p className="text-xs text-muted-foreground">
             Analiza tu Travel Workspace y sugiere. Nunca modifica ni envía nada sin que tú lo
             confirmes.
@@ -209,7 +212,7 @@ export function AluxTravelerPanel() {
         <p className="mt-1 text-muted-foreground">
           Mientras más completo esté tu perfil (estilo, intereses, presupuesto, fechas) y más lo
           completes como perfil público, más preciso puedo ser al recomendarte hoteles,
-          restaurantes, experiencias y rutas del Oriente Maya.{" "}
+           restaurantes, experiencias y rutas de {brand.tagline}.{" "}
           <a href="/cuenta/perfil" className="font-medium text-alux hover:underline">
             Completar perfil
           </a>
