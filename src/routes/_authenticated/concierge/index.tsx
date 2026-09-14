@@ -266,41 +266,39 @@ function CaseRowCard({
 
   return (
     <li className="rounded-md border border-border bg-card p-4 text-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-xs text-muted-foreground">{c.id.slice(0, 8)}</span>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${slaClassName}`}
-                  >
-                    SLA · {c.sla_status ?? "n/a"}
-                  </span>
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
-                    {c.priority}
-                  </span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {c.status}
-                  </span>
-                </div>
-              </div>
-              <Link
-                to="/concierge/expedientes/$caseId"
-                params={{ caseId: c.id }}
-                className="mt-2 block font-medium hover:underline"
-              >
-                {c.summary ?? "Sin resumen"}
-              </Link>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Origen: {c.source}
-                {c.target_response_at
-                  ? ` · Objetivo ${new Date(c.target_response_at).toLocaleString()}`
-                  : ""}
-                {c.last_activity_at
-                  ? ` · Última actividad ${new Date(c.last_activity_at).toLocaleString()}`
-                  : ""}
-                {c.assigned_concierge_user_id
-                  ? ` · Resp. ${c.assigned_concierge_user_id.slice(0, 8)}`
-                  : " · Sin asignar"}
-              </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-mono text-xs text-muted-foreground">{c.id.slice(0, 8)}</span>
+        <div className="flex items-center gap-2">
+          <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${slaClassName}`}>
+            SLA · {c.sla_status ?? "n/a"}
+          </span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
+            {c.priority}
+          </span>
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+            {c.status}
+          </span>
+        </div>
+      </div>
+      <Link
+        to="/concierge/expedientes/$caseId"
+        params={{ caseId: c.id }}
+        className="mt-2 block font-medium hover:underline"
+      >
+        {c.summary ?? "Sin resumen"}
+      </Link>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Origen: {c.source}
+        {c.target_response_at
+          ? ` · Objetivo ${new Date(c.target_response_at).toLocaleString()}`
+          : ""}
+        {c.last_activity_at
+          ? ` · Última actividad ${new Date(c.last_activity_at).toLocaleString()}`
+          : ""}
+        {c.assigned_concierge_user_id
+          ? ` · Resp. ${c.assigned_concierge_user_id.slice(0, 8)}`
+          : " · Sin asignar"}
+      </p>
       {scope === "unassigned" && !c.assigned_concierge_user_id ? (
         <div className="mt-3 border-t border-border/60 pt-3">
           <Button type="button" size="sm" onClick={onAssignSelf} disabled={assigning}>
