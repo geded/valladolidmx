@@ -2465,6 +2465,10 @@ export type Database = {
           created_by_user_id: string | null
           currency: string
           id: string
+          pay_reminder_r1_sent_at: string | null
+          pay_reminder_r2_sent_at: string | null
+          pay_reminder_r3_sent_at: string | null
+          pay_reminder_team_sent_at: string | null
           payload: Json
           responded_at: string | null
           sent_at: string | null
@@ -2484,6 +2488,10 @@ export type Database = {
           created_by_user_id?: string | null
           currency?: string
           id?: string
+          pay_reminder_r1_sent_at?: string | null
+          pay_reminder_r2_sent_at?: string | null
+          pay_reminder_r3_sent_at?: string | null
+          pay_reminder_team_sent_at?: string | null
           payload?: Json
           responded_at?: string | null
           sent_at?: string | null
@@ -2503,6 +2511,10 @@ export type Database = {
           created_by_user_id?: string | null
           currency?: string
           id?: string
+          pay_reminder_r1_sent_at?: string | null
+          pay_reminder_r2_sent_at?: string | null
+          pay_reminder_r3_sent_at?: string | null
+          pay_reminder_team_sent_at?: string | null
           payload?: Json
           responded_at?: string | null
           sent_at?: string | null
@@ -8360,6 +8372,26 @@ export type Database = {
           traveler_locale: string
           traveler_name: string
           user_id: string
+        }[]
+      }
+      get_proposals_needing_payment_reminder: {
+        Args: { _kind: string }
+        Returns: {
+          accepted_at: string
+          case_id: string
+          case_summary: string
+          currency: string
+          end_date: string
+          party_size: number
+          proposal_id: string
+          start_date: string
+          total_amount_cents: number
+          traveler_email: string
+          traveler_name: string
+          traveler_phone: string
+          traveler_user_id: string
+          valid_until: string
+          whatsapp_consent: boolean
         }[]
       }
       get_public_traveler_profile: { Args: { _handle: string }; Returns: Json }
