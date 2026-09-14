@@ -1631,6 +1631,7 @@ type HandoffPayload = {
       subtitle?: string | null;
     }>;
   } | null;
+  trip_brief?: TripBrief | null;
 };
 
 function HandoffContextCard({ caseId }: { caseId: string }) {
