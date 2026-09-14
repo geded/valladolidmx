@@ -290,6 +290,10 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
             type: str(row.type, item?.type ?? ""),
             detail: str(row.detail, item?.detail ?? ""),
             href: hrefN(row.href, item?.href ?? null),
+            startsAt:
+              typeof row.starts_at === "string" && row.starts_at.trim().length > 0
+                ? row.starts_at.trim()
+                : (item?.startsAt ?? null),
           }),
         ),
       ),
