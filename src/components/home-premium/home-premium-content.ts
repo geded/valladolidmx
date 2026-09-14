@@ -376,9 +376,9 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   },
   mapa: {
     kicker: "Del relato al territorio",
-    title: "Mira el territorio y sus paradas",
+    title: "Mira en el mapa la ruta seleccionada",
     description:
-      "El mapa oficial reúne los puntos reales publicados. En móvil, el orden sigue siendo mapa → paradas.",
+      "Visualiza en el territorio tu próximo recorrido por el Oriente Maya de Yucatán.",
     dto: MAP_DTO,
   },
   travelPlan: {

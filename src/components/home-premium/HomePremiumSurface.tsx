@@ -1436,10 +1436,10 @@ function MapSection({
       <div className="mb-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase text-primary">{content.mapa.kicker}</p>
-          <h2 id="map-title" className="mt-2 font-display text-3xl sm:text-4xl">
+          <h2 id="map-title" className="mt-1.5 font-display text-base sm:text-lg">
             {content.mapa.title}
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
             {content.mapa.description}
           </p>
         </div>
