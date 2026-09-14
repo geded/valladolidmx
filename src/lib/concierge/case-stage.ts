@@ -45,12 +45,7 @@ export interface CaseStage {
 
 const CLOSED_STATUSES = new Set(["closed_lost", "archived"]);
 const WON_STATUSES = new Set(["closed_won", "won", "resolved"]);
-const REWORK_PROPOSALS = new Set([
-  "rejected",
-  "withdrawn",
-  "superseded",
-  "expired",
-]);
+const REWORK_PROPOSALS = new Set(["rejected", "withdrawn", "superseded", "expired"]);
 const ACCEPTED_PROPOSALS = new Set(["accepted"]);
 const OPEN_PROPOSALS = new Set(["sent", "viewed"]);
 

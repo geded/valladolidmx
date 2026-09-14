@@ -202,7 +202,6 @@ function ConciergeInboxPage() {
     return result;
   }, [enriched, user, visibleInboxes]);
 
-
   const term = search.trim().toLowerCase();
   const items = (byInbox.get(inboxId) ?? []).filter((item) => {
     if (owner && item.ownerId !== owner) return false;
@@ -450,9 +449,7 @@ function CaseRowCard({
   return (
     <li className="rounded-md border border-border bg-card p-4 text-sm shadow-soft">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="font-mono text-xs font-medium text-foreground">
-          {caseReference(c.id)}
-        </span>
+        <span className="font-mono text-xs font-medium text-foreground">{caseReference(c.id)}</span>
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={`rounded-pill px-2 py-0.5 text-[11px] font-medium ${STAGE_TONE[stage.tone]}`}
@@ -500,7 +497,10 @@ function CaseRowCard({
             size="sm"
             disabled={busy}
             onClick={() =>
-              run(() => assignSelf({ data: { caseId: c.id } }), "El expediente quedó asignado a ti.")
+              run(
+                () => assignSelf({ data: { caseId: c.id } }),
+                "El expediente quedó asignado a ti.",
+              )
             }
           >
             {busy ? "Asignando…" : "Asignarme este expediente"}

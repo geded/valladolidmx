@@ -564,9 +564,7 @@ export const listConciergeDirectory = createServerFn({ method: "GET" })
  */
 export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) =>
-    z.object({ caseIds: z.array(z.string().uuid()).max(200) }).parse(data),
-  )
+  .inputValidator((data) => z.object({ caseIds: z.array(z.string().uuid()).max(200) }).parse(data))
   .handler(async ({ data, context }) => {
     const ids = data.caseIds;
     if (ids.length === 0) return [];
@@ -655,4 +653,3 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
 
     return Array.from(byCase.values()).map(({ latest_proposal_version: _v, ...rest }) => rest);
   });
-
