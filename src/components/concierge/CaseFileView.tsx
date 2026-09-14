@@ -1808,7 +1808,14 @@ function TerritorialMemory({ memory }: { memory: Record<string, unknown> | null 
     new Set(
       (Array.isArray(memory.last_signals) ? (memory.last_signals as unknown[]) : [])
         .filter((s): s is string => typeof s === "string" && s.startsWith("act:view_business:"))
-        .map((s) => humanizeKey(s.replace("act:view_business:", ""))),
+        .map((s) =>
+          s
+            .replace("act:view_business:", "")
+            .split("-")
+            .filter(Boolean)
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
+        ),
     ),
   ).filter(Boolean);
 
