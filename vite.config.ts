@@ -32,16 +32,12 @@ export default defineConfig({
         workbox: {
           cleanupOutdatedCaches: true,
           clientsClaim: true,
-          skipWaiting: false,
-          // Adenda 15.10.6.5 · Single Update Lifecycle. Añade el listener
-          // oficial de `SKIP_WAITING` al SW generado por workbox para que
-          // `applyPendingUpdate()` pueda activar la nueva versión de
-          // forma controlada.
-          importScripts: ["/pwa-skipwaiting.js"],
-          // Offline fallback: rutas navegacionales sin caché caen a /offline
-          // (precacheado). El shell público sigue disponible offline si ya se
-          // visitó; el resto muestra un estado offline controlado.
-          navigateFallback: "/offline",
+          // La versión nueva toma control en cuanto termina de instalarse.
+          // Evita que Safari móvil conserve HTML que apunta a assets retirados.
+          skipWaiting: true,
+          // Fallback autónomo: no depende de React, CSS ni chunks con hash.
+          // Así siempre conserva estilos y puede reparar una caché obsoleta.
+          navigateFallback: "/offline.html",
           navigateFallbackDenylist: [
             /^\/~oauth/,
             /^\/api\//,
@@ -62,11 +58,10 @@ export default defineConfig({
             "og/default-1200x630.jpg",
             "assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*",
           ],
-          // La revisión debe cambiar en cada build: con una revisión fija, el
-          // HTML de /offline quedaba congelado en el precache y seguía
-          // apuntando a hashes de assets antiguos (pantalla sin estilos).
+          // La revisión cambia en cada build para reemplazar de inmediato
+          // cualquier fallback anterior que haya quedado en Safari móvil.
           additionalManifestEntries: [
-            { url: "/offline", revision: `pwa-offline-${Date.now().toString(36)}` },
+            { url: "/offline.html", revision: `pwa-offline-${Date.now().toString(36)}` },
           ],
           runtimeCaching: [
             // Rutas sensibles / autenticadas: NUNCA cachear.
@@ -100,9 +95,20 @@ export default defineConfig({
                 expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
               },
             },
-            // Los assets públicos esenciales ya están versionados en el
-            // precache. No registrar un catch-all de JS/CSS aquí: también
-            // atraparía chunks privados de CMS/Admin después de visitarlos.
+            // Los archivos construidos llevan hash en el nombre y no contienen
+            // datos ni sesiones. Guardarlos permite reabrir offline una página
+            // pública ya visitada sin mezclar archivos de versiones distintas.
+            {
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin &&
+                /^\/assets\/.+-[A-Za-z0-9_-]+\.(?:js|css|woff2?)$/.test(url.pathname),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "built-assets-v1",
+                expiration: { maxEntries: 160, maxAgeSeconds: 60 * 60 * 24 * 30 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin && /\.(?:png|jpg|jpeg|svg|webp|ico)$/.test(url.pathname),
