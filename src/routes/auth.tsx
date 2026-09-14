@@ -373,13 +373,13 @@ function AuthRoute() {
             </Button>
           </form>
 
-          <div className="mt-3 grid gap-1 border-t border-border pt-2.5 text-xs sm:mt-4 sm:grid-cols-2 sm:items-center sm:gap-1.5 sm:pt-3 sm:text-[13px]">
+          <div className="mt-3 grid gap-1 border-t border-border pt-2.5 sm:mt-4 sm:grid-cols-2 sm:items-center sm:gap-1.5 sm:pt-3">
             {mode === "signin" ? (
               <>
                 <Button
                   type="button"
                   variant="link"
-                  className="h-auto justify-start p-0 text-muted-foreground"
+                  className="h-auto justify-start p-0 text-xs text-muted-foreground sm:text-[13px]"
                   onClick={() => setMode("forgot")}
                 >
                   {t("auth.forgot_q")}
@@ -387,7 +387,7 @@ function AuthRoute() {
                 <Button
                   type="button"
                   variant="link"
-                  className="h-auto justify-start p-0 text-foreground sm:justify-end"
+                  className="h-auto justify-start p-0 text-xs text-foreground sm:justify-end sm:text-[13px]"
                   onClick={() => setMode("signup")}
                 >
                   {t("auth.create_account")}
@@ -397,7 +397,7 @@ function AuthRoute() {
               <Button
                 type="button"
                 variant="link"
-                className="h-auto justify-start p-0 text-foreground"
+                className="h-auto justify-start p-0 text-xs text-foreground sm:text-[13px]"
                 onClick={() => setMode("signin")}
               >
                 {t("auth.back_to_signin")}
