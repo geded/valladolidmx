@@ -201,7 +201,8 @@ export function HomePremiumSurface({
       key !== "destinos" &&
       key !== "rutas" &&
       key !== "eventos" &&
-      key !== "experiencias",
+      key !== "experiencias" &&
+      key !== "mapa",
   );
 
   const renderSection = (key: HomePremiumSectionKey) => {
@@ -308,6 +309,12 @@ export function HomePremiumSurface({
         {enabled("rutas") ? (
           <Container className="mt-8 lg:mt-12" data-home-journey="routes">
             <div data-cinematic-section={cinematic || undefined}>{renderSection("rutas")}</div>
+          </Container>
+        ) : null}
+
+        {enabled("mapa") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="mapa">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("mapa")}</div>
           </Container>
         ) : null}
 
