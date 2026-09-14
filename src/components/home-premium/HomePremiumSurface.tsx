@@ -10,6 +10,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  CalendarDays,
   Check,
   ChevronRight,
   Clock3,
@@ -23,6 +24,8 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
@@ -1057,18 +1060,34 @@ function meridaDayKey(iso: string | null | undefined): string | null {
   return parts;
 }
 
+function calendarDateFromKey(value: string): Date | undefined {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return undefined;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12);
+}
+
+function calendarKeyFromDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function EventsSection({ content }: { content: HomePremiumContent }) {
   const hasMedia = content.eventos.media.url.trim().length > 0;
-  const [mode, setMode] = useState<"today" | "date" | "all">("today");
-  const [dateFilter, setDateFilter] = useState("");
+  const [mode, setMode] = useState<"today" | "date" | "month">("today");
+  const [dateFilter, setDateFilter] = useState(meridaToday);
   const [page, setPage] = useState(0);
 
   const items = content.eventos.items;
   const todayKey = meridaToday();
-  const activeKey = mode === "date" ? dateFilter : mode === "today" ? todayKey : "";
-  const filtered = activeKey
-    ? items.filter((event) => meridaDayKey(event.startsAt) === activeKey)
-    : items;
+  const queryKey = dateFilter || todayKey;
+  const filtered = items.filter((event) => {
+    const eventKey = meridaDayKey(event.startsAt);
+    if (mode === "today") return eventKey === todayKey;
+    if (mode === "date") return eventKey === queryKey;
+    return eventKey?.slice(0, 7) === queryKey.slice(0, 7);
+  });
   const pageCount = Math.max(1, Math.ceil(filtered.length / EVENTS_PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   const visible = filtered.slice(safePage * EVENTS_PAGE_SIZE, (safePage + 1) * EVENTS_PAGE_SIZE);
@@ -1101,12 +1120,11 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
               className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
             />
           ) : null}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1 lg:grid-cols-3">
             <Button
               type="button"
               variant={mode === "today" ? "default" : "outline"}
-              size="sm"
-              className="min-h-9 rounded-pill text-xs"
+              className="h-10 w-full justify-center rounded-pill px-5 text-xs font-semibold"
               onClick={() => {
                 setMode("today");
                 setPage(0);
@@ -1114,41 +1132,47 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             >
               Hoy
             </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant={mode === "date" ? "default" : "outline"}
+                  className="h-10 w-full justify-center gap-2 rounded-pill px-5 text-xs font-semibold"
+                  onClick={() => {
+                    setMode("date");
+                    setPage(0);
+                  }}
+                >
+                  Buscar por fecha
+                  <CalendarDays className="size-4" aria-hidden />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={calendarDateFromKey(queryKey)}
+                  onSelect={(date) => {
+                    if (!date) return;
+                    setDateFilter(calendarKeyFromDate(date));
+                    setMode("date");
+                    setPage(0);
+                  }}
+                  defaultMonth={calendarDateFromKey(queryKey)}
+                  className="pointer-events-auto p-3"
+                />
+              </PopoverContent>
+            </Popover>
             <Button
               type="button"
-              variant={mode === "date" ? "default" : "outline"}
-              size="sm"
-              className="min-h-9 rounded-pill text-xs"
+              variant={mode === "month" ? "default" : "outline"}
+              className="h-10 w-full justify-center rounded-pill px-5 text-xs font-semibold"
               onClick={() => {
-                setMode("date");
+                setMode("month");
                 setPage(0);
               }}
             >
-              Por fecha
+              Eventos del mes
             </Button>
-            <Button
-              type="button"
-              variant={mode === "all" ? "default" : "outline"}
-              size="sm"
-              className="min-h-9 rounded-pill text-xs"
-              onClick={() => {
-                setMode("all");
-                setPage(0);
-              }}
-            >
-              Todas
-            </Button>
-            {mode === "date" ? (
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(event) => {
-                  setDateFilter(event.target.value);
-                  setPage(0);
-                }}
-                className="h-9 min-w-[8rem] rounded-pill border border-border bg-background px-3 text-sm text-foreground ring-focus"
-              />
-            ) : null}
           </div>
         </div>
         <div>
@@ -1192,7 +1216,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                   ? "No hay eventos publicados para hoy."
                   : mode === "date"
                     ? "No hay eventos publicados para esa fecha."
-                    : "No hay eventos publicados."}
+                    : "No hay eventos publicados durante ese mes."}
               </li>
             ) : null}
           </ol>
