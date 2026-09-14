@@ -116,3 +116,12 @@
 - [x] Al pagar, el expediente pasa a cerrado ganado y se abre el itinerario confirmado del viajero.
 - [ ] Conectar pago real con proveedor cuando el Founder lo autorice.
 - [x] Confirmación de viaje antes de enviar al Concierge (TripBriefForm 3 secciones: datos del viaje, quiénes viajan, transportación con 'aún no lo decido'). Brief en travel_plans.meta.trip_brief, incluido en handoff context, mostrado en CaseFileView. Typecheck + build + Playwright 1440/834/430/390 OK. No publicado.
+
+## Recordatorios de pago de propuesta aceptada (2026-09-14)
+- Propuesta `accepted` sin reservación pagada → correo al viajero a 1 h, 24 h y 72 h, y aviso interno al equipo a las 72 h.
+- Fuentes reales: `concierge_proposals.status`, `concierge_cases.status`, `concierge_orders.status`. Sin estados nuevos.
+- Idempotencia: columnas `pay_reminder_r1/r2/r3/team_sent_at` en `concierge_proposals`.
+- Selección: `get_proposals_needing_payment_reminder(_kind)` (SECURITY DEFINER, sólo `service_role`).
+- Trabajo `src/lib/cron/jobs/proposal-payment-reminders.server.ts` + gancho `/api/public/hooks/proposal-payment-reminders` (x-cron-secret, dry-run soportado).
+- Cron horario `proposal-payment-reminders-hourly` ('20 * * * *').
+- Plantillas `proposal-payment-reminder` y `proposal-payment-stalled-team`.
