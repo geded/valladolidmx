@@ -4,7 +4,7 @@
  */
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { meridaDate, meridaDateTime } from "@/lib/time/merida";
+import { meridaDate, meridaDateTime, meridaLongDate } from "@/lib/time/merida";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -906,11 +906,7 @@ function ProposalCard({
           caseReference: `Expediente ${caseId.slice(0, 8).toUpperCase()}`,
           totalLabel: money(p.total_amount_cents, p.currency),
           validUntilLabel: p.valid_until
-            ? new Date(p.valid_until).toLocaleDateString("es-MX", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })
+            ? meridaLongDate(p.valid_until)
             : undefined,
         },
       });
