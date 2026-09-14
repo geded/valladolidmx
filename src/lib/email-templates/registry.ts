@@ -13,6 +13,7 @@ import { template as tripWelcomeTemplate } from "./trip-welcome";
 import { template as tripPostTemplate } from "./trip-post";
 import { template as tripConfirmedTemplate } from "./trip-confirmed";
 import { template as conciergeProposalSentTemplate } from "./concierge-proposal-sent";
+import { template as bookingPaidAdminTemplate } from "./booking-paid-admin";
 
 export interface TemplateEntry {
   component: ComponentType<any>;
