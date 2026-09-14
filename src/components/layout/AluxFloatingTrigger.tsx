@@ -959,7 +959,7 @@ export function AluxFloatingTrigger() {
             {geo.status === "granted" && geo.location ? (
               <p className="mt-2 text-sm text-foreground">
                 Compartiste tu ubicación. Puedo calcular distancias reales a hoteles, restaurantes y
-                experiencias del Oriente Maya.
+                experiencias de {alux.copy("territorialDescriptor")}.
               </p>
             ) : (
               <>
@@ -1102,7 +1102,7 @@ export function AluxFloatingTrigger() {
                 return (
                   <p className="mt-2 text-sm text-muted-foreground">
                     {suggestionsQuery.data?.reason ??
-                      `Sigue explorando ${ctx.destination?.label ?? "el Oriente Maya"} y Alux te sugerirá qué visitar a continuación.`}
+                      `Sigue explorando ${ctx.destination?.label ?? alux.copy("territorialDescriptor")} y ${alux.name} te sugerirá qué visitar a continuación.`}
                   </p>
                 );
               }
@@ -1376,7 +1376,7 @@ export function AluxFloatingTrigger() {
             <p className="mt-2 text-sm text-foreground">
               Si completas tu perfil de viajero (estilo, intereses, compañía, presupuesto, fechas) y
               también tu perfil público, puedo recomendarte hoteles, restaurantes, experiencias y
-              rutas del Oriente Maya con mucha más precisión.
+              rutas de {alux.copy("territorialDescriptor")} con mucha más precisión.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <a

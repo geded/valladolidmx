@@ -327,8 +327,8 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         setStatus("idle");
         setLiveNote(
           res.recommendations.length
-            ? `Alux respondió con ${res.recommendations.length} opción${res.recommendations.length === 1 ? "" : "es"}.`
-            : "Alux respondió.",
+            ? `${alux.name} respondió con ${res.recommendations.length} opción${res.recommendations.length === 1 ? "" : "es"}.`
+            : `${alux.name} respondió.`,
         );
       } catch (err) {
         console.error("[alux.converse] fallo", err);
@@ -348,6 +348,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       messages,
       converseFn,
       props,
+      alux.name,
       understood,
       tripMeta,
     ],
@@ -469,7 +470,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-[12px] text-foreground"
         >
           <AlertCircle className="size-3.5 text-destructive" aria-hidden />
-          <span>No pude cargar tu viaje. Alux no enviará un contexto incompleto.</span>
+          <span>No pude cargar tu viaje. {alux.name} no enviará un contexto incompleto.</span>
           <button
             type="button"
             onClick={() => void refetchPlan()}
@@ -492,7 +493,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         role="log"
         aria-live="polite"
         aria-relevant="additions"
-        aria-label="Conversación con Alux"
+        aria-label={alux.copy("conversationTitle")}
         className={[
           "mt-3 flex flex-col gap-3 overflow-y-auto pr-1",
           messages.length > 0 || thinking ? "max-h-[46vh] min-h-[6rem]" : "",

@@ -59,15 +59,14 @@ function ensureSessionKey(): string {
   return key;
 }
 
-const SUGGESTIONS = [
-  "¿Cuál es la mejor época para visitar Valladolid?",
-  "¿Qué hacer en 3 días en el Oriente Maya?",
-  "¿Cómo llego a Chichén Itzá desde Valladolid?",
-  "¿Qué son los Pueblos Mágicos de la región?",
-];
-
 export function PublicAluxChat() {
   const alux = useAluxBrand();
+  const suggestions = [
+    `¿Cuál es la mejor época para visitar ${alux.copy("territorialDescriptor")}?`,
+    `¿Qué hacer en 3 días en ${alux.copy("territorialDescriptor")}?`,
+    "¿Qué destinos publicados me recomiendas?",
+    "¿Qué experiencias encajan con mi viaje?",
+  ];
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -297,7 +296,7 @@ export function PublicAluxChat() {
               {alux.copy("publicIntro")}
             </p>
             <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   type="button"
