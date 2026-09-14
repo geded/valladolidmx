@@ -11,7 +11,7 @@ Se muestra lo que ya existe, editable en línea:
 - Destinos y lugares guardados (la lista actual de su viaje, con opción de quitar algo antes de enviar).
 - Fechas de llegada y salida → calcula y muestra "7 días / 6 noches".
 - Ciudad o país de origen (de dónde llega).
-- Cómo llega al destino: avión (con aeropuerto: Cancún, Mérida, Chichén Itzá), autobús, auto propio, ya estoy en la zona.
+- Cómo llega al destino: avión (con aeropuerto: Mérida, Cancún, Tulum o Chichén Itzá), autobús, auto propio, ya estoy en la zona.
 
 ## Paso 2 · Quiénes viajan
 
