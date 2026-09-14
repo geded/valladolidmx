@@ -1804,8 +1804,21 @@ function TerritorialMemory({ memory }: { memory: Record<string, unknown> | null 
     .split("\n")
     .map((line) => line.replace(/^·\s*/, "").trim())
     .filter(Boolean);
+  // Fichas de negocio que el viajero abrió antes de enviar su viaje.
+  const visitedBusinesses = Array.from(
+    new Set(
+      (Array.isArray(memory.last_signals) ? (memory.last_signals as unknown[]) : [])
+        .filter((s): s is string => typeof s === "string" && s.startsWith("act:view_business:"))
+        .map((s) => humanizeKey(s.replace("act:view_business:", ""))),
+    ),
+  ).filter(Boolean);
 
-  if (destinations.length === 0 && categories.length === 0 && summaryLines.length === 0) {
+  if (
+    destinations.length === 0 &&
+    categories.length === 0 &&
+    visitedBusinesses.length === 0 &&
+    summaryLines.length === 0
+  ) {
     return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
   }
 
