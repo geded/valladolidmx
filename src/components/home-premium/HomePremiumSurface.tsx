@@ -564,7 +564,7 @@ function RoutesSection({
         actionHref={content.rutas.actionHref}
       />
       <div
-        className="-mx-4 grid snap-x snap-mandatory grid-flow-col auto-cols-[86%] items-stretch gap-3 overflow-x-auto px-4 pb-3 sm:auto-cols-[52%] md:auto-cols-[38%] xl:mx-0 xl:grid-flow-row xl:grid-cols-4 xl:gap-4 xl:overflow-visible xl:px-0 xl:pb-0"
+        className="grid snap-x snap-mandatory grid-flow-col auto-cols-[78%] items-stretch gap-3 overflow-x-auto pb-3 sm:auto-cols-[48%] md:auto-cols-[38%] xl:grid-flow-row xl:grid-cols-4 xl:gap-4 xl:overflow-visible xl:pb-0"
         tabIndex={0}
         aria-label="Rutas recomendadas"
       >
