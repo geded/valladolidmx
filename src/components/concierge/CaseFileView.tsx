@@ -501,6 +501,122 @@ function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
   );
 }
 
+/**
+ * Datos del viaje que el viajero envió al Concierge: personas, fechas,
+ * duración, notas y los lugares que guardó. Sin claves internas.
+ */
+function TravelPlanSection({ plan }: { plan: CaseFile["travel_plan"] }) {
+  if (!plan) {
+    return (
+      <Section title="Datos del viaje">
+        <Empty>
+          Este expediente no tiene un viaje enlazado. Confirma con el viajero fechas, número de
+          personas y lo que quiere hacer antes de cotizar.
+        </Empty>
+      </Section>
+    );
+  }
+
+  const fmtDate = (value?: string | null) =>
+    value
+      ? new Date(`${value}T12:00:00`).toLocaleDateString("es-MX", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : null;
+  const start = fmtDate(plan.start_date);
+  const end = fmtDate(plan.end_date);
+  let nights: number | null = null;
+  if (plan.start_date && plan.end_date) {
+    const ms =
+      new Date(`${plan.end_date}T12:00:00`).getTime() -
+      new Date(`${plan.start_date}T12:00:00`).getTime();
+    nights = Math.max(0, Math.round(ms / 86_400_000));
+  }
+  const items = plan.items ?? [];
+
+  const facts: Array<{ label: string; value: string }> = [
+    {
+      label: "Personas",
+      value: plan.party_size ? `${plan.party_size} viajero(s)` : "No indicado",
+    },
+    {
+      label: "Fechas",
+      value: start && end ? `${start} → ${end}` : (start ?? "Sin fechas definidas"),
+    },
+    {
+      label: "Duración",
+      value:
+        nights !== null
+          ? `${nights + 1} día(s) · ${nights} noche(s)`
+          : "Pendiente de confirmar con el viajero",
+    },
+    { label: "Experiencias guardadas", value: `${items.length}` },
+  ];
+
+  return (
+    <Section title="Datos del viaje">
+      <div className="grid gap-4">
+        {plan.title ? <p className="text-sm font-medium">{plan.title}</p> : null}
+        <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {facts.map((fact) => (
+            <div key={fact.label} className="rounded-md border border-border bg-card p-3">
+              <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                {fact.label}
+              </dt>
+              <dd className="mt-1 text-sm font-medium">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        {plan.notes ? (
+          <div className="rounded-md border border-dashed border-border bg-background/60 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Notas del viajero
+            </p>
+            <p className="mt-1 whitespace-pre-line text-sm">{plan.notes}</p>
+          </div>
+        ) : null}
+
+        <div>
+          <p className="mb-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+            Lo que guardó en Mi Viaje
+          </p>
+          {items.length === 0 ? (
+            <Empty>Todavía no guardó lugares ni experiencias.</Empty>
+          ) : (
+            <ul className="grid gap-2">
+              {items.map((it) => (
+                <li key={it.id} className="rounded-md border border-border bg-card p-3 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium">
+                      {it.title ?? it.subtitle ?? it.slug ?? "Sin nombre"}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                      {labelFor(it.item_kind, ITEM_KIND_LABELS)}
+                    </span>
+                  </div>
+                  {it.subtitle && it.title ? (
+                    <p className="mt-1 text-xs text-muted-foreground">{it.subtitle}</p>
+                  ) : null}
+                  {it.notes ? <p className="mt-1 text-xs">{it.notes}</p> : null}
+                  {typeof it.day_index === "number" ? (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Día {it.day_index + 1} del viaje
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+
 function TravelerContactSection({ traveler }: { traveler: CaseFile["traveler"] }) {
   const safePhone = traveler.phone?.trim() ?? "";
   const phoneHref = /^\+?[0-9 ()-]{8,32}$/.test(safePhone)
