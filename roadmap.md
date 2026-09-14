@@ -82,6 +82,12 @@
 
 - [x] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
 
+## Incidencia · Envío de Mi Viaje al Concierge (2026-09-14)
+
+- [ ] Diagnosticar por qué el viaje de kafir hadded no creó expediente ni llegó a revisión/cotización del concierge.
+- [ ] Contrastar diagnóstico y corrección con la documentación oficial versionada del flujo Mi Viaje → Concierge → cotización.
+- [ ] Corregir únicamente el flujo de promoción del viaje y verificar viaje → expediente → panel Concierge, sin alterar los datos del viajero.
+
 ## Alux multimarca · configuración desde Marca (2026-09-14)
 
 - [x] Extender `brand.identity` con paleta de interfaz y textos de Alux configurables por marca, con herencia segura de los valores vigentes.
