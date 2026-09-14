@@ -704,9 +704,7 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           )}
         </>
       )}
-      {internal && f.quotes && f.quotes.some((q) => q.status === "submitted") ? (
-        <ProposalComposer caseId={f.case.id} quotes={f.quotes} />
-      ) : null}
+      {internal ? <ProposalComposer caseId={f.case.id} quotes={f.quotes ?? []} /> : null}
     </Section>
   );
 }
