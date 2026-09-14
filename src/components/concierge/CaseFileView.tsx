@@ -29,6 +29,7 @@ import {
   createOrderFromProposal,
   markConciergeOrderPaidCash,
 } from "@/lib/concierge/orders.functions";
+import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
 import {
   generateAluxSummary,
   generateAluxProducts,
