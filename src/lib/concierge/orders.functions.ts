@@ -315,3 +315,28 @@ export const getMyConfirmedTravel = createServerFn({ method: "GET" })
       email_post_sent_at: (order as any).email_post_sent_at ?? null,
     };
   });
+
+// ---------- pago en efectivo (CV4.2 · modalidad única vigente) ----------
+
+const CashInput = z.object({
+  orderId: z.string().uuid(),
+  note: z.string().max(300).optional().nullable(),
+});
+
+/**
+ * Marca la reservación como pagada en efectivo.
+ * Puede ejecutarla el viajero dueño de la reservación o el equipo interno
+ * (concierge, coordinación, administración). La autorización real vive en
+ * `concierge_order_mark_paid_cash` (SECURITY DEFINER).
+ */
+export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => CashInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: res, error } = await context.supabase.rpc("concierge_order_mark_paid_cash", {
+      _order_id: data.orderId,
+      _note: data.note ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
+  });
