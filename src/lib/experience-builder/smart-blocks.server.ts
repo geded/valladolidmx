@@ -35,7 +35,7 @@ import {
   normalizeScheduleTimes,
   toRecurrencePayload,
 } from "@/lib/events/recurrence";
-import type { EventRecurrenceInput } from "@/lib/events/recurrence";
+import type { EventRecurrenceInput, EventRecurrencePayload } from "@/lib/events/recurrence";
 import {
   routeDifficultyLabel,
   routeDurationLabel,
@@ -215,6 +215,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         ends_at: row.recurrence_frequency ? null : str(row.ends_at),
         href: buildCanonicalEntityUrl({ entityType: "event", slug }),
         featured: false,
+        recurrence: { ...toRecurrencePayload(recurrenceInput) },
         _media: str(row.cover_media_id) ?? undefined,
       };
     },
@@ -646,15 +647,20 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
     // búsqueda por fecha. Sin `starts_at` publicado, la tarjeta conserva el
     // orden editorial y no declara fecha (jamás se inventa una).
     const eventStartsByHref = new Map<string, string>();
+    const eventRecurrenceByHref = new Map<string, EventRecurrencePayload>();
     for (const item of eventRes.items) {
-      if (typeof item.href === "string" && typeof item.starts_at === "string") {
-        eventStartsByHref.set(item.href, item.starts_at);
+      if (typeof item.href !== "string") continue;
+      if (typeof item.starts_at === "string") eventStartsByHref.set(item.href, item.starts_at);
+      const recurrence = item.recurrence;
+      if (recurrence && typeof recurrence === "object" && !Array.isArray(recurrence)) {
+        eventRecurrenceByHref.set(item.href, recurrence as unknown as EventRecurrencePayload);
       }
     }
     const eventos = cardsFrom(eventRes, () => "Evento").map((card, index) => ({
       ...card,
       day: String(index + 1).padStart(2, "0"),
       startsAt: eventStartsByHref.get(card.href) ?? null,
+      recurrence: eventRecurrenceByHref.get(card.href) ?? null,
     }));
 
     const value: HomeRealContent = {
