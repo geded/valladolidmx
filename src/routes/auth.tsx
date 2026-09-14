@@ -200,23 +200,23 @@ function AuthRoute() {
   ];
 
   return (
-    <PublicShell crumbs={crumbs} compactCrumbsOnMobile className="pb-16 md:pb-24">
-      <div className="mx-auto grid max-w-5xl items-start gap-7 pt-4 md:grid-cols-[minmax(0,0.85fr)_minmax(360px,0.95fr)] md:gap-12 md:pt-7 lg:gap-16">
-        <header className="min-w-0 md:sticky md:top-28 md:pt-5">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+    <PublicShell crumbs={crumbs} compactCrumbsOnMobile className="pb-12 md:pb-20">
+      <div className="mx-auto grid max-w-4xl items-start gap-6 pt-3 md:grid-cols-[minmax(0,0.8fr)_minmax(340px,0.9fr)] md:gap-10 md:pt-6">
+        <header className="min-w-0 md:sticky md:top-28 md:pt-3">
+          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
             {t("auth.eyebrow")}
           </p>
-          <h1 className="mt-2 max-w-xl font-sans text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+          <h1 className="mt-1.5 max-w-xl font-sans text-[22px] font-semibold leading-snug tracking-tight text-foreground sm:text-[26px]">
             {titles[mode]}
           </h1>
-          <p className="mt-3 max-w-md text-base leading-7 text-muted-foreground">
+          <p className="mt-2 max-w-lg text-[13px] leading-6 text-muted-foreground">
             {t("auth.subtitle")}
           </p>
         </header>
 
         <section
           aria-label={titles[mode]}
-          className="min-w-0 rounded-lg border border-border bg-card p-5 shadow-soft sm:p-6"
+          className="min-w-0 rounded-lg border border-border bg-card p-4 shadow-soft sm:p-5"
         >
           {returnTarget ? (
             <Button
