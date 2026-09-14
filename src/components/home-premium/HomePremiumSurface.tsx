@@ -8,6 +8,7 @@
  */
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
+import { es } from "date-fns/locale";
 import {
   ArrowRight,
   CalendarDays,
@@ -1150,6 +1151,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
+                  locale={es}
                   selected={calendarDateFromKey(queryKey)}
                   onSelect={(date) => {
                     if (!date) return;
