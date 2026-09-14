@@ -582,11 +582,11 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
     const ids = data.caseIds;
     if (ids.length === 0) return [];
 
-    const [quotesRes, proposalsRes, assignmentsRes, directoryRes] = await Promise.all([
+    const [quotesRes, proposalsRes, assignmentsRes, directoryRes, ordersRes] = await Promise.all([
       context.supabase.from("concierge_quotes").select("case_id, status").in("case_id", ids),
       context.supabase
         .from("concierge_proposals")
-        .select("case_id, status, sent_at, version, created_at")
+        .select("case_id, status, sent_at, version, created_at, total_amount_cents, currency")
         .in("case_id", ids),
       context.supabase
         .from("concierge_assignments")
@@ -594,6 +594,10 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         .in("case_id", ids)
         .eq("status", "active"),
       context.supabase.rpc("concierge_directory" as never),
+      context.supabase
+        .from("concierge_orders")
+        .select("source_case_id, status, paid_at, created_at")
+        .in("source_case_id", ids),
     ]);
 
     if (quotesRes.error) throw new Error(quotesRes.error.message);
@@ -617,7 +621,11 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         quotes_other: number;
         latest_proposal_status: string | null;
         latest_proposal_sent_at: string | null;
+        latest_proposal_total_cents: number | null;
+        latest_proposal_currency: string | null;
         latest_proposal_version: number;
+        order_status: string | null;
+        order_paid_at: string | null;
         assigned_concierge_user_id: string | null;
         assigned_concierge_name: string | null;
       }
@@ -630,7 +638,11 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         quotes_other: 0,
         latest_proposal_status: null,
         latest_proposal_sent_at: null,
+        latest_proposal_total_cents: null,
+        latest_proposal_currency: null,
         latest_proposal_version: -1,
+        order_status: null,
+        order_paid_at: null,
         assigned_concierge_user_id: null,
         assigned_concierge_name: null,
       });
@@ -652,6 +664,20 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         row.latest_proposal_version = version;
         row.latest_proposal_status = (p.status as string) ?? null;
         row.latest_proposal_sent_at = (p.sent_at as string | null) ?? null;
+        row.latest_proposal_total_cents = (p.total_amount_cents as number | null) ?? null;
+        row.latest_proposal_currency = (p.currency as string | null) ?? null;
+      }
+    }
+
+    // Reservación derivada de la propuesta aceptada (si ya existe).
+    for (const o of ordersRes.data ?? []) {
+      const row = byCase.get(o.source_case_id as string);
+      if (!row) continue;
+      const paid = o.status === "paid" || o.status === "fulfilled";
+      const already = row.order_status === "paid" || row.order_status === "fulfilled";
+      if (!row.order_status || (paid && !already)) {
+        row.order_status = (o.status as string) ?? null;
+        row.order_paid_at = (o.paid_at as string | null) ?? null;
       }
     }
 

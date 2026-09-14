@@ -19,6 +19,7 @@ export type CaseStageId =
   | "intake"
   | "awaiting_quotes"
   | "ready_to_propose"
+  | "proposal_draft"
   | "proposal_sent"
   | "needs_rework"
   | "accepted"
@@ -31,6 +32,11 @@ export interface CaseFollowUp {
   quotes_other: number;
   latest_proposal_status: string | null;
   latest_proposal_sent_at: string | null;
+  latest_proposal_total_cents?: number | null;
+  latest_proposal_currency?: string | null;
+  /** Reservación generada al aceptar la propuesta, si ya existe. */
+  order_status?: string | null;
+  order_paid_at?: string | null;
   assigned_concierge_user_id: string | null;
   assigned_concierge_name: string | null;
 }
@@ -58,10 +64,16 @@ export function deriveCaseStage(input: {
   const proposal = f?.latest_proposal_status ?? null;
 
   if (WON_STATUSES.has(input.status) || (proposal && ACCEPTED_PROPOSALS.has(proposal))) {
+    const paid = f?.order_status === "paid" || f?.order_status === "fulfilled";
+    const hasOrder = Boolean(f?.order_status);
     return {
       id: "accepted",
-      label: "Propuesta aceptada",
-      nextAction: "El viajero aceptó. Da seguimiento al cierre del viaje.",
+      label: paid ? "Viaje confirmado y pagado" : "Propuesta aceptada",
+      nextAction: paid
+        ? "Pagado. Da seguimiento al itinerario del viajero."
+        : hasOrder
+          ? "El viajero aceptó. Falta confirmar el pago de su reservación."
+          : "El viajero aceptó. Falta que confirme su reservación y el pago.",
       tone: "success",
     };
   }
@@ -96,6 +108,15 @@ export function deriveCaseStage(input: {
           ? "El viajero ya la abrió. Da seguimiento a su respuesta."
           : "Esperando que el viajero la abra y responda.",
       tone: "info",
+    };
+  }
+
+  if (proposal === "draft") {
+    return {
+      id: "proposal_draft",
+      label: "Propuesta en preparación",
+      nextAction: "La propuesta está en borrador. Revísala y envíala al viajero.",
+      tone: "warning",
     };
   }
 
@@ -160,6 +181,7 @@ export const CONCIERGE_INBOXES: readonly InboxDefinition[] = [
       "intake",
       "awaiting_quotes",
       "ready_to_propose",
+      "proposal_draft",
       "proposal_sent",
       "needs_rework",
     ],
@@ -174,7 +196,7 @@ export const CONCIERGE_INBOXES: readonly InboxDefinition[] = [
     id: "ready_to_propose",
     label: "Listos para proponer",
     scope: "lead",
-    stages: ["ready_to_propose"],
+    stages: ["ready_to_propose", "proposal_draft"],
   },
   { id: "sent", label: "Propuestas enviadas", scope: "lead", stages: ["proposal_sent"] },
   { id: "rework", label: "Requieren ajuste", scope: "lead", stages: ["needs_rework"] },

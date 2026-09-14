@@ -313,6 +313,7 @@ function ConciergeInboxPage() {
               key={item.row.id}
               caseRow={item.row}
               stage={item.stage}
+              followUp={item.followUp}
               ownerId={item.ownerId}
               ownerName={item.ownerName}
               directory={directoryQ.data ?? []}
@@ -406,9 +407,64 @@ function slaClass(s: CaseRow["sla_status"]) {
         : "bg-muted text-muted-foreground";
 }
 
+/**
+ * Traza económica del expediente: cotizaciones pedidas/recibidas,
+ * propuesta vigente con su monto y estado real del pago.
+ */
+function ProposalTrace({ followUp }: { followUp: CaseFollowUp | null }) {
+  if (!followUp) return null;
+  const parts: string[] = [];
+
+  const requested = followUp.quotes_requested ?? 0;
+  const submitted = followUp.quotes_submitted ?? 0;
+  if (requested > 0 || submitted > 0) {
+    parts.push(`Cotizaciones: ${submitted} recibida(s) · ${requested} pendiente(s)`);
+  }
+
+  const proposal = followUp.latest_proposal_status;
+  if (proposal) {
+    const money =
+      typeof followUp.latest_proposal_total_cents === "number"
+        ? new Intl.NumberFormat("es-MX", {
+            style: "currency",
+            currency: followUp.latest_proposal_currency ?? "MXN",
+          }).format(followUp.latest_proposal_total_cents / 100)
+        : null;
+    const label = PROPOSAL_LABEL[proposal] ?? proposal;
+    parts.push(`Propuesta ${label}${money ? ` · ${money}` : ""}`);
+    if (followUp.latest_proposal_sent_at) {
+      parts.push(`Enviada ${new Date(followUp.latest_proposal_sent_at).toLocaleString("es-MX")}`);
+    }
+  }
+
+  if (followUp.order_status) {
+    const paid = followUp.order_status === "paid" || followUp.order_status === "fulfilled";
+    parts.push(
+      paid
+        ? `Pagado${followUp.order_paid_at ? ` el ${new Date(followUp.order_paid_at).toLocaleDateString("es-MX")}` : ""}`
+        : "Reservación creada, pago pendiente",
+    );
+  }
+
+  if (parts.length === 0) return null;
+  return <p className="mt-1 text-xs text-muted-foreground">{parts.join(" · ")}</p>;
+}
+
+const PROPOSAL_LABEL: Record<string, string> = {
+  draft: "en borrador",
+  sent: "enviada",
+  viewed: "vista por el viajero",
+  accepted: "aceptada",
+  rejected: "rechazada",
+  withdrawn: "retirada",
+  superseded: "reemplazada",
+  expired: "vencida",
+};
+
 function CaseRowCard({
   caseRow: c,
   stage,
+  followUp,
   ownerId,
   ownerName,
   directory,
@@ -416,6 +472,7 @@ function CaseRowCard({
 }: {
   caseRow: CaseRow;
   stage: CaseStage;
+  followUp: CaseFollowUp | null;
   ownerId: string | null;
   ownerName: string | null;
   directory: DirectoryEntry[];
@@ -476,6 +533,8 @@ function CaseRowCard({
       </Link>
 
       <p className="mt-1 text-xs text-muted-foreground">{stage.nextAction}</p>
+
+      <ProposalTrace followUp={followUp} />
 
       <p className="mt-2 text-xs text-muted-foreground">
         Responsable:{" "}
