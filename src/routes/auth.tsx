@@ -207,23 +207,27 @@ function AuthRoute() {
   ];
 
   return (
-    <PublicShell crumbs={crumbs} compactCrumbsOnMobile className="pb-12 md:pb-20">
-      <div className="mx-auto grid max-w-4xl items-start gap-6 pt-3 md:grid-cols-[minmax(0,0.8fr)_minmax(340px,0.9fr)] md:gap-10 md:pt-6">
+    <PublicShell
+      crumbs={crumbs}
+      compactCrumbsOnMobile
+      className="pb-10 pt-5 sm:pt-7 md:pb-20 md:pt-12"
+    >
+      <div className="mx-auto grid max-w-4xl items-start gap-4 pt-2 sm:gap-5 sm:pt-3 md:grid-cols-[minmax(0,0.8fr)_minmax(340px,0.9fr)] md:gap-10 md:pt-6">
         <header className="min-w-0 md:sticky md:top-28 md:pt-3">
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary sm:text-[11px]">
             {t("auth.eyebrow")}
           </p>
-          <h1 className="mt-1.5 max-w-xl font-sans text-[22px] font-semibold leading-snug tracking-tight text-foreground sm:text-[26px]">
+          <h1 className="mt-1 max-w-xl font-sans text-xl font-semibold leading-tight tracking-normal text-foreground sm:text-2xl">
             {titles[mode]}
           </h1>
-          <p className="mt-2 max-w-lg text-[13px] leading-6 text-muted-foreground">
+          <p className="mt-1.5 max-w-lg text-xs leading-5 text-muted-foreground sm:text-[13px]">
             {t("auth.subtitle")}
           </p>
         </header>
 
         <section
           aria-label={titles[mode]}
-          className="min-w-0 rounded-lg border border-border bg-card p-4 shadow-soft sm:p-5"
+          className="min-w-0 rounded-lg border border-border bg-card p-3.5 shadow-soft sm:p-5"
         >
           {returnTarget ? (
             <Button
@@ -244,7 +248,7 @@ function AuthRoute() {
                 type="button"
                 variant="outline"
                 onClick={handleGoogle}
-                className="h-10 w-full rounded-lg bg-card text-[13px] shadow-none hover:bg-muted hover:text-foreground"
+               className="h-11 w-full rounded-lg bg-card text-xs shadow-none hover:bg-muted hover:text-foreground sm:h-10 sm:text-[13px]"
               >
                 <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
                   <path
@@ -266,20 +270,20 @@ function AuthRoute() {
                 </svg>
                 {t("auth.google")}
               </Button>
-              <div className="relative my-4 text-center text-xs text-muted-foreground">
+               <div className="relative my-3 text-center text-[11px] text-muted-foreground sm:my-4 sm:text-xs">
                 <span className="relative z-10 bg-card px-3">{t("auth.or_email")}</span>
                 <span className="absolute inset-x-0 top-1/2 h-px bg-border" aria-hidden />
               </div>
             </>
           ) : null}
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
             {mode === "signup" ? (
               <div>
-                <label className="text-[13px] font-medium text-foreground" htmlFor="name">
+                 <label className="text-xs font-medium text-foreground sm:text-[13px]" htmlFor="name">
                   {t("auth.name")}
                 </label>
-                <div className="relative mt-1.5">
+                 <div className="relative mt-1">
                   <UserRound
                     className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                     aria-hidden
@@ -289,17 +293,17 @@ function AuthRoute() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-10 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus"
+                    className="h-11 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus sm:h-10"
                   />
                 </div>
               </div>
             ) : null}
 
             <div>
-              <label className="text-[13px] font-medium text-foreground" htmlFor="email">
+              <label className="text-xs font-medium text-foreground sm:text-[13px]" htmlFor="email">
                 {t("auth.email")}
               </label>
-              <div className="relative mt-1.5">
+              <div className="relative mt-1">
                 <Mail
                   className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                   aria-hidden
@@ -311,17 +315,17 @@ function AuthRoute() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-10 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus"
+                  className="h-11 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus sm:h-10"
                 />
               </div>
             </div>
 
             {mode !== "forgot" ? (
               <div>
-                <label className="text-[13px] font-medium text-foreground" htmlFor="password">
+                <label className="text-xs font-medium text-foreground sm:text-[13px]" htmlFor="password">
                   {t("auth.password")}
                 </label>
-                <div className="relative mt-1.5">
+                <div className="relative mt-1">
                   <LockKeyhole
                     className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                     aria-hidden
@@ -334,7 +338,7 @@ function AuthRoute() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-10 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus"
+                    className="h-11 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus sm:h-10"
                   />
                 </div>
               </div>
@@ -357,7 +361,7 @@ function AuthRoute() {
             <Button
               type="submit"
               disabled={busy}
-              className="h-10 w-full rounded-lg bg-foreground text-[13px] font-medium text-background shadow-none hover:bg-foreground/90"
+              className="h-11 w-full rounded-lg bg-foreground text-xs font-medium text-background shadow-none hover:bg-foreground/90 sm:h-10 sm:text-[13px]"
             >
               {busy
                 ? t("auth.processing")
@@ -369,7 +373,7 @@ function AuthRoute() {
             </Button>
           </form>
 
-          <div className="mt-4 grid gap-1.5 border-t border-border pt-3 text-[13px] sm:grid-cols-2 sm:items-center">
+          <div className="mt-3 grid gap-1 border-t border-border pt-2.5 text-xs sm:mt-4 sm:grid-cols-2 sm:items-center sm:gap-1.5 sm:pt-3 sm:text-[13px]">
             {mode === "signin" ? (
               <>
                 <Button
