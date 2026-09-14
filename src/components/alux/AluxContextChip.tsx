@@ -18,6 +18,7 @@ import { computeOpenNow, type BusinessHourRow } from "@/lib/business/open-now";
 import { getBusinessHoursPublic } from "@/lib/alux/business-context.functions";
 import { logAluxPublicSignal } from "@/lib/alux/public-signals";
 import { supabase } from "@/integrations/supabase/client";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 export interface AluxContextChipProps {
   businessId: string;
@@ -51,6 +52,7 @@ export function AluxContextChip({
   latitude,
   longitude,
 }: AluxContextChipProps) {
+  const alux = useAluxBrand();
   const { location } = useVisitorGeolocation(); // sólo lee caché; no fuerza prompt
   const fetchHours = useServerFn(getBusinessHoursPublic);
   const [hours, setHours] = useState<BusinessHourRow[] | null>(null);
@@ -123,14 +125,14 @@ export function AluxContextChip({
 
   return (
     <div
-      className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-alux/20 bg-alux/5 px-4 py-2.5 text-sm"
+      className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-alux/20 bg-alux-surface px-4 py-2.5 text-sm"
       data-omxds-visual-foundation="alux-context"
       role="note"
-      aria-label="Alux · contexto de esta ficha"
+      aria-label={`${alux.name} · contexto de esta ficha`}
     >
       <span className="inline-flex items-center gap-1.5 font-medium text-alux">
         <Sparkles className="h-4 w-4" aria-hidden />
-        Alux
+        {alux.name}
       </span>
       <span className="text-alux/40" aria-hidden>
         ·

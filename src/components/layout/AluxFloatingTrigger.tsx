@@ -97,6 +97,7 @@ import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -117,6 +118,7 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 
 export function AluxFloatingTrigger() {
   const { t, locale } = useTranslation();
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
@@ -569,7 +571,7 @@ export function AluxFloatingTrigger() {
       : "Contexto reciente"
     : "Modo descubrimiento";
 
-  const triggerLabel = ctx.hasContext ? (current?.label ?? "Concierge IA") : t("alux_floating");
+  const triggerLabel = ctx.hasContext ? (current?.label ?? alux.copy("shortDescriptor")) : t("alux_floating");
 
   return (
     <>
@@ -606,10 +608,10 @@ export function AluxFloatingTrigger() {
               <AluxMark family="avatar" size={20} decorative loading="eager" />
             </span>
             <span className="min-w-0 truncate">
-              Alux · Personalizando{selection.title ? ` ${selection.title}` : ""}
+              {alux.name} · Personalizando{selection.title ? ` ${selection.title}` : ""}
             </span>
             <span className="shrink-0 rounded-full bg-alux/10 px-2 py-1 text-[11px] font-semibold text-alux">
-              Continuar con Alux
+              Continuar con {alux.name}
             </span>
           </button>
         ) : null}
@@ -617,7 +619,7 @@ export function AluxFloatingTrigger() {
           type="button"
           hidden={minimized && Boolean(selection)}
           onClick={() => setOpen(true)}
-          title={`Alux · ${triggerLabel}`}
+          title={`${alux.name} · ${triggerLabel}`}
           className="pointer-events-auto group flex min-h-11 max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
           <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-alux/15">
@@ -631,9 +633,9 @@ export function AluxFloatingTrigger() {
             )}
           </span>
 
-          <span className="hidden sm:inline">Alux</span>
-          <span className="hidden text-xs text-muted-foreground sm:inline">· Concierge IA</span>
-          <span className="ml-1 text-xs text-muted-foreground sm:hidden">Alux</span>
+          <span className="hidden sm:inline">{alux.name}</span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">· {alux.copy("shortDescriptor")}</span>
+          <span className="ml-1 text-xs text-muted-foreground sm:hidden">{alux.name}</span>
         </button>
         {/* Consolidación Alux: la sugerencia proactiva ya NO se pinta como un
             segundo globo flotante. Vive dentro del mismo panel (nota + pistas)
@@ -654,7 +656,7 @@ export function AluxFloatingTrigger() {
                 <AluxMark family="avatar" size={28} decorative loading="eager" />
               </span>
               <div>
-                <SheetTitle className="text-lg">Alux · Concierge IA del Oriente Maya</SheetTitle>
+                <SheetTitle className="text-lg">{alux.name} · {alux.copy("territorialDescriptor")}</SheetTitle>
                 <SheetDescription className="text-xs text-muted-foreground">
                   {originLabel} · te acompaña mientras exploras el destino.
                 </SheetDescription>
@@ -729,7 +731,7 @@ export function AluxFloatingTrigger() {
                           : "inline-flex min-h-8 items-center rounded-full px-3 text-[11px] font-medium text-muted-foreground"
                       }
                     >
-                      {variant === "original" ? "Ruta original" : "Tu propuesta con Alux"}
+                      {variant === "original" ? "Ruta original" : `Tu propuesta con ${alux.name}`}
                     </button>
                   ))}
                 </div>
@@ -1028,11 +1030,10 @@ export function AluxFloatingTrigger() {
             >
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 <Compass className="size-3.5" aria-hidden />
-                <span id="alux-discover">Empieza a explorar</span>
+                 <span id="alux-discover">{alux.copy("discoveryTitle")}</span>
               </div>
               <p className="mt-2 text-sm text-foreground">
-                Aún no exploras un destino del Oriente Maya. Elige un Pueblo Mágico para que te
-                acompañe con recomendaciones basadas en tu recorrido, nunca inventadas.
+                {alux.copy("discoveryBody")}
               </p>
               {/* Lote 3J.1 · Destinos publicados del CMS (sin lista fija). */}
               {(publishedDestinations ?? []).length > 0 ? (

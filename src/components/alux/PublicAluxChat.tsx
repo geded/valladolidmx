@@ -31,6 +31,7 @@ import { useTranslation } from "@/i18n/context";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
 import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -66,6 +67,7 @@ const SUGGESTIONS = [
 ];
 
 export function PublicAluxChat() {
+  const alux = useAluxBrand();
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -217,8 +219,8 @@ export function PublicAluxChat() {
 
   return (
     <section
-      aria-label="Habla con Alux"
-      className="rounded-3xl border border-border/60 bg-card shadow-elevated overflow-hidden"
+      aria-label={alux.copy("conversationTitle")}
+      className="rounded-3xl border border-alux-border bg-alux-surface text-alux-surface-foreground shadow-elevated overflow-hidden"
     >
       <header className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-4">
         {/* G8-R1-D3 · Identidad canónica: activo gobernado de /brand/alux/. */}
@@ -227,9 +229,9 @@ export function PublicAluxChat() {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="font-serif text-lg leading-none">Habla con Alux</h2>
+          <h2 className="font-serif text-lg leading-none">{alux.copy("conversationTitle")}</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Concierge IA del Oriente Maya · disponible sin registro
+            {alux.copy("territorialDescriptor")} · disponible sin registro
           </p>
         </div>
         {rateInfo && (
@@ -292,8 +294,7 @@ export function PublicAluxChat() {
         {messages.length === 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Pregúntame lo que quieras sobre Valladolid, Izamal, Espita, los cenotes, Chichén Itzá
-              o cómo armar tu viaje al Oriente Maya.
+              {alux.copy("publicIntro")}
             </p>
             <div className="flex flex-wrap gap-2">
               {SUGGESTIONS.map((s) => (
@@ -335,7 +336,7 @@ export function PublicAluxChat() {
         {sending && (
           <div className="flex justify-start">
             <div className="rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Alux está pensando…
+              <Loader2 className="h-4 w-4 animate-spin" /> {alux.copy("thinking")}
             </div>
           </div>
         )}
@@ -364,7 +365,7 @@ export function PublicAluxChat() {
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu pregunta…"
+          placeholder={alux.copy("inputPlaceholder")}
           rows={1}
           maxLength={800}
           disabled={!anonymousTripReady}
@@ -382,13 +383,12 @@ export function PublicAluxChat() {
           disabled={sending || !input.trim() || !anonymousTripReady}
         >
           <Send className="h-4 w-4" />
-          <span className="sr-only">Enviar</span>
+          <span className="sr-only">{alux.copy("sendLabel")}</span>
         </Button>
       </form>
 
       <p className="px-5 pb-4 pt-2 text-[11px] text-muted-foreground bg-muted/30">
-        Alux es una guía inspiracional. Nunca reserva ni cotiza sin tu confirmación. Para armar tu
-        viaje completo,{" "}
+        {alux.copy("disclaimer")} Para armar tu viaje completo,{" "}
         <Link
           to="/auth"
           onClick={() => rememberAuthReturnPath("/alux")}

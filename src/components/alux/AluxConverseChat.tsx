@@ -58,6 +58,7 @@ import {
 import { useAnonymousTrip, type AnonymousItemKind } from "@/lib/traveler/anonymous-draft";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 /* ─────────────────────────── persistencia local del hilo ─────────────────────────── */
 
@@ -153,6 +154,7 @@ export interface AluxConverseChatProps {
 /* ─────────────────────────── componente ─────────────────────────── */
 
 export function AluxConverseChat(props: AluxConverseChatProps) {
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const isAuthed = Boolean(user?.id);
   const queryClient = useQueryClient();
@@ -430,11 +432,11 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   return (
     <section
       aria-labelledby="alux-converse"
-      className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+      className="rounded-2xl border border-alux-border bg-alux-surface p-4 text-alux-surface-foreground shadow-soft"
     >
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
         <MessageCircle className="size-3.5" aria-hidden />
-        <span id="alux-converse">Conversa con Alux</span>
+         <span id="alux-converse">{alux.copy("conversationTitle")}</span>
         {messages.length > 0 ? (
           <button
             type="button"
@@ -448,13 +450,12 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
             className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-full px-2 text-[10px] font-medium normal-case tracking-normal text-muted-foreground hover:text-foreground"
           >
             <RotateCcw className="size-3" aria-hidden />
-            Nueva conversación
+            {alux.copy("newConversation")}
           </button>
         ) : null}
       </div>
       <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-        Pregunta libre. Alux responde sólo con el catálogo publicado y te dice cuándo un dato no
-        está disponible.
+        {alux.copy("conversationDescription")}
       </p>
       {isAuthed && isPlanPending ? (
         <p role="status" className="mt-3 flex items-center gap-2 text-[12px] text-muted-foreground">
@@ -533,7 +534,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               <AluxMark family="avatar" size={20} decorative />
             </span>
             <Loader2 className="size-3.5 animate-spin" aria-hidden />
-            {ALUX_CONVERSE_COPY.thinking}
+            {alux.copy("thinking")}
           </div>
         ) : null}
 
@@ -608,8 +609,8 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           maxLength={ALUX_CONVERSE_LIMITS.maxMessageChars}
           placeholder={
             props.destination?.label
-              ? `Pregúntale a Alux sobre ${props.destination.label}…`
-              : "¿Qué viaje tienes en mente?"
+              ? `${alux.copy("inputPlaceholder")} · ${props.destination.label}`
+              : alux.copy("inputPlaceholder")
           }
           disabled={thinking || planBlocked}
           className="min-h-11 flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] leading-snug text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-focus disabled:opacity-60"
@@ -617,7 +618,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         <button
           type="submit"
           disabled={thinking || planBlocked || input.trim().length === 0}
-          aria-label="Enviar a Alux"
+          aria-label={alux.copy("sendLabel")}
           className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-alux text-alux-foreground transition-colors hover:bg-alux/90 disabled:opacity-50"
         >
           {thinking ? (
@@ -628,8 +629,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         </button>
       </form>
       <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
-        Alux propone; tú decides con un toque. No reserva ni inventa precios, horarios o
-        disponibilidad.
+        {alux.copy("disclaimer")}
       </p>
     </section>
   );
