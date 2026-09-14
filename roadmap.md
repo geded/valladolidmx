@@ -105,3 +105,7 @@
 
 - [x] Confirmar que contacto interno, privacidad empresarial y autoría de propuestas respetan las adendas oficiales sincronizadas desde GitHub.
 - [x] Validar contratos Concierge, typecheck, formato y diff check. El render autenticado completo requiere una sesión de QA; 1440/834/430/390 alcanzaron correctamente el control de sesión sin desbordamiento.
+
+## Propuesta con partidas propias del Concierge (2026-09-14)
+- [x] Permitir partidas escritas por el Concierge (título, importe, notas) sin empresa ni cotización, mezclables con cotizaciones recibidas.
+- [ ] Dejar claro en el compositor que la empresa sólo se involucra cuando se le solicita cotización desde el servicio.
