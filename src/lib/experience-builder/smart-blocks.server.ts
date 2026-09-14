@@ -196,7 +196,8 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         schedule_times: normalizeScheduleTimes(row.schedule_times),
         exception_dates: normalizeExceptionDates(row.exception_dates),
         event_timezone: str(row.event_timezone) ?? "America/Merida",
-      });
+      };
+      const next = nextEventOccurrence(recurrenceInput);
       if (!next) return null;
       return {
         id: str(row.id),
