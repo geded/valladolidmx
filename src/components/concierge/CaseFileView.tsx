@@ -1434,6 +1434,94 @@ function HandoffBlock({ title, children }: { title: string; children: ReactNode 
   );
 }
 
+/**
+ * Presentación legible de la memoria territorial capturada por Alux:
+ * destinos y categorías consultados por el viajero antes del envío,
+ * más el resumen narrativo. Sin claves internas ni datos crudos.
+ */
+function TerritorialMemory({ memory }: { memory: Record<string, unknown> | null }) {
+  if (!memory) {
+    return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
+  }
+  const nameOf = (v: unknown): string => {
+    if (typeof v === "string") return humanizeKey(v);
+    if (v && typeof v === "object") {
+      const o = v as Record<string, unknown>;
+      const raw = (o.label as string) || (o.slug as string) || "";
+      const count = typeof o.count === "number" && o.count > 1 ? ` (${o.count})` : "";
+      return raw ? `${humanizeKey(raw)}${count}` : "";
+    }
+    return "";
+  };
+  const destinations = Array.isArray(memory.visited_destinations)
+    ? (memory.visited_destinations as unknown[]).map(nameOf).filter(Boolean)
+    : [];
+  const categories = Array.isArray(memory.visited_categories)
+    ? (memory.visited_categories as unknown[]).map(nameOf).filter(Boolean)
+    : [];
+  const lastDestination =
+    typeof memory.last_destination_slug === "string"
+      ? humanizeKey(memory.last_destination_slug)
+      : null;
+  const summary = typeof memory.summary === "string" ? memory.summary.trim() : "";
+  const summaryLines = summary
+    .split("\n")
+    .map((line) => line.replace(/^·\s*/, "").trim())
+    .filter(Boolean);
+
+  if (destinations.length === 0 && categories.length === 0 && summaryLines.length === 0) {
+    return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
+  }
+
+  return (
+    <div className="grid gap-2 text-xs">
+      {destinations.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Destinos que consultó</span>
+          <div className="flex flex-wrap gap-1">
+            {destinations.map((d) => (
+              <span key={d} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {d}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {categories.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Qué estuvo buscando</span>
+          <div className="flex flex-wrap gap-1">
+            {categories.map((c) => (
+              <span key={c} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {lastDestination ? (
+        <p className="text-foreground/90">
+          <span className="text-muted-foreground">Último destino consultado: </span>
+          {lastDestination}
+        </p>
+      ) : null}
+      {summaryLines.length > 0 ? (
+        <div className="grid gap-1 border-t border-border/60 pt-2">
+          <span className="text-muted-foreground">Lo que Alux entendió del viajero</span>
+          <ul className="grid gap-1">
+            {summaryLines.map((line, i) => (
+              <li key={i} className="text-foreground/90">
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+
 function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
   const all: Array<[string, unknown]> = [
     ["Idioma", profile.preferred_language],
