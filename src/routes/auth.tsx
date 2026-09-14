@@ -177,7 +177,10 @@ function AuthRoute() {
    */
   const territorialOrigin =
     returnTarget?.startsWith("/oriente-maya") === true ||
-    journey.some((s) => s.path === "/mapa" || s.path === "/rutas");
+    returnTarget === "/mapa" ||
+    returnTarget?.startsWith("/mapa/") === true ||
+    returnTarget === "/rutas" ||
+    returnTarget?.startsWith("/rutas/") === true;
   const destinationCrumb =
     territorialOrigin && session?.destination
       ? [
