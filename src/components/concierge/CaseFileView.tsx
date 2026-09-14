@@ -698,7 +698,13 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           ) : (
             <ul className="grid gap-3">
               {proposals.map((p) => (
-                <ProposalCard key={p.proposal_id} p={p} caseId={f.case.id} internal={internal} />
+                <ProposalCard
+                  key={p.proposal_id}
+                  p={p}
+                  caseId={f.case.id}
+                  internal={internal}
+                  traveler={f.traveler}
+                />
               ))}
             </ul>
           )}
