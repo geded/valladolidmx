@@ -796,6 +796,29 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
     return { planId: assertUuid(src.planId, "plan_id"), summary };
   })
   .handler(async ({ context, data }): Promise<{ caseId: string; planId: string }> => {
+    const [{ data: profile, error: profileError }, { data: traveler, error: travelerError }] =
+      await Promise.all([
+        context.supabase
+          .from("profiles")
+          .select("display_name,email,phone")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+        context.supabase
+          .from("traveler_profiles")
+          .select("whatsapp_contact_consent")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+      ]);
+    if (profileError || travelerError) throw new Error("concierge_contact_read_failed");
+    if (!profile?.display_name?.trim()) throw new Error("concierge_contact_name_required");
+    if (!profile.email?.trim()) throw new Error("concierge_contact_email_required");
+    if (!profile.phone?.trim() || !/^\+?[0-9 ()-]{8,32}$/.test(profile.phone.trim())) {
+      throw new Error("concierge_contact_phone_required");
+    }
+    if (!traveler?.whatsapp_contact_consent) {
+      throw new Error("concierge_whatsapp_consent_required");
+    }
+
     // 1. Snapshot vía RPC (aplica RLS/visibility).
     const { data: snapJson, error: snapErr } = await context.supabase.rpc(
       "travel_plan_build_snapshot",

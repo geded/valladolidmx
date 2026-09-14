@@ -99,6 +99,9 @@
 - [x] Dar presencia a Alux tras enviar a Concierge: acompañar la espera y avisar desde Mi Viaje cuando exista una propuesta nueva.
 - [x] Reparar asignación y cotización del expediente: autoasignación ligada a la sesión desde la bandeja y el detalle, avisos claros, solicitud de cotización por servicio con empresa y refresco inmediato; validado con sesión Concierge y QA en 1440/834/430/390.
 ## Mejora de expedientes Concierge
-- [ ] Auditar documentación oficial: contacto, alcance de cotización y autoría de propuesta.
-- [ ] Comparar contrato documentado con captura e implementación actual.
-- [ ] Definir delta mínimo con Scope Gate y Preservation Gate antes de modificar.
+- [x] Auditar documentación oficial: contacto, alcance de cotización y autoría de propuesta.
+- [x] Comparar contrato documentado con captura e implementación actual.
+- [x] Definir delta mínimo con Scope Gate y Preservation Gate antes de modificar.
+
+- [x] Confirmar que contacto interno, privacidad empresarial y autoría de propuestas respetan las adendas oficiales sincronizadas desde GitHub.
+- [x] Validar contratos Concierge, typecheck, formato y diff check. El render autenticado completo requiere una sesión de QA; 1440/834/430/390 alcanzaron correctamente el control de sesión sin desbordamiento.

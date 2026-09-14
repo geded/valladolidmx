@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Circle, Headset, Sparkles } from "lucide-react";
+import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAluxBrand } from "@/lib/brand/brand-context";
 import { toast } from "@/lib/toast";
@@ -52,7 +52,17 @@ type CaseFile = {
     priority_reason?: string | null;
   };
   viewer: { user_id: string; is_internal: boolean };
-  traveler: { user_id: string; display_name?: string | null; preferred_language?: string | null };
+  traveler: {
+    user_id: string;
+    display_name?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    preferred_language?: string | null;
+    whatsapp_contact_consent?: boolean;
+    whatsapp_contact_consented_at?: string | null;
+  };
   travel_plan: { id: string } | null;
   requests: Array<{
     id: string;
@@ -341,9 +351,10 @@ export function CaseFileView({
       {!internal && <TravelerConciergeProgress f={f} />}
       {!internal && <ProposalsSection f={f} internal={false} />}
       {internal && <SlaAssignmentPanel f={f} />}
+      {internal && <TravelerContactSection traveler={f.traveler} />}
       {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
-      <Section title="Servicios por revisar">
+      <Section title="Qué solicita el viajero">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
         ) : (
@@ -442,7 +453,9 @@ function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
   return (
     <header className="rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="font-mono text-xs text-muted-foreground">{f.case.id.slice(0, 8)}</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Expediente {f.case.id.slice(0, 8).toUpperCase()}
+        </span>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
           {labelFor(f.case.status, CASE_STATUS_LABELS)}
         </span>
@@ -458,6 +471,74 @@ function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
         <p className="mt-1 text-xs text-muted-foreground">Viajero: {f.traveler.display_name}</p>
       )}
     </header>
+  );
+}
+
+function TravelerContactSection({ traveler }: { traveler: CaseFile["traveler"] }) {
+  const safePhone = traveler.phone?.trim() ?? "";
+  const phoneHref = /^\+?[0-9 ()-]{8,32}$/.test(safePhone)
+    ? `tel:${safePhone.replace(/[^+0-9]/g, "")}`
+    : null;
+  const whatsappHref =
+    traveler.whatsapp_contact_consent && phoneHref
+      ? `https://wa.me/${safePhone.replace(/\D/g, "")}`
+      : null;
+  const emailHref = traveler.email ? `mailto:${encodeURIComponent(traveler.email)}` : null;
+
+  return (
+    <Section title="Cliente y contacto">
+      <div className="grid gap-4 rounded-md border border-border bg-card p-4 sm:grid-cols-[1fr_auto]">
+        <div>
+          <p className="font-semibold text-foreground">
+            {traveler.display_name ?? "Nombre no disponible"}
+          </p>
+          <dl className="mt-2 grid gap-1 text-sm">
+            <div className="flex flex-wrap gap-2">
+              <dt className="text-muted-foreground">Correo:</dt>
+              <dd className="break-all">{traveler.email ?? "No disponible"}</dd>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <dt className="text-muted-foreground">Móvil:</dt>
+              <dd>{safePhone || "No disponible"}</dd>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <dt className="text-muted-foreground">WhatsApp:</dt>
+              <dd>
+                {traveler.whatsapp_contact_consent
+                  ? "Autorizado por el viajero"
+                  : "Sin autorización de contacto"}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div className="flex flex-wrap content-start gap-2">
+          {emailHref ? (
+            <Button asChild size="sm" variant="outline">
+              <a href={emailHref}>
+                <Mail className="size-4" aria-hidden />
+                Correo
+              </a>
+            </Button>
+          ) : null}
+          {phoneHref ? (
+            <Button asChild size="sm" variant="outline">
+              <a href={phoneHref}>
+                <Phone className="size-4" aria-hidden />
+                Llamar
+              </a>
+            </Button>
+          ) : null}
+          {whatsappHref ? (
+            <Button asChild size="sm">
+              <a href={whatsappHref} target="_blank" rel="noreferrer">
+                <MessageCircle className="size-4" aria-hidden />
+                WhatsApp
+              </a>
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -584,7 +665,16 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
   const canCompare = proposals.length >= 2;
 
   return (
-    <Section title="Propuestas" id="case-proposals">
+    <Section
+      title={internal ? "Propuesta económica del Concierge" : "Propuestas"}
+      id="case-proposals"
+    >
+      {internal ? (
+        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+          Las empresas sólo cotizan sus servicios. Tú seleccionas esas respuestas, preparas la
+          propuesta final y la envías al viajero.
+        </p>
+      ) : null}
       {proposals.length === 0 ? (
         <Empty>Sin propuestas todavía.</Empty>
       ) : (
@@ -857,7 +947,14 @@ function ProposalComposer({
   const submittable = quotes.filter((q) => q.status === "submitted");
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [summary, setSummary] = useState("");
+  const [terms, setTerms] = useState("");
+  const [validUntil, setValidUntil] = useState("");
   const [busy, setBusy] = useState(false);
+  const selectedQuotes = submittable.filter((quote) => selected[quote.quote_id]);
+  const selectedTotal = selectedQuotes.reduce(
+    (sum, quote) => sum + (quote.total_amount_cents ?? 0),
+    0,
+  );
 
   async function onCreate() {
     const items = Object.entries(selected)
@@ -867,11 +964,24 @@ function ProposalComposer({
     setBusy(true);
     try {
       await createFn({
-        data: { caseId, items, summary: summary || null },
+        data: {
+          caseId,
+          items,
+          summary: summary.trim() || null,
+          terms: terms.trim() || null,
+          validUntil: validUntil ? new Date(`${validUntil}T23:59:59`).toISOString() : null,
+        },
       });
       setSelected({});
       setSummary("");
+      setTerms("");
+      setValidUntil("");
+      toast.success("Borrador de propuesta creado. Revísalo antes de enviarlo al viajero.");
       await router.invalidate();
+    } catch (error) {
+      toast.error("No fue posible crear el borrador", {
+        description: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setBusy(false);
     }
@@ -880,7 +990,10 @@ function ProposalComposer({
   return (
     <div className="mt-4 rounded-md border border-dashed border-border bg-card/40 p-3 text-xs">
       <p className="mb-2 font-medium uppercase tracking-wide text-muted-foreground">
-        Componer nueva propuesta
+        Preparar propuesta final para el viajero
+      </p>
+      <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+        Selecciona las cotizaciones que incluirás. El total se calcula con las respuestas elegidas.
       </p>
       <ul className="grid gap-1">
         {submittable.map((q) => (
@@ -897,13 +1010,34 @@ function ProposalComposer({
           </li>
         ))}
       </ul>
+      <p className="mt-3 border-t border-border/60 pt-3 text-sm font-semibold">
+        Total seleccionado: {money(selectedTotal, selectedQuotes[0]?.currency ?? "MXN")}
+      </p>
       <textarea
         className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
         rows={2}
-        placeholder="Resumen para el viajero (opcional)"
+        maxLength={1000}
+        placeholder="Explica al viajero qué incluye esta propuesta"
         value={summary}
         onChange={(e) => setSummary(e.target.value)}
       />
+      <textarea
+        className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
+        rows={3}
+        maxLength={4000}
+        placeholder="Condiciones, cambios y consideraciones"
+        value={terms}
+        onChange={(e) => setTerms(e.target.value)}
+      />
+      <label className="mt-2 grid max-w-xs gap-1 text-xs font-medium text-muted-foreground">
+        Vigencia de la propuesta
+        <input
+          type="date"
+          value={validUntil}
+          onChange={(event) => setValidUntil(event.target.value)}
+          className="h-10 rounded border border-border bg-background px-2 text-foreground"
+        />
+      </label>
       <div className="mt-2 flex justify-end">
         <ActionButton
           label="Crear borrador"
