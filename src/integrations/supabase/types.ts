@@ -2403,8 +2403,9 @@ export type Database = {
           notes: string | null
           position: number
           proposal_id: string
-          quote_id: string
-          request_id: string
+          quote_id: string | null
+          request_id: string | null
+          title: string | null
           updated_at: string
         }
         Insert: {
@@ -2415,8 +2416,9 @@ export type Database = {
           notes?: string | null
           position?: number
           proposal_id: string
-          quote_id: string
-          request_id: string
+          quote_id?: string | null
+          request_id?: string | null
+          title?: string | null
           updated_at?: string
         }
         Update: {
@@ -2427,8 +2429,9 @@ export type Database = {
           notes?: string | null
           position?: number
           proposal_id?: string
-          quote_id?: string
-          request_id?: string
+          quote_id?: string | null
+          request_id?: string | null
+          title?: string | null
           updated_at?: string
         }
         Relationships: [
