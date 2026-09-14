@@ -201,7 +201,16 @@ function MiViajePage() {
   });
   // CV5.9 · Propuestas pendientes por confirmar (badge + spotlight).
   const fetchCaseFile = useServerFn(getConciergeCaseFile);
-  const activeCaseId = activeQ.data?.plan.case_id ?? null;
+  // Si el plan activo aún no tiene expediente (el viajero ya inició otro viaje
+  // después de enviarlo), seguimos mostrando su expediente más reciente para
+  // que no pierda de vista la propuesta del Concierge.
+  const latestOpenCaseId = useMemo(() => {
+    const closed = new Set(["closed_lost", "archived"]);
+    const open = (cases ?? []).filter((c) => !closed.has(c.status));
+    const sorted = [...open].sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1));
+    return sorted[0]?.id ?? null;
+  }, [cases]);
+  const activeCaseId = activeQ.data?.plan.case_id ?? latestOpenCaseId;
   const { data: caseFile } = useQuery({
     queryKey: ["concierge", "case-file", "traveler", activeCaseId],
     queryFn: () => fetchCaseFile({ data: { caseId: activeCaseId! } }),
