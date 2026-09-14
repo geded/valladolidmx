@@ -6,12 +6,16 @@
  */
 import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
+  assignSelfConciergeCase,
   listConciergeCasesExtended,
   getConciergeMyWorkload,
 } from "@/lib/concierge/concierge.functions";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/lib/toast";
 
 type Scope = "concierge" | "unassigned" | "lead";
 type Sort =
@@ -153,7 +157,7 @@ function ConciergeInboxPage() {
         />
       </div>
 
-      <CasesSection cases={casesQ.data} empty="Sin expedientes." />
+      <CasesSection cases={casesQ.data} empty="Sin expedientes." scope={scope} />
     </section>
   );
 }
@@ -203,7 +207,7 @@ function Select({
   );
 }
 
-function CasesSection({ cases, empty }: { cases: CaseRow[]; empty: string }) {
+function CasesSection({ cases, empty, scope }: { cases: CaseRow[]; empty: string; scope: Scope }) {
   const slaCls = (s: CaseRow["sla_status"]) =>
     s === "overdue"
       ? "bg-destructive/15 text-destructive"
@@ -221,12 +225,52 @@ function CasesSection({ cases, empty }: { cases: CaseRow[]; empty: string }) {
       ) : (
         <ul className="mt-3 grid gap-2">
           {cases.map((c) => (
-            <li key={c.id} className="rounded-md border border-border bg-card p-4 text-sm">
+            <CaseRowCard key={c.id} caseRow={c} scope={scope} slaClassName={slaCls(c.sla_status)} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function CaseRowCard({
+  caseRow: c,
+  scope,
+  slaClassName,
+}: {
+  caseRow: CaseRow;
+  scope: Scope;
+  slaClassName: string;
+}) {
+  const queryClient = useQueryClient();
+  const assignSelf = useServerFn(assignSelfConciergeCase);
+  const [assigning, setAssigning] = useState(false);
+
+  async function onAssignSelf() {
+    setAssigning(true);
+    try {
+      await assignSelf({ data: { caseId: c.id } });
+      await queryClient.invalidateQueries({ queryKey: ["concierge"] });
+      toast.success("El expediente quedó asignado a ti.");
+    } catch (error) {
+      const forbidden = error instanceof Error && error.message.toLowerCase().includes("forbidden");
+      toast.error(
+        forbidden
+          ? "Tu perfil actual no puede tomar expedientes. Usa un perfil Concierge, Concierge Lead o Administrador."
+          : "No fue posible asignarte el expediente. Intenta nuevamente.",
+      );
+    } finally {
+      setAssigning(false);
+    }
+  }
+
+  return (
+    <li className="rounded-md border border-border bg-card p-4 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-mono text-xs text-muted-foreground">{c.id.slice(0, 8)}</span>
                 <div className="flex items-center gap-2">
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${slaCls(c.sla_status)}`}
+                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${slaClassName}`}
                   >
                     SLA · {c.sla_status ?? "n/a"}
                   </span>
@@ -257,10 +301,13 @@ function CasesSection({ cases, empty }: { cases: CaseRow[]; empty: string }) {
                   ? ` · Resp. ${c.assigned_concierge_user_id.slice(0, 8)}`
                   : " · Sin asignar"}
               </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+      {scope === "unassigned" && !c.assigned_concierge_user_id ? (
+        <div className="mt-3 border-t border-border/60 pt-3">
+          <Button type="button" size="sm" onClick={onAssignSelf} disabled={assigning}>
+            {assigning ? "Asignando…" : "Asignarme este expediente"}
+          </Button>
+        </div>
+      ) : null}
+    </li>
   );
 }

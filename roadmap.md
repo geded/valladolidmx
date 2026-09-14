@@ -97,4 +97,4 @@
 - [x] Scope Gate y QA 1440/834/430/390: PASS (un H1, sin desbordamiento ni errores de consola); typecheck y 86 contratos Alux PASS. Preservation Gate específico de Alux PASS; la suite Premium ampliada conserva 6 fallos previos fuera de alcance. No publicado.
 
 - [x] Dar presencia a Alux tras enviar a Concierge: acompañar la espera y avisar desde Mi Viaje cuando exista una propuesta nueva.
-- [ ] Reparar asignación y cotización del expediente: autoasignación ligada a la sesión, avisos claros, solicitud de cotización por servicio con empresa y refresco inmediato; pendiente validación autenticada Concierge/Admin y QA responsive.
+- [ ] Reparar asignación y cotización del expediente: autoasignación ligada a la sesión desde la bandeja y el detalle, avisos claros, solicitud de cotización por servicio con empresa y refresco inmediato; pendiente validación autenticada Concierge/Admin y QA responsive.

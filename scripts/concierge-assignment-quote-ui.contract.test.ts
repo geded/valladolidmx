@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 
 const view = readFileSync("src/components/concierge/CaseFileView.tsx", "utf8");
 const functions = readFileSync("src/lib/concierge/concierge.functions.ts", "utf8");
+const inbox = readFileSync("src/routes/_authenticated/concierge/index.tsx", "utf8");
 
 describe("Asignación y cotización del expediente", () => {
   test("la autoasignación deriva la identidad de la sesión", () => {
@@ -18,6 +19,12 @@ describe("Asignación y cotización del expediente", () => {
     expect(view).toContain('toast.success("El expediente quedó asignado a ti.")');
     expect(view).toContain('readableConciergeError(error, "assign")');
     expect(view).toContain('["concierge", "case-file", f.case.id]');
+  });
+
+  test("la bandeja permite tomar un expediente antes de abrir su detalle", () => {
+    expect(inbox).toContain("Asignarme este expediente");
+    expect(inbox).toContain("useServerFn(assignSelfConciergeCase)");
+    expect(inbox).toContain('queryKey: ["concierge"]');
   });
 
   test("cada servicio empresarial puede solicitar una sola cotización activa", () => {
