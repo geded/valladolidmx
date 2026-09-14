@@ -517,7 +517,7 @@ export interface HomeRealContent {
   experiencias: HomeRealCard[];
   stays: HomeRealCard[];
   food: HomeRealCard[];
-  eventos: Array<HomeRealCard & { day: string; startsAt: string | null }>;
+  eventos: Array<HomeRealCard & { day: string; startsAt: string | null; recurrence: EventRecurrencePayload | null }>;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
 }
