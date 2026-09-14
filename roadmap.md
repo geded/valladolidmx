@@ -127,6 +127,8 @@
 - Trabajo `src/lib/cron/jobs/proposal-payment-reminders.server.ts` + gancho `/api/public/hooks/proposal-payment-reminders` (x-cron-secret, dry-run soportado).
 - Cron horario `proposal-payment-reminders-hourly` ('20 * * * *').
 - Plantillas `proposal-payment-reminder` y `proposal-payment-stalled-team`.
+- 2026-09-14: verificado en producción — r1 enviado 15:20 UTC a Kafir (`email_send_log` = sent); r2 enviado manualmente 17:49 UTC a petición del Founder y marcado `pay_reminder_r2_sent_at`.
+- 2026-09-14: cron `eb-process-scheduled-publish` devolvía 401 cada 5 min (enviaba `apikey`, la ruta exigía `EB_CRON_SECRET`). Se migró el job a `cron_hooks_invoke(...)` y la ruta acepta también `CRON_HOOKS_SECRET`. Efectivo en producción al publicar.
 
 ## Zona horaria oficial fija: America/Merida (2026-09-14)
 - `src/lib/time/merida.ts` es la fuente única: `MERIDA_TIME_ZONE`, `formatInMerida`, `meridaDate/DateTime/LongDate/DayMonth/Clock`, `meridaToday`.
