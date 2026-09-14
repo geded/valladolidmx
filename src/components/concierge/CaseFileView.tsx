@@ -704,9 +704,7 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           )}
         </>
       )}
-      {internal && f.quotes && f.quotes.some((q) => q.status === "submitted") ? (
-        <ProposalComposer caseId={f.case.id} quotes={f.quotes} />
-      ) : null}
+      {internal ? <ProposalComposer caseId={f.case.id} quotes={f.quotes ?? []} /> : null}
     </Section>
   );
 }
@@ -995,6 +993,13 @@ function ProposalComposer({
       <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
         Selecciona las cotizaciones que incluirás. El total se calcula con las respuestas elegidas.
       </p>
+      {submittable.length === 0 ? (
+        <p className="rounded-md border border-border/70 bg-background/70 p-2 leading-relaxed text-muted-foreground">
+          Todavía no hay cotizaciones recibidas. Solicita una cotización a las empresas en el
+          apartado &quot;Qué solicita el viajero&quot;; cuando respondan con su precio podrás armar
+          aquí la propuesta económica y enviarla al viajero.
+        </p>
+      ) : null}
       <ul className="grid gap-1">
         {submittable.map((q) => (
           <li key={q.quote_id} className="flex items-center gap-2">
@@ -1312,7 +1317,21 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
           setState("empty");
           return;
         }
-        setPayload(raw as HandoffPayload);
+        // La operación oficial devuelve un sobre
+        // { event_id, occurred_at, payload }. Aceptamos ambas formas.
+        const envelope = raw as { payload?: unknown; occurred_at?: string };
+        const inner =
+          envelope && typeof envelope === "object" && envelope.payload
+            ? (envelope.payload as HandoffPayload)
+            : (raw as HandoffPayload);
+        if (!inner || Object.keys(inner).length === 0) {
+          setState("empty");
+          return;
+        }
+        setPayload({
+          ...inner,
+          generated_at: inner.generated_at ?? envelope?.occurred_at,
+        });
         setState("idle");
       })
       .catch((e) => {
@@ -1401,19 +1420,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
           </HandoffBlock>
 
           <HandoffBlock title="Memoria territorial">
-            {payload.territorial_memory &&
-            readableEntries(payload.territorial_memory).length > 0 ? (
-              <dl className="grid gap-1 text-xs">
-                {readableEntries(payload.territorial_memory).map(([label, value]) => (
-                  <div key={label} className="grid grid-cols-[minmax(7rem,0.4fr)_1fr] gap-2">
-                    <dt className="text-muted-foreground">{label}</dt>
-                    <dd className="min-w-0 break-words text-foreground/90">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : (
-              <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>
-            )}
+            <TerritorialMemory memory={payload.territorial_memory ?? null} />
           </HandoffBlock>
         </div>
       )}
@@ -1432,17 +1439,108 @@ function HandoffBlock({ title, children }: { title: string; children: ReactNode 
   );
 }
 
+/**
+ * Presentación legible de la memoria territorial capturada por Alux:
+ * destinos y categorías consultados por el viajero antes del envío,
+ * más el resumen narrativo. Sin claves internas ni datos crudos.
+ */
+function TerritorialMemory({ memory }: { memory: Record<string, unknown> | null }) {
+  if (!memory) {
+    return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
+  }
+  const nameOf = (v: unknown): string => {
+    if (typeof v === "string") return humanizeKey(v);
+    if (v && typeof v === "object") {
+      const o = v as Record<string, unknown>;
+      const raw = (o.label as string) || (o.slug as string) || "";
+      const count = typeof o.count === "number" && o.count > 1 ? ` (${o.count})` : "";
+      return raw ? `${humanizeKey(raw)}${count}` : "";
+    }
+    return "";
+  };
+  const destinations = Array.isArray(memory.visited_destinations)
+    ? (memory.visited_destinations as unknown[]).map(nameOf).filter(Boolean)
+    : [];
+  const categories = Array.isArray(memory.visited_categories)
+    ? (memory.visited_categories as unknown[]).map(nameOf).filter(Boolean)
+    : [];
+  const lastDestination =
+    typeof memory.last_destination_slug === "string"
+      ? humanizeKey(memory.last_destination_slug)
+      : null;
+  const summary = typeof memory.summary === "string" ? memory.summary.trim() : "";
+  const summaryLines = summary
+    .split("\n")
+    .map((line) => line.replace(/^·\s*/, "").trim())
+    .filter(Boolean);
+
+  if (destinations.length === 0 && categories.length === 0 && summaryLines.length === 0) {
+    return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
+  }
+
+  return (
+    <div className="grid gap-2 text-xs">
+      {destinations.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Destinos que consultó</span>
+          <div className="flex flex-wrap gap-1">
+            {destinations.map((d) => (
+              <span key={d} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {d}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {categories.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Qué estuvo buscando</span>
+          <div className="flex flex-wrap gap-1">
+            {categories.map((c) => (
+              <span key={c} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {lastDestination ? (
+        <p className="text-foreground/90">
+          <span className="text-muted-foreground">Último destino consultado: </span>
+          {lastDestination}
+        </p>
+      ) : null}
+      {summaryLines.length > 0 ? (
+        <div className="grid gap-1 border-t border-border/60 pt-2">
+          <span className="text-muted-foreground">Lo que Alux entendió del viajero</span>
+          <ul className="grid gap-1">
+            {summaryLines.map((line, i) => (
+              <li key={i} className="text-foreground/90">
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
   const all: Array<[string, unknown]> = [
     ["Idioma", profile.preferred_language],
-    ["País", profile.country_code],
-    ["Moneda", profile.preferred_currency],
-    ["Presupuesto", profile.budget_level],
-    ["Dieta", profile.dietary_preferences],
-    ["Movilidad", profile.mobility_needs],
+    ["País de origen", profile.home_country],
+    ["Estilo de viaje", profile.travel_style ?? profile.travel_style_tags],
+    ["Presupuesto", profile.budget_band ?? profile.budget_range],
+    ["Dieta", profile.dietary ?? profile.dietary_restrictions],
+    ["Accesibilidad", profile.accessibility ?? profile.accessibility_needs],
+    ["Idiomas que habla", profile.languages],
     ["Intereses", profile.interests],
+    ["Acompañantes", profile.travel_party],
   ];
-  const rows = all.filter(([, v]) => v !== undefined && v !== null && v !== "");
+  const rows = all.filter(
+    ([, v]) => v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && v.length === 0),
+  );
   if (rows.length === 0) return <Empty>El viajero todavía no ha indicado sus preferencias.</Empty>;
   return (
     <dl className="grid gap-1 text-xs">
