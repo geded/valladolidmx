@@ -84,9 +84,9 @@
 
 ## Incidencia · Envío de Mi Viaje al Concierge (2026-09-14)
 
-- [ ] Diagnosticar por qué el viaje de kafir hadded no creó expediente ni llegó a revisión/cotización del concierge.
-- [ ] Contrastar diagnóstico y corrección con la documentación oficial versionada del flujo Mi Viaje → Concierge → cotización.
-- [ ] Corregir únicamente el flujo de promoción del viaje y verificar viaje → expediente → panel Concierge, sin alterar los datos del viajero.
+- [x] Diagnosticar por qué el viaje de kafir hadded no creó expediente ni llegó a revisión/cotización del concierge: el estado sin expediente ocultaba el formulario `promotePlanToCase` detrás de una pantalla vacía cuyo CTA regresaba a Resumen.
+- [x] Contrastar diagnóstico y corrección con la documentación oficial versionada: `promotePlanToCase` permanece como única puerta y conserva snapshot, vínculo, estado compartido y expediente `new`.
+- [x] Corregir únicamente el bloqueo de acceso al formulario y verificar viaje → expediente → panel de seguimiento: caso `941c04fd-b8d2-46dd-a211-65a121805a58` creado con 6 elementos, viaje vinculado como `shared_with_concierge`, UI desktop/móvil sin errores. Sin publicación.
 
 ## Alux multimarca · configuración desde Marca (2026-09-14)
 
