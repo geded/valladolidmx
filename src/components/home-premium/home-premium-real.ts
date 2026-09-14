@@ -209,6 +209,7 @@ export function mergeHomeRealContent(
         type: card.category,
         detail: card.subtitle,
         href: card.href,
+        startsAt: card.startsAt,
       })),
     },
     mapa: {

@@ -36,6 +36,7 @@ import { ExperienceMapBlock } from "@/components/experience-builder/blocks/exper
 import { PremiumAluxBar } from "./shared/PremiumShowcase";
 import { TravelPlanBand } from "@/components/travel-plan/TravelPlanBand";
 import { cn } from "@/lib/utils";
+import { MERIDA_TIME_ZONE, meridaDate } from "@/lib/time/merida";
 
 import { openAluxFloating, onAluxMapFocus } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
@@ -1040,8 +1041,35 @@ function ServiceColumn({
   );
 }
 
+const EVENTS_PAGE_SIZE = 5;
+
+/** Día calendario del evento en la hora del destino (nunca la del aparato). */
+function meridaDayKey(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: MERIDA_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+  return parts;
+}
+
 function EventsSection({ content }: { content: HomePremiumContent }) {
   const hasMedia = content.eventos.media.url.trim().length > 0;
+  const [dateFilter, setDateFilter] = useState("");
+  const [page, setPage] = useState(0);
+
+  const items = content.eventos.items;
+  const filtered = dateFilter
+    ? items.filter((event) => meridaDayKey(event.startsAt) === dateFilter)
+    : items;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / EVENTS_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const visible = filtered.slice(safePage * EVENTS_PAGE_SIZE, (safePage + 1) * EVENTS_PAGE_SIZE);
+
   return (
     <section
       aria-labelledby="events-title"
@@ -1054,11 +1082,13 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
         )}
       >
         <div>
-          <p className="text-xs font-semibold uppercase text-primary">{content.eventos.kicker}</p>
-          <h2 id="events-title" className="mt-2 font-display text-3xl">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+            {content.eventos.kicker}
+          </p>
+          <h2 id="events-title" className="mt-1.5 font-display text-2xl lg:text-3xl">
             {content.eventos.title}
           </h2>
-          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
             {content.eventos.description}
           </p>
           {hasMedia ? (
@@ -1068,36 +1098,104 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
               className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
             />
           ) : null}
+          <div className="mt-4 flex flex-wrap items-end gap-2">
+            <label className="flex-1 min-w-[10rem] text-xs font-medium text-muted-foreground">
+              Buscar por fecha
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(event) => {
+                  setDateFilter(event.target.value);
+                  setPage(0);
+                }}
+                className="mt-1 h-11 w-full rounded-pill border border-border bg-background px-3 text-sm text-foreground ring-focus"
+              />
+            </label>
+            {dateFilter ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="min-h-11 rounded-pill text-xs"
+                onClick={() => {
+                  setDateFilter("");
+                  setPage(0);
+                }}
+              >
+                Ver todas
+              </Button>
+            ) : null}
+          </div>
         </div>
-        <ol className="divide-y divide-border border-y border-border">
-          {content.eventos.items.map((event, index) => (
-            <li
-              key={event.title}
-              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 py-3 lg:grid-cols-[3rem_1fr_auto] lg:py-5"
-            >
-              <span className="grid size-10 place-items-center rounded-full bg-secondary font-display text-lg">
-                {index + 1}
-              </span>
-              <div>
-                <p className="text-[10px] font-semibold uppercase text-primary">
-                  {event.day} · {event.type}
-                </p>
-                <h3 className="mt-1 font-display text-xl">{event.title}</h3>
-                <p className="mt-1 hidden text-sm text-muted-foreground lg:block">{event.detail}</p>
-              </div>
-              {event.href ? (
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="hidden min-h-11 justify-self-start rounded-pill lg:inline-flex lg:justify-self-end"
-                >
-                  <Link to={event.href}>Ver agenda</Link>
-                </Button>
-              ) : null}
-            </li>
-          ))}
-        </ol>
+        <div>
+          <ol className="divide-y divide-border border-y border-border">
+            {visible.map((event, index) => (
+              <li
+                key={`${event.title}-${index}`}
+                className="grid grid-cols-[2.25rem_1fr] items-center gap-3 py-2.5 lg:grid-cols-[2.5rem_1fr_auto] lg:py-3.5"
+              >
+                <span className="grid size-9 place-items-center rounded-full bg-secondary font-display text-sm">
+                  {safePage * EVENTS_PAGE_SIZE + index + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">
+                    {[meridaDate(event.startsAt) ?? event.day, event.type]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                  <h3 className="mt-0.5 truncate text-[15px] font-semibold leading-snug">
+                    {event.title}
+                  </h3>
+                  <p className="mt-0.5 hidden text-[13px] text-muted-foreground lg:block">
+                    {event.detail}
+                  </p>
+                </div>
+                {event.href ? (
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="hidden min-h-11 justify-self-start rounded-pill text-xs lg:inline-flex lg:justify-self-end"
+                  >
+                    <Link to={event.href}>Ver agenda</Link>
+                  </Button>
+                ) : null}
+              </li>
+            ))}
+            {visible.length === 0 ? (
+              <li className="py-4 text-sm text-muted-foreground">
+                No hay eventos publicados para esa fecha.
+              </li>
+            ) : null}
+          </ol>
+          {filtered.length > EVENTS_PAGE_SIZE ? (
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-11 rounded-pill text-xs"
+                disabled={safePage === 0}
+                onClick={() => setPage((current) => Math.max(0, current - 1))}
+              >
+                Anterior
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Página {safePage + 1} de {pageCount}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-11 rounded-pill text-xs"
+                disabled={safePage >= pageCount - 1}
+                onClick={() => setPage((current) => Math.min(pageCount - 1, current + 1))}
+              >
+                Siguiente
+              </Button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </section>
   );

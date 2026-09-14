@@ -102,6 +102,8 @@ export type HomePremiumEvent = {
   type: string;
   detail: string;
   href: string | null;
+  /** Fecha acreditada del evento (ISO). Null cuando el CMS no la declara. */
+  startsAt?: string | null;
 };
 
 export type HomePremiumEditorial = {
