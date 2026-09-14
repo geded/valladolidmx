@@ -6,13 +6,19 @@
  * un documento editorial pensado para el diálogo de impresión del
  * navegador (Ctrl/Cmd+P → Guardar como PDF).
  */
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Printer, ArrowLeft } from "lucide-react";
+import { Printer, ArrowLeft, WifiOff } from "lucide-react";
 import { getConciergeOrder, type ConciergeOrderItemView } from "@/lib/concierge/orders.functions";
+import {
+  readOfflineDocuments,
+  saveOfflineDocuments,
+  type OfflineDocumentSnapshot,
+} from "@/lib/traveler/offline-documents";
+import { TripQrCode } from "@/components/traveler/TripQrCode";
 
 const searchSchema = z.object({
   doc: z.enum(["voucher", "recibo"]).default("voucher"),
@@ -23,33 +29,70 @@ export const Route = createFileRoute("/_authenticated/cuenta/documentos/$orderId
   component: DocumentoRoute,
 });
 
+/** Convierte la copia local en la misma forma que usa la vista imprimible. */
+function fromSnapshot(snapshot: OfflineDocumentSnapshot) {
+  return {
+    folio: snapshot.folio,
+    paid_at: snapshot.paid_at,
+    destination_name: snapshot.destination_name,
+    editorial_title: snapshot.editorial_title,
+    editorial_summary: snapshot.editorial_summary,
+    currency: snapshot.currency,
+    subtotal_amount: snapshot.subtotal_amount,
+    discount_amount: snapshot.discount_amount,
+    tax_amount: snapshot.tax_amount,
+    total_amount: snapshot.total_amount,
+    items: snapshot.items as unknown as ConciergeOrderItemView[],
+  };
+}
+
 function DocumentoRoute() {
   const { orderId } = Route.useParams();
   const { doc } = Route.useSearch();
   const navigate = useNavigate();
   const fetchOrder = useServerFn(getConciergeOrder);
+  const [offline, setOffline] = useState<OfflineDocumentSnapshot | null>(null);
 
   const q = useQuery({
     queryKey: ["concierge-order", orderId, "document", doc],
     queryFn: () => fetchOrder({ data: { orderId } }),
     staleTime: 60_000,
+    retry: 1,
   });
 
   useEffect(() => {
     document.title = doc === "voucher" ? "Voucher · Valladolid.mx" : "Recibo · Valladolid.mx";
   }, [doc]);
 
-  if (q.isLoading) {
+  useEffect(() => {
+    setOffline(readOfflineDocuments(orderId));
+  }, [orderId]);
+
+  useEffect(() => {
+    if (!q.data) return;
+    const saved = saveOfflineDocuments(q.data);
+    if (saved) setOffline(saved);
+  }, [q.data]);
+
+  if (q.isLoading && !offline) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-sm text-muted-foreground">
         Preparando tu documento…
       </div>
     );
   }
-  if (q.error || !q.data) {
+
+  const usingOffline = !q.data && !!offline;
+  const order = q.data ?? (offline ? fromSnapshot(offline) : null);
+
+  if (!order) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="font-serif text-xl text-foreground">No pudimos cargar este documento</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Si estás sin señal, abre este documento una vez con conexión y quedará disponible en tu
+          dispositivo para el resto de tu viaje.
+        </p>
         <button
           type="button"
           onClick={() => navigate({ to: "/cuenta/mi-viaje", search: { vista: "documentos" } })}
@@ -62,7 +105,6 @@ function DocumentoRoute() {
     );
   }
 
-  const order = q.data;
   return (
     <div className="mx-auto min-h-screen max-w-3xl px-6 py-8">
       <div className="mb-6 flex items-center justify-between print:hidden">
@@ -84,10 +126,25 @@ function DocumentoRoute() {
         </button>
       </div>
 
+      {usingOffline ? (
+        <p className="mb-4 inline-flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-[12px] text-muted-foreground print:hidden">
+          <WifiOff className="size-3.5" aria-hidden />
+          Estás viendo la copia guardada en tu dispositivo. Se actualizará cuando vuelvas a tener
+          conexión.
+        </p>
+      ) : null}
+
+      <div className="mb-6 flex justify-center print:mb-4">
+        <div className="rounded-xl border border-border/60 bg-white p-3">
+          <TripQrCode folio={order.folio} size={132} className="block size-[132px]" />
+        </div>
+      </div>
+
       {doc === "voucher" ? <VoucherDocument order={order} /> : <ReciboDocument order={order} />}
     </div>
   );
 }
+
 
 function formatMoney(amount: number, currency: string) {
   try {
