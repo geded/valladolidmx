@@ -1,0 +1,38 @@
+import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+
+const source = readFileSync("src/components/concierge/CaseFileView.tsx", "utf8");
+const route = readFileSync("src/routes/_authenticated/concierge/expedientes.$caseId.tsx", "utf8");
+
+describe("Expediente Concierge en lenguaje claro", () => {
+  test("traduce los estados operativos sin alterar sus valores internos", () => {
+    expect(source).toContain('new: "Nuevo"');
+    expect(source).toContain('normal: "Normal"');
+    expect(source).toContain('on_time: "A tiempo"');
+    expect(source).toContain('travel_plan: "Mi Viaje"');
+    expect(source).toContain('travel_plan_item: "Experiencia guardada en Mi Viaje"');
+  });
+
+  test("no presenta claves técnicas en los puntos principales de lectura", () => {
+    expect(source).not.toContain("{f.case.status}");
+    expect(source).not.toContain("{r.status}");
+    expect(source).not.toContain("{q.status}");
+    expect(source).not.toContain("{t.event_type}");
+    expect(source).not.toContain("Sin perfil M2 disponible");
+    expect(source).not.toContain("Plan vacío al momento del handoff");
+    expect(source).not.toContain(">read-only<");
+  });
+
+  test("presenta el contexto y las sugerencias de Alux para lectura humana", () => {
+    expect(source).toContain("Información disponible cuando el viajero envió su selección");
+    expect(source).toContain("Experiencias guardadas");
+    expect(source).toContain("Alux interpreta la información disponible");
+    expect(source).toContain("<AluxReadableText text={r.text} />");
+    expect(source).not.toContain("JSON.stringify(payload.territorial_memory");
+  });
+
+  test("usa un título comprensible para la vista interna", () => {
+    expect(route).toContain(">Detalle del expediente</h1>");
+    expect(route).not.toContain(">Customer Case File</h1>");
+  });
+});
