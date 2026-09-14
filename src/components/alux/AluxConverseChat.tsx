@@ -432,7 +432,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       aria-labelledby="alux-converse"
       className="rounded-2xl border border-border bg-card p-4 shadow-soft"
     >
-      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
         <MessageCircle className="size-3.5" aria-hidden />
         <span id="alux-converse">Conversa con Alux</span>
         {messages.length > 0 ? (
@@ -505,7 +505,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                   "max-w-[88%] rounded-2xl rounded-br-md px-3 py-2 text-[13px] leading-snug",
                   m.failed
                     ? "border border-destructive/40 bg-destructive/5 text-foreground"
-                    : "bg-primary/10 text-foreground",
+                    : "bg-alux/10 text-foreground",
                 ].join(" ")}
               >
                 {m.content}
@@ -529,7 +529,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
 
         {thinking ? (
           <div role="status" className="flex items-center gap-2 text-[12px] text-muted-foreground">
-            <span className="grid size-6 place-items-center rounded-full bg-primary/15">
+            <span className="grid size-6 place-items-center rounded-full bg-alux/15">
               <AluxMark family="avatar" size={20} decorative />
             </span>
             <Loader2 className="size-3.5 animate-spin" aria-hidden />
@@ -574,7 +574,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               key={s}
               type="button"
               onClick={() => void send(s)}
-              className="inline-flex min-h-11 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+              className="inline-flex min-h-11 items-center rounded-full border border-alux/25 bg-alux/5 px-3 text-[12px] font-medium text-alux transition-colors hover:bg-alux/10"
             >
               {s}
             </button>
@@ -618,7 +618,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           type="submit"
           disabled={thinking || planBlocked || input.trim().length === 0}
           aria-label="Enviar a Alux"
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-alux text-alux-foreground transition-colors hover:bg-alux/90 disabled:opacity-50"
         >
           {thinking ? (
             <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -676,7 +676,7 @@ function AssistantTurn({
   const res = message.response;
   return (
     <article className="flex gap-2" aria-label="Respuesta de Alux">
-      <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+      <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-alux/15">
         <AluxMark family="avatar" size={20} decorative />
       </span>
       <div className="min-w-0 flex-1 space-y-2">
@@ -701,7 +701,7 @@ function AssistantTurn({
                 key={q}
                 type="button"
                 onClick={() => onAsk(q)}
-                className="inline-flex min-h-11 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-left text-[12px] font-medium text-primary hover:bg-primary/10"
+                className="inline-flex min-h-11 items-center rounded-full border border-alux/25 bg-alux/5 px-3 text-left text-[12px] font-medium text-alux hover:bg-alux/10"
               >
                 {q}
               </button>
@@ -727,7 +727,7 @@ function AssistantTurn({
 
         {res?.sequence?.length ? (
           <div className="rounded-xl border border-border bg-background/70 p-3">
-            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-alux">
               <ListOrdered className="size-3.5" aria-hidden />
               Propuesta por día
             </p>
@@ -750,8 +750,8 @@ function AssistantTurn({
         ) : null}
 
         {res?.reorderProposal ? (
-          <div className="rounded-xl border border-primary/25 bg-primary/5 p-3">
-            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+          <div className="rounded-xl border border-alux/25 bg-alux/5 p-3">
+            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-alux">
               <ListOrdered className="size-3.5" aria-hidden />
               Nuevo orden sugerido
             </p>
@@ -768,7 +768,7 @@ function AssistantTurn({
                 type="button"
                 disabled={applyingOrder}
                 onClick={() => onApplyOrder(res.reorderProposal!.orderedKeys)}
-                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary/10 px-3 text-[12px] font-medium text-primary hover:bg-primary/15 disabled:opacity-60"
+                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-alux bg-alux/10 px-3 text-[12px] font-medium text-alux hover:bg-alux/15 disabled:opacity-60"
               >
                 {applyingOrder ? (
                   <Loader2 className="size-3.5 animate-spin" aria-hidden />
@@ -843,7 +843,7 @@ function RecommendationCard({
           </span>
         ) : null}
         {inTrip ? (
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary normal-case tracking-normal">
+          <span className="rounded-full bg-alux/10 px-2 py-0.5 text-alux normal-case tracking-normal">
             En Mi Viaje
           </span>
         ) : null}
@@ -857,7 +857,7 @@ function RecommendationCard({
       </a>
       {rec.subtitle ? <p className="text-[11px] text-muted-foreground">{rec.subtitle}</p> : null}
       <p className="mt-1 flex items-start gap-1.5 text-[12px] leading-snug text-foreground/85">
-        <Sparkles className="mt-0.5 size-3 shrink-0 text-primary" aria-hidden />
+        <Sparkles className="mt-0.5 size-3 shrink-0 text-alux" aria-hidden />
         <span>{rec.reason}</span>
       </p>
       {rec.confirmedFacts.length > 0 ? (

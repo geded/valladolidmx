@@ -123,16 +123,16 @@ export function AluxContextChip({
 
   return (
     <div
-      className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm"
+      className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-alux/20 bg-alux/5 px-4 py-2.5 text-sm"
       data-omxds-visual-foundation="alux-context"
       role="note"
       aria-label="Alux · contexto de esta ficha"
     >
-      <span className="inline-flex items-center gap-1.5 font-medium text-primary">
+      <span className="inline-flex items-center gap-1.5 font-medium text-alux">
         <Sparkles className="h-4 w-4" aria-hidden />
         Alux
       </span>
-      <span className="text-primary/40" aria-hidden>
+      <span className="text-alux/40" aria-hidden>
         ·
       </span>
 
@@ -143,7 +143,7 @@ export function AluxContextChip({
             {formatDistance(distanceKm)}
           </span>
           {(openNow?.state !== "unknown" || hasCoupon) && (
-            <span className="text-primary/30" aria-hidden>
+            <span className="text-alux/30" aria-hidden>
               ·
             </span>
           )}
@@ -162,7 +162,7 @@ export function AluxContextChip({
             {openNow.label}
           </span>
           {hasCoupon && (
-            <span className="text-primary/30" aria-hidden>
+            <span className="text-alux/30" aria-hidden>
               ·
             </span>
           )}

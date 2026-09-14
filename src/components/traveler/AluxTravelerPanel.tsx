@@ -189,10 +189,10 @@ export function AluxTravelerPanel() {
   return (
     <section
       aria-label="Copiloto Alux · Viajero"
-      className="rounded-2xl border border-primary/20 bg-card p-5"
+      className="rounded-2xl border border-alux/20 bg-card p-5"
     >
       <header className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-xl bg-primary/15 text-primary">
+        <span className="grid size-10 place-items-center rounded-xl bg-alux/15 text-alux">
           <Sparkles className="size-5" aria-hidden />
         </span>
         <div className="min-w-0">
@@ -204,17 +204,17 @@ export function AluxTravelerPanel() {
         </div>
       </header>
 
-      <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-foreground">
+      <div className="mt-3 rounded-xl border border-alux/20 bg-alux/5 p-3 text-xs text-foreground">
         <p className="font-medium">Ayúdame a asesorarte mejor</p>
         <p className="mt-1 text-muted-foreground">
           Mientras más completo esté tu perfil (estilo, intereses, presupuesto, fechas) y más lo
           completes como perfil público, más preciso puedo ser al recomendarte hoteles,
           restaurantes, experiencias y rutas del Oriente Maya.{" "}
-          <a href="/cuenta/perfil" className="font-medium text-primary hover:underline">
+          <a href="/cuenta/perfil" className="font-medium text-alux hover:underline">
             Completar perfil
           </a>
           {" · "}
-          <a href="/cuenta/perfil-publico" className="font-medium text-primary hover:underline">
+          <a href="/cuenta/perfil-publico" className="font-medium text-alux hover:underline">
             Completar tu perfil público
           </a>
         </p>
@@ -231,9 +231,9 @@ export function AluxTravelerPanel() {
               type="button"
               disabled={mut.isPending}
               onClick={() => mut.mutate(c.id)}
-              className="group flex items-start gap-3 rounded-xl border border-border bg-background p-3 text-left transition-colors hover:border-primary/40 hover:bg-primary/5 disabled:opacity-60"
+              className="group flex items-start gap-3 rounded-xl border border-border bg-background p-3 text-left transition-colors hover:border-alux/40 hover:bg-alux/5 disabled:opacity-60"
             >
-              <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+              <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-alux/10 text-alux">
                 {isRunning ? (
                   <Loader2 className="size-4 animate-spin" aria-hidden />
                 ) : (
@@ -244,7 +244,7 @@ export function AluxTravelerPanel() {
                 <span className="block text-sm font-medium">{c.label}</span>
                 <span className="block text-[11px] text-muted-foreground">{c.description}</span>
                 {hasResult ? (
-                  <span className="mt-0.5 inline-block text-[10px] font-semibold uppercase tracking-wide text-primary">
+                  <span className="mt-0.5 inline-block text-[10px] font-semibold uppercase tracking-wide text-alux">
                     · Sugerencia lista
                   </span>
                 ) : null}
@@ -288,7 +288,7 @@ export function AluxTravelerPanel() {
                   type="button"
                   onClick={() => mut.mutate(c.id)}
                   disabled={mut.isPending}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-primary/5 disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-alux/5 disabled:opacity-60"
                 >
                   <RotateCcw className="size-3" aria-hidden />
                   Reintentar

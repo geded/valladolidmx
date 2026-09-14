@@ -222,7 +222,7 @@ export function PublicAluxChat() {
     >
       <header className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-4">
         {/* G8-R1-D3 · Identidad canónica: activo gobernado de /brand/alux/. */}
-        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-alux/10">
           <AluxMark family="avatar" size={40} decorative loading="eager" />
         </div>
 
@@ -251,7 +251,7 @@ export function PublicAluxChat() {
       </header>
 
       {hasMemory && (
-        <div className="flex items-center gap-2 border-b border-border/60 bg-primary/5 px-5 py-2 text-[11px] text-primary">
+        <div className="flex items-center gap-2 border-b border-border/60 bg-alux/5 px-5 py-2 text-[11px] text-alux">
           <BrainCircuit className="h-3 w-3" />
           Alux recuerda tu conversación previa · no necesitas repetir contexto
         </div>
@@ -320,7 +320,7 @@ export function PublicAluxChat() {
               className={[
                 "max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed",
                 m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  ? "bg-alux text-alux-foreground rounded-br-md"
                   : "bg-muted text-foreground rounded-bl-md",
               ].join(" ")}
             >
@@ -444,12 +444,12 @@ function AluxProposals({ items }: { items: Proposal[] }) {
             type="button"
             disabled={added || pending === p.entity_id}
             onClick={() => handleAdd(p)}
-            className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs text-primary hover:bg-primary/10 transition disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-pill border border-alux/30 bg-alux/5 px-3 py-1.5 text-xs text-alux hover:bg-alux/10 transition disabled:opacity-60"
             title={p.rationale ?? undefined}
           >
             {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
             <span className="truncate max-w-[180px]">{p.title}</span>
-            {p.subtitle && <span className="text-[10px] text-primary/70">· {p.subtitle}</span>}
+            {p.subtitle && <span className="text-[10px] text-alux/70">· {p.subtitle}</span>}
           </button>
         );
       })}
