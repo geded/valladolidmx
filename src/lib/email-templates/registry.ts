@@ -13,6 +13,7 @@ import { template as tripWelcomeTemplate } from "./trip-welcome";
 import { template as tripPostTemplate } from "./trip-post";
 import { template as tripConfirmedTemplate } from "./trip-confirmed";
 import { template as conciergeProposalSentTemplate } from "./concierge-proposal-sent";
+import { template as bookingPaidAdminTemplate } from "./booking-paid-admin";
 
 export interface TemplateEntry {
   component: ComponentType<any>;
@@ -46,4 +47,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "trip-post": tripPostTemplate,
   "trip-confirmed": tripConfirmedTemplate,
   "concierge-proposal-sent": conciergeProposalSentTemplate,
+  "booking-paid-admin": bookingPaidAdminTemplate,
 };

@@ -21,6 +21,7 @@ import {
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
+import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
   component: CheckoutPage,
@@ -41,6 +42,7 @@ function CheckoutPage() {
   const fetchOrder = useServerFn(getConciergeOrder);
   const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
+  const notifyAdmin = useServerFn(notifyAdminBookingPaid);
 
   const orderQ = useQuery({
     queryKey: ["concierge-order", orderId],
@@ -118,6 +120,11 @@ function CheckoutPage() {
       // Modalidad vigente: pago en efectivo con el concierge.
       await payCash({ data: { orderId, note: null } });
       await notifyConfirmed(order);
+      try {
+        await notifyAdmin({ data: { orderId } });
+      } catch {
+        // El aviso interno puede reintentarse; no bloquea la confirmación.
+      }
       await orderQ.refetch();
       toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
       navigate({

@@ -29,6 +29,7 @@ import {
   createOrderFromProposal,
   markConciergeOrderPaidCash,
 } from "@/lib/concierge/orders.functions";
+import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
 import {
   generateAluxSummary,
   generateAluxProducts,
@@ -739,6 +740,7 @@ function ProposalCard({
   const rejectFn = useServerFn(rejectConciergeProposal);
   const createOrderFn = useServerFn(createOrderFromProposal);
   const payCashFn = useServerFn(markConciergeOrderPaidCash);
+  const notifyAdminFn = useServerFn(notifyAdminBookingPaid);
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<unknown>) {
@@ -865,6 +867,11 @@ function ProposalCard({
                       "El viaje quedó confirmado, pero el correo de aviso no pudo salir.",
                     );
                   }
+                }
+                try {
+                  await notifyAdminFn({ data: { orderId } });
+                } catch {
+                  // El aviso interno puede reintentarse; no bloquea el registro del pago.
                 }
                 await router.invalidate();
                 toast.success("Pago en efectivo registrado. El viaje quedó confirmado.");
