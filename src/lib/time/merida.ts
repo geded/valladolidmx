@@ -87,3 +87,63 @@ export function formatMeridaRange(
     timeZone: MERIDA_TIME_ZONE,
   }).formatRange(from, to);
 }
+
+/**
+ * Formateador genérico en hora de Mérida. Devuelve cadena vacía si la fecha
+ * no es válida, para poder usarse directamente en JSX.
+ */
+export function formatInMerida(
+  input: DestinationDateInput | null | undefined,
+  options: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" },
+  locale: string = MERIDA_LOCALE,
+): string {
+  if (input === null || input === undefined) return "";
+  return format(input, options, locale) ?? "";
+}
+
+/** Fecha corta: 14/09/2026. */
+export function meridaDate(input: DestinationDateInput | null | undefined, locale?: string) {
+  return formatInMerida(input, { day: "2-digit", month: "2-digit", year: "numeric" }, locale);
+}
+
+/** Fecha y hora: 14/09/2026, 08:23. */
+export function meridaDateTime(input: DestinationDateInput | null | undefined, locale?: string) {
+  return formatInMerida(
+    input,
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    },
+    locale,
+  );
+}
+
+/** Fecha larga: 14 de septiembre de 2026. */
+export function meridaLongDate(input: DestinationDateInput | null | undefined, locale?: string) {
+  return formatInMerida(input, { day: "numeric", month: "long", year: "numeric" }, locale);
+}
+
+/** Día y mes: 14 sep. */
+export function meridaDayMonth(input: DestinationDateInput | null | undefined, locale?: string) {
+  return formatInMerida(input, { day: "numeric", month: "short" }, locale);
+}
+
+/** Hora del destino: 08:23. */
+export function meridaClock(input: DestinationDateInput | null | undefined, locale?: string) {
+  return formatInMerida(input, { hour: "2-digit", minute: "2-digit", hour12: false }, locale);
+}
+
+/** Fecha de hoy en el destino, en formato ISO `YYYY-MM-DD`. */
+export function meridaToday(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: MERIDA_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+  return parts;
+}
