@@ -717,12 +717,14 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
 
 function ProposalCard({
   p,
-  caseId: _caseId,
+  caseId,
   internal,
+  traveler,
 }: {
   p: NonNullable<CaseFile["proposals"]>[number];
   caseId: string;
   internal: boolean;
+  traveler?: CaseFile["traveler"];
 }) {
   const router = useRouter();
   const navigate = useNavigate();
