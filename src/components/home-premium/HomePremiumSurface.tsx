@@ -312,6 +312,12 @@ export function HomePremiumSurface({
           </Container>
         ) : null}
 
+        {enabled("mapa") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="mapa">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("mapa")}</div>
+          </Container>
+        ) : null}
+
         <Container className="mt-8 lg:mt-12" data-home-journey="travel-plan">
           <TravelPlanClose
             content={content}
