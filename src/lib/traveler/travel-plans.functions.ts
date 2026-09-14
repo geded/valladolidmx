@@ -908,9 +908,9 @@ async function attachHandoffContext(args: {
   const nowIso = new Date().toISOString();
   const couponsPromise = userSupabase
     .from("traveler_coupons")
-    .select("id,title,code,business_slug,promotion_slug,discount_percent,valid_until,status")
+    .select("id,title,code,business_id,promotion_slug,discount_percent,valid_until,status")
     .eq("user_id", userId)
-    .eq("status", "issued")
+    .eq("status", "active")
     .gte("valid_until", nowIso)
     .order("valid_until", { ascending: true })
     .limit(20);
