@@ -655,7 +655,7 @@ function RoutesSection({
                       className="h-9 shrink-0 gap-1.5 rounded-pill px-3 text-[11px] sm:text-xs"
                     >
                       <Link to={route.href} aria-label={`Ver la ruta ${route.title}`}>
-                        <Route className="size-3.5" aria-hidden />
+                        <RouteIcon className="size-3.5" aria-hidden />
                         <span>Ver ruta</span>
                       </Link>
                     </Button>
