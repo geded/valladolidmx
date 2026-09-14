@@ -210,6 +210,7 @@ export function mergeHomeRealContent(
         detail: card.subtitle,
         href: card.href,
         startsAt: card.startsAt,
+        recurrence: card.recurrence,
         media: card.mediaUrl.length > 0 ? { url: card.mediaUrl, alt: card.title } : null,
       })),
     },
