@@ -241,6 +241,7 @@ import { Route as AuthenticatedCmsAluxConocimientoRouteImport } from './routes/_
 import { Route as AuthenticatedCmsAluxCalidadRouteImport } from './routes/_authenticated/cms/alux.calidad'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as OrienteMayaDestinoCategoriaEmpresaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.index'
+import { Route as AuthenticatedConciergeExpedientesCaseIdIndexRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId.index'
 import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedPortalProductosProductIdPreviewRouteImport } from './routes/_authenticated/portal/productos.$productId.preview'
@@ -1577,6 +1578,12 @@ const OrienteMayaDestinoCategoriaEmpresaIndexRoute =
     path: '/',
     getParentRoute: () => OrienteMayaDestinoCategoriaEmpresaRoute,
   } as any)
+const AuthenticatedConciergeExpedientesCaseIdIndexRoute =
+  AuthenticatedConciergeExpedientesCaseIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedConciergeExpedientesCaseIdRoute,
+  } as any)
 const OrienteMayaDestinoCategoriaEmpresaProductoRoute =
   OrienteMayaDestinoCategoriaEmpresaProductoRouteImport.update({
     id: '/$producto',
@@ -1935,6 +1942,7 @@ export interface FileRoutesByFullPath {
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+  '/concierge/expedientes/$caseId/': typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
   '/oriente-maya/$destino/$categoria/$empresa/': typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 export interface FileRoutesByTo {
@@ -2113,7 +2121,6 @@ export interface FileRoutesByTo {
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
-  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -2175,6 +2182,7 @@ export interface FileRoutesByTo {
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
   '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 export interface FileRoutesById {
@@ -2428,6 +2436,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+  '/_authenticated/concierge/expedientes/$caseId/': typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
   '/oriente-maya/$destino/$categoria/$empresa/': typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 export interface FileRouteTypes {
@@ -2681,6 +2690,7 @@ export interface FileRouteTypes {
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
+    | '/concierge/expedientes/$caseId/'
     | '/oriente-maya/$destino/$categoria/$empresa/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -2859,7 +2869,6 @@ export interface FileRouteTypes {
     | '/cms/visibilidad/spotlight'
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
-    | '/concierge/expedientes/$caseId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
     | '/cuenta/documentos/$orderId'
@@ -2921,6 +2930,7 @@ export interface FileRouteTypes {
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
+    | '/concierge/expedientes/$caseId'
     | '/oriente-maya/$destino/$categoria/$empresa'
   id:
     | '__root__'
@@ -3173,6 +3183,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
+    | '/_authenticated/concierge/expedientes/$caseId/'
     | '/oriente-maya/$destino/$categoria/$empresa/'
   fileRoutesById: FileRoutesById
 }
@@ -4920,6 +4931,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaIndexRouteImport
       parentRoute: typeof OrienteMayaDestinoCategoriaEmpresaRoute
     }
+    '/_authenticated/concierge/expedientes/$caseId/': {
+      id: '/_authenticated/concierge/expedientes/$caseId/'
+      path: '/'
+      fullPath: '/concierge/expedientes/$caseId/'
+      preLoaderRoute: typeof AuthenticatedConciergeExpedientesCaseIdIndexRouteImport
+      parentRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
+    }
     '/oriente-maya/$destino/$categoria/$empresa/$producto': {
       id: '/oriente-maya/$destino/$categoria/$empresa/$producto'
       path: '/$producto'
@@ -5096,12 +5114,15 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedConciergeExpedientesCaseIdRouteChildren {
   AuthenticatedConciergeExpedientesCaseIdPropuestaRoute: typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRoute
+  AuthenticatedConciergeExpedientesCaseIdIndexRoute: typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
 }
 
 const AuthenticatedConciergeExpedientesCaseIdRouteChildren: AuthenticatedConciergeExpedientesCaseIdRouteChildren =
   {
     AuthenticatedConciergeExpedientesCaseIdPropuestaRoute:
       AuthenticatedConciergeExpedientesCaseIdPropuestaRoute,
+    AuthenticatedConciergeExpedientesCaseIdIndexRoute:
+      AuthenticatedConciergeExpedientesCaseIdIndexRoute,
   }
 
 const AuthenticatedConciergeExpedientesCaseIdRouteWithChildren =
