@@ -299,6 +299,12 @@ export function HomePremiumSurface({
           </Container>
         ) : null}
 
+        {enabled("experiencias") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="experiencias">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("experiencias")}</div>
+          </Container>
+        ) : null}
+
         {enabled("rutas") ? (
           <Container className="mt-8 lg:mt-12" data-home-journey="routes">
             <div data-cinematic-section={cinematic || undefined}>{renderSection("rutas")}</div>
