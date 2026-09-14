@@ -538,3 +538,121 @@ export const getConciergeWorkloadForLead = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return (data ?? []) as unknown as Json[];
   });
+
+/**
+ * Directorio de concierges activos (sólo personal interno; la RPC valida el rol).
+ * Se usa para mostrar el nombre del responsable y para asignar expedientes.
+ */
+export const listConciergeDirectory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("concierge_directory" as never);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as Array<{
+      user_id: string;
+      display_name: string | null;
+      active: boolean;
+    }>;
+  });
+
+/**
+ * Seguimiento agregado por expediente (sólo lectura).
+ *
+ * No crea una segunda fuente de verdad: lee las tablas oficiales
+ * `concierge_quotes`, `concierge_proposals` y `concierge_assignments`,
+ * limitadas por RLS a los expedientes que el rol ya puede ver.
+ */
+export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ caseIds: z.array(z.string().uuid()).max(200) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const ids = data.caseIds;
+    if (ids.length === 0) return [];
+
+    const [quotesRes, proposalsRes, assignmentsRes, directoryRes] = await Promise.all([
+      context.supabase.from("concierge_quotes").select("case_id, status").in("case_id", ids),
+      context.supabase
+        .from("concierge_proposals")
+        .select("case_id, status, sent_at, version, created_at")
+        .in("case_id", ids),
+      context.supabase
+        .from("concierge_assignments")
+        .select("case_id, concierge_user_id, status, assigned_at")
+        .in("case_id", ids)
+        .eq("status", "active"),
+      context.supabase.rpc("concierge_directory" as never),
+    ]);
+
+    if (quotesRes.error) throw new Error(quotesRes.error.message);
+    if (proposalsRes.error) throw new Error(proposalsRes.error.message);
+    if (assignmentsRes.error) throw new Error(assignmentsRes.error.message);
+
+    const names = new Map<string, string | null>();
+    for (const row of (directoryRes.data ?? []) as unknown as Array<{
+      user_id: string;
+      display_name: string | null;
+    }>) {
+      names.set(row.user_id, row.display_name);
+    }
+
+    const byCase = new Map<
+      string,
+      {
+        case_id: string;
+        quotes_requested: number;
+        quotes_submitted: number;
+        quotes_other: number;
+        latest_proposal_status: string | null;
+        latest_proposal_sent_at: string | null;
+        latest_proposal_version: number;
+        assigned_concierge_user_id: string | null;
+        assigned_concierge_name: string | null;
+      }
+    >();
+    for (const id of ids) {
+      byCase.set(id, {
+        case_id: id,
+        quotes_requested: 0,
+        quotes_submitted: 0,
+        quotes_other: 0,
+        latest_proposal_status: null,
+        latest_proposal_sent_at: null,
+        latest_proposal_version: -1,
+        assigned_concierge_user_id: null,
+        assigned_concierge_name: null,
+      });
+    }
+
+    for (const q of quotesRes.data ?? []) {
+      const row = byCase.get(q.case_id as string);
+      if (!row) continue;
+      if (q.status === "requested") row.quotes_requested += 1;
+      else if (q.status === "submitted") row.quotes_submitted += 1;
+      else row.quotes_other += 1;
+    }
+
+    for (const p of proposalsRes.data ?? []) {
+      const row = byCase.get(p.case_id as string);
+      if (!row) continue;
+      const version = typeof p.version === "number" ? p.version : 0;
+      if (version >= row.latest_proposal_version) {
+        row.latest_proposal_version = version;
+        row.latest_proposal_status = (p.status as string) ?? null;
+        row.latest_proposal_sent_at = (p.sent_at as string | null) ?? null;
+      }
+    }
+
+    for (const a of assignmentsRes.data ?? []) {
+      const row = byCase.get(a.case_id as string);
+      if (!row) continue;
+      row.assigned_concierge_user_id = (a.concierge_user_id as string) ?? null;
+      row.assigned_concierge_name = row.assigned_concierge_user_id
+        ? (names.get(row.assigned_concierge_user_id) ?? null)
+        : null;
+    }
+
+    return Array.from(byCase.values()).map(({ latest_proposal_version: _v, ...rest }) => rest);
+  });
+
