@@ -26,21 +26,23 @@ function OfflinePage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.top !== window.self) return;
-    if (!navigator.onLine) return;
-    let key = "";
+    // Reintento acotado en el tiempo: antes bastaba un intento fallido para
+    // dejar al visitante atrapado en esta pantalla durante toda la sesión.
+    const now = Date.now();
+    let last = 0;
     try {
-      key = window.sessionStorage.getItem("vmx.offline.recovered") ?? "";
+      last = Number(window.sessionStorage.getItem("vmx.offline.recovered.at") ?? "0");
     } catch {
       /* noop */
     }
-    if (key === "1") return;
-    setRecovering(true);
-    void (async () => {
-      try {
-        window.sessionStorage.setItem("vmx.offline.recovered", "1");
-      } catch {
-        /* noop */
-      }
+    const recover = () => {
+      setRecovering(true);
+      void (async () => {
+        try {
+          window.sessionStorage.setItem("vmx.offline.recovered.at", String(Date.now()));
+        } catch {
+          /* noop */
+        }
       try {
         if ("caches" in window) {
           const names = await caches.keys();
