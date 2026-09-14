@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAluxBrand } from "@/lib/brand/brand-context";
+import { briefToDetailRows, type TripBrief } from "@/lib/traveler/trip-brief";
 import { toast } from "@/lib/toast";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import {
@@ -1630,6 +1631,7 @@ type HandoffPayload = {
       subtitle?: string | null;
     }>;
   } | null;
+  trip_brief?: TripBrief | null;
 };
 
 function HandoffContextCard({ caseId }: { caseId: string }) {
@@ -1707,6 +1709,12 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
 
       {state === "idle" && payload && (
         <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {payload.trip_brief && (
+            <HandoffBlock title="Brief del viaje (confirmado por el viajero)">
+              <TripBriefBlock brief={payload.trip_brief} />
+            </HandoffBlock>
+          )}
+
           <HandoffBlock title="Perfil del viajero">
             {payload.profile ? (
               <ProfileSummary profile={payload.profile} />
@@ -1755,6 +1763,24 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
         </div>
       )}
     </section>
+  );
+}
+
+/**
+ * Presentación legible del brief de viaje: composición del grupo,
+ * llegada, transportación y pendientes — en texto humano para el concierge.
+ */
+function TripBriefBlock({ brief }: { brief: TripBrief }) {
+  const rows = briefToDetailRows(brief);
+  return (
+    <dl className="grid gap-1.5 text-xs">
+      {rows.map((r, i) => (
+        <div key={i} className="flex gap-2">
+          <dt className="shrink-0 font-medium text-muted-foreground">{r.label}:</dt>
+          <dd className="text-foreground">{r.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 

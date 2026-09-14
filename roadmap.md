@@ -115,3 +115,4 @@
 - [x] Pago en efectivo: el viajero confirma y queda pagado; el concierge también puede registrarlo desde el expediente.
 - [x] Al pagar, el expediente pasa a cerrado ganado y se abre el itinerario confirmado del viajero.
 - [ ] Conectar pago real con proveedor cuando el Founder lo autorice.
+- [x] Confirmación de viaje antes de enviar al Concierge (TripBriefForm 3 secciones: datos del viaje, quiénes viajan, transportación con 'aún no lo decido'). Brief en travel_plans.meta.trip_brief, incluido en handoff context, mostrado en CaseFileView. Typecheck + build + Playwright 1440/834/430/390 OK. No publicado.

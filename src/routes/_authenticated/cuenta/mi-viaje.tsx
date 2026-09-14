@@ -77,6 +77,7 @@ import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
+import { TripBriefForm } from "@/components/traveler/TripBriefForm";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
 import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -2183,204 +2184,15 @@ function ConciergeSection({
   cases: CaseSummary[];
   onChanged: () => void;
 }) {
-  const qc = useQueryClient();
-  const alux = useAluxBrand();
-  const promote = useServerFn(promotePlanToCase);
-  const getContact = useServerFn(getMyPersonalProfile);
-  const saveContact = useServerFn(saveMyConciergeContact);
-  const { plan, items } = data;
-  const [summary, setSummary] = useState("");
-  const contactQuery = useQuery({
-    queryKey: ["traveler", "concierge-contact"],
-    queryFn: () => getContact(),
-    staleTime: 30_000,
-  });
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [whatsappConsent, setWhatsappConsent] = useState(false);
-
-  useEffect(() => {
-    const profile = contactQuery.data;
-    if (!profile) return;
-    setContactName(
-      profile.display_name ?? [profile.first_name, profile.last_name].filter(Boolean).join(" "),
-    );
-    setContactPhone(profile.phone ?? "");
-    setWhatsappConsent(profile.whatsapp_contact_consent);
-  }, [contactQuery.data]);
-
-  const hasContent = items.length > 0 || Boolean((plan.notes ?? "").trim().length >= 8);
-  const alreadyShared = plan.status === "shared_with_concierge" && Boolean(plan.case_id);
-
-  const send = useMutation({
-    mutationFn: async (s: string) => {
-      await saveContact({
-        data: { name: contactName, phone: contactPhone, whatsappConsent },
-      });
-      return promote({ data: { planId: plan.id, summary: s } });
-    },
-    onSuccess: (res) => {
-      setSummary("");
-      qc.invalidateQueries({ queryKey: ["cc", "my-cases"] });
-      onChanged();
-      toast.success("Expediente enviado al Concierge", {
-        description: "Un concierge humano revisará tu viaje.",
-        action: {
-          label: "Ver caso",
-          onClick: () => {
-            window.location.href = `/cuenta/concierge/${res.caseId}`;
-          },
-        },
-      });
-    },
-    onError: (e) =>
-      toast.error("No se pudo enviar", {
-        description: e instanceof Error ? e.message : undefined,
-      }),
-  });
-
-  const derivedSummary =
-    summary.trim() ||
-    `Viaje "${plan.title}" · ${items.length} elemento${items.length === 1 ? "" : "s"}${
-      plan.party_size ? ` · ${plan.party_size} personas` : ""
-    }${plan.start_date ? ` · desde ${plan.start_date}` : ""}`;
-  const contactReady =
-    contactName.trim().length >= 2 &&
-    Boolean(contactQuery.data?.email) &&
-    /^\+?[0-9 ()-]{8,32}$/.test(contactPhone.trim()) &&
-    whatsappConsent;
-  const canSend =
-    !alreadyShared && hasContent && contactReady && derivedSummary.length >= 8 && !send.isPending;
 
   return (
     <section className="rounded-lg border bg-card p-5">
       <h2 className="text-lg font-medium">Enviar al Concierge</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tu expediente completo (destinos, empresas, productos, eventos, notas, fechas y personas)
-        viaja como snapshot al concierge humano.
+        Revisa tu viaje, completa los datos del brief y envía a un concierge humano para cotizar.
       </p>
 
-      {alreadyShared ? (
-        <div className="mt-4 border-y border-alux-border bg-alux-surface px-4 py-4 text-sm">
-          <div className="flex items-start gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-alux text-alux-foreground">
-              <SparklesIcon className="size-4" aria-hidden />
-            </span>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-alux-surface-foreground/70">
-                {alux.name} · seguimiento activo
-              </p>
-              <p className="mt-1 font-semibold text-alux-surface-foreground">
-                {alux.copy("conciergeSentTitle")}
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-alux-surface-foreground/75">
-                {alux.copy("conciergeSentBody")}
-              </p>
-            </div>
-          </div>
-          {plan.case_id ? (
-            <Link
-              to="/cuenta/concierge/$caseId"
-              params={{ caseId: plan.case_id }}
-              className="mt-4 inline-flex min-h-11 items-center rounded-full bg-alux px-4 py-2 text-xs font-semibold text-alux-foreground hover:opacity-90"
-            >
-              Ver seguimiento →
-            </Link>
-          ) : null}
-        </div>
-      ) : !hasContent ? (
-        <div className="mt-4 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-          Agrega al menos un destino, empresa, producto o evento — o escribe notas generales del
-          viaje — para poder enviarlo.
-        </div>
-      ) : (
-        <form
-          className="mt-4 space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (canSend) send.mutate(derivedSummary);
-          }}
-        >
-          <fieldset className="grid gap-3 rounded-md border border-border/70 bg-background/60 p-4">
-            <legend className="px-1 text-sm font-semibold">Tus datos de contacto</legend>
-            <p className="text-xs text-muted-foreground">
-              El equipo Concierge los usará para aclarar tu solicitud. Nunca se comparten con las
-              empresas.
-            </p>
-            <label className="grid gap-1 text-xs font-medium">
-              Nombre completo
-              <input
-                value={contactName}
-                onChange={(event) => setContactName(event.target.value)}
-                maxLength={120}
-                autoComplete="name"
-                required
-                className="h-11 rounded-md border border-border bg-background px-3 text-sm font-normal"
-              />
-            </label>
-            <label className="grid gap-1 text-xs font-medium">
-              Correo de tu cuenta
-              <input
-                value={contactQuery.data?.email ?? ""}
-                readOnly
-                aria-readonly="true"
-                className="h-11 rounded-md border border-border bg-muted px-3 text-sm font-normal text-muted-foreground"
-              />
-            </label>
-            <label className="grid gap-1 text-xs font-medium">
-              Móvil
-              <input
-                value={contactPhone}
-                onChange={(event) => setContactPhone(event.target.value)}
-                maxLength={32}
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="Ej. +52 985 000 0000"
-                required
-                className="h-11 rounded-md border border-border bg-background px-3 text-sm font-normal"
-              />
-            </label>
-            <label className="flex min-h-11 items-start gap-3 rounded-md border border-border/70 p-3 text-xs leading-relaxed">
-              <input
-                type="checkbox"
-                checked={whatsappConsent}
-                onChange={(event) => setWhatsappConsent(event.target.checked)}
-                className="mt-0.5 size-4 accent-primary"
-              />
-              <span>
-                Confirmo que este móvil tiene WhatsApp y autorizo al Concierge a escribirme sobre
-                este viaje.
-              </span>
-            </label>
-          </fieldset>
-          <textarea
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            rows={3}
-            maxLength={500}
-            placeholder="Mensaje opcional para tu concierge (fechas flexibles, presupuesto, restricciones…)"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          />
-          <p className="text-xs text-muted-foreground">
-            Adjuntaremos automáticamente: {items.length} elemento
-            {items.length === 1 ? "" : "s"}
-            {plan.party_size ? ` · ${plan.party_size} personas` : ""}
-            {plan.start_date ? ` · ${plan.start_date}` : ""}
-            {plan.end_date ? ` → ${plan.end_date}` : ""}.
-          </p>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{summary.length}/500</span>
-            <Button type="submit" disabled={!canSend}>
-              {send.isPending ? "Enviando…" : "Enviar al Concierge"}
-            </Button>
-          </div>
-          {send.isError ? (
-            <p className="text-xs text-destructive">
-              {send.error instanceof Error ? send.error.message : "Error al enviar"}
-            </p>
-          ) : null}
-        </form>
-      )}
+      <TripBriefForm data={data} onChanged={onChanged} />
 
       <div className="mt-6">
         <div className="flex items-center justify-between">

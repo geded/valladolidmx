@@ -27,6 +27,7 @@ import {
   anonymousImportNoteId,
   prepareAnonymousDraftImport,
 } from "./anonymous-draft/import-contract";
+import { tripBriefSchema, type TripBrief } from "./trip-brief";
 
 // -------------------------------------------------------------------------
 // Contrato público (estable)
@@ -717,6 +718,51 @@ export const updatePlanMeta = createServerFn({ method: "POST" })
   });
 
 // =========================================================================
+// BRIEF DE VIAJE (confirmación antes de enviar al Concierge)
+// =========================================================================
+
+/**
+ * saveTripBrief — Guarda el brief de viaje en `travel_plans.meta.trip_brief`.
+ * Lee el meta existente, lo fusiona y actualiza `party_size` con adultos+menores.
+ * Sin tablas nuevas; usa el jsonb `meta` ya existente.
+ */
+export const saveTripBrief = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const src = (d ?? {}) as { planId?: unknown; brief?: unknown };
+    const planId = assertUuid(src.planId, "plan_id");
+    const brief = tripBriefSchema.parse(src.brief);
+    return { planId, brief };
+  })
+  .handler(async ({ context, data }): Promise<{ ok: true }> => {
+    // Leer meta existente
+    const { data: row, error: readErr } = await context.supabase
+      .from("travel_plans")
+      .select("meta")
+      .eq("id", data.planId)
+      .single();
+    if (readErr) throw new Error(`plan_read_failed: ${readErr.message}`);
+    const meta =
+      row.meta && typeof row.meta === "object" && !Array.isArray(row.meta)
+        ? { ...(row.meta as Record<string, Json>) }
+        : {};
+
+    // Fusionar trip_brief
+    meta["trip_brief"] = data.brief as unknown as Json;
+
+    // Actualizar party_size coherente: adultos + menores
+    const minorsCount = data.brief.hasMinors && data.brief.minorAges ? data.brief.minorAges.length : 0;
+    const partySize = data.brief.adults + minorsCount;
+
+    const { error: updErr } = await context.supabase
+      .from("travel_plans")
+      .update({ meta, party_size: partySize })
+      .eq("id", data.planId);
+    if (updErr) throw new Error(`plan_brief_update_failed: ${updErr.message}`);
+    return { ok: true };
+  });
+
+// =========================================================================
 // ACCIONES
 // =========================================================================
 
@@ -895,6 +941,23 @@ async function attachHandoffContext(args: {
 }): Promise<void> {
   const { caseId, planId, userId, userSupabase, planItems } = args;
 
+  // Brief de viaje (si el viajero lo completó antes de enviar).
+  let tripBrief: TripBrief | null = null;
+  try {
+    const { data: planRow } = await userSupabase
+      .from("travel_plans")
+      .select("meta")
+      .eq("id", planId)
+      .maybeSingle();
+    const meta = planRow?.meta as Record<string, unknown> | null;
+    if (meta && meta["trip_brief"]) {
+      tripBrief = tripBriefSchema.parse(meta["trip_brief"]);
+    }
+  } catch {
+    tripBrief = null;
+  }
+
+
   // Perfil M2 (subset operativo, sin PII).
   const profilePromise = userSupabase
     .from("traveler_profiles")
@@ -958,6 +1021,7 @@ async function attachHandoffContext(args: {
       item_count: planItems.length,
       items: planSnapshotItems,
     },
+    trip_brief: tripBrief,
   };
 
   const { error } = await userSupabase.rpc(
