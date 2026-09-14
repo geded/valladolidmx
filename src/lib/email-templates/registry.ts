@@ -47,4 +47,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "trip-post": tripPostTemplate,
   "trip-confirmed": tripConfirmedTemplate,
   "concierge-proposal-sent": conciergeProposalSentTemplate,
+  "booking-paid-admin": bookingPaidAdminTemplate,
 };
