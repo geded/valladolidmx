@@ -630,14 +630,15 @@ function RoutesSection({
                     route.title
                   )}
                 </h3>
-                <p className="min-w-0 truncate text-[11px] text-muted-foreground sm:text-xs">
+                <p className="min-w-0 text-[11px] text-muted-foreground sm:text-xs">
                   {route.duration} · {route.stops} paradas · {route.vibe}
                 </p>
                 {route.description ? (
-                  <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                  <p className="text-xs leading-snug text-muted-foreground">
                     {route.description}
                   </p>
                 ) : null}
+
                 <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
                   <button
                     type="button"
