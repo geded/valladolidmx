@@ -335,7 +335,7 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: res, error } = await context.supabase.rpc("concierge_order_mark_paid_cash", {
       _order_id: data.orderId,
-      _note: data.note ?? null,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
