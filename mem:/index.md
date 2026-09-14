@@ -39,6 +39,8 @@ Founder Evolution Principle (CV8.S+, vinculante): CV8.S es la primera implementa
 Founder Scenario Coherence Principle (CV8.S.2+, vinculante): el Motor de Eventos genera historias de viaje coherentes — nunca eventos aislados. Regla de Causalidad (cada T1..T9 declara prerequisite, influencer, gap_ms, scenario_probability), Regla Territorial (destino principal domina; distribución no uniforme; sólo aristas válidas del grafo) y Regla de Realismo Temporal (weekends/temporada/horas/gaps por ventana). Cero saltos entre transiciones. Ver `mem://policies/founder-scenario-coherence.md`.
 Founder Ecosystem Interaction Principle (CV8.S.3+, vinculante): los sub-motores Alux/Concierge/Commerce/Reviews sólo emiten interacciones causales al Journey compartido. Prohibido compras sin propuesta, reseñas sin experiencia, Concierge sin caso, aceptación Alux sin recomendación. Cada evento declara rationale + prerequisite apuntando a evento previo real. Objetivo: demostrar qué combinaciones producen confianza, permanencia, conversión y recomendación. Ver `mem://policies/founder-ecosystem-interaction.md`.
 
+Zona Horaria Oficial (vinculante): toda fecha/hora visible se formatea en `America/Merida` vía `src/lib/time/merida.ts`; nunca la zona del dispositivo o servidor. Ver `mem://policies/merida-timezone.md`.
+
 ## Memories
 
 - [Founder Experience First](mem://policies/founder-experience-first.md) — CV6: capacidades sólo si aportan ayuda concreta y accionable; auto-ocultamiento cuando no aportan valor.
