@@ -24,6 +24,7 @@ import { AddToTravelPlanButton } from "./AddToTravelPlanButton";
 import { AluxSourcesFooter } from "./AluxSourcesFooter";
 import { AluxFeedbackButtons } from "./AluxFeedbackButtons";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 const ADDABLE_KINDS: TravelItemKind[] = ["destination", "business", "product", "event", "note"];
 
@@ -37,6 +38,7 @@ export interface AluxSuggestionCardProps {
 }
 
 export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggestionCardProps) {
+  const alux = useAluxBrand();
   const addable = suggestion.sources.filter(isAddable).slice(0, 4);
 
   return (
@@ -49,10 +51,10 @@ export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggesti
         </span>
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-            Alux · {capabilityLabel}
+            {alux.copy("suggestionEyebrow", { capability: capabilityLabel })}
           </p>
           <p className="text-[11px] text-muted-foreground">
-            Sugerencia · no modifica tu viaje sin tu confirmación
+            {alux.copy("suggestionSafety")}
           </p>
         </div>
         {suggestion.latency_ms > 0 && (
@@ -75,7 +77,7 @@ export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggesti
       {suggestion.rationale ? (
         <div className="mt-3 rounded-lg bg-background/60 p-3">
           <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            <Info className="size-3" aria-hidden /> Por qué te lo recomiendo
+            <Info className="size-3" aria-hidden /> {alux.copy("suggestionWhy")}
           </p>
           <p className="whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
             {suggestion.rationale}
@@ -98,7 +100,7 @@ export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggesti
       {addable.length > 0 ? (
         <div className="mt-3">
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Acción disponible
+            {alux.copy("suggestionAction")}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {addable.map((s) => (

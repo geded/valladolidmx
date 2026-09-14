@@ -904,7 +904,7 @@ export function AluxFloatingTrigger() {
             >
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
                 <Headset className="size-3.5" aria-hidden />
-                <span id="alux-concierge">Tu concierge humano</span>
+                <span id="alux-concierge">{alux.copy("humanConciergeTitle")}</span>
                 <a
                   href="/cuenta/mi-viaje"
                   className="ml-auto text-[10px] font-medium hover:underline"
@@ -954,7 +954,7 @@ export function AluxFloatingTrigger() {
           >
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <MapPin className="size-3.5" aria-hidden />
-              <span id="alux-geo">Cercanía real</span>
+              <span id="alux-geo">{alux.copy("nearbySectionTitle")}</span>
             </div>
             {geo.status === "granted" && geo.location ? (
               <p className="mt-2 text-sm text-foreground">
@@ -964,8 +964,7 @@ export function AluxFloatingTrigger() {
             ) : (
               <>
                 <p className="mt-2 text-sm text-foreground">
-                  Compartir tu ubicación me permite priorizar lugares que están realmente cerca de
-                  ti y calcular tiempos de traslado.
+                  {alux.copy("locationBody")}
                 </p>
                 <button
                   type="button"
@@ -975,12 +974,12 @@ export function AluxFloatingTrigger() {
                 >
                   <MapPin className="size-3.5" aria-hidden />
                   {geo.status === "prompting"
-                    ? "Solicitando permiso…"
+                    ? alux.copy("requestingLocation")
                     : geo.status === "denied"
-                      ? "Permiso denegado — reintentar"
+                      ? alux.copy("locationDenied")
                       : geo.status === "unavailable"
-                        ? "Ubicación no disponible"
-                        : "Compartir mi ubicación"}
+                        ? alux.copy("locationUnavailable")
+                        : alux.copy("shareLocation")}
                 </button>
               </>
             )}
@@ -992,7 +991,7 @@ export function AluxFloatingTrigger() {
               <section aria-labelledby="alux-where">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   <MapPin className="size-3.5" aria-hidden />
-                  <span id="alux-where">Dónde estás</span>
+                   <span id="alux-where">{alux.copy("locationTitle")}</span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {chain.map((slot) => (
@@ -1008,7 +1007,7 @@ export function AluxFloatingTrigger() {
               >
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   <Compass className="size-3.5" aria-hidden />
-                  <span id="alux-what">Qué estás explorando</span>
+                   <span id="alux-what">{alux.copy("contextTitle")}</span>
                 </div>
                 <p className="mt-2 text-sm text-foreground">{ctx.reason}</p>
                 {current?.href && (
@@ -1057,7 +1056,7 @@ export function AluxFloatingTrigger() {
           <section aria-labelledby="alux-next">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <Sparkles className="size-3.5" aria-hidden />
-              <span id="alux-next">Qué explorar cerca</span>
+               <span id="alux-next">{alux.copy("exploreNearbyTitle")}</span>
               {suggestionsQuery.data?.rationaleSource === "ai" && (
                 <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-alux/10 px-2 py-0.5 text-[10px] font-medium text-alux">
                   <Sparkles className="size-3" aria-hidden />
@@ -1283,8 +1282,7 @@ export function AluxFloatingTrigger() {
               );
             })()}
             <p className="mt-3 text-[11px] text-muted-foreground">
-              Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido,
-              nunca inventadas.
+              {alux.copy("catalogGrounding")}
             </p>
           </section>
 
@@ -1296,7 +1294,7 @@ export function AluxFloatingTrigger() {
             >
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
                 <Ticket className="size-3.5" aria-hidden />
-                <span id="alux-coupons">Tus cupones activos</span>
+                 <span id="alux-coupons">{alux.copy("activeCouponsTitle")}</span>
               </div>
               <ul className="mt-2 grid gap-1.5">
                 {lens.active_coupons.slice(0, 4).map((c) => (
@@ -1329,7 +1327,9 @@ export function AluxFloatingTrigger() {
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   <Tag className="size-3.5" aria-hidden />
                   <span id="alux-promos">
-                    Promociones en {ctx.destination?.label ?? "el destino"}
+                    {alux.copy("promotionsTitle", {
+                      destination: ctx.destination?.label ?? "el destino",
+                    })}
                   </span>
                 </div>
                 <ul className="mt-2 grid gap-1.5">
@@ -1371,19 +1371,17 @@ export function AluxFloatingTrigger() {
           >
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
               <Sparkles className="size-3.5" aria-hidden />
-              <span id="alux-profile">Ayúdame a asesorarte mejor</span>
+              <span id="alux-profile">{alux.copy("profileAccuracyTitle")}</span>
             </div>
             <p className="mt-2 text-sm text-foreground">
-              Si completas tu perfil de viajero (estilo, intereses, compañía, presupuesto, fechas) y
-              también tu perfil público, puedo recomendarte hoteles, restaurantes, experiencias y
-              rutas de {alux.copy("territorialDescriptor")} con mucha más precisión.
+              {alux.copy("profileAccuracyBody")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <a
                 href="/cuenta/perfil-publico"
                 className="inline-flex items-center gap-1 rounded-full bg-alux px-3 py-1.5 text-xs font-medium text-alux-foreground transition-colors hover:bg-alux/90"
               >
-                Completar tu perfil público
+                {alux.copy("completePublicProfile")}
                 <ArrowRight className="size-3.5" aria-hidden />
               </a>
             </div>

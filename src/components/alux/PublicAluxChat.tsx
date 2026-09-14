@@ -62,10 +62,10 @@ function ensureSessionKey(): string {
 export function PublicAluxChat() {
   const alux = useAluxBrand();
   const suggestions = [
-    `¿Cuál es la mejor época para visitar ${alux.copy("territorialDescriptor")}?`,
-    `¿Qué hacer en 3 días en ${alux.copy("territorialDescriptor")}?`,
-    "¿Qué destinos publicados me recomiendas?",
-    "¿Qué experiencias encajan con mi viaje?",
+    alux.copy("publicStarterSeason"),
+    alux.copy("publicStarterDays"),
+    alux.copy("publicStarterDestinations"),
+    alux.copy("publicStarterExperiences"),
   ];
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
@@ -230,7 +230,7 @@ export function PublicAluxChat() {
         <div className="flex-1 min-w-0">
           <h2 className="font-serif text-lg leading-none">{alux.copy("conversationTitle")}</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            {alux.copy("territorialDescriptor")} · disponible sin registro
+            {alux.copy("publicAvailability")}
           </p>
         </div>
         {rateInfo && (
@@ -243,10 +243,10 @@ export function PublicAluxChat() {
             type="button"
             onClick={resetConversation}
             className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
-            title="Iniciar una conversación nueva"
+             title={alux.copy("newConversation")}
           >
             <RotateCcw className="h-3 w-3" />
-            Nueva
+             {alux.copy("newConversation")}
           </button>
         )}
       </header>
@@ -254,7 +254,7 @@ export function PublicAluxChat() {
       {hasMemory && (
         <div className="flex items-center gap-2 border-b border-border/60 bg-alux/5 px-5 py-2 text-[11px] text-alux">
           <BrainCircuit className="h-3 w-3" />
-          Alux recuerda tu conversación previa · no necesitas repetir contexto
+          {alux.copy("conversationMemory")}
         </div>
       )}
 
@@ -263,13 +263,13 @@ export function PublicAluxChat() {
         {status === "granted" && location ? (
           <span className="inline-flex items-center gap-1.5 rounded-pill bg-success/10 px-2.5 py-1 text-success">
             <MapPin className="h-3 w-3" />
-            Ordenando por cercanía a tu ubicación
+            {alux.copy("locationGranted")}
             {nearbyUsed != null && nearbyUsed > 0 ? ` · ${nearbyUsed} cerca` : ""}
           </span>
         ) : status === "denied" || status === "unavailable" ? (
           <span className="inline-flex items-center gap-1.5 text-muted-foreground">
             <MapPinOff className="h-3 w-3" />
-            Sin ubicación · recomiendo por relevancia territorial
+            {alux.copy("locationGeneral")}
           </span>
         ) : (
           <button
@@ -280,8 +280,8 @@ export function PublicAluxChat() {
           >
             <MapPin className="h-3 w-3" />
             {status === "prompting"
-              ? "Solicitando ubicación…"
-              : "Compartir mi ubicación para sugerencias cercanas"}
+              ? alux.copy("requestingLocation")
+              : alux.copy("locationNearbyCta")}
           </button>
         )}
       </div>
@@ -348,7 +348,7 @@ export function PublicAluxChat() {
               onClick={() => rememberAuthReturnPath("/alux")}
               className="underline font-medium"
             >
-              Crear cuenta gratuita
+               {alux.copy("createAccount")}
             </Link>
           </div>
         )}
@@ -402,6 +402,7 @@ export function PublicAluxChat() {
 }
 
 function AluxProposals({ items }: { items: Proposal[] }) {
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const proposeFn = useServerFn(proposeAluxPlanAddition);
   const [pending, setPending] = useState<string | null>(null);
@@ -453,7 +454,7 @@ function AluxProposals({ items }: { items: Proposal[] }) {
         );
       })}
       <p className="basis-full text-[10px] text-muted-foreground">
-        Alux propone · tú confirmas en{" "}
+        {alux.copy("proposalFooter").replace("Mi Viaje.", "")} {" "}
         <Link to="/cuenta/mi-viaje" className="underline">
           Mi Viaje
         </Link>

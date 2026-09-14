@@ -246,8 +246,8 @@
   --badge-patrimonio-fg: oklch(0.977 0.013 86.8);
   --badge-verified: oklch(0.58 0.13 150);
   --badge-verified-fg: oklch(0.18 0.02 150);
-  --badge-alux: oklch(0.54 0.14 295);
-  --badge-alux-fg: oklch(0.98 0.008 295);
+  --badge-alux: var(--alux);
+  --badge-alux-fg: var(--alux-foreground);
   --badge-award: oklch(0.72 0.15 85);
   --badge-award-fg: oklch(0.22 0.02 85);
   --badge-certification: oklch(0.62 0.11 230);
@@ -360,8 +360,8 @@
   --badge-patrimonio-fg: oklch(0.977 0.013 86.8);
   --badge-verified: oklch(0.7 0.13 150);
   --badge-verified-fg: oklch(0.18 0.02 150);
-  --badge-alux: oklch(0.66 0.135 295);
-  --badge-alux-fg: oklch(0.98 0.008 295);
+  --badge-alux: var(--alux);
+  --badge-alux-fg: var(--alux-foreground);
   --badge-award: oklch(0.8 0.14 85);
   --badge-award-fg: oklch(0.22 0.02 85);
   --badge-certification: oklch(0.72 0.105 230);

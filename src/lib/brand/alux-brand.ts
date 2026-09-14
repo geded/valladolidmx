@@ -50,6 +50,81 @@ export interface AluxVoice {
   workspaceActionTitle: string;
   workspaceOpen: string;
   unavailable: string;
+  pageEyebrow: string;
+  pageTitle: string;
+  pageDescription: string;
+  nextStepTitle: string;
+  nextStepReview: string;
+  nextStepDetect: string;
+  nextStepNearby: string;
+  viewTrip: string;
+  humanConciergeTitle: string;
+  humanConciergeBody: string;
+  prepareTrip: string;
+  retry: string;
+  loadingTrip: string;
+  tripLoadError: string;
+  suggestedQuestions: string;
+  travelerPanelTitle: string;
+  travelerPanelDescription: string;
+  profilePromptTitle: string;
+  profilePromptBody: string;
+  completeProfile: string;
+  completePublicProfile: string;
+  suggestionReady: string;
+  nearbySectionTitle: string;
+  locationTitle: string;
+  locationBody: string;
+  shareLocation: string;
+  requestingLocation: string;
+  locationDenied: string;
+  locationUnavailable: string;
+  contextTitle: string;
+  exploreNearbyTitle: string;
+  catalogGrounding: string;
+  activeCouponsTitle: string;
+  promotionsTitle: string;
+  profileAccuracyTitle: string;
+  profileAccuracyBody: string;
+  publicStarterSeason: string;
+  publicStarterDays: string;
+  publicStarterDestinations: string;
+  publicStarterExperiences: string;
+  publicAvailability: string;
+  conversationMemory: string;
+  locationGranted: string;
+  locationGeneral: string;
+  locationNearbyCta: string;
+  createAccount: string;
+  proposalFooter: string;
+  suggestionEyebrow: string;
+  suggestionSafety: string;
+  suggestionWhy: string;
+  suggestionAction: string;
+  sourcesTitle: string;
+  sourcesEmpty: string;
+  proposalsTitle: string;
+  proposalsDisclaimer: string;
+  proposalsWhy: string;
+  proposalsHideWhy: string;
+  workspaceNoActions: string;
+  workspaceReversible: string;
+  workspaceWhy: string;
+  workspaceRationale: string;
+  workspaceEffect: string;
+  workspaceSources: string;
+  memoryTitle: string;
+  memoryPaused: string;
+  memoryActive: string;
+  memoryDescription: string;
+  memoryGeneral: string;
+  memorySignals: string;
+  memoryPreserved: string;
+  memoryResume: string;
+  memoryPause: string;
+  memoryForget: string;
+  memoryConfirm: string;
+  memoryCancel: string;
 }
 
 export const ALUX_VOICE_KEYS = [
@@ -76,6 +151,81 @@ export const ALUX_VOICE_KEYS = [
   "workspaceActionTitle",
   "workspaceOpen",
   "unavailable",
+  "pageEyebrow",
+  "pageTitle",
+  "pageDescription",
+  "nextStepTitle",
+  "nextStepReview",
+  "nextStepDetect",
+  "nextStepNearby",
+  "viewTrip",
+  "humanConciergeTitle",
+  "humanConciergeBody",
+  "prepareTrip",
+  "retry",
+  "loadingTrip",
+  "tripLoadError",
+  "suggestedQuestions",
+  "travelerPanelTitle",
+  "travelerPanelDescription",
+  "profilePromptTitle",
+  "profilePromptBody",
+  "completeProfile",
+  "completePublicProfile",
+  "suggestionReady",
+  "nearbySectionTitle",
+  "locationTitle",
+  "locationBody",
+  "shareLocation",
+  "requestingLocation",
+  "locationDenied",
+  "locationUnavailable",
+  "contextTitle",
+  "exploreNearbyTitle",
+  "catalogGrounding",
+  "activeCouponsTitle",
+  "promotionsTitle",
+  "profileAccuracyTitle",
+  "profileAccuracyBody",
+  "publicStarterSeason",
+  "publicStarterDays",
+  "publicStarterDestinations",
+  "publicStarterExperiences",
+  "publicAvailability",
+  "conversationMemory",
+  "locationGranted",
+  "locationGeneral",
+  "locationNearbyCta",
+  "createAccount",
+  "proposalFooter",
+  "suggestionEyebrow",
+  "suggestionSafety",
+  "suggestionWhy",
+  "suggestionAction",
+  "sourcesTitle",
+  "sourcesEmpty",
+  "proposalsTitle",
+  "proposalsDisclaimer",
+  "proposalsWhy",
+  "proposalsHideWhy",
+  "workspaceNoActions",
+  "workspaceReversible",
+  "workspaceWhy",
+  "workspaceRationale",
+  "workspaceEffect",
+  "workspaceSources",
+  "memoryTitle",
+  "memoryPaused",
+  "memoryActive",
+  "memoryDescription",
+  "memoryGeneral",
+  "memorySignals",
+  "memoryPreserved",
+  "memoryResume",
+  "memoryPause",
+  "memoryForget",
+  "memoryConfirm",
+  "memoryCancel",
 ] as const satisfies ReadonlyArray<keyof AluxVoice>;
 
 export type AluxCopyByLocale = Record<LocaleCode, AluxVoice>;
@@ -108,6 +258,90 @@ const ES: AluxVoice = {
   workspaceActionTitle: "Próxima acción de alto impacto",
   workspaceOpen: "Abrir conversación con {name}",
   unavailable: "{name} no pudo responder ahora. Inténtalo en un momento.",
+  pageEyebrow: "Inteligencia",
+  pageTitle: "{name}",
+  pageDescription:
+    "La inteligencia que acompaña el trabajo del concierge humano: resume expedientes, sugiere productos y prepara borradores revisables.",
+  nextStepTitle: "Tu siguiente mejor paso",
+  nextStepReview: "Revisar los destinos y experiencias de tu viaje",
+  nextStepDetect: "Detectar qué puede faltar según tu tiempo y ritmo",
+  nextStepNearby: "Sugerir lugares cercanos sin cambiar tu plan",
+  viewTrip: "Ver mi viaje",
+  humanConciergeTitle: "Cuando quieras hacerlo realidad",
+  humanConciergeBody:
+    "Tu expediente conserva lo que elegiste. Cuando tú lo decidas, un concierge humano podrá revisarlo contigo, coordinar opciones y ayudarte a convertirlo en un viaje real.",
+  prepareTrip: "Preparar mi viaje",
+  retry: "Reintentar",
+  loadingTrip: "Cargando tu viaje antes de conversar…",
+  tripLoadError: "No pude cargar tu viaje. {name} no enviará un contexto incompleto.",
+  suggestedQuestions: "Preguntas sugeridas",
+  travelerPanelTitle: "{name} · Copiloto de tu viaje",
+  travelerPanelDescription:
+    "Analiza tu espacio de viaje y sugiere. Nunca modifica ni envía nada sin que tú lo confirmes.",
+  profilePromptTitle: "Ayúdame a asesorarte mejor",
+  profilePromptBody:
+    "Mientras más completo esté tu perfil, más preciso puedo ser al recomendarte opciones de {territory}.",
+  completeProfile: "Completar perfil",
+  completePublicProfile: "Completar tu perfil público",
+  suggestionReady: "Sugerencia lista",
+  nearbySectionTitle: "Cercanía real",
+  locationTitle: "Dónde estás",
+  locationBody:
+    "Compartir tu ubicación me permite priorizar lugares realmente cercanos y calcular tiempos de traslado.",
+  shareLocation: "Compartir mi ubicación",
+  requestingLocation: "Solicitando permiso…",
+  locationDenied: "Permiso denegado — reintentar",
+  locationUnavailable: "Ubicación no disponible",
+  contextTitle: "Qué estás explorando",
+  exploreNearbyTitle: "Qué explorar cerca",
+  catalogGrounding:
+    "Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido, nunca inventadas.",
+  activeCouponsTitle: "Tus cupones activos",
+  promotionsTitle: "Promociones en {destination}",
+  profileAccuracyTitle: "Ayúdame a asesorarte mejor",
+  profileAccuracyBody:
+    "Completa tu perfil de viajero y tu perfil público para recibir recomendaciones más precisas de {territory}.",
+  publicStarterSeason: "¿Cuál es la mejor época para visitar {territory}?",
+  publicStarterDays: "¿Qué hacer en 3 días en {territory}?",
+  publicStarterDestinations: "¿Qué destinos publicados me recomiendas?",
+  publicStarterExperiences: "¿Qué experiencias encajan con mi viaje?",
+  publicAvailability: "{territory} · disponible sin registro",
+  conversationMemory: "{name} recuerda tu conversación previa · no necesitas repetir contexto",
+  locationGranted: "Ordenando por cercanía a tu ubicación",
+  locationGeneral: "Sin ubicación · recomiendo por relevancia territorial",
+  locationNearbyCta: "Compartir mi ubicación para sugerencias cercanas",
+  createAccount: "Crear cuenta gratuita",
+  proposalFooter: "{name} propone · tú confirmas en Mi Viaje.",
+  suggestionEyebrow: "{name} · {capability}",
+  suggestionSafety: "Sugerencia · no modifica tu viaje sin tu confirmación",
+  suggestionWhy: "Por qué te lo recomiendo",
+  suggestionAction: "Acción disponible",
+  sourcesTitle: "Fuentes utilizadas",
+  sourcesEmpty: "Sin referencias del catálogo utilizadas.",
+  proposalsTitle: "{name} sugiere para tu viaje",
+  proposalsDisclaimer: "{name} propone; tú decides. Nada se añade a tu plan sin tu confirmación.",
+  proposalsWhy: "Por qué {name} lo sugiere",
+  proposalsHideWhy: "Ocultar por qué",
+  workspaceNoActions: "Sin acciones sugeridas por ahora.",
+  workspaceReversible: "Reversible",
+  workspaceWhy: "¿Por qué?",
+  workspaceRationale: "Razón",
+  workspaceEffect: "Efecto",
+  workspaceSources: "Fuentes",
+  memoryTitle: "Personalización y memoria",
+  memoryPaused: "En pausa",
+  memoryActive: "Activa",
+  memoryDescription:
+    "{name} recuerda lo que exploras en este dispositivo para sugerirte mejores lugares y experiencias. Nunca guarda tu nombre, correo ni teléfono, y lo que recuerda se borra solo después de {count} días sin actividad.",
+  memoryGeneral: "Ahora mismo {name} te acompaña con recomendaciones generales.",
+  memorySignals: "{name} está usando {count} señales recientes de tu navegación.",
+  memoryPreserved:
+    "Tu viaje y tus lugares guardados se conservan siempre, incluso con la personalización en pausa.",
+  memoryResume: "Reactivar personalización",
+  memoryPause: "Pausar personalización",
+  memoryForget: "Borrar lo que {name} recuerda",
+  memoryConfirm: "Sí, borrar",
+  memoryCancel: "Mejor no",
 };
 
 const EN: AluxVoice = {
