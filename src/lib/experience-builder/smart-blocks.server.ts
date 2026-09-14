@@ -182,7 +182,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
       const slug = str(row.slug);
       const name = str(row.title);
       if (!slug || !name) return null;
-      const recurrenceInput = {
+      const recurrenceInput: EventRecurrenceInput = {
         starts_at: str(row.starts_at) ?? "",
         ends_at: str(row.ends_at),
         recurrence_frequency:
