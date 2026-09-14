@@ -86,11 +86,6 @@ export const upsertMyPersonalProfile = createServerFn({ method: "POST" })
   .inputValidator((input: PersonalProfileInput | undefined) => {
     const v = input ?? {};
     const lang = clampStr(v.preferred_language, 8);
-    const { data: traveler } = await context.supabase
-      .from("traveler_profiles")
-      .select("whatsapp_contact_consent, whatsapp_contact_consented_at")
-      .eq("user_id", context.userId)
-      .maybeSingle();
     return {
       first_name: clampStr(v.first_name, 60),
       last_name: clampStr(v.last_name, 60),
@@ -117,6 +112,11 @@ export const upsertMyPersonalProfile = createServerFn({ method: "POST" })
       .select(SELECT_COLS)
       .single();
     if (error) throw new Error(`personal_profile_write_failed: ${error.message}`);
+    const { data: traveler } = await context.supabase
+      .from("traveler_profiles")
+      .select("whatsapp_contact_consent, whatsapp_contact_consented_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
     const r = row as Record<string, unknown>;
     return {
       user_id: String(r.user_id),
