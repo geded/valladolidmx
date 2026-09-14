@@ -222,7 +222,7 @@ function AuthRoute() {
             <Button
               asChild
               variant="ghost"
-              className="-ml-3 mb-3 justify-start px-3 text-muted-foreground"
+              className="-ml-2 mb-2 h-8 justify-start px-2 text-[13px] text-muted-foreground"
             >
               <Link to={returnTarget}>
                 <ArrowLeft aria-hidden />
@@ -237,9 +237,9 @@ function AuthRoute() {
                 type="button"
                 variant="outline"
                 onClick={handleGoogle}
-                className="h-11 w-full rounded-lg bg-card text-sm shadow-none hover:bg-muted hover:text-foreground"
+                className="h-10 w-full rounded-lg bg-card text-[13px] shadow-none hover:bg-muted hover:text-foreground"
               >
-                <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
+                <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.75h3.57c2.08-1.92 3.28-4.74 3.28-8.07z"
@@ -259,22 +259,22 @@ function AuthRoute() {
                 </svg>
                 {t("auth.google")}
               </Button>
-              <div className="relative my-5 text-center text-xs text-muted-foreground">
+              <div className="relative my-4 text-center text-xs text-muted-foreground">
                 <span className="relative z-10 bg-card px-3">{t("auth.or_email")}</span>
                 <span className="absolute inset-x-0 top-1/2 h-px bg-border" aria-hidden />
               </div>
             </>
           ) : null}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {mode === "signup" ? (
               <div>
-                <label className="text-sm font-medium text-foreground" htmlFor="name">
+                <label className="text-[13px] font-medium text-foreground" htmlFor="name">
                   {t("auth.name")}
                 </label>
-                <div className="relative mt-2">
+                <div className="relative mt-1.5">
                   <UserRound
-                    className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                     aria-hidden
                   />
                   <input
@@ -282,19 +282,19 @@ function AuthRoute() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-11 w-full rounded-lg border border-input bg-background pl-11 pr-4 text-sm outline-none transition-shadow focus-visible:ring-focus"
+                    className="h-10 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus"
                   />
                 </div>
               </div>
             ) : null}
 
             <div>
-              <label className="text-sm font-medium text-foreground" htmlFor="email">
+              <label className="text-[13px] font-medium text-foreground" htmlFor="email">
                 {t("auth.email")}
               </label>
-              <div className="relative mt-2">
+              <div className="relative mt-1.5">
                 <Mail
-                  className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                   aria-hidden
                 />
                 <input
@@ -304,19 +304,19 @@ function AuthRoute() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11 w-full rounded-lg border border-input bg-background pl-11 pr-4 text-sm outline-none transition-shadow focus-visible:ring-focus"
+                  className="h-10 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus"
                 />
               </div>
             </div>
 
             {mode !== "forgot" ? (
               <div>
-                <label className="text-sm font-medium text-foreground" htmlFor="password">
+                <label className="text-[13px] font-medium text-foreground" htmlFor="password">
                   {t("auth.password")}
                 </label>
-                <div className="relative mt-2">
+                <div className="relative mt-1.5">
                   <LockKeyhole
-                    className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                     aria-hidden
                   />
                   <input
@@ -327,7 +327,7 @@ function AuthRoute() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11 w-full rounded-lg border border-input bg-background pl-11 pr-4 text-sm outline-none transition-shadow focus-visible:ring-focus"
+                    className="h-10 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-[13px] outline-none transition-shadow focus-visible:ring-focus"
                   />
                 </div>
               </div>
@@ -350,7 +350,7 @@ function AuthRoute() {
             <Button
               type="submit"
               disabled={busy}
-              className="h-11 w-full rounded-lg bg-foreground text-sm font-medium text-background shadow-none hover:bg-foreground/90"
+              className="h-10 w-full rounded-lg bg-foreground text-[13px] font-medium text-background shadow-none hover:bg-foreground/90"
             >
               {busy
                 ? t("auth.processing")
@@ -362,7 +362,7 @@ function AuthRoute() {
             </Button>
           </form>
 
-          <div className="mt-5 grid gap-2 border-t border-border pt-4 text-sm sm:grid-cols-2 sm:items-center">
+          <div className="mt-4 grid gap-1.5 border-t border-border pt-3 text-[13px] sm:grid-cols-2 sm:items-center">
             {mode === "signin" ? (
               <>
                 <Button
