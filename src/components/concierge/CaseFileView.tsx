@@ -1449,14 +1449,19 @@ function HandoffBlock({ title, children }: { title: string; children: ReactNode 
 function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
   const all: Array<[string, unknown]> = [
     ["Idioma", profile.preferred_language],
-    ["País", profile.country_code],
-    ["Moneda", profile.preferred_currency],
-    ["Presupuesto", profile.budget_level],
-    ["Dieta", profile.dietary_preferences],
-    ["Movilidad", profile.mobility_needs],
+    ["País de origen", profile.home_country],
+    ["Estilo de viaje", profile.travel_style ?? profile.travel_style_tags],
+    ["Presupuesto", profile.budget_band ?? profile.budget_range],
+    ["Dieta", profile.dietary ?? profile.dietary_restrictions],
+    ["Accesibilidad", profile.accessibility ?? profile.accessibility_needs],
+    ["Idiomas que habla", profile.languages],
     ["Intereses", profile.interests],
+    ["Acompañantes", profile.travel_party],
   ];
-  const rows = all.filter(([, v]) => v !== undefined && v !== null && v !== "");
+  const rows = all.filter(
+    ([, v]) =>
+      v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && v.length === 0),
+  );
   if (rows.length === 0) return <Empty>El viajero todavía no ha indicado sus preferencias.</Empty>;
   return (
     <dl className="grid gap-1 text-xs">
