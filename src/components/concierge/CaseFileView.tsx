@@ -11,6 +11,7 @@ import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lu
 import { Button } from "@/components/ui/button";
 import { useAluxBrand } from "@/lib/brand/brand-context";
 import { toast } from "@/lib/toast";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   acceptConciergeProposal,
   rejectConciergeProposal,
@@ -743,7 +744,34 @@ function ProposalCard({
       await router.invalidate();
     } finally {
       setBusy(false);
+  }
+
+  async function sendAndNotify() {
+    await sendFn({ data: { proposalId: p.proposal_id } });
+    const email = traveler?.email?.trim();
+    if (!email) return;
+    try {
+      await sendTransactionalEmail({
+        templateName: "concierge-proposal-sent",
+        recipientEmail: email,
+        idempotencyKey: `concierge-proposal-sent-${p.proposal_id}`,
+        templateData: {
+          travelerName: traveler?.display_name ?? undefined,
+          caseReference: `Expediente ${caseId.slice(0, 8).toUpperCase()}`,
+          totalLabel: money(p.total_amount_cents, p.currency),
+          validUntilLabel: p.valid_until
+            ? new Date(p.valid_until).toLocaleDateString("es-MX", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : undefined,
+        },
+      });
+    } catch {
+      toast.error("La propuesta se envió, pero el correo de aviso no pudo salir.");
     }
+  }
   }
 
   // Marcar como vista al renderizar para el viajero (idempotente, server-side)
@@ -794,7 +822,7 @@ function ProposalCard({
           <ActionButton
             label="Enviar al viajero"
             disabled={busy}
-            onClick={() => run(() => sendFn({ data: { proposalId: p.proposal_id } }))}
+            onClick={() => run(sendAndNotify)}
           />
         )}
         {internal && ["draft", "sent", "viewed"].includes(p.status) && (
