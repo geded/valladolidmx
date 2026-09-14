@@ -109,3 +109,9 @@
 ## Propuesta con partidas propias del Concierge (2026-09-14)
 - [x] Permitir partidas escritas por el Concierge (título, importe, notas) sin empresa ni cotización, mezclables con cotizaciones recibidas.
 - [ ] Dejar claro en el compositor que la empresa sólo se involucra cuando se le solicita cotización desde el servicio.
+
+## Itinerario tras aceptación + pago en efectivo (2026-09-14)
+- [x] La reservación creada desde la propuesta queda enlazada al viaje del cliente.
+- [x] Pago en efectivo: el viajero confirma y queda pagado; el concierge también puede registrarlo desde el expediente.
+- [x] Al pagar, el expediente pasa a cerrado ganado y se abre el itinerario confirmado del viajero.
+- [ ] Conectar pago real con proveedor cuando el Founder lo autorice.

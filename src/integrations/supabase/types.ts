@@ -7881,6 +7881,10 @@ export type Database = {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
       }
+      concierge_order_mark_paid_cash: {
+        Args: { _note?: string; _order_id: string }
+        Returns: Json
+      }
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json

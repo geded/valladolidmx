@@ -15,11 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   getConciergeOrder,
-  startConciergeOrderCheckout,
+  markConciergeOrderPaidCash,
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
-import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
   component: CheckoutPage,
@@ -38,18 +37,12 @@ function CheckoutPage() {
   const navigate = useNavigate();
 
   const fetchOrder = useServerFn(getConciergeOrder);
-  const startCheckout = useServerFn(startConciergeOrderCheckout);
+  const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
-  const fetchPaymentsStatus = useServerFn(getPaymentsReadyPublic);
 
   const orderQ = useQuery({
     queryKey: ["concierge-order", orderId],
     queryFn: () => fetchOrder({ data: { orderId } }),
-  });
-  const payQ = useQuery({
-    queryKey: ["payments", "public-status"],
-    queryFn: () => fetchPaymentsStatus(),
-    staleTime: 60_000,
   });
 
   const [busy, setBusy] = useState(false);
@@ -84,8 +77,6 @@ function CheckoutPage() {
   }
 
   const order: ConciergeOrderView = orderQ.data;
-  const demoMode = payQ.data?.demoMode ?? true;
-  const paymentsReady = payQ.data?.ready ?? false;
 
   const isFinal =
     order.status === "paid" ||
@@ -97,21 +88,15 @@ function CheckoutPage() {
   async function handleConfirm() {
     setBusy(true);
     try {
-      const result = await startCheckout({ data: { orderId } });
-      if (result.mode === "demo" || result.status === "paid") {
-        await orderQ.refetch();
-        toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
-        navigate({
-          to: "/cuenta/pagos/exito",
-          search: { order: orderId },
-        });
-        return;
-      }
-      if (result.redirectUrl) {
-        window.location.assign(result.redirectUrl);
-        return;
-      }
-      toast.info("Estamos preparando el cobro con el proveedor…");
+      // Modalidad vigente: pago en efectivo con el concierge.
+      await payCash({ data: { orderId, note: null } });
+      await orderQ.refetch();
+      toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
+      navigate({
+        to: "/cuenta/pagos/exito",
+        search: { order: orderId },
+      });
+      return;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Ocurrió un problema";
       toast.error(message);
@@ -219,22 +204,16 @@ function CheckoutPage() {
         <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
           <h3 className="font-serif text-lg">Confirmemos tu viaje</h3>
           <p className="mt-2 text-sm text-foreground/80">
-            Al continuar reservamos tu experiencia con los anfitriones seleccionados y activamos el
+            Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el
             acompañamiento de tu concierge para los siguientes pasos.
           </p>
-          {demoMode || !paymentsReady ? (
-            <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
-              Modo demostración: el viaje se confirma al instante sin cobro real. Ideal para
-              recorridos comerciales.
-            </p>
-          ) : null}
+          <p className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground/80">
+            Forma de pago: <strong>efectivo con tu concierge</strong>. Al confirmar queda registrado
+            el pago de tu viaje y se abre tu itinerario con el acompañamiento de Alux.
+          </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Button onClick={handleConfirm} disabled={busy} size="lg">
-              {busy
-                ? "Confirmando…"
-                : demoMode || !paymentsReady
-                  ? "Confirmar mi viaje (demo)"
-                  : "Confirmar mi viaje"}
+              {busy ? "Confirmando…" : "Confirmar mi viaje (pago en efectivo)"}
             </Button>
             <Button type="button" variant="ghost" onClick={handleCancel} disabled={busy}>
               Cancelar
