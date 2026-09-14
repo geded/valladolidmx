@@ -35,6 +35,8 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { ACTIVE_BRAND } from "@/config/brand";
+import { payloadOccursOnDate } from "@/lib/events/recurrence";
+import type { HomePremiumEvent } from "./home-premium-content";
 
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import { PremiumAluxBar } from "./shared/PremiumShowcase";
