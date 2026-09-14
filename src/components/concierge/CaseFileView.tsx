@@ -1415,19 +1415,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
           </HandoffBlock>
 
           <HandoffBlock title="Memoria territorial">
-            {payload.territorial_memory &&
-            readableEntries(payload.territorial_memory).length > 0 ? (
-              <dl className="grid gap-1 text-xs">
-                {readableEntries(payload.territorial_memory).map(([label, value]) => (
-                  <div key={label} className="grid grid-cols-[minmax(7rem,0.4fr)_1fr] gap-2">
-                    <dt className="text-muted-foreground">{label}</dt>
-                    <dd className="min-w-0 break-words text-foreground/90">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : (
-              <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>
-            )}
+            <TerritorialMemory memory={payload.territorial_memory ?? null} />
           </HandoffBlock>
         </div>
       )}
