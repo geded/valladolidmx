@@ -740,6 +740,7 @@ function ProposalCard({
   const rejectFn = useServerFn(rejectConciergeProposal);
   const createOrderFn = useServerFn(createOrderFromProposal);
   const payCashFn = useServerFn(markConciergeOrderPaidCash);
+  const notifyAdminFn = useServerFn(notifyAdminBookingPaid);
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<unknown>) {
