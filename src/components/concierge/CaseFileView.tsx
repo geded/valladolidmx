@@ -358,8 +358,11 @@ export function CaseFileView({
       {f.businesses.length > 0 && (
         <Section title="Empresas participantes">
           <ul className="flex flex-wrap gap-2 text-xs">
-            {f.businesses.map((b) => (
-              <li key={b.id} className="rounded-full border border-border bg-card px-3 py-1">
+            {f.businesses.map((b, index) => (
+              <li
+                key={`${b.id}-${index}`}
+                className="rounded-full border border-border bg-card px-3 py-1"
+              >
                 {b.display_name}
               </li>
             ))}
