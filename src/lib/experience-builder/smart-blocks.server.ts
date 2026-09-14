@@ -29,7 +29,13 @@ import { buildCanonicalEntityUrl } from "./canonical-entity-binding";
 import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
 import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 import { readPublishedRouteCards } from "@/lib/routes-editorial/route-public-reads.server";
-import { nextEventOccurrence, normalizeExceptionDates, normalizeScheduleTimes } from "@/lib/events/recurrence";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+  toRecurrencePayload,
+} from "@/lib/events/recurrence";
+import type { EventRecurrenceInput, EventRecurrencePayload } from "@/lib/events/recurrence";
 import {
   routeDifficultyLabel,
   routeDurationLabel,
@@ -182,7 +188,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
       const slug = str(row.slug);
       const name = str(row.title);
       if (!slug || !name) return null;
-      const next = nextEventOccurrence({
+      const recurrenceInput: EventRecurrenceInput = {
         starts_at: str(row.starts_at) ?? "",
         ends_at: str(row.ends_at),
         recurrence_frequency:
@@ -196,7 +202,8 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         schedule_times: normalizeScheduleTimes(row.schedule_times),
         exception_dates: normalizeExceptionDates(row.exception_dates),
         event_timezone: str(row.event_timezone) ?? "America/Merida",
-      });
+      };
+      const next = nextEventOccurrence(recurrenceInput);
       if (!next) return null;
       return {
         id: str(row.id),
@@ -208,6 +215,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         ends_at: row.recurrence_frequency ? null : str(row.ends_at),
         href: buildCanonicalEntityUrl({ entityType: "event", slug }),
         featured: false,
+        recurrence: { ...toRecurrencePayload(recurrenceInput) },
         _media: str(row.cover_media_id) ?? undefined,
       };
     },
@@ -509,7 +517,7 @@ export interface HomeRealContent {
   experiencias: HomeRealCard[];
   stays: HomeRealCard[];
   food: HomeRealCard[];
-  eventos: Array<HomeRealCard & { day: string; startsAt: string | null }>;
+  eventos: Array<HomeRealCard & { day: string; startsAt: string | null; recurrence: EventRecurrencePayload | null }>;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
 }
@@ -639,15 +647,20 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
     // búsqueda por fecha. Sin `starts_at` publicado, la tarjeta conserva el
     // orden editorial y no declara fecha (jamás se inventa una).
     const eventStartsByHref = new Map<string, string>();
+    const eventRecurrenceByHref = new Map<string, EventRecurrencePayload>();
     for (const item of eventRes.items) {
-      if (typeof item.href === "string" && typeof item.starts_at === "string") {
-        eventStartsByHref.set(item.href, item.starts_at);
+      if (typeof item.href !== "string") continue;
+      if (typeof item.starts_at === "string") eventStartsByHref.set(item.href, item.starts_at);
+      const recurrence = item.recurrence;
+      if (recurrence && typeof recurrence === "object" && !Array.isArray(recurrence)) {
+        eventRecurrenceByHref.set(item.href, recurrence as unknown as EventRecurrencePayload);
       }
     }
     const eventos = cardsFrom(eventRes, () => "Evento").map((card, index) => ({
       ...card,
       day: String(index + 1).padStart(2, "0"),
       startsAt: eventStartsByHref.get(card.href) ?? null,
+      recurrence: eventRecurrenceByHref.get(card.href) ?? null,
     }));
 
     const value: HomeRealContent = {

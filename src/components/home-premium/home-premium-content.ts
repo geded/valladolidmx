@@ -1,3 +1,4 @@
+import type { EventRecurrencePayload } from "@/lib/events/recurrence";
 /**
  * G8-D · Home Premium G4 — contenido canónico compartido.
  *
@@ -104,6 +105,7 @@ export type HomePremiumEvent = {
   href: string | null;
   /** Fecha acreditada del evento (ISO). Null cuando el CMS no la declara. */
   startsAt?: string | null;
+  recurrence?: EventRecurrencePayload | null;
   /** Portada del evento en miniatura. Null cuando el CMS no publica medio. */
   media?: { url: string; alt: string } | null;
 };

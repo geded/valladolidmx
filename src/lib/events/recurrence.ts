@@ -244,3 +244,66 @@ export function upcomingEventOccurrences(
   }
   return out;
 }
+
+/**
+ * ¿El evento ocurre en el día calendario indicado (zona del destino)?
+ * Reutiliza la misma autoridad de recurrencia (intervalos, días de la
+ * semana, fecha final y fechas suspendidas) que el resto del sistema.
+ * A diferencia de `nextEventOccurrence`, no descarta el día en curso por
+ * la hora: un evento de hoy sigue siendo un evento de hoy.
+ */
+export function eventOccursOnDate(input: EventRecurrenceInput, dateKey: string): boolean {
+  if (!DATE_RE.test(dateKey)) return false;
+  const base = new Date(input.starts_at);
+  if (Number.isNaN(base.getTime())) return false;
+  const startDate = input.starts_at.slice(0, 10);
+
+  if (!input.recurrence_frequency) {
+    const endKey = input.ends_at ? input.ends_at.slice(0, 10) : startDate;
+    return dateKey >= startDate && dateKey <= (endKey >= startDate ? endKey : startDate);
+  }
+
+  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  if (until && dateKey > until) return false;
+  const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
+  if (excluded.has(dateKey)) return false;
+  return isOccurrenceDate(input, dateKey, startDate);
+}
+
+/** Datos mínimos de recurrencia que viajan a las superficies públicas. */
+export interface EventRecurrencePayload {
+  startsAt: string;
+  frequency: EventRecurrenceFrequency | null;
+  interval: number;
+  weekdays: number[];
+  until: string | null;
+  endsAt: string | null;
+  exceptions: string[];
+}
+
+export function toRecurrencePayload(input: EventRecurrenceInput): EventRecurrencePayload {
+  return {
+    startsAt: input.starts_at,
+    frequency: input.recurrence_frequency ?? null,
+    interval: Math.max(1, Math.floor(input.recurrence_interval ?? 1)),
+    weekdays: input.recurrence_weekdays ?? [],
+    until: input.recurrence_until ?? null,
+    endsAt: input.ends_at ?? null,
+    exceptions: normalizeExceptionDates(input.exception_dates).map((item) => item.date),
+  };
+}
+
+export function payloadOccursOnDate(payload: EventRecurrencePayload, dateKey: string): boolean {
+  return eventOccursOnDate(
+    {
+      starts_at: payload.startsAt,
+      ends_at: payload.endsAt,
+      recurrence_frequency: payload.frequency,
+      recurrence_interval: payload.interval,
+      recurrence_weekdays: payload.weekdays,
+      recurrence_until: payload.until,
+      exception_dates: payload.exceptions.map((date) => ({ date })),
+    },
+    dateKey,
+  );
+}
