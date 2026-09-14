@@ -7043,6 +7043,8 @@ export type Database = {
           trip_context: Json
           updated_at: string
           user_id: string
+          whatsapp_contact_consent: boolean
+          whatsapp_contact_consented_at: string | null
         }
         Insert: {
           accessibility?: string[]
@@ -7072,6 +7074,8 @@ export type Database = {
           trip_context?: Json
           updated_at?: string
           user_id: string
+          whatsapp_contact_consent?: boolean
+          whatsapp_contact_consented_at?: string | null
         }
         Update: {
           accessibility?: string[]
@@ -7101,6 +7105,8 @@ export type Database = {
           trip_context?: Json
           updated_at?: string
           user_id?: string
+          whatsapp_contact_consent?: boolean
+          whatsapp_contact_consented_at?: string | null
         }
         Relationships: []
       }
