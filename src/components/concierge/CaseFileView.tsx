@@ -1848,6 +1848,18 @@ function TerritorialMemory({ memory }: { memory: Record<string, unknown> | null 
           </div>
         </div>
       ) : null}
+      {visitedBusinesses.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Fichas que abrió</span>
+          <div className="flex flex-wrap gap-1">
+            {visitedBusinesses.map((b) => (
+              <span key={b} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {b}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
       {lastDestination ? (
         <p className="text-foreground/90">
           <span className="text-muted-foreground">Último destino consultado: </span>
