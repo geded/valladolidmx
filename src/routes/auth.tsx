@@ -167,8 +167,15 @@ function AuthRoute() {
     forgot: t("auth.forgot"),
   };
 
+  // Home no forma parte del recorrido territorial, pero sí es un origen válido:
+  // sin este caso el enlace mostraba el texto genérico "la página anterior".
+  const normalizedReturn = returnTarget?.split("?")[0].replace(/\/+$/, "") || "/";
   const returnLabel =
-    (returnTarget ? describeJourneyStep(returnTarget)?.label : null) ?? "la página anterior";
+    (returnTarget
+      ? normalizedReturn === "/"
+        ? "Inicio"
+        : (describeJourneyStep(returnTarget)?.label ?? null)
+      : null) ?? "la página anterior";
   /*
    * Las migas reflejan el recorrido REAL del explorador. Antes se anteponía
    * siempre "Oriente Maya" (+ el último destino guardado en sesión), de modo
