@@ -861,7 +861,9 @@ function ProposalCard({
                       },
                     });
                   } catch {
-                    toast.error("El viaje quedó confirmado, pero el correo de aviso no pudo salir.");
+                    toast.error(
+                      "El viaje quedó confirmado, pero el correo de aviso no pudo salir.",
+                    );
                   }
                 }
                 await router.invalidate();

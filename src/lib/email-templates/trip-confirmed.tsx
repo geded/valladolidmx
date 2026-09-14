@@ -24,7 +24,9 @@ const Email = ({
   <VisibilityShell
     preview="Tu viaje quedó confirmado"
     eyebrow="Viaje confirmado"
-    heading={travelerName ? `${travelerName}, tu viaje quedó confirmado` : "Tu viaje quedó confirmado"}
+    heading={
+      travelerName ? `${travelerName}, tu viaje quedó confirmado` : "Tu viaje quedó confirmado"
+    }
     ctaLabel="Ver mi itinerario"
     ctaUrl={planUrl}
     footerNote={`Folio de confirmación: ${folio}`}
