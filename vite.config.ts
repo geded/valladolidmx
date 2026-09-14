@@ -87,7 +87,16 @@ export default defineConfig({
                    sólo cuando la red realmente falla. */
                 networkTimeoutSeconds: 20,
                 expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
-              },
+                // Único punto donde puede aparecer la pantalla sin conexión:
+                // cuando red y caché fallan de verdad.
+                plugins: [
+                  {
+                    handlerDidError: async () =>
+                      (await caches.match("/offline.html", { ignoreSearch: true })) ??
+                      Response.error(),
+                  },
+                ],
+
             },
             // Los archivos construidos llevan hash en el nombre y no contienen
             // datos ni sesiones. Guardarlos permite reabrir offline una página
