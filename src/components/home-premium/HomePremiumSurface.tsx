@@ -630,14 +630,15 @@ function RoutesSection({
                     route.title
                   )}
                 </h3>
-                <p className="min-w-0 truncate text-[11px] text-muted-foreground sm:text-xs">
+                <p className="min-w-0 text-[11px] text-muted-foreground sm:text-xs">
                   {route.duration} · {route.stops} paradas · {route.vibe}
                 </p>
                 {route.description ? (
-                  <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                  <p className="text-xs leading-snug text-muted-foreground">
                     {route.description}
                   </p>
                 ) : null}
+
                 <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
                   <button
                     type="button"
@@ -647,38 +648,20 @@ function RoutesSection({
                     <MapPin className="size-3.5 shrink-0" aria-hidden />
                     <span className="truncate">{content.rutas.selectLabel}</span>
                   </button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={active ? "default" : "secondary"}
-                    aria-label={`Personalizar con Alux: ${route.title}`}
-                    title="Personalizar con Alux"
-                    onClick={() => {
-                      onSelectRoute(route.id);
-                      onAdd();
-                      openAluxFloating({
-                        reason: "manual",
-                        selection: {
-                          entityRef: `route:${route.id}`,
-                          title: route.title,
-                          summary: buildAluxRouteSummary(route),
-                          familySlug: "rutas",
-                          facts: buildRouteFacts(route),
-                          quickActions: ROUTE_QUICK_ACTIONS,
-                          mapAnchor: "mapa",
-                          ...(route.href ? { href: route.href } : {}),
-                        },
-                        hint: buildAluxStageAwareHint(
-                          `Ayúdame a personalizar esta ruta: ${route.title}. ${route.description}`,
-                          `${route.duration} · ${route.stops} paradas · ${route.vibe}`,
-                        ),
-                      });
-                    }}
-                    className="h-9 shrink-0 gap-1.5 rounded-pill px-3 text-[11px] sm:text-xs"
-                  >
-                    <Sparkles className="size-3.5" aria-hidden />
-                    <span>Alux</span>
-                  </Button>
+                  {route.href ? (
+                    <Button
+                      asChild
+                      size="sm"
+                      variant={active ? "default" : "secondary"}
+                      className="h-9 shrink-0 gap-1.5 rounded-pill px-3 text-[11px] sm:text-xs"
+                    >
+                      <Link to={route.href} aria-label={`Ver la ruta ${route.title}`}>
+                        <RouteIcon className="size-3.5" aria-hidden />
+                        <span>Ver ruta</span>
+                      </Link>
+                    </Button>
+                  ) : null}
+
                 </div>
               </div>
             </article>
