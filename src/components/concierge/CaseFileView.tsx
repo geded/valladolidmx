@@ -135,6 +135,185 @@ type CaseFile = {
   } | null;
 };
 
+const CASE_STATUS_LABELS: Record<string, string> = {
+  new: "Nuevo",
+  triaged: "En revisión",
+  in_progress: "En atención",
+  waiting_customer: "Esperando respuesta del viajero",
+  waiting_business: "Esperando respuesta de una empresa",
+  on_hold: "En pausa",
+  resolved: "Resuelto",
+  closed_won: "Cerrado con viaje confirmado",
+  closed_lost: "Cerrado sin confirmación",
+  closed: "Cerrado",
+  archived: "Archivado",
+  cancelled: "Cancelado",
+  lost: "Cerrado sin confirmación",
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  low: "Baja",
+  normal: "Normal",
+  high: "Alta",
+  urgent: "Urgente",
+};
+
+const PRIORITY_SOURCE_LABELS: Record<string, string> = {
+  manual: "Definida por el concierge",
+  sla: "Calculada por tiempo de respuesta",
+  trip_date: "Calculada por cercanía del viaje",
+  payment: "Relacionada con una confirmación",
+  system: "Asignada automáticamente",
+  alux: "Sugerida por Alux",
+  other: "Otro criterio",
+};
+
+const SLA_STATUS_LABELS: Record<string, string> = {
+  on_time: "A tiempo",
+  due_soon: "Por vencer",
+  overdue: "Vencido",
+};
+
+const REQUEST_STATUS_LABELS: Record<string, string> = {
+  open: "Pendiente de revisión",
+  quoting: "Solicitando cotización",
+  quoted: "Cotización recibida",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+  cancelled: "Cancelada",
+};
+
+const QUOTE_STATUS_LABELS: Record<string, string> = {
+  requested: "Solicitada",
+  draft: "En preparación",
+  submitted: "Recibida",
+  withdrawn: "Retirada",
+  expired: "Vencida",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+};
+
+const PROPOSAL_STATUS_LABELS: Record<string, string> = {
+  draft: "En preparación",
+  sent: "Enviada al viajero",
+  viewed: "Vista por el viajero",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+  withdrawn: "Retirada",
+  expired: "Vencida",
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+  travel_plan: "Mi Viaje",
+  travel_plan_item: "Experiencia guardada en Mi Viaje",
+  marketplace_product: "Ficha de una experiencia",
+  manual: "Solicitud registrada por el Concierge",
+};
+
+const REQUEST_KIND_LABELS: Record<string, string> = {
+  reservable: "Requiere cotización o disponibilidad",
+  non_reservable: "Interés o actividad por considerar",
+};
+
+const ITEM_KIND_LABELS: Record<string, string> = {
+  business: "Empresa",
+  hotel: "Hotel",
+  restaurant: "Restaurante",
+  vacation_rental: "Casa de vacaciones",
+  experience: "Experiencia",
+  product: "Experiencia",
+  event: "Evento",
+  place: "Lugar",
+  destination: "Destino",
+  route: "Ruta",
+};
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  "Concierge.Case.Created": "Expediente creado",
+  "Concierge.Case.Assigned": "Expediente asignado",
+  "Concierge.Case.Reassigned": "Expediente reasignado",
+  "Concierge.Case.Released": "Expediente liberado",
+  "Concierge.Case.StatusChanged": "Estado del expediente actualizado",
+  "Concierge.Case.PriorityChanged": "Prioridad actualizada",
+  "Concierge.Case.TargetResponseSet": "Fecha objetivo de respuesta actualizada",
+  "Concierge.Request.Created": "Solicitud agregada al expediente",
+  "Concierge.Quote.Requested": "Cotización solicitada",
+  "Concierge.Quote.Submitted": "Cotización recibida",
+  "Concierge.Proposal.Created": "Propuesta preparada",
+  "Concierge.Proposal.Sent": "Propuesta enviada al viajero",
+  "Concierge.Proposal.Viewed": "Propuesta vista por el viajero",
+  "Concierge.Proposal.Accepted": "Propuesta aceptada",
+};
+
+const FIELD_LABELS: Record<string, string> = {
+  destination: "Destino",
+  destination_id: "Destino",
+  destination_name: "Destino",
+  destinations: "Destinos",
+  last_destination: "Último destino consultado",
+  recent_destinations: "Destinos consultados recientemente",
+  interests: "Intereses",
+  categories: "Intereses",
+  visited_places: "Lugares visitados",
+  saved_places: "Lugares guardados",
+  routes: "Rutas de interés",
+  notes: "Notas",
+  count: "Registros",
+  updated_at: "Última actualización",
+  created_at: "Fecha de registro",
+};
+
+const VALUE_LABELS: Record<string, string> = {
+  es: "Español",
+  en: "Inglés",
+  fr: "Francés",
+  de: "Alemán",
+  it: "Italiano",
+  pt: "Portugués",
+  low: "Bajo",
+  medium: "Medio",
+  high: "Alto",
+  budget: "Económico",
+  comfort: "Confort",
+  premium: "Premium",
+};
+
+function labelFor(value: string | null | undefined, labels: Record<string, string>): string {
+  if (!value) return "Sin datos";
+  return labels[value] ?? humanizeKey(value);
+}
+
+function humanizeKey(value: string): string {
+  const spaced = value
+    .replaceAll("_", " ")
+    .replaceAll(".", " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .trim();
+  return spaced ? spaced.charAt(0).toUpperCase() + spaced.slice(1) : "Sin datos";
+}
+
+function readableValue(value: unknown): string {
+  if (value == null || value === "") return "Sin información";
+  if (typeof value === "boolean") return value ? "Sí" : "No";
+  if (typeof value === "number") return value.toLocaleString("es-MX");
+  if (typeof value === "string") {
+    const mapped = VALUE_LABELS[value.toLowerCase()];
+    if (mapped) return mapped;
+    const maybeDate = /^\d{4}-\d{2}-\d{2}T/.test(value) ? new Date(value) : null;
+    return maybeDate && !Number.isNaN(maybeDate.getTime())
+      ? maybeDate.toLocaleString("es-MX")
+      : humanizeKey(value);
+  }
+  if (Array.isArray(value)) return value.map(readableValue).join(", ");
+  return Object.values(value as Record<string, unknown>).map(readableValue).join(" · ");
+}
+
+function readableEntries(value: Record<string, unknown>): Array<[string, string]> {
+  return Object.entries(value)
+    .filter(([, entry]) => entry !== undefined && entry !== null && entry !== "")
+    .map(([key, entry]) => [FIELD_LABELS[key] ?? humanizeKey(key), readableValue(entry)]);
+}
+
 export function CaseFileView({
   data,
   hideInternal = false,
@@ -162,11 +341,11 @@ export function CaseFileView({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-medium">{r.title}</span>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {r.status}
+                    {labelFor(r.status, REQUEST_STATUS_LABELS)}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Tipo: {r.kind} · Origen: {r.source_type}
+                  {labelFor(r.kind, REQUEST_KIND_LABELS)} · Origen: {labelFor(r.source_type, SOURCE_LABELS)}
                 </p>
                 {r.notes ? <p className="mt-1 text-xs text-foreground/80">{r.notes}</p> : null}
               </li>
@@ -197,7 +376,7 @@ export function CaseFileView({
                     {q.business_name ?? "Empresa"} · {q.request_title}
                   </span>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {q.status}
+                    {labelFor(q.status, QUOTE_STATUS_LABELS)}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -241,7 +420,7 @@ export function CaseFileView({
             {f.timeline.map((t) => (
               <li key={t.id} className="rounded-md border border-border bg-card p-3 text-xs">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium">{t.event_type}</span>
+                  <span className="font-medium">{labelFor(t.event_type, EVENT_TYPE_LABELS)}</span>
                   <span className="text-muted-foreground">
                     {new Date(t.occurred_at).toLocaleString()}
                   </span>
@@ -262,12 +441,12 @@ function Header({ f }: { f: CaseFile }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-mono text-xs text-muted-foreground">{f.case.id.slice(0, 8)}</span>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-          {f.case.status}
+          {labelFor(f.case.status, CASE_STATUS_LABELS)}
         </span>
       </div>
       <h2 className="mt-2 text-lg font-semibold">{f.case.summary ?? "Sin resumen"}</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Origen: {f.case.source} · Prioridad: {f.case.priority} · Creado{" "}
+        Origen: {labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: {labelFor(f.case.priority, PRIORITY_LABELS)} · Creado{" "}
         {new Date(f.case.created_at).toLocaleString()}
       </p>
       {f.traveler.display_name && (
@@ -390,7 +569,7 @@ function ProposalCard({
           Propuesta v{p.version} · {money(p.total_amount_cents, p.currency)}
         </span>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-          {p.status}
+          {labelFor(p.status, PROPOSAL_STATUS_LABELS)}
         </span>
       </div>
       {p.summary ? <p className="mt-1 text-xs text-foreground/80">{p.summary}</p> : null}
@@ -517,7 +696,7 @@ function ProposalCompare({
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${statusTone(p.status)}`}
               >
-                {p.status}
+                {labelFor(p.status, PROPOSAL_STATUS_LABELS)}
               </span>
             </header>
             <div className="text-base font-semibold text-foreground">
@@ -720,11 +899,13 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className={`rounded-full px-2 py-0.5 font-medium ${slaBadge}`}>
-            SLA · {sla?.sla_status ?? "n/a"}
+            Tiempo de respuesta · {labelFor(sla?.sla_status, SLA_STATUS_LABELS)}
           </span>
           <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
-            Prioridad: <strong className="text-foreground">{f.case.priority}</strong>
-            {f.case.priority_source ? ` · ${f.case.priority_source}` : ""}
+            Prioridad: <strong className="text-foreground">{labelFor(f.case.priority, PRIORITY_LABELS)}</strong>
+            {f.case.priority_source
+              ? ` · ${labelFor(f.case.priority_source, PRIORITY_SOURCE_LABELS)}`
+              : ""}
           </span>
           {sla?.target_response_at && (
             <span className="text-muted-foreground">
@@ -744,7 +925,7 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
           )}
           {assignment && !isAssignedToMe && (
             <span className="text-xs text-muted-foreground">
-              Responsable: {assignment.concierge_user_id.slice(0, 8)}
+              Asignado a otro concierge
             </span>
           )}
         </div>
@@ -759,7 +940,7 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
             onClick={() => changePriority(p)}
             className="rounded-md border border-border bg-background px-2 py-1 text-[11px] font-medium hover:bg-muted disabled:opacity-50"
           >
-            {p}
+            {PRIORITY_LABELS[p]}
           </button>
         ))}
       </div>
@@ -796,7 +977,6 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
   const fetchFn = useServerFn(getConciergeCaseHandoffContext);
   const [payload, setPayload] = useState<HandoffPayload | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "empty" | "error">("loading");
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -813,7 +993,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
       })
       .catch((e) => {
         if (!alive) return;
-        setError(e instanceof Error ? e.message : String(e));
+        console.error("No se pudo cargar el contexto del viajero", e);
         setState("error");
       });
     return () => {
@@ -827,7 +1007,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
         <div>
           <h3 className="text-sm font-semibold">Contexto del viajero (Alux)</h3>
           <p className="text-[11px] text-muted-foreground">
-            Fotografía inmutable capturada al promover el Travel Plan.
+            Información disponible cuando el viajero envió su selección al Concierge.
           </p>
         </div>
         {payload?.generated_at && (
@@ -848,7 +1028,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
       )}
       {state === "error" && (
         <p className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
-          {error ?? "No se pudo cargar el contexto."}
+          No pudimos cargar la información del viajero. Intenta de nuevo en un momento.
         </p>
       )}
 
@@ -858,7 +1038,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
             {payload.profile ? (
               <ProfileSummary profile={payload.profile} />
             ) : (
-              <Empty>Sin perfil M2 disponible.</Empty>
+              <Empty>El viajero todavía no ha compartido preferencias personales.</Empty>
             )}
           </HandoffBlock>
 
@@ -877,28 +1057,35 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
             )}
           </HandoffBlock>
 
-          <HandoffBlock title={`Plan (${payload.plan_snapshot?.item_count ?? 0} ítems)`}>
+          <HandoffBlock title={`Experiencias guardadas (${payload.plan_snapshot?.item_count ?? 0})`}>
             {payload.plan_snapshot?.items && payload.plan_snapshot.items.length > 0 ? (
               <ul className="grid gap-1 text-xs">
                 {payload.plan_snapshot.items.slice(0, 8).map((it, i) => (
                   <li key={i} className="truncate">
-                    · <span className="text-muted-foreground">[{it.kind ?? "?"}]</span>{" "}
-                    {it.title ?? it.slug ?? "—"}
+                    <span className="text-muted-foreground">
+                      {labelFor(it.kind, ITEM_KIND_LABELS)}:
+                    </span>{" "}
+                    {it.title ?? it.subtitle ?? it.slug ?? "Sin nombre"}
                   </li>
                 ))}
               </ul>
             ) : (
-              <Empty>Plan vacío al momento del handoff.</Empty>
+              <Empty>No había experiencias guardadas cuando se envió el viaje.</Empty>
             )}
           </HandoffBlock>
 
           <HandoffBlock title="Memoria territorial">
-            {payload.territorial_memory ? (
-              <pre className="whitespace-pre-wrap break-words text-[11px] text-muted-foreground">
-                {JSON.stringify(payload.territorial_memory, null, 2).slice(0, 600)}
-              </pre>
+            {payload.territorial_memory && readableEntries(payload.territorial_memory).length > 0 ? (
+              <dl className="grid gap-1 text-xs">
+                {readableEntries(payload.territorial_memory).map(([label, value]) => (
+                  <div key={label} className="grid grid-cols-[minmax(7rem,0.4fr)_1fr] gap-2">
+                    <dt className="text-muted-foreground">{label}</dt>
+                    <dd className="min-w-0 break-words text-foreground/90">{value}</dd>
+                  </div>
+                ))}
+              </dl>
             ) : (
-              <Empty>Sin historial territorial registrado.</Empty>
+              <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>
             )}
           </HandoffBlock>
         </div>
@@ -929,14 +1116,14 @@ function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
     ["Intereses", profile.interests],
   ];
   const rows = all.filter(([, v]) => v !== undefined && v !== null && v !== "");
-  if (rows.length === 0) return <Empty>Perfil sin campos declarados.</Empty>;
+  if (rows.length === 0) return <Empty>El viajero todavía no ha indicado sus preferencias.</Empty>;
   return (
     <dl className="grid gap-1 text-xs">
       {rows.map(([k, v]) => (
         <div key={k} className="flex gap-2">
           <dt className="min-w-[80px] text-muted-foreground">{k}</dt>
           <dd className="flex-1 truncate text-foreground/90">
-            {Array.isArray(v) ? (v as unknown[]).join(", ") : String(v)}
+             {readableValue(v)}
           </dd>
         </div>
       ))}
@@ -994,7 +1181,8 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
       }
       setResults((s) => ({ ...s, [cap]: res }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.error("No se pudo generar la sugerencia de Alux", e);
+      setError("Alux no pudo preparar esta lectura. Intenta de nuevo en un momento.");
     } finally {
       setBusy(null);
     }
@@ -1006,11 +1194,11 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
         <div>
           <h3 className="text-sm font-semibold">Asistente Alux</h3>
           <p className="text-[11px] text-muted-foreground">
-            Copiloto operativo en modo consultivo. Toda acción la ejecutas tú.
+            Alux interpreta la información disponible; tú revisas y decides cada acción.
           </p>
         </div>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-          read-only
+          Solo sugerencias
         </span>
       </header>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -1043,13 +1231,9 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
                 <span className="font-semibold uppercase tracking-wide text-foreground">
                   {ALUX_LABELS[cap]}
                 </span>
-                <span>
-                  {r.model} · {r.latency_ms} ms
-                </span>
+                <span title={`${r.model} · ${r.latency_ms} ms`}>Generado por Alux</span>
               </header>
-              <pre className="whitespace-pre-wrap break-words text-xs text-foreground/90">
-                {r.text}
-              </pre>
+              <AluxReadableText text={r.text} />
               <footer className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] text-muted-foreground">
                 <span>{r.disclaimer}</span>
                 <button
@@ -1065,5 +1249,29 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
         })}
       </div>
     </section>
+  );
+}
+
+function AluxReadableText({ text }: { text: string }) {
+  const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+  return (
+    <div className="grid gap-1.5 text-xs leading-relaxed text-foreground/90">
+      {lines.map((line, index) => {
+        const cleaned = line
+          .replace(/^#{1,6}\s*/, "")
+          .replace(/\*\*(.*?)\*\*/g, "$1")
+          .replace(/__(.*?)__/g, "$1")
+          .replace(/`([^`]+)`/g, "$1");
+        const isBullet = /^[-*•]\s+/.test(cleaned);
+        const isNumbered = /^\d+[.)]\s+/.test(cleaned);
+        const content = cleaned.replace(/^[-*•]\s+/, "").replace(/^\d+[.)]\s+/, "");
+        return (
+          <p key={`${index}-${line.slice(0, 12)}`} className={isBullet || isNumbered ? "pl-4" : undefined}>
+            {isBullet ? "• " : isNumbered ? `${cleaned.match(/^\d+/)?.[0]}. ` : ""}
+            {content}
+          </p>
+        );
+      })}
+    </div>
   );
 }

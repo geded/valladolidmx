@@ -34,7 +34,7 @@ function StaffCasePage() {
       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         Concierge Workspace · Expediente
       </p>
-      <h1 className="mt-1 mb-6 text-2xl font-semibold">Customer Case File</h1>
+      <h1 className="mt-1 mb-6 text-2xl font-semibold">Detalle del expediente</h1>
       <CaseFileView data={q.data} />
     </section>
   );
