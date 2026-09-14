@@ -848,6 +848,24 @@ function ProposalCard({
               try {
                 const { orderId } = await createOrderFn({ data: { proposalId: p.proposal_id } });
                 await payCashFn({ data: { orderId, note: "Pago en efectivo con el concierge" } });
+                const travelerEmail = traveler?.email?.trim();
+                if (travelerEmail) {
+                  try {
+                    await sendTransactionalEmail({
+                      templateName: "trip-confirmed",
+                      recipientEmail: travelerEmail,
+                      idempotencyKey: `trip-confirmed-${orderId}`,
+                      templateData: {
+                        travelerName: traveler?.display_name ?? undefined,
+                        totalLabel: money(p.total_amount_cents, p.currency),
+                      },
+                    });
+                  } catch {
+                    toast.error(
+                      "El viaje quedó confirmado, pero el correo de aviso no pudo salir.",
+                    );
+                  }
+                }
                 await router.invalidate();
                 toast.success("Pago en efectivo registrado. El viaje quedó confirmado.");
               } catch (err) {

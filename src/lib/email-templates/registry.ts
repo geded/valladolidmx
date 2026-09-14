@@ -11,6 +11,7 @@ import { template as tripT14Template } from "./trip-t14";
 import { template as tripT3Template } from "./trip-t3";
 import { template as tripWelcomeTemplate } from "./trip-welcome";
 import { template as tripPostTemplate } from "./trip-post";
+import { template as tripConfirmedTemplate } from "./trip-confirmed";
 import { template as conciergeProposalSentTemplate } from "./concierge-proposal-sent";
 
 export interface TemplateEntry {
@@ -43,5 +44,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "trip-t3": tripT3Template,
   "trip-welcome": tripWelcomeTemplate,
   "trip-post": tripPostTemplate,
+  "trip-confirmed": tripConfirmedTemplate,
   "concierge-proposal-sent": conciergeProposalSentTemplate,
 };

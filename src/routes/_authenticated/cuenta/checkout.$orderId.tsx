@@ -13,6 +13,8 @@ import { useState } from "react";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   getConciergeOrder,
   markConciergeOrderPaidCash,
@@ -85,11 +87,37 @@ function CheckoutPage() {
     order.status === "expired" ||
     order.status === "refunded";
 
+  async function notifyConfirmed(current: ConciergeOrderView) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const email = user?.email?.trim();
+      if (!email) return;
+      await sendTransactionalEmail({
+        templateName: "trip-confirmed",
+        recipientEmail: email,
+        idempotencyKey: `trip-confirmed-${orderId}`,
+        templateData: {
+          travelerName:
+            (user?.user_metadata?.["full_name"] as string | undefined)?.split(" ")[0] ?? undefined,
+          folio: current.folio,
+          totalLabel: money(current.total_amount, current.currency),
+          destinationName: current.destination_name ?? undefined,
+          itinerary: current.items.map((it) => it.title).slice(0, 12),
+        },
+      });
+    } catch {
+      // El viaje ya quedó confirmado; el correo puede reintentarse después.
+    }
+  }
+
   async function handleConfirm() {
     setBusy(true);
     try {
       // Modalidad vigente: pago en efectivo con el concierge.
       await payCash({ data: { orderId, note: null } });
+      await notifyConfirmed(order);
       await orderQ.refetch();
       toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
       navigate({
