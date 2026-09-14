@@ -24,7 +24,7 @@ import {
 import { ACTIVE_BRAND } from "@/config/brand";
 import { brandPaletteStyle } from "./brand-theme";
 import { aluxPaletteStyle } from "./brand-theme";
-import { fillAluxCopy, type AluxPalette, type AluxVoice } from "./alux-brand";
+import { DEFAULT_ALUX_COPY, fillAluxCopy, type AluxPalette, type AluxVoice } from "./alux-brand";
 import { useTranslation } from "@/i18n/context";
 
 export const BRAND_SETTINGS_QUERY_KEY = ["brand", "identity"] as const;
@@ -58,7 +58,8 @@ export function BrandProvider({
     const root = document.documentElement;
     const style = brandPaletteStyle(brand.palette) as Record<string, string>;
     const aluxStyle = aluxPaletteStyle(brand.aluxPalette) as Record<string, string>;
-    for (const [property, value] of Object.entries({ ...style, ...aluxStyle })) root.style.setProperty(property, value);
+    for (const [property, value] of Object.entries({ ...style, ...aluxStyle }))
+      root.style.setProperty(property, value);
   }, [brand.palette, brand.aluxPalette]);
 
   return <BrandContext.Provider value={brand}>{children}</BrandContext.Provider>;
@@ -74,7 +75,10 @@ export function useAluxBrand(): {
   name: string;
   palette: AluxPalette;
   voice: AluxVoice;
-  copy: (key: keyof AluxVoice, values?: Record<string, string | number | null | undefined>) => string;
+  copy: (
+    key: keyof AluxVoice,
+    values?: Record<string, string | number | null | undefined>,
+  ) => string;
 } {
   const brand = useBrand();
   const { locale } = useTranslation();
@@ -84,7 +88,8 @@ export function useAluxBrand(): {
     name: brand.conciergeName,
     palette: brand.aluxPalette,
     voice,
-    copy: (key, extra = {}) => fillAluxCopy(voice[key], { ...values, ...extra }),
+    copy: (key, extra = {}) =>
+      fillAluxCopy(voice[key] ?? DEFAULT_ALUX_COPY.es[key], { ...values, ...extra }),
   };
 }
 
