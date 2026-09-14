@@ -127,7 +127,11 @@ export const template = {
     paidAtLabel: "14 sep 2026, 00:12",
     items: [
       { title: "Tour a Ek Balam", detail: "1 × servicio", amountLabel: "$2,600.00 MXN" },
-      { title: "Cena en el centro histórico", detail: "2 × personas", amountLabel: "$1,500.00 MXN" },
+      {
+        title: "Cena en el centro histórico",
+        detail: "2 × personas",
+        amountLabel: "$1,500.00 MXN",
+      },
     ],
   },
 } satisfies TemplateEntry;

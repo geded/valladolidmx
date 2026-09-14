@@ -19,9 +19,7 @@ const Input = z.object({ orderId: z.string().uuid() });
 const ADMIN_RECIPIENTS_KEY = "notifications.admin_booking_emails";
 
 function money(cents: number | null | undefined, currency = "MXN") {
-  return new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(
-    (cents ?? 0) / 100,
-  );
+  return new Intl.NumberFormat("es-MX", { style: "currency", currency }).format((cents ?? 0) / 100);
 }
 
 function dateLabel(value?: string | null) {
