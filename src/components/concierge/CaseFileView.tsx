@@ -1019,16 +1019,16 @@ function ProposalComposer({
       </p>
       <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
         Puedes incluir dos tipos de partidas: las cotizaciones que respondieron las empresas y
-        partidas escritas por ti con precios que ya tienes acordados con el proveedor. Sólo necesitas
-        pedir cotización a una empresa cuando el viajero solicite algo especial.
+        partidas escritas por ti con precios que ya tienes acordados con el proveedor. Sólo
+        necesitas pedir cotización a una empresa cuando el viajero solicite algo especial.
       </p>
 
       <p className="mb-1 font-medium text-foreground">Cotizaciones recibidas de empresas</p>
       {submittable.length === 0 ? (
         <p className="rounded-md border border-border/70 bg-background/70 p-2 leading-relaxed text-muted-foreground">
-          Todavía no hay cotizaciones recibidas. Si necesitas el precio de una empresa, solicítala en
-          el apartado &quot;Qué solicita el viajero&quot;. Si ya tienes el precio acordado, agrega la
-          partida tú mismo aquí abajo.
+          Todavía no hay cotizaciones recibidas. Si necesitas el precio de una empresa, solicítala
+          en el apartado &quot;Qué solicita el viajero&quot;. Si ya tienes el precio acordado,
+          agrega la partida tú mismo aquí abajo.
         </p>
       ) : (
         <ul className="grid gap-1">
@@ -1151,7 +1151,11 @@ function ProposalComposer({
             con su concepto y precio.
           </p>
         ) : null}
-        <ActionButton label="Crear borrador" disabled={busy || totalLines === 0} onClick={onCreate} />
+        <ActionButton
+          label="Crear borrador"
+          disabled={busy || totalLines === 0}
+          onClick={onCreate}
+        />
       </div>
     </div>
   );
