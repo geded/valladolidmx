@@ -35,4 +35,19 @@ describe("Expediente Concierge en lenguaje claro", () => {
     expect(route).toContain(">Detalle del expediente</h1>");
     expect(route).not.toContain(">Customer Case File</h1>");
   });
+
+  test("identifica el expediente y presenta el contacto sólo en la vista interna", () => {
+    expect(source).toContain("Expediente {f.case.id.slice(0, 8).toUpperCase()}");
+    expect(source).toContain("{internal && <TravelerContactSection traveler={f.traveler} />}");
+    expect(source).toContain('title="Cliente y contacto"');
+    expect(source).toContain("Autorizado por el viajero");
+    expect(source).toContain("Sin autorización de contacto");
+  });
+
+  test("mantiene separadas las cotizaciones empresariales y la propuesta final", () => {
+    expect(source).toContain('"Propuesta económica del Concierge"');
+    expect(source).toContain("Las empresas sólo cotizan sus servicios.");
+    expect(source).toContain("Preparar propuesta final para el viajero");
+    expect(source).toContain("Total seleccionado:");
+  });
 });
