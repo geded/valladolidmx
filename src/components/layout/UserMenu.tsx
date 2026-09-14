@@ -182,8 +182,20 @@ export function UserMenu() {
                 </Link>
               </>
             ) : (
-              <Link
-                to={accountTarget}
+              <>
+                {activeMode === "traveler" ? (
+                  <Link
+                    to="/cuenta/mi-viaje"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 border-b border-border px-3 py-2 text-sm hover:bg-accent"
+                  >
+                    <Compass className="size-4" aria-hidden />
+                    Mi Viaje
+                  </Link>
+                ) : null}
+                <Link
+                  to={accountTarget}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 border-b border-border px-3 py-2 text-sm hover:bg-accent"
