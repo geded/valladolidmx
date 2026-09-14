@@ -433,7 +433,7 @@ function ProposalTrace({ followUp }: { followUp: CaseFollowUp | null }) {
     const label = PROPOSAL_LABEL[proposal] ?? proposal;
     parts.push(`Propuesta ${label}${money ? ` · ${money}` : ""}`);
     if (followUp.latest_proposal_sent_at) {
-      parts.push(`Enviada ${new Date(followUp.latest_proposal_sent_at).toLocaleString("es-MX")}`);
+      parts.push(`Enviada ${meridaDateTime(followUp.latest_proposal_sent_at)}`);
     }
   }
 
@@ -441,7 +441,7 @@ function ProposalTrace({ followUp }: { followUp: CaseFollowUp | null }) {
     const paid = followUp.order_status === "paid" || followUp.order_status === "fulfilled";
     parts.push(
       paid
-        ? `Pagado${followUp.order_paid_at ? ` el ${new Date(followUp.order_paid_at).toLocaleDateString("es-MX")}` : ""}`
+        ? `Pagado${followUp.order_paid_at ? ` el ${meridaDate(followUp.order_paid_at)}` : ""}`
         : "Reservación creada, pago pendiente",
     );
   }
@@ -542,10 +542,10 @@ function CaseRowCard({
           {ownerId ? (ownerName ?? "Concierge asignado") : "Sin asignar"}
         </strong>
         {c.last_activity_at
-          ? ` · Última actividad ${new Date(c.last_activity_at).toLocaleString("es-MX")}`
+          ? ` · Última actividad ${meridaDateTime(c.last_activity_at)}`
           : ""}
         {c.target_response_at
-          ? ` · Objetivo ${new Date(c.target_response_at).toLocaleString("es-MX")}`
+          ? ` · Objetivo ${meridaDateTime(c.target_response_at)}`
           : ""}
       </p>
 

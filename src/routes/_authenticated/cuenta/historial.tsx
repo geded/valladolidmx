@@ -122,7 +122,7 @@ function HistorialPage() {
                       </span>
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {new Date(order.created_at).toLocaleString()}
+                      {meridaDateTime(order.created_at)}
                     </p>
                   </div>
                   {cancellable ? (

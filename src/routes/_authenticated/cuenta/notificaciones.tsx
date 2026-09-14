@@ -137,7 +137,7 @@ function NotificationPreferencesPage() {
                         <p className="text-sm font-medium">{CHANNEL_LABELS[row.channel]}</p>
                         {row.consent_at ? (
                           <p className="text-[11px] text-muted-foreground">
-                            Consentimiento: {new Date(row.consent_at).toLocaleDateString()}
+                            Consentimiento: {meridaDate(row.consent_at)}
                           </p>
                         ) : null}
                       </div>

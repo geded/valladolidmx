@@ -184,7 +184,7 @@ function QuoteCard({
       <p className="mt-1 text-xs text-muted-foreground">
         Tipo: {quote.request.kind}
         {quote.valid_until
-          ? ` · Vigente hasta ${new Date(quote.valid_until).toLocaleString()}`
+          ? ` · Vigente hasta ${meridaDateTime(quote.valid_until)}`
           : ""}
       </p>
       {quote.request.notes ? (
