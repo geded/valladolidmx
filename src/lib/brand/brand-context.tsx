@@ -24,7 +24,12 @@ import {
 import { ACTIVE_BRAND } from "@/config/brand";
 import { brandPaletteStyle } from "./brand-theme";
 import { aluxPaletteStyle } from "./brand-theme";
-import { fillAluxCopy, type AluxPalette, type AluxVoice } from "./alux-brand";
+import {
+  DEFAULT_ALUX_COPY,
+  fillAluxCopy,
+  type AluxPalette,
+  type AluxVoice,
+} from "./alux-brand";
 import { useTranslation } from "@/i18n/context";
 
 export const BRAND_SETTINGS_QUERY_KEY = ["brand", "identity"] as const;
@@ -84,7 +89,8 @@ export function useAluxBrand(): {
     name: brand.conciergeName,
     palette: brand.aluxPalette,
     voice,
-    copy: (key, extra = {}) => fillAluxCopy(voice[key], { ...values, ...extra }),
+    copy: (key, extra = {}) =>
+      fillAluxCopy(voice[key] ?? DEFAULT_ALUX_COPY.es[key], { ...values, ...extra }),
   };
 }
 
