@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Heart, Star, Trash2, Camera, Loader2, X } from "lucide-react";
@@ -260,8 +261,7 @@ function MemoryCard({
   onDelete: () => void;
   disabled: boolean;
 }) {
-  const date = new Date(memory.created_at);
-  const formatted = date.toLocaleDateString("es-MX", {
+  const formatted = formatInMerida(memory.created_at, {
     day: "2-digit",
     month: "long",
     year: "numeric",
