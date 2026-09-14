@@ -11,8 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/lib/toast";
 import { useAluxMemory } from "@/lib/alux/use-alux-memory";
 import { ALUX_SIGNAL_TTL_DAYS } from "@/lib/alux/behavior-signals";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 export function AluxMemoryPanel() {
+  const alux = useAluxBrand();
   const { hydrated, memory, summary, paused, pause, resume, forget } = useAluxMemory();
   const [confirming, setConfirming] = useState(false);
 
@@ -28,7 +30,7 @@ export function AluxMemoryPanel() {
           </Badge>
         </div>
         <CardDescription>
-          Alux recuerda lo que exploras en este dispositivo para sugerirte mejores lugares y
+           {alux.name} recuerda lo que exploras en este dispositivo para sugerirte mejores lugares y
           experiencias. Nunca guarda tu nombre, correo ni teléfono, y lo que recuerda se borra solo
           después de {ALUX_SIGNAL_TTL_DAYS} días sin actividad.
         </CardDescription>
@@ -37,8 +39,8 @@ export function AluxMemoryPanel() {
         <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-sm">
           <p className="font-medium text-foreground">
             {paused
-              ? "Ahora mismo Alux te acompaña con recomendaciones generales."
-              : `Alux está usando ${remembered} señal(es) recientes de tu navegación.`}
+               ? `Ahora mismo ${alux.name} te acompaña con recomendaciones generales.`
+               : `${alux.name} está usando ${remembered} señal(es) recientes de tu navegación.`}
           </p>
           <p className="mt-1 text-muted-foreground">
             Tu viaje y tus lugares guardados se conservan siempre, incluso con la personalización en
@@ -86,7 +88,7 @@ export function AluxMemoryPanel() {
             </div>
           ) : (
             <Button variant="ghost" onClick={() => setConfirming(true)}>
-              Borrar lo que Alux recuerda
+              Borrar lo que {alux.name} recuerda
             </Button>
           )}
         </div>

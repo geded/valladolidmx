@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { TourismBrandDefinition } from "@/config/brand";
+import { ALUX_PALETTE_KEYS, type AluxPalette } from "./alux-brand";
 
 export type BrandPalette = TourismBrandDefinition["palette"];
 
@@ -71,6 +72,23 @@ export function paletteContrastChecks(palette: BrandPalette) {
   ].map((check) => ({ ...check, pass: check.ratio >= 4.5 }));
 }
 
+export function aluxPaletteContrastChecks(palette: AluxPalette) {
+  return [
+    { label: "Acción principal de Alux", ratio: contrastRatio(palette.primaryForeground, palette.primary) },
+    { label: "Superficie de Alux", ratio: contrastRatio(palette.surfaceForeground, palette.surface) },
+    { label: "Acento de Alux", ratio: contrastRatio(palette.accentForeground, palette.accent) },
+    { label: "Insignia de Alux", ratio: contrastRatio(palette.badgeForeground, palette.badge) },
+  ].map((check) => ({ ...check, pass: check.ratio >= 4.5 }));
+}
+
+export function normalizeAluxPalette(value: unknown, fallback: AluxPalette): AluxPalette {
+  const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const palette = Object.fromEntries(
+    ALUX_PALETTE_KEYS.map((key) => [key, normalizeHexColor(row[key], fallback[key])]),
+  ) as unknown as AluxPalette;
+  return aluxPaletteContrastChecks(palette).every((check) => check.pass) ? palette : fallback;
+}
+
 export function brandPaletteStyle(palette: BrandPalette): CSSProperties {
   return {
     "--background": palette.background,
@@ -93,5 +111,20 @@ export function brandPaletteStyle(palette: BrandPalette): CSSProperties {
     "--brand-primary-strong": `color-mix(in oklab, ${palette.primary}, black 24%)`,
     "--brand-territory-deep": `color-mix(in oklab, ${palette.territory}, black 18%)`,
     "--brand-surface-soft": `color-mix(in oklab, ${palette.background}, ${palette.secondary} 45%)`,
+  } as CSSProperties;
+}
+
+export function aluxPaletteStyle(palette: AluxPalette): CSSProperties {
+  return {
+    "--alux": palette.primary,
+    "--alux-foreground": palette.primaryForeground,
+    "--alux-surface": palette.surface,
+    "--alux-surface-foreground": palette.surfaceForeground,
+    "--alux-accent": palette.accent,
+    "--alux-accent-foreground": palette.accentForeground,
+    "--alux-border": palette.border,
+    "--alux-ring": palette.ring,
+    "--badge-alux": palette.badge,
+    "--badge-alux-fg": palette.badgeForeground,
   } as CSSProperties;
 }

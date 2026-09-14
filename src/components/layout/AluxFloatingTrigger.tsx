@@ -97,6 +97,7 @@ import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -117,6 +118,7 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 
 export function AluxFloatingTrigger() {
   const { t, locale } = useTranslation();
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
@@ -569,7 +571,7 @@ export function AluxFloatingTrigger() {
       : "Contexto reciente"
     : "Modo descubrimiento";
 
-  const triggerLabel = ctx.hasContext ? (current?.label ?? "Concierge IA") : t("alux_floating");
+  const triggerLabel = ctx.hasContext ? (current?.label ?? alux.copy("shortDescriptor")) : t("alux_floating");
 
   return (
     <>
@@ -600,16 +602,16 @@ export function AluxFloatingTrigger() {
           <button
             type="button"
             onClick={() => setMinimized(false)}
-            className="pointer-events-auto flex min-h-11 max-w-[86vw] items-center gap-2 rounded-full border border-primary/40 bg-card/95 px-3.5 py-2 text-left text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
+            className="pointer-events-auto flex min-h-11 max-w-[86vw] items-center gap-2 rounded-full border border-alux/40 bg-card/95 px-3.5 py-2 text-left text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-alux/15">
               <AluxMark family="avatar" size={20} decorative loading="eager" />
             </span>
             <span className="min-w-0 truncate">
-              Alux · Personalizando{selection.title ? ` ${selection.title}` : ""}
+              {alux.name} · Personalizando{selection.title ? ` ${selection.title}` : ""}
             </span>
-            <span className="shrink-0 rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
-              Continuar con Alux
+            <span className="shrink-0 rounded-full bg-alux/10 px-2 py-1 text-[11px] font-semibold text-alux">
+              Continuar con {alux.name}
             </span>
           </button>
         ) : null}
@@ -617,23 +619,23 @@ export function AluxFloatingTrigger() {
           type="button"
           hidden={minimized && Boolean(selection)}
           onClick={() => setOpen(true)}
-          title={`Alux · ${triggerLabel}`}
+          title={`${alux.name} · ${triggerLabel}`}
           className="pointer-events-auto group flex min-h-11 max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
-          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-alux/15">
             {/* Sistema visual canónico Alux IA (activo gobernado). */}
             <AluxMark family="avatar" size={20} decorative loading="eager" />
             {nudge && !open && (
               <span
                 aria-hidden
-                className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background animate-pulse"
+                className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-alux ring-2 ring-background animate-pulse"
               />
             )}
           </span>
 
-          <span className="hidden sm:inline">Alux</span>
-          <span className="hidden text-xs text-muted-foreground sm:inline">· Concierge IA</span>
-          <span className="ml-1 text-xs text-muted-foreground sm:hidden">Alux</span>
+          <span className="hidden sm:inline">{alux.name}</span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">· {alux.copy("shortDescriptor")}</span>
+          <span className="ml-1 text-xs text-muted-foreground sm:hidden">{alux.name}</span>
         </button>
         {/* Consolidación Alux: la sugerencia proactiva ya NO se pinta como un
             segundo globo flotante. Vive dentro del mismo panel (nota + pistas)
@@ -650,11 +652,11 @@ export function AluxFloatingTrigger() {
         <SheetContent side="right" className="flex w-full max-w-md flex-col gap-6 overflow-y-auto">
           <SheetHeader className="text-left">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-full bg-primary/15">
+              <span className="grid size-8 place-items-center rounded-full bg-alux/15">
                 <AluxMark family="avatar" size={28} decorative loading="eager" />
               </span>
               <div>
-                <SheetTitle className="text-lg">Alux · Concierge IA del Oriente Maya</SheetTitle>
+                <SheetTitle className="text-lg">{alux.name} · {alux.copy("territorialDescriptor")}</SheetTitle>
                 <SheetDescription className="text-xs text-muted-foreground">
                   {originLabel} · te acompaña mientras exploras el destino.
                 </SheetDescription>
@@ -666,9 +668,9 @@ export function AluxFloatingTrigger() {
           {selection && (selection.title || selection.destinationLabel) ? (
             <section
               aria-labelledby="alux-selection"
-              className="rounded-2xl border border-primary/25 bg-primary/5 p-4"
+              className="rounded-2xl border border-alux/25 bg-alux/5 p-4"
             >
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
                 <Sparkles className="size-3.5" aria-hidden />
                 <span id="alux-selection">Tu selección</span>
               </div>
@@ -715,7 +717,7 @@ export function AluxFloatingTrigger() {
                 <div
                   role="group"
                   aria-label="Qué mostrar en el mapa"
-                  className="mt-3 inline-flex rounded-full border border-primary/25 bg-background p-0.5"
+                  className="mt-3 inline-flex rounded-full border border-alux/25 bg-background p-0.5"
                 >
                   {(["original", "proposal"] as const).map((variant) => (
                     <button
@@ -725,11 +727,11 @@ export function AluxFloatingTrigger() {
                       onClick={() => setMapVariant(variant)}
                       className={
                         mapVariant === variant
-                          ? "inline-flex min-h-8 items-center rounded-full bg-primary/15 px-3 text-[11px] font-semibold text-primary"
+                          ? "inline-flex min-h-8 items-center rounded-full bg-alux/15 px-3 text-[11px] font-semibold text-alux"
                           : "inline-flex min-h-8 items-center rounded-full px-3 text-[11px] font-medium text-muted-foreground"
                       }
                     >
-                      {variant === "original" ? "Ruta original" : "Tu propuesta con Alux"}
+                      {variant === "original" ? "Ruta original" : `Tu propuesta con ${alux.name}`}
                     </button>
                   ))}
                 </div>
@@ -750,7 +752,7 @@ export function AluxFloatingTrigger() {
                        el viajero puede continuar donde iba. */
                     setMinimized(true);
                   }}
-                  className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+                  className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-alux/30 bg-background px-3 text-[12px] font-medium text-alux transition-colors hover:bg-alux/10"
                 >
                   <MapPin className="size-3.5" aria-hidden />
                   Ver mi ruta en el mapa
@@ -783,8 +785,8 @@ export function AluxFloatingTrigger() {
 
           {/* Sugerencia proactiva consolidada: mismo Alux, dentro del panel. */}
           {nudge ? (
-            <p className="rounded-2xl border border-primary/25 bg-primary/5 px-3 py-2 text-[12px] font-medium text-foreground">
-              <span className="mr-1 text-primary" aria-hidden>
+            <p className="rounded-2xl border border-alux/25 bg-alux/5 px-3 py-2 text-[12px] font-medium text-foreground">
+              <span className="mr-1 text-alux" aria-hidden>
                 ✨
               </span>
               {nudge.message}
@@ -820,7 +822,7 @@ export function AluxFloatingTrigger() {
             !pathname.includes(`/oriente-maya/${territory.last_destination_slug}`) && (
               <a
                 href={`/oriente-maya/${territory.last_destination_slug}`}
-                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:bg-primary/15"
+                className="inline-flex items-center gap-2 rounded-full border border-alux/30 bg-alux/10 px-3 py-2 text-[12px] font-medium text-alux transition-colors hover:bg-alux/15"
               >
                 <Compass className="size-3.5" aria-hidden />
                 Retomar donde te quedaste en{" "}
@@ -835,14 +837,14 @@ export function AluxFloatingTrigger() {
           {isAuthed && plan && (plan.start_date || plan.item_count > 0 || plan.party_size) && (
             <section
               aria-labelledby="alux-plan"
-              className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+              className="rounded-2xl border border-alux/20 bg-alux/5 p-4"
             >
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
                 <CalendarDays className="size-3.5" aria-hidden />
                 <span id="alux-plan">Tu viaje</span>
                 <a
                   href="/cuenta/mi-viaje"
-                  className="ml-auto text-[10px] font-medium text-primary/80 hover:underline"
+                  className="ml-auto text-[10px] font-medium text-alux/80 hover:underline"
                 >
                   Editar
                 </a>
@@ -957,7 +959,7 @@ export function AluxFloatingTrigger() {
             {geo.status === "granted" && geo.location ? (
               <p className="mt-2 text-sm text-foreground">
                 Compartiste tu ubicación. Puedo calcular distancias reales a hoteles, restaurantes y
-                experiencias del Oriente Maya.
+                experiencias de {alux.copy("territorialDescriptor")}.
               </p>
             ) : (
               <>
@@ -969,7 +971,7 @@ export function AluxFloatingTrigger() {
                   type="button"
                   onClick={geo.request}
                   disabled={geo.status === "prompting"}
-                  className="mt-3 inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-60"
+                  className="mt-3 inline-flex items-center gap-1 rounded-full border border-alux/40 bg-background px-3 py-1.5 text-xs font-medium text-alux transition-colors hover:bg-alux/10 disabled:opacity-60"
                 >
                   <MapPin className="size-3.5" aria-hidden />
                   {geo.status === "prompting"
@@ -1012,7 +1014,7 @@ export function AluxFloatingTrigger() {
                 {current?.href && (
                   <a
                     href={current.href}
-                    className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-alux hover:underline"
                   >
                     Ver {current.label}
                     <ArrowRight className="size-3.5" aria-hidden />
@@ -1028,11 +1030,10 @@ export function AluxFloatingTrigger() {
             >
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 <Compass className="size-3.5" aria-hidden />
-                <span id="alux-discover">Empieza a explorar</span>
+                 <span id="alux-discover">{alux.copy("discoveryTitle")}</span>
               </div>
               <p className="mt-2 text-sm text-foreground">
-                Aún no exploras un destino del Oriente Maya. Elige un Pueblo Mágico para que te
-                acompañe con recomendaciones basadas en tu recorrido, nunca inventadas.
+                {alux.copy("discoveryBody")}
               </p>
               {/* Lote 3J.1 · Destinos publicados del CMS (sin lista fija). */}
               {(publishedDestinations ?? []).length > 0 ? (
@@ -1058,7 +1059,7 @@ export function AluxFloatingTrigger() {
               <Sparkles className="size-3.5" aria-hidden />
               <span id="alux-next">Qué explorar cerca</span>
               {suggestionsQuery.data?.rationaleSource === "ai" && (
-                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-alux/10 px-2 py-0.5 text-[10px] font-medium text-alux">
                   <Sparkles className="size-3" aria-hidden />
                   Alux
                 </span>
@@ -1101,7 +1102,7 @@ export function AluxFloatingTrigger() {
                 return (
                   <p className="mt-2 text-sm text-muted-foreground">
                     {suggestionsQuery.data?.reason ??
-                      `Sigue explorando ${ctx.destination?.label ?? "el Oriente Maya"} y Alux te sugerirá qué visitar a continuación.`}
+                      `Sigue explorando ${ctx.destination?.label ?? alux.copy("territorialDescriptor")} y ${alux.name} te sugerirá qué visitar a continuación.`}
                   </p>
                 );
               }
@@ -1162,7 +1163,7 @@ export function AluxFloatingTrigger() {
                                   <span className="flex items-center gap-1.5">
                                     <span className="block truncate font-medium">{item.label}</span>
                                     {item.hasActiveCoupon && (
-                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-alux/15 px-1.5 py-0.5 text-[10px] font-medium text-alux">
                                         <Ticket className="size-2.5" aria-hidden />
                                         Cupón tuyo
                                       </span>
@@ -1291,9 +1292,9 @@ export function AluxFloatingTrigger() {
           {isAuthed && lens && lens.active_coupons.length > 0 && (
             <section
               aria-labelledby="alux-coupons"
-              className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+              className="rounded-2xl border border-alux/20 bg-alux/5 p-4"
             >
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
                 <Ticket className="size-3.5" aria-hidden />
                 <span id="alux-coupons">Tus cupones activos</span>
               </div>
@@ -1303,12 +1304,12 @@ export function AluxFloatingTrigger() {
                     <span className="min-w-0 truncate text-foreground">
                       {c.title}
                       {c.discount_percent != null && (
-                        <span className="ml-1 text-xs text-primary">−{c.discount_percent}%</span>
+                        <span className="ml-1 text-xs text-alux">−{c.discount_percent}%</span>
                       )}
                     </span>
                     <a
                       href="/cuenta/cupones"
-                      className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+                      className="shrink-0 text-[11px] font-medium text-alux hover:underline"
                     >
                       Canjear
                     </a>
@@ -1344,7 +1345,7 @@ export function AluxFloatingTrigger() {
                       </span>
                       <a
                         href={p.href}
-                        className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+                        className="shrink-0 text-[11px] font-medium text-alux hover:underline"
                       >
                         Ver
                       </a>
@@ -1354,7 +1355,7 @@ export function AluxFloatingTrigger() {
                 {!isAuthed && (
                   <p className="mt-2 text-[11px] text-muted-foreground">
                     Crea tu cuenta para reclamar cupones digitales en{" "}
-                    <a href="/promociones" className="text-primary hover:underline">
+                    <a href="/promociones" className="text-alux hover:underline">
                       /promociones
                     </a>
                     .
@@ -1366,21 +1367,21 @@ export function AluxFloatingTrigger() {
           {/* Invitación a completar y publicar perfil — para asesoría más precisa */}
           <section
             aria-labelledby="alux-profile"
-            className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+            className="rounded-2xl border border-alux/20 bg-alux/5 p-4"
           >
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
               <Sparkles className="size-3.5" aria-hidden />
               <span id="alux-profile">Ayúdame a asesorarte mejor</span>
             </div>
             <p className="mt-2 text-sm text-foreground">
               Si completas tu perfil de viajero (estilo, intereses, compañía, presupuesto, fechas) y
               también tu perfil público, puedo recomendarte hoteles, restaurantes, experiencias y
-              rutas del Oriente Maya con mucha más precisión.
+              rutas de {alux.copy("territorialDescriptor")} con mucha más precisión.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <a
                 href="/cuenta/perfil-publico"
-                className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="inline-flex items-center gap-1 rounded-full bg-alux px-3 py-1.5 text-xs font-medium text-alux-foreground transition-colors hover:bg-alux/90"
               >
                 Completar tu perfil público
                 <ArrowRight className="size-3.5" aria-hidden />

@@ -31,6 +31,7 @@ import { useTranslation } from "@/i18n/context";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
 import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -58,14 +59,14 @@ function ensureSessionKey(): string {
   return key;
 }
 
-const SUGGESTIONS = [
-  "¿Cuál es la mejor época para visitar Valladolid?",
-  "¿Qué hacer en 3 días en el Oriente Maya?",
-  "¿Cómo llego a Chichén Itzá desde Valladolid?",
-  "¿Qué son los Pueblos Mágicos de la región?",
-];
-
 export function PublicAluxChat() {
+  const alux = useAluxBrand();
+  const suggestions = [
+    `¿Cuál es la mejor época para visitar ${alux.copy("territorialDescriptor")}?`,
+    `¿Qué hacer en 3 días en ${alux.copy("territorialDescriptor")}?`,
+    "¿Qué destinos publicados me recomiendas?",
+    "¿Qué experiencias encajan con mi viaje?",
+  ];
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -217,19 +218,19 @@ export function PublicAluxChat() {
 
   return (
     <section
-      aria-label="Habla con Alux"
-      className="rounded-3xl border border-border/60 bg-card shadow-elevated overflow-hidden"
+      aria-label={alux.copy("conversationTitle")}
+      className="rounded-3xl border border-alux-border bg-alux-surface text-alux-surface-foreground shadow-elevated overflow-hidden"
     >
       <header className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-4">
         {/* G8-R1-D3 · Identidad canónica: activo gobernado de /brand/alux/. */}
-        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-alux/10">
           <AluxMark family="avatar" size={40} decorative loading="eager" />
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="font-serif text-lg leading-none">Habla con Alux</h2>
+          <h2 className="font-serif text-lg leading-none">{alux.copy("conversationTitle")}</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Concierge IA del Oriente Maya · disponible sin registro
+            {alux.copy("territorialDescriptor")} · disponible sin registro
           </p>
         </div>
         {rateInfo && (
@@ -251,7 +252,7 @@ export function PublicAluxChat() {
       </header>
 
       {hasMemory && (
-        <div className="flex items-center gap-2 border-b border-border/60 bg-primary/5 px-5 py-2 text-[11px] text-primary">
+        <div className="flex items-center gap-2 border-b border-border/60 bg-alux/5 px-5 py-2 text-[11px] text-alux">
           <BrainCircuit className="h-3 w-3" />
           Alux recuerda tu conversación previa · no necesitas repetir contexto
         </div>
@@ -292,11 +293,10 @@ export function PublicAluxChat() {
         {messages.length === 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Pregúntame lo que quieras sobre Valladolid, Izamal, Espita, los cenotes, Chichén Itzá
-              o cómo armar tu viaje al Oriente Maya.
+              {alux.copy("publicIntro")}
             </p>
             <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -320,7 +320,7 @@ export function PublicAluxChat() {
               className={[
                 "max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed",
                 m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  ? "bg-alux text-alux-foreground rounded-br-md"
                   : "bg-muted text-foreground rounded-bl-md",
               ].join(" ")}
             >
@@ -335,7 +335,7 @@ export function PublicAluxChat() {
         {sending && (
           <div className="flex justify-start">
             <div className="rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Alux está pensando…
+              <Loader2 className="h-4 w-4 animate-spin" /> {alux.copy("thinking")}
             </div>
           </div>
         )}
@@ -364,7 +364,7 @@ export function PublicAluxChat() {
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu pregunta…"
+          placeholder={alux.copy("inputPlaceholder")}
           rows={1}
           maxLength={800}
           disabled={!anonymousTripReady}
@@ -382,13 +382,12 @@ export function PublicAluxChat() {
           disabled={sending || !input.trim() || !anonymousTripReady}
         >
           <Send className="h-4 w-4" />
-          <span className="sr-only">Enviar</span>
+          <span className="sr-only">{alux.copy("sendLabel")}</span>
         </Button>
       </form>
 
       <p className="px-5 pb-4 pt-2 text-[11px] text-muted-foreground bg-muted/30">
-        Alux es una guía inspiracional. Nunca reserva ni cotiza sin tu confirmación. Para armar tu
-        viaje completo,{" "}
+        {alux.copy("disclaimer")} Para armar tu viaje completo,{" "}
         <Link
           to="/auth"
           onClick={() => rememberAuthReturnPath("/alux")}
@@ -444,12 +443,12 @@ function AluxProposals({ items }: { items: Proposal[] }) {
             type="button"
             disabled={added || pending === p.entity_id}
             onClick={() => handleAdd(p)}
-            className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs text-primary hover:bg-primary/10 transition disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-pill border border-alux/30 bg-alux/5 px-3 py-1.5 text-xs text-alux hover:bg-alux/10 transition disabled:opacity-60"
             title={p.rationale ?? undefined}
           >
             {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
             <span className="truncate max-w-[180px]">{p.title}</span>
-            {p.subtitle && <span className="text-[10px] text-primary/70">· {p.subtitle}</span>}
+            {p.subtitle && <span className="text-[10px] text-alux/70">· {p.subtitle}</span>}
           </button>
         );
       })}

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { AluxPalette } from "@/lib/brand/alux-brand";
 
 /** Identidad intercambiable del motor turístico multi-marca. */
 export interface TourismBrandDefinition {
@@ -8,6 +9,7 @@ export interface TourismBrandDefinition {
   tagline: string;
   discoveryPromise: string;
   conciergeName: string;
+  aluxPalette: AluxPalette;
   logo: { src: string; width: number; height: number };
   palette: {
     background: string;
@@ -40,6 +42,18 @@ export const ACTIVE_BRAND: TourismBrandDefinition = {
   tagline: "Oriente Maya de Yucatán",
   discoveryPromise: "Despierta en Valladolid y descubre el Oriente Maya de Yucatán",
   conciergeName: "Alux",
+  aluxPalette: {
+    primary: "#eaa840",
+    primaryForeground: "#1c1d14",
+    surface: "#fffdf7",
+    surfaceForeground: "#1c1d14",
+    accent: "#234933",
+    accentForeground: "#fbf7ee",
+    border: "#ded7c8",
+    ring: "#eaa840",
+    badge: "#6f50a4",
+    badgeForeground: "#fffaff",
+  },
   logo: { src: "/logo.png", width: 470, height: 159 },
   palette: {
     background: "#fbf7ee",
@@ -79,4 +93,14 @@ export const ACTIVE_BRAND_THEME_STYLE = {
   "--ring": ACTIVE_BRAND.palette.ring,
   "--selva": ACTIVE_BRAND.palette.territory,
   "--selva-foreground": ACTIVE_BRAND.palette.territoryForeground,
+  "--alux": ACTIVE_BRAND.aluxPalette.primary,
+  "--alux-foreground": ACTIVE_BRAND.aluxPalette.primaryForeground,
+  "--alux-surface": ACTIVE_BRAND.aluxPalette.surface,
+  "--alux-surface-foreground": ACTIVE_BRAND.aluxPalette.surfaceForeground,
+  "--alux-accent": ACTIVE_BRAND.aluxPalette.accent,
+  "--alux-accent-foreground": ACTIVE_BRAND.aluxPalette.accentForeground,
+  "--alux-border": ACTIVE_BRAND.aluxPalette.border,
+  "--alux-ring": ACTIVE_BRAND.aluxPalette.ring,
+  "--badge-alux": ACTIVE_BRAND.aluxPalette.badge,
+  "--badge-alux-fg": ACTIVE_BRAND.aluxPalette.badgeForeground,
 } as CSSProperties;
