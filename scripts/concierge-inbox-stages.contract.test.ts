@@ -146,6 +146,7 @@ describe("bandejas", () => {
       "intake",
       "awaiting_quotes",
       "ready_to_propose",
+      "proposal_draft",
       "proposal_sent",
       "needs_rework",
       "accepted",
