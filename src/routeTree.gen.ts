@@ -241,11 +241,13 @@ import { Route as AuthenticatedCmsAluxConocimientoRouteImport } from './routes/_
 import { Route as AuthenticatedCmsAluxCalidadRouteImport } from './routes/_authenticated/cms/alux.calidad'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as OrienteMayaDestinoCategoriaEmpresaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.index'
+import { Route as AuthenticatedConciergeExpedientesCaseIdIndexRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId.index'
 import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedPortalProductosProductIdPreviewRouteImport } from './routes/_authenticated/portal/productos.$productId.preview'
 import { Route as AuthenticatedCuentaEmpresaBusinessIdPublicacionRouteImport } from './routes/_authenticated/cuenta/empresa.$businessId.publicacion'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
+import { Route as AuthenticatedConciergeExpedientesCaseIdPropuestaRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId.propuesta'
 import { Route as AuthenticatedCmsZonasIdEditarRouteImport } from './routes/_authenticated/cms/zonas.$id.editar'
 import { Route as AuthenticatedCmsRutasIdEditarRouteImport } from './routes/_authenticated/cms/rutas.$id.editar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
@@ -1576,6 +1578,12 @@ const OrienteMayaDestinoCategoriaEmpresaIndexRoute =
     path: '/',
     getParentRoute: () => OrienteMayaDestinoCategoriaEmpresaRoute,
   } as any)
+const AuthenticatedConciergeExpedientesCaseIdIndexRoute =
+  AuthenticatedConciergeExpedientesCaseIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedConciergeExpedientesCaseIdRoute,
+  } as any)
 const OrienteMayaDestinoCategoriaEmpresaProductoRoute =
   OrienteMayaDestinoCategoriaEmpresaProductoRouteImport.update({
     id: '/$producto',
@@ -1605,6 +1613,12 @@ const AuthenticatedCuentaConciergeCaseIdEvaluarRoute =
     id: '/evaluar',
     path: '/evaluar',
     getParentRoute: () => AuthenticatedCuentaConciergeCaseIdRoute,
+  } as any)
+const AuthenticatedConciergeExpedientesCaseIdPropuestaRoute =
+  AuthenticatedConciergeExpedientesCaseIdPropuestaRouteImport.update({
+    id: '/propuesta',
+    path: '/propuesta',
+    getParentRoute: () => AuthenticatedConciergeExpedientesCaseIdRoute,
   } as any)
 const AuthenticatedCmsZonasIdEditarRoute =
   AuthenticatedCmsZonasIdEditarRouteImport.update({
@@ -1865,7 +1879,7 @@ export interface FileRoutesByFullPath {
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
-  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -1922,11 +1936,13 @@ export interface FileRoutesByFullPath {
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cms/rutas/$id/editar': typeof AuthenticatedCmsRutasIdEditarRoute
   '/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
+  '/concierge/expedientes/$caseId/propuesta': typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/cuenta/empresa/$businessId/publicacion': typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+  '/concierge/expedientes/$caseId/': typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
   '/oriente-maya/$destino/$categoria/$empresa/': typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 export interface FileRoutesByTo {
@@ -2105,7 +2121,6 @@ export interface FileRoutesByTo {
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
-  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -2161,11 +2176,13 @@ export interface FileRoutesByTo {
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cms/rutas/$id/editar': typeof AuthenticatedCmsRutasIdEditarRoute
   '/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
+  '/concierge/expedientes/$caseId/propuesta': typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/cuenta/empresa/$businessId/publicacion': typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
   '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 export interface FileRoutesById {
@@ -2356,7 +2373,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/_authenticated/cms/visitor-intel_/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
-  '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
   '/_authenticated/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/_authenticated/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -2413,11 +2430,13 @@ export interface FileRoutesById {
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cms/rutas/$id/editar': typeof AuthenticatedCmsRutasIdEditarRoute
   '/_authenticated/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
+  '/_authenticated/concierge/expedientes/$caseId/propuesta': typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/_authenticated/cuenta/empresa/$businessId/publicacion': typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
   '/_authenticated/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+  '/_authenticated/concierge/expedientes/$caseId/': typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
   '/oriente-maya/$destino/$categoria/$empresa/': typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 export interface FileRouteTypes {
@@ -2665,11 +2684,13 @@ export interface FileRouteTypes {
     | '/cms/reviews/$id/moderar'
     | '/cms/rutas/$id/editar'
     | '/cms/zonas/$id/editar'
+    | '/concierge/expedientes/$caseId/propuesta'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/cuenta/empresa/$businessId/publicacion'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
+    | '/concierge/expedientes/$caseId/'
     | '/oriente-maya/$destino/$categoria/$empresa/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -2848,7 +2869,6 @@ export interface FileRouteTypes {
     | '/cms/visibilidad/spotlight'
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
-    | '/concierge/expedientes/$caseId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
     | '/cuenta/documentos/$orderId'
@@ -2904,11 +2924,13 @@ export interface FileRouteTypes {
     | '/cms/reviews/$id/moderar'
     | '/cms/rutas/$id/editar'
     | '/cms/zonas/$id/editar'
+    | '/concierge/expedientes/$caseId/propuesta'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/cuenta/empresa/$businessId/publicacion'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
+    | '/concierge/expedientes/$caseId'
     | '/oriente-maya/$destino/$categoria/$empresa'
   id:
     | '__root__'
@@ -3155,11 +3177,13 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cms/rutas/$id/editar'
     | '/_authenticated/cms/zonas/$id/editar'
+    | '/_authenticated/concierge/expedientes/$caseId/propuesta'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
     | '/_authenticated/cuenta/empresa/$businessId/publicacion'
     | '/_authenticated/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
+    | '/_authenticated/concierge/expedientes/$caseId/'
     | '/oriente-maya/$destino/$categoria/$empresa/'
   fileRoutesById: FileRoutesById
 }
@@ -4907,6 +4931,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaIndexRouteImport
       parentRoute: typeof OrienteMayaDestinoCategoriaEmpresaRoute
     }
+    '/_authenticated/concierge/expedientes/$caseId/': {
+      id: '/_authenticated/concierge/expedientes/$caseId/'
+      path: '/'
+      fullPath: '/concierge/expedientes/$caseId/'
+      preLoaderRoute: typeof AuthenticatedConciergeExpedientesCaseIdIndexRouteImport
+      parentRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
+    }
     '/oriente-maya/$destino/$categoria/$empresa/$producto': {
       id: '/oriente-maya/$destino/$categoria/$empresa/$producto'
       path: '/$producto'
@@ -4941,6 +4972,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cuenta/concierge/$caseId/evaluar'
       preLoaderRoute: typeof AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport
       parentRoute: typeof AuthenticatedCuentaConciergeCaseIdRoute
+    }
+    '/_authenticated/concierge/expedientes/$caseId/propuesta': {
+      id: '/_authenticated/concierge/expedientes/$caseId/propuesta'
+      path: '/propuesta'
+      fullPath: '/concierge/expedientes/$caseId/propuesta'
+      preLoaderRoute: typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRouteImport
+      parentRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
     }
     '/_authenticated/cms/zonas/$id/editar': {
       id: '/_authenticated/cms/zonas/$id/editar'
@@ -5074,16 +5112,34 @@ const AuthenticatedAdminRouteRouteWithChildren =
     AuthenticatedAdminRouteRouteChildren,
   )
 
+interface AuthenticatedConciergeExpedientesCaseIdRouteChildren {
+  AuthenticatedConciergeExpedientesCaseIdPropuestaRoute: typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRoute
+  AuthenticatedConciergeExpedientesCaseIdIndexRoute: typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
+}
+
+const AuthenticatedConciergeExpedientesCaseIdRouteChildren: AuthenticatedConciergeExpedientesCaseIdRouteChildren =
+  {
+    AuthenticatedConciergeExpedientesCaseIdPropuestaRoute:
+      AuthenticatedConciergeExpedientesCaseIdPropuestaRoute,
+    AuthenticatedConciergeExpedientesCaseIdIndexRoute:
+      AuthenticatedConciergeExpedientesCaseIdIndexRoute,
+  }
+
+const AuthenticatedConciergeExpedientesCaseIdRouteWithChildren =
+  AuthenticatedConciergeExpedientesCaseIdRoute._addFileChildren(
+    AuthenticatedConciergeExpedientesCaseIdRouteChildren,
+  )
+
 interface AuthenticatedConciergeRouteRouteChildren {
   AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
-  AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
 }
 
 const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRouteChildren =
   {
     AuthenticatedConciergeIndexRoute: AuthenticatedConciergeIndexRoute,
     AuthenticatedConciergeExpedientesCaseIdRoute:
-      AuthenticatedConciergeExpedientesCaseIdRoute,
+      AuthenticatedConciergeExpedientesCaseIdRouteWithChildren,
   }
 
 const AuthenticatedConciergeRouteRouteWithChildren =

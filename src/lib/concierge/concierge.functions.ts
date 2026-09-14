@@ -248,18 +248,42 @@ export const listBusinessConciergeQuotes = createServerFn({ method: "GET" })
  * (`quote_id`) o ser una partida propia del Concierge (`title` + importe),
  * por ejemplo un tour con precio ya acordado con el proveedor.
  */
+const ScheduleFields = {
+  /** Día del viaje (0 = primer día). */
+  day_index: z.number().int().min(0).max(365).optional().nullable(),
+  /** Hora local del destino (America/Merida), formato HH:MM. */
+  starts_at_local: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .optional()
+    .nullable(),
+  duration_minutes: z.number().int().min(1).max(1440).optional().nullable(),
+  target_kind: z
+    .enum(["destination", "business", "product", "event", "route", "place", "note"])
+    .optional()
+    .nullable(),
+  target_id: z.string().uuid().optional().nullable(),
+};
+
 const ProposalItem = z.union([
   z.object({
     quote_id: z.string().uuid(),
     notes: z.string().max(1000).optional().nullable(),
+    title: z.string().trim().max(200).optional().nullable(),
+    ...ScheduleFields,
   }),
   z.object({
     title: z.string().trim().min(3).max(200),
     amount_cents: z.number().int().min(0).max(100_000_000),
     currency: z.string().length(3).optional(),
     notes: z.string().max(1000).optional().nullable(),
+    /** Recomendación sin costo: se muestra al viajero y no suma al total. */
+    is_suggestion: z.boolean().optional(),
+    source: z.enum(["quote", "manual", "alux"]).optional(),
+    ...ScheduleFields,
   }),
 ]);
+
 
 const ProposalCreateInput = z.object({
   caseId: z.string().uuid(),
@@ -318,8 +342,18 @@ export const acceptConciergeProposal = createServerFn({ method: "POST" })
       _proposal_id: data.proposalId,
     });
     if (error) throw new Error(error.message);
+    // Al aceptar, el itinerario capturado por el Concierge (día y hora)
+    // pasa al viaje del viajero. Nunca bloquea la aceptación.
+    try {
+      await context.supabase.rpc("concierge_proposal_apply_schedule_to_plan", {
+        _proposal_id: data.proposalId,
+      });
+    } catch {
+      /* el horario puede reaplicarse; la aceptación ya quedó registrada */
+    }
     return res as Json;
   });
+
 
 const ProposalReasonInput = z.object({
   proposalId: z.string().uuid(),

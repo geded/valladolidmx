@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { meridaDate, meridaDateTime, meridaLongDate } from "@/lib/time/merida";
 import { useServerFn } from "@tanstack/react-start";
-import { useRouter, useNavigate } from "@tanstack/react-router";
+import { useRouter, useNavigate, Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -152,6 +152,12 @@ type CaseFile = {
       business_id: string;
       business_name: string | null;
       request_title: string;
+      day_index?: number | null;
+      /** Hora local del destino (America/Merida). */
+      starts_at_local?: string | null;
+      duration_minutes?: number | null;
+      is_suggestion?: boolean | null;
+      source?: string | null;
     }>;
   }>;
   assignment?: {
@@ -854,7 +860,21 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           )}
         </>
       )}
-      {internal ? <ProposalComposer caseId={f.case.id} quotes={f.quotes ?? []} /> : null}
+      {internal ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-dashed border-border bg-card/40 p-3">
+          <p className="min-w-[220px] flex-1 text-xs leading-relaxed text-muted-foreground">
+            Arma la propuesta en su propio espacio: partidas con día, hora del destino, duración y
+            precio, más las recomendaciones sin costo para el viajero.
+          </p>
+          <Link
+            to="/concierge/expedientes/$caseId/propuesta"
+            params={{ caseId: f.case.id }}
+            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+          >
+            {proposals.length === 0 ? "Armar propuesta" : "Nueva versión"}
+          </Link>
+        </div>
+      ) : null}
     </Section>
   );
 }
@@ -939,21 +959,7 @@ function ProposalCard({
           Vigente hasta {meridaDateTime(p.valid_until)}
         </p>
       ) : null}
-      {p.items.length > 0 && (
-        <ul className="mt-2 grid gap-1 text-xs">
-          {p.items.map((it) => (
-            <li
-              key={it.item_id}
-              className="flex items-center justify-between gap-2 rounded border border-border/60 bg-background/60 px-2 py-1"
-            >
-              <span>
-                {it.business_name ?? "Empresa"} · {it.request_title}
-              </span>
-              <span className="font-mono">{money(it.amount_cents, it.currency)}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {p.items.length > 0 && <ProposalItemsByDay items={p.items} />}
       {p.terms ? (
         <p className="mt-2 whitespace-pre-line text-[11px] text-muted-foreground">{p.terms}</p>
       ) : null}
@@ -1154,230 +1160,88 @@ function ProposalCompare({
   );
 }
 
-interface ManualLine {
-  key: string;
-  title: string;
-  amount: string;
-  notes: string;
-}
+/* El compositor de propuestas vive ahora en su propia pantalla:
+ * /concierge/expedientes/$caseId/propuesta (Estudio de Propuesta). */
 
-function ProposalComposer({
-  caseId,
-  quotes,
+
+/**
+ * Partidas de la propuesta agrupadas por día del viaje, con hora local del
+ * destino. Las recomendaciones sin costo se muestran aparte del total.
+ */
+function ProposalItemsByDay({
+  items,
 }: {
-  caseId: string;
-  quotes: NonNullable<CaseFile["quotes"]>;
+  items: NonNullable<CaseFile["proposals"]>[number]["items"];
 }) {
-  const router = useRouter();
-  const createFn = useServerFn(createConciergeProposal);
-  const submittable = quotes.filter((q) => q.status === "submitted");
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [manual, setManual] = useState<ManualLine[]>([]);
-  const [summary, setSummary] = useState("");
-  const [terms, setTerms] = useState("");
-  const [validUntil, setValidUntil] = useState("");
-  const [busy, setBusy] = useState(false);
-  const selectedQuotes = submittable.filter((quote) => selected[quote.quote_id]);
+  const priced = items.filter((it) => !it.is_suggestion);
+  const suggestions = items.filter((it) => it.is_suggestion);
+  const days = Array.from(
+    new Set(priced.map((it) => (it.day_index == null ? -1 : it.day_index))),
+  ).sort((a, b) => a - b);
 
-  const manualValid = manual.filter(
-    (line) => line.title.trim().length >= 3 && Number(line.amount) >= 0 && line.amount !== "",
-  );
-  const manualTotalCents = manualValid.reduce(
-    (sum, line) => sum + Math.round(Number(line.amount) * 100),
-    0,
-  );
-  const selectedTotal =
-    selectedQuotes.reduce((sum, quote) => sum + (quote.total_amount_cents ?? 0), 0) +
-    manualTotalCents;
-  const totalLines = selectedQuotes.length + manualValid.length;
-
-  function updateManual(key: string, patch: Partial<ManualLine>) {
-    setManual((lines) => lines.map((l) => (l.key === key ? { ...l, ...patch } : l)));
-  }
-
-  async function onCreate() {
-    const items: Array<Record<string, unknown>> = [
-      ...selectedQuotes.map((quote) => ({ quote_id: quote.quote_id })),
-      ...manualValid.map((line) => ({
-        title: line.title.trim(),
-        amount_cents: Math.round(Number(line.amount) * 100),
-        currency: "MXN",
-        notes: line.notes.trim() || null,
-      })),
-    ];
-    if (items.length === 0) return;
-    setBusy(true);
-    try {
-      await createFn({
-        data: {
-          caseId,
-          items,
-          summary: summary.trim() || null,
-          terms: terms.trim() || null,
-          validUntil: validUntil ? new Date(`${validUntil}T23:59:59`).toISOString() : null,
-        },
-      });
-      setSelected({});
-      setManual([]);
-      setSummary("");
-      setTerms("");
-      setValidUntil("");
-      toast.success("Borrador de propuesta creado. Revísalo antes de enviarlo al viajero.");
-      await router.invalidate();
-    } catch (error) {
-      toast.error("No fue posible crear el borrador", {
-        description: error instanceof Error ? error.message : undefined,
-      });
-    } finally {
-      setBusy(false);
-    }
+  function titleOf(it: (typeof items)[number]) {
+    return it.business_name ? `${it.business_name} · ${it.request_title}` : it.request_title;
   }
 
   return (
-    <div className="mt-4 rounded-md border border-dashed border-border bg-card/40 p-3 text-xs">
-      <p className="mb-2 font-medium uppercase tracking-wide text-muted-foreground">
-        Preparar propuesta final para el viajero
-      </p>
-      <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-        Puedes incluir dos tipos de partidas: las cotizaciones que respondieron las empresas y
-        partidas escritas por ti con precios que ya tienes acordados con el proveedor. Sólo
-        necesitas pedir cotización a una empresa cuando el viajero solicite algo especial.
-      </p>
-
-      <p className="mb-1 font-medium text-foreground">Cotizaciones recibidas de empresas</p>
-      {submittable.length === 0 ? (
-        <p className="rounded-md border border-border/70 bg-background/70 p-2 leading-relaxed text-muted-foreground">
-          Todavía no hay cotizaciones recibidas. Si necesitas el precio de una empresa, solicítala
-          en el apartado &quot;Qué solicita el viajero&quot;. Si ya tienes el precio acordado,
-          agrega la partida tú mismo aquí abajo.
-        </p>
-      ) : (
-        <ul className="grid gap-1">
-          {submittable.map((q) => (
-            <li key={q.quote_id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={!!selected[q.quote_id]}
-                onChange={(e) => setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))}
-              />
-              <span className="flex-1">
-                {q.business_name ?? "Empresa"} · {q.request_title} ·{" "}
-                {money(q.total_amount_cents, q.currency)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <p className="mb-1 mt-4 font-medium text-foreground">Partidas propias del Concierge</p>
-      {manual.length === 0 ? (
-        <p className="leading-relaxed text-muted-foreground">
-          Ejemplo: &quot;Tour a Ek Balam con transporte y guía&quot; con el precio que ya tienes
-          acordado.
-        </p>
-      ) : null}
-      <ul className="grid gap-2">
-        {manual.map((line) => (
-          <li key={line.key} className="rounded-md border border-border/70 bg-background/70 p-2">
-            <div className="flex flex-wrap gap-2">
-              <input
-                className="min-w-[180px] flex-1 rounded border border-border bg-background px-2 py-1.5 text-xs"
-                placeholder="Concepto (ej. Tour a Ek Balam)"
-                maxLength={200}
-                value={line.title}
-                onChange={(e) => updateManual(line.key, { title: e.target.value })}
-              />
-              <input
-                className="w-32 rounded border border-border bg-background px-2 py-1.5 text-xs"
-                type="number"
-                min={0}
-                step="0.01"
-                inputMode="decimal"
-                placeholder="Precio MXN"
-                value={line.amount}
-                onChange={(e) => updateManual(line.key, { amount: e.target.value })}
-              />
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => setManual((lines) => lines.filter((l) => l.key !== line.key))}
-              >
-                Quitar
-              </Button>
-            </div>
-            <textarea
-              className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
-              rows={2}
-              maxLength={1000}
-              placeholder="Descripción para el viajero: qué incluye, horarios, condiciones"
-              value={line.notes}
-              onChange={(e) => updateManual(line.key, { notes: e.target.value })}
-            />
-          </li>
-        ))}
-      </ul>
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        className="mt-2"
-        onClick={() =>
-          setManual((lines) => [
-            ...lines,
-            {
-              key: `m-${Date.now()}-${lines.length}`,
-              title: "",
-              amount: "",
-              notes: "",
-            },
-          ])
-        }
-      >
-        Agregar partida propia
-      </Button>
-
-      <p className="mt-3 border-t border-border/60 pt-3 text-sm font-semibold">
-        Total seleccionado: {money(selectedTotal, selectedQuotes[0]?.currency ?? "MXN")}
-      </p>
-      <textarea
-        className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
-        rows={2}
-        maxLength={1000}
-        placeholder="Explica al viajero qué incluye esta propuesta"
-        value={summary}
-        onChange={(e) => setSummary(e.target.value)}
-      />
-      <textarea
-        className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
-        rows={3}
-        maxLength={4000}
-        placeholder="Condiciones, cambios y consideraciones"
-        value={terms}
-        onChange={(e) => setTerms(e.target.value)}
-      />
-      <label className="mt-2 grid max-w-xs gap-1 text-xs font-medium text-muted-foreground">
-        Vigencia de la propuesta
-        <input
-          type="date"
-          value={validUntil}
-          onChange={(event) => setValidUntil(event.target.value)}
-          className="h-10 rounded border border-border bg-background px-2 text-foreground"
-        />
-      </label>
-      <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
-        {totalLines === 0 ? (
-          <p className="mr-auto max-w-md leading-relaxed text-muted-foreground">
-            Agrega al menos una partida: marca una cotización recibida o escribe una partida propia
-            con su concepto y precio.
+    <div className="mt-2 grid gap-2 text-xs">
+      {days.map((day) => {
+        const rows = priced
+          .filter((it) => (it.day_index == null ? -1 : it.day_index) === day)
+          .sort((a, b) =>
+            (a.starts_at_local ?? "99:99").localeCompare(b.starts_at_local ?? "99:99"),
+          );
+        return (
+          <div key={day}>
+            <p className="mb-1 text-[11px] font-semibold text-foreground">
+              {day < 0 ? "Sin día asignado" : `Día ${day + 1}`}
+            </p>
+            <ul className="grid gap-1">
+              {rows.map((it) => (
+                <li
+                  key={it.item_id}
+                  className="flex items-center justify-between gap-2 rounded border border-border/60 bg-background/60 px-2 py-1"
+                >
+                  <span className="min-w-0">
+                    {it.starts_at_local ? (
+                      <span className="mr-2 font-mono text-foreground/80">
+                        {it.starts_at_local.slice(0, 5)}
+                      </span>
+                    ) : null}
+                    {titleOf(it)}
+                    {it.duration_minutes ? (
+                      <span className="ml-2 text-[11px] text-muted-foreground">
+                        {it.duration_minutes} min
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="font-mono">{money(it.amount_cents, it.currency)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+      {suggestions.length > 0 ? (
+        <div>
+          <p className="mb-1 text-[11px] font-semibold text-foreground">
+            Recomendaciones sin costo
           </p>
-        ) : null}
-        <ActionButton
-          label="Crear borrador"
-          disabled={busy || totalLines === 0}
-          onClick={onCreate}
-        />
-      </div>
+          <ul className="grid gap-1">
+            {suggestions.map((it) => (
+              <li
+                key={it.item_id}
+                className="rounded border border-dashed border-border/70 bg-background/40 px-2 py-1 text-muted-foreground"
+              >
+                {it.starts_at_local ? (
+                  <span className="mr-2 font-mono">{it.starts_at_local.slice(0, 5)}</span>
+                ) : null}
+                {titleOf(it)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
