@@ -933,6 +933,13 @@ function ProposalCompare({
   );
 }
 
+interface ManualLine {
+  key: string;
+  title: string;
+  amount: string;
+  notes: string;
+}
+
 function ProposalComposer({
   caseId,
   quotes,
@@ -944,20 +951,39 @@ function ProposalComposer({
   const createFn = useServerFn(createConciergeProposal);
   const submittable = quotes.filter((q) => q.status === "submitted");
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [manual, setManual] = useState<ManualLine[]>([]);
   const [summary, setSummary] = useState("");
   const [terms, setTerms] = useState("");
   const [validUntil, setValidUntil] = useState("");
   const [busy, setBusy] = useState(false);
   const selectedQuotes = submittable.filter((quote) => selected[quote.quote_id]);
-  const selectedTotal = selectedQuotes.reduce(
-    (sum, quote) => sum + (quote.total_amount_cents ?? 0),
+
+  const manualValid = manual.filter(
+    (line) => line.title.trim().length >= 3 && Number(line.amount) >= 0 && line.amount !== "",
+  );
+  const manualTotalCents = manualValid.reduce(
+    (sum, line) => sum + Math.round(Number(line.amount) * 100),
     0,
   );
+  const selectedTotal =
+    selectedQuotes.reduce((sum, quote) => sum + (quote.total_amount_cents ?? 0), 0) +
+    manualTotalCents;
+  const totalLines = selectedQuotes.length + manualValid.length;
+
+  function updateManual(key: string, patch: Partial<ManualLine>) {
+    setManual((lines) => lines.map((l) => (l.key === key ? { ...l, ...patch } : l)));
+  }
 
   async function onCreate() {
-    const items = Object.entries(selected)
-      .filter(([, v]) => v)
-      .map(([quote_id]) => ({ quote_id }));
+    const items: Array<Record<string, unknown>> = [
+      ...selectedQuotes.map((quote) => ({ quote_id: quote.quote_id })),
+      ...manualValid.map((line) => ({
+        title: line.title.trim(),
+        amount_cents: Math.round(Number(line.amount) * 100),
+        currency: "MXN",
+        notes: line.notes.trim() || null,
+      })),
+    ];
     if (items.length === 0) return;
     setBusy(true);
     try {
@@ -971,6 +997,7 @@ function ProposalComposer({
         },
       });
       setSelected({});
+      setManual([]);
       setSummary("");
       setTerms("");
       setValidUntil("");
@@ -991,30 +1018,104 @@ function ProposalComposer({
         Preparar propuesta final para el viajero
       </p>
       <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-        Selecciona las cotizaciones que incluirás. El total se calcula con las respuestas elegidas.
+        Puedes incluir dos tipos de partidas: las cotizaciones que respondieron las empresas y
+        partidas escritas por ti con precios que ya tienes acordados con el proveedor. Sólo necesitas
+        pedir cotización a una empresa cuando el viajero solicite algo especial.
       </p>
+
+      <p className="mb-1 font-medium text-foreground">Cotizaciones recibidas de empresas</p>
       {submittable.length === 0 ? (
         <p className="rounded-md border border-border/70 bg-background/70 p-2 leading-relaxed text-muted-foreground">
-          Todavía no hay cotizaciones recibidas. Solicita una cotización a las empresas en el
-          apartado &quot;Qué solicita el viajero&quot;; cuando respondan con su precio podrás armar
-          aquí la propuesta económica y enviarla al viajero.
+          Todavía no hay cotizaciones recibidas. Si necesitas el precio de una empresa, solicítala en
+          el apartado &quot;Qué solicita el viajero&quot;. Si ya tienes el precio acordado, agrega la
+          partida tú mismo aquí abajo.
+        </p>
+      ) : (
+        <ul className="grid gap-1">
+          {submittable.map((q) => (
+            <li key={q.quote_id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={!!selected[q.quote_id]}
+                onChange={(e) => setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))}
+              />
+              <span className="flex-1">
+                {q.business_name ?? "Empresa"} · {q.request_title} ·{" "}
+                {money(q.total_amount_cents, q.currency)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="mb-1 mt-4 font-medium text-foreground">Partidas propias del Concierge</p>
+      {manual.length === 0 ? (
+        <p className="leading-relaxed text-muted-foreground">
+          Ejemplo: &quot;Tour a Ek Balam con transporte y guía&quot; con el precio que ya tienes
+          acordado.
         </p>
       ) : null}
-      <ul className="grid gap-1">
-        {submittable.map((q) => (
-          <li key={q.quote_id} className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={!!selected[q.quote_id]}
-              onChange={(e) => setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))}
+      <ul className="grid gap-2">
+        {manual.map((line) => (
+          <li key={line.key} className="rounded-md border border-border/70 bg-background/70 p-2">
+            <div className="flex flex-wrap gap-2">
+              <input
+                className="min-w-[180px] flex-1 rounded border border-border bg-background px-2 py-1.5 text-xs"
+                placeholder="Concepto (ej. Tour a Ek Balam)"
+                maxLength={200}
+                value={line.title}
+                onChange={(e) => updateManual(line.key, { title: e.target.value })}
+              />
+              <input
+                className="w-32 rounded border border-border bg-background px-2 py-1.5 text-xs"
+                type="number"
+                min={0}
+                step="0.01"
+                inputMode="decimal"
+                placeholder="Precio MXN"
+                value={line.amount}
+                onChange={(e) => updateManual(line.key, { amount: e.target.value })}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setManual((lines) => lines.filter((l) => l.key !== line.key))}
+              >
+                Quitar
+              </Button>
+            </div>
+            <textarea
+              className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
+              rows={2}
+              maxLength={1000}
+              placeholder="Descripción para el viajero: qué incluye, horarios, condiciones"
+              value={line.notes}
+              onChange={(e) => updateManual(line.key, { notes: e.target.value })}
             />
-            <span className="flex-1">
-              {q.business_name ?? "Empresa"} · {q.request_title} ·{" "}
-              {money(q.total_amount_cents, q.currency)}
-            </span>
           </li>
         ))}
       </ul>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        className="mt-2"
+        onClick={() =>
+          setManual((lines) => [
+            ...lines,
+            {
+              key: `m-${Date.now()}-${lines.length}`,
+              title: "",
+              amount: "",
+              notes: "",
+            },
+          ])
+        }
+      >
+        Agregar partida propia
+      </Button>
+
       <p className="mt-3 border-t border-border/60 pt-3 text-sm font-semibold">
         Total seleccionado: {money(selectedTotal, selectedQuotes[0]?.currency ?? "MXN")}
       </p>
@@ -1044,18 +1145,13 @@ function ProposalComposer({
         />
       </label>
       <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
-        {selectedQuotes.length === 0 ? (
+        {totalLines === 0 ? (
           <p className="mr-auto max-w-md leading-relaxed text-muted-foreground">
-            {submittable.length === 0
-              ? "El borrador se habilita cuando al menos una empresa responda su cotización."
-              : "Marca al menos una cotización de la lista para habilitar el borrador; los textos y la vigencia por sí solos no arman la propuesta."}
+            Agrega al menos una partida: marca una cotización recibida o escribe una partida propia
+            con su concepto y precio.
           </p>
         ) : null}
-        <ActionButton
-          label="Crear borrador"
-          disabled={busy || selectedQuotes.length === 0}
-          onClick={onCreate}
-        />
+        <ActionButton label="Crear borrador" disabled={busy || totalLines === 0} onClick={onCreate} />
       </div>
     </div>
   );
