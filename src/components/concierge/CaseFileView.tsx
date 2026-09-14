@@ -305,7 +305,9 @@ function readableValue(value: unknown): string {
       : humanizeKey(value);
   }
   if (Array.isArray(value)) return value.map(readableValue).join(", ");
-  return Object.values(value as Record<string, unknown>).map(readableValue).join(" · ");
+  return Object.values(value as Record<string, unknown>)
+    .map(readableValue)
+    .join(" · ");
 }
 
 function readableEntries(value: Record<string, unknown>): Array<[string, string]> {
@@ -345,7 +347,8 @@ export function CaseFileView({
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {labelFor(r.kind, REQUEST_KIND_LABELS)} · Origen: {labelFor(r.source_type, SOURCE_LABELS)}
+                  {labelFor(r.kind, REQUEST_KIND_LABELS)} · Origen:{" "}
+                  {labelFor(r.source_type, SOURCE_LABELS)}
                 </p>
                 {r.notes ? <p className="mt-1 text-xs text-foreground/80">{r.notes}</p> : null}
               </li>
@@ -446,7 +449,8 @@ function Header({ f }: { f: CaseFile }) {
       </div>
       <h2 className="mt-2 text-lg font-semibold">{f.case.summary ?? "Sin resumen"}</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Origen: {labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: {labelFor(f.case.priority, PRIORITY_LABELS)} · Creado{" "}
+        Origen: {labelFor(f.case.source, SOURCE_LABELS)} · Prioridad:{" "}
+        {labelFor(f.case.priority, PRIORITY_LABELS)} · Creado{" "}
         {new Date(f.case.created_at).toLocaleString()}
       </p>
       {f.traveler.display_name && (
@@ -902,7 +906,10 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
             Tiempo de respuesta · {labelFor(sla?.sla_status, SLA_STATUS_LABELS)}
           </span>
           <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
-            Prioridad: <strong className="text-foreground">{labelFor(f.case.priority, PRIORITY_LABELS)}</strong>
+            Prioridad:{" "}
+            <strong className="text-foreground">
+              {labelFor(f.case.priority, PRIORITY_LABELS)}
+            </strong>
             {f.case.priority_source
               ? ` · ${labelFor(f.case.priority_source, PRIORITY_SOURCE_LABELS)}`
               : ""}
@@ -924,9 +931,7 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
             <ActionButton label="Liberar" variant="ghost" onClick={doRelease} disabled={busy} />
           )}
           {assignment && !isAssignedToMe && (
-            <span className="text-xs text-muted-foreground">
-              Asignado a otro concierge
-            </span>
+            <span className="text-xs text-muted-foreground">Asignado a otro concierge</span>
           )}
         </div>
       </div>
@@ -1057,7 +1062,9 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
             )}
           </HandoffBlock>
 
-          <HandoffBlock title={`Experiencias guardadas (${payload.plan_snapshot?.item_count ?? 0})`}>
+          <HandoffBlock
+            title={`Experiencias guardadas (${payload.plan_snapshot?.item_count ?? 0})`}
+          >
             {payload.plan_snapshot?.items && payload.plan_snapshot.items.length > 0 ? (
               <ul className="grid gap-1 text-xs">
                 {payload.plan_snapshot.items.slice(0, 8).map((it, i) => (
@@ -1075,7 +1082,8 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
           </HandoffBlock>
 
           <HandoffBlock title="Memoria territorial">
-            {payload.territorial_memory && readableEntries(payload.territorial_memory).length > 0 ? (
+            {payload.territorial_memory &&
+            readableEntries(payload.territorial_memory).length > 0 ? (
               <dl className="grid gap-1 text-xs">
                 {readableEntries(payload.territorial_memory).map(([label, value]) => (
                   <div key={label} className="grid grid-cols-[minmax(7rem,0.4fr)_1fr] gap-2">
@@ -1122,9 +1130,7 @@ function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
       {rows.map(([k, v]) => (
         <div key={k} className="flex gap-2">
           <dt className="min-w-[80px] text-muted-foreground">{k}</dt>
-          <dd className="flex-1 truncate text-foreground/90">
-             {readableValue(v)}
-          </dd>
+          <dd className="flex-1 truncate text-foreground/90">{readableValue(v)}</dd>
         </div>
       ))}
     </dl>
@@ -1253,7 +1259,10 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
 }
 
 function AluxReadableText({ text }: { text: string }) {
-  const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
   return (
     <div className="grid gap-1.5 text-xs leading-relaxed text-foreground/90">
       {lines.map((line, index) => {
@@ -1266,7 +1275,10 @@ function AluxReadableText({ text }: { text: string }) {
         const isNumbered = /^\d+[.)]\s+/.test(cleaned);
         const content = cleaned.replace(/^[-*•]\s+/, "").replace(/^\d+[.)]\s+/, "");
         return (
-          <p key={`${index}-${line.slice(0, 12)}`} className={isBullet || isNumbered ? "pl-4" : undefined}>
+          <p
+            key={`${index}-${line.slice(0, 12)}`}
+            className={isBullet || isNumbered ? "pl-4" : undefined}
+          >
             {isBullet ? "• " : isNumbered ? `${cleaned.match(/^\d+/)?.[0]}. ` : ""}
             {content}
           </p>
