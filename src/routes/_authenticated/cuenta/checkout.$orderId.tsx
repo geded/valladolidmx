@@ -21,6 +21,7 @@ import {
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
+import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
   component: CheckoutPage,
