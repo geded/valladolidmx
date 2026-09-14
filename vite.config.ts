@@ -96,8 +96,9 @@ export default defineConfig({
                       Response.error(),
                   },
                 ],
-
+              },
             },
+
             // Los archivos construidos llevan hash en el nombre y no contienen
             // datos ni sesiones. Guardarlos permite reabrir offline una página
             // pública ya visitada sin mezclar archivos de versiones distintas.
