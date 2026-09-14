@@ -104,6 +104,8 @@ export type HomePremiumEvent = {
   href: string | null;
   /** Fecha acreditada del evento (ISO). Null cuando el CMS no la declara. */
   startsAt?: string | null;
+  /** Portada del evento en miniatura. Null cuando el CMS no publica medio. */
+  media?: { url: string; alt: string } | null;
 };
 
 export type HomePremiumEditorial = {
