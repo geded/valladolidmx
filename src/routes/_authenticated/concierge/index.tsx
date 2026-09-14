@@ -177,9 +177,10 @@ function ConciergeInboxPage() {
     [allCases, followUpById],
   );
 
+  // "Todo el equipo" sólo tiene sentido para quien supervisa la operación.
   const visibleInboxes = useMemo(
-    () => CONCIERGE_INBOXES.filter((i) => (i.scope === "lead" ? true : true)),
-    [],
+    () => CONCIERGE_INBOXES.filter((i) => (i.id === "all" ? isLead : true)),
+    [isLead],
   );
 
   const byInbox = useMemo(() => {
@@ -189,14 +190,18 @@ function ConciergeInboxPage() {
         inbox.id,
         enriched.filter((item) => {
           if (inbox.id === "unassigned") return !item.ownerId;
-          if (inbox.id === "mine") return unassignedQ.data.every((u) => u.id !== item.row.id);
+          if (inbox.id === "mine") {
+            if (!user || item.ownerId !== user.id) return false;
+            return inbox.stages.includes(item.stage.id);
+          }
           if (inbox.stages.length === 0) return true;
           return inbox.stages.includes(item.stage.id);
         }),
       );
     }
     return result;
-  }, [enriched, unassignedQ.data, visibleInboxes]);
+  }, [enriched, user, visibleInboxes]);
+
 
   const term = search.trim().toLowerCase();
   const items = (byInbox.get(inboxId) ?? []).filter((item) => {
