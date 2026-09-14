@@ -1312,7 +1312,21 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
           setState("empty");
           return;
         }
-        setPayload(raw as HandoffPayload);
+        // La operación oficial devuelve un sobre
+        // { event_id, occurred_at, payload }. Aceptamos ambas formas.
+        const envelope = raw as { payload?: unknown; occurred_at?: string };
+        const inner =
+          envelope && typeof envelope === "object" && envelope.payload
+            ? (envelope.payload as HandoffPayload)
+            : (raw as HandoffPayload);
+        if (!inner || Object.keys(inner).length === 0) {
+          setState("empty");
+          return;
+        }
+        setPayload({
+          ...inner,
+          generated_at: inner.generated_at ?? envelope?.occurred_at,
+        });
         setState("idle");
       })
       .catch((e) => {
