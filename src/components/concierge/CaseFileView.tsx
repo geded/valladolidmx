@@ -514,18 +514,25 @@ function TravelerContactSection({ traveler }: { traveler: CaseFile["traveler"] }
         <div className="flex flex-wrap content-start gap-2">
           {emailHref ? (
             <Button asChild size="sm" variant="outline">
-              <a href={emailHref}><Mail className="size-4" aria-hidden />Correo</a>
+              <a href={emailHref}>
+                <Mail className="size-4" aria-hidden />
+                Correo
+              </a>
             </Button>
           ) : null}
           {phoneHref ? (
             <Button asChild size="sm" variant="outline">
-              <a href={phoneHref}><Phone className="size-4" aria-hidden />Llamar</a>
+              <a href={phoneHref}>
+                <Phone className="size-4" aria-hidden />
+                Llamar
+              </a>
             </Button>
           ) : null}
           {whatsappHref ? (
             <Button asChild size="sm">
               <a href={whatsappHref} target="_blank" rel="noreferrer">
-                <MessageCircle className="size-4" aria-hidden />WhatsApp
+                <MessageCircle className="size-4" aria-hidden />
+                WhatsApp
               </a>
             </Button>
           ) : null}
@@ -658,10 +665,14 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
   const canCompare = proposals.length >= 2;
 
   return (
-    <Section title={internal ? "Propuesta económica del Concierge" : "Propuestas"} id="case-proposals">
+    <Section
+      title={internal ? "Propuesta económica del Concierge" : "Propuestas"}
+      id="case-proposals"
+    >
       {internal ? (
         <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-          Las empresas sólo cotizan sus servicios. Tú seleccionas esas respuestas, preparas la propuesta final y la envías al viajero.
+          Las empresas sólo cotizan sus servicios. Tú seleccionas esas respuestas, preparas la
+          propuesta final y la envías al viajero.
         </p>
       ) : null}
       {proposals.length === 0 ? (
@@ -940,7 +951,10 @@ function ProposalComposer({
   const [validUntil, setValidUntil] = useState("");
   const [busy, setBusy] = useState(false);
   const selectedQuotes = submittable.filter((quote) => selected[quote.quote_id]);
-  const selectedTotal = selectedQuotes.reduce((sum, quote) => sum + (quote.total_amount_cents ?? 0), 0);
+  const selectedTotal = selectedQuotes.reduce(
+    (sum, quote) => sum + (quote.total_amount_cents ?? 0),
+    0,
+  );
 
   async function onCreate() {
     const items = Object.entries(selected)

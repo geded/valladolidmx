@@ -2193,7 +2193,9 @@ function ConciergeSection({
   useEffect(() => {
     const profile = contactQuery.data;
     if (!profile) return;
-    setContactName(profile.display_name ?? [profile.first_name, profile.last_name].filter(Boolean).join(" "));
+    setContactName(
+      profile.display_name ?? [profile.first_name, profile.last_name].filter(Boolean).join(" "),
+    );
     setContactPhone(profile.phone ?? "");
     setWhatsappConsent(profile.whatsapp_contact_consent);
   }, [contactQuery.data]);
@@ -2293,7 +2295,8 @@ function ConciergeSection({
           <fieldset className="grid gap-3 rounded-md border border-border/70 bg-background/60 p-4">
             <legend className="px-1 text-sm font-semibold">Tus datos de contacto</legend>
             <p className="text-xs text-muted-foreground">
-              El equipo Concierge los usará para aclarar tu solicitud. Nunca se comparten con las empresas.
+              El equipo Concierge los usará para aclarar tu solicitud. Nunca se comparten con las
+              empresas.
             </p>
             <label className="grid gap-1 text-xs font-medium">
               Nombre completo
@@ -2335,7 +2338,10 @@ function ConciergeSection({
                 onChange={(event) => setWhatsappConsent(event.target.checked)}
                 className="mt-0.5 size-4 accent-primary"
               />
-              <span>Confirmo que este móvil tiene WhatsApp y autorizo al Concierge a escribirme sobre este viaje.</span>
+              <span>
+                Confirmo que este móvil tiene WhatsApp y autorizo al Concierge a escribirme sobre
+                este viaje.
+              </span>
             </label>
           </fieldset>
           <textarea
@@ -2355,10 +2361,7 @@ function ConciergeSection({
           </p>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>{summary.length}/500</span>
-            <Button
-              type="submit"
-              disabled={!canSend}
-            >
+            <Button type="submit" disabled={!canSend}>
               {send.isPending ? "Enviando…" : "Enviar al Concierge"}
             </Button>
           </div>
