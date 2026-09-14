@@ -207,10 +207,37 @@ function CheckoutPage() {
             Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el
             acompañamiento de tu concierge para los siguientes pasos.
           </p>
-          <p className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground/80">
-            Forma de pago: <strong>efectivo con tu concierge</strong>. Al confirmar queda registrado
-            el pago de tu viaje y se abre tu itinerario con el acompañamiento de Alux.
-          </p>
+          <div className="mt-4 space-y-3">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              Forma de pago
+            </p>
+            <div className="rounded-md border border-primary/40 bg-background px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium">Efectivo con tu concierge</span>
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  Disponible
+                </Badge>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Al confirmar queda registrado el pago de tu viaje y se abre tu itinerario con el
+                acompañamiento de Alux.
+              </p>
+            </div>
+            <div
+              aria-disabled="true"
+              className="cursor-not-allowed rounded-md border border-border bg-muted/30 px-4 py-3 opacity-60"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium">Pagar con tarjeta</span>
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  Próximamente
+                </Badge>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                El pago con tarjeta estará disponible muy pronto.
+              </p>
+            </div>
+          </div>
           <div className="mt-5 flex flex-wrap gap-3">
             <Button onClick={handleConfirm} disabled={busy} size="lg">
               {busy ? "Confirmando…" : "Confirmar mi viaje (pago en efectivo)"}
