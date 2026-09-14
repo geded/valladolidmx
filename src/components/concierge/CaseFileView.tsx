@@ -68,7 +68,28 @@ type CaseFile = {
     whatsapp_contact_consent?: boolean;
     whatsapp_contact_consented_at?: string | null;
   };
-  travel_plan: { id: string } | null;
+  travel_plan: {
+    id: string;
+    title?: string | null;
+    status?: string | null;
+    party_size?: number | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    notes?: string | null;
+    source?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+    items?: Array<{
+      id: string;
+      item_kind: string;
+      day_index?: number | null;
+      position?: number | null;
+      notes?: string | null;
+      title?: string | null;
+      subtitle?: string | null;
+      slug?: string | null;
+    }>;
+  } | null;
   requests: Array<{
     id: string;
     title: string;
