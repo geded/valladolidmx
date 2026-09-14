@@ -42,6 +42,10 @@ export default defineConfig({
           // conexión" unos segundos y luego la autorreparación de esa página
           // recargaba el sitio. El fallback offline ahora vive dentro de la
           // ruta NetworkFirst de navegación y sólo actúa si la red falla.
+          // El valor por defecto del plugin ("index.html") debe anularse.
+          navigateFallback: undefined,
+
+
 
           // Sólo el cascarón público estable. Los chunks de rutas, CMS,
           // administración y sesiones se solicitan bajo demanda y nunca se
