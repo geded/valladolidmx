@@ -219,22 +219,16 @@ function CheckoutPage() {
         <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
           <h3 className="font-serif text-lg">Confirmemos tu viaje</h3>
           <p className="mt-2 text-sm text-foreground/80">
-            Al continuar reservamos tu experiencia con los anfitriones seleccionados y activamos el
+            Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el
             acompañamiento de tu concierge para los siguientes pasos.
           </p>
-          {demoMode || !paymentsReady ? (
-            <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
-              Modo demostración: el viaje se confirma al instante sin cobro real. Ideal para
-              recorridos comerciales.
-            </p>
-          ) : null}
+          <p className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground/80">
+            Forma de pago: <strong>efectivo con tu concierge</strong>. Al confirmar queda registrado
+            el pago de tu viaje y se abre tu itinerario con el acompañamiento de Alux.
+          </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Button onClick={handleConfirm} disabled={busy} size="lg">
-              {busy
-                ? "Confirmando…"
-                : demoMode || !paymentsReady
-                  ? "Confirmar mi viaje (demo)"
-                  : "Confirmar mi viaje"}
+              {busy ? "Confirmando…" : "Confirmar mi viaje (pago en efectivo)"}
             </Button>
             <Button type="button" variant="ghost" onClick={handleCancel} disabled={busy}>
               Cancelar
