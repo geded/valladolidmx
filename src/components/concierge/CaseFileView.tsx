@@ -6,6 +6,8 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter, useNavigate } from "@tanstack/react-router";
+import { Check, Circle, Headset, Sparkles } from "lucide-react";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 import { toast } from "@/lib/toast";
 import {
   acceptConciergeProposal,
@@ -329,7 +331,9 @@ export function CaseFileView({
 
   return (
     <div className="grid gap-6">
-      <Header f={f} />
+      <Header f={f} internal={internal} />
+      {!internal && <TravelerConciergeProgress f={f} />}
+      {!internal && <ProposalsSection f={f} internal={false} />}
       {internal && <SlaAssignmentPanel f={f} />}
       {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
@@ -397,7 +401,7 @@ export function CaseFileView({
         </Section>
       )}
 
-      <ProposalsSection f={f} internal={internal} />
+      {internal && <ProposalsSection f={f} internal />}
 
       {internal && (
         <Section title="Enlaces internos">
@@ -438,7 +442,7 @@ export function CaseFileView({
   );
 }
 
-function Header({ f }: { f: CaseFile }) {
+function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
   return (
     <header className="rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -449,14 +453,76 @@ function Header({ f }: { f: CaseFile }) {
       </div>
       <h2 className="mt-2 text-lg font-semibold">{f.case.summary ?? "Sin resumen"}</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Origen: {labelFor(f.case.source, SOURCE_LABELS)} · Prioridad:{" "}
-        {labelFor(f.case.priority, PRIORITY_LABELS)} · Creado{" "}
-        {new Date(f.case.created_at).toLocaleString()}
+        {internal ? `Origen: ${labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: ${labelFor(f.case.priority, PRIORITY_LABELS)} · ` : "Recibido "}
+        {new Date(f.case.created_at).toLocaleString("es-MX")}
       </p>
-      {f.traveler.display_name && (
+      {internal && f.traveler.display_name && (
         <p className="mt-1 text-xs text-muted-foreground">Viajero: {f.traveler.display_name}</p>
       )}
     </header>
+  );
+}
+
+function TravelerConciergeProgress({ f }: { f: CaseFile }) {
+  const alux = useAluxBrand();
+  const proposals = f.proposals ?? [];
+  const hasReadyProposal = proposals.some((proposal) =>
+    ["sent", "viewed", "accepted"].includes(proposal.status),
+  );
+  const hasQuoteActivity =
+    f.requests.some((request) => ["quoting", "quoted", "accepted"].includes(request.status)) ||
+    (f.quotes?.length ?? 0) > 0;
+  const isReviewing =
+    hasQuoteActivity ||
+    ["triaged", "in_progress", "waiting_business", "waiting_customer"].includes(f.case.status);
+  const activeStep = hasReadyProposal ? 3 : hasQuoteActivity ? 2 : isReviewing ? 1 : 0;
+  const steps = ["Recibido", "En revisión", "Preparando propuesta", "Propuesta lista"];
+
+  return (
+    <section aria-labelledby="traveler-concierge-progress" className="border-y border-alux-border bg-alux-surface px-4 py-5 sm:px-5">
+      <div className="flex items-start gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-alux text-alux-foreground">
+          {hasReadyProposal ? <Headset className="size-5" aria-hidden /> : <Sparkles className="size-5" aria-hidden />}
+        </span>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-alux-surface-foreground/70">
+            {alux.name} · contigo durante la espera
+          </p>
+          <h3 id="traveler-concierge-progress" className="mt-1 text-lg font-semibold text-alux-surface-foreground">
+            {hasReadyProposal
+              ? alux.copy("conciergeProposalReadyTitle")
+              : isReviewing
+                ? alux.copy("conciergeWaitingTitle")
+                : alux.copy("conciergeSentTitle")}
+          </h3>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-alux-surface-foreground/75">
+            {hasReadyProposal
+              ? alux.copy("conciergeProposalReadyBody")
+              : isReviewing
+                ? alux.copy("conciergeWaitingBody")
+                : alux.copy("conciergeSentBody")}
+          </p>
+        </div>
+      </div>
+      <ol className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Avance de tu solicitud">
+        {steps.map((step, index) => {
+          const complete = index <= activeStep;
+          return (
+            <li key={step} className="flex items-center gap-2 text-xs">
+              <span className={`grid size-6 shrink-0 place-items-center rounded-full border ${complete ? "border-alux bg-alux text-alux-foreground" : "border-alux-border bg-background text-muted-foreground"}`}>
+                {complete ? <Check className="size-3.5" aria-hidden /> : <Circle className="size-3" aria-hidden />}
+              </span>
+              <span className={complete ? "font-medium text-alux-surface-foreground" : "text-alux-surface-foreground/55"}>{step}</span>
+            </li>
+          );
+        })}
+      </ol>
+      {!hasReadyProposal ? (
+        <p className="mt-4 border-t border-alux-border pt-3 text-xs text-alux-surface-foreground/70">
+          Cuando esté lista, recibirás un aviso en tu cuenta y podrás revisar qué incluye, el importe y la vigencia antes de decidir.
+        </p>
+      ) : null}
+    </section>
   );
 }
 

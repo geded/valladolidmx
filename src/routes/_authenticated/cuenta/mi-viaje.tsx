@@ -85,6 +85,7 @@ import {
   openWorkspaceTour,
 } from "@/components/traveler/WorkspaceOnboardingTour";
 import { HelpCircle } from "lucide-react";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista; focus?: string } => {
@@ -2169,6 +2170,7 @@ function ConciergeSection({
   onChanged: () => void;
 }) {
   const qc = useQueryClient();
+  const alux = useAluxBrand();
   const promote = useServerFn(promotePlanToCase);
   const { plan, items } = data;
   const [summary, setSummary] = useState("");
@@ -2214,19 +2216,30 @@ function ConciergeSection({
       </p>
 
       {alreadyShared ? (
-        <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
-          <p className="font-medium">Ya enviaste este viaje al Concierge.</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            El caso está en proceso. Puedes seguir agregando elementos y volver a enviar cuando
-            quieras revisar contigo tu concierge.
-          </p>
+        <div className="mt-4 border-y border-alux-border bg-alux-surface px-4 py-4 text-sm">
+          <div className="flex items-start gap-3">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-alux text-alux-foreground">
+              <SparklesIcon className="size-4" aria-hidden />
+            </span>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-alux-surface-foreground/70">
+                {alux.name} · seguimiento activo
+              </p>
+              <p className="mt-1 font-semibold text-alux-surface-foreground">
+                {alux.copy("conciergeSentTitle")}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-alux-surface-foreground/75">
+                {alux.copy("conciergeSentBody")}
+              </p>
+            </div>
+          </div>
           {plan.case_id ? (
             <Link
               to="/cuenta/concierge/$caseId"
               params={{ caseId: plan.case_id }}
-              className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
+              className="mt-4 inline-flex min-h-11 items-center rounded-full bg-alux px-4 py-2 text-xs font-semibold text-alux-foreground hover:opacity-90"
             >
-              Ver mi caso →
+              Ver seguimiento →
             </Link>
           ) : null}
         </div>

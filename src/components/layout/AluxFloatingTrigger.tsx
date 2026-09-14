@@ -942,7 +942,9 @@ export function AluxFloatingTrigger() {
                 </ul>
               )}
               <p className="mt-2 text-[11px] text-muted-foreground">
-                No repito ni contradigo lo que tu concierge ya está armando — complemento alrededor.
+                {concierge.active_proposals_count > 0
+                  ? alux.copy("conciergeProposalReadyBody")
+                  : alux.copy("conciergeWaitingBody")}
               </p>
             </section>
           )}

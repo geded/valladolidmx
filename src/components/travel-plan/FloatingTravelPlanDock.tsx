@@ -44,6 +44,8 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { getMyActivePlan, type TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
+import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 import { narratePlan, type AluxTravelerSuggestion } from "@/lib/traveler/alux-traveler.functions";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTranslation } from "@/i18n/context";
@@ -112,6 +114,7 @@ const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
 };
 
 export function FloatingTravelPlanDock() {
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const {
     trip: anonymousTrip,
@@ -144,6 +147,18 @@ export function FloatingTravelPlanDock() {
     enabled,
     staleTime: 60_000,
   });
+  const fetchCaseFile = useServerFn(getConciergeCaseFile);
+  const activeCaseId = q.data?.plan.case_id ?? null;
+  const caseFileQ = useQuery({
+    queryKey: ["concierge", "case-file", "dock", activeCaseId],
+    queryFn: () => {
+      if (!activeCaseId) return Promise.resolve(null);
+      return fetchCaseFile({ data: { caseId: activeCaseId } });
+    },
+    enabled: enabled && Boolean(activeCaseId),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+  });
 
   const [open, setOpen] = useState(false);
   /* Founder Decision: el retorno se reconoce con un aviso breve en el
@@ -165,9 +180,10 @@ export function FloatingTravelPlanDock() {
     return onPlanChanged(() => {
       void q.refetch();
       void confirmedQ.refetch();
+      void caseFileQ.refetch();
       narration.reset();
     });
-  }, [enabled, q, confirmedQ]);
+  }, [enabled, q, confirmedQ, caseFileQ]);
 
   /* Aviso de continuidad: aparece una sola vez al volver y se cierra solo. */
   useEffect(() => {
@@ -320,6 +336,14 @@ export function FloatingTravelPlanDock() {
   const count = items.length;
   const confirmed = confirmedQ.data ?? null;
   const isConfirmed = !!confirmed && confirmed.status !== "refunded";
+  const caseFile = caseFileQ.data as
+    | { proposals?: Array<{ status?: string }>; case?: { id?: string } }
+    | null
+    | undefined;
+  const hasConciergeResponse =
+    caseFile?.proposals?.some((proposal) =>
+      ["sent", "viewed", "accepted"].includes(proposal.status ?? ""),
+    ) ?? false;
 
   // No molestar cuando aún no hay ítems ni viaje confirmado ni sheet abierto.
   if (count === 0 && !isConfirmed && !open) return null;
@@ -332,12 +356,16 @@ export function FloatingTravelPlanDock() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={
-          isConfirmed
+          hasConciergeResponse
+            ? "Ya tienes una respuesta de tu Concierge humano"
+            : isConfirmed
             ? `Viaje confirmado ${confirmed!.folio}`
             : `Tu viaje (${count} ${count === 1 ? "ítem" : "ítems"})`
         }
         className={`fixed left-4 z-40 inline-flex items-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-semibold shadow-elevated backdrop-blur transition-colors md:left-6 ${
-          isConfirmed
+          hasConciergeResponse
+            ? "border-alux-border bg-alux-surface text-alux-surface-foreground hover:opacity-95"
+            : isConfirmed
             ? "border-success/40 bg-success/10 text-foreground hover:bg-success/15"
             : "border-primary/25 bg-card/95 text-foreground hover:bg-card"
         }`}
@@ -345,15 +373,24 @@ export function FloatingTravelPlanDock() {
       >
         <span
           className={`grid size-7 place-items-center rounded-full ${
-            isConfirmed
+            hasConciergeResponse
+              ? "bg-alux text-alux-foreground"
+              : isConfirmed
               ? "bg-success text-success-foreground"
               : "bg-primary text-primary-foreground"
           }`}
         >
           <Luggage className="h-4 w-4" aria-hidden />
         </span>
-        <span className="hidden sm:inline">{isConfirmed ? "Viaje confirmado" : "Tu viaje"}</span>
-        {isConfirmed ? (
+        <span className="hidden sm:inline">
+          {hasConciergeResponse ? "Respuesta del Concierge" : isConfirmed ? "Viaje confirmado" : "Tu viaje"}
+        </span>
+        {hasConciergeResponse ? (
+          <span className="relative flex size-5 items-center justify-center" aria-hidden>
+            <span className="absolute size-2.5 animate-ping rounded-full bg-alux opacity-40 motion-reduce:animate-none" />
+            <span className="relative size-2.5 rounded-full bg-alux" />
+          </span>
+        ) : isConfirmed ? (
           <span className="inline-flex items-center rounded-full bg-success/20 px-2 text-[11px] font-bold tracking-wider text-success-foreground">
             {confirmed!.folio}
           </span>
@@ -376,6 +413,37 @@ export function FloatingTravelPlanDock() {
                   : `${count} ${count === 1 ? "ítem guardado" : "ítems guardados"}. Abre la vista completa para editar fechas, notas y enviar a tu concierge.`}
             </SheetDescription>
           </SheetHeader>
+
+          {hasConciergeResponse ? (
+            <div className="mt-4 border-y border-alux-border bg-alux-surface px-3 py-4">
+              <div className="flex items-start gap-2.5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-alux text-alux-foreground">
+                  <Sparkles className="size-4" aria-hidden />
+                </span>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-alux-surface-foreground/70">
+                    {alux.name} · nueva respuesta
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-alux-surface-foreground">
+                    {alux.copy("conciergeProposalReadyTitle")}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-alux-surface-foreground/75">
+                    {alux.copy("conciergeProposalReadyBody")}
+                  </p>
+                  {activeCaseId ? (
+                    <Link
+                      to="/cuenta/concierge/$caseId"
+                      params={{ caseId: activeCaseId }}
+                      onClick={() => setOpen(false)}
+                      className="mt-3 inline-flex min-h-10 items-center rounded-full bg-alux px-4 py-2 text-xs font-semibold text-alux-foreground hover:opacity-90"
+                    >
+                      Revisar propuesta
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {isConfirmed ? (
             <div className="mt-4 rounded-xl border border-success/40 bg-success/10 p-3">

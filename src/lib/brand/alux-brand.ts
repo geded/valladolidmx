@@ -60,6 +60,12 @@ export interface AluxVoice {
   viewTrip: string;
   humanConciergeTitle: string;
   humanConciergeBody: string;
+  conciergeSentTitle: string;
+  conciergeSentBody: string;
+  conciergeWaitingTitle: string;
+  conciergeWaitingBody: string;
+  conciergeProposalReadyTitle: string;
+  conciergeProposalReadyBody: string;
   prepareTrip: string;
   retry: string;
   loadingTrip: string;
@@ -270,6 +276,15 @@ const ES: AluxVoice = {
   humanConciergeTitle: "Cuando quieras hacerlo realidad",
   humanConciergeBody:
     "Tu expediente conserva lo que elegiste. Cuando tú lo decidas, un concierge humano podrá revisarlo contigo, coordinar opciones y ayudarte a convertirlo en un viaje real.",
+  conciergeSentTitle: "Ya compartí tu viaje con el Concierge",
+  conciergeSentBody:
+    "Un concierge humano tiene la información que elegiste. Me quedaré pendiente y te avisaré cuando llegue una respuesta para revisarla juntos.",
+  conciergeWaitingTitle: "Tu Concierge está revisando el viaje",
+  conciergeWaitingBody:
+    "Mientras prepara una respuesta, puedes seguir explorando o añadir una nota. Te avisaré aquí cuando haya una propuesta para ti.",
+  conciergeProposalReadyTitle: "Ya tienes una respuesta de tu Concierge",
+  conciergeProposalReadyBody:
+    "La propuesta está lista. Ábrela para que revisemos juntos qué incluye, su importe y su vigencia antes de que decidas.",
   prepareTrip: "Preparar mi viaje",
   retry: "Reintentar",
   loadingTrip: "Cargando tu viaje antes de conversar…",
