@@ -1183,19 +1183,19 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             {visible.map((event, index) => (
               <li
                 key={`${event.title}-${index}`}
-                className="grid grid-cols-[3.25rem_1fr] items-center gap-3 py-2.5 lg:grid-cols-[3.5rem_1fr_auto] lg:py-3.5"
+                className="grid grid-cols-[3rem_1fr] items-center gap-3 py-2.5 lg:grid-cols-[3rem_1fr_auto] lg:py-3.5"
               >
                 {event.media?.url ? (
                   <img
                     src={event.media.url}
                     alt={event.media.alt || event.title}
                     loading="lazy"
-                    className="size-13 h-13 w-13 rounded-xl object-cover"
+                    className="h-12 w-12 rounded-xl object-cover"
                   />
                 ) : (
                   <span
                     aria-hidden
-                    className="grid h-13 w-13 place-items-center rounded-xl bg-secondary text-muted-foreground"
+                    className="grid h-12 w-12 place-items-center rounded-xl bg-secondary text-muted-foreground"
                   >
                     <CalendarDays className="size-5" />
                   </span>
