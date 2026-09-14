@@ -43,20 +43,28 @@ function OfflinePage() {
         } catch {
           /* noop */
         }
-      try {
-        if ("caches" in window) {
-          const names = await caches.keys();
-          await Promise.all(names.map((n) => caches.delete(n)));
+        try {
+          if ("caches" in window) {
+            const names = await caches.keys();
+            await Promise.all(names.map((n) => caches.delete(n)));
+          }
+          if ("serviceWorker" in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((r) => r.unregister()));
+          }
+        } catch {
+          /* noop */
         }
-        if ("serviceWorker" in navigator) {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(regs.map((r) => r.unregister()));
-        }
-      } catch {
-        /* noop */
-      }
-      window.location.replace("/");
-    })();
+        window.location.replace("/");
+      })();
+    };
+
+    // Vuelve a intentar si pasó más de un minuto desde el último intento.
+    if (navigator.onLine && now - last > 60_000) recover();
+
+    const onOnline = () => recover();
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
   }, []);
 
   if (recovering) {
