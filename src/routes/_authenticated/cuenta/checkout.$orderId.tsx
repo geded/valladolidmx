@@ -97,21 +97,15 @@ function CheckoutPage() {
   async function handleConfirm() {
     setBusy(true);
     try {
-      const result = await startCheckout({ data: { orderId } });
-      if (result.mode === "demo" || result.status === "paid") {
-        await orderQ.refetch();
-        toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
-        navigate({
-          to: "/cuenta/pagos/exito",
-          search: { order: orderId },
-        });
-        return;
-      }
-      if (result.redirectUrl) {
-        window.location.assign(result.redirectUrl);
-        return;
-      }
-      toast.info("Estamos preparando el cobro con el proveedor…");
+      // Modalidad vigente: pago en efectivo con el concierge.
+      await payCash({ data: { orderId, note: null } });
+      await orderQ.refetch();
+      toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
+      navigate({
+        to: "/cuenta/pagos/exito",
+        search: { order: orderId },
+      });
+      return;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Ocurrió un problema";
       toast.error(message);
