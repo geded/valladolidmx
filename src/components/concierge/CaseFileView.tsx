@@ -616,7 +616,6 @@ function TravelPlanSection({ plan }: { plan: CaseFile["travel_plan"] }) {
   );
 }
 
-
 function TravelerContactSection({ traveler }: { traveler: CaseFile["traveler"] }) {
   const safePhone = traveler.phone?.trim() ?? "";
   const phoneHref = /^\+?[0-9 ()-]{8,32}$/.test(safePhone)
