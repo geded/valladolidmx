@@ -29,7 +29,13 @@ import { buildCanonicalEntityUrl } from "./canonical-entity-binding";
 import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
 import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 import { readPublishedRouteCards } from "@/lib/routes-editorial/route-public-reads.server";
-import { nextEventOccurrence, normalizeExceptionDates, normalizeScheduleTimes } from "@/lib/events/recurrence";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+  toRecurrencePayload,
+} from "@/lib/events/recurrence";
+import type { EventRecurrenceInput } from "@/lib/events/recurrence";
 import {
   routeDifficultyLabel,
   routeDurationLabel,
