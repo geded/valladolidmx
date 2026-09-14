@@ -6786,36 +6786,45 @@ export type Database = {
         Row: {
           created_at: string
           day_index: number | null
+          duration_minutes: number | null
           id: string
           item_kind: Database["public"]["Enums"]["travel_item_kind"]
           notes: string | null
           plan_id: string
           position: number
+          schedule_source: string | null
           snapshot: Json
+          starts_at_local: string | null
           target_id: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           day_index?: number | null
+          duration_minutes?: number | null
           id?: string
           item_kind: Database["public"]["Enums"]["travel_item_kind"]
           notes?: string | null
           plan_id: string
           position?: number
+          schedule_source?: string | null
           snapshot?: Json
+          starts_at_local?: string | null
           target_id?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           day_index?: number | null
+          duration_minutes?: number | null
           id?: string
           item_kind?: Database["public"]["Enums"]["travel_item_kind"]
           notes?: string | null
           plan_id?: string
           position?: number
+          schedule_source?: string | null
           snapshot?: Json
+          starts_at_local?: string | null
           target_id?: string | null
           updated_at?: string
         }
