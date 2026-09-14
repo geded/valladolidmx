@@ -197,7 +197,11 @@ export function HomePremiumSurface({
   // Nunca cambian jerarquía, orden ni geometría entre sí.
   const presentationOrder: HomePremiumSectionKey[] = order;
   const remainingDiscoveryOrder = presentationOrder.filter(
-    (key) => key !== "destinos" && key !== "rutas" && key !== "eventos",
+    (key) =>
+      key !== "destinos" &&
+      key !== "rutas" &&
+      key !== "eventos" &&
+      key !== "experiencias",
   );
 
   const renderSection = (key: HomePremiumSectionKey) => {
@@ -292,6 +296,12 @@ export function HomePremiumSurface({
         {enabled("eventos") ? (
           <Container className="mt-8 lg:mt-12" data-home-journey="eventos">
             <div data-cinematic-section={cinematic || undefined}>{renderSection("eventos")}</div>
+          </Container>
+        ) : null}
+
+        {enabled("experiencias") ? (
+          <Container className="mt-8 lg:mt-12" data-home-journey="experiencias">
+            <div data-cinematic-section={cinematic || undefined}>{renderSection("experiencias")}</div>
           </Container>
         ) : null}
 
