@@ -161,9 +161,17 @@ function AuthRoute() {
 
   const returnLabel =
     (returnTarget ? describeJourneyStep(returnTarget)?.label : null) ?? "la página anterior";
-  const crumbs = [
-    { label: "Oriente Maya", to: "/oriente-maya" },
-    ...(session?.destination
+  /*
+   * Las migas reflejan el recorrido REAL del explorador. Antes se anteponía
+   * siempre "Oriente Maya" (+ el último destino guardado en sesión), de modo
+   * que al entrar desde Home la ruta mostrada era falsa. Ahora el ancla
+   * territorial sólo aparece cuando el origen del acceso es territorial.
+   */
+  const territorialOrigin =
+    returnTarget?.startsWith("/oriente-maya") === true ||
+    journey.some((s) => s.path === "/mapa" || s.path === "/rutas");
+  const destinationCrumb =
+    territorialOrigin && session?.destination
       ? [
           {
             label: session.destination.label,
@@ -171,7 +179,10 @@ function AuthRoute() {
             params: { destino: session.destination.slug },
           },
         ]
-      : []),
+      : [];
+  const crumbs = [
+    ...(territorialOrigin ? [{ label: "Oriente Maya", to: "/oriente-maya" }] : []),
+    ...destinationCrumb,
     // Recorrido real del explorador (Arma tu Viaje, Alux, Mapa…) antes del acceso.
     ...journey.map((step) => ({ label: step.label, to: step.path })),
     { label: t("auth.eyebrow") },
