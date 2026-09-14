@@ -191,7 +191,7 @@ export const updateBrandSettings = createServerFn({ method: "POST" })
         value:
           data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
         is_public: true,
-        description: "Identidad editorial y paleta visual de la marca activa.",
+        description: "Identidad editorial, paleta visual y voz multilingüe de la marca activa.",
         updated_by: context.userId,
       },
       { onConflict: "key" },

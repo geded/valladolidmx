@@ -15,15 +15,17 @@ import type { AluxAction } from "@/lib/workspace/types";
 import { workspaceToast } from "@/lib/workspace/toast-bus";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 const IMPACT_TONE: Record<NonNullable<AluxAction["impact"]>, string> = {
   low: "bg-muted text-muted-foreground",
   medium: "bg-info/15 text-info",
-  high: "bg-primary/15 text-primary",
+  high: "bg-alux/15 text-alux",
 };
 
 export function AluxCopilotPanel({ className }: { className?: string }) {
   const { workspace } = useWorkspace();
+  const alux = useAluxBrand();
   const [headline, setHeadline] = useState<string>("");
   const [summary, setSummary] = useState<string | undefined>();
   const [actions, setActions] = useState<AluxAction[]>([]);
@@ -74,15 +76,15 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
   return (
     <section
       className={cn("flex h-full flex-col gap-4 border-l border-border bg-surface p-4", className)}
-      aria-label="Copiloto Alux"
+      aria-label={alux.copy("workspaceTitle")}
     >
       <header className="flex items-center gap-2">
-        <span className="grid size-8 place-items-center rounded-full bg-primary/15 text-primary">
+        <span className="grid size-8 place-items-center rounded-full bg-alux/15 text-alux">
           <Sparkles className="h-4 w-4" aria-hidden />
         </span>
         <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            Copiloto · Alux
+            {alux.copy("workspaceTitle")}
           </div>
           <div className="truncate font-display text-sm">{workspace?.label ?? "Workspace"}</div>
         </div>
@@ -90,14 +92,14 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
 
       <div className="rounded-2xl border border-border bg-surface-raised p-4">
         <p className="font-display text-base leading-snug">
-          {headline || "Alux está observando el pulso de este workspace."}
+          {headline || alux.copy("workspaceEmpty")}
         </p>
         {summary ? <p className="mt-2 text-sm text-muted-foreground">{summary}</p> : null}
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Próxima acción de alto impacto
+          {alux.copy("workspaceActionTitle")}
         </div>
         <ul className="mt-2 space-y-2">
           {actions.length === 0 ? (
@@ -209,7 +211,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
 
       <footer>
         <Button variant="outline" className="w-full" size="sm">
-          Abrir conversación con Alux
+          {alux.copy("workspaceOpen")}
         </Button>
       </footer>
     </section>

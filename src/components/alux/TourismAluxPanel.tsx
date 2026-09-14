@@ -4,7 +4,7 @@ import { Compass, Sparkles } from "lucide-react";
 import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
 import { useRegisterAluxEmbedded } from "@/lib/alux/embedded-presence";
 
-import { useBrand } from "@/lib/brand/brand-context";
+import { useAluxBrand, useBrand } from "@/lib/brand/brand-context";
 import { openAluxFloating, type AluxOpenSelection } from "@/lib/alux/floating-bus";
 import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { cn } from "@/lib/utils";
@@ -49,13 +49,14 @@ export function TourismAluxPanel({
   selection,
 }: TourismAluxPanelProps) {
   const brand = useBrand();
+  const alux = useAluxBrand();
   const ref = useRef<HTMLElement | null>(null);
   useRegisterAluxEmbedded(ref);
   /* Lote 3G · sin pistas duplicadas: las sugerencias de la plantilla no
      pueden repetir las dos pistas base (clave React duplicada). */
   const chips = useMemo(
-    () => Array.from(new Set<string>(["Estoy planeando", "Ya estoy en la región", ...prompts])),
-    [prompts],
+    () => Array.from(new Set<string>([alux.copy("planningPrompt"), alux.copy("onsitePrompt"), ...prompts])),
+    [alux, prompts],
   );
   const ask = (preference?: string) =>
     askAluxWithPreferenceMemory({
@@ -72,7 +73,7 @@ export function TourismAluxPanel({
       className={cn(
         /* Lote 3G.1 · presencia secundaria: superficie clara con acento de
            marca en lugar de una masa de color, altura y padding reducidos. */
-        "rounded-2xl border border-selva/25 border-l-2 border-l-selva/70 bg-selva/[0.06]",
+        "rounded-2xl border border-alux/25 border-l-2 border-l-alux/70 bg-alux-surface",
         compact ? "px-3 py-2.5" : "px-3.5 py-3",
         className,
       )}
@@ -93,10 +94,10 @@ export function TourismAluxPanel({
             loading="eager"
           />
           <div className="min-w-0">
-            <h2 className="truncate font-display text-sm leading-tight text-selva">
+            <h2 className="truncate font-display text-sm leading-tight text-alux-accent">
               {brand.conciergeName}
             </h2>
-            <p className="text-[10.5px] leading-tight text-muted-foreground">Concierge IA</p>
+            <p className="text-[10.5px] leading-tight text-muted-foreground">{alux.copy("shortDescriptor")}</p>
           </div>
         </div>
 
@@ -123,14 +124,14 @@ export function TourismAluxPanel({
         <button
           type="button"
           onClick={() => ask()}
-          className="relative col-start-2 row-start-1 inline-flex h-9 w-auto shrink-0 items-center justify-center gap-1.5 justify-self-end rounded-pill lg:col-start-3 lg:justify-self-start border border-selva/40 bg-background px-3.5 text-[13px] font-semibold text-selva transition-colors hover:bg-selva/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
+          className="relative col-start-2 row-start-1 inline-flex h-9 w-auto shrink-0 items-center justify-center gap-1.5 justify-self-end rounded-pill lg:col-start-3 lg:justify-self-start border border-alux/40 bg-alux-surface px-3.5 text-[13px] font-semibold text-alux-accent transition-colors hover:bg-alux/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alux-ring focus-visible:ring-offset-2 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-['']"
         >
           {variant === "card" ? (
             <Sparkles className="size-3.5" aria-hidden />
           ) : (
             <Compass className="size-3.5" aria-hidden />
           )}
-          Planear con {brand.conciergeName}
+          {alux.copy("planCta")}
         </button>
       </div>
     </section>

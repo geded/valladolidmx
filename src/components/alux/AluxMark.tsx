@@ -16,6 +16,7 @@
  */
 
 import { ACTIVE_BRAND } from "@/config/brand";
+import { useBrand } from "@/lib/brand/brand-context";
 
 export type AluxMarkFamily = "full" | "avatar";
 
@@ -58,6 +59,7 @@ export function AluxMark({
   className,
   loading = "lazy",
 }: AluxMarkProps) {
+  const brand = useBrand();
   const sizes = family === "full" ? FULL_SIZES : AVATAR_SIZES;
   const px = nearest(sizes, size);
   const srcSet = (fmt: "webp" | "avif") =>
@@ -77,7 +79,7 @@ export function AluxMark({
         height={size}
         loading={loading}
         decoding="async"
-        alt={decorative ? "" : ALUX_ACCESSIBLE_NAME}
+        alt={decorative ? "" : `${brand.conciergeName}, concierge IA de ${brand.name}`}
         aria-hidden={decorative ? true : undefined}
         className={className ? `object-contain ${className}` : "object-contain"}
         style={{ width: size, height: size }}

@@ -23,8 +23,8 @@ import {
 } from "./brand-settings.functions";
 import { ACTIVE_BRAND } from "@/config/brand";
 import { brandPaletteStyle } from "./brand-theme";
-import { aluxPaletteStyle, type AluxPalette } from "./brand-theme";
-import { fillAluxCopy, type AluxVoice } from "./alux-brand";
+import { aluxPaletteStyle } from "./brand-theme";
+import { fillAluxCopy, type AluxPalette, type AluxVoice } from "./alux-brand";
 import { useTranslation } from "@/i18n/context";
 
 export const BRAND_SETTINGS_QUERY_KEY = ["brand", "identity"] as const;

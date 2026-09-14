@@ -141,10 +141,11 @@ const EN: AluxVoice = {
 export const DEFAULT_ALUX_COPY: AluxCopyByLocale = {
   es: ES,
   en: EN,
-  fr: { ...EN, shortDescriptor: "Concierge IA", territorialDescriptor: "Concierge IA de {territory}" },
-  de: { ...EN, shortDescriptor: "KI-Concierge", territorialDescriptor: "KI-Concierge für {territory}" },
-  it: { ...EN, shortDescriptor: "Concierge IA", territorialDescriptor: "Concierge IA di {territory}" },
-  pt: { ...EN, shortDescriptor: "Concierge de IA", territorialDescriptor: "Concierge de IA de {territory}" },
+  // La voz actual es la reserva segura hasta que Marca publique cada traducción.
+  fr: { ...ES },
+  de: { ...ES },
+  it: { ...ES },
+  pt: { ...ES },
 };
 
 export function fillAluxCopy(
