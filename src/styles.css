@@ -101,6 +101,16 @@
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
 
+  /* Alux — identidad visual configurable por marca */
+  --color-alux: var(--alux);
+  --color-alux-foreground: var(--alux-foreground);
+  --color-alux-surface: var(--alux-surface);
+  --color-alux-surface-foreground: var(--alux-surface-foreground);
+  --color-alux-accent: var(--alux-accent);
+  --color-alux-accent-foreground: var(--alux-accent-foreground);
+  --color-alux-border: var(--alux-border);
+  --color-alux-ring: var(--alux-ring);
+
   /*
    * Institutional Badges — H-03 · I3.d.2 · M1
    * Especificación oficial: docs/blueprint/15.10.H-03-INSTITUTIONAL-BADGE-SPECIFICATION-v1.0.md
@@ -165,6 +175,15 @@
   --border: oklch(0.88 0.022 85.8);
   --input: oklch(0.88 0.022 85.8);
   --ring: oklch(0.777 0.14 74.9);
+
+  --alux: oklch(0.777 0.14 74.9);
+  --alux-foreground: oklch(0.227 0.017 112.9);
+  --alux-surface: oklch(0.993 0.008 86.8);
+  --alux-surface-foreground: oklch(0.227 0.017 112.9);
+  --alux-accent: oklch(0.511 0.073 125.9);
+  --alux-accent-foreground: oklch(0.977 0.013 86.8);
+  --alux-border: oklch(0.88 0.022 85.8);
+  --alux-ring: oklch(0.777 0.14 74.9);
 
   /* Acentos territoriales oficiales */
   --selva: oklch(0.511 0.073 125.9); /* Verde Selva #5C6E3F */
@@ -417,9 +436,9 @@ html[data-omxds-visual-foundations="enabled"].dark {
   color-scheme: dark;
 }
 html[data-omxds-visual-foundations="enabled"] [data-omxds-visual-foundation="alux-context"] {
-  background: color-mix(in oklab, var(--color-card) 92%, var(--color-primary));
-  border-color: color-mix(in oklab, var(--color-primary) 32%, var(--color-border));
-  color: var(--color-card-foreground);
+  background: color-mix(in oklab, var(--color-alux-surface) 92%, var(--color-alux));
+  border-color: color-mix(in oklab, var(--color-alux) 32%, var(--color-alux-border));
+  color: var(--color-alux-surface-foreground);
 }
 
 @layer base {
