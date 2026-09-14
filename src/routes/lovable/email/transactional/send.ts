@@ -135,6 +135,13 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               });
               authorized = Boolean(isSuper);
             }
+            if (!authorized) {
+              // Concierge interno: puede avisar al viajero de su expediente.
+              const { data: isInternal } = await supabase.rpc("concierge_is_internal", {
+                _user_id: user.id,
+              });
+              authorized = Boolean(isInternal);
+            }
           }
 
           if (!authorized) {
