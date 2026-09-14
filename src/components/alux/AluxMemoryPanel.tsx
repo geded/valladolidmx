@@ -24,27 +24,24 @@ export function AluxMemoryPanel() {
     <Card data-alux-memory-panel className="shadow-soft">
       <CardHeader>
         <div className="flex flex-wrap items-center gap-3">
-          <CardTitle className="font-serif text-2xl">Personalización y memoria</CardTitle>
+          <CardTitle className="font-serif text-2xl">{alux.copy("memoryTitle")}</CardTitle>
           <Badge variant={paused ? "secondary" : "default"} className="rounded-pill">
-            {paused ? "En pausa" : "Activa"}
+            {paused ? alux.copy("memoryPaused") : alux.copy("memoryActive")}
           </Badge>
         </div>
         <CardDescription>
-           {alux.name} recuerda lo que exploras en este dispositivo para sugerirte mejores lugares y
-          experiencias. Nunca guarda tu nombre, correo ni teléfono, y lo que recuerda se borra solo
-          después de {ALUX_SIGNAL_TTL_DAYS} días sin actividad.
+          {alux.copy("memoryDescription", { count: ALUX_SIGNAL_TTL_DAYS })}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-sm">
           <p className="font-medium text-foreground">
             {paused
-               ? `Ahora mismo ${alux.name} te acompaña con recomendaciones generales.`
-               : `${alux.name} está usando ${remembered} señal(es) recientes de tu navegación.`}
+               ? alux.copy("memoryGeneral")
+               : alux.copy("memorySignals", { count: remembered })}
           </p>
           <p className="mt-1 text-muted-foreground">
-            Tu viaje y tus lugares guardados se conservan siempre, incluso con la personalización en
-            pausa.
+            {alux.copy("memoryPreserved")}
           </p>
         </div>
 
@@ -56,7 +53,7 @@ export function AluxMemoryPanel() {
                 toast.success("Listo, vuelvo a acompañarte con sugerencias a tu medida.");
               }}
             >
-              Reactivar personalización
+              {alux.copy("memoryResume")}
             </Button>
           ) : (
             <Button
@@ -66,7 +63,7 @@ export function AluxMemoryPanel() {
                 toast.success("Pausé la personalización. Seguiré sugiriéndote lo esencial.");
               }}
             >
-              Pausar personalización
+              {alux.copy("memoryPause")}
             </Button>
           )}
 
@@ -80,15 +77,15 @@ export function AluxMemoryPanel() {
                   toast.success("Listo, olvidé lo que había aprendido de tu navegación.");
                 }}
               >
-                Sí, borrar
+                {alux.copy("memoryConfirm")}
               </Button>
               <Button variant="ghost" onClick={() => setConfirming(false)}>
-                Mejor no
+                {alux.copy("memoryCancel")}
               </Button>
             </div>
           ) : (
             <Button variant="ghost" onClick={() => setConfirming(true)}>
-              Borrar lo que {alux.name} recuerda
+              {alux.copy("memoryForget")}
             </Button>
           )}
         </div>

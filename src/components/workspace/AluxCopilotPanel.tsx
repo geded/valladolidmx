@@ -104,7 +104,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
         <ul className="mt-2 space-y-2">
           {actions.length === 0 ? (
             <li className="rounded-xl border border-dashed border-border bg-surface p-4 text-sm text-muted-foreground">
-              Sin acciones sugeridas por ahora.
+              {alux.copy("workspaceNoActions")}
             </li>
           ) : (
             actions.map((a) => {
@@ -141,7 +141,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
                     {a.reversible ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-success">
-                        <Undo2 className="h-3 w-3" aria-hidden /> Reversible
+                        <Undo2 className="h-3 w-3" aria-hidden /> {alux.copy("workspaceReversible")}
                       </span>
                     ) : null}
                     {explainable ? (
@@ -151,7 +151,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                         className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 hover:bg-muted/80"
                       >
                         <Info className="h-3 w-3" aria-hidden />
-                        ¿Por qué?
+                        {alux.copy("workspaceWhy")}
                         {isOpen ? (
                           <ChevronUp className="h-3 w-3" aria-hidden />
                         ) : (
@@ -166,7 +166,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.rationale ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                            Razón
+                             {alux.copy("workspaceRationale")}
                           </div>
                           <p className="mt-0.5">{a.rationale}</p>
                         </div>
@@ -174,7 +174,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.effect ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                            Efecto
+                             {alux.copy("workspaceEffect")}
                           </div>
                           <p className="mt-0.5">{a.effect}</p>
                         </div>
@@ -182,7 +182,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.sources && a.sources.length > 0 ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                            Fuentes
+                             {alux.copy("workspaceSources")}
                           </div>
                           <ul className="mt-1 flex flex-wrap gap-1">
                             {a.sources.map((s) => (
