@@ -86,6 +86,11 @@ import {
 } from "@/components/traveler/WorkspaceOnboardingTour";
 import { HelpCircle } from "lucide-react";
 import { useAluxBrand } from "@/lib/brand/brand-context";
+import {
+  getMyPersonalProfile,
+  saveMyConciergeContact,
+} from "@/lib/traveler/profile-personal.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista; focus?: string } => {
@@ -2172,14 +2177,37 @@ function ConciergeSection({
   const qc = useQueryClient();
   const alux = useAluxBrand();
   const promote = useServerFn(promotePlanToCase);
+  const getContact = useServerFn(getMyPersonalProfile);
+  const saveContact = useServerFn(saveMyConciergeContact);
   const { plan, items } = data;
   const [summary, setSummary] = useState("");
+  const contactQuery = useQuery({
+    queryKey: ["traveler", "concierge-contact"],
+    queryFn: () => getContact(),
+    staleTime: 30_000,
+  });
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
+
+  useEffect(() => {
+    const profile = contactQuery.data;
+    if (!profile) return;
+    setContactName(profile.display_name ?? [profile.first_name, profile.last_name].filter(Boolean).join(" "));
+    setContactPhone(profile.phone ?? "");
+    setWhatsappConsent(profile.whatsapp_contact_consent);
+  }, [contactQuery.data]);
 
   const hasContent = items.length > 0 || Boolean((plan.notes ?? "").trim().length >= 8);
   const alreadyShared = plan.status === "shared_with_concierge" && Boolean(plan.case_id);
 
   const send = useMutation({
-    mutationFn: (s: string) => promote({ data: { planId: plan.id, summary: s } }),
+    mutationFn: async (s: string) => {
+      await saveContact({
+        data: { name: contactName, phone: contactPhone, whatsappConsent },
+      });
+      return promote({ data: { planId: plan.id, summary: s } });
+    },
     onSuccess: (res) => {
       setSummary("");
       qc.invalidateQueries({ queryKey: ["cc", "my-cases"] });
@@ -2205,7 +2233,13 @@ function ConciergeSection({
     `Viaje "${plan.title}" · ${items.length} elemento${items.length === 1 ? "" : "s"}${
       plan.party_size ? ` · ${plan.party_size} personas` : ""
     }${plan.start_date ? ` · desde ${plan.start_date}` : ""}`;
-  const canSend = !alreadyShared && hasContent && derivedSummary.length >= 8 && !send.isPending;
+  const contactReady =
+    contactName.trim().length >= 2 &&
+    Boolean(contactQuery.data?.email) &&
+    /^\+?[0-9 ()-]{8,32}$/.test(contactPhone.trim()) &&
+    whatsappConsent;
+  const canSend =
+    !alreadyShared && hasContent && contactReady && derivedSummary.length >= 8 && !send.isPending;
 
   return (
     <section className="rounded-lg border bg-card p-5">
@@ -2256,6 +2290,54 @@ function ConciergeSection({
             if (canSend) send.mutate(derivedSummary);
           }}
         >
+          <fieldset className="grid gap-3 rounded-md border border-border/70 bg-background/60 p-4">
+            <legend className="px-1 text-sm font-semibold">Tus datos de contacto</legend>
+            <p className="text-xs text-muted-foreground">
+              El equipo Concierge los usará para aclarar tu solicitud. Nunca se comparten con las empresas.
+            </p>
+            <label className="grid gap-1 text-xs font-medium">
+              Nombre completo
+              <input
+                value={contactName}
+                onChange={(event) => setContactName(event.target.value)}
+                maxLength={120}
+                autoComplete="name"
+                required
+                className="h-11 rounded-md border border-border bg-background px-3 text-sm font-normal"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium">
+              Correo de tu cuenta
+              <input
+                value={contactQuery.data?.email ?? ""}
+                readOnly
+                aria-readonly="true"
+                className="h-11 rounded-md border border-border bg-muted px-3 text-sm font-normal text-muted-foreground"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium">
+              Móvil
+              <input
+                value={contactPhone}
+                onChange={(event) => setContactPhone(event.target.value)}
+                maxLength={32}
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="Ej. +52 985 000 0000"
+                required
+                className="h-11 rounded-md border border-border bg-background px-3 text-sm font-normal"
+              />
+            </label>
+            <label className="flex min-h-11 items-start gap-3 rounded-md border border-border/70 p-3 text-xs leading-relaxed">
+              <input
+                type="checkbox"
+                checked={whatsappConsent}
+                onChange={(event) => setWhatsappConsent(event.target.checked)}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span>Confirmo que este móvil tiene WhatsApp y autorizo al Concierge a escribirme sobre este viaje.</span>
+            </label>
+          </fieldset>
           <textarea
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
@@ -2273,13 +2355,12 @@ function ConciergeSection({
           </p>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>{summary.length}/500</span>
-            <button
+            <Button
               type="submit"
               disabled={!canSend}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
               {send.isPending ? "Enviando…" : "Enviar al Concierge"}
-            </button>
+            </Button>
           </div>
           {send.isError ? (
             <p className="text-xs text-destructive">
