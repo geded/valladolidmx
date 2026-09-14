@@ -1,4 +1,5 @@
 import * as React from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import { SITE } from "@/config/site";
 import {
   Body,
@@ -35,11 +36,7 @@ const CouponIssuedEmail = ({
   terms,
 }: Props) => {
   const validUntilLabel = validUntil
-    ? new Date(validUntil).toLocaleDateString("es-MX", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
+    ? formatInMerida(validUntil, { day: "2-digit", month: "long", year: "numeric" })
     : null;
   return (
     <Html lang="es" dir="ltr">

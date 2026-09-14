@@ -11,6 +11,7 @@
  * y presenta el código QR del folio (generado localmente).
  */
 import { useEffect, useState } from "react";
+import { meridaLongDate } from "@/lib/time/merida";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -54,11 +55,7 @@ const DOCS: Doc[] = [
 function fmtDate(iso: string | null) {
   if (!iso) return null;
   try {
-    return new Date(iso).toLocaleDateString("es-MX", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    return meridaLongDate(iso) || null;
   } catch {
     return null;
   }

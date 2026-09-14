@@ -15,6 +15,7 @@
  * Con `ctx.dryRun` se ejecuta la selección y el render sin encolar ni marcar.
  */
 import * as React from "react";
+import { meridaLongDate } from "@/lib/time/merida";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
 import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
@@ -81,12 +82,7 @@ function moneyLabel(cents: number | null, currency: string | null): string | und
 
 function dayLabel(iso: string | null): string | undefined {
   if (!iso) return undefined;
-  try {
-    const value = iso.length <= 10 ? new Date(iso + "T12:00:00") : new Date(iso);
-    return value.toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" });
-  } catch {
-    return undefined;
-  }
+  return meridaLongDate(iso) || undefined;
 }
 
 function datesLabel(row: PaymentReminderRow): string | undefined {

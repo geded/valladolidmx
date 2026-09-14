@@ -4,6 +4,7 @@
  */
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { meridaDate, meridaDateTime, meridaLongDate } from "@/lib/time/merida";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -346,7 +347,7 @@ function readableValue(value: unknown): string {
     if (mapped) return mapped;
     const maybeDate = /^\d{4}-\d{2}-\d{2}T/.test(value) ? new Date(value) : null;
     return maybeDate && !Number.isNaN(maybeDate.getTime())
-      ? maybeDate.toLocaleString("es-MX")
+      ? meridaDateTime(maybeDate)
       : humanizeKey(value);
   }
   if (Array.isArray(value)) return value.map(readableValue).join(", ");
@@ -426,7 +427,7 @@ export function CaseFileView({
                     ? `${(q.total_amount_cents / 100).toLocaleString("es-MX", { style: "currency", currency: q.currency })}`
                     : "Sin monto"}
                   {q.valid_until
-                    ? ` · Vigente hasta ${new Date(q.valid_until).toLocaleString()}`
+                    ? ` · Vigente hasta ${meridaDateTime(q.valid_until)}`
                     : ""}
                 </p>
                 {q.notes ? <p className="mt-1 text-xs text-foreground/80">{q.notes}</p> : null}
@@ -464,7 +465,7 @@ export function CaseFileView({
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{labelFor(t.event_type, EVENT_TYPE_LABELS)}</span>
                   <span className="text-muted-foreground">
-                    {new Date(t.occurred_at).toLocaleString()}
+                    {meridaDateTime(t.occurred_at)}
                   </span>
                 </div>
                 {t.summary ? <p className="mt-1 text-foreground/80">{t.summary}</p> : null}
@@ -493,7 +494,7 @@ function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
         {internal
           ? `Origen: ${labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: ${labelFor(f.case.priority, PRIORITY_LABELS)} · `
           : "Recibido "}
-        {new Date(f.case.created_at).toLocaleString("es-MX")}
+        {meridaDateTime(f.case.created_at)}
       </p>
       {internal && f.traveler.display_name && (
         <p className="mt-1 text-xs text-muted-foreground">Viajero: {f.traveler.display_name}</p>
@@ -905,11 +906,7 @@ function ProposalCard({
           caseReference: `Expediente ${caseId.slice(0, 8).toUpperCase()}`,
           totalLabel: money(p.total_amount_cents, p.currency),
           validUntilLabel: p.valid_until
-            ? new Date(p.valid_until).toLocaleDateString("es-MX", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })
+            ? meridaLongDate(p.valid_until)
             : undefined,
         },
       });
@@ -939,7 +936,7 @@ function ProposalCard({
       {p.summary ? <p className="mt-1 text-xs text-foreground/80">{p.summary}</p> : null}
       {p.valid_until ? (
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Vigente hasta {new Date(p.valid_until).toLocaleString()}
+          Vigente hasta {meridaDateTime(p.valid_until)}
         </p>
       ) : null}
       {p.items.length > 0 && (
@@ -1112,7 +1109,7 @@ function ProposalCompare({
             </div>
             {p.valid_until ? (
               <p className="text-[10px] text-muted-foreground">
-                Vigente hasta {new Date(p.valid_until).toLocaleDateString("es-MX")}
+                Vigente hasta {meridaDate(p.valid_until)}
               </p>
             ) : null}
             {p.summary ? (
@@ -1571,12 +1568,12 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
           </span>
           {sla?.target_response_at && (
             <span className="text-muted-foreground">
-              Objetivo: {new Date(sla.target_response_at).toLocaleString()}
+              Objetivo: {meridaDateTime(sla.target_response_at)}
             </span>
           )}
           {sla?.last_activity_at && (
             <span className="text-muted-foreground">
-              Última actividad: {new Date(sla.last_activity_at).toLocaleString()}
+              Última actividad: {meridaDateTime(sla.last_activity_at)}
             </span>
           )}
         </div>
@@ -1687,7 +1684,7 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
         </div>
         {payload?.generated_at && (
           <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-            {new Date(payload.generated_at).toLocaleString()}
+            {meridaDateTime(payload.generated_at)}
           </span>
         )}
       </header>

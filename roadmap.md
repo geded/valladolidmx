@@ -125,3 +125,8 @@
 - Trabajo `src/lib/cron/jobs/proposal-payment-reminders.server.ts` + gancho `/api/public/hooks/proposal-payment-reminders` (x-cron-secret, dry-run soportado).
 - Cron horario `proposal-payment-reminders-hourly` ('20 * * * *').
 - Plantillas `proposal-payment-reminder` y `proposal-payment-stalled-team`.
+
+## Zona horaria oficial fija: America/Merida (2026-09-14)
+- `src/lib/time/merida.ts` es la fuente única: `MERIDA_TIME_ZONE`, `formatInMerida`, `meridaDate/DateTime/LongDate/DayMonth/Clock`, `meridaToday`.
+- Aplicado en expedientes Concierge, bandejas, Mi Viaje, itinerario, reservaciones, historial, documentos, cupones, recuerdos, recap en vivo, portal empresarial y todas las plantillas/cron de correo.
+- Regla: prohibido formatear fechas visibles con la zona del dispositivo o del servidor.

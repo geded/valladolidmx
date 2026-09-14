@@ -7,6 +7,7 @@
  * /cms/visibilidad. Stripe checkout llega en Sub-ola 7.2.b.
  */
 import { useEffect, useMemo, useState } from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -248,7 +249,7 @@ function ActiveGrantCard({
             {grant.expires_at && grant.status === "active" ? (
               <>
                 {" · "}vigente hasta{" "}
-                {new Date(grant.expires_at).toLocaleDateString("es-MX", {
+                {formatInMerida(grant.expires_at, {
                   day: "2-digit",
                   month: "short",
                   year: "numeric",

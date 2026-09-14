@@ -4,6 +4,7 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { meridaDateTime } from "@/lib/time/merida";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -122,7 +123,7 @@ function HistorialPage() {
                       </span>
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {new Date(order.created_at).toLocaleString()}
+                      {meridaDateTime(order.created_at)}
                     </p>
                   </div>
                   {cancellable ? (

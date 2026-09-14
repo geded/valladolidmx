@@ -10,6 +10,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { meridaDateTime } from "@/lib/time/merida";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Clock3, Headset } from "lucide-react";
 import { listConciergeCases, type ConciergeCase } from "@/lib/concierge/concierge.functions";
@@ -113,7 +114,7 @@ function TravelerConciergePage() {
                       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                           <Clock3 className="size-3.5" aria-hidden />
-                          Actualizado {new Date(c.updated_at).toLocaleString("es-MX")}
+                          Actualizado {meridaDateTime(c.updated_at)}
                         </span>
                         <span className="inline-flex items-center gap-1 font-medium text-primary">
                           Ver seguimiento

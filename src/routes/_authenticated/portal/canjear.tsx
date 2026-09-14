@@ -8,6 +8,7 @@
  *  - Marcar como canjeado (update RLS: business_users).
  */
 import { useEffect, useRef, useState } from "react";
+import { meridaDate } from "@/lib/time/merida";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -312,7 +313,7 @@ function RedeemPage() {
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Código: <code>{result.coupon.code}</code> · Vigencia:{" "}
-                {new Date(result.coupon.valid_until).toLocaleDateString("es-MX")}
+                {meridaDate(result.coupon.valid_until)}
               </p>
             </div>
           </div>
