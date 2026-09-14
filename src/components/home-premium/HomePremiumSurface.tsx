@@ -1210,7 +1210,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             {visible.map((event, index) => (
               <li
                 key={`${event.title}-${index}`}
-                className="grid grid-cols-[3rem_1fr] items-center gap-3 py-2.5 lg:grid-cols-[3rem_1fr_auto] lg:py-3.5"
+                className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 py-2.5 lg:py-3.5"
               >
                 {event.media?.url ? (
                   <img
@@ -1245,7 +1245,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                     asChild
                     variant="ghost"
                     size="sm"
-                    className="hidden min-h-11 justify-self-start rounded-pill text-xs lg:inline-flex lg:justify-self-end"
+                    className="min-h-11 shrink-0 justify-self-end rounded-pill px-3 text-xs lg:px-4"
                   >
                     <Link to={event.href}>Ver agenda</Link>
                   </Button>
