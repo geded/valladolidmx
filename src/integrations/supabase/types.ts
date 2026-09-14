@@ -7860,6 +7860,10 @@ export type Database = {
       }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
       concierge_my_workload: { Args: never; Returns: Json }
+      concierge_order_has_business_member: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json
