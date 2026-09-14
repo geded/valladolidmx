@@ -1,6 +1,6 @@
 /**
  * 15.10.4 Fase 2 — Ciclo "Arma tu Viaje" end-to-end.
- * Server functions del ciclo público de Concierge (Adenda 15.10.4).
+ * Server functions del contrato público `cc_*` (Adenda 15.10.4).
  * Toda autorización vive en las RPCs SECURITY DEFINER de la base.
  */
 import { createServerFn } from "@tanstack/react-start";
@@ -27,12 +27,11 @@ export const ccCreateCaseFromPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => CreateInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { data: id, error } = await context.supabase.rpc("concierge_case_from_travel_plan", {
-      _traveler_user_id: context.userId,
+    const { data: id, error } = await context.supabase.rpc("cc_case_create_from_plan", {
       _summary: data.summary,
       _items: (data.items ?? []) as unknown as Json,
       _travel_plan_id: data.travelPlanId ?? undefined,
-    });
+    } as never);
     if (error) throw new Error(error.message);
     return id as string;
   });

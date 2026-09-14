@@ -779,8 +779,8 @@ export const buildSnapshot = createServerFn({ method: "POST" })
  *
  * Flujo:
  *  1. `buildSnapshot(plan)` → payload serializable.
- *  2. `concierge_case_from_travel_plan(...)` — reutiliza el contrato
- *     canónico vigente del Concierge.
+ *  2. `cc_case_create_from_plan(summary, items)` — reutiliza el contrato
+ *     ya existente de la Fase 2 (15.10.4).
  *  3. Vincula el caso al plan (`travel_plans.case_id`) y marca el plan
  *     como `shared_with_concierge`.
  *
@@ -804,7 +804,7 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
     if (snapErr) throw new Error(`build_snapshot_failed: ${snapErr.message}`);
     const snap = (snapJson ?? {}) as { items?: ItemRow[] };
 
-    // 2. Traducir items al contrato canónico del Concierge.
+    // 2. Traducir items a contrato `cc_case_create_from_plan`
     //    (product_id/business_id conocidos; el resto viaja como notas).
     const ccItems = (snap.items ?? []).slice(0, 20).map((r) => {
       const kind = r.item_kind as TravelItemKind;
@@ -813,21 +813,16 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
         title: snapshot.title ?? undefined,
         notes: r.notes ?? undefined,
         kind: "non_reservable" as const,
-        source_ref: r.target_id,
         product_id: kind === "product" ? r.target_id : null,
         business_id: kind === "business" ? r.target_id : null,
       };
     });
 
-    const { data: caseId, error: ccErr } = await context.supabase.rpc(
-      "concierge_case_from_travel_plan",
-      {
-        _traveler_user_id: context.userId,
-        _summary: data.summary,
-        _items: ccItems as unknown as never,
-        _travel_plan_id: data.planId,
-      },
-    );
+    const { data: caseId, error: ccErr } = await context.supabase.rpc("cc_case_create_from_plan", {
+      _summary: data.summary,
+      _items: ccItems as unknown as never,
+      _travel_plan_id: data.planId,
+    } as never);
     if (ccErr) throw new Error(`case_create_failed: ${ccErr.message}`);
 
     // 3. Vincular caso al plan y marcar estado.
