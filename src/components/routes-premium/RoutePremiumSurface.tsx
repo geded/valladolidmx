@@ -254,6 +254,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
             dto={{
               variant: route.gallery.length >= 3 ? "mosaic" : "grid",
               items: route.gallery.map((media) => ({
+                kind: "image" as const,
                 url: media.url,
                 alt: media.alt ?? route.name,
               })),
@@ -262,7 +263,15 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
               heading: null,
               subheading: null,
               ariaLabel: `Galería de ${route.name}`,
-              capabilities: { lightbox: true, captions: true },
+              capabilities: {
+                lightbox: true,
+                captions: true,
+                video: false,
+                panorama360: false,
+                model3d: false,
+                ar: false,
+                ugc: false,
+              },
             }}
           />
         </section>
