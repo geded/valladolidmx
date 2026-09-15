@@ -232,7 +232,18 @@ export async function prepareImageForRole(file: File, role: ImageRole): Promise<
   const keepPng = isPng && (await pngHasAlpha(file));
   const outType = keepPng ? "image/png" : file.type === "image/jpeg" ? "image/jpeg" : "image/webp";
 
-  const blob = await canvasToBlob(canvas, outType, outType === "image/png" ? 1 : spec.quality);
+  // Techo de peso compartido: ninguna subida (portada, galería, logo) debe
+  // entrar por encima de `INGEST_TARGET_BYTES`, aunque su rol lo permitiera.
+  let blob: Blob;
+  if (outType === "image/png") {
+    blob = await canvasToBlob(canvas, outType, 1);
+  } else {
+    blob = await canvasToBlob(canvas, outType, spec.quality);
+    for (const quality of INGEST_QUALITY_STEPS) {
+      if (blob.size <= INGEST_TARGET_BYTES || quality >= spec.quality) break;
+      blob = await canvasToBlob(canvas, outType, quality);
+    }
+  }
 
   // Si tras procesar sigue pesando más que el original Y ya está dentro
   // de los límites de dimensión, devuelve el original.
