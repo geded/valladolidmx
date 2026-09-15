@@ -29,7 +29,12 @@ import {
   uploadStudioMediaViaServer,
 } from "@/lib/experience-builder/studio-media.functions";
 import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
-import { validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
+import {
+  describeIngestSavings,
+  prepareImageForIngest,
+  validateImageFile,
+  type ImageRole,
+} from "@/lib/cms/image-upload";
 
 export interface PickedMedia {
   /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
@@ -148,6 +153,7 @@ export function MediaPickerDialog({
   const [fileBytesBase64, setFileBytesBase64] = useState<string | null>(null);
   const [readingFile, setReadingFile] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const [rights, setRights] = useState({ ...emptyRights });
 
   const refresh = useCallback(() => {
@@ -179,6 +185,7 @@ export function MediaPickerDialog({
     setFileBytesBase64(null);
     setReadingFile(false);
     setPreview(null);
+    setDimensions(null);
     setRights({ ...emptyRights });
     setError(null);
     setNotice(null);
@@ -191,19 +198,33 @@ export function MediaPickerDialog({
       return;
     }
     setError(null);
+    setNotice(null);
     setReadingFile(true);
     setFile(null);
     setFileBytesBase64(null);
+    setDimensions(null);
     setPreview(null);
     try {
+      // Carga inteligente: se normaliza el archivo antes de enviarlo
+      // (sin recortar) para que no entren imágenes innecesariamente pesadas.
+      const ingest = await prepareImageForIngest(f);
       // Debe leerse durante el evento de selección. Algunos navegadores
       // eliminan el archivo temporal antes de que el usuario termine la ficha.
-      const bytesBase64 = await fileToBase64(f);
-      setFile(f);
+      const bytesBase64 = await fileToBase64(ingest.file);
+      setFile(ingest.file);
       setFileBytesBase64(bytesBase64);
-      setPreview(URL.createObjectURL(f));
-    } catch {
-      setError("No se pudo leer la imagen seleccionada. Vuelve a elegir el archivo.");
+      setDimensions(
+        ingest.width && ingest.height ? { width: ingest.width, height: ingest.height } : null,
+      );
+      setPreview(URL.createObjectURL(ingest.file));
+      const savings = describeIngestSavings(ingest);
+      if (savings) setNotice(`Imagen optimizada al elegirla: ${savings}. No se recortó nada.`);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo leer la imagen seleccionada. Vuelve a elegir el archivo.",
+      );
     } finally {
       setReadingFile(false);
     }
@@ -228,6 +249,7 @@ export function MediaPickerDialog({
           mime: file.type,
           sizeBytes: file.size,
           bytesBase64: fileBytesBase64,
+          ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
           rights,
         },
       });
@@ -237,6 +259,7 @@ export function MediaPickerDialog({
       setFile(null);
       setFileBytesBase64(null);
       setPreview(null);
+      setDimensions(null);
       setRights({ ...emptyRights });
       setMode("library");
       setFilter("pending");
