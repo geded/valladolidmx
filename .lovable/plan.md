@@ -15,9 +15,11 @@ Actualizar la autoridad existente de rutas para adoptar el mismo lenguaje visual
    - La fotografía irá primero en móvil y a la derecha en escritorio, igual que las demás fichas Premium.
    - Integrar duración, ritmo, dificultad y número de paradas como datos compactos dentro de la portada.
 
-2. **Acciones de la ficha**
-   - Colocar `Agregar a Mi Viaje` en la zona de acciones inmediatamente posterior a la portada.
-   - Incorporar la acción compartida de compartir si ya está disponible en el sistema.
+2. **Acciones de la ficha: agregar, guardar y compartir**
+   - Las tres acciones quedan juntas y visibles junto a la portada, con la misma jerarquía que en hoteles y restaurantes: `Agregar a Mi Viaje` como acción principal, y `Guardar` y `Compartir` como acciones secundarias.
+   - `Guardar` usa el mismo botón de favoritos ya aprobado del sistema: guarda la ruta en los favoritos del viajero, distinto de Mi Viaje, y pide acceso igual que en las demás fichas.
+   - `Compartir` abre la misma hoja de compartir ya existente (WhatsApp, copiar enlace, Facebook, correo, X, y el compartir nativo del teléfono), con el nombre de la ruta y su dirección pública.
+   - En móvil, esas mismas acciones se repiten en la barra inferior fija de la ficha, igual que en hoteles y restaurantes, para que estén siempre al alcance.
    - Eliminar el texto técnico sobre la referencia privada; no cambia el comportamiento ni los datos guardados.
 
 3. **Alux y navegación interna**
