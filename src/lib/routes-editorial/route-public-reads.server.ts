@@ -346,13 +346,13 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
   const stopsRaw = (stopRows ?? []) as Array<Record<string, unknown>>;
   const galleryIds = (row.gallery_media_ids ?? []) as string[];
 
-  const [destinations, media, hrefs] = await Promise.all([
+  const [destinations, media, entities] = await Promise.all([
     destinationSlugMap(sb, [
       ...((row.destination_ids ?? []) as string[]),
       ...(row.origin_destination_id ? [String(row.origin_destination_id)] : []),
     ]),
     signMedia([...(row.cover_media_id ? [String(row.cover_media_id)] : []), ...galleryIds]),
-    resolveStopHrefs(
+    resolveStopEntities(
       sb,
       stopsRaw.map((s) => ({
         entity_kind: String(s.entity_kind),
@@ -361,17 +361,23 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
     ),
   ]);
 
-  const stops: EditorialRouteStopDTO[] = stopsRaw.map((s) => ({
-    id: String(s.id),
-    position: Number(s.position ?? 0),
-    dayNumber: s.day_number == null ? null : Number(s.day_number),
-    entityKind: String(s.entity_kind) as EditorialRouteStopKind,
-    entityId: s.entity_id ? String(s.entity_id) : null,
-    title: String(s.title ?? ""),
-    note: ((s.note as string) ?? "").trim() || null,
-    durationMinutes: s.duration_minutes == null ? null : Number(s.duration_minutes),
-    href: s.entity_id ? (hrefs.get(String(s.entity_id)) ?? null) : null,
-  }));
+  const stops: EditorialRouteStopDTO[] = stopsRaw.map((s) => {
+    const entityId = s.entity_id ? String(s.entity_id) : null;
+    const point = entityId ? (entities.coords.get(entityId) ?? null) : null;
+    return {
+      id: String(s.id),
+      position: Number(s.position ?? 0),
+      dayNumber: s.day_number == null ? null : Number(s.day_number),
+      entityKind: String(s.entity_kind) as EditorialRouteStopKind,
+      entityId,
+      title: String(s.title ?? ""),
+      note: ((s.note as string) ?? "").trim() || null,
+      durationMinutes: s.duration_minutes == null ? null : Number(s.duration_minutes),
+      href: entityId ? (entities.hrefs.get(entityId) ?? null) : null,
+      lat: point?.lat ?? null,
+      lng: point?.lng ?? null,
+    };
+  });
 
   const card = toCard(
     row as unknown as EditorialRouteRow,
