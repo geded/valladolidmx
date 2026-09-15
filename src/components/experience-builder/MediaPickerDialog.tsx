@@ -446,6 +446,9 @@ export function MediaPickerDialog({
               onChooseFile={chooseFile}
               onRights={(patch) => setRights((r) => ({ ...r, ...patch }))}
               onSubmit={handleUpload}
+              fit={fit}
+              upscaling={upscaling}
+              onAluxUpscale={handleAluxUpscale}
             />
           ) : loading ? (
             <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
