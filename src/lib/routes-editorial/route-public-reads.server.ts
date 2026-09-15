@@ -316,9 +316,13 @@ async function resolveStopEntities(
     const d = b.destination_id ? destMap.get(b.destination_id) : null;
     const cat = b.primary_category_id ? catMap.get(b.primary_category_id) : null;
     if (d && cat) hrefs.set(b.id, `/oriente-maya/${d.slug}/${cat}/${b.slug}`);
+    const loc = Array.isArray(b.business_locations)
+      ? (b.business_locations[0] ?? null)
+      : (b.business_locations ?? null);
+    if (loc) setCoord(b.id, loc.latitude, loc.longitude);
   }
 
-  return hrefs;
+  return { hrefs, coords };
 }
 
 export async function readPublicRoute(slug: string): Promise<EditorialRouteDetailDTO | null> {
