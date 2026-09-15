@@ -7,12 +7,18 @@
  */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Share2 } from "lucide-react";
 
 import {
   PremiumAluxBar,
-  PremiumEditorialHero,
   PremiumSectionHead,
 } from "@/components/home-premium/shared/PremiumShowcase";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
+import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
+import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
+import { Button } from "@/components/ui/button";
+import { ShareSheet } from "@/components/share/ShareSheet";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
