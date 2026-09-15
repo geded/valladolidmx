@@ -128,7 +128,8 @@ export function prepareAnonymousDraftImport(
     } else if (
       favorite.kind === "destination" ||
       favorite.kind === "event" ||
-      favorite.kind === "place"
+      favorite.kind === "place" ||
+      favorite.kind === "route"
     ) {
       addTargetItem(favorite.kind, favorite.id, {
         ...(favorite.title ? { title: favorite.title } : {}),
