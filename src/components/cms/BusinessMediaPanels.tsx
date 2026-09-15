@@ -15,7 +15,10 @@ import {
   reorderBusinessGallery,
   signBusinessImageUpload,
 } from "@/lib/cms/businesses-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { prepareImageForRole, withRetry, type ImageRole } from "@/lib/cms/image-upload";
+import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
+import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
+import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
 
 type MediaRow = Awaited<ReturnType<typeof listBusinessMedia>>[number];
 
