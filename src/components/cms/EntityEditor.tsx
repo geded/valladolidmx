@@ -22,9 +22,7 @@ import { StatusBadge } from "@/components/cms/EntityListView";
 import { MediaIdField } from "@/components/cms/MediaIdField";
 import {
   describeEditorialHistory,
-  getEditorialActionLabel,
   getEditorialStatusGuidance,
-  getEditorialStatusLabel,
 } from "@/lib/cms/editorial-language";
 
 export type FieldType =
