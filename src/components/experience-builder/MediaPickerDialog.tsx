@@ -566,6 +566,9 @@ function UploadForm({
   onChooseFile,
   onRights,
   onSubmit,
+  fit,
+  upscaling,
+  onAluxUpscale,
 }: {
   file: File | null;
   preview: string | null;
@@ -575,6 +578,9 @@ function UploadForm({
   onChooseFile: (f: File) => void | Promise<void>;
   onRights: (patch: Partial<typeof emptyRights>) => void;
   onSubmit: () => void;
+  fit: RoleFit | null;
+  upscaling: boolean;
+  onAluxUpscale: () => void | Promise<void>;
 }) {
   const inputCls = "h-9 w-full rounded-md border border-border bg-background px-2 text-xs";
   return (
