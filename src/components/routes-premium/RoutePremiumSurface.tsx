@@ -85,30 +85,33 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
 
   return (
     <div className="space-y-8">
-      <PremiumEditorialHero
-        eyebrow="Ruta sugerida"
-        title={route.name}
-        subtitle={route.summary || "Itinerario editorial del Oriente Maya."}
-        media={route.coverUrl ? { url: route.coverUrl, alt: route.coverAlt ?? route.name } : null}
-        caption={
-          route.originDestinationLabel ? `Salida desde ${route.originDestinationLabel}` : undefined
-        }
+      <PremiumHero
+        layout="entity"
+        vm={{
+          presentation: DEFAULT_PREMIUM_PRESENTATION,
+          eyebrow: "Ruta sugerida",
+          title: route.name,
+          description: route.summary || "Itinerario editorial del Oriente Maya.",
+          media: route.coverUrl
+            ? { url: route.coverUrl, alt: route.coverAlt ?? route.name }
+            : null,
+          badges: route.originDestinationLabel
+            ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
+            : [],
+        }}
       />
 
       {chips.length ? (
-        <div className="flex flex-wrap gap-2">
+        <TourismChipRow ariaLabel="Datos de la ruta">
           {chips.map((chip) => (
-            <span
-              key={chip}
-              className="rounded-pill border border-border bg-card px-3 py-1 text-xs text-muted-foreground"
-            >
+            <TourismChip key={chip} scheme="surface" size="sm">
               {chip}
-            </span>
+            </TourismChip>
           ))}
-        </div>
+        </TourismChipRow>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <AddToTravelPlanButton
           kind="route"
           targetId={route.id}
@@ -118,10 +121,48 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           imageUrl={route.coverUrl}
           variant="full"
         />
-        <span className="text-xs text-muted-foreground">
-          Guardamos una referencia privada a esta ruta; el itinerario editorial no se modifica.
-        </span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShareOpen(true)}
+          className="min-h-11 rounded-pill"
+        >
+          <Share2 className="size-4" aria-hidden />
+          Compartir
+        </Button>
       </div>
+
+      <ShareSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={route.name}
+        url={typeof window !== "undefined" ? window.location.href : `/rutas/${route.slug}`}
+        {...(route.summary ? { text: route.summary } : {})}
+        heading="Compartir esta ruta"
+      />
+
+      <PremiumAluxBar
+        question={`¿Quieres adaptar "${route.name}" a tus fechas?`}
+        selectedParty={party}
+        onSelectParty={(value) => {
+          setParty(value);
+          askAlux();
+        }}
+        onContinue={() => askAlux()}
+      />
+
+      {subnavAnchors.length > 1 ? (
+        <ExperienceSubnav
+          dto={{
+            variant: "pill",
+            sticky: true,
+            scrollOffset: 88,
+            ariaLabel: "Secciones de la ruta",
+            anchors: subnavAnchors,
+            capabilities: { scrollSpy: true, collapseOnMobile: true, showIcons: true },
+          }}
+        />
+      ) : null}
 
       <RouteMapSection
         stops={mapStops}
