@@ -21,6 +21,7 @@
  */
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
 
 /* ------------------------------------------------------------------ *
@@ -354,11 +355,10 @@ export function TourismCard({
           )}
         >
           {vm.mediaUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={vm.mediaUrl}
-              alt={vm.mediaAlt ?? vm.name}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name }}
+              context="card"
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
           ) : (
@@ -583,11 +583,10 @@ export function TourismCardRow({
       {caps.showMedia ? (
         <div className={cn("shrink-0 overflow-hidden rounded-xl bg-muted", size)}>
           {vm.mediaUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={vm.mediaUrl}
-              alt={vm.mediaAlt ?? vm.name}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name }}
+              context="thumbnail"
+              sizes="96px"
               className="h-full w-full object-cover"
             />
           ) : (

@@ -1,5 +1,6 @@
 import { SmartEmpty } from "./SmartCard";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export interface SmartEventItem {
   id?: string;
@@ -53,10 +54,10 @@ export function SmartEventsList({ items, title }: { items: SmartEventItem[]; tit
                 className="flex items-center gap-4 p-4 transition hover:bg-muted/40"
               >
                 {e.cover_image_url ? (
-                  <img
-                    src={e.cover_image_url}
-                    alt={String(e.name ?? "Evento")}
-                    loading="lazy"
+                  <EditorialMediaFrame
+                    media={{ url: e.cover_image_url, alt: String(e.name ?? "Evento") }}
+                    context="thumbnail"
+                    sizes="64px"
                     className="h-16 w-16 rounded-lg object-cover"
                   />
                 ) : (

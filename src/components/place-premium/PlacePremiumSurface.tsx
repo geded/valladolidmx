@@ -39,6 +39,7 @@ import {
   type PremiumPresentation,
 } from "@/lib/omxds/presentation/presentation";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import {
   PLACE_PREMIUM_DEMO_CONTENT,
   type PlacePremiumContent,
@@ -630,7 +631,12 @@ function DemoImage({
   }
   return (
     <figure className={cn("relative overflow-hidden bg-muted", className)}>
-      <img src={media.url} alt={media.alt} className="size-full object-cover" loading="lazy" />
+      <EditorialMediaFrame
+        media={{ url: media.url, alt: media.alt }}
+        context="gallery"
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="size-full object-cover"
+      />
       {captionHidden ? (
         <figcaption className="sr-only">{media.credit}</figcaption>
       ) : (

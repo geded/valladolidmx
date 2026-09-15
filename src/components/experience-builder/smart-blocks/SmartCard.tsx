@@ -5,6 +5,7 @@
  * tipos estrictos. Es presentational-only.
  */
 import { ArrowUpRight } from "lucide-react";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export interface SmartCardProps {
   title: string;
@@ -38,10 +39,10 @@ export function SmartCard({
       <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
         <div className={`${aspectClass} w-full overflow-hidden bg-muted`}>
           {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={title}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={{ url: imageUrl, alt: title }}
+              context="card"
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
             />
           ) : null}

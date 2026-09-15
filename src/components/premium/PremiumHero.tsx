@@ -1,6 +1,7 @@
 import { PremiumAction } from "./PremiumAction";
 import type { PremiumHeroVM } from "./types";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export function PremiumHero({
   vm,
@@ -57,7 +58,14 @@ export function PremiumHero({
           </div>
           {vm.media ? (
             <figure className="order-1 min-h-64 overflow-hidden bg-muted sm:min-h-80 lg:order-2 lg:min-h-[30rem]">
-              <img src={vm.media.url} alt={vm.media.alt ?? ""} className="size-full object-cover" />
+              <EditorialMediaFrame
+                media={{ url: vm.media.url, alt: vm.media.alt ?? "" }}
+                context="hero"
+                loading="eager"
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="size-full object-cover"
+              />
               {vm.media.caption || vm.media.credit ? (
                 <figcaption className="sr-only">
                   {[vm.media.caption, vm.media.credit].filter(Boolean).join(" · ")}
@@ -92,9 +100,12 @@ export function PremiumHero({
                 cinematic && "absolute inset-0 -z-20 min-h-0",
               )}
             >
-              <img
-                src={vm.media?.url}
-                alt={vm.media?.alt ?? ""}
+              <EditorialMediaFrame
+                media={vm.media ? { url: vm.media.url, alt: vm.media.alt ?? "" } : null}
+                context="hero"
+                loading="eager"
+                fetchPriority="high"
+                sizes="100vw"
                 className="size-full object-cover"
               />
               <div
@@ -154,9 +165,12 @@ export function PremiumHero({
       )}
     >
       {vm.media ? (
-        <img
-          src={vm.media.url}
-          alt={vm.media.alt ?? ""}
+        <EditorialMediaFrame
+          media={{ url: vm.media.url, alt: vm.media.alt ?? "" }}
+          context="hero"
+          loading="eager"
+          fetchPriority="high"
+          sizes="100vw"
           className="absolute inset-0 -z-20 size-full object-cover"
         />
       ) : null}
