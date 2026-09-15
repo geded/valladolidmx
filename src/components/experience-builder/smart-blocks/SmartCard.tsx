@@ -5,6 +5,7 @@
  * tipos estrictos. Es presentational-only.
  */
 import { ArrowUpRight } from "lucide-react";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export interface SmartCardProps {
   title: string;

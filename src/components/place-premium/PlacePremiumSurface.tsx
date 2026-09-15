@@ -39,6 +39,7 @@ import {
   type PremiumPresentation,
 } from "@/lib/omxds/presentation/presentation";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import {
   PLACE_PREMIUM_DEMO_CONTENT,
   type PlacePremiumContent,
