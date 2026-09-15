@@ -1400,11 +1400,22 @@ function MapSection({
     .map((title) => pointByTitle.get(normalizeLabel(title)))
     .filter((point): point is NonNullable<typeof point> => Boolean(point));
   const showingProposal = proposalPoints.length >= 2;
+  /* Las paradas reales publicadas de la ruta (lugares, empresas y destinos)
+     mandan sobre la lista de destinos: así el mapa dibuja el recorrido
+     completo y no sólo el origen y el destino final. */
+  const stopPoints = (route?.stopPoints ?? []).map((point) => ({
+    ...point,
+    thumbUrl: null,
+    badge: null,
+    priceLabel: null,
+  }));
   const routePoints = showingProposal
     ? proposalPoints
-    : (route?.sequence ?? [])
-        .map((title) => pointByTitle.get(normalizeLabel(title)))
-        .filter((point): point is NonNullable<typeof point> => Boolean(point));
+    : stopPoints.length >= 2
+      ? stopPoints
+      : (route?.sequence ?? [])
+          .map((title) => pointByTitle.get(normalizeLabel(title)))
+          .filter((point): point is NonNullable<typeof point> => Boolean(point));
   const mapDto = {
     ...content.mapa.dto,
     center: null,

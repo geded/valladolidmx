@@ -480,6 +480,143 @@ export async function resolveTerritoryMapPointsQuery(limit = 60): Promise<Territ
   }
 }
 
+/**
+ * Paradas reales de cada ruta editorial con coordenadas acreditadas.
+ *
+ * El mapa del Home dibujaba sólo los DESTINOS de la ruta, por lo que las
+ * paradas intermedias publicadas (lugares como Cenote Zací o Suytun y
+ * empresas como Yerbabuena del Sisal) no aparecían. Aquí se resuelven las
+ * paradas reales de `editorial_route_stops` en su orden editorial, con la
+ * misma elegibilidad pública fail-closed. Sin coordenadas publicadas, la
+ * parada simplemente no se dibuja: nunca se inventa una ubicación.
+ */
+async function resolveRouteStopPoints(
+  routeIds: string[],
+): Promise<Map<string, TerritoryMapPoint[]>> {
+  const out = new Map<string, TerritoryMapPoint[]>();
+  const ids = Array.from(new Set(routeIds.filter(Boolean)));
+  if (!ids.length) return out;
+  try {
+    const client = getPublicClient();
+    const { data: stops, error } = await client
+      .from("editorial_route_stops")
+      .select("route_id, position, entity_kind, entity_id, title")
+      .in("route_id", ids)
+      .order("position", { ascending: true });
+    if (error) return out;
+    const rows = (stops ?? []) as Row[];
+    const idsOf = (kind: string) =>
+      Array.from(
+        new Set(
+          rows
+            .filter((r) => str(r.entity_kind) === kind && r.entity_id)
+            .map((r) => String(r.entity_id)),
+        ),
+      );
+    const destIds = idsOf("destination");
+    const placeIds = idsOf("place");
+    const bizIds = idsOf("business");
+
+    const [destRes, placeRes, bizRes] = await Promise.all([
+      destIds.length
+        ? client
+            .from("destinations")
+            .select("id, slug, name, latitude, longitude")
+            .in("id", destIds)
+            .eq("status", "published")
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [], error: null }),
+      placeIds.length
+        ? client
+            .from("points_of_interest")
+            .select("id, slug, name, latitude, longitude, destinations:destination_id ( slug )")
+            .in("id", placeIds)
+            .eq("status", "published")
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [], error: null }),
+      bizIds.length
+        ? client
+            .from("businesses")
+            .select(
+              "id, slug, display_name, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ), business_locations ( latitude, longitude )",
+            )
+            .in("id", bizIds)
+            .eq("status", "published")
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+    const byId = new Map<string, TerritoryMapPoint>();
+    for (const row of (destRes.data ?? []) as Row[]) {
+      const lat = Number(row.latitude);
+      const lng = Number(row.longitude);
+      const slug = str(row.slug);
+      if (!slug || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      byId.set(String(row.id), {
+        id: String(row.id),
+        kind: "destination",
+        lat,
+        lng,
+        title: str(row.name) ?? slug,
+        subtitle: null,
+        href: `/oriente-maya/${slug}`,
+      });
+    }
+    for (const row of (placeRes.data ?? []) as Row[]) {
+      const lat = Number(row.latitude);
+      const lng = Number(row.longitude);
+      const slug = str(row.slug);
+      const destSlug = str(rel(row, "destinations")?.slug);
+      if (!slug || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      byId.set(String(row.id), {
+        // El contrato del bloque de mapa no declara `place`; el lugar se
+        // representa como punto territorial sin inventar otra familia.
+        id: String(row.id),
+        kind: "destination",
+        lat,
+        lng,
+        title: str(row.name) ?? slug,
+        subtitle: null,
+        href: destSlug ? `/oriente-maya/${destSlug}/lugares/${slug}` : null,
+      });
+    }
+    for (const row of (bizRes.data ?? []) as Row[]) {
+      const loc = rel(row, "business_locations");
+      const lat = Number(loc?.latitude);
+      const lng = Number(loc?.longitude);
+      const slug = str(row.slug);
+      if (!slug || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      byId.set(String(row.id), {
+        id: String(row.id),
+        kind: "business",
+        lat,
+        lng,
+        title: str(row.display_name) ?? slug,
+        subtitle: null,
+        href: buildCanonicalEntityUrl({
+          entityType: "business",
+          slug,
+          destinationSlug: str(rel(row, "destinations")?.slug),
+          categorySlug: str(rel(row, "business_categories")?.slug),
+        }),
+      });
+    }
+
+    for (const row of rows) {
+      const routeId = String(row.route_id);
+      const entityId = row.entity_id ? String(row.entity_id) : null;
+      const point = entityId ? byId.get(entityId) : null;
+      if (!point) continue;
+      const list = out.get(routeId) ?? [];
+      if (!list.some((p) => p.id === point.id)) list.push(point);
+      out.set(routeId, list);
+    }
+    return out;
+  } catch {
+    return out;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * G8-R1-F1L-R2 · Corpus real de la Home premium (`vmx.home.premium-g4`)
  *
@@ -508,6 +645,8 @@ export interface HomeRealRoute {
   vibe: string;
   description: string;
   sequence: string[];
+  /** Paradas reales publicadas con coordenadas, en orden editorial. */
+  stopPoints: TerritoryMapPoint[];
   href: string;
   mediaUrl: string;
 }
@@ -669,20 +808,24 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       stays,
       food,
       eventos,
-      rutas: publishedRoutes.map((route) => ({
-        id: route.id,
-        title: route.name,
-        duration: routeDurationLabel(route) ?? "",
-        stops: route.stopCount,
-        vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
-        description: route.summary,
-        sequence: [
-          ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
-          ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
-        ],
-        href: routePublicPath(route.slug),
-        mediaUrl: route.coverUrl ?? "",
-      })),
+      rutas: await (async () => {
+        const stopPointsByRoute = await resolveRouteStopPoints(publishedRoutes.map((r) => r.id));
+        return publishedRoutes.map((route) => ({
+          id: route.id,
+          title: route.name,
+          duration: routeDurationLabel(route) ?? "",
+          stops: route.stopCount,
+          vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
+          description: route.summary,
+          sequence: [
+            ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
+            ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
+          ],
+          stopPoints: stopPointsByRoute.get(route.id) ?? [],
+          href: routePublicPath(route.slug),
+          mediaUrl: route.coverUrl ?? "",
+        }));
+      })(),
       mapPoints,
     };
     homeCache = { at: Date.now(), value };

@@ -66,6 +66,16 @@ export type HomePremiumRoute = {
   vibe: string;
   description: string;
   sequence: string[];
+  /** Paradas reales publicadas de la ruta (con coordenadas), en orden. */
+  stopPoints?: Array<{
+    id: string;
+    kind: "business" | "destination";
+    lat: number;
+    lng: number;
+    title: string;
+    subtitle: string | null;
+    href: string | null;
+  }>;
   media: HomePremiumMedia;
   /** URL canónica de la ruta editorial publicada. */
   href: string | null;
