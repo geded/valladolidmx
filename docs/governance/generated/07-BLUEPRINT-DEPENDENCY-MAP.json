@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.86",
     "state": "Approved",
-    "source_sha256": "60ffb246b22e3921ef9b88a16b58ca98f9ad6089ff0d8f01ddf2a7f895a84493",
+    "source_sha256": "d0666a63484a02bdcfdcb50475dde48ec11f1768d17fa340f3b68c1c95bc7442",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-09-09T00:00:00.000Z",
+  "generated_at": "2026-09-15T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -12200,6 +12200,24 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-081.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-081.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "owner": "D08 · traveler-lifecycle",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/traveler/offline-documents.ts",
+      "type": "artifact",
+      "path": "src/lib/traveler/offline-documents.ts"
+    },
+    {
+      "id": "ART:src/components/traveler/TripQrCode.tsx",
+      "type": "artifact",
+      "path": "src/components/traveler/TripQrCode.tsx"
     }
   ],
   "edges": [
@@ -37456,6 +37474,42 @@
       "evidence": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1L-PUBLIC-PREMIUM-RUNTIME-INTEGRATION-v1.0.md",
       "verified_at": "2026-09-09"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/traveler/offline-documents.ts:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "origin": "ART:src/lib/traveler/offline-documents.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "evidence": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "verified_at": "2026-09-15"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/traveler/TripQrCode.tsx:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "origin": "ART:src/components/traveler/TripQrCode.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "evidence": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "verified_at": "2026-09-15"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/traveler/TravelDocumentsList.tsx:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "origin": "ART:src/components/traveler/TravelDocumentsList.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "evidence": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "verified_at": "2026-09-15"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/_authenticated/cuenta/documentos.$orderId.tsx:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cuenta/documentos.$orderId.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "evidence": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
+      "verified_at": "2026-09-15"
     }
   ],
   "critical_chain_coverage": [
