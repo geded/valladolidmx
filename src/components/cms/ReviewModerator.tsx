@@ -15,6 +15,7 @@ import {
   describeEditorialHistory,
   getEditorialStatusGuidance,
 } from "@/lib/cms/editorial-language";
+import { meridaDateTime } from "@/lib/time/merida";
 import {
   getReviewForModeration,
   listReviewModerationHistory,
@@ -236,7 +237,7 @@ export function ReviewModerator({ id }: { id: string }) {
                 </details>
               </div>
               <time className="text-muted-foreground">
-                {new Date(h.at).toLocaleString("es-MX")}
+                {meridaDateTime(h.at)} · hora de Mérida
               </time>
             </div>
           ))}
