@@ -56,7 +56,7 @@ Permanecen sin cambios:
 - **Scope Gate:** sólo los dos componentes de la ficha de rutas; ninguna modificación a hoteles o restaurantes.
 - **Preservation Gate:** comparación completa antes/después de `/rutas/pueblos-coloniales` y `/rutas/ruta-sukin`.
 - Validación visual en 1440, 834, 430 y 390 px.
-- Verificar portada, breadcrumbs, Alux, Mi Viaje, mapa, nombres de pines, trazo vial, días, paradas, galería, header y footer.
+- Verificar portada, breadcrumbs, Alux, Mi Viaje, guardar, compartir, barra móvil de acciones, mapa, nombres de pines, trazo vial, días, paradas, galería, header y footer.
 - Typecheck, pruebas de mapas y smoke de las rutas.
 - No publicar sin autorización posterior.
 
