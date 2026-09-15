@@ -196,19 +196,33 @@ export function MediaPickerDialog({
       return;
     }
     setError(null);
+    setNotice(null);
     setReadingFile(true);
     setFile(null);
     setFileBytesBase64(null);
+    setDimensions(null);
     setPreview(null);
     try {
+      // Carga inteligente: se normaliza el archivo antes de enviarlo
+      // (sin recortar) para que no entren imágenes innecesariamente pesadas.
+      const ingest = await prepareImageForIngest(f);
       // Debe leerse durante el evento de selección. Algunos navegadores
       // eliminan el archivo temporal antes de que el usuario termine la ficha.
-      const bytesBase64 = await fileToBase64(f);
-      setFile(f);
+      const bytesBase64 = await fileToBase64(ingest.file);
+      setFile(ingest.file);
       setFileBytesBase64(bytesBase64);
-      setPreview(URL.createObjectURL(f));
-    } catch {
-      setError("No se pudo leer la imagen seleccionada. Vuelve a elegir el archivo.");
+      setDimensions(
+        ingest.width && ingest.height ? { width: ingest.width, height: ingest.height } : null,
+      );
+      setPreview(URL.createObjectURL(ingest.file));
+      const savings = describeIngestSavings(ingest);
+      if (savings) setNotice(`Imagen optimizada al elegirla: ${savings}. No se recortó nada.`);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo leer la imagen seleccionada. Vuelve a elegir el archivo.",
+      );
     } finally {
       setReadingFile(false);
     }
