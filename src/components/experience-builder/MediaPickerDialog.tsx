@@ -29,7 +29,12 @@ import {
   uploadStudioMediaViaServer,
 } from "@/lib/experience-builder/studio-media.functions";
 import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
-import { validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
+import {
+  describeIngestSavings,
+  prepareImageForIngest,
+  validateImageFile,
+  type ImageRole,
+} from "@/lib/cms/image-upload";
 
 export interface PickedMedia {
   /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
