@@ -122,11 +122,67 @@ export const listCategoriesCms = createServerFn({ method: "POST" })
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
   });
 
+/* ───────────────  Opciones territoriales compartidas (CMS)  ───────────── */
+
+/**
+ * listCmsTerritoryOptions — Catálogos de apoyo para los filtros de los
+ * listados administrativos (destinos, zonas, categorías de empresa y
+ * empresas). Lectura únicamente; misma autoridad CMS, sin datos inventados.
+ */
+export const listCmsTerritoryOptions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertEditorial(context);
+    const [destinations, zones, categories, businesses] = await Promise.all([
+      context.supabase
+        .from("destinations")
+        .select("id, name")
+        .is("deleted_at", null)
+        .order("name", { ascending: true })
+        .limit(500),
+      context.supabase
+        .from("destination_zones")
+        .select("id, name, destination_id, status")
+        .is("deleted_at", null)
+        .neq("status", "archived")
+        .order("name", { ascending: true })
+        .limit(1000),
+      context.supabase
+        .from("business_categories")
+        .select("id, name, slug")
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true })
+        .limit(300),
+      context.supabase
+        .from("businesses")
+        .select("id, display_name, destination_id")
+        .is("deleted_at", null)
+        .order("display_name", { ascending: true })
+        .limit(2000),
+    ]);
+    const err =
+      destinations.error ?? zones.error ?? categories.error ?? businesses.error ?? null;
+    if (err) throw err;
+    return {
+      destinations: destinations.data ?? [],
+      zones: zones.data ?? [],
+      categories: categories.data ?? [],
+      businesses: businesses.data ?? [],
+    };
+  });
+
 /* ────────────────────────────  Empresas  ──────────────────────────────── */
+
+interface ListBusinessesInput extends ListInput {
+  destinationId?: string;
+  categoryId?: string;
+  status?: string;
+  verified?: string;
+}
 
 export const listBusinessesCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListBusinessesInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
@@ -139,6 +195,23 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
       .order("display_name", { ascending: true })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("display_name", `%${search}%`);
+    if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
+    if (data?.status) q = q.eq("status", data.status);
+    if (data?.verified === "yes") q = q.eq("verified", true);
+    if (data?.verified === "no") q = q.eq("verified", false);
+    if (data?.categoryId) {
+      // La categoría puede ser la principal o venir de la tabla de enlaces.
+      const { data: links, error: linkError } = await context.supabase
+        .from("business_category_links")
+        .select("business_id")
+        .eq("category_id", data.categoryId)
+        .limit(5000);
+      if (linkError) throw linkError;
+      const ids = (links ?? []).map((l: { business_id: string }) => l.business_id);
+      q = ids.length
+        ? q.or(`primary_category_id.eq.${data.categoryId},id.in.(${ids.join(",")})`)
+        : q.eq("primary_category_id", data.categoryId);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -146,19 +219,34 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
 
 /* ────────────────────────────  Productos  ─────────────────────────────── */
 
+interface ListProductsInput extends ListInput {
+  destinationId?: string;
+  businessId?: string;
+  productType?: string;
+  status?: string;
+}
+
 export const listProductsCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListProductsInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
+    const columns = "id, slug, name, product_type, status, business_id, updated_at";
+    const select = data?.destinationId
+      ? `${columns}, businesses!inner(destination_id)`
+      : columns;
     let q = context.supabase
       .from("products")
-      .select("id, slug, name, product_type, status, business_id, updated_at", { count: "exact" })
+      .select(select, { count: "exact" })
       .is("deleted_at", null)
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("name", `%${search}%`);
+    if (data?.businessId) q = q.eq("business_id", data.businessId);
+    if (data?.productType) q = q.eq("product_type", data.productType);
+    if (data?.status) q = q.eq("status", data.status);
+    if (data?.destinationId) q = q.eq("businesses.destination_id", data.destinationId);
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
