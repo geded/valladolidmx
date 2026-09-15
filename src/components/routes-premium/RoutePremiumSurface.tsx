@@ -56,6 +56,7 @@ function groupByDay(stops: readonly EditorialRouteStopDTO[]) {
 
 export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO }) {
   const [party, setParty] = useState<PartyComposition | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const chips = [
     routeDurationLabel(route),
     routePaceLabel(route.pace),
