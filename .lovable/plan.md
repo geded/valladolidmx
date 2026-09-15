@@ -37,9 +37,7 @@ Actualizar la autoridad existente de rutas para adoptar el mismo lenguaje visual
 - `src/components/routes-premium/RoutePremiumSurface.tsx`
 - `src/components/routes-premium/RouteMapSection.tsx`
 
-Sólo si resulta indispensable para reutilizar una pieza existente sin duplicarla:
-
-- un componente compartido ya aprobado de `src/components/premium/` o `src/components/share/`, sin cambiar sus otros consumidores.
+Se reutilizan sin modificarlos los componentes aprobados existentes: portada Premium de entidad, botón de Mi Viaje, botón de favoritos, hoja de compartir y barra de acciones móvil. No se crean versiones nuevas ni se cambian sus otros consumidores.
 
 ## Invariantes de preservación
 
