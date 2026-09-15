@@ -140,6 +140,8 @@ export function resolveMediaSource(
     height: asset?.original_height ?? undefined,
     usedPipeline: false,
     pipelineStatus,
+    ...(options.sizes ? { sizes: options.sizes } : {}),
+    ...(options.priority ? { priority: options.priority } : {}),
   };
 
   if (!asset) return baseResult;
@@ -170,6 +172,7 @@ export function resolveMediaSource(
       sources.push({
         type: MIME_BY_FORMAT[fmt],
         srcSet: buildSrcSet(list),
+        ...(options.sizes ? { sizes: options.sizes } : {}),
       });
     }
   }
@@ -192,6 +195,8 @@ export function resolveMediaSource(
     height: asset.original_height ?? undefined,
     usedPipeline: true,
     pipelineStatus: "ready",
+    ...(options.sizes ? { sizes: options.sizes } : {}),
+    ...(options.priority ? { priority: options.priority } : {}),
   };
 }
 

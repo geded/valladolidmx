@@ -369,6 +369,17 @@ describe("E. Contrato aditivo · resolveMediaSource() byte-identidad", () => {
     expect(r.src).toBe("https://cdn.example.com/original.jpg");
     expect(r.sources).toEqual([]);
   });
+
+  test("propaga sizes y prioridad sin alterar la URL canónica", () => {
+    const r = resolveMediaSource(asset, {
+      sizes: "(max-width: 768px) 100vw, 35vw",
+      priority: "high",
+    });
+    expect(r.canonical).toBe("https://cdn.example.com/original.jpg");
+    expect(r.sizes).toBe("(max-width: 768px) 100vw, 35vw");
+    expect(r.priority).toBe("high");
+    expect(r.sources[0]?.sizes).toBe("(max-width: 768px) 100vw, 35vw");
+  });
 });
 
 describe("F. Respuesta del evaluador NO expone URLs firmadas", () => {
