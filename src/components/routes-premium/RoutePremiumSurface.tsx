@@ -265,15 +265,32 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
         </section>
       ) : null}
 
-      <PremiumAluxBar
-        question={`¿Quieres adaptar "${route.name}" a tus fechas?`}
-        selectedParty={party}
-        onSelectParty={(value) => {
-          setParty(value);
-          askAlux();
-        }}
-        onContinue={() => askAlux()}
-      />
+      <div className="flex flex-wrap items-center gap-2 rounded-3xl border border-border bg-card p-5 shadow-soft">
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-lg">¿Te llevas esta ruta?</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Súmala a Mi Viaje y tu concierge la adapta a tus fechas.
+          </p>
+        </div>
+        <AddToTravelPlanButton
+          kind="route"
+          targetId={route.id}
+          title={route.name}
+          slug={route.slug}
+          subtitle={route.originDestinationLabel}
+          imageUrl={route.coverUrl}
+          variant="full"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShareOpen(true)}
+          className="min-h-11 rounded-pill"
+        >
+          <Share2 className="size-4" aria-hidden />
+          Compartir
+        </Button>
+      </div>
     </div>
   );
 }
