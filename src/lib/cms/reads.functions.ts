@@ -232,21 +232,29 @@ export const listProductsCms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
-    const columns = "id, slug, name, product_type, status, business_id, updated_at";
-    const select = data?.destinationId
-      ? `${columns}, businesses!inner(destination_id)`
-      : columns;
     let q = context.supabase
       .from("products")
-      .select(select, { count: "exact" })
+      .select("id, slug, name, product_type, status, business_id, updated_at", { count: "exact" })
       .is("deleted_at", null)
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("name", `%${search}%`);
     if (data?.businessId) q = q.eq("business_id", data.businessId);
-    if (data?.productType) q = q.eq("product_type", data.productType);
-    if (data?.status) q = q.eq("status", data.status);
-    if (data?.destinationId) q = q.eq("businesses.destination_id", data.destinationId);
+    if (data?.productType) q = q.eq("product_type", data.productType as never);
+    if (data?.status) q = q.eq("status", data.status as never);
+    if (data?.destinationId && !data?.businessId) {
+      // Productos del destino = productos de las empresas de ese destino.
+      const { data: bizRows, error: bizError } = await context.supabase
+        .from("businesses")
+        .select("id")
+        .eq("destination_id", data.destinationId)
+        .is("deleted_at", null)
+        .limit(5000);
+      if (bizError) throw bizError;
+      const ids = (bizRows ?? []).map((b: { id: string }) => b.id);
+      if (ids.length === 0) return { rows: [], total: 0, limit, offset };
+      q = q.in("business_id", ids);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
