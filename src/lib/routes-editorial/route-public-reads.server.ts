@@ -188,11 +188,25 @@ export async function readPublishedRouteCards(input?: {
     : cards;
 }
 
-async function resolveStopHrefs(
+/**
+ * Resuelve, por entidad de parada, su enlace canónico y sus coordenadas
+ * acreditadas. Si la entidad no publicó ubicación, la parada se queda sin
+ * coordenadas: el mapa simplemente no la dibuja (nunca se inventa un punto).
+ */
+async function resolveStopEntities(
   sb: AnyClient,
   stops: Array<{ entity_kind: string; entity_id: string | null }>,
-): Promise<Map<string, string>> {
+): Promise<{
+  hrefs: Map<string, string>;
+  coords: Map<string, { lat: number; lng: number }>;
+}> {
   const hrefs = new Map<string, string>();
+  const coords = new Map<string, { lat: number; lng: number }>();
+  const setCoord = (id: string, lat: unknown, lng: unknown) => {
+    const la = Number(lat);
+    const ln = Number(lng);
+    if (Number.isFinite(la) && Number.isFinite(ln)) coords.set(id, { lat: la, lng: ln });
+  };
   const idsOf = (kind: string) =>
     Array.from(
       new Set(
