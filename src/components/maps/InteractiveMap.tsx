@@ -23,7 +23,6 @@ import {
   loadGoogleMaps,
   subscribeGoogleMapsAuthFailure,
 } from "@/lib/maps/google-maps-loader";
-import { computeRoadRoute } from "@/lib/maps/maps.functions";
 import { MapUnavailableFallback } from "./MapUnavailableFallback";
 import { StaticMap } from "./StaticMap";
 
@@ -206,6 +205,12 @@ export interface InteractiveMapProps {
   onRouteStatus?: (status: MapRouteStatus) => void;
   /** Refuerza visualmente el recorrido sin alterar los mapas de otras superficies. */
   routeEmphasis?: "standard" | "prominent";
+  /** Geometría vial acreditada, calculada en servidor para una ruta CMS publicada. */
+  roadRoute?: {
+    encodedPolyline: string;
+    distanceMeters: number | null;
+    durationSeconds: number | null;
+  } | null;
   /** Selección de un marcador desde el mapa. */
   onMarkerSelect?: (key: string) => void;
   /** Puntos a los que se ajusta el encuadre; por defecto todos los pines. */
@@ -287,6 +292,7 @@ export function InteractiveMap({
   optimizeRoute = false,
   onRouteStatus,
   routeEmphasis = "standard",
+  roadRoute,
   onMarkerSelect,
   fitPoints,
   fitPadding = 88,
@@ -390,8 +396,33 @@ export function InteractiveMap({
         const stops =
           routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
         if (stops.length > 1) {
-          const directions = new google.maps.DirectionsService();
           const isProminentRoute = routeEmphasis === "prominent";
+          if (isProminentRoute && roadRoute?.encodedPolyline) {
+            const roadPath = decodePolyline(roadRoute.encodedPolyline);
+            new google.maps.Polyline({
+              map,
+              path: roadPath,
+              strokeColor: themeColor("--selva", "#234933"),
+              strokeOpacity: 0.88,
+              strokeWeight: 10,
+            });
+            new google.maps.Polyline({
+              map,
+              path: roadPath,
+              strokeColor: themeColor("--primary", "#eaa840"),
+              strokeOpacity: 1,
+              strokeWeight: 6,
+            });
+            map.fitBounds(bounds, fitPadding);
+            routeStatusRef.current?.({
+              mode: "directions",
+              distanceMeters: roadRoute.distanceMeters ?? undefined,
+              durationSeconds: roadRoute.durationSeconds ?? undefined,
+            });
+            setReady(true);
+            return;
+          }
+          const directions = new google.maps.DirectionsService();
           const routeUnderlay = isProminentRoute
             ? new google.maps.DirectionsRenderer({
                 map,
@@ -452,36 +483,7 @@ export function InteractiveMap({
                 return;
               }
               if (isProminentRoute) {
-                void computeRoadRoute({
-                  data: { points: stops.map((point) => ({ lat: point.lat, lng: point.lng })) },
-                }).then((roadRoute) => {
-                  if (cancelled) return;
-                  if (!roadRoute.ok || !roadRoute.encodedPolyline) {
-                    routeStatusRef.current?.({ mode: "none", providerStatus: status });
-                    return;
-                  }
-                  const roadPath = decodePolyline(roadRoute.encodedPolyline);
-                  new google.maps.Polyline({
-                    map,
-                    path: roadPath,
-                    strokeColor: themeColor("--selva", "#234933"),
-                    strokeOpacity: 0.88,
-                    strokeWeight: 10,
-                  });
-                  new google.maps.Polyline({
-                    map,
-                    path: roadPath,
-                    strokeColor: themeColor("--primary", "#eaa840"),
-                    strokeOpacity: 1,
-                    strokeWeight: 6,
-                  });
-                  map.fitBounds(bounds, fitPadding);
-                  routeStatusRef.current?.({
-                    mode: "directions",
-                    distanceMeters: roadRoute.distanceMeters ?? undefined,
-                    durationSeconds: roadRoute.durationSeconds ?? undefined,
-                  });
-                });
+                routeStatusRef.current?.({ mode: "none", providerStatus: status });
               } else {
                 const approximatePath = stops.map((s) => ({ lat: s.lat, lng: s.lng }));
                 new google.maps.Polyline({
@@ -528,6 +530,9 @@ export function InteractiveMap({
     restrictionSignature,
     optimizeRoute,
     routeEmphasis,
+    roadRoute?.encodedPolyline,
+    roadRoute?.distanceMeters,
+    roadRoute?.durationSeconds,
     fitPadding,
     minZoom,
   ]);

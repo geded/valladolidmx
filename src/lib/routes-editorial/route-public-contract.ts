@@ -62,6 +62,11 @@ export interface EditorialRouteCardDTO {
 export interface EditorialRouteDetailDTO extends EditorialRouteCardDTO {
   contractVersion: string;
   stops: EditorialRouteStopDTO[];
+  roadRoute: {
+    encodedPolyline: string;
+    distanceMeters: number | null;
+    durationSeconds: number | null;
+  } | null;
   gallery: Array<{ url: string; alt: string | null }>;
 }
 

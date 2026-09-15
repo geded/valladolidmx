@@ -68,11 +68,17 @@ function googleDirectionsUrl(stops: RouteMapStop[]): string {
 export function RouteMapSection({
   stops,
   durationDays,
+  roadRoute,
   selectedStopId,
   onSelectStop,
 }: {
   stops: RouteMapStop[];
   durationDays: number | null;
+  roadRoute: {
+    encodedPolyline: string;
+    distanceMeters: number | null;
+    durationSeconds: number | null;
+  } | null;
   selectedStopId?: string | null;
   onSelectStop?: (id: string) => void;
 }) {
@@ -125,6 +131,7 @@ export function RouteMapSection({
           routeStops={stops.map((stop) => ({ lat: stop.lat, lng: stop.lng, key: stop.id }))}
           connectByRoad
           routeEmphasis="prominent"
+          roadRoute={roadRoute}
           fitPadding={36}
           onRouteStatus={setStatus}
           {...(onSelectStop ? { onMarkerSelect: onSelectStop } : {})}

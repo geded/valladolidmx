@@ -379,6 +379,22 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
     };
   });
 
+  const roadPoints = stops
+    .filter(
+      (stop) =>
+        typeof stop.lat === "number" &&
+        Number.isFinite(stop.lat) &&
+        typeof stop.lng === "number" &&
+        Number.isFinite(stop.lng),
+    )
+    .map((stop) => ({ lat: stop.lat as number, lng: stop.lng as number }));
+  const roadResult =
+    roadPoints.length > 1
+      ? await import("@/lib/maps/routes.server").then(({ computeRoadRouteInternal }) =>
+          computeRoadRouteInternal(roadPoints),
+        )
+      : null;
+
   const card = toCard(
     row as unknown as EditorialRouteRow,
     destinations,
@@ -390,6 +406,14 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
     ...card,
     contractVersion: "1.0.0",
     stops,
+    roadRoute:
+      roadResult?.ok && roadResult.encodedPolyline
+        ? {
+            encodedPolyline: roadResult.encodedPolyline,
+            distanceMeters: roadResult.distanceMeters,
+            durationSeconds: roadResult.durationSeconds,
+          }
+        : null,
     gallery: galleryIds
       .map((id) => media.get(id))
       .filter((m): m is { url: string | null; alt: string | null } => Boolean(m?.url))

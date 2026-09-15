@@ -117,7 +117,11 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
         </span>
       </div>
 
-      <RouteMapSection stops={mapStops} durationDays={route.durationDays} />
+      <RouteMapSection
+        stops={mapStops}
+        durationDays={route.durationDays}
+        roadRoute={route.roadRoute}
+      />
 
       <section aria-labelledby="ruta-itinerario">
         <PremiumSectionHead
