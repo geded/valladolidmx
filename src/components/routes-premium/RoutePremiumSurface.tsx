@@ -112,19 +112,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           ],
         }}
       />
-
-
-
-      <div className="flex flex-wrap items-center gap-2">
-        <AddToTravelPlanButton
-          kind="route"
-          targetId={route.id}
-          title={route.name}
-          slug={route.slug}
-          subtitle={route.originDestinationLabel}
-          imageUrl={route.coverUrl}
-          variant="full"
-        />
+      <div className="flex flex-wrap items-center justify-end gap-2">
         <Button
           type="button"
           variant="outline"
@@ -134,7 +122,17 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           <Share2 className="size-4" aria-hidden />
           Compartir
         </Button>
+        <AddToTravelPlanButton
+          kind="route"
+          targetId={route.id}
+          title={route.name}
+          slug={route.slug}
+          subtitle={route.originDestinationLabel}
+          imageUrl={route.coverUrl}
+          variant="full"
+        />
       </div>
+
 
       <ShareSheet
         open={shareOpen}
