@@ -386,9 +386,15 @@ export const listReviewsCms = createServerFn({ method: "POST" })
 
 /* ─────────────────────────────  Eventos  ─────────────────────────────── */
 
+interface ListEventsInput extends ListInput {
+  destinationId?: string;
+  status?: string;
+  period?: string;
+}
+
 export const listEventsCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListEventsInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
@@ -401,6 +407,10 @@ export const listEventsCms = createServerFn({ method: "POST" })
       .order("starts_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("title", `%${search}%`);
+    if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
+    if (data?.status) q = q.eq("status", data.status as never);
+    if (data?.period === "upcoming") q = q.gte("starts_at", new Date().toISOString());
+    if (data?.period === "past") q = q.lt("starts_at", new Date().toISOString());
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
