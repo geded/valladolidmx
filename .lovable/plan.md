@@ -15,9 +15,11 @@ Actualizar la autoridad existente de rutas para adoptar el mismo lenguaje visual
    - La fotografía irá primero en móvil y a la derecha en escritorio, igual que las demás fichas Premium.
    - Integrar duración, ritmo, dificultad y número de paradas como datos compactos dentro de la portada.
 
-2. **Acciones de la ficha**
-   - Colocar `Agregar a Mi Viaje` en la zona de acciones inmediatamente posterior a la portada.
-   - Incorporar la acción compartida de compartir si ya está disponible en el sistema.
+2. **Acciones de la ficha: agregar, guardar y compartir**
+   - Las tres acciones quedan juntas y visibles junto a la portada, con la misma jerarquía que en hoteles y restaurantes: `Agregar a Mi Viaje` como acción principal, y `Guardar` y `Compartir` como acciones secundarias.
+   - `Guardar` usa el mismo botón de favoritos ya aprobado del sistema: guarda la ruta en los favoritos del viajero, distinto de Mi Viaje, y pide acceso igual que en las demás fichas.
+   - `Compartir` abre la misma hoja de compartir ya existente (WhatsApp, copiar enlace, Facebook, correo, X, y el compartir nativo del teléfono), con el nombre de la ruta y su dirección pública.
+   - En móvil, esas mismas acciones se repiten en la barra inferior fija de la ficha, igual que en hoteles y restaurantes, para que estén siempre al alcance.
    - Eliminar el texto técnico sobre la referencia privada; no cambia el comportamiento ni los datos guardados.
 
 3. **Alux y navegación interna**
@@ -35,9 +37,7 @@ Actualizar la autoridad existente de rutas para adoptar el mismo lenguaje visual
 - `src/components/routes-premium/RoutePremiumSurface.tsx`
 - `src/components/routes-premium/RouteMapSection.tsx`
 
-Sólo si resulta indispensable para reutilizar una pieza existente sin duplicarla:
-
-- un componente compartido ya aprobado de `src/components/premium/` o `src/components/share/`, sin cambiar sus otros consumidores.
+Se reutilizan sin modificarlos los componentes aprobados existentes: portada Premium de entidad, botón de Mi Viaje, botón de favoritos, hoja de compartir y barra de acciones móvil. No se crean versiones nuevas ni se cambian sus otros consumidores.
 
 ## Invariantes de preservación
 
@@ -56,7 +56,7 @@ Permanecen sin cambios:
 - **Scope Gate:** sólo los dos componentes de la ficha de rutas; ninguna modificación a hoteles o restaurantes.
 - **Preservation Gate:** comparación completa antes/después de `/rutas/pueblos-coloniales` y `/rutas/ruta-sukin`.
 - Validación visual en 1440, 834, 430 y 390 px.
-- Verificar portada, breadcrumbs, Alux, Mi Viaje, mapa, nombres de pines, trazo vial, días, paradas, galería, header y footer.
+- Verificar portada, breadcrumbs, Alux, Mi Viaje, guardar, compartir, barra móvil de acciones, mapa, nombres de pines, trazo vial, días, paradas, galería, header y footer.
 - Typecheck, pruebas de mapas y smoke de las rutas.
 - No publicar sin autorización posterior.
 
