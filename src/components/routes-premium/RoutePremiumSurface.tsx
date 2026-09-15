@@ -17,7 +17,7 @@ import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
-import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
+
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
 
@@ -104,32 +104,15 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           media: route.coverUrl
             ? { url: route.coverUrl, alt: route.coverAlt ?? route.name }
             : null,
-          badges: route.originDestinationLabel
-            ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
-            : [],
+          badges: [
+            ...(route.originDestinationLabel
+              ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
+              : []),
+            ...chips.map((chip) => ({ label: chip })),
+          ],
         }}
       />
-
-      {chips.length ? (
-        <TourismChipRow label="Datos de la ruta">
-          {chips.map((chip) => (
-            <TourismChip key={chip} scheme="surface" size="sm">
-              {chip}
-            </TourismChip>
-          ))}
-        </TourismChipRow>
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-2">
-        <AddToTravelPlanButton
-          kind="route"
-          targetId={route.id}
-          title={route.name}
-          slug={route.slug}
-          subtitle={route.originDestinationLabel}
-          imageUrl={route.coverUrl}
-          variant="full"
-        />
+      <div className="flex flex-wrap items-center justify-end gap-2">
         <Button
           type="button"
           variant="outline"
@@ -139,7 +122,17 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           <Share2 className="size-4" aria-hidden />
           Compartir
         </Button>
+        <AddToTravelPlanButton
+          kind="route"
+          targetId={route.id}
+          title={route.name}
+          slug={route.slug}
+          subtitle={route.originDestinationLabel}
+          imageUrl={route.coverUrl}
+          variant="full"
+        />
       </div>
+
 
       <ShareSheet
         open={shareOpen}
