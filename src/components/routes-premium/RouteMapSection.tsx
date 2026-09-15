@@ -9,6 +9,7 @@
 import { useMemo, useState } from "react";
 
 import { InteractiveMap, type MapRouteStatus } from "@/components/maps/InteractiveMap";
+import { Button } from "@/components/ui/button";
 import { PremiumSectionHead } from "@/components/home-premium/shared/PremiumShowcase";
 import type { EditorialRouteStopDTO } from "@/lib/routes-editorial/route-public-contract";
 
