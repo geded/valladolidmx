@@ -8583,6 +8583,7 @@ export type Database = {
         Args: { _error: string; _variant_key: string; _worker_id: string }
         Returns: undefined
       }
+      masu_renew_secret_fingerprint: { Args: never; Returns: string }
       masu_trigger_renewal: { Args: never; Returns: undefined }
       masu_upsert_monotonic: {
         Args: {
