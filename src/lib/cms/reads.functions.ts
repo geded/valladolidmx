@@ -166,12 +166,67 @@ export const listProductsCms = createServerFn({ method: "POST" })
 
 /* ─────────────────────────────  Media  ────────────────────────────────── */
 
+/**
+ * Biblioteca Media · "Mis imágenes" y filtros por uso.
+ *
+ * Delta aditivo sobre la lectura existente: se conservan columnas, orden y
+ * paginación. Se añaden dos filtros opcionales:
+ *  - `scope: "mine"` limita a las imágenes de las empresas del usuario
+ *    (y a las que él mismo cargó), sin exponer activos de terceros.
+ *  - `usage` agrupa los contextos reales del catálogo en portadas, galerías
+ *    y logos, dejando el resto en "otros".
+ */
+export type MediaUsageFilter = "all" | "cover" | "gallery" | "logo" | "other";
+export type MediaScopeFilter = "all" | "mine";
+
+const MEDIA_COVER_CONTEXTS = ["cover", "cover_mobile", "hero", "business_cover_preview"];
+const MEDIA_GALLERY_CONTEXTS = ["gallery"];
+const MEDIA_LOGO_CONTEXTS = ["logo", "icon", "avatar"];
+const MEDIA_KNOWN_CONTEXTS = [
+  ...MEDIA_COVER_CONTEXTS,
+  ...MEDIA_GALLERY_CONTEXTS,
+  ...MEDIA_LOGO_CONTEXTS,
+];
+
+interface ListMediaInput extends ListInput {
+  scope?: MediaScopeFilter;
+  usage?: MediaUsageFilter;
+}
+
 export const listMediaCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListMediaInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
+    const scope: MediaScopeFilter = data?.scope === "mine" ? "mine" : "all";
+    const usage: MediaUsageFilter = (
+      ["cover", "gallery", "logo", "other"] as const
+    ).includes(data?.usage as never)
+      ? (data!.usage as MediaUsageFilter)
+      : "all";
+
+    let businessIds: string[] = [];
+    let productIds: string[] = [];
+    if (scope === "mine") {
+      const { data: memberships, error: memberError } = await context.supabase
+        .from("business_users")
+        .select("business_id")
+        .eq("user_id", context.userId)
+        .eq("status", "active");
+      if (memberError) throw memberError;
+      businessIds = (memberships ?? []).map((m: { business_id: string }) => m.business_id);
+      if (businessIds.length > 0) {
+        const { data: products, error: productError } = await context.supabase
+          .from("products")
+          .select("id")
+          .in("business_id", businessIds)
+          .is("deleted_at", null);
+        if (productError) throw productError;
+        productIds = (products ?? []).map((p: { id: string }) => p.id);
+      }
+    }
+
     let q = context.supabase
       .from("media_assets")
       .select(
@@ -182,10 +237,33 @@ export const listMediaCms = createServerFn({ method: "POST" })
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("alt_text", `%${search}%`);
+
+    if (scope === "mine") {
+      const ownedIds = [...businessIds, ...productIds];
+      const clauses = [`created_by.eq.${context.userId}`];
+      if (ownedIds.length > 0) clauses.push(`entity_id.in.(${ownedIds.join(",")})`);
+      q = q.or(clauses.join(","));
+    }
+
+    if (usage === "other") {
+      q = q.or(
+        `usage_context.is.null,usage_context.not.in.(${MEDIA_KNOWN_CONTEXTS.join(",")})`,
+      );
+    } else if (usage !== "all") {
+      const list =
+        usage === "cover"
+          ? MEDIA_COVER_CONTEXTS
+          : usage === "gallery"
+            ? MEDIA_GALLERY_CONTEXTS
+            : MEDIA_LOGO_CONTEXTS;
+      q = q.in("usage_context", list);
+    }
+
     const { data: rows, count, error } = await q;
     if (error) throw error;
-    return { rows: rows ?? [], total: count ?? 0, limit, offset };
+    return { rows: rows ?? [], total: count ?? 0, limit, offset, scope, usage };
   });
+
 
 /* ─────────────────────────────  Reseñas  ──────────────────────────────── */
 
