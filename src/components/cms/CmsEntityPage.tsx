@@ -27,6 +27,8 @@ interface Props<Row> {
   rowKey: (row: Row) => string;
   emptyMessage?: string;
   headerActions?: ReactNode;
+  /** Filtros adicionales enviados a la server fn (p. ej. uso o alcance). */
+  extraParams?: Record<string, string | number | boolean | null>;
 }
 
 export function CmsEntityPage<Row>(props: Props<Row>) {
@@ -34,8 +36,9 @@ export function CmsEntityPage<Row>(props: Props<Row>) {
   const [search, setSearch] = useState("");
 
   const query = useQuery<ListResult<Row>>({
-    queryKey: ["cms", props.queryKey, { search }],
-    queryFn: () => callFn({ data: { search, limit: 50, offset: 0 } }),
+    queryKey: ["cms", props.queryKey, { search, ...(props.extraParams ?? {}) }],
+    queryFn: () =>
+      callFn({ data: { search, limit: 50, offset: 0, ...(props.extraParams ?? {}) } }),
   });
 
   if (query.isError) {
