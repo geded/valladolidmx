@@ -406,7 +406,7 @@ export function InteractiveMap({
             const nameMarker = new google.maps.Marker({
               position: { lat: m.lat, lng: m.lng },
               map,
-              clickable: Boolean(m.key),
+              title: stopName,
               zIndex: (selected ? 20 : 10) + 1,
               icon: {
                 url: chip.url,
