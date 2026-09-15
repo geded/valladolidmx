@@ -28,6 +28,12 @@ interface Props<Row> {
   rowKey: (row: Row) => string;
   emptyMessage?: string;
   headerActions?: ReactNode;
+  /** Barra territorial y filtros propios de la sección. */
+  filters?: ReactNode;
+  /** Paginación (1-indexada). Si se omite, no se muestran controles. */
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (next: number) => void;
 }
 
 export function EntityListView<Row>(props: Props<Row>) {
@@ -44,7 +50,16 @@ export function EntityListView<Row>(props: Props<Row>) {
     rowKey,
     emptyMessage = "Sin registros que mostrar.",
     headerActions,
+    filters,
+    page,
+    pageSize,
+    onPageChange,
   } = props;
+
+  const hasPaging = typeof page === "number" && typeof pageSize === "number" && !!onPageChange;
+  const totalPages = hasPaging ? Math.max(1, Math.ceil(total / pageSize!)) : 1;
+  const from = hasPaging && total > 0 ? (page! - 1) * pageSize! + 1 : 0;
+  const to = hasPaging ? Math.min(total, (page! - 1) * pageSize! + rows.length) : rows.length;
 
   const inputId = useId();
   const [draft, setDraft] = useState(search);
@@ -70,6 +85,8 @@ export function EntityListView<Row>(props: Props<Row>) {
           {headerActions}
         </div>
       </header>
+
+      {filters && <div className="mt-5">{filters}</div>}
 
       <form
         className="mt-5 flex flex-wrap items-end gap-3"
@@ -151,6 +168,34 @@ export function EntityListView<Row>(props: Props<Row>) {
           </table>
         </div>
       </div>
+
+      {hasPaging && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            {total === 0
+              ? "Sin resultados."
+              : `Mostrando ${from}–${to} de ${total} · página ${page} de ${totalPages}`}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={page! <= 1}
+              onClick={() => onPageChange!(page! - 1)}
+              className="h-9 rounded-md border border-border bg-card px-3 text-xs font-medium disabled:opacity-40 hover:bg-accent"
+            >
+              ← Anterior
+            </button>
+            <button
+              type="button"
+              disabled={page! >= totalPages}
+              onClick={() => onPageChange!(page! + 1)}
+              className="h-9 rounded-md border border-border bg-card px-3 text-xs font-medium disabled:opacity-40 hover:bg-accent"
+            >
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -10,6 +10,7 @@ import {
   reconcileZoneForDestination,
   type TerritorialZone,
 } from "@/lib/places/place-territory";
+import { useCmsTerritory } from "@/lib/cms/territory-context";
 
 export const Route = createFileRoute("/_authenticated/cms/lugares/")({
   head: () => ({
@@ -38,8 +39,12 @@ function LugaresPage() {
   const listFn = useServerFn(listPlacesCms);
 
   const [search, setSearch] = useState("");
-  const [destinationId, setDestinationId] = useState("");
-  const [zoneId, setZoneId] = useState("");
+  /* El destino y la zona de trabajo se recuerdan entre recargas y se comparten
+     con el resto del CMS (empresas, productos, eventos). */
+  const { territory, setDestination, setZone } = useCmsTerritory();
+  const destinationId = territory.destinationId;
+  const zoneId = territory.zoneId;
+  const setZoneId = setZone;
   const [status, setStatus] = useState("");
   /* Adenda 3: segmentación por taxonomía canónica (familia documental,
      `place_types` y `place_categories`). Sin etiquetas inventadas. */
@@ -66,8 +71,8 @@ function LugaresPage() {
   );
 
   const selectDestination = (next: string) => {
-    setDestinationId(next);
-    setZoneId((current) => reconcileZoneForDestination(opts.zones ?? [], next, current));
+    setDestination(next);
+    setZoneId(reconcileZoneForDestination(opts.zones ?? [], next, zoneId));
   };
 
   const list = useQuery({
