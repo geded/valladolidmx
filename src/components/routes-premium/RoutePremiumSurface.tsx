@@ -20,7 +20,7 @@ import { ExperienceGallery } from "@/components/experience-builder/blocks/experi
 import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
-import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";

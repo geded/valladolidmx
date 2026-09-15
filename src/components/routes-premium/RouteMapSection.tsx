@@ -114,7 +114,7 @@ export function RouteMapSection({
         description="Paradas publicadas, en su orden real, sobre la cartografía del Oriente Maya."
       />
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+      <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
         <InteractiveMap
           lat={center.lat}
           lng={center.lng}
@@ -138,14 +138,14 @@ export function RouteMapSection({
           {...(onSelectStop ? { onMarkerSelect: onSelectStop } : {})}
         />
 
-        <div className="space-y-3 border-t border-border p-4">
-          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="space-y-3 border-t border-border p-5">
+          <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {metrics.map((metric) => (
               <div key={metric.label}>
-                <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   {metric.label}
                 </dt>
-                <dd className="font-display text-base">{metric.value}</dd>
+                <dd className="mt-0.5 font-display text-lg">{metric.value}</dd>
               </div>
             ))}
           </dl>
