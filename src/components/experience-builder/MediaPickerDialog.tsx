@@ -145,6 +145,7 @@ export function MediaPickerDialog({
   const list = useServerFn(listStudioMediaLibrary);
   const serverUpload = useServerFn(uploadStudioMediaViaServer);
   const approve = useServerFn(approveStudioMedia);
+  const upscale = useServerFn(aluxUpscaleImage);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
@@ -160,6 +161,8 @@ export function MediaPickerDialog({
   const [preview, setPreview] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const [rights, setRights] = useState({ ...emptyRights });
+  const [fit, setFit] = useState<RoleFit | null>(null);
+  const [upscaling, setUpscaling] = useState(false);
 
   const refresh = useCallback(() => {
     setLoading(true);
