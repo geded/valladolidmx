@@ -269,8 +269,18 @@ export function InteractiveMap({
   /* Sólo se descarga el SDK cuando el panel está visible y con tamaño real. */
   const shouldMount = useVisibleWithSize(ref);
 
+  /* Firmas estables: evitan reconstruir el mapa (y repetir Directions)
+     cuando el padre vuelve a crear los mismos arreglos en cada render. */
+  const markersSignature = JSON.stringify(markers ?? null);
+  const routeStopsSignature = JSON.stringify(routeStops ?? null);
+  const fitPointsSignature = JSON.stringify(fitPoints ?? null);
+  const restrictionSignature = JSON.stringify(restriction ?? null);
+  const latestRef = useRef({ markers, routeStops, fitPoints, restriction });
+  latestRef.current = { markers, routeStops, fitPoints, restriction };
+
   /* Fallo de autorización del proveedor: suscripción por instancia. */
   useEffect(() => subscribeGoogleMapsAuthFailure(() => setFailed(true)), []);
+
 
   useEffect(() => {
     if (!shouldMount) return;
@@ -284,6 +294,13 @@ export function InteractiveMap({
     loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
+        const {
+          markers,
+          routeStops,
+          fitPoints,
+          restriction,
+        } = latestRef.current;
+
 
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
@@ -418,11 +435,13 @@ export function InteractiveMap({
     lng,
     zoom,
     markerTitle,
-    markers,
+    markersSignature,
     connectByRoad,
-    routeStops,
+    routeStopsSignature,
+    fitPointsSignature,
+    restrictionSignature,
     optimizeRoute,
-    restriction,
+    fitPadding,
     minZoom,
   ]);
 
