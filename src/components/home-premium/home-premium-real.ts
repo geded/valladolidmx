@@ -13,6 +13,7 @@
  */
 import type { HomeRealContent } from "@/lib/experience-builder/smart-blocks.server";
 import { decodeSlotMedia } from "@/lib/media/slot-media";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 import {
   HOME_PREMIUM_MEDIA,
   type HomePremiumContent,
@@ -114,6 +115,29 @@ function isApprovedConfiguredMedia(url: string): boolean {
   );
 }
 
+/**
+ * H3·A4 · Adjunta, sin alterar ninguna URL canónica, el asset con sus
+ * versiones ligeras a cada medio `{ url, alt }` del árbol de la Home. El
+ * render sigue mostrando exactamente la misma imagen; `resolveMediaSource()`
+ * decide después si puede ofrecer AVIF/WebP más livianos.
+ */
+function attachMediaAssets<T>(node: T, assets: Record<string, MediaAssetInput>): T {
+  if (Array.isArray(node)) {
+    return node.map((item) => attachMediaAssets(item, assets)) as unknown as T;
+  }
+  if (!node || typeof node !== "object") return node;
+  const record = node as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(record)) {
+    out[key] = attachMediaAssets(value, assets);
+  }
+  if (typeof record.url === "string" && typeof record.alt === "string" && !("asset" in record)) {
+    const asset = assets[decodeSlotMedia(record.url).src];
+    if (asset) out.asset = asset;
+  }
+  return out as T;
+}
+
 /** Fusiona el corpus real sobre el contenido editorial resuelto del bloque. */
 export function mergeHomeRealContent(
   content: HomePremiumContent,
@@ -121,6 +145,7 @@ export function mergeHomeRealContent(
 ): HomePremiumContent {
   const safeContent = withoutUnapprovedMedia(content);
   if (!real) return safeContent;
+  const mediaAssets = real.mediaAssets ?? {};
 
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
   const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
@@ -131,7 +156,7 @@ export function mergeHomeRealContent(
     caption: card.title,
   }));
 
-  return {
+  return attachMediaAssets({
     ...safeContent,
     hero: {
       ...safeContent.hero,
@@ -232,7 +257,7 @@ export function mergeHomeRealContent(
         })),
       },
     },
-  };
+  }, mediaAssets);
 }
 
 /**

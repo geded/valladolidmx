@@ -13,8 +13,17 @@ import type { EventRecurrencePayload } from "@/lib/events/recurrence";
  */
 
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 
-export type HomePremiumMedia = { url: string; alt: string };
+/**
+ * `asset` es aditivo (H3·A4): cuando el pipeline tiene versiones ligeras
+ * `ready`, el componente oficial puede servirlas; si falta, se usa `url`.
+ */
+export type HomePremiumMedia = {
+  url: string;
+  alt: string;
+  asset?: MediaAssetInput | null;
+};
 
 /**
  * Medios conceptuales aprobados para visualizar la Home completa antes de

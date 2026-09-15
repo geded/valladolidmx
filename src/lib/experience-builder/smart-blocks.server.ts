@@ -27,7 +27,19 @@ import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { PUBLIC_APPROVED_REVIEW_STATE } from "@/lib/omxds/public-eligibility";
 import { buildCanonicalEntityUrl } from "./canonical-entity-binding";
 import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
-import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
+import {
+  STABLE_PUBLIC_MEDIA_BUCKET,
+  STABLE_PUBLIC_MEDIA_PREFIX,
+  toStablePublicMediaUrl,
+} from "@/lib/media/stable-public-url";
+import { toDerivedPublicMediaUrl } from "@/lib/media/derived-public-url";
+import type { MediaAssetInput, MediaVariantInput } from "@/lib/media/resolve-source";
+import { HOME_PREMIUM_MEDIA } from "@/components/home-premium/home-premium-content";
+
+/** URLs estables ya aprobadas del fixture editorial de la portada. */
+const HOME_PREMIUM_STABLE_MEDIA_URLS: string[] = Object.values(HOME_PREMIUM_MEDIA).map(
+  (m) => m.url,
+);
 import { readPublishedRouteCards } from "@/lib/routes-editorial/route-public-reads.server";
 import {
   nextEventOccurrence,
@@ -237,6 +249,85 @@ function getPublicClient() {
   return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+}
+
+/**
+ * H3·A4 · Carga en lote de assets + variantes `ready` para las URLs públicas
+ * estables que ya usa la portada. No cambia ninguna URL canónica: sólo añade
+ * las versiones ligeras que `resolveMediaSource()` podrá ofrecer vía
+ * `<picture>`. Fail-closed: cualquier error devuelve un mapa vacío y la
+ * superficie conserva exactamente el original de hoy.
+ */
+export async function resolveStableMediaAssets(
+  stableUrls: string[],
+): Promise<Record<string, MediaAssetInput>> {
+  const out: Record<string, MediaAssetInput> = {};
+  const paths = Array.from(
+    new Set(
+      stableUrls
+        .filter((u) => typeof u === "string" && u.startsWith(STABLE_PUBLIC_MEDIA_PREFIX))
+        .map((u) => u.slice(STABLE_PUBLIC_MEDIA_PREFIX.length)),
+    ),
+  );
+  if (paths.length === 0) return out;
+  try {
+    const client = getPublicClient();
+    const { data: assets, error } = await client
+      .from("media_assets")
+      .select("id, storage_bucket, storage_path, width, height, mime_type, pipeline_status")
+      .eq("storage_bucket", STABLE_PUBLIC_MEDIA_BUCKET)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .in("storage_path", paths);
+    if (error || !assets || assets.length === 0) return out;
+
+    const ready = assets.filter((a) => a.pipeline_status === "ready");
+    if (ready.length === 0) return out;
+
+    const { data: variants } = await client
+      .from("media_asset_variants")
+      .select("asset_id, bucket, path, format, width, height, bytes, status, usage_context")
+      .in(
+        "asset_id",
+        ready.map((a) => a.id),
+      )
+      .eq("status", "ready");
+
+    const byAsset = new Map<string, MediaVariantInput[]>();
+    for (const v of variants ?? []) {
+      const url = toDerivedPublicMediaUrl(v.bucket, v.path);
+      if (!url) continue;
+      const list = byAsset.get(v.asset_id) ?? [];
+      list.push({
+        format: v.format as MediaVariantInput["format"],
+        width: Number(v.width),
+        height: v.height ?? null,
+        url,
+        bytes: v.bytes ?? null,
+        status: "ready",
+        usage_context: (v.usage_context ?? null) as MediaVariantInput["usage_context"],
+      });
+      byAsset.set(v.asset_id, list);
+    }
+
+    for (const asset of ready) {
+      const stableUrl = toStablePublicMediaUrl(asset.storage_bucket, asset.storage_path);
+      const list = byAsset.get(asset.id);
+      if (!stableUrl || !list || list.length === 0) continue;
+      out[stableUrl] = {
+        id: asset.id,
+        file_url: stableUrl,
+        original_width: asset.width ?? null,
+        original_height: asset.height ?? null,
+        original_mime: asset.mime_type ?? null,
+        pipeline_status: "ready",
+        variants: list,
+      };
+    }
+  } catch {
+    /* Fail-closed: sin variantes, la portada sirve el original de siempre. */
+  }
+  return out;
 }
 
 /**
@@ -659,6 +750,11 @@ export interface HomeRealContent {
   eventos: Array<HomeRealCard & { day: string; startsAt: string | null; recurrence: EventRecurrencePayload | null }>;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
+  /**
+   * H3·A4 · Versiones ligeras (AVIF/WebP/JPEG) disponibles por URL pública
+   * estable. Aditivo: si falta una entrada, la superficie sirve el original.
+   */
+  mediaAssets: Record<string, MediaAssetInput>;
 }
 
 /** Pueblos Mágicos del Oriente Maya (registro configurable, G8/H-03). */
@@ -675,6 +771,7 @@ const EMPTY_HOME: HomeRealContent = {
   eventos: [],
   rutas: [],
   mapPoints: [],
+  mediaAssets: {},
 };
 
 function cardsFrom(
@@ -802,31 +899,42 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       recurrence: eventRecurrenceByHref.get(card.href) ?? null,
     }));
 
+    const stopPointsByRoute = await resolveRouteStopPoints(publishedRoutes.map((r) => r.id));
+    const rutas = publishedRoutes.map((route) => ({
+      id: route.id,
+      title: route.name,
+      duration: routeDurationLabel(route) ?? "",
+      stops: route.stopCount,
+      vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
+      description: route.summary,
+      sequence: [
+        ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
+        ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
+      ],
+      stopPoints: stopPointsByRoute.get(route.id) ?? [],
+      href: routePublicPath(route.slug),
+      mediaUrl: route.coverUrl ?? "",
+    }));
+
+    const mediaAssets = await resolveStableMediaAssets([
+      ...destinos.map((c) => c.mediaUrl),
+      ...experiencias.map((c) => c.mediaUrl),
+      ...stays.map((c) => c.mediaUrl),
+      ...food.map((c) => c.mediaUrl),
+      ...eventos.map((c) => c.mediaUrl),
+      ...rutas.map((r) => r.mediaUrl),
+      ...HOME_PREMIUM_STABLE_MEDIA_URLS,
+    ]);
+
     const value: HomeRealContent = {
       destinos,
       experiencias,
       stays,
       food,
       eventos,
-      rutas: await (async () => {
-        const stopPointsByRoute = await resolveRouteStopPoints(publishedRoutes.map((r) => r.id));
-        return publishedRoutes.map((route) => ({
-          id: route.id,
-          title: route.name,
-          duration: routeDurationLabel(route) ?? "",
-          stops: route.stopCount,
-          vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
-          description: route.summary,
-          sequence: [
-            ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
-            ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
-          ],
-          stopPoints: stopPointsByRoute.get(route.id) ?? [],
-          href: routePublicPath(route.slug),
-          mediaUrl: route.coverUrl ?? "",
-        }));
-      })(),
+      rutas,
       mapPoints,
+      mediaAssets,
     };
     homeCache = { at: Date.now(), value };
     return value;
