@@ -197,7 +197,26 @@ export function MediaPickerDialog({
     setRights({ ...emptyRights });
     setError(null);
     setNotice(null);
+    setFit(null);
+    setUpscaling(false);
   }, [open]);
+
+  async function applyPreparedFile(f: File) {
+    // Carga inteligente: se normaliza el archivo antes de enviarlo
+    // (sin recortar) para que no entren imágenes innecesariamente pesadas.
+    const ingest = await prepareImageForIngest(f);
+    // Debe leerse durante el evento de selección. Algunos navegadores
+    // eliminan el archivo temporal antes de que el usuario termine la ficha.
+    const bytesBase64 = await fileToBase64(ingest.file);
+    setFile(ingest.file);
+    setFileBytesBase64(bytesBase64);
+    setDimensions(
+      ingest.width && ingest.height ? { width: ingest.width, height: ingest.height } : null,
+    );
+    setPreview(URL.createObjectURL(ingest.file));
+    setFit(evaluateRoleFit(ingest.width, ingest.height, role));
+    return ingest;
+  }
 
   async function chooseFile(f: File) {
     const invalid = validateImageFile(f);
@@ -212,19 +231,9 @@ export function MediaPickerDialog({
     setFileBytesBase64(null);
     setDimensions(null);
     setPreview(null);
+    setFit(null);
     try {
-      // Carga inteligente: se normaliza el archivo antes de enviarlo
-      // (sin recortar) para que no entren imágenes innecesariamente pesadas.
-      const ingest = await prepareImageForIngest(f);
-      // Debe leerse durante el evento de selección. Algunos navegadores
-      // eliminan el archivo temporal antes de que el usuario termine la ficha.
-      const bytesBase64 = await fileToBase64(ingest.file);
-      setFile(ingest.file);
-      setFileBytesBase64(bytesBase64);
-      setDimensions(
-        ingest.width && ingest.height ? { width: ingest.width, height: ingest.height } : null,
-      );
-      setPreview(URL.createObjectURL(ingest.file));
+      const ingest = await applyPreparedFile(f);
       const savings = describeIngestSavings(ingest);
       if (savings) setNotice(`Imagen optimizada al elegirla: ${savings}. No se recortó nada.`);
     } catch (err) {
@@ -235,6 +244,49 @@ export function MediaPickerDialog({
       );
     } finally {
       setReadingFile(false);
+    }
+  }
+
+  /**
+   * Alux IA (sólo editores y administradores): amplía la foto elegida cuando
+   * queda por debajo del tamaño recomendado del uso. Nunca es automático y el
+   * archivo ampliado vuelve a pasar por el mismo ingreso gobernado.
+   */
+  async function handleAluxUpscale() {
+    if (!file || !fileBytesBase64 || !fit || upscaling || readingFile || uploading) return;
+    setError(null);
+    setNotice("Alux IA está ampliando la foto…");
+    setUpscaling(true);
+    try {
+      const res = await upscale({
+        data: {
+          bytesBase64: fileBytesBase64,
+          mime: file.type,
+          width: fit.width,
+          height: fit.height,
+          targetLongSide: fit.recommendedLongSide,
+          roleLabel: ROLE_LABELS[role],
+        },
+      });
+      const bin = atob(res.bytesBase64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
+      const enlarged = new File([bytes], `${baseName}-alux.png`, {
+        type: res.mime,
+        lastModified: Date.now(),
+      });
+      const ingest = await applyPreparedFile(enlarged);
+      setNotice(
+        ingest.width && ingest.height
+          ? `Alux IA amplió la foto a ${ingest.width}×${ingest.height} px. Revísala antes de subirla.`
+          : "Alux IA amplió la foto. Revísala antes de subirla.",
+      );
+    } catch (err) {
+      setNotice(null);
+      setError(err instanceof Error ? humanize(err.message) : "Alux IA no pudo ampliar la foto.");
+    } finally {
+      setUpscaling(false);
     }
   }
 
