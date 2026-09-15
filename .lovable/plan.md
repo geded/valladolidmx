@@ -15,10 +15,12 @@ Autorizado por el Founder en este turno: activar progresivamente imágenes liger
 Incluye:
 
 1. Cerrar el bloqueo técnico ya documentado del firmador de variantes, sin rotar ni exponer secretos.
-2. Completar variantes responsivas para las imágenes publicadas elegibles, empezando por Home.
-3. Conectar el componente oficial de imagen responsiva a los componentes compartidos y plantillas existentes.
-4. Declarar tamaño, proporción, carga diferida y prioridad según la posición real de cada imagen.
-5. Medir peso, tiempos, errores y fallback antes de ampliar cada lote.
+2. Convertir toda carga nueva del CMS, Portal y Experience Builder en un ingreso gobernado: validación previa, original inmutable y optimización automática.
+3. Completar variantes responsivas para las imágenes publicadas elegibles, empezando por Home.
+4. Conectar el componente oficial de imagen responsiva a los componentes compartidos y plantillas existentes.
+5. Declarar tamaño, proporción, carga diferida y prioridad según la posición real de cada imagen.
+6. Procesar cargas masivas mediante cola limitada, idempotente y observable, sin ejecutar trabajo pesado desde la pantalla del usuario.
+7. Medir peso, tiempos, errores y fallback antes de ampliar cada lote.
 
 No incluye:
 
@@ -47,17 +49,29 @@ Se preservarán sin cambios visuales:
 - Evolucionar el componente editorial existente para producir `<picture>` con AVIF/WebP/JPEG, `srcset`, `sizes`, dimensiones y fallback al original.
 - Marcar como prioritaria únicamente la imagen principal visible al abrir la portada; mantener carga diferida en “¿Qué hacer hoy?” cuando esté fuera de la primera vista.
 
-### Lote 2 — Plantillas públicas compartidas
+### Lote 2 — Ingreso inteligente y escalable
+
+- Pedir y comprobar el uso de la foto —portada, galería, tarjeta, miniatura o logo— para asignar requisitos claros de orientación y resolución mínima.
+- Rechazar antes de subir archivos no admitidos, dañados, excesivos o con dimensiones insuficientes, con mensajes comprensibles para empresa y editor.
+- Conservar un solo original inmutable y registrar cada imagen una sola vez; una reanudación o reintento no duplica trabajo.
+- Crear automáticamente versiones AVIF, WebP y JPEG en anchos útiles, sin ampliar imágenes pequeñas.
+- Encolar cada imagen con una clave única; procesar lotes pequeños, con límite de concurrencia, reintentos espaciados y bloqueo para impedir dos procesadores simultáneos.
+- Mostrar estados claros: “Recibida”, “Optimizando”, “Lista” y “Necesita revisión”. La carga editorial termina al guardar el original; la optimización continúa de forma segura sin congelar la pantalla.
+- Ante una jornada con cientos de empresas, la cola absorbe el volumen y regula el ritmo; nunca dispara cientos de procesos paralelos ni depende de una página abierta.
+- Pausar automáticamente ante saturación o fallos repetidos, conservar el original y avisar al administrador; reanudar sólo de forma controlada.
+
+### Lote 3 — Plantillas públicas compartidas
 
 - Aplicar el mismo componente oficial a héroes, tarjetas, galerías, miniaturas y listados.
 - Empezar por componentes compartidos para evitar cambios duplicados y cubrir varias plantillas con el delta mínimo.
 - Migrar sólo consumidores que tengan identidad de imagen y variantes verificables; los demás conservarán automáticamente el original.
 
-### Lote 3 — Cobertura y endurecimiento
+### Lote 4 — Cobertura y endurecimiento
 
 - Completar el procesamiento gradual del catálogo publicado, con lotes pequeños, reintentos y rollback.
 - Confirmar que no queden miniaturas descargando originales grandes ni imágenes visibles sin dimensiones.
 - Mantener los originales inmutables y las URLs canónicas estables.
+- Probar una carga simultánea equivalente a **100 empresas**, con múltiples fotos por empresa, verificando que no haya duplicados, bloqueo de pantallas ni degradación del sitio público.
 
 ## Validación
 
@@ -69,6 +83,7 @@ En cada lote:
 - Medición antes/después de bytes, tiempo de primera imagen, LCP y errores.
 - Comprobación de canonical, OG, JSON-LD y ALT sin cambios.
 - Rollback inmediato del lote si aparece una diferencia visual o una imagen rota.
+- Pruebas de volumen, reintento, deduplicación, pausa, recuperación y límite de concurrencia de la cola.
 
 ## Resultado esperado
 
