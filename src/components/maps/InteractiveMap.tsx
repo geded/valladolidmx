@@ -98,7 +98,19 @@ function getBrandMapStyles() {
       elementType: "geometry",
       stylers: [{ color: mixHex(secondary, territory, 0.16) }],
     },
-    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+    /* Ruido comercial fuera, contexto territorial dentro: se ocultan los
+       rótulos de negocios y se conservan los de sitios de interés, parques y
+       zonas arqueológicas con la tipografía de marca. */
+    { featureType: "poi.business", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.medical", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.school", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.attraction", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "poi.park", elementType: "labels", stylers: [{ visibility: "on" }] },
+    {
+      featureType: "poi.place_of_worship",
+      elementType: "labels",
+      stylers: [{ visibility: "on" }],
+    },
     {
       featureType: "poi.park",
       elementType: "geometry",
