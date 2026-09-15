@@ -6,6 +6,7 @@
  * estados vacíos y de error explícitos.
  */
 import { useId, useState, type ReactNode } from "react";
+import { getEditorialStatusLabel } from "@/lib/cms/editorial-language";
 
 export interface EntityColumn<Row> {
   key: string;
@@ -170,7 +171,7 @@ export function StatusBadge({ value }: { value: string | null | undefined }) {
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${tone}`}
     >
-      {v}
+      {getEditorialStatusLabel(v)}
     </span>
   );
 }

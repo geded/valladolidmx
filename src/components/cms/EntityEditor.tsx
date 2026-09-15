@@ -20,6 +20,12 @@ import {
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { MediaIdField } from "@/components/cms/MediaIdField";
+import {
+  describeEditorialHistory,
+  getEditorialActionLabel,
+  getEditorialStatusGuidance,
+  getEditorialStatusLabel,
+} from "@/lib/cms/editorial-language";
 
 export type FieldType =
   | "text"
@@ -272,10 +278,10 @@ export function EntityEditor(props: Props) {
 
       {isEdit && (
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold tracking-tight">Workflow editorial</h2>
+          <h2 className="text-sm font-semibold tracking-tight">Estado de publicación</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            draft → in_review → approved → published → archived. Cada transición se valida
-            server-side y queda asociada al usuario actual como insumo de auditoría futura.
+            {getEditorialStatusGuidance(status)} Cada cambio de estado queda registrado con la
+            persona responsable.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {NEXT_ACTIONS[status].map((action) => (
@@ -294,7 +300,7 @@ export function EntityEditor(props: Props) {
             ))}
             {NEXT_ACTIONS[status].length === 0 && (
               <span className="text-xs text-muted-foreground">
-                Sin transiciones disponibles desde este estado.
+                No hay acciones disponibles para este estado.
               </span>
             )}
           </div>
@@ -303,15 +309,9 @@ export function EntityEditor(props: Props) {
 
       {isEdit && (
         <section className="mt-6 rounded-xl border border-border bg-card p-5">
-          <header className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold tracking-tight">Historial editorial</h2>
-            <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-              content_audit_log
-            </span>
-          </header>
+          <h2 className="text-sm font-semibold tracking-tight">Historial editorial</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Bitácora append-only de creaciones, ediciones y transiciones de estado. Insumo oficial
-            de auditoría (Serie 13.4).
+            Aquí puedes consultar qué cambió, cuándo ocurrió y quién realizó cada acción.
           </p>
           <div className="mt-4 divide-y divide-border text-xs">
             {history.isLoading && <p className="py-2 text-muted-foreground">Cargando historial…</p>}
@@ -323,23 +323,26 @@ export function EntityEditor(props: Props) {
                 key={h.id}
                 className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider">
-                    {h.action}
-                  </span>
-                  {h.from_status && h.to_status && (
-                    <span className="text-muted-foreground">
-                      {h.from_status} → <strong>{h.to_status}</strong>
-                    </span>
+                <div>
+                  <p className="font-medium">{describeEditorialHistory(h)}</p>
+                  {h.notes && <p className="mt-1 text-muted-foreground">Nota: {h.notes}</p>}
+                  {h.actor_user_id && (
+                    <p className="mt-1 text-muted-foreground">Responsable registrado</p>
                   )}
-                  {!h.from_status && h.to_status && (
-                    <span className="text-muted-foreground">
-                      → <strong>{h.to_status}</strong>
-                    </span>
-                  )}
+                  <details className="mt-1 text-muted-foreground">
+                    <summary className="cursor-pointer select-none">Detalle técnico</summary>
+                    <dl className="mt-1 grid gap-1 rounded-md bg-muted/50 p-2 font-mono text-[10px]">
+                      <div>Registro: content_audit_log</div>
+                      <div>Acción: {h.action}</div>
+                      <div>
+                        Estado: {h.from_status ?? "—"} → {h.to_status ?? "—"}
+                      </div>
+                      {h.actor_user_id && <div>Usuario: {h.actor_user_id}</div>}
+                    </dl>
+                  </details>
                 </div>
                 <time className="text-muted-foreground">
-                  {new Date(h.created_at).toLocaleString()}
+                  {new Date(h.created_at).toLocaleString("es-MX")}
                 </time>
               </div>
             ))}

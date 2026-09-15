@@ -37,6 +37,7 @@ import {
 } from "@/lib/places/place-territory";
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
+import { getEditorialStatusGuidance } from "@/lib/cms/editorial-language";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { geocodeAddress } from "@/lib/maps/maps.functions";
@@ -1162,8 +1163,8 @@ export function PlaceEditor({ placeId }: Props) {
 
       <PlaceSection
         id="place-workflow"
-        title="Workflow editorial"
-        description="draft → in_review → approved → published → archived. Publicar exige coordenadas, tipo, descripción corta y medios aprobados."
+        title="Estado de publicación"
+        description={`${getEditorialStatusGuidance(status)} Para publicar, completa la ubicación, el tipo, la descripción corta y agrega medios aprobados.`}
       >
         <div className="md:col-span-2 flex flex-wrap gap-2">
           {NEXT_ACTIONS[status].map((action) => (
