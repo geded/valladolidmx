@@ -225,6 +225,50 @@ export function PlaceEditor({ placeId }: Props) {
   const [longitude, setLongitude] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  /* Búsqueda de dirección en Google (gateway) para capturar coordenadas. */
+  const geocodeFn = useServerFn(geocodeAddress);
+  const [placeSearch, setPlaceSearch] = useState("");
+  const [searching, setSearching] = useState(false);
+  const mapLat = Number(latitude);
+  const mapLng = Number(longitude);
+  const searchOnGoogle = async () => {
+    const query = placeSearch.trim();
+    if (query.length < 3) {
+      toast.error("Escribe al menos 3 caracteres para buscar.");
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await geocodeFn({ data: { address: query } });
+      if (!res.ok || res.lat == null || res.lng == null) {
+        toast.error("No encontramos ese lugar en Google. Ajusta la búsqueda o mueve el pin.");
+        return;
+      }
+      setLatitude(String(res.lat));
+      setLongitude(String(res.lng));
+      if (res.formatted && !values.address_line) set("address_line")(res.formatted);
+      toast.success("Coordenadas capturadas. Ajusta el pin si es necesario y guarda.");
+    } catch {
+      toast.error("No pudimos consultar Google en este momento.");
+    } finally {
+      setSearching(false);
+    }
+  };
+  const useMyLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Tu navegador no soporta geolocalización.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(String(pos.coords.latitude));
+        setLongitude(String(pos.coords.longitude));
+        toast.success("Ubicación capturada. Ajusta el pin si es necesario y guarda.");
+      },
+      (err) => toast.error(err.message || "No pudimos leer tu ubicación."),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
 
   useEffect(() => {
     if (!place) return;
