@@ -32,6 +32,9 @@ export interface EditorialRouteStopDTO {
   durationMinutes: number | null;
   /** Enlace canónico resuelto; `null` cuando la entidad no es navegable. */
   href: string | null;
+  /** Coordenadas acreditadas de la entidad; `null` cuando no publicó ubicación. */
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface EditorialRouteCardDTO {

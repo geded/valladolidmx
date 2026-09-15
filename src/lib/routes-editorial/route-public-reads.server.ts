@@ -188,11 +188,25 @@ export async function readPublishedRouteCards(input?: {
     : cards;
 }
 
-async function resolveStopHrefs(
+/**
+ * Resuelve, por entidad de parada, su enlace canónico y sus coordenadas
+ * acreditadas. Si la entidad no publicó ubicación, la parada se queda sin
+ * coordenadas: el mapa simplemente no la dibuja (nunca se inventa un punto).
+ */
+async function resolveStopEntities(
   sb: AnyClient,
   stops: Array<{ entity_kind: string; entity_id: string | null }>,
-): Promise<Map<string, string>> {
+): Promise<{
+  hrefs: Map<string, string>;
+  coords: Map<string, { lat: number; lng: number }>;
+}> {
   const hrefs = new Map<string, string>();
+  const coords = new Map<string, { lat: number; lng: number }>();
+  const setCoord = (id: string, lat: unknown, lng: unknown) => {
+    const la = Number(lat);
+    const ln = Number(lng);
+    if (Number.isFinite(la) && Number.isFinite(ln)) coords.set(id, { lat: la, lng: ln });
+  };
   const idsOf = (kind: string) =>
     Array.from(
       new Set(
@@ -209,7 +223,7 @@ async function resolveStopHrefs(
     destinationIds.length
       ? sb
           .from("destinations")
-          .select("id, slug, status, deleted_at")
+          .select("id, slug, latitude, longitude, status, deleted_at")
           .in("id", destinationIds)
           .eq("status", "published")
           .is("deleted_at", null)
@@ -217,7 +231,7 @@ async function resolveStopHrefs(
     placeIds.length
       ? sb
           .from("points_of_interest")
-          .select("id, slug, destination_id, status, deleted_at")
+          .select("id, slug, destination_id, latitude, longitude, status, deleted_at")
           .in("id", placeIds)
           .eq("status", "published")
           .is("deleted_at", null)
@@ -233,26 +247,42 @@ async function resolveStopHrefs(
     businessIds.length
       ? sb
           .from("businesses")
-          .select("id, slug, destination_id, primary_category_id, status, deleted_at")
+          .select(
+            "id, slug, destination_id, primary_category_id, business_locations ( latitude, longitude ), status, deleted_at",
+          )
           .in("id", businessIds)
           .eq("status", "published")
           .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
   ]);
 
-  const destRows = (dests.data ?? []) as Array<{ id: string; slug: string }>;
-  for (const d of destRows) hrefs.set(d.id, `/oriente-maya/${d.slug}`);
+  const destRows = (dests.data ?? []) as Array<{
+    id: string;
+    slug: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  }>;
+  for (const d of destRows) {
+    hrefs.set(d.id, `/oriente-maya/${d.slug}`);
+    setCoord(d.id, d.latitude, d.longitude);
+  }
 
   const placeRows = (places.data ?? []) as Array<{
     id: string;
     slug: string;
     destination_id: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
   }>;
   const businessRows = (businesses.data ?? []) as Array<{
     id: string;
     slug: string;
     destination_id: string | null;
     primary_category_id: string | null;
+    business_locations?:
+      | Array<{ latitude?: number | null; longitude?: number | null }>
+      | { latitude?: number | null; longitude?: number | null }
+      | null;
   }>;
 
   const extraDestIds = [
@@ -264,6 +294,7 @@ async function resolveStopHrefs(
   for (const p of placeRows) {
     const d = p.destination_id ? destMap.get(p.destination_id) : null;
     if (d) hrefs.set(p.id, `/oriente-maya/${d.slug}/lugares/${p.slug}`);
+    setCoord(p.id, p.latitude, p.longitude);
   }
 
   for (const e of (events.data ?? []) as Array<{ id: string; slug: string }>)
@@ -285,9 +316,13 @@ async function resolveStopHrefs(
     const d = b.destination_id ? destMap.get(b.destination_id) : null;
     const cat = b.primary_category_id ? catMap.get(b.primary_category_id) : null;
     if (d && cat) hrefs.set(b.id, `/oriente-maya/${d.slug}/${cat}/${b.slug}`);
+    const loc = Array.isArray(b.business_locations)
+      ? (b.business_locations[0] ?? null)
+      : (b.business_locations ?? null);
+    if (loc) setCoord(b.id, loc.latitude, loc.longitude);
   }
 
-  return hrefs;
+  return { hrefs, coords };
 }
 
 export async function readPublicRoute(slug: string): Promise<EditorialRouteDetailDTO | null> {
@@ -311,13 +346,13 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
   const stopsRaw = (stopRows ?? []) as Array<Record<string, unknown>>;
   const galleryIds = (row.gallery_media_ids ?? []) as string[];
 
-  const [destinations, media, hrefs] = await Promise.all([
+  const [destinations, media, entities] = await Promise.all([
     destinationSlugMap(sb, [
       ...((row.destination_ids ?? []) as string[]),
       ...(row.origin_destination_id ? [String(row.origin_destination_id)] : []),
     ]),
     signMedia([...(row.cover_media_id ? [String(row.cover_media_id)] : []), ...galleryIds]),
-    resolveStopHrefs(
+    resolveStopEntities(
       sb,
       stopsRaw.map((s) => ({
         entity_kind: String(s.entity_kind),
@@ -326,17 +361,23 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
     ),
   ]);
 
-  const stops: EditorialRouteStopDTO[] = stopsRaw.map((s) => ({
-    id: String(s.id),
-    position: Number(s.position ?? 0),
-    dayNumber: s.day_number == null ? null : Number(s.day_number),
-    entityKind: String(s.entity_kind) as EditorialRouteStopKind,
-    entityId: s.entity_id ? String(s.entity_id) : null,
-    title: String(s.title ?? ""),
-    note: ((s.note as string) ?? "").trim() || null,
-    durationMinutes: s.duration_minutes == null ? null : Number(s.duration_minutes),
-    href: s.entity_id ? (hrefs.get(String(s.entity_id)) ?? null) : null,
-  }));
+  const stops: EditorialRouteStopDTO[] = stopsRaw.map((s) => {
+    const entityId = s.entity_id ? String(s.entity_id) : null;
+    const point = entityId ? (entities.coords.get(entityId) ?? null) : null;
+    return {
+      id: String(s.id),
+      position: Number(s.position ?? 0),
+      dayNumber: s.day_number == null ? null : Number(s.day_number),
+      entityKind: String(s.entity_kind) as EditorialRouteStopKind,
+      entityId,
+      title: String(s.title ?? ""),
+      note: ((s.note as string) ?? "").trim() || null,
+      durationMinutes: s.duration_minutes == null ? null : Number(s.duration_minutes),
+      href: entityId ? (entities.hrefs.get(entityId) ?? null) : null,
+      lat: point?.lat ?? null,
+      lng: point?.lng ?? null,
+    };
+  });
 
   const card = toCard(
     row as unknown as EditorialRouteRow,
