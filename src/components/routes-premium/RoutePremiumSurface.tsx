@@ -7,13 +7,20 @@
  */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Share2 } from "lucide-react";
 
 import {
   PremiumAluxBar,
-  PremiumEditorialHero,
   PremiumSectionHead,
 } from "@/components/home-premium/shared/PremiumShowcase";
-import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
+import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
+import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
+import { Button } from "@/components/ui/button";
+import { ShareSheet } from "@/components/share/ShareSheet";
+
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
@@ -50,6 +57,7 @@ function groupByDay(stops: readonly EditorialRouteStopDTO[]) {
 
 export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO }) {
   const [party, setParty] = useState<PartyComposition | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const chips = [
     routeDurationLabel(route),
     routePaceLabel(route.pace),
@@ -77,32 +85,42 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
   const mapStops = routeMapStops(route.stops);
   const mapOrder = new Map(mapStops.map((stop, index) => [stop.id, index + 1]));
 
+  // Navegación interna: sólo se declaran las secciones realmente presentes.
+  const subnavAnchors = [
+    ...(mapStops.length ? [{ id: "ruta-mapa", label: "Mapa", iconKey: "map-pin" }] : []),
+    ...(route.stops.length ? [{ id: "ruta-itinerario", label: "Itinerario", iconKey: "info" }] : []),
+    ...(route.gallery.length ? [{ id: "ruta-galeria", label: "Galería", iconKey: "camera" }] : []),
+  ];
+
   return (
     <div className="space-y-8">
-      <PremiumEditorialHero
-        eyebrow="Ruta sugerida"
-        title={route.name}
-        subtitle={route.summary || "Itinerario editorial del Oriente Maya."}
-        media={route.coverUrl ? { url: route.coverUrl, alt: route.coverAlt ?? route.name } : null}
-        caption={
-          route.originDestinationLabel ? `Salida desde ${route.originDestinationLabel}` : undefined
-        }
+      <PremiumHero
+        layout="entity"
+        vm={{
+          presentation: DEFAULT_PREMIUM_PRESENTATION,
+          eyebrow: "Ruta sugerida",
+          title: route.name,
+          description: route.summary || "Itinerario editorial del Oriente Maya.",
+          media: route.coverUrl
+            ? { url: route.coverUrl, alt: route.coverAlt ?? route.name }
+            : null,
+          badges: route.originDestinationLabel
+            ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
+            : [],
+        }}
       />
 
       {chips.length ? (
-        <div className="flex flex-wrap gap-2">
+        <TourismChipRow label="Datos de la ruta">
           {chips.map((chip) => (
-            <span
-              key={chip}
-              className="rounded-pill border border-border bg-card px-3 py-1 text-xs text-muted-foreground"
-            >
+            <TourismChip key={chip} scheme="surface" size="sm">
               {chip}
-            </span>
+            </TourismChip>
           ))}
-        </div>
+        </TourismChipRow>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <AddToTravelPlanButton
           kind="route"
           targetId={route.id}
@@ -112,10 +130,48 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           imageUrl={route.coverUrl}
           variant="full"
         />
-        <span className="text-xs text-muted-foreground">
-          Guardamos una referencia privada a esta ruta; el itinerario editorial no se modifica.
-        </span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShareOpen(true)}
+          className="min-h-11 rounded-pill"
+        >
+          <Share2 className="size-4" aria-hidden />
+          Compartir
+        </Button>
       </div>
+
+      <ShareSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={route.name}
+        url={typeof window !== "undefined" ? window.location.href : `/rutas/${route.slug}`}
+        {...(route.summary ? { text: route.summary } : {})}
+        heading="Compartir esta ruta"
+      />
+
+      <PremiumAluxBar
+        question={`¿Quieres adaptar "${route.name}" a tus fechas?`}
+        selectedParty={party}
+        onSelectParty={(value) => {
+          setParty(value);
+          askAlux();
+        }}
+        onContinue={() => askAlux()}
+      />
+
+      {subnavAnchors.length > 1 ? (
+        <ExperienceSubnav
+          dto={{
+            variant: "pill",
+            sticky: true,
+            scrollOffset: 88,
+            ariaLabel: "Secciones de la ruta",
+            anchors: subnavAnchors,
+            capabilities: { scrollSpy: true, collapseOnMobile: true, showIcons: true },
+          }}
+        />
+      ) : null}
 
       <RouteMapSection
         stops={mapStops}
@@ -193,32 +249,61 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
       {route.gallery.length ? (
         <section aria-labelledby="ruta-galeria">
           <PremiumSectionHead id="ruta-galeria" kicker="Galería" title="Así se ve la ruta" />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {route.gallery.map((media) => (
-              <figure
-                key={media.url}
-                className="relative h-48 overflow-hidden rounded-2xl border border-border"
-              >
-                <EditorialMediaFrame
-                  media={{ url: media.url, alt: media.alt ?? route.name }}
-                  label={route.name}
-                  className="absolute inset-0 size-full object-cover"
-                />
-              </figure>
-            ))}
-          </div>
+          {/* Mosaico oficial de la Biblioteca (mismo bloque que hoteles y
+              restaurantes). Sólo fotografías publicadas en el CMS. */}
+          <ExperienceGallery
+            dto={{
+              variant: route.gallery.length >= 3 ? "mosaic" : "grid",
+              items: route.gallery.map((media) => ({
+                kind: "image" as const,
+                url: media.url,
+                alt: media.alt ?? route.name,
+              })),
+              maxVisible: 8,
+              aspect: "landscape",
+              heading: null,
+              subheading: null,
+              ariaLabel: `Galería de ${route.name}`,
+              capabilities: {
+                lightbox: true,
+                captions: true,
+                video: false,
+                panorama360: false,
+                model3d: false,
+                ar: false,
+                ugc: false,
+              },
+            }}
+          />
         </section>
       ) : null}
 
-      <PremiumAluxBar
-        question={`¿Quieres adaptar "${route.name}" a tus fechas?`}
-        selectedParty={party}
-        onSelectParty={(value) => {
-          setParty(value);
-          askAlux();
-        }}
-        onContinue={() => askAlux()}
-      />
+      <div className="flex flex-wrap items-center gap-2 rounded-3xl border border-border bg-card p-5 shadow-soft">
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-lg">¿Te llevas esta ruta?</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Súmala a Mi Viaje y tu concierge la adapta a tus fechas.
+          </p>
+        </div>
+        <AddToTravelPlanButton
+          kind="route"
+          targetId={route.id}
+          title={route.name}
+          slug={route.slug}
+          subtitle={route.originDestinationLabel}
+          imageUrl={route.coverUrl}
+          variant="full"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShareOpen(true)}
+          className="min-h-11 rounded-pill"
+        >
+          <Share2 className="size-4" aria-hidden />
+          Compartir
+        </Button>
+      </div>
     </div>
   );
 }
