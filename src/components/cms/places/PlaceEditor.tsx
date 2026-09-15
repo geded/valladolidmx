@@ -385,14 +385,30 @@ export function PlaceEditor({ placeId }: Props) {
     mutationFn: async () => {
       const parsed = placeDetailsPatchSchema.safeParse(buildPatch());
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos.");
-      return updateFn({
+      const result = await updateFn({
         data: {
           place_id: placeId!,
           expected_updated_at: String(place?.updated_at ?? ""),
           patch: parsed.data,
         },
       });
+      /* Las coordenadas viven fuera del patch de detalles: si el editor movió
+         el pin, se persisten en la misma acción de "Guardar cambios" para no
+         perder la ubicación marcada en el mapa. */
+      const lat = Number(latitude);
+      const lng = Number(longitude);
+      const changed =
+        latitude !== "" &&
+        longitude !== "" &&
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        (Number(place?.latitude ?? NaN) !== lat || Number(place?.longitude ?? NaN) !== lng);
+      if (changed) {
+        await locationFn({ data: { place_id: placeId!, latitude: lat, longitude: lng } });
+      }
+      return result;
     },
+
     onSuccess: async () => {
       setFieldError(null);
       toast.success("Cambios guardados.");
