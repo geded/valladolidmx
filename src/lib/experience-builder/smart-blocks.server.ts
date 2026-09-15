@@ -645,6 +645,8 @@ export interface HomeRealRoute {
   vibe: string;
   description: string;
   sequence: string[];
+  /** Paradas reales publicadas con coordenadas, en orden editorial. */
+  stopPoints: TerritoryMapPoint[];
   href: string;
   mediaUrl: string;
 }
@@ -806,20 +808,24 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       stays,
       food,
       eventos,
-      rutas: publishedRoutes.map((route) => ({
-        id: route.id,
-        title: route.name,
-        duration: routeDurationLabel(route) ?? "",
-        stops: route.stopCount,
-        vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
-        description: route.summary,
-        sequence: [
-          ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
-          ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
-        ],
-        href: routePublicPath(route.slug),
-        mediaUrl: route.coverUrl ?? "",
-      })),
+      rutas: await (async () => {
+        const stopPointsByRoute = await resolveRouteStopPoints(publishedRoutes.map((r) => r.id));
+        return publishedRoutes.map((route) => ({
+          id: route.id,
+          title: route.name,
+          duration: routeDurationLabel(route) ?? "",
+          stops: route.stopCount,
+          vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
+          description: route.summary,
+          sequence: [
+            ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
+            ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
+          ],
+          stopPoints: stopPointsByRoute.get(route.id) ?? [],
+          href: routePublicPath(route.slug),
+          mediaUrl: route.coverUrl ?? "",
+        }));
+      })(),
       mapPoints,
     };
     homeCache = { at: Date.now(), value };
