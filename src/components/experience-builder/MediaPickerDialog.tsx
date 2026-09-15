@@ -123,6 +123,12 @@ const RIGHTS_ERRORS: Record<string, string> = {
   credit_without_author: "El crédito no puede acreditar a un fotógrafo no declarado como autor.",
   forbidden_requires_admin: "Sólo un rol administrativo puede aprobar para uso público.",
   self_approval_not_allowed: "No puedes aprobar un activo que tú mismo subiste.",
+  forbidden: "Esta acción está reservada a editores y administradores.",
+  alux_rate_limited: "Alux IA está saturado en este momento. Inténtalo de nuevo en un minuto.",
+  alux_credits_required: "Alux IA no tiene créditos disponibles. Recárgalos para continuar.",
+  alux_blocked: "Alux IA está deshabilitado por la configuración del espacio de trabajo.",
+  alux_empty_response: "Alux IA no devolvió una imagen. Prueba con otra foto.",
+  image_too_large: "La foto es demasiado pesada para ampliarla con Alux IA.",
 };
 
 const humanize = (msg: string) => RIGHTS_ERRORS[msg] ?? msg;
