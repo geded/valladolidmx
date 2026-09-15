@@ -258,28 +258,65 @@ function getPublicClient() {
  * `<picture>`. Fail-closed: cualquier error devuelve un mapa vacío y la
  * superficie conserva exactamente el original de hoy.
  */
+/** Prefijo editorial gobernado que la portada resuelve en cliente. */
+const GOVERNED_MEDIA_PATH_PREFIX = "governed/v1p1c/";
+
+/** Extrae la ruta de almacenamiento de una URL estable o firmada del bucket. */
+function toStableMediaPath(url: string): string | null {
+  if (typeof url !== "string" || url.length === 0) return null;
+  const clean = url.split("?")[0] ?? url;
+  if (clean.startsWith(STABLE_PUBLIC_MEDIA_PREFIX)) {
+    return clean.slice(STABLE_PUBLIC_MEDIA_PREFIX.length) || null;
+  }
+  const marker = `/${STABLE_PUBLIC_MEDIA_BUCKET}/`;
+  const at = clean.indexOf(marker);
+  if (at >= 0) return clean.slice(at + marker.length) || null;
+  return null;
+}
+
 export async function resolveStableMediaAssets(
   stableUrls: string[],
 ): Promise<Record<string, MediaAssetInput>> {
   const out: Record<string, MediaAssetInput> = {};
-  const paths = Array.from(
-    new Set(
-      stableUrls
-        .filter((u) => typeof u === "string" && u.startsWith(STABLE_PUBLIC_MEDIA_PREFIX))
-        .map((u) => u.slice(STABLE_PUBLIC_MEDIA_PREFIX.length)),
-    ),
-  );
-  if (paths.length === 0) return out;
+  /* Una misma ruta puede llegar como URL estable o como URL firmada ya
+     resuelta: conservamos todas las claves para que la superficie encuentre
+     su asset sin cambiar ninguna URL canónica. */
+  const pathToUrls = new Map<string, Set<string>>();
+  for (const url of stableUrls) {
+    const path = toStableMediaPath(url);
+    if (!path) continue;
+    const set = pathToUrls.get(path) ?? new Set<string>();
+    set.add(url);
+    pathToUrls.set(path, set);
+  }
+  const paths = Array.from(pathToUrls.keys());
   try {
     const client = getPublicClient();
-    const { data: assets, error } = await client
-      .from("media_assets")
-      .select("id, storage_bucket, storage_path, width, height, mime_type, pipeline_status")
-      .eq("storage_bucket", STABLE_PUBLIC_MEDIA_BUCKET)
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .in("storage_path", paths);
-    if (error || !assets || assets.length === 0) return out;
+    const baseSelect =
+      "id, storage_bucket, storage_path, width, height, mime_type, pipeline_status";
+    const [listed, governed] = await Promise.all([
+      paths.length > 0
+        ? client
+            .from("media_assets")
+            .select(baseSelect)
+            .eq("storage_bucket", STABLE_PUBLIC_MEDIA_BUCKET)
+            .eq("status", "published")
+            .is("deleted_at", null)
+            .in("storage_path", paths)
+        : Promise.resolve({ data: [], error: null }),
+      /* El bloque editorial gobernado compone sus URLs en cliente, así que
+         sus assets se cargan por prefijo y no por lista. */
+      client
+        .from("media_assets")
+        .select(baseSelect)
+        .eq("storage_bucket", STABLE_PUBLIC_MEDIA_BUCKET)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .like("storage_path", `${GOVERNED_MEDIA_PATH_PREFIX}%`),
+    ]);
+    const assets = [...(listed.data ?? []), ...(governed.data ?? [])];
+    if (assets.length === 0) return out;
+
 
     const ready = assets.filter((a) => a.pipeline_status === "ready");
     if (ready.length === 0) return out;
@@ -314,7 +351,7 @@ export async function resolveStableMediaAssets(
       const stableUrl = toStablePublicMediaUrl(asset.storage_bucket, asset.storage_path);
       const list = byAsset.get(asset.id);
       if (!stableUrl || !list || list.length === 0) continue;
-      out[stableUrl] = {
+      const entry: MediaAssetInput = {
         id: asset.id,
         file_url: stableUrl,
         original_width: asset.width ?? null,
@@ -323,6 +360,10 @@ export async function resolveStableMediaAssets(
         pipeline_status: "ready",
         variants: list,
       };
+      out[stableUrl] = entry;
+      for (const url of pathToUrls.get(asset.storage_path) ?? []) {
+        out[url] = entry;
+      }
     }
   } catch {
     /* Fail-closed: sin variantes, la portada sirve el original de siempre. */
