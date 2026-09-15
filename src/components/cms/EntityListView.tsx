@@ -28,6 +28,12 @@ interface Props<Row> {
   rowKey: (row: Row) => string;
   emptyMessage?: string;
   headerActions?: ReactNode;
+  /** Barra territorial y filtros propios de la sección. */
+  filters?: ReactNode;
+  /** Paginación (1-indexada). Si se omite, no se muestran controles. */
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (next: number) => void;
 }
 
 export function EntityListView<Row>(props: Props<Row>) {
