@@ -196,7 +196,7 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("display_name", `%${search}%`);
     if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
-    if (data?.status) q = q.eq("status", data.status);
+    if (data?.status) q = q.eq("status", data.status as never);
     if (data?.verified === "yes") q = q.eq("verified", true);
     if (data?.verified === "no") q = q.eq("verified", false);
     if (data?.categoryId) {
