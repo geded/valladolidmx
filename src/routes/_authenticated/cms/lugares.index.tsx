@@ -71,8 +71,8 @@ function LugaresPage() {
   );
 
   const selectDestination = (next: string) => {
-    setDestinationId(next);
-    setZoneId((current) => reconcileZoneForDestination(opts.zones ?? [], next, current));
+    setDestination(next);
+    setZoneId(reconcileZoneForDestination(opts.zones ?? [], next, zoneId));
   };
 
   const list = useQuery({
