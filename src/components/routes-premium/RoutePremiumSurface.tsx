@@ -25,6 +25,7 @@ import {
   type EditorialRouteDetailDTO,
   type EditorialRouteStopDTO,
 } from "@/lib/routes-editorial/route-public-contract";
+import { RouteMapSection, routeMapStops } from "./RouteMapSection";
 
 const STOP_KIND_LABELS: Record<string, string> = {
   place: "Lugar",
