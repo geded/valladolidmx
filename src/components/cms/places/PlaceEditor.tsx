@@ -38,6 +38,8 @@ import {
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
+import { geocodeAddress } from "@/lib/maps/maps.functions";
 
 import {
   PlaceField,
@@ -223,6 +225,50 @@ export function PlaceEditor({ placeId }: Props) {
   const [longitude, setLongitude] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  /* Búsqueda de dirección en Google (gateway) para capturar coordenadas. */
+  const geocodeFn = useServerFn(geocodeAddress);
+  const [placeSearch, setPlaceSearch] = useState("");
+  const [searching, setSearching] = useState(false);
+  const mapLat = Number(latitude);
+  const mapLng = Number(longitude);
+  const searchOnGoogle = async () => {
+    const query = placeSearch.trim();
+    if (query.length < 3) {
+      toast.error("Escribe al menos 3 caracteres para buscar.");
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await geocodeFn({ data: { address: query } });
+      if (!res.ok || res.lat == null || res.lng == null) {
+        toast.error("No encontramos ese lugar en Google. Ajusta la búsqueda o mueve el pin.");
+        return;
+      }
+      setLatitude(String(res.lat));
+      setLongitude(String(res.lng));
+      if (res.formatted && !values.address_line) set("address_line")(res.formatted);
+      toast.success("Coordenadas capturadas. Ajusta el pin si es necesario y guarda.");
+    } catch {
+      toast.error("No pudimos consultar Google en este momento.");
+    } finally {
+      setSearching(false);
+    }
+  };
+  const useMyLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Tu navegador no soporta geolocalización.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(String(pos.coords.latitude));
+        setLongitude(String(pos.coords.longitude));
+        toast.success("Ubicación capturada. Ajusta el pin si es necesario y guarda.");
+      },
+      (err) => toast.error(err.message || "No pudimos leer tu ubicación."),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
 
   useEffect(() => {
     if (!place) return;
@@ -757,6 +803,47 @@ export function PlaceEditor({ placeId }: Props) {
           </button>
         }
       >
+        <div className="md:col-span-2 space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              className={inputClass}
+              placeholder="Buscar en Google: nombre del lugar o dirección"
+              value={placeSearch}
+              onChange={(e) => setPlaceSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void searchOnGoogle();
+                }
+              }}
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className={buttonClass}
+                disabled={searching}
+                onClick={() => void searchOnGoogle()}
+              >
+                {searching ? "Buscando…" : "Buscar"}
+              </button>
+              <button type="button" className={buttonClass} onClick={useMyLocation}>
+                Mi ubicación
+              </button>
+            </div>
+          </div>
+          <LocationPickerMap
+            lat={Number.isFinite(mapLat) && latitude !== "" ? mapLat : 20.6896}
+            lng={Number.isFinite(mapLng) && longitude !== "" ? mapLng : -88.2019}
+            onChange={(p) => {
+              setLatitude(String(p.lat));
+              setLongitude(String(p.lng));
+            }}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Busca el lugar, toca el mapa o arrastra el pin. Las coordenadas se llenan solas y se
+            guardan con “Guardar ubicación”.
+          </p>
+        </div>
         <PlaceField name="latitude" label="Latitud" required>
           {({ id }) => (
             <input
