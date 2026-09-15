@@ -294,6 +294,13 @@ export function InteractiveMap({
     loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
+        const {
+          markers,
+          routeStops,
+          fitPoints,
+          restriction,
+        } = latestRef.current;
+
 
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
