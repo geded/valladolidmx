@@ -114,20 +114,20 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           ],
         }}
       />
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
         <FavoriteButton
           entityKind="route"
           entityId={route.id}
           entityTitle={route.name}
           entitySlug={route.slug}
           {...(route.coverUrl ? { entityImageUrl: route.coverUrl } : {})}
-          className="min-h-11 rounded-pill px-4 text-sm"
+          className="min-h-11 w-full justify-center rounded-pill px-4 text-sm sm:w-auto"
         />
         <Button
           type="button"
           variant="outline"
           onClick={() => setShareOpen(true)}
-          className="min-h-11 rounded-pill"
+          className="min-h-11 w-full rounded-pill sm:w-auto"
         >
           <Share2 className="size-4" aria-hidden />
           Compartir
@@ -140,6 +140,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           subtitle={route.originDestinationLabel}
           imageUrl={route.coverUrl}
           variant="full"
+          className="col-span-2 min-h-11 w-full justify-center rounded-pill sm:w-auto"
         />
       </div>
 
@@ -300,31 +301,42 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
         </section>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2 rounded-3xl border border-border bg-card p-5 shadow-soft">
-        <div className="min-w-0 flex-1">
+      <div className="grid gap-4 rounded-3xl border border-border bg-card p-5 shadow-soft sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
           <p className="font-display text-lg">¿Te llevas esta ruta?</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Súmala a Mi Viaje y tu concierge la adapta a tus fechas.
           </p>
         </div>
-        <AddToTravelPlanButton
-          kind="route"
-          targetId={route.id}
-          title={route.name}
-          slug={route.slug}
-          subtitle={route.originDestinationLabel}
-          imageUrl={route.coverUrl}
-          variant="full"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShareOpen(true)}
-          className="min-h-11 rounded-pill"
-        >
-          <Share2 className="size-4" aria-hidden />
-          Compartir
-        </Button>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+          <FavoriteButton
+            entityKind="route"
+            entityId={route.id}
+            entityTitle={route.name}
+            entitySlug={route.slug}
+            {...(route.coverUrl ? { entityImageUrl: route.coverUrl } : {})}
+            className="min-h-11 w-full justify-center rounded-pill px-4 text-sm sm:w-auto"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShareOpen(true)}
+            className="min-h-11 w-full rounded-pill sm:w-auto"
+          >
+            <Share2 className="size-4" aria-hidden />
+            Compartir
+          </Button>
+          <AddToTravelPlanButton
+            kind="route"
+            targetId={route.id}
+            title={route.name}
+            slug={route.slug}
+            subtitle={route.originDestinationLabel}
+            imageUrl={route.coverUrl}
+            variant="full"
+            className="col-span-2 min-h-11 w-full justify-center rounded-pill sm:w-auto"
+          />
+        </div>
       </div>
     </div>
   );
