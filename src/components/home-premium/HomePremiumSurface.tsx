@@ -1219,10 +1219,13 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 py-2.5 lg:py-3.5"
               >
                 {event.media?.url ? (
-                  <img
-                    src={event.media.url}
-                    alt={event.media.alt || event.title}
-                    loading="lazy"
+                  /* H3·A4 · La miniatura de agenda usa la familia `thumbnail`
+                     del pipeline: mismo encuadre aprobado, bytes mínimos. */
+                  <EditorialMediaFrame
+                    media={{ ...event.media, alt: event.media.alt || event.title }}
+                    label={event.title}
+                    context="thumbnail"
+                    sizes="48px"
                     className="h-12 w-12 rounded-xl object-cover"
                   />
                 ) : (
