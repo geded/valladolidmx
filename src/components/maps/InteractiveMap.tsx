@@ -573,6 +573,7 @@ export function InteractiveMap({
     roadRoute?.durationSeconds,
     fitPadding,
     minZoom,
+    showMarkerNames,
   ]);
 
   if (failed) {
