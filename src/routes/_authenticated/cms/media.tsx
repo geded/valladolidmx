@@ -25,6 +25,9 @@ type Row = {
   width: number | null;
   height: number | null;
   status: string | null;
+  usage_context: string | null;
+  entity_kind: string | null;
+  entity_id: string | null;
   updated_at: string;
 };
 
@@ -233,25 +236,95 @@ function AiConceptBatchUpload() {
   );
 }
 
-function MediaHeaderActions() {
+const SCOPE_OPTIONS = [
+  { value: "all", label: "Todas las imágenes" },
+  { value: "mine", label: "Mis imágenes" },
+] as const;
+
+const USAGE_OPTIONS = [
+  { value: "all", label: "Todos los usos" },
+  { value: "cover", label: "Portadas" },
+  { value: "gallery", label: "Galerías" },
+  { value: "logo", label: "Logos" },
+  { value: "other", label: "Otros" },
+] as const;
+
+type ScopeValue = (typeof SCOPE_OPTIONS)[number]["value"];
+type UsageValue = (typeof USAGE_OPTIONS)[number]["value"];
+
+const USAGE_LABELS: Record<string, string> = {
+  cover: "Portada",
+  cover_mobile: "Portada móvil",
+  hero: "Portada",
+  business_cover_preview: "Portada",
+  gallery: "Galería",
+  logo: "Logo",
+  icon: "Logo",
+  avatar: "Logo",
+  social: "Redes",
+  offer: "Oferta",
+  territory: "Territorio",
+};
+
+function FilterChips<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+}: {
+  options: readonly { value: T; label: string }[];
+  value: T;
+  onChange: (next: T) => void;
+  label: string;
+}) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <AiConceptBatchUpload />
-      <BatchToolbar />
+    <div className="flex flex-wrap items-center gap-1" role="group" aria-label={label}>
+      {options.map((option) => (
+        <Button
+          key={option.value}
+          size="sm"
+          variant={option.value === value ? "default" : "outline"}
+          aria-pressed={option.value === value}
+          onClick={() => onChange(option.value)}
+        >
+          {option.label}
+        </Button>
+      ))}
     </div>
   );
 }
 
 function MediaPage() {
+  const [scope, setScope] = useState<ScopeValue>("all");
+  const [usage, setUsage] = useState<UsageValue>("all");
+
   return (
     <CmsEntityPage<Row>
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-      description="Media Intelligence Pipeline · IA propone, el editor decide."
+      description="Filtra por quién subió la imagen y para qué se usa. Las versiones ligeras se generan solas."
       rowKey={(r) => r.id}
-      emptyMessage="Sin activos multimedia todavía."
-      headerActions={<MediaHeaderActions />}
+      emptyMessage="Sin imágenes con estos filtros."
+      extraParams={{ scope, usage }}
+      headerActions={
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterChips
+            label="Alcance de la biblioteca"
+            options={SCOPE_OPTIONS}
+            value={scope}
+            onChange={setScope}
+          />
+          <FilterChips
+            label="Uso de la imagen"
+            options={USAGE_OPTIONS}
+            value={usage}
+            onChange={setUsage}
+          />
+          <AiConceptBatchUpload />
+          <BatchToolbar />
+        </div>
+      }
       columns={[
         {
           key: "alt",
@@ -268,6 +341,15 @@ function MediaPage() {
                 origen: {r.alt_text_source ?? "none"} · revisión: {r.review_state ?? "unreviewed"}
               </div>
             </div>
+          ),
+        },
+        {
+          key: "usage",
+          header: "Uso",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {r.usage_context ? (USAGE_LABELS[r.usage_context] ?? r.usage_context) : "Sin asignar"}
+            </span>
           ),
         },
         {
