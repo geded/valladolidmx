@@ -275,7 +275,12 @@ export function deriveTripPhase(input: {
     };
   }
 
-  return { id: "selling", label: "En venta", detail: input.stage.nextAction, tone: "info" };
+  return {
+    id: "selling",
+    label: "En venta",
+    detail: "Todavía sin reservación confirmada.",
+    tone: "info",
+  };
 }
 
 export interface InboxDefinition {
