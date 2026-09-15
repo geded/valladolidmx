@@ -202,6 +202,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
+import { Route as ApiPublicMediaDerivedSplatRouteImport } from './routes/api/public/media-derived.$'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
 import { Route as ApiPublicHooksTripJourneyEmailsRouteImport } from './routes/api/public/hooks/trip-journey-emails'
@@ -1348,6 +1349,12 @@ const ApiPublicStudioMediaSplatRoute =
     path: '/api/public/studio-media/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicMediaDerivedSplatRoute =
+  ApiPublicMediaDerivedSplatRouteImport.update({
+    id: '/api/public/media-derived/$',
+    path: '/api/public/media-derived/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicMapsStaticRoute = ApiPublicMapsStaticRouteImport.update({
   id: '/api/public/maps/static',
   path: '/api/public/maps/static',
@@ -1899,6 +1906,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
+  '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -2140,6 +2148,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
+  '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -2393,6 +2402,7 @@ export interface FileRoutesById {
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
+  '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -2647,6 +2657,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
+    | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -2888,6 +2899,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
+    | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -3140,6 +3152,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
+    | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -3296,6 +3309,7 @@ export interface RootRouteChildren {
   ApiPublicHooksTripJourneyEmailsRoute: typeof ApiPublicHooksTripJourneyEmailsRoute
   ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
+  ApiPublicMediaDerivedSplatRoute: typeof ApiPublicMediaDerivedSplatRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -4658,6 +4672,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStudioMediaSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/media-derived/$': {
+      id: '/api/public/media-derived/$'
+      path: '/api/public/media-derived/$'
+      fullPath: '/api/public/media-derived/$'
+      preLoaderRoute: typeof ApiPublicMediaDerivedSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/maps/static': {
       id: '/api/public/maps/static'
       path: '/api/public/maps/static'
@@ -5747,6 +5768,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksVisibilityNotificationsRoute:
     ApiPublicHooksVisibilityNotificationsRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
+  ApiPublicMediaDerivedSplatRoute: ApiPublicMediaDerivedSplatRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
