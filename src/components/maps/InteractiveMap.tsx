@@ -221,6 +221,8 @@ export interface InteractiveMapProps {
   restriction?: { north: number; south: number; east: number; west: number };
   /** Zoom mínimo permitido (evita alejarse fuera del área). */
   minZoom?: number;
+  /** Muestra el nombre de cada parada junto a su pin. */
+  showMarkerNames?: boolean;
 
 }
 
@@ -280,6 +282,23 @@ function markerIconDataUri(letter: string, selected = false): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+/** Etiqueta con el nombre de la parada, anclada bajo el pin. */
+function markerNameIconDataUri(text: string): { url: string; width: number; height: number } {
+  const { bg, fg, stroke } = getMarkerColors();
+  const clean = text.length > 28 ? `${text.slice(0, 27)}…` : text;
+  const safe = clean
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const width = Math.max(56, Math.round(clean.length * 7.2) + 20);
+  const height = 26;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="${(height - 2) / 2}" fill="${bg}" stroke="${stroke}" stroke-width="1.5" opacity=".97"/>
+    <text x="${width / 2}" y="${height / 2 + 4}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="${fg}">${safe}</text>
+  </svg>`;
+  return { url: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`, width, height };
+}
+
 export function InteractiveMap({
   lat,
   lng,
@@ -298,6 +317,7 @@ export function InteractiveMap({
   fitPadding = 88,
   restriction,
   minZoom,
+  showMarkerNames = false,
 
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -379,6 +399,24 @@ export function InteractiveMap({
           });
           if (m.key) {
             marker.addListener("click", () => markerSelectRef.current?.(m.key as string));
+          }
+          const stopName = m.title ?? markerTitle ?? null;
+          if (showMarkerNames && stopName) {
+            const chip = markerNameIconDataUri(stopName);
+            const nameMarker = new google.maps.Marker({
+              position: { lat: m.lat, lng: m.lng },
+              map,
+              title: stopName,
+              zIndex: (selected ? 20 : 10) + 1,
+              icon: {
+                url: chip.url,
+                scaledSize: new google.maps.Size(chip.width, chip.height),
+                anchor: new google.maps.Point(chip.width / 2, -4),
+              },
+            });
+            if (m.key) {
+              nameMarker.addListener("click", () => markerSelectRef.current?.(m.key as string));
+            }
           }
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
@@ -535,6 +573,7 @@ export function InteractiveMap({
     roadRoute?.durationSeconds,
     fitPadding,
     minZoom,
+    showMarkerNames,
   ]);
 
   if (failed) {

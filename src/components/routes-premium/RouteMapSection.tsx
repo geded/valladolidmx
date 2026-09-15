@@ -129,6 +129,7 @@ export function RouteMapSection({
             order: index + 1,
           }))}
           routeStops={stops.map((stop) => ({ lat: stop.lat, lng: stop.lng, key: stop.id }))}
+          showMarkerNames
           connectByRoad
           routeEmphasis="prominent"
           roadRoute={roadRoute}
