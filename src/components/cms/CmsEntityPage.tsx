@@ -29,16 +29,36 @@ interface Props<Row> {
   headerActions?: ReactNode;
   /** Filtros adicionales enviados a la server fn (p. ej. uso o alcance). */
   extraParams?: Record<string, string | number | boolean | null>;
+  /** Barra territorial y filtros de la sección. */
+  filters?: ReactNode;
+  /** Tamaño de página; por defecto 50. */
+  pageSize?: number;
 }
 
 export function CmsEntityPage<Row>(props: Props<Row>) {
   const callFn = useServerFn(props.fn);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = props.pageSize ?? 50;
+  const params = props.extraParams ?? {};
+  const paramsKey = JSON.stringify(params);
+
+  // Cualquier cambio de búsqueda o filtro vuelve a la primera página.
+  useEffect(() => {
+    setPage(1);
+  }, [search, paramsKey]);
 
   const query = useQuery<ListResult<Row>>({
-    queryKey: ["cms", props.queryKey, { search, ...(props.extraParams ?? {}) }],
+    queryKey: ["cms", props.queryKey, { search, page, pageSize, ...params }],
     queryFn: () =>
-      callFn({ data: { search, limit: 50, offset: 0, ...(props.extraParams ?? {}) } }),
+      callFn({
+        data: {
+          search,
+          limit: pageSize,
+          offset: (page - 1) * pageSize,
+          ...params,
+        },
+      }),
   });
 
   if (query.isError) {
