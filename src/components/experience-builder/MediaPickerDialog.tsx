@@ -185,6 +185,7 @@ export function MediaPickerDialog({
     setFileBytesBase64(null);
     setReadingFile(false);
     setPreview(null);
+    setDimensions(null);
     setRights({ ...emptyRights });
     setError(null);
     setNotice(null);
@@ -248,6 +249,7 @@ export function MediaPickerDialog({
           mime: file.type,
           sizeBytes: file.size,
           bytesBase64: fileBytesBase64,
+          ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
           rights,
         },
       });
