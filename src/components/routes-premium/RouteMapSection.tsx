@@ -157,14 +157,11 @@ export function RouteMapSection({
             </p>
           ) : null}
 
-          <a
-            href={googleDirectionsUrl(stops)}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="inline-flex items-center rounded-pill border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-secondary"
-          >
-            Cómo llegar
-          </a>
+          <Button asChild variant="outline" size="sm" className="min-h-11 rounded-pill">
+            <a href={googleDirectionsUrl(stops)} target="_blank" rel="noreferrer noopener">
+              Cómo llegar
+            </a>
+          </Button>
         </div>
       </div>
 
