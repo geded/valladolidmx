@@ -95,6 +95,10 @@ export function CmsEntityPage<Row>(props: Props<Row>) {
       rowKey={props.rowKey}
       emptyMessage={props.emptyMessage}
       headerActions={props.headerActions}
+      filters={props.filters}
+      page={page}
+      pageSize={pageSize}
+      onPageChange={setPage}
     />
   );
 }
