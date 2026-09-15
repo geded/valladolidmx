@@ -2,6 +2,10 @@
  * ProductMediaPanels — Portada y galería de un producto. Sube al bucket
  * `products` con signed upload URLs. Autorización server-side admite
  * admins/editores O dueños (≥editor) de la empresa asociada.
+ *
+ * Alux IA (sólo editores/admins): al elegir una foto pequeña para la
+ * portada, ofrece ampliarla. En galería, casilla para ampliar fotos
+ * pequeñas automáticamente en lote.
  */
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +19,10 @@ import {
   reorderProductGallery,
   signProductImageUpload,
 } from "@/lib/cms/products-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { prepareImageForRole, withRetry, type ImageRole } from "@/lib/cms/image-upload";
+import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
+import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
+import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
 
 type MediaRow = Awaited<ReturnType<typeof listProductMedia>>[number];
 
@@ -31,11 +38,16 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
   const registerFn = useServerFn(registerProductMedia);
   const removeFn = useServerFn(removeProductMedia);
   const reorderFn = useServerFn(reorderProductGallery);
+  const upscaleFn = useServerFn(aluxUpscaleImage);
 
   const media = useQuery({
     queryKey: ["cms", "product_media", productId],
     queryFn: () => listFn({ data: { productId } }),
   });
+
+  const [upscaleGallery, setUpscaleGallery] = useState(false);
+  const upscaleGalleryRef = useRef(upscaleGallery);
+  upscaleGalleryRef.current = upscaleGallery;
 
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: ["cms", "product_media", productId] });
@@ -43,7 +55,21 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
   };
 
   const uploadOne = async (file: File, role: "cover" | "gallery") => {
-    const prepared = await prepareImageForRole(file, role);
+    let fileToPrepare = file;
+    if (role === "gallery" && upscaleGalleryRef.current) {
+      try {
+        const result = await upscaleIfUndersized(file, "gallery", upscaleFn);
+        if (result.upscaled) {
+          fileToPrepare = result.file;
+          toast.success(`"${file.name}" se amplió con Alux IA.`);
+        }
+      } catch (err) {
+        toast.error(
+          `No se pudo ampliar "${file.name}": ${err instanceof Error ? err.message : "error"}. Se sube la original.`,
+        );
+      }
+    }
+    const prepared = await prepareImageForRole(fileToPrepare, role);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -146,6 +172,8 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
         }}
         uploading={galleryUpload.isPending}
         error={galleryUpload.error}
+        upscaleSmall={upscaleGallery}
+        onToggleUpscale={() => setUpscaleGallery((v) => !v)}
       />
     </div>
   );
@@ -159,6 +187,15 @@ function CoverPanel(props: {
   error: unknown;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const alux = useAluxUpscale("cover");
+
+  const handleFile = async (f: File) => {
+    const undersized = await alux.evaluate(f);
+    if (!undersized) {
+      props.onUpload(f);
+    }
+  };
+
   return (
     <section className="rounded-xl border border-border bg-card p-5">
       <header className="mb-3 flex items-center justify-between">
@@ -169,7 +206,7 @@ function CoverPanel(props: {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          disabled={props.uploading}
+          disabled={props.uploading || alux.upscaling}
           className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
         >
           {props.uploading ? "Subiendo…" : props.cover ? "Reemplazar" : "Subir"}
@@ -181,11 +218,26 @@ function CoverPanel(props: {
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) props.onUpload(f);
+            if (f) void handleFile(f);
             e.target.value = "";
           }}
         />
       </header>
+      {alux.pending && (
+        <AluxUpscaleCard
+          fit={alux.pending.fit}
+          upscaling={alux.upscaling}
+          busy={props.uploading}
+          onUpscale={async () => {
+            const enlarged = await alux.upscale();
+            if (enlarged) props.onUpload(enlarged);
+          }}
+          onSkip={() => {
+            const f = alux.proceedAsIs();
+            if (f) props.onUpload(f);
+          }}
+        />
+      )}
       {props.cover?.previewUrl ? (
         <div className="relative overflow-hidden rounded-lg border border-border">
           <img
@@ -220,6 +272,8 @@ function GalleryPanel(props: {
   onMove: (id: string, direction: -1 | 1) => void;
   uploading: boolean;
   error: unknown;
+  upscaleSmall: boolean;
+  onToggleUpscale: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -230,14 +284,26 @@ function GalleryPanel(props: {
           <h2 className="text-sm font-semibold tracking-tight">Galería</h2>
           <p className="text-xs text-muted-foreground">Imágenes adicionales del producto.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={props.uploading}
-          className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-        >
-          {props.uploading ? "Subiendo…" : "Añadir imágenes"}
-        </button>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={props.upscaleSmall}
+              onChange={props.onToggleUpscale}
+              disabled={props.uploading}
+              className="size-3.5 accent-amber-600"
+            />
+            Ampliar pequeñas con Alux IA
+          </label>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={props.uploading}
+            className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
+          >
+            {props.uploading ? "Subiendo…" : "Añadir imágenes"}
+          </button>
+        </div>
         <input
           ref={inputRef}
           type="file"
