@@ -50,7 +50,16 @@ export function EntityListView<Row>(props: Props<Row>) {
     rowKey,
     emptyMessage = "Sin registros que mostrar.",
     headerActions,
+    filters,
+    page,
+    pageSize,
+    onPageChange,
   } = props;
+
+  const hasPaging = typeof page === "number" && typeof pageSize === "number" && !!onPageChange;
+  const totalPages = hasPaging ? Math.max(1, Math.ceil(total / pageSize!)) : 1;
+  const from = hasPaging && total > 0 ? (page! - 1) * pageSize! + 1 : 0;
+  const to = hasPaging ? Math.min(total, (page! - 1) * pageSize! + rows.length) : rows.length;
 
   const inputId = useId();
   const [draft, setDraft] = useState(search);
