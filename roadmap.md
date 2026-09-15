@@ -144,3 +144,4 @@
 - [ ] Vista del viajero para propuestas largas: resumen por días, secciones plegables y descarga en PDF.
 
 - [ ] Diseñar carga inteligente obligatoria de imágenes: validación de tamaños, optimización automática y cola segura para cargas masivas.
+- [ ] Definir biblioteca Media por empresa: visibilidad, permisos, búsqueda, filtros y usos portada/galería/logo/miniatura.

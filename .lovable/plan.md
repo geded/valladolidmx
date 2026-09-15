@@ -60,6 +60,19 @@ Se preservarán sin cambios visuales:
 - Ante una jornada con cientos de empresas, la cola absorbe el volumen y regula el ritmo; nunca dispara cientos de procesos paralelos ni depende de una página abierta.
 - Pausar automáticamente ante saturación o fallos repetidos, conservar el original y avisar al administrador; reanudar sólo de forma controlada.
 
+### Biblioteca Media — visibilidad y navegación
+
+- **Empresa:** verá únicamente las imágenes que pertenecen a sus empresas y productos, más una colección oficial compartida cuando el administrador la habilite. Nunca podrá explorar fotos privadas de otra empresa.
+- **Editor territorial:** verá las imágenes de las entidades incluidas en su ámbito autorizado.
+- **Administrador y superadministrador:** podrán consultar todo el catálogo, con filtros por empresa, destino, responsable y estado.
+- La entrada principal será **“Mis imágenes”**, con buscador por nombre, empresa, producto y texto alternativo; filtros por fecha, orientación, estado y uso.
+- Los usos se presentarán como filtros claros: **Portadas**, **Galerías** y **Logos**. Una misma imagen podrá estar vinculada en más de un lugar sin duplicar el original.
+- **Miniaturas no serán una biblioteca editable ni una carga adicional:** el sistema las generará automáticamente como versiones derivadas de portadas y galerías.
+- Cada ficha mostrará dónde se usa la imagen, su empresa/producto, quién la subió, fecha, estado de optimización y si requiere revisión.
+- El selector contextual abrirá prefiltrado según la tarea: al elegir una portada mostrará imágenes horizontales aptas; para logo, imágenes de logo; para galería, imágenes compatibles.
+- Se admitirán selección múltiple, paginación/carga progresiva y orden por recientes para navegar miles de imágenes sin descargar todo el catálogo.
+- Las asignaciones a portada, galería o logo serán relaciones administradas, no nombres de carpetas ni copias físicas del archivo.
+
 ### Lote 3 — Plantillas públicas compartidas
 
 - Aplicar el mismo componente oficial a héroes, tarjetas, galerías, miniaturas y listados.
@@ -84,6 +97,7 @@ En cada lote:
 - Comprobación de canonical, OG, JSON-LD y ALT sin cambios.
 - Rollback inmediato del lote si aparece una diferencia visual o una imagen rota.
 - Pruebas de volumen, reintento, deduplicación, pausa, recuperación y límite de concurrencia de la cola.
+- Pruebas de aislamiento entre empresas y ámbitos editoriales, incluidos intentos de acceso directo a imágenes ajenas.
 
 ## Resultado esperado
 
