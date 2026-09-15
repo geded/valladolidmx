@@ -271,12 +271,18 @@ async function resolveStopEntities(
     id: string;
     slug: string;
     destination_id: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
   }>;
   const businessRows = (businesses.data ?? []) as Array<{
     id: string;
     slug: string;
     destination_id: string | null;
     primary_category_id: string | null;
+    business_locations?:
+      | Array<{ latitude?: number | null; longitude?: number | null }>
+      | { latitude?: number | null; longitude?: number | null }
+      | null;
   }>;
 
   const extraDestIds = [
@@ -288,6 +294,7 @@ async function resolveStopEntities(
   for (const p of placeRows) {
     const d = p.destination_id ? destMap.get(p.destination_id) : null;
     if (d) hrefs.set(p.id, `/oriente-maya/${d.slug}/lugares/${p.slug}`);
+    setCoord(p.id, p.latitude, p.longitude);
   }
 
   for (const e of (events.data ?? []) as Array<{ id: string; slug: string }>)
