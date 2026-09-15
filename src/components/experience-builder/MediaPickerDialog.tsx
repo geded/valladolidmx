@@ -20,6 +20,7 @@ import {
   Loader2,
   Search,
   ShieldAlert,
+  Sparkles,
   Upload,
   X,
 } from "lucide-react";
@@ -31,10 +32,15 @@ import {
 import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
 import {
   describeIngestSavings,
+  describeRoleFit,
+  evaluateRoleFit,
   prepareImageForIngest,
   validateImageFile,
+  ROLE_LABELS,
   type ImageRole,
+  type RoleFit,
 } from "@/lib/cms/image-upload";
+import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
 
 export interface PickedMedia {
   /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
@@ -118,6 +124,12 @@ const RIGHTS_ERRORS: Record<string, string> = {
   credit_without_author: "El crédito no puede acreditar a un fotógrafo no declarado como autor.",
   forbidden_requires_admin: "Sólo un rol administrativo puede aprobar para uso público.",
   self_approval_not_allowed: "No puedes aprobar un activo que tú mismo subiste.",
+  forbidden: "Esta acción está reservada a editores y administradores.",
+  alux_rate_limited: "Alux IA está saturado en este momento. Inténtalo de nuevo en un minuto.",
+  alux_credits_required: "Alux IA no tiene créditos disponibles. Recárgalos para continuar.",
+  alux_blocked: "Alux IA está deshabilitado por la configuración del espacio de trabajo.",
+  alux_empty_response: "Alux IA no devolvió una imagen. Prueba con otra foto.",
+  image_too_large: "La foto es demasiado pesada para ampliarla con Alux IA.",
 };
 
 const humanize = (msg: string) => RIGHTS_ERRORS[msg] ?? msg;
@@ -140,6 +152,7 @@ export function MediaPickerDialog({
   const list = useServerFn(listStudioMediaLibrary);
   const serverUpload = useServerFn(uploadStudioMediaViaServer);
   const approve = useServerFn(approveStudioMedia);
+  const upscale = useServerFn(aluxUpscaleImage);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
@@ -155,6 +168,8 @@ export function MediaPickerDialog({
   const [preview, setPreview] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const [rights, setRights] = useState({ ...emptyRights });
+  const [fit, setFit] = useState<RoleFit | null>(null);
+  const [upscaling, setUpscaling] = useState(false);
 
   const refresh = useCallback(() => {
     setLoading(true);
@@ -189,7 +204,26 @@ export function MediaPickerDialog({
     setRights({ ...emptyRights });
     setError(null);
     setNotice(null);
+    setFit(null);
+    setUpscaling(false);
   }, [open]);
+
+  async function applyPreparedFile(f: File) {
+    // Carga inteligente: se normaliza el archivo antes de enviarlo
+    // (sin recortar) para que no entren imágenes innecesariamente pesadas.
+    const ingest = await prepareImageForIngest(f);
+    // Debe leerse durante el evento de selección. Algunos navegadores
+    // eliminan el archivo temporal antes de que el usuario termine la ficha.
+    const bytesBase64 = await fileToBase64(ingest.file);
+    setFile(ingest.file);
+    setFileBytesBase64(bytesBase64);
+    setDimensions(
+      ingest.width && ingest.height ? { width: ingest.width, height: ingest.height } : null,
+    );
+    setPreview(URL.createObjectURL(ingest.file));
+    setFit(evaluateRoleFit(ingest.width, ingest.height, role));
+    return ingest;
+  }
 
   async function chooseFile(f: File) {
     const invalid = validateImageFile(f);
@@ -204,19 +238,9 @@ export function MediaPickerDialog({
     setFileBytesBase64(null);
     setDimensions(null);
     setPreview(null);
+    setFit(null);
     try {
-      // Carga inteligente: se normaliza el archivo antes de enviarlo
-      // (sin recortar) para que no entren imágenes innecesariamente pesadas.
-      const ingest = await prepareImageForIngest(f);
-      // Debe leerse durante el evento de selección. Algunos navegadores
-      // eliminan el archivo temporal antes de que el usuario termine la ficha.
-      const bytesBase64 = await fileToBase64(ingest.file);
-      setFile(ingest.file);
-      setFileBytesBase64(bytesBase64);
-      setDimensions(
-        ingest.width && ingest.height ? { width: ingest.width, height: ingest.height } : null,
-      );
-      setPreview(URL.createObjectURL(ingest.file));
+      const ingest = await applyPreparedFile(f);
       const savings = describeIngestSavings(ingest);
       if (savings) setNotice(`Imagen optimizada al elegirla: ${savings}. No se recortó nada.`);
     } catch (err) {
@@ -227,6 +251,49 @@ export function MediaPickerDialog({
       );
     } finally {
       setReadingFile(false);
+    }
+  }
+
+  /**
+   * Alux IA (sólo editores y administradores): amplía la foto elegida cuando
+   * queda por debajo del tamaño recomendado del uso. Nunca es automático y el
+   * archivo ampliado vuelve a pasar por el mismo ingreso gobernado.
+   */
+  async function handleAluxUpscale() {
+    if (!file || !fileBytesBase64 || !fit || upscaling || readingFile || uploading) return;
+    setError(null);
+    setNotice("Alux IA está ampliando la foto…");
+    setUpscaling(true);
+    try {
+      const res = await upscale({
+        data: {
+          bytesBase64: fileBytesBase64,
+          mime: file.type,
+          width: fit.width,
+          height: fit.height,
+          targetLongSide: fit.recommendedLongSide,
+          roleLabel: ROLE_LABELS[role],
+        },
+      });
+      const bin = atob(res.bytesBase64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
+      const enlarged = new File([bytes], `${baseName}-alux.png`, {
+        type: res.mime,
+        lastModified: Date.now(),
+      });
+      const ingest = await applyPreparedFile(enlarged);
+      setNotice(
+        ingest.width && ingest.height
+          ? `Alux IA amplió la foto a ${ingest.width}×${ingest.height} px. Revísala antes de subirla.`
+          : "Alux IA amplió la foto. Revísala antes de subirla.",
+      );
+    } catch (err) {
+      setNotice(null);
+      setError(err instanceof Error ? humanize(err.message) : "Alux IA no pudo ampliar la foto.");
+    } finally {
+      setUpscaling(false);
     }
   }
 
@@ -380,6 +447,9 @@ export function MediaPickerDialog({
               onChooseFile={chooseFile}
               onRights={(patch) => setRights((r) => ({ ...r, ...patch }))}
               onSubmit={handleUpload}
+              fit={fit}
+              upscaling={upscaling}
+              onAluxUpscale={handleAluxUpscale}
             />
           ) : loading ? (
             <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
@@ -497,6 +567,9 @@ function UploadForm({
   onChooseFile,
   onRights,
   onSubmit,
+  fit,
+  upscaling,
+  onAluxUpscale,
 }: {
   file: File | null;
   preview: string | null;
@@ -506,6 +579,9 @@ function UploadForm({
   onChooseFile: (f: File) => void | Promise<void>;
   onRights: (patch: Partial<typeof emptyRights>) => void;
   onSubmit: () => void;
+  fit: RoleFit | null;
+  upscaling: boolean;
+  onAluxUpscale: () => void | Promise<void>;
 }) {
   const inputCls = "h-9 w-full rounded-md border border-border bg-background px-2 text-xs";
   return (
@@ -528,6 +604,34 @@ function UploadForm({
           }}
         />
       </label>
+
+      {fit?.undersized ? (
+        <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
+          <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">
+            {fit.severelyUndersized
+              ? "Esta foto es pequeña para el espacio donde se usará"
+              : "Esta foto queda algo por debajo del tamaño recomendado"}
+          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {describeRoleFit(fit)} Alux IA puede ampliarla conservando la misma escena. El archivo
+            original no se modifica: revisarás el resultado antes de subirlo.
+          </p>
+          <button
+            type="button"
+            onClick={() => void onAluxUpscale()}
+            disabled={upscaling || uploading}
+            className="mt-2 inline-flex h-9 items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 text-xs font-medium text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {upscaling ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Sparkles className="size-3.5" aria-hidden />
+            )}
+            {upscaling ? "Alux IA está ampliando…" : "Ampliar con Alux IA"}
+          </button>
+        </div>
+      ) : null}
+
 
       {preview ? (
         <FocalPicker

@@ -377,6 +377,67 @@ export function describeIngestSavings(result: IngestResult): string | null {
   return `${mb(result.originalBytes)} → ${mb(result.bytes)} (−${pct}%)`;
 }
 
+/* ───────────  Detección de foto pequeña para el uso (Alux IA)  ─────────── */
+
+/**
+ * Ancho mínimo recomendado por uso. Si la foto elegida queda por debajo,
+ * la Biblioteca ofrece ampliarla con Alux IA (asistente editorial).
+ * Nunca se amplía de forma automática ni silenciosa.
+ */
+export const ROLE_MIN_LONG_SIDE: Record<ImageRole, number> = {
+  hero: 2400,
+  cover: 1600,
+  gallery: 1600,
+  logo: 512,
+  thumbnail: 400,
+};
+
+export interface RoleFit {
+  role: ImageRole;
+  width: number;
+  height: number;
+  /** Lado mayor recomendado para este uso. */
+  recommendedLongSide: number;
+  /** Proporción del tamaño recomendado que cubre la foto (0-1+). */
+  coverage: number;
+  /** La foto no alcanza el tamaño recomendado. */
+  undersized: boolean;
+  /** Queda muy por debajo (<60%): la ampliación con Alux IA es aconsejable. */
+  severelyUndersized: boolean;
+}
+
+export function evaluateRoleFit(
+  width: number | null,
+  height: number | null,
+  role: ImageRole,
+): RoleFit | null {
+  if (!width || !height) return null;
+  const recommendedLongSide = ROLE_MIN_LONG_SIDE[role];
+  const longest = Math.max(width, height);
+  const coverage = longest / recommendedLongSide;
+  return {
+    role,
+    width,
+    height,
+    recommendedLongSide,
+    coverage,
+    undersized: coverage < 1,
+    severelyUndersized: coverage < 0.6,
+  };
+}
+
+export const ROLE_LABELS: Record<ImageRole, string> = {
+  hero: "portada principal",
+  cover: "portada",
+  gallery: "galería",
+  logo: "logotipo",
+  thumbnail: "miniatura",
+};
+
+export function describeRoleFit(fit: RoleFit): string {
+  return `La foto mide ${fit.width}×${fit.height} px y para ${ROLE_LABELS[fit.role]} se recomiendan al menos ${fit.recommendedLongSide} px de lado mayor.`;
+}
+
 export interface RetryOptions {
   retries?: number;
   baseDelayMs?: number;
