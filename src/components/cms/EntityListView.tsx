@@ -168,6 +168,34 @@ export function EntityListView<Row>(props: Props<Row>) {
           </table>
         </div>
       </div>
+
+      {hasPaging && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            {total === 0
+              ? "Sin resultados."
+              : `Mostrando ${from}–${to} de ${total} · página ${page} de ${totalPages}`}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={page! <= 1}
+              onClick={() => onPageChange!(page! - 1)}
+              className="h-9 rounded-md border border-border bg-card px-3 text-xs font-medium disabled:opacity-40 hover:bg-accent"
+            >
+              ← Anterior
+            </button>
+            <button
+              type="button"
+              disabled={page! >= totalPages}
+              onClick={() => onPageChange!(page! + 1)}
+              className="h-9 rounded-md border border-border bg-card px-3 text-xs font-medium disabled:opacity-40 hover:bg-accent"
+            >
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
