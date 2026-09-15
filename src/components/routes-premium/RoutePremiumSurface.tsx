@@ -83,6 +83,13 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
   const mapStops = routeMapStops(route.stops);
   const mapOrder = new Map(mapStops.map((stop, index) => [stop.id, index + 1]));
 
+  // Navegación interna: sólo se declaran las secciones realmente presentes.
+  const subnavAnchors = [
+    ...(mapStops.length ? [{ id: "ruta-mapa", label: "Mapa", iconKey: "map-pin" }] : []),
+    ...(route.stops.length ? [{ id: "ruta-itinerario", label: "Itinerario", iconKey: "info" }] : []),
+    ...(route.gallery.length ? [{ id: "ruta-galeria", label: "Galería", iconKey: "camera" }] : []),
+  ];
+
   return (
     <div className="space-y-8">
       <PremiumHero
