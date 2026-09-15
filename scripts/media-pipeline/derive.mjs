@@ -189,8 +189,12 @@ async function deriveOne(sb, assetId, report, dryRun) {
     await markAssetFailed(`sharp.metadata: ${e?.message ?? e}`);
     return;
   }
-  const ctx = asset.usage_context || "generic";
-  const plan = MATRIX[ctx] || MATRIX.generic;
+  /* Los contextos editoriales libres del CMS (p. ej. `cover`) no pertenecen
+     al contrato de variantes: se normalizan al contexto oficial más cercano
+     para no bloquear la derivación ni inventar valores nuevos. */
+  const rawCtx = asset.usage_context || "generic";
+  const ctx = MATRIX[rawCtx] ? rawCtx : "generic";
+  const plan = MATRIX[ctx];
 
   // 3. Cargar variantes existentes (idempotencia)
   const { data: existing } = await sb
