@@ -223,7 +223,7 @@ async function resolveStopEntities(
     destinationIds.length
       ? sb
           .from("destinations")
-          .select("id, slug, status, deleted_at")
+          .select("id, slug, latitude, longitude, status, deleted_at")
           .in("id", destinationIds)
           .eq("status", "published")
           .is("deleted_at", null)
@@ -231,7 +231,7 @@ async function resolveStopEntities(
     placeIds.length
       ? sb
           .from("points_of_interest")
-          .select("id, slug, destination_id, status, deleted_at")
+          .select("id, slug, destination_id, latitude, longitude, status, deleted_at")
           .in("id", placeIds)
           .eq("status", "published")
           .is("deleted_at", null)
@@ -247,15 +247,25 @@ async function resolveStopEntities(
     businessIds.length
       ? sb
           .from("businesses")
-          .select("id, slug, destination_id, primary_category_id, status, deleted_at")
+          .select(
+            "id, slug, destination_id, primary_category_id, business_locations ( latitude, longitude ), status, deleted_at",
+          )
           .in("id", businessIds)
           .eq("status", "published")
           .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
   ]);
 
-  const destRows = (dests.data ?? []) as Array<{ id: string; slug: string }>;
-  for (const d of destRows) hrefs.set(d.id, `/oriente-maya/${d.slug}`);
+  const destRows = (dests.data ?? []) as Array<{
+    id: string;
+    slug: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  }>;
+  for (const d of destRows) {
+    hrefs.set(d.id, `/oriente-maya/${d.slug}`);
+    setCoord(d.id, d.latitude, d.longitude);
+  }
 
   const placeRows = (places.data ?? []) as Array<{
     id: string;
