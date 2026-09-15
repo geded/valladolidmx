@@ -102,7 +102,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
       />
 
       {chips.length ? (
-        <TourismChipRow ariaLabel="Datos de la ruta">
+        <TourismChipRow label="Datos de la ruta">
           {chips.map((chip) => (
             <TourismChip key={chip} scheme="surface" size="sm">
               {chip}
