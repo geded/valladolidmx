@@ -86,6 +86,8 @@ export function EntityListView<Row>(props: Props<Row>) {
         </div>
       </header>
 
+      {filters && <div className="mt-5">{filters}</div>}
+
       <form
         className="mt-5 flex flex-wrap items-end gap-3"
         onSubmit={(e) => {
