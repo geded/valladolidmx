@@ -74,6 +74,8 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
     });
 
   const days = groupByDay(route.stops);
+  const mapStops = routeMapStops(route.stops);
+  const mapOrder = new Map(mapStops.map((stop, index) => [stop.id, index + 1]));
 
   return (
     <div className="space-y-8">
