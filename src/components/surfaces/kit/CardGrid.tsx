@@ -1,6 +1,7 @@
 import type { CardGridVM, CardVM } from "./types";
 import { formatPrice } from "./format";
 import { KitBadges } from "./Badges";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 const COLS: Record<NonNullable<CardGridVM["columns"]>, string> = {
   1: "sm:grid-cols-1",
@@ -21,11 +22,11 @@ function Card({ vm }: { vm: CardVM }) {
   return (
     <li className="rounded-2xl border border-border bg-card p-5">
       {vm.media?.url ? (
-        <img
-          src={vm.media.url}
-          alt={vm.media.alt ?? ""}
+        <EditorialMediaFrame
+          media={{ url: vm.media.url, alt: vm.media.alt ?? "" }}
+          context="card"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="mb-3 aspect-[4/3] w-full rounded-xl object-cover"
-          loading="lazy"
         />
       ) : null}
       {vm.eyebrow ? (

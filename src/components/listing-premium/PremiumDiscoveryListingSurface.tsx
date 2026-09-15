@@ -31,6 +31,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { useBrand } from "@/lib/brand/brand-context";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
@@ -434,7 +435,14 @@ function PremiumHero({
           cinematic && "absolute inset-0",
         )}
       >
-        <img src={hero.src} alt={hero.alt} className="absolute inset-0 size-full object-cover" />
+        <EditorialMediaFrame
+          media={{ url: hero.src, alt: hero.alt }}
+          context="hero"
+          loading="eager"
+          fetchPriority="high"
+          sizes="100vw"
+          className="absolute inset-0 size-full object-cover"
+        />
         <div
           className={cn(
             "absolute inset-0",
@@ -623,9 +631,10 @@ function PremiumListingCard({
           featured || cinematic ? "min-h-56" : "min-h-36",
         )}
       >
-        <img
-          src={media.src}
-          alt={media.alt}
+        <EditorialMediaFrame
+          media={{ url: media.src, alt: media.alt }}
+          context="card"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
         />
         {featured ? (
