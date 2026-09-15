@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public._concierge_note_timeline() FROM PUBLIC, anon, authenticated;

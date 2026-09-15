@@ -8,6 +8,7 @@ import {
   CONCIERGE_INBOXES,
   caseReference,
   deriveCaseStage,
+  deriveTripPhase,
   type CaseFollowUp,
 } from "../src/lib/concierge/case-stage";
 
@@ -155,5 +156,83 @@ describe("bandejas", () => {
     for (const inbox of CONCIERGE_INBOXES) {
       for (const stage of inbox.stages) expect(allowed.has(stage)).toBe(true);
     }
+  });
+});
+
+describe("Ciclo de vida del viaje", () => {
+  const stage = deriveCaseStage({
+    status: "in_progress",
+    assigned_concierge_user_id: "u1",
+    followUp: null,
+  });
+
+  const base = { status: "in_progress", stage };
+  const now = new Date("2026-09-15T18:00:00Z"); // 12:00 en Mérida
+
+  it("marca por pagar cuando hay reservación sin pago", () => {
+    const phase = deriveTripPhase({
+      ...base,
+      followUp: { order_status: "pending" } as never,
+      now,
+    });
+    expect(phase.id).toBe("awaiting_payment");
+  });
+
+  it("reconoce que el viajero está en destino", () => {
+    const phase = deriveTripPhase({
+      ...base,
+      followUp: {
+        order_status: "paid",
+        trip_start_date: "2026-09-14",
+        trip_end_date: "2026-09-18",
+      } as never,
+      now,
+    });
+    expect(phase.id).toBe("on_trip");
+    expect(phase.detail).toContain("Día 2 de 5");
+  });
+
+  it("avisa cuando el viaje sale esta semana", () => {
+    const phase = deriveTripPhase({
+      ...base,
+      followUp: {
+        order_status: "paid",
+        trip_start_date: "2026-09-18",
+        trip_end_date: "2026-09-20",
+      } as never,
+      now,
+    });
+    expect(phase.id).toBe("departing_soon");
+  });
+
+  it("detecta pagos sin fechas capturadas", () => {
+    const phase = deriveTripPhase({
+      ...base,
+      followUp: { order_status: "paid" } as never,
+      now,
+    });
+    expect(phase.id).toBe("no_dates");
+  });
+
+  it("cada bandeja declara su grupo y sólo usa fases del contrato", () => {
+    const phases = new Set([
+      "selling",
+      "awaiting_payment",
+      "paid_upcoming",
+      "departing_soon",
+      "on_trip",
+      "returned",
+      "no_dates",
+      "closed",
+    ]);
+    for (const inbox of CONCIERGE_INBOXES) {
+      expect(["Venta", "Pago", "Viaje", "Cierre"]).toContain(inbox.group);
+      for (const p of inbox.phases ?? []) expect(phases.has(p)).toBe(true);
+    }
+  });
+
+  it("incluye la bandeja de preguntas sin responder", () => {
+    const questions = CONCIERGE_INBOXES.find((i) => i.id === "questions");
+    expect(questions?.pendingQuestion).toBe(true);
   });
 });

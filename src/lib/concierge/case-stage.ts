@@ -39,6 +39,11 @@ export interface CaseFollowUp {
   order_paid_at?: string | null;
   assigned_concierge_user_id: string | null;
   assigned_concierge_name: string | null;
+  /** Fechas reales del viaje (Travel Plan ligado al expediente). */
+  trip_start_date?: string | null;
+  trip_end_date?: string | null;
+  /** Momento de la última pregunta del viajero sin responder. */
+  pending_question_since?: string | null;
 }
 
 export interface CaseStage {
@@ -161,20 +166,139 @@ export function deriveCaseStage(input: {
   };
 }
 
+/* ───────────── Ciclo de vida del viaje ─────────────
+ * Segundo eje, derivado de la reservación (`concierge_orders`) y de las
+ * fechas del Travel Plan. No introduce estados nuevos.
+ */
+
+export type TripPhaseId =
+  | "selling"
+  | "awaiting_payment"
+  | "paid_upcoming"
+  | "departing_soon"
+  | "on_trip"
+  | "returned"
+  | "no_dates"
+  | "closed";
+
+export interface TripPhase {
+  id: TripPhaseId;
+  label: string;
+  detail: string;
+  tone: "neutral" | "info" | "warning" | "success" | "danger";
+}
+
+const PAID_ORDER = new Set(["paid", "fulfilled"]);
+const PENDING_ORDER = new Set(["pending", "cart", "confirmed"]);
+
+/** Diferencia en días entre hoy (hora de Mérida) y una fecha ISO `YYYY-MM-DD`. */
+export function daysFromToday(date: string, now: Date = new Date()): number {
+  const today = new Date(
+    now.toLocaleString("en-US", { timeZone: "America/Merida" }),
+  );
+  const t = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const [y, m, d] = date.slice(0, 10).split("-").map(Number);
+  if (!y || !m || !d) return Number.NaN;
+  return Math.round((Date.UTC(y, m - 1, d) - t) / 86_400_000);
+}
+
+export function deriveTripPhase(input: {
+  status: string;
+  stage: CaseStage;
+  followUp?: CaseFollowUp | null;
+  now?: Date;
+}): TripPhase {
+  const f = input.followUp ?? null;
+  const now = input.now ?? new Date();
+
+  if (CLOSED_STATUSES.has(input.status)) {
+    return {
+      id: "closed",
+      label: "Cerrado",
+      detail: "Sin acciones pendientes.",
+      tone: "neutral",
+    };
+  }
+
+  const order = f?.order_status ?? null;
+  const paid = order ? PAID_ORDER.has(order) : false;
+  const start = f?.trip_start_date ?? null;
+  const end = f?.trip_end_date ?? start;
+
+  if (paid && start) {
+    const toStart = daysFromToday(start, now);
+    const toEnd = end ? daysFromToday(end, now) : toStart;
+    if (toStart <= 0 && toEnd >= 0) {
+      const dayNumber = 1 - toStart;
+      const total = toEnd - toStart + 1;
+      return {
+        id: "on_trip",
+        label: "En destino",
+        detail: `Día ${dayNumber} de ${total} en el destino.`,
+        tone: "success",
+      };
+    }
+    if (toEnd < 0) {
+      return { id: "returned", label: "Regresó", detail: "El viaje terminó.", tone: "neutral" };
+    }
+    if (toStart <= 7) {
+      return {
+        id: "departing_soon",
+        label: "Viaja pronto",
+        detail: toStart === 1 ? "Sale mañana." : `Sale en ${toStart} días.`,
+        tone: "warning",
+      };
+    }
+    return {
+      id: "paid_upcoming",
+      label: "Pagado · por viajar",
+      detail: `Sale en ${toStart} días.`,
+      tone: "info",
+    };
+  }
+
+  if (paid) {
+    return {
+      id: "no_dates",
+      label: "Pagado · sin fechas",
+      detail: "Falta capturar las fechas del viaje.",
+      tone: "warning",
+    };
+  }
+
+  if (input.stage.id === "accepted" || (order && PENDING_ORDER.has(order))) {
+    return {
+      id: "awaiting_payment",
+      label: "Por pagar",
+      detail: "Reservación sin pago confirmado.",
+      tone: "danger",
+    };
+  }
+
+  return { id: "selling", label: "En venta", detail: input.stage.nextAction, tone: "info" };
+}
+
 export interface InboxDefinition {
   id: string;
   label: string;
+  /** Agrupación visual de la bandeja. */
+  group: "Venta" | "Pago" | "Viaje" | "Cierre";
   /** Scope que se pide a la operación oficial de listado. */
   scope: "concierge" | "unassigned" | "lead";
   /** Etapas que se muestran en esta bandeja; vacío = todas. */
   stages: CaseStageId[];
+  /** Fases del viaje que se muestran; vacío = no filtra por fase. */
+  phases?: TripPhaseId[];
+  /** Sólo expedientes con una pregunta del viajero sin responder. */
+  pendingQuestion?: boolean;
 }
 
 export const CONCIERGE_INBOXES: readonly InboxDefinition[] = [
-  { id: "unassigned", label: "Sin asignar", scope: "unassigned", stages: [] },
+  { id: "unassigned", label: "Sin asignar", group: "Venta", scope: "unassigned", stages: [] },
   {
     id: "mine",
     label: "Mis expedientes",
+    group: "Venta",
     scope: "concierge",
     stages: [
       "unassigned",
@@ -187,22 +311,92 @@ export const CONCIERGE_INBOXES: readonly InboxDefinition[] = [
     ],
   },
   {
+    id: "questions",
+    label: "Preguntas sin responder",
+    group: "Venta",
+    scope: "lead",
+    stages: [],
+    pendingQuestion: true,
+  },
+  {
     id: "awaiting_quotes",
     label: "Esperando cotización",
+    group: "Venta",
     scope: "lead",
     stages: ["awaiting_quotes"],
   },
   {
     id: "ready_to_propose",
     label: "Listos para proponer",
+    group: "Venta",
     scope: "lead",
     stages: ["ready_to_propose", "proposal_draft"],
   },
-  { id: "sent", label: "Propuestas enviadas", scope: "lead", stages: ["proposal_sent"] },
-  { id: "rework", label: "Requieren ajuste", scope: "lead", stages: ["needs_rework"] },
-  { id: "accepted", label: "Aceptadas", scope: "lead", stages: ["accepted"] },
-  { id: "closed", label: "Cerrados", scope: "lead", stages: ["closed"] },
-  { id: "all", label: "Todo el equipo", scope: "lead", stages: [] },
+  {
+    id: "sent",
+    label: "Propuestas enviadas",
+    group: "Venta",
+    scope: "lead",
+    stages: ["proposal_sent"],
+  },
+  {
+    id: "rework",
+    label: "Requieren ajuste",
+    group: "Venta",
+    scope: "lead",
+    stages: ["needs_rework"],
+  },
+  {
+    id: "awaiting_payment",
+    label: "Por pagar",
+    group: "Pago",
+    scope: "lead",
+    stages: [],
+    phases: ["awaiting_payment"],
+  },
+  {
+    id: "paid_upcoming",
+    label: "Pagados · por viajar",
+    group: "Viaje",
+    scope: "lead",
+    stages: [],
+    phases: ["paid_upcoming"],
+  },
+  {
+    id: "departing_soon",
+    label: "Viaja esta semana",
+    group: "Viaje",
+    scope: "lead",
+    stages: [],
+    phases: ["departing_soon"],
+  },
+  {
+    id: "on_trip",
+    label: "En destino",
+    group: "Viaje",
+    scope: "lead",
+    stages: [],
+    phases: ["on_trip"],
+  },
+  {
+    id: "no_dates",
+    label: "Sin fechas de viaje",
+    group: "Viaje",
+    scope: "lead",
+    stages: [],
+    phases: ["no_dates"],
+  },
+  {
+    id: "returned",
+    label: "Regresaron",
+    group: "Cierre",
+    scope: "lead",
+    stages: [],
+    phases: ["returned"],
+  },
+  { id: "accepted", label: "Aceptadas", group: "Pago", scope: "lead", stages: ["accepted"] },
+  { id: "closed", label: "Cerrados", group: "Cierre", scope: "lead", stages: ["closed"] },
+  { id: "all", label: "Todo el equipo", group: "Cierre", scope: "lead", stages: [] },
 ] as const;
 
 /** Referencia legible del expediente, igual que en el detalle. */
