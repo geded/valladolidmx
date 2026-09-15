@@ -202,6 +202,9 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
             vibe: str(row.vibe, item?.vibe ?? ""),
             description: str(row.description, item?.description ?? ""),
             sequence: resolved,
+            // Las paradas georreferenciadas provienen del corpus publicado,
+            // no del CMS editorial: se preservan al fusionar la configuración.
+            stopPoints: item?.stopPoints ?? [],
             media: media(row, item?.media),
             href: hrefN(row.href, item?.href ?? null),
           };
