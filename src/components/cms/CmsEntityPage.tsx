@@ -1,7 +1,7 @@
 /**
  * CmsEntityPage — Adaptador entre una server fn de lectura y EntityListView.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityListView, type EntityColumn } from "@/components/cms/EntityListView";
