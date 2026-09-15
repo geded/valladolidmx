@@ -259,6 +259,7 @@ export function MediaPickerDialog({
       setFile(null);
       setFileBytesBase64(null);
       setPreview(null);
+      setDimensions(null);
       setRights({ ...emptyRights });
       setMode("library");
       setFilter("pending");
