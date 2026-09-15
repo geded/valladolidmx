@@ -221,6 +221,8 @@ export interface InteractiveMapProps {
   restriction?: { north: number; south: number; east: number; west: number };
   /** Zoom mínimo permitido (evita alejarse fuera del área). */
   minZoom?: number;
+  /** Muestra el nombre de cada parada junto a su pin. */
+  showMarkerNames?: boolean;
 
 }
 
@@ -278,6 +280,23 @@ function markerIconDataUri(letter: string, selected = false): string {
     <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${selected ? stroke : fg}">${letter}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+/** Etiqueta con el nombre de la parada, anclada bajo el pin. */
+function markerNameIconDataUri(text: string): { url: string; width: number; height: number } {
+  const { bg, fg, stroke } = getMarkerColors();
+  const clean = text.length > 28 ? `${text.slice(0, 27)}…` : text;
+  const safe = clean
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const width = Math.max(56, Math.round(clean.length * 7.2) + 20);
+  const height = 26;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="${(height - 2) / 2}" fill="${stroke}" stroke="${bg}" stroke-width="1.5" opacity=".96"/>
+    <text x="${width / 2}" y="${height / 2 + 4}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="${fg}">${safe}</text>
+  </svg>`;
+  return { url: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`, width, height };
 }
 
 export function InteractiveMap({
