@@ -203,6 +203,8 @@ export interface InteractiveMapProps {
   optimizeRoute?: boolean;
   /** Reporta la capacidad real usada y el bloqueo exacto del proveedor. */
   onRouteStatus?: (status: MapRouteStatus) => void;
+  /** Refuerza visualmente el recorrido sin alterar los mapas de otras superficies. */
+  routeEmphasis?: "standard" | "prominent";
   /** Selección de un marcador desde el mapa. */
   onMarkerSelect?: (key: string) => void;
   /** Puntos a los que se ajusta el encuadre; por defecto todos los pines. */
@@ -251,6 +253,7 @@ export function InteractiveMap({
   routeStops,
   optimizeRoute = false,
   onRouteStatus,
+  routeEmphasis = "standard",
   onMarkerSelect,
   fitPoints,
   fitPadding = 88,
@@ -355,14 +358,27 @@ export function InteractiveMap({
           routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
         if (stops.length > 1) {
           const directions = new google.maps.DirectionsService();
+          const isProminentRoute = routeEmphasis === "prominent";
+          const routeUnderlay = isProminentRoute
+            ? new google.maps.DirectionsRenderer({
+                map,
+                suppressMarkers: true,
+                preserveViewport: true,
+                polylineOptions: {
+                  strokeColor: themeColor("--selva", "#234933"),
+                  strokeOpacity: 0.9,
+                  strokeWeight: 10,
+                },
+              })
+            : null;
           const renderer = new google.maps.DirectionsRenderer({
             map,
             suppressMarkers: true,
-            preserveViewport: false,
+            preserveViewport: isProminentRoute,
             polylineOptions: {
               strokeColor: themeColor("--primary", "#eaa840"),
-              strokeOpacity: 0.95,
-              strokeWeight: 5,
+              strokeOpacity: 1,
+              strokeWeight: isProminentRoute ? 6 : 5,
             },
           });
           directions.route(
@@ -379,7 +395,9 @@ export function InteractiveMap({
             (result, status) => {
               if (cancelled) return;
               if (status === google.maps.DirectionsStatus.OK && result) {
+                routeUnderlay?.setDirections(result);
                 renderer.setDirections(result);
+                if (isProminentRoute) map.fitBounds(bounds, fitPadding);
                 const route = (
                   result as {
                     routes?: Array<{
@@ -400,21 +418,41 @@ export function InteractiveMap({
                 });
                 return;
               }
-              /* Sin Directions: línea aproximada derivada de coordenadas CMS. */
-              new google.maps.Polyline({
-                map,
-                path: stops.map((s) => ({ lat: s.lat, lng: s.lng })),
-                strokeColor: themeColor("--primary", "#eaa840"),
-                strokeOpacity: 0,
-                icons: [
-                  {
-                    icon: { path: "M 0,-1 0,1", strokeOpacity: 0.9, scale: 3 },
-                    offset: "0",
-                    repeat: "14px",
-                  },
-                ],
-              });
-              map.fitBounds(bounds, 88);
+              /* Sin Directions: respaldo derivado de coordenadas CMS.
+                 En la ficha Premium se presenta sólido, pero la superficie
+                 mantiene la nota explícita de que no es geometría vial. */
+              const approximatePath = stops.map((s) => ({ lat: s.lat, lng: s.lng }));
+              if (isProminentRoute) {
+                new google.maps.Polyline({
+                  map,
+                  path: approximatePath,
+                  strokeColor: themeColor("--selva", "#234933"),
+                  strokeOpacity: 0.82,
+                  strokeWeight: 9,
+                });
+                new google.maps.Polyline({
+                  map,
+                  path: approximatePath,
+                  strokeColor: themeColor("--primary", "#eaa840"),
+                  strokeOpacity: 1,
+                  strokeWeight: 5,
+                });
+              } else {
+                new google.maps.Polyline({
+                  map,
+                  path: approximatePath,
+                  strokeColor: themeColor("--primary", "#eaa840"),
+                  strokeOpacity: 0,
+                  icons: [
+                    {
+                      icon: { path: "M 0,-1 0,1", strokeOpacity: 0.9, scale: 3 },
+                      offset: "0",
+                      repeat: "14px",
+                    },
+                  ],
+                });
+              }
+              map.fitBounds(bounds, isProminentRoute ? fitPadding : 88);
               routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
             },
           );
@@ -441,6 +479,7 @@ export function InteractiveMap({
     fitPointsSignature,
     restrictionSignature,
     optimizeRoute,
+    routeEmphasis,
     fitPadding,
     minZoom,
   ]);
