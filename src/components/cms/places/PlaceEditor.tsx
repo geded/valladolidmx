@@ -803,6 +803,47 @@ export function PlaceEditor({ placeId }: Props) {
           </button>
         }
       >
+        <div className="md:col-span-2 space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              className={inputClass}
+              placeholder="Buscar en Google: nombre del lugar o dirección"
+              value={placeSearch}
+              onChange={(e) => setPlaceSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void searchOnGoogle();
+                }
+              }}
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className={buttonClass}
+                disabled={searching}
+                onClick={() => void searchOnGoogle()}
+              >
+                {searching ? "Buscando…" : "Buscar"}
+              </button>
+              <button type="button" className={buttonClass} onClick={useMyLocation}>
+                Mi ubicación
+              </button>
+            </div>
+          </div>
+          <LocationPickerMap
+            lat={Number.isFinite(mapLat) && latitude !== "" ? mapLat : 20.6896}
+            lng={Number.isFinite(mapLng) && longitude !== "" ? mapLng : -88.2019}
+            onChange={(p) => {
+              setLatitude(String(p.lat));
+              setLongitude(String(p.lng));
+            }}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Busca el lugar, toca el mapa o arrastra el pin. Las coordenadas se llenan solas y se
+            guardan con “Guardar ubicación”.
+          </p>
+        </div>
         <PlaceField name="latitude" label="Latitud" required>
           {({ id }) => (
             <input
