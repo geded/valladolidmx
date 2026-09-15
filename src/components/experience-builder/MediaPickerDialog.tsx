@@ -604,6 +604,34 @@ function UploadForm({
         />
       </label>
 
+      {fit?.undersized ? (
+        <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
+          <p className="text-xs font-semibold text-amber-900 dark:text-amber-200">
+            {fit.severelyUndersized
+              ? "Esta foto es pequeña para el espacio donde se usará"
+              : "Esta foto queda algo por debajo del tamaño recomendado"}
+          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {describeRoleFit(fit)} Alux IA puede ampliarla conservando la misma escena. El archivo
+            original no se modifica: revisarás el resultado antes de subirlo.
+          </p>
+          <button
+            type="button"
+            onClick={() => void onAluxUpscale()}
+            disabled={upscaling || uploading}
+            className="mt-2 inline-flex h-9 items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 text-xs font-medium text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {upscaling ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Sparkles className="size-3.5" aria-hidden />
+            )}
+            {upscaling ? "Alux IA está ampliando…" : "Ampliar con Alux IA"}
+          </button>
+        </div>
+      ) : null}
+
+
       {preview ? (
         <FocalPicker
           preview={preview}
