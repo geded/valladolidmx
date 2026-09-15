@@ -20,6 +20,7 @@ import {
   Loader2,
   Search,
   ShieldAlert,
+  Sparkles,
   Upload,
   X,
 } from "lucide-react";
