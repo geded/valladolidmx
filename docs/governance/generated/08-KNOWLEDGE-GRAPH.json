@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "66030b0b4b4b3126164ec71635f46133993fc965068c4c6593586ccceb23e68b"
+      "source_sha256": "27490c86ccf0a51e2f25a7e6c9ad67d97e41dd371316ccf7e1229fc46a7907e8"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -17149,7 +17149,7 @@
       "id": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
       "type": "blueprint",
       "path": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
-      "owner": "D08 · traveler-lifecycle",
+      "owner": "D01 · product-governance",
       "state": "Approved",
       "version": "1.0",
       "source": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",

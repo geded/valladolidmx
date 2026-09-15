@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.86",
     "state": "Approved",
-    "source_sha256": "d0666a63484a02bdcfdcb50475dde48ec11f1768d17fa340f3b68c1c95bc7442",
+    "source_sha256": "893bee7da618ec7e26760a2973fdefbc7673fda34b29b9fd67f5d9640bdc6bac",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -12205,7 +12205,7 @@
       "id": "DOC:docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
       "type": "blueprint",
       "path": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
-      "owner": "D08 · traveler-lifecycle",
+      "owner": "D01 · product-governance",
       "state": "Approved",
       "version": "1.0"
     },
