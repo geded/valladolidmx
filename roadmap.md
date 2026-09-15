@@ -142,3 +142,5 @@
 - [ ] Velocidad para cientos de propuestas: plantillas reutilizables, alta rápida y atajos de teclado.
 - [ ] Alux copiloto del Concierge con contexto real del destino (horarios, clima, distancias, eventos) vía Context Engine.
 - [ ] Vista del viajero para propuestas largas: resumen por días, secciones plegables y descarga en PDF.
+
+- [ ] Diseñar carga inteligente obligatoria de imágenes: validación de tamaños, optimización automática y cola segura para cargas masivas.
