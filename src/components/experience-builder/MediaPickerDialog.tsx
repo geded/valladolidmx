@@ -31,10 +31,15 @@ import {
 import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
 import {
   describeIngestSavings,
+  describeRoleFit,
+  evaluateRoleFit,
   prepareImageForIngest,
   validateImageFile,
+  ROLE_LABELS,
   type ImageRole,
+  type RoleFit,
 } from "@/lib/cms/image-upload";
+import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
 
 export interface PickedMedia {
   /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
