@@ -435,11 +435,13 @@ export function InteractiveMap({
     lng,
     zoom,
     markerTitle,
-    markers,
+    markersSignature,
     connectByRoad,
-    routeStops,
+    routeStopsSignature,
+    fitPointsSignature,
+    restrictionSignature,
     optimizeRoute,
-    restriction,
+    fitPadding,
     minZoom,
   ]);
 
