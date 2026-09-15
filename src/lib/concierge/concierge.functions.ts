@@ -616,7 +616,16 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
     const ids = data.caseIds;
     if (ids.length === 0) return [];
 
-    const [quotesRes, proposalsRes, assignmentsRes, directoryRes, ordersRes] = await Promise.all([
+    const [
+      quotesRes,
+      proposalsRes,
+      assignmentsRes,
+      directoryRes,
+      ordersRes,
+      plansRes,
+      notesRes,
+      casesRes,
+    ] = await Promise.all([
       context.supabase.from("concierge_quotes").select("case_id, status").in("case_id", ids),
       context.supabase
         .from("concierge_proposals")
@@ -632,6 +641,19 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         .from("concierge_orders")
         .select("source_case_id, status, paid_at, created_at")
         .in("source_case_id", ids),
+      // Fechas reales del viaje: permiten derivar la fase del ciclo de vida.
+      context.supabase
+        .from("travel_plans")
+        .select("case_id, start_date, end_date, title")
+        .in("case_id", ids),
+      // Mensajes con el viajero: detectan preguntas sin responder.
+      context.supabase
+        .from("concierge_case_notes")
+        .select("case_id, author_user_id, created_at")
+        .eq("visibility", "traveler")
+        .in("case_id", ids)
+        .order("created_at", { ascending: true }),
+      context.supabase.from("concierge_cases").select("id, traveler_user_id").in("id", ids),
     ]);
 
     if (quotesRes.error) throw new Error(quotesRes.error.message);
@@ -662,6 +684,9 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         order_paid_at: string | null;
         assigned_concierge_user_id: string | null;
         assigned_concierge_name: string | null;
+        trip_start_date: string | null;
+        trip_end_date: string | null;
+        pending_question_since: string | null;
       }
     >();
     for (const id of ids) {
@@ -679,7 +704,47 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
         order_paid_at: null,
         assigned_concierge_user_id: null,
         assigned_concierge_name: null,
+        trip_start_date: null,
+        trip_end_date: null,
+        pending_question_since: null,
       });
+    }
+
+    for (const p of (plansRes.data ?? []) as Array<{
+      case_id: string | null;
+      start_date: string | null;
+      end_date: string | null;
+    }>) {
+      const row = p.case_id ? byCase.get(p.case_id) : null;
+      if (!row) continue;
+      row.trip_start_date = p.start_date ?? row.trip_start_date;
+      row.trip_end_date = p.end_date ?? row.trip_end_date;
+    }
+
+    // Última pregunta del viajero sin respuesta del equipo.
+    {
+      const travelerByCase = new Map<string, string | null>();
+      for (const c of (casesRes.data ?? []) as Array<{
+        id: string;
+        traveler_user_id: string | null;
+      }>) {
+        travelerByCase.set(c.id, c.traveler_user_id);
+      }
+      const lastMessage = new Map<string, { author: string | null; at: string }>();
+      for (const n of (notesRes.data ?? []) as Array<{
+        case_id: string;
+        author_user_id: string | null;
+        created_at: string;
+      }>) {
+        lastMessage.set(n.case_id, { author: n.author_user_id, at: n.created_at });
+      }
+      for (const [caseId, entry] of lastMessage) {
+        const row = byCase.get(caseId);
+        if (!row) continue;
+        if (entry.author && entry.author === travelerByCase.get(caseId)) {
+          row.pending_question_since = entry.at;
+        }
+      }
     }
 
     for (const q of quotesRes.data ?? []) {

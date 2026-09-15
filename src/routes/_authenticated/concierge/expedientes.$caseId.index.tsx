@@ -6,6 +6,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
+import { CaseMessages } from "@/components/concierge/CaseMessages";
 
 export const Route = createFileRoute("/_authenticated/concierge/expedientes/$caseId/")({
   component: StaffCasePage,
@@ -35,6 +36,9 @@ function StaffCasePage() {
         Concierge Workspace · Expediente
       </p>
       <h1 className="mt-1 mb-6 text-2xl font-semibold">Detalle del expediente</h1>
+      <div className="mb-6">
+        <CaseMessages caseId={caseId} internal />
+      </div>
       <CaseFileView data={q.data} />
     </section>
   );

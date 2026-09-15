@@ -10,7 +10,43 @@ import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { meridaDate, meridaDateTime } from "@/lib/time/merida";
 import { useSuspenseQuery, queryOptions, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+/** Bandeja recordada entre recargas y tamaño de página del listado. */
+const INBOX_STORAGE_KEY = "vmx.concierge.inbox";
+const PAGE_SIZE = 50;
+
+/** Contador del tablero: un clic lleva a su bandeja. */
+function Kpi({
+  label,
+  value,
+  tone = "neutral",
+  onClick,
+}: {
+  label: string;
+  value: number;
+  tone?: "neutral" | "warning" | "danger" | "success";
+  onClick: () => void;
+}) {
+  const toneClass =
+    tone === "danger"
+      ? "text-destructive"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "success"
+          ? "text-success"
+          : "text-foreground";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-md border border-border bg-card p-3 text-left shadow-soft transition hover:border-primary/50 focus-visible:ring-focus"
+    >
+      <span className={`block text-2xl font-semibold tabular-nums ${toneClass}`}>{value}</span>
+      <span className="mt-0.5 block text-[11px] leading-tight text-muted-foreground">{label}</span>
+    </button>
+  );
+}
 import {
   assignSelfConciergeCase,
   assignConciergeCase,
@@ -25,8 +61,10 @@ import {
   CONCIERGE_INBOXES,
   caseReference,
   deriveCaseStage,
+  deriveTripPhase,
   type CaseFollowUp,
   type CaseStage,
+  type TripPhase,
 } from "@/lib/concierge/case-stage";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
@@ -93,6 +131,25 @@ function ConciergeInboxPage() {
   const isLead = useMemo(() => roles.some((r) => LEAD_ROLES.includes(r)), [roles]);
 
   const [inboxId, setInboxId] = useState<string>("unassigned");
+  // La bandeja de trabajo se recuerda entre recargas (se hidrata tras montar).
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(INBOX_STORAGE_KEY);
+      if (stored) setInboxId(stored);
+    } catch {
+      /* almacenamiento no disponible */
+    }
+  }, []);
+  const [page, setPage] = useState(1);
+  const goInbox = (id: string) => {
+    setInboxId(id);
+    setPage(1);
+    try {
+      window.localStorage.setItem(INBOX_STORAGE_KEY, id);
+    } catch {
+      /* almacenamiento no disponible */
+    }
+  };
   const [sort, setSort] = useState<Sort>("sla_status");
   const [priority, setPriority] = useState<string>("");
   const [slaStatus, setSlaStatus] = useState<string>("");
@@ -163,16 +220,19 @@ function ConciergeInboxPage() {
       allCases.map((c) => {
         const followUp = followUpById.get(c.id) ?? null;
         const ownerId = followUp?.assigned_concierge_user_id ?? c.assigned_concierge_user_id;
+        const stage = deriveCaseStage({
+          status: c.status,
+          assigned_concierge_user_id: ownerId,
+          followUp,
+        });
         return {
           row: c,
           followUp,
           ownerId,
           ownerName: followUp?.assigned_concierge_name ?? null,
-          stage: deriveCaseStage({
-            status: c.status,
-            assigned_concierge_user_id: ownerId,
-            followUp,
-          }),
+          stage,
+          phase: deriveTripPhase({ status: c.status, stage, followUp }),
+          pendingQuestionSince: followUp?.pending_question_since ?? null,
         };
       }),
     [allCases, followUpById],
@@ -195,6 +255,10 @@ function ConciergeInboxPage() {
             if (!user || item.ownerId !== user.id) return false;
             return inbox.stages.includes(item.stage.id);
           }
+          if (inbox.pendingQuestion && !item.pendingQuestionSince) return false;
+          if (inbox.phases && inbox.phases.length > 0) {
+            return inbox.phases.includes(item.phase.id);
+          }
           if (inbox.stages.length === 0) return true;
           return inbox.stages.includes(item.stage.id);
         }),
@@ -204,7 +268,7 @@ function ConciergeInboxPage() {
   }, [enriched, user, visibleInboxes]);
 
   const term = search.trim().toLowerCase();
-  const items = (byInbox.get(inboxId) ?? []).filter((item) => {
+  const filtered = (byInbox.get(inboxId) ?? []).filter((item) => {
     if (owner && item.ownerId !== owner) return false;
     if (!term) return true;
     return (
@@ -214,13 +278,30 @@ function ConciergeInboxPage() {
     );
   });
 
+  // En la bandeja de preguntas manda la antigüedad: primero quien lleva más esperando.
+  const ordered =
+    inboxId === "questions"
+      ? [...filtered].sort((a, b) =>
+          (a.pendingQuestionSince ?? "").localeCompare(b.pendingQuestionSince ?? ""),
+        )
+      : filtered;
+
+  const totalPages = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const items = ordered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const countOf = (id: string) => (byInbox.get(id) ?? []).length;
+  const overdueCount = enriched.filter((i) => i.row.sla_status === "overdue").length;
+
+  const groups = ["Venta", "Pago", "Viaje", "Cierre"] as const;
+
   return (
     <section className="mx-auto w-full max-w-[1100px]">
-      <header className="mb-6">
+      <header className="mb-4">
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
           Concierge Workspace
         </p>
-        <h1 className="mt-1 text-2xl font-semibold">Seguimiento de expedientes</h1>
+        <h1 className="mt-1 text-2xl font-semibold">Central de operaciones</h1>
         {wlQ.data && (
           <p className="mt-1 text-sm text-muted-foreground">
             Activos: <strong className="text-foreground">{wlQ.data.active_cases}</strong>
@@ -230,16 +311,65 @@ function ConciergeInboxPage() {
         )}
       </header>
 
-      <nav className="mb-4 flex flex-wrap items-center gap-2" aria-label="Bandejas">
-        {visibleInboxes.map((inbox) => (
-          <Tab
-            key={inbox.id}
-            active={inboxId === inbox.id}
-            label={inbox.label}
-            count={(byInbox.get(inbox.id) ?? []).length}
-            onClick={() => setInboxId(inbox.id)}
-          />
-        ))}
+      {/* Tablero: cada contador es un atajo a su bandeja. */}
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <Kpi
+          label="Sin asignar"
+          value={countOf("unassigned")}
+          onClick={() => goInbox("unassigned")}
+        />
+        <Kpi
+          label="Preguntas sin responder"
+          value={countOf("questions")}
+          tone="danger"
+          onClick={() => goInbox("questions")}
+        />
+        <Kpi
+          label="Por pagar"
+          value={countOf("awaiting_payment")}
+          tone="warning"
+          onClick={() => goInbox("awaiting_payment")}
+        />
+        <Kpi
+          label="Propuestas sin respuesta"
+          value={countOf("sent")}
+          onClick={() => goInbox("sent")}
+        />
+        <Kpi
+          label="Viaja esta semana"
+          value={countOf("departing_soon")}
+          tone="warning"
+          onClick={() => goInbox("departing_soon")}
+        />
+        <Kpi
+          label="En destino hoy"
+          value={countOf("on_trip")}
+          tone="success"
+          onClick={() => goInbox("on_trip")}
+        />
+      </div>
+
+      <nav className="mb-4 grid gap-2" aria-label="Bandejas">
+        {groups.map((group) => {
+          const inGroup = visibleInboxes.filter((i) => i.group === group);
+          if (inGroup.length === 0) return null;
+          return (
+            <div key={group} className="flex flex-wrap items-center gap-2">
+              <span className="w-14 shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">
+                {group}
+              </span>
+              {inGroup.map((inbox) => (
+                <Tab
+                  key={inbox.id}
+                  active={inboxId === inbox.id}
+                  label={inbox.label}
+                  count={countOf(inbox.id)}
+                  onClick={() => goInbox(inbox.id)}
+                />
+              ))}
+            </div>
+          );
+        })}
       </nav>
 
       <div className="mb-4 flex flex-wrap items-end gap-3 rounded-md border border-border bg-card/40 p-3 text-xs">
@@ -317,12 +447,44 @@ function ConciergeInboxPage() {
               followUp={item.followUp}
               ownerId={item.ownerId}
               ownerName={item.ownerName}
+              phase={item.phase}
+              pendingQuestionSince={item.pendingQuestionSince}
               directory={directoryQ.data ?? []}
               isLead={isLead}
             />
           ))}
         </ul>
       )}
+
+      {ordered.length > PAGE_SIZE ? (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+          <span>
+            Mostrando {(currentPage - 1) * PAGE_SIZE + 1}–
+            {Math.min(currentPage * PAGE_SIZE, ordered.length)} de {ordered.length} · página{" "}
+            {currentPage} de {totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={currentPage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Anterior
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={currentPage >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            >
+              Siguiente
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -468,6 +630,8 @@ function CaseRowCard({
   followUp,
   ownerId,
   ownerName,
+  phase,
+  pendingQuestionSince,
   directory,
   isLead,
 }: {
@@ -476,6 +640,8 @@ function CaseRowCard({
   followUp: CaseFollowUp | null;
   ownerId: string | null;
   ownerName: string | null;
+  phase: TripPhase;
+  pendingQuestionSince: string | null;
   directory: DirectoryEntry[];
   isLead: boolean;
 }) {
@@ -515,6 +681,16 @@ function CaseRowCard({
             {stage.label}
           </span>
           <span
+            className={`rounded-pill px-2 py-0.5 text-[11px] font-medium ${STAGE_TONE[phase.tone]}`}
+          >
+            {phase.label}
+          </span>
+          {pendingQuestionSince ? (
+            <span className="rounded-pill bg-destructive/15 px-2 py-0.5 text-[11px] font-medium text-destructive">
+              Pregunta sin responder
+            </span>
+          ) : null}
+          <span
             className={`rounded-pill px-2 py-0.5 text-[11px] font-medium ${slaClass(c.sla_status)}`}
           >
             SLA · {c.sla_status ? SLA_LABEL[c.sla_status] : "sin objetivo"}
@@ -534,6 +710,26 @@ function CaseRowCard({
       </Link>
 
       <p className="mt-1 text-xs text-muted-foreground">{stage.nextAction}</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Viaje: {phase.detail}
+        {followUp?.trip_start_date
+          ? ` · ${meridaDate(followUp.trip_start_date)}${
+              followUp.trip_end_date ? ` → ${meridaDate(followUp.trip_end_date)}` : ""
+            }`
+          : ""}
+      </p>
+      {pendingQuestionSince ? (
+        <p className="mt-1 text-xs font-medium text-destructive">
+          El viajero escribió el {meridaDateTime(pendingQuestionSince)} y espera respuesta.{" "}
+          <Link
+            to="/concierge/expedientes/$caseId"
+            params={{ caseId: c.id }}
+            className="underline"
+          >
+            Responder
+          </Link>
+        </p>
+      ) : null}
 
       <ProposalTrace followUp={followUp} />
 
