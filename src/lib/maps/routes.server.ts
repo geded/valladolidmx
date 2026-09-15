@@ -31,6 +31,14 @@ export interface RouteInternalResult {
   error?: string;
 }
 
+export interface RoadRouteInternalResult {
+  ok: boolean;
+  encodedPolyline: string | null;
+  distanceMeters: number | null;
+  durationSeconds: number | null;
+  error?: string;
+}
+
 const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
 
 function gatewayHeaders() {
@@ -118,5 +126,83 @@ export async function computeRouteInternal(
     };
   } finally {
     clearTimeout(t);
+  }
+}
+
+/** Calcula una geometría vial única para una ruta editorial ya publicada. */
+export async function computeRoadRouteInternal(
+  points: Array<{ lat: number; lng: number }>,
+  opts: { timeoutMs?: number } = {},
+): Promise<RoadRouteInternalResult> {
+  const safePoints = points
+    .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng))
+    .slice(0, 12);
+  const origin = safePoints[0];
+  const destination = safePoints.at(-1);
+  if (!origin || !destination || safePoints.length < 2) {
+    return { ok: false, encodedPolyline: null, distanceMeters: null, durationSeconds: null };
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), opts.timeoutMs ?? 6000);
+  try {
+    const response = await fetch(`${GATEWAY}/routes/directions/v2:computeRoutes`, {
+      method: "POST",
+      headers: {
+        ...gatewayHeaders(),
+        "Content-Type": "application/json",
+        "X-Goog-FieldMask":
+          "routes.polyline.encodedPolyline,routes.distanceMeters,routes.duration",
+      },
+      body: JSON.stringify({
+        origin: { location: { latLng: { latitude: origin.lat, longitude: origin.lng } } },
+        destination: {
+          location: { latLng: { latitude: destination.lat, longitude: destination.lng } },
+        },
+        intermediates: safePoints.slice(1, -1).map((point) => ({
+          location: { latLng: { latitude: point.lat, longitude: point.lng } },
+        })),
+        travelMode: "DRIVE",
+        routingPreference: "TRAFFIC_UNAWARE",
+        polylineQuality: "HIGH_QUALITY",
+        polylineEncoding: "ENCODED_POLYLINE",
+      }),
+      signal: controller.signal,
+    });
+    const body = (await response.json().catch(() => ({}))) as {
+      routes?: Array<{
+        polyline?: { encodedPolyline?: string };
+        distanceMeters?: number;
+        duration?: string;
+      }>;
+      error?: { message?: string };
+    };
+    const route = body.routes?.[0];
+    if (!response.ok || !route?.polyline?.encodedPolyline) {
+      return {
+        ok: false,
+        encodedPolyline: null,
+        distanceMeters: null,
+        durationSeconds: null,
+        error: body.error?.message ?? `HTTP ${response.status}`,
+      };
+    }
+    const seconds = route.duration ? Number(route.duration.replace(/s$/, "")) : null;
+    return {
+      ok: true,
+      encodedPolyline: route.polyline.encodedPolyline,
+      distanceMeters: route.distanceMeters ?? null,
+      durationSeconds: Number.isFinite(seconds) ? seconds : null,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      encodedPolyline: null,
+      distanceMeters: null,
+      durationSeconds: null,
+      error: error instanceof Error ? error.message : "Route computation failed",
+    };
+  } finally {
+    clearTimeout(timer);
   }
 }
