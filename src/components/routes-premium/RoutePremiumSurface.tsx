@@ -16,6 +16,7 @@ import {
 import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { TourismChip, TourismChipRow } from "@/components/omxds/TourismChip";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
