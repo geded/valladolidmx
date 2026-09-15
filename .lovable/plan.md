@@ -73,6 +73,15 @@ Se preservarán sin cambios visuales:
 - Se admitirán selección múltiple, paginación/carga progresiva y orden por recientes para navegar miles de imágenes sin descargar todo el catálogo.
 - Las asignaciones a portada, galería o logo serán relaciones administradas, no nombres de carpetas ni copias físicas del archivo.
 
+### Continuidad cuando una empresa es reclamada
+
+- Si un administrador carga una foto para una empresa, el activo queda **asignado a esa empresa**, con su procedencia y autoría administrativa registradas; no queda como foto personal del administrador.
+- Cuando la reclamación se aprueba, el dueño obtiene acceso a la biblioteca de esa empresa y ve las imágenes ya publicadas o asignadas, sin perder portada, galería, SEO ni historial.
+- El dueño puede conservarlas, cambiar cuál es portada, reordenar la galería y añadir imágenes propias.
+- Las fotos preexistentes no cambian silenciosamente de autor ni se borran. Si el dueño desea retirarlas, se despublican de su empresa conservando trazabilidad y posibilidad de revisión administrativa.
+- Reemplazar una foto crea un nuevo original y actualiza la asignación; nunca sobrescribe el original anterior.
+- Una transferencia futura de propiedad mantiene la biblioteca ligada a la empresa, mientras los permisos personales se revocan y reasignan según el flujo oficial.
+
 ### Lote 3 — Plantillas públicas compartidas
 
 - Aplicar el mismo componente oficial a héroes, tarjetas, galerías, miniaturas y listados.
