@@ -10,6 +10,7 @@ import {
   reconcileZoneForDestination,
   type TerritorialZone,
 } from "@/lib/places/place-territory";
+import { useCmsTerritory } from "@/lib/cms/territory-context";
 
 export const Route = createFileRoute("/_authenticated/cms/lugares/")({
   head: () => ({
