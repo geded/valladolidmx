@@ -98,7 +98,19 @@ function getBrandMapStyles() {
       elementType: "geometry",
       stylers: [{ color: mixHex(secondary, territory, 0.16) }],
     },
-    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+    /* Ruido comercial fuera, contexto territorial dentro: se ocultan los
+       rótulos de negocios y se conservan los de sitios de interés, parques y
+       zonas arqueológicas con la tipografía de marca. */
+    { featureType: "poi.business", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.medical", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.school", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.attraction", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "poi.park", elementType: "labels", stylers: [{ visibility: "on" }] },
+    {
+      featureType: "poi.place_of_worship",
+      elementType: "labels",
+      stylers: [{ visibility: "on" }],
+    },
     {
       featureType: "poi.park",
       elementType: "geometry",
@@ -383,6 +395,25 @@ export function InteractiveMap({
         const list: InteractiveMapMarker[] =
           markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
         const bounds = new google.maps.LatLngBounds();
+        /* Paradas muy cercanas (mismo pueblo) se superponen al encuadrar toda
+           la ruta: conservamos su ubicación real y escalonamos la etiqueta y
+           el orden de dibujo para que ninguna parada quede oculta. */
+        const clusterIndex = new Map<number, number>();
+        {
+          const seen: Array<{ lat: number; lng: number; count: number }> = [];
+          list.forEach((m, i) => {
+            const hit = seen.find(
+              (s) => Math.abs(s.lat - m.lat) < 0.02 && Math.abs(s.lng - m.lng) < 0.02,
+            );
+            if (hit) {
+              clusterIndex.set(i, hit.count);
+              hit.count += 1;
+            } else {
+              clusterIndex.set(i, 0);
+              seen.push({ lat: m.lat, lng: m.lng, count: 1 });
+            }
+          });
+        }
         list.forEach((m, i) => {
           const selected = typeof m.order === "number" && m.order > 0;
           const label = selected ? String(m.order) : labelForIndex(i);
