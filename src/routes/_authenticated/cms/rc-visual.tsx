@@ -324,7 +324,7 @@ function RcVisualHub() {
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
           Todos los enlaces abren rutas, resolutores y plantillas productivas con datos reales. Las
-          entidades en <em>draft</em> o <em>in review</em> son navegables sólo desde este canary
+          entidades en <em>Borrador</em> o <em>En revisión</em> son navegables sólo desde esta revisión
           autenticado y nunca se indexan. La ausencia de fotografía resuelve Editorial con marcador
           neutral y jamás bloquea la navegación.
         </p>

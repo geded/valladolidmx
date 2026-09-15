@@ -77,8 +77,8 @@ function ObservabilityPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Observabilidad y Hardening</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Dashboards técnicos y de negocio de la plataforma. Todas las lecturas son agregadas y
-          exigen rol admin / super_admin server-side.
+          Paneles técnicos y de negocio de la plataforma. Toda la información se presenta de forma
+          agrupada y requiere acceso de administrador verificado.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
           <label className="flex items-center gap-2">

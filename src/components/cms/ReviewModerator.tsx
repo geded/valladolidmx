@@ -12,6 +12,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import {
+  describeEditorialHistory,
+  getEditorialStatusGuidance,
+} from "@/lib/cms/editorial-language";
+import { meridaDateTime } from "@/lib/time/merida";
+import {
   getReviewForModeration,
   listReviewModerationHistory,
   moderateReview,
@@ -141,12 +146,8 @@ export function ReviewModerator({ id }: { id: string }) {
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold tracking-tight">Decisión de moderación</h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          La transición se valida server-side contra la máquina oficial (Serie 14). Las notas quedan
-          almacenadas en
-          <code className="mx-1 rounded bg-muted px-1 py-0.5 text-[11px]">
-            reviews.metadata.moderation_history
-          </code>
-          como bitácora append-only por reseña.
+          {getEditorialStatusGuidance(status)} Tus notas y cada decisión quedan guardadas con la
+          persona responsable.
         </p>
         <div className="mt-4 flex flex-col gap-2">
           <label className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -189,7 +190,7 @@ export function ReviewModerator({ id }: { id: string }) {
           })}
           {NEXT_ACTIONS[status].length === 0 && (
             <span className="text-xs text-muted-foreground">
-              Sin transiciones disponibles desde este estado.
+              No hay acciones disponibles para este estado.
             </span>
           )}
           <button
@@ -203,12 +204,10 @@ export function ReviewModerator({ id }: { id: string }) {
       </section>
 
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
-        <header className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold tracking-tight">Historial de moderación</h2>
-          <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            metadata.moderation_history
-          </span>
-        </header>
+        <h2 className="text-sm font-semibold tracking-tight">Historial de moderación</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Aquí puedes consultar las decisiones tomadas sobre esta reseña.
+        </p>
         <div className="mt-4 divide-y divide-border text-xs">
           {history.isLoading && <p className="py-2 text-muted-foreground">Cargando historial…</p>}
           {history.data && history.data.length === 0 && (
@@ -222,17 +221,24 @@ export function ReviewModerator({ id }: { id: string }) {
               className="flex flex-col gap-1 py-2 sm:flex-row sm:items-start sm:justify-between"
             >
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider">
-                    {h.action}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {h.from_status} → <strong>{h.to_status}</strong>
-                  </span>
-                </div>
+                <p className="font-medium">{describeEditorialHistory(h)}</p>
                 {h.notes && <p className="max-w-xl text-muted-foreground">{h.notes}</p>}
+                <p className="text-muted-foreground">Responsable registrado</p>
+                <details className="text-muted-foreground">
+                  <summary className="cursor-pointer select-none">Detalle técnico</summary>
+                  <div className="mt-1 grid gap-1 rounded-md bg-muted/50 p-2 font-mono text-[10px]">
+                    <div>Registro: metadata.moderation_history</div>
+                    <div>Acción: {h.action}</div>
+                    <div>
+                      Estado: {h.from_status} → {h.to_status}
+                    </div>
+                    <div>Usuario: {h.actor_user_id}</div>
+                  </div>
+                </details>
               </div>
-              <time className="text-muted-foreground">{new Date(h.at).toLocaleString()}</time>
+              <time className="text-muted-foreground">
+                {meridaDateTime(h.at)} · hora de Mérida
+              </time>
             </div>
           ))}
         </div>

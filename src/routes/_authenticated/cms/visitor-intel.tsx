@@ -1426,8 +1426,8 @@ function ValidationLoopBody({
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · Estado recomputado desde el historial append-only
-        (Founder Journey State).
+        Contrato v{snapshot.contract_version} · Estado actualizado a partir del historial de cambios
+        del recorrido del visitante.
       </p>
     </div>
   );
