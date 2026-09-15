@@ -61,6 +61,8 @@ export interface EditorialRouteCardDTO {
 
 export interface EditorialRouteDetailDTO extends EditorialRouteCardDTO {
   contractVersion: string;
+  /** Texto editorial largo publicado en el CMS (`editorial_routes.body`). */
+  body: string | null;
   stops: EditorialRouteStopDTO[];
   roadRoute: {
     encodedPolyline: string;
