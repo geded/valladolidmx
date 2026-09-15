@@ -5,9 +5,13 @@
  * componentes con utilidades (react-refresh) y para poder consumirse desde
  * resolutores y servidores sin arrastrar JSX.
  */
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
+
 export interface EditorialMedia {
   url: string;
   alt: string;
+  /** Identidad y variantes opcionales; una URL legacy sigue siendo suficiente. */
+  asset?: MediaAssetInput | null;
 }
 
 /** `true` cuando existe un medio acreditado renderizable. */

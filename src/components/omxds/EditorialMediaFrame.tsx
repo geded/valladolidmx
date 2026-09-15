@@ -11,6 +11,10 @@
  * debe consumirlo en lugar de emitir `<img>` sin fallback.
  */
 import { cn } from "@/lib/utils";
+import {
+  resolveMediaSource,
+  type MediaUsageContext,
+} from "@/lib/media/resolve-source";
 import { hasEditorialMedia, type EditorialMedia } from "./editorial-media";
 
 export type { EditorialMedia };
@@ -26,6 +30,10 @@ export interface EditorialMediaFrameProps {
   markerClassName?: string;
   loading?: "eager" | "lazy";
   fetchPriority?: "high" | "low" | "auto";
+  /** Tamaños responsivos del espacio real ocupado por la imagen. */
+  sizes?: string;
+  /** Contexto que selecciona la familia correcta de variantes derivadas. */
+  context?: MediaUsageContext;
 }
 
 export function EditorialMediaFrame({
@@ -35,17 +43,38 @@ export function EditorialMediaFrame({
   markerClassName,
   loading = "lazy",
   fetchPriority,
+  sizes,
+  context = "editorial",
 }: EditorialMediaFrameProps) {
   if (hasEditorialMedia(media)) {
+    const resolved = resolveMediaSource(media?.asset, {
+      context,
+      fallbackUrl: media!.url,
+      sizes,
+      priority: fetchPriority,
+    });
     return (
-      <img
-        src={media!.url}
-        alt={media!.alt}
-        loading={loading}
-        {...(fetchPriority ? { fetchPriority } : {})}
-        data-omxds-media="g8-m1"
-        className={className}
-      />
+      <picture>
+        {resolved.sources.map((source) => (
+          <source
+            key={source.type}
+            type={source.type}
+            srcSet={source.srcSet}
+            {...(source.sizes ? { sizes: source.sizes } : {})}
+          />
+        ))}
+        <img
+          src={resolved.src}
+          alt={media!.alt}
+          loading={loading}
+          width={resolved.width}
+          height={resolved.height}
+          {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
+          {...(fetchPriority ? { fetchPriority } : {})}
+          data-omxds-media="g8-m1"
+          className={className}
+        />
+      </picture>
     );
   }
 
