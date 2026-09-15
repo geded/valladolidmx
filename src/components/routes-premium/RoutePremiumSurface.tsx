@@ -104,21 +104,16 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           media: route.coverUrl
             ? { url: route.coverUrl, alt: route.coverAlt ?? route.name }
             : null,
-          badges: route.originDestinationLabel
-            ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
-            : [],
+          badges: [
+            ...(route.originDestinationLabel
+              ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
+              : []),
+            ...chips.map((chip) => ({ label: chip })),
+          ],
         }}
       />
 
-      {chips.length ? (
-        <TourismChipRow label="Datos de la ruta">
-          {chips.map((chip) => (
-            <TourismChip key={chip} scheme="surface" size="sm">
-              {chip}
-            </TourismChip>
-          ))}
-        </TourismChipRow>
-      ) : null}
+
 
       <div className="flex flex-wrap items-center gap-2">
         <AddToTravelPlanButton
