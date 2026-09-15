@@ -22,6 +22,7 @@ interface EditorialRouteRow {
   slug: string;
   name: string;
   summary?: string | null;
+  body?: string | null;
   palette?: EditorialRoutePalette | null;
   region_slug?: string | null;
   duration_days?: number | null;
@@ -50,7 +51,7 @@ function anonClient(): AnyClient {
 }
 
 const ROUTE_COLUMNS =
-  "id, slug, name, summary, palette, duration_days, duration_hours, pace, difficulty, interests, audiences, seasons, destination_ids, origin_destination_id, region_slug, cover_media_id, gallery_media_ids, status, deleted_at, published_at";
+  "id, slug, name, summary, body, palette, duration_days, duration_hours, pace, difficulty, interests, audiences, seasons, destination_ids, origin_destination_id, region_slug, cover_media_id, gallery_media_ids, status, deleted_at, published_at";
 
 async function destinationSlugMap(
   sb: AnyClient,
@@ -405,6 +406,7 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
   return {
     ...card,
     contractVersion: "1.0.0",
+    body: String((row as { body?: string | null }).body ?? "").trim() || null,
     stops,
     roadRoute:
       roadResult?.ok && roadResult.encodedPolyline

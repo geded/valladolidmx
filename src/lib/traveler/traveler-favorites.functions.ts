@@ -13,7 +13,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type FavoriteEntityKind = "business" | "product" | "promotion" | "place" | "event";
+export type FavoriteEntityKind =
+  | "business"
+  | "product"
+  | "promotion"
+  | "place"
+  | "event"
+  | "route";
 
 const KINDS = new Set<FavoriteEntityKind>([
   "business",
@@ -21,6 +27,7 @@ const KINDS = new Set<FavoriteEntityKind>([
   "promotion",
   "place",
   "event",
+  "route",
 ]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -72,6 +79,7 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       promotion: [],
       place: [],
       event: [],
+      route: [],
     };
     for (const r of rows) byKind[r.entity_kind].push(r.entity_id);
 
@@ -153,6 +161,21 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       }
     }
 
+
+    if (byKind.route.length > 0) {
+      const { data } = await context.supabase
+        .from("editorial_routes")
+        .select("id, slug, name, summary, status, deleted_at")
+        .in("id", byKind.route);
+      for (const rt of data ?? []) {
+        const visible = rt.status === "published" && !rt.deleted_at;
+        lookup.set(`route:${rt.id}`, {
+          title: visible ? rt.name : "",
+          slug: visible ? rt.slug : null,
+          subtitle: visible ? (rt.summary ?? null) : null,
+        });
+      }
+    }
 
     return rows.map((r) => {
       const hit = lookup.get(`${r.entity_kind}:${r.entity_id}`);

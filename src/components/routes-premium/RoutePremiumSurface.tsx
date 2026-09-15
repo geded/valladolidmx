@@ -17,6 +17,8 @@ import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
+import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
@@ -113,6 +115,14 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
         }}
       />
       <div className="flex flex-wrap items-center justify-end gap-2">
+        <FavoriteButton
+          entityKind="route"
+          entityId={route.id}
+          entityTitle={route.name}
+          entitySlug={route.slug}
+          {...(route.coverUrl ? { entityImageUrl: route.coverUrl } : {})}
+          className="min-h-11 rounded-pill px-4 text-sm"
+        />
         <Button
           type="button"
           variant="outline"
@@ -162,6 +172,25 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
             ariaLabel: "Secciones de la ruta",
             anchors: subnavAnchors,
             capabilities: { scrollSpy: true, collapseOnMobile: true, showIcons: true },
+          }}
+        />
+      ) : null}
+
+      {route.body ? (
+        <ExperienceSection
+          dto={{
+            variant: "editorial",
+            eyebrow: null,
+            title: `Sobre ${route.name}`,
+            lead: null,
+            body: route.body,
+            media: null,
+            attribution: null,
+            ctas: [],
+            align: "left",
+            tone: "default",
+            ariaLabel: `Sobre ${route.name}`,
+            capabilities: { anchor: true, seoHeading: true, richText: false },
           }}
         />
       ) : null}
