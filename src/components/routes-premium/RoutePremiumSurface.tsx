@@ -248,20 +248,23 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
       {route.gallery.length ? (
         <section aria-labelledby="ruta-galeria">
           <PremiumSectionHead id="ruta-galeria" kicker="Galería" title="Así se ve la ruta" />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {route.gallery.map((media) => (
-              <figure
-                key={media.url}
-                className="relative h-48 overflow-hidden rounded-2xl border border-border"
-              >
-                <EditorialMediaFrame
-                  media={{ url: media.url, alt: media.alt ?? route.name }}
-                  label={route.name}
-                  className="absolute inset-0 size-full object-cover"
-                />
-              </figure>
-            ))}
-          </div>
+          {/* Mosaico oficial de la Biblioteca (mismo bloque que hoteles y
+              restaurantes). Sólo fotografías publicadas en el CMS. */}
+          <ExperienceGallery
+            dto={{
+              variant: route.gallery.length >= 3 ? "mosaic" : "grid",
+              items: route.gallery.map((media) => ({
+                url: media.url,
+                alt: media.alt ?? route.name,
+              })),
+              maxVisible: 8,
+              aspect: "landscape",
+              heading: null,
+              subheading: null,
+              ariaLabel: `Galería de ${route.name}`,
+              capabilities: { lightbox: true, captions: true },
+            }}
+          />
         </section>
       ) : null}
 
