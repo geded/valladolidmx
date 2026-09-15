@@ -114,6 +114,8 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
         </span>
       </div>
 
+      <RouteMapSection stops={mapStops} durationDays={route.durationDays} />
+
       <section aria-labelledby="ruta-itinerario">
         <PremiumSectionHead
           id="ruta-itinerario"
@@ -136,9 +138,20 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
                       key={stop.id}
                       className="rounded-2xl border border-border bg-card p-4 shadow-soft"
                     >
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                        {STOP_KIND_LABELS[stop.entityKind] ?? "Parada"}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {mapOrder.get(stop.id) ? (
+                          <a
+                            href="#ruta-mapa"
+                            aria-label={`Ver ${stop.title} en el mapa`}
+                            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+                          >
+                            {mapOrder.get(stop.id)}
+                          </a>
+                        ) : null}
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+                          {STOP_KIND_LABELS[stop.entityKind] ?? "Parada"}
+                        </p>
+                      </div>
                       <div className="mt-1 flex flex-wrap items-baseline justify-between gap-2">
                         {stop.href ? (
                           <Link
