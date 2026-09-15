@@ -153,6 +153,7 @@ export function MediaPickerDialog({
   const [fileBytesBase64, setFileBytesBase64] = useState<string | null>(null);
   const [readingFile, setReadingFile] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const [rights, setRights] = useState({ ...emptyRights });
 
   const refresh = useCallback(() => {
