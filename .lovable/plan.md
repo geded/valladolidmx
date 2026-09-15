@@ -47,3 +47,21 @@ Quedan intactos el detalle del expediente, el compositor de propuesta, el Portal
 
 ## Nota
 La fase "En destino" depende de que el viaje tenga fechas. Los expedientes sin fechas se muestran en una bandeja "Sin fechas de viaje" para que el equipo las capture, en lugar de desaparecer del tablero.
+
+---
+
+## Añadido: preguntas del viajero a su concierge
+
+**Hallazgo.** Hoy esa conversación no existe de verdad. El viajero ve su expediente y una línea de tiempo de sólo lectura; "Nuevo mensaje de tu Concierge" en Mi Viaje sólo muestra el último evento del sistema, no un mensaje escrito. Existe una tabla de notas del expediente con visibilidad "interna" o "para el viajero", pero nadie puede escribir en ella: sólo tiene permisos de lectura y ninguna pantalla la usa. Es decir, si el viajero escribiera una pregunta hoy, no llegaría a ningún lado.
+
+**Qué se implementa**
+- **Conversación en el expediente**: un hilo de mensajes por expediente sobre la tabla de notas ya existente, con dos visibilidades — *mensaje con el viajero* y *nota interna del equipo*. Sin tabla nueva.
+  - Permisos: el viajero escribe y lee sólo los mensajes marcados para él en sus propios expedientes; el concierge asignado, el lead y los administradores escriben ambos tipos y leen todo. Se agregan las reglas de escritura que hoy faltan.
+  - Cada mensaje enviado deja rastro en la línea de tiempo del expediente, para que el seguimiento siga siendo uno solo.
+- **Viajero**: cuadro "Escríbele a tu concierge" en `/cuenta/concierge/{expediente}` y acceso directo desde Mi Viaje, con los mensajes en orden y aviso de leído/respondido.
+- **Concierge**: el mismo hilo dentro del expediente, con dos pestañas — *Con el viajero* y *Interno* — y respuesta rápida sin salir de la pantalla.
+- **Central de operaciones**: bandeja **"Preguntas sin responder"** y contador en el tablero, calculada como expedientes cuyo último mensaje es del viajero; ordena por antigüedad de la pregunta para que ninguna quede más de un día sin respuesta.
+
+**Alcance adicional autorizado**: migración aditiva con permisos de escritura y notificación en la línea de tiempo para la tabla de notas; nuevas operaciones de lectura y envío de mensajes; hilo en el expediente del viajero y en el del concierge; bandeja y contador de preguntas sin responder.
+
+**Sigue sin autorizarse**: tablas nuevas, cambio de estados del expediente, exponer datos del viajero a empresas, correo o notificaciones push en esta entrega, y publicar.
