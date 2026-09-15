@@ -129,8 +129,103 @@ export async function computeRouteInternal(
   }
 }
 
-/** Calcula una geometría vial única para una ruta editorial ya publicada. */
+function decodeLine(encoded: string): Array<[number, number]> {
+  const path: Array<[number, number]> = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+  while (index < encoded.length) {
+    let shift = 0;
+    let result = 0;
+    let byte: number;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    lat += result & 1 ? ~(result >> 1) : result >> 1;
+    shift = 0;
+    result = 0;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    lng += result & 1 ? ~(result >> 1) : result >> 1;
+    path.push([lat, lng]);
+  }
+  return path;
+}
+
+function encodeValue(value: number): string {
+  let v = value < 0 ? ~(value << 1) : value << 1;
+  let out = "";
+  while (v >= 0x20) {
+    out += String.fromCharCode((0x20 | (v & 0x1f)) + 63);
+    v >>= 5;
+  }
+  out += String.fromCharCode(v + 63);
+  return out;
+}
+
+/** Une varias geometrías viales en una sola polilínea codificada. */
+function encodeLine(points: Array<[number, number]>): string {
+  let lat = 0;
+  let lng = 0;
+  let out = "";
+  for (const [la, ln] of points) {
+    out += encodeValue(la - lat) + encodeValue(ln - lng);
+    lat = la;
+    lng = ln;
+  }
+  return out;
+}
+
+/**
+ * Calcula la geometría vial de una ruta editorial publicada.
+ *
+ * Primero pide el recorrido completo en una sola llamada. Si el proveedor
+ * no lo resuelve (alguna parada queda fuera de la red vial acreditada),
+ * calcula tramo por tramo y une los que sí existen: la ruta se dibuja sobre
+ * carretera aunque una parada aislada no sea enrutable.
+ */
 export async function computeRoadRouteInternal(
+  points: Array<{ lat: number; lng: number }>,
+  opts: { timeoutMs?: number } = {},
+): Promise<RoadRouteInternalResult> {
+  const single = await computeRoadRouteSingle(points, opts);
+  if (single.ok && single.encodedPolyline) return single;
+
+  const safe = points
+    .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng))
+    .slice(0, 12);
+  if (safe.length < 2) return single;
+
+  const legs = await Promise.all(
+    safe.slice(0, -1).map((from, i) => computeRoadRouteSingle([from, safe[i + 1]!], opts)),
+  );
+  const merged: Array<[number, number]> = [];
+  let distance = 0;
+  let duration = 0;
+  let any = false;
+  for (const leg of legs) {
+    if (!leg.ok || !leg.encodedPolyline) continue;
+    any = true;
+    distance += leg.distanceMeters ?? 0;
+    duration += leg.durationSeconds ?? 0;
+    for (const point of decodeLine(leg.encodedPolyline)) merged.push(point);
+  }
+  if (!any || merged.length < 2) return single;
+
+  return {
+    ok: true,
+    encodedPolyline: encodeLine(merged),
+    distanceMeters: distance || null,
+    durationSeconds: duration || null,
+  };
+}
+
+async function computeRoadRouteSingle(
   points: Array<{ lat: number; lng: number }>,
   opts: { timeoutMs?: number } = {},
 ): Promise<RoadRouteInternalResult> {
