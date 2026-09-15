@@ -142,10 +142,10 @@ export function RouteMapSection({
             ))}
           </dl>
 
-          {status && status.mode !== "directions" ? (
+          {status?.mode === "none" ? (
             <p className="text-xs text-muted-foreground">
-              El trazo se muestra aproximado entre las paradas publicadas; no mostramos tiempos ni
-              distancias estimadas.
+              El recorrido por carretera no está disponible en este momento. Conservamos las
+              paradas publicadas y puedes abrir la ruta completa en “Cómo llegar”.
             </p>
           ) : null}
 
