@@ -282,6 +282,8 @@ export const getPlaceCms = createServerFn({ method: "POST" })
     let assets: Array<{
       id: string;
       storage_path: string;
+      storage_bucket?: string | null;
+      previewUrl?: string | null;
       alt_text: string | null;
       review_state: string | null;
       status: string | null;
@@ -298,13 +300,43 @@ export const getPlaceCms = createServerFn({ method: "POST" })
         await ctx.supabase
           .from("media_assets")
           .select(
-            "id, storage_path, alt_text, review_state, status, metadata, is_demo_seed, demo_seed_batch",
+            "id, storage_path, storage_bucket, alt_text, review_state, status, metadata, is_demo_seed, demo_seed_batch",
           )
           .in(
             "id",
             mediaRows.map((r) => r.media_asset_id),
           ),
       ) ?? []) as typeof assets;
+
+      // Miniatura editorial: el bucket es privado y los borradores no pasan
+      // por el proxy público, así que firmamos una URL temporal (1 h) con la
+      // sesión del editor. Mismo patrón aprobado en los paneles de medios.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const storage = (ctx.supabase as any).storage;
+      const byBucket = new Map<string, string[]>();
+      for (const a of assets) {
+        const bucket = a.storage_bucket ?? "studio-media";
+        if (!a.storage_path) continue;
+        byBucket.set(bucket, [...(byBucket.get(bucket) ?? []), a.storage_path]);
+      }
+      const signedByKey = new Map<string, string>();
+      for (const [bucket, paths] of byBucket) {
+        try {
+          const { data: signed } = await storage.from(bucket).createSignedUrls(paths, 3600);
+          for (const row of (signed ?? []) as Array<{
+            path?: string | null;
+            signedUrl?: string | null;
+          }>) {
+            if (row?.path && row?.signedUrl) signedByKey.set(`${bucket}:${row.path}`, row.signedUrl);
+          }
+        } catch {
+          // Sin firma la ficha sigue funcionando: sólo no muestra miniatura.
+        }
+      }
+      assets = assets.map((a) => ({
+        ...a,
+        previewUrl: signedByKey.get(`${a.storage_bucket ?? "studio-media"}:${a.storage_path}`) ?? null,
+      }));
     }
 
     return {
