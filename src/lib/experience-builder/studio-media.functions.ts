@@ -640,9 +640,12 @@ export const getStudioMediaAssetById = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw error;
     if (!row || row.storage_bucket !== BUCKET) return null;
+    const stableUrl = publicProxyUrl(row.storage_path as string);
+    const signed = await signPreviewUrls(context.supabase, [row.storage_path as string]);
     return {
       id: row.id as string,
-      url: publicProxyUrl(row.storage_path as string),
+      url: stableUrl,
+      previewUrl: signed.get(row.storage_path as string) ?? stableUrl,
       alt: (row.alt_text as string | null) ?? (row.title as string | null) ?? null,
       reviewState: (row.review_state as string | null) ?? "unreviewed",
     };
