@@ -25,6 +25,9 @@ import {
   getEditorialStatusGuidance,
 } from "@/lib/cms/editorial-language";
 import { meridaDateTime } from "@/lib/time/merida";
+import { Sparkles } from "lucide-react";
+import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
+
 
 export type FieldType =
   | "text"
