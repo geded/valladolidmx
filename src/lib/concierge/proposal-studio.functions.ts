@@ -117,7 +117,7 @@ export interface ItineraryDeskRow {
   updated_at: string;
 }
 
-export const listConciergeItineraries = createServerFn({ method: "GET" })
+export const listConciergeItineraries = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
     z
@@ -207,7 +207,7 @@ export interface CaseItinerary {
 
 
 /** Itinerario del viaje ligado a un expediente (sólo lectura). */
-export const getCaseItinerary = createServerFn({ method: "GET" })
+export const getCaseItinerary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ caseId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
@@ -297,7 +297,7 @@ export interface AdjustmentSummary {
 }
 
 /** Compara lo aprobado con lo cobrado para saber qué falta ajustar. */
-export const getCaseAdjustmentSummary = createServerFn({ method: "GET" })
+export const getCaseAdjustmentSummary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ caseId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
