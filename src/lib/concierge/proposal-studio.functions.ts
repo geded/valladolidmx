@@ -630,15 +630,19 @@ type ScheduleCallInput = z.infer<typeof ScheduleInput>;
 /** Núcleo compartido: valida rol interno y pide la agenda a Alux. */
 async function aluxScheduleCall(
   input: ScheduleCallInput,
-  context: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string },
+  context: { supabase: { rpc: (...args: never[]) => Promise<{ data: unknown }> }; userId: string },
 ): Promise<AluxScheduleSuggestion[]> {
-  const { data: editorial } = await context.supabase.rpc("is_editor_or_admin", {
+  const rpc = context.supabase.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown }>;
+  const { data: editorial } = await rpc("is_editor_or_admin", {
     _user_id: context.userId,
   });
   let allowed = Boolean(editorial);
   if (!allowed) {
     for (const role of ["concierge", "concierge_lead"] as const) {
-      const { data: has } = await context.supabase.rpc("has_role", {
+      const { data: has } = await rpc("has_role", {
         _user_id: context.userId,
         _role: role,
       });
