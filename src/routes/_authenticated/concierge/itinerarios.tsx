@@ -96,7 +96,7 @@ function ItinerariesDeskPage() {
           <tbody>
             {query.isLoading ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
                   Cargando itinerarios…
                 </td>
               </tr>
@@ -140,7 +140,7 @@ function ItinerariesDeskPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
                   Todavía no hay viajes con itinerario armado.
                 </td>
               </tr>
