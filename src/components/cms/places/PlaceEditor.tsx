@@ -684,11 +684,37 @@ export function PlaceEditor({ placeId }: Props) {
             <code>/{String(place.slug)}</code> · nombre, slug y destino son campos protegidos.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => setAutofillOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            Completar con Alux
+          </button>
           <span>Estado:</span>
           <StatusBadge value={status} />
         </div>
       </header>
+
+      <AluxAutofillDialog
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        entityKind="lugar o sitio de interés"
+        name={String(place.name ?? "")}
+        destination={destinationName}
+        zone={zoneName}
+        fields={AUTOFILL_FIELDS}
+        onApply={(patch, facts) => {
+          setValues((v) => ({ ...v, ...patch }));
+          if (facts?.latitude != null && facts.longitude != null && !latitude && !longitude) {
+            setLatitude(String(facts.latitude));
+            setLongitude(String(facts.longitude));
+          }
+        }}
+      />
+
 
       {fieldError && (
         <div
