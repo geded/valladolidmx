@@ -158,7 +158,7 @@ async function reservationContext(
   opts: { folio?: string; orderId?: string; caseId?: string },
 ): Promise<string | null> {
   const columns =
-    "id, folio, source_kind, source_case_id, traveler_name, destination_name, editorial_title, status, payment_provider, paid_at, created_at, total_amount, currency, travel_plan_id";
+    "id, folio, source_kind, source_case_id, traveler_name, traveler_email, traveler_phone, destination_name, editorial_title, status, payment_provider, paid_at, created_at, total_amount, currency, travel_plan_id";
   let query = supabase.from("concierge_orders").select(columns);
   if (opts.orderId) query = query.eq("id", opts.orderId);
   else if (opts.folio) query = query.ilike("folio", opts.folio.replace(/[%,]/g, ""));
@@ -240,6 +240,10 @@ async function reservationContext(
     `· Folio: ${order.folio} — ${order.source_kind === "direct_sale" ? "reserva en línea de experiencia" : "venta de Arma tu Viaje"}.`,
     `· Creada: ${order.created_at?.slice(0, 10) ?? "—"} (hora de Mérida).`,
     order.traveler_name ? `· Viajero: ${order.traveler_name}.` : null,
+    order.traveler_phone
+      ? `· Teléfono / WhatsApp: ${order.traveler_phone} — enlace directo: https://wa.me/${String(order.traveler_phone).replace(/\D/g, "")}`
+      : "· Teléfono no registrado en la reservación.",
+    order.traveler_email ? `· Correo: ${order.traveler_email}.` : "· Correo no registrado en la reservación.",
     order.destination_name ? `· Destino: ${order.destination_name}.` : null,
     order.editorial_title ? `· Título: ${order.editorial_title}.` : null,
     `· Estado de la reservación: ${order.status}.`,
@@ -284,8 +288,12 @@ Reglas:
   ahí, dilo con honestidad y sugiere a quién preguntar. Nunca inventes datos,
   cifras, nombres de viajeros, precios, horarios ni funciones que no se
   mencionen.
-· No reveles datos de contacto del viajero; no prometas ejecutar acciones: tú
-  explicas, la persona actúa en el panel.
+· Quien te consulta es personal interno autorizado: SÍ puedes darle el nombre,
+  teléfono, WhatsApp y correo que aparezcan en la RESERVACIÓN CONSULTADA, tal
+  cual, para que pueda contactar al viajero. Si un dato no está registrado,
+  dilo; nunca lo inventes ni lo completes.
+· No prometas ejecutar acciones: tú explicas y consultas, la persona actúa en
+  el panel.
 
 · Termina siempre con JSON válido y nada más, con esta forma exacta:
   {"answer":"…","followUps":["…","…"]}
