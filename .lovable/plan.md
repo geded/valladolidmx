@@ -24,7 +24,7 @@ Mientras no esté habilitada, el asistente redacta las descripciones a partir de
 
 Desde el mismo editor, en portada y galería, un acceso "Buscar fotos con Alux" usa los datos de la ficha para traer candidatas.
 
-Sólo se buscan en acervos de licencia libre verificable (Wikimedia Commons y Openverse). Cada resultado muestra autor, licencia y enlace a la fuente, y el editor marca cuáles usar. No se descargan fotos de buscadores, redes ni portales de viajes: no son de uso libre y exponen legalmente a la plataforma.
+Aquí Google no sirve como origen: sus condiciones no permiten descargar ni guardar las fotos de una ficha, sólo mostrarlas dentro de Google. Por eso la búsqueda se hace en acervos de licencia libre verificable (Wikimedia Commons y Openverse). Cada resultado muestra autor, licencia y enlace a la fuente, y el editor marca cuáles usar. No se descargan fotos de buscadores, redes ni portales de viajes: no son de uso libre y exponen legalmente a la plataforma.
 
 Al elegir una foto, entra por el mismo camino gobernado que hoy:
 
