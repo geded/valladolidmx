@@ -186,6 +186,9 @@ export function AluxPhotoFinderDialog({
                 if (e.key === "Enter") void search();
               }}
               aria-label="Qué foto buscas"
+              placeholder={
+                workingPlace ? "Sólo el tema: video mapping, cenote, fachada…" : "Qué foto buscas"
+              }
               className="h-10 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
             />
           </div>
@@ -198,6 +201,14 @@ export function AluxPhotoFinderDialog({
             {loading ? "Buscando…" : "Buscar"}
           </button>
         </div>
+
+        {workingPlace && (
+          <p className="flex items-center gap-1.5 border-b border-border bg-muted/20 px-4 py-1.5 text-[11px] text-muted-foreground">
+            <MapPin className="size-3.5 shrink-0" aria-hidden />
+            Buscando en {workingPlace}. No hace falta escribir el destino.
+          </p>
+        )}
+
 
         <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
           <input
