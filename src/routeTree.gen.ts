@@ -152,6 +152,7 @@ import { Route as AuthenticatedCuentaAnfitrionRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
 import { Route as AuthenticatedConciergeReservacionesRouteImport } from './routes/_authenticated/concierge/reservaciones'
 import { Route as AuthenticatedConciergePropuestasRouteImport } from './routes/_authenticated/concierge/propuestas'
+import { Route as AuthenticatedConciergePreguntasRouteImport } from './routes/_authenticated/concierge/preguntas'
 import { Route as AuthenticatedConciergeItinerariosRouteImport } from './routes/_authenticated/concierge/itinerarios'
 import { Route as AuthenticatedCmsVisitorIntelRouteImport } from './routes/_authenticated/cms/visitor-intel'
 import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authenticated/cms/visibilidad'
@@ -1062,6 +1063,12 @@ const AuthenticatedConciergePropuestasRoute =
     path: '/propuestas',
     getParentRoute: () => AuthenticatedConciergeRouteRoute,
   } as any)
+const AuthenticatedConciergePreguntasRoute =
+  AuthenticatedConciergePreguntasRouteImport.update({
+    id: '/preguntas',
+    path: '/preguntas',
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
+  } as any)
 const AuthenticatedConciergeItinerariosRoute =
   AuthenticatedConciergeItinerariosRouteImport.update({
     id: '/itinerarios',
@@ -1858,6 +1865,7 @@ export interface FileRoutesByFullPath {
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
   '/concierge/itinerarios': typeof AuthenticatedConciergeItinerariosRoute
+  '/concierge/preguntas': typeof AuthenticatedConciergePreguntasRoute
   '/concierge/propuestas': typeof AuthenticatedConciergePropuestasRoute
   '/concierge/reservaciones': typeof AuthenticatedConciergeReservacionesRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
@@ -2106,6 +2114,7 @@ export interface FileRoutesByTo {
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
   '/concierge/itinerarios': typeof AuthenticatedConciergeItinerariosRoute
+  '/concierge/preguntas': typeof AuthenticatedConciergePreguntasRoute
   '/concierge/propuestas': typeof AuthenticatedConciergePropuestasRoute
   '/concierge/reservaciones': typeof AuthenticatedConciergeReservacionesRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
@@ -2362,6 +2371,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/_authenticated/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
   '/_authenticated/concierge/itinerarios': typeof AuthenticatedConciergeItinerariosRoute
+  '/_authenticated/concierge/preguntas': typeof AuthenticatedConciergePreguntasRoute
   '/_authenticated/concierge/propuestas': typeof AuthenticatedConciergePropuestasRoute
   '/_authenticated/concierge/reservaciones': typeof AuthenticatedConciergeReservacionesRouteWithChildren
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
@@ -2621,6 +2631,7 @@ export interface FileRouteTypes {
     | '/cms/visibilidad'
     | '/cms/visitor-intel'
     | '/concierge/itinerarios'
+    | '/concierge/preguntas'
     | '/concierge/propuestas'
     | '/concierge/reservaciones'
     | '/cuenta/actividad'
@@ -2869,6 +2880,7 @@ export interface FileRouteTypes {
     | '/cms/visibilidad'
     | '/cms/visitor-intel'
     | '/concierge/itinerarios'
+    | '/concierge/preguntas'
     | '/concierge/propuestas'
     | '/concierge/reservaciones'
     | '/cuenta/actividad'
@@ -3124,6 +3136,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/visibilidad'
     | '/_authenticated/cms/visitor-intel'
     | '/_authenticated/concierge/itinerarios'
+    | '/_authenticated/concierge/preguntas'
     | '/_authenticated/concierge/propuestas'
     | '/_authenticated/concierge/reservaciones'
     | '/_authenticated/cuenta/actividad'
@@ -4374,6 +4387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConciergePropuestasRouteImport
       parentRoute: typeof AuthenticatedConciergeRouteRoute
     }
+    '/_authenticated/concierge/preguntas': {
+      id: '/_authenticated/concierge/preguntas'
+      path: '/preguntas'
+      fullPath: '/concierge/preguntas'
+      preLoaderRoute: typeof AuthenticatedConciergePreguntasRouteImport
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
+    }
     '/_authenticated/concierge/itinerarios': {
       id: '/_authenticated/concierge/itinerarios'
       path: '/itinerarios'
@@ -5248,6 +5268,7 @@ const AuthenticatedConciergeExpedientesCaseIdRouteWithChildren =
 
 interface AuthenticatedConciergeRouteRouteChildren {
   AuthenticatedConciergeItinerariosRoute: typeof AuthenticatedConciergeItinerariosRoute
+  AuthenticatedConciergePreguntasRoute: typeof AuthenticatedConciergePreguntasRoute
   AuthenticatedConciergePropuestasRoute: typeof AuthenticatedConciergePropuestasRoute
   AuthenticatedConciergeReservacionesRoute: typeof AuthenticatedConciergeReservacionesRouteWithChildren
   AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
@@ -5258,6 +5279,7 @@ const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRoute
   {
     AuthenticatedConciergeItinerariosRoute:
       AuthenticatedConciergeItinerariosRoute,
+    AuthenticatedConciergePreguntasRoute: AuthenticatedConciergePreguntasRoute,
     AuthenticatedConciergePropuestasRoute:
       AuthenticatedConciergePropuestasRoute,
     AuthenticatedConciergeReservacionesRoute:
