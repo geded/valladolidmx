@@ -45,6 +45,32 @@ function publicProxyUrl(path: string) {
 }
 
 /**
+ * Vista previa editorial firmada (1 h). El proxy público sólo sirve activos
+ * `published`; los borradores gobernados (G8-M1 nacen `draft`) quedaban sin
+ * miniatura en el CMS. Misma técnica ya aprobada en los paneles de medios
+ * de empresas/destinos/zonas/productos: firma con la sesión del editor, por
+ * lo que respeta RLS y no expone nada públicamente.
+ */
+async function signPreviewUrls(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  paths: string[],
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const unique = [...new Set(paths.filter(Boolean))];
+  if (unique.length === 0) return out;
+  try {
+    const { data } = await supabase.storage.from(BUCKET).createSignedUrls(unique, 3600);
+    for (const row of (data ?? []) as Array<{ path?: string | null; signedUrl?: string | null }>) {
+      if (row?.path && row?.signedUrl) out.set(row.path, row.signedUrl);
+    }
+  } catch {
+    // Silencioso: sin firma, la tarjeta cae al proxy estable.
+  }
+  return out;
+}
+
+/**
  * Resuelve una portada temporal únicamente para una vista autenticada.
  * No escribe `events.cover_media_id`, no cambia el workflow del evento y
  * rechaza cualquier activo que no sea IA/conceptual/temporal/preview_only.
