@@ -269,6 +269,84 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
         )}
       </section>
 
+      {suggestions.data &&
+      (suggestions.data.suggestions.length ||
+        suggestions.data.interests.length ||
+        suggestions.data.free_days.length) ? (
+        <section className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Sugerencias de Alux para este viaje
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Lo que el viajero vio y guardó y todavía no está en su viaje. Sin precio: tú eliges qué
+            proponerle y lo cotizas en el Estudio de Propuesta.
+          </p>
+
+          {suggestions.data.free_days.length && suggestions.data.total_days ? (
+            <p className="mt-3 rounded-md bg-muted/50 p-2 text-xs">
+              Días del viaje todavía sin nada agendado:{" "}
+              <span className="font-medium">
+                {suggestions.data.free_days.map((d) => `Día ${d + 1}`).join(", ")}
+              </span>
+            </p>
+          ) : null}
+
+          {suggestions.data.suggestions.length ? (
+            <>
+              <ul className="mt-3 space-y-2">
+                {suggestions.data.suggestions.map((s) => {
+                  const checked = picked.includes(s.label);
+                  return (
+                    <li
+                      key={`${s.kind}-${s.entity_id ?? s.label}`}
+                      className="flex items-start gap-3 rounded-md border border-border/60 bg-background p-3"
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-primary"
+                        checked={checked}
+                        aria-label={`Proponer ${s.label}`}
+                        onChange={() =>
+                          setPicked((prev) =>
+                            checked ? prev.filter((l) => l !== s.label) : [...prev, s.label],
+                          )
+                        }
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{s.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {KIND_LABEL[s.kind] ?? s.kind} · {s.reason}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-3">
+                <Button size="sm" disabled={!picked.length} onClick={sendToStudio}>
+                  Agregar a la propuesta ({picked.length})
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Todo lo que el viajero guardó ya está en su viaje.
+            </p>
+          )}
+
+          {suggestions.data.interests.length || suggestions.data.territories.length ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Le interesan: {suggestions.data.interests.join(", ") || "sin datos"}.
+              {suggestions.data.territories.length
+                ? ` Destinos que estuvo viendo: ${suggestions.data.territories.join(", ")}.`
+                : ""}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+
+
       <section className="rounded-lg border border-border bg-card p-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Ajustar el itinerario aprobado
