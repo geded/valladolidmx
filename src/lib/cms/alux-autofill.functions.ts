@@ -786,25 +786,38 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    // Consulta literal en todas las fuentes: nunca se amplía la búsqueda, para
-    // no mostrar material ajeno al lugar o al evento solicitado.
-    const [web, google, commons, openverse] = await Promise.all([
-      searchWebImages(data.query).catch(() => [] as PhotoCandidate[]),
+    // La frase del editor se conserva siempre; sólo se añaden formas
+    // equivalentes de preguntar lo mismo (tema + territorio) para que una
+    // fuente que titula distinto también responda. El filtro por tema sigue
+    // siendo obligatorio, así que nunca se muestra material ajeno.
+    const plan = buildQueryPlan(data.query);
+    const webBatches = await Promise.all(
+      plan.variants.map((variant) =>
+        searchWebImages(variant).catch(() => [] as PhotoCandidate[]),
+      ),
+    );
+    const [google, commons, openverse] = await Promise.all([
       searchGooglePhotos(data.query).catch(() => [] as PhotoCandidate[]),
-      searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
+      searchCommons(plan.subjectPhrase || data.query).catch(() => [] as PhotoCandidate[]),
+      searchOpenverse(plan.subjectPhrase || data.query).catch(() => [] as PhotoCandidate[]),
     ]);
 
     const seen = new Set<string>();
-    const photos = [...site, ...web, ...google, ...commons, ...openverse]
-      .map((photo) => ({ photo, relevance: photoRelevance(photo, data.query) }))
+    const scored = [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]
+      .map((photo) => ({ photo, ...photoMatch(photo, plan) }))
       .filter(({ photo, relevance }) => {
         if (!photo.url || relevance === 0 || seen.has(photo.url)) return false;
         seen.add(photo.url);
         return true;
       })
-      .sort((a, b) => b.relevance - a.relevance)
-      .map(({ photo }) => photo);
+      .sort((a, b) => b.relevance - a.relevance);
+
+    // Si alguna foto sí nombra el territorio, se descartan las que sólo
+    // coinciden con el tema: es material de otro lugar.
+    const territorial = scored.filter((entry) => entry.placeMatch);
+    const photos = (plan.place.length && territorial.length ? territorial : scored).map(
+      ({ photo }) => photo,
+    );
     const visible = photos.slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
