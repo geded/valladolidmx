@@ -95,6 +95,171 @@ Mensajes: las preguntas del viajero se responden desde el expediente, en
 "Con el viajero"; "Notas internas" no las ve el viajero.
 `.trim();
 
+const CMS_GLOSSARY = `
+CMS STUDIO — cómo se llena una ficha
+
+Estado de publicación (en este orden): Borrador → En revisión → Aprobado →
+Publicado → Archivado. Sólo lo publicado se ve en el sitio; cada cambio de
+estado queda registrado con autor y hora de Mérida.
+
+Qué se espera de los campos comunes:
+· Nombre / Título — nombre real con el que se conoce el lugar, empresa,
+  producto o evento. Sin mayúsculas completas, sin adjetivos publicitarios,
+  sin la ciudad repetida si ya está en el destino.
+· Slug — parte final de la dirección web. Minúsculas, sin acentos, con
+  guiones. Una vez publicado conviene no cambiarlo; si se cambia, el sistema
+  guarda una redirección para no perder el posicionamiento.
+· Resumen / Descripción corta — una o dos frases (unos 160 caracteres) que
+  digan qué es y por qué vale la pena. Se usa en tarjetas, buscadores y
+  redes sociales.
+· Descripción larga — de dónde viene, qué se vive ahí, qué lo hace distinto,
+  qué conviene saber antes de ir. Escribir con voz propia de Oriente Maya:
+  cálida, concreta, sin frases genéricas de folleto.
+· Destino / Zona / Región — ubican la ficha en el territorio y arman las
+  migas de pan y las recomendaciones cercanas. No dejar en blanco.
+· Categorías y atributos — sirven para los filtros del visitante; elegir sólo
+  las que aplican de verdad.
+· Ubicación (latitud y longitud) — obligatoria: sin ella no se calcula la
+  distancia ni aparece en los mapas, y la ficha no debe publicarse.
+· Portada, galería y logotipo — se eligen desde la Biblioteca de imágenes;
+  el sistema las optimiza solo. Imagen horizontal y nítida para portada.
+· Texto alternativo de la imagen — describe lo que se ve, para quien no puede
+  verla y para buscadores.
+· Horarios, contacto y precios — datos reales y verificables. Si no se
+  conocen, dejar vacío antes que suponer.
+· SEO (título y descripción) — si se dejan vacíos se generan del contenido;
+  título corto con el nombre y el destino.
+
+Reglas de contenido: nunca inventar datos, precios, teléfonos ni horarios;
+no copiar textos de otros sitios; no repetir el mismo texto en varias fichas.
+Para publicar hace falta, como mínimo: nombre, resumen, destino, ubicación e
+imagen de portada.
+`.trim();
+
+/** Formato de dinero en pesos, sin depender del navegador. */
+function money(amount: number, currency: string) {
+  return `${new Intl.NumberFormat("es-MX", { minimumFractionDigits: 2 }).format(amount)} ${currency}`;
+}
+
+const FOLIO_RE = /\b((?:ERL|AVL|VMX)[-\s]?[A-Za-z0-9]{2,8}(?:[-\s]?\d{1,3})?)\b/i;
+
+/**
+ * Lee una reservación real (folio, expediente u orden abierta) con el cliente
+ * autenticado del propio usuario: la RLS vigente decide qué puede ver.
+ * Sólo lectura; nunca escribe ni ejecuta acciones.
+ */
+async function reservationContext(
+  supabase: any,
+  opts: { folio?: string; orderId?: string; caseId?: string },
+): Promise<string | null> {
+  const columns =
+    "id, folio, source_kind, source_case_id, traveler_name, destination_name, editorial_title, status, payment_provider, paid_at, created_at, total_amount, currency, travel_plan_id";
+  let query = supabase.from("concierge_orders").select(columns);
+  if (opts.orderId) query = query.eq("id", opts.orderId);
+  else if (opts.folio) query = query.ilike("folio", opts.folio.replace(/[%,]/g, ""));
+  else if (opts.caseId) query = query.eq("source_case_id", opts.caseId);
+  else return null;
+
+  const { data: order, error } = await query
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error || !order) {
+    if (opts.folio) return `RESERVACIÓN CONSULTADA\nNo existe ninguna reservación con el folio "${opts.folio}" visible para esta persona.`;
+    return null;
+  }
+
+  const [{ data: items }, { data: plan }, { data: kase }] = await Promise.all([
+    supabase
+      .from("concierge_order_items")
+      .select("title, quantity, subtotal_amount, currency")
+      .eq("order_id", order.id)
+      .limit(12),
+    order.travel_plan_id
+      ? supabase
+          .from("travel_plans")
+          .select("start_date, end_date")
+          .eq("id", order.travel_plan_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    order.source_case_id
+      ? supabase
+          .from("concierge_cases")
+          .select("id, status, assigned_concierge_user_id")
+          .eq("id", order.source_case_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const { data: proposal } = order.source_case_id
+    ? await supabase
+        .from("concierge_proposals")
+        .select("status, sent_at")
+        .eq("case_id", order.source_case_id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+
+  const followUp: CaseFollowUp = {
+    case_id: order.source_case_id ?? order.id,
+    quotes_requested: 0,
+    quotes_submitted: 0,
+    quotes_other: 0,
+    latest_proposal_status: proposal?.status ?? null,
+    latest_proposal_sent_at: proposal?.sent_at ?? null,
+    order_status: order.status,
+    order_paid_at: order.paid_at,
+    assigned_concierge_user_id: kase?.assigned_concierge_user_id ?? null,
+    assigned_concierge_name: null,
+    trip_start_date: plan?.start_date ?? null,
+    trip_end_date: plan?.end_date ?? null,
+  };
+  const stage = deriveCaseStage({
+    status: kase?.status ?? (order.paid_at ? "closed_won" : "open"),
+    assigned_concierge_user_id: followUp.assigned_concierge_user_id,
+    followUp,
+  });
+  const phase = deriveTripPhase({ status: kase?.status ?? "open", stage, followUp });
+
+  const paymentLabel = !order.paid_at
+    ? "Sin pago registrado"
+    : order.payment_provider === "cash"
+      ? "Pagado en efectivo"
+      : order.payment_provider === "demo"
+        ? "Pago de demostración"
+        : "Pagado en línea con tarjeta";
+
+  return [
+    "RESERVACIÓN CONSULTADA (dato real, sólo lectura)",
+    `· Folio: ${order.folio} — ${order.source_kind === "direct_sale" ? "reserva en línea de experiencia" : "venta de Arma tu Viaje"}.`,
+    `· Creada: ${order.created_at?.slice(0, 10) ?? "—"} (hora de Mérida).`,
+    order.traveler_name ? `· Viajero: ${order.traveler_name}.` : null,
+    order.destination_name ? `· Destino: ${order.destination_name}.` : null,
+    order.editorial_title ? `· Título: ${order.editorial_title}.` : null,
+    `· Estado de la reservación: ${order.status}.`,
+    `· Pago: ${paymentLabel}${order.paid_at ? ` el ${order.paid_at.slice(0, 10)}` : ""}.`,
+    `· Importe total: ${money(Number(order.total_amount ?? 0), order.currency ?? "MXN")}.`,
+    followUp.trip_start_date
+      ? `· Fechas del viaje: del ${followUp.trip_start_date} al ${followUp.trip_end_date ?? followUp.trip_start_date}.`
+      : "· Sin fechas de viaje registradas.",
+    `· Etapa comercial: ${stage.label}. ${stage.nextAction}`,
+    `· Fase del viaje: ${phase.label}. ${phase.detail}`,
+    (items ?? []).length
+      ? `· Conceptos: ${(items ?? [])
+          .map(
+            (i: { title: string; quantity: number; subtotal_amount: number; currency: string }) =>
+              `${i.title} ×${i.quantity} (${money(Number(i.subtotal_amount ?? 0), i.currency ?? "MXN")})`,
+          )
+          .join("; ")}.`
+      : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+
+
 const SYSTEM = `
 Eres Alux, el copiloto interno de Valladolid.mx (Oriente Maya de Yucatán).
 Hablas con personal del equipo (concierge, editores, administración).
