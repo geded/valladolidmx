@@ -87,8 +87,10 @@ function ItinerariesDeskPage() {
               <th className="p-3">Fechas</th>
               <th className="p-3">Personas</th>
               <th className="p-3">Paradas</th>
+              <th className="p-3">Agenda</th>
               <th className="p-3">Estado</th>
               <th className="p-3">Expediente</th>
+
             </tr>
           </thead>
           <tbody>
