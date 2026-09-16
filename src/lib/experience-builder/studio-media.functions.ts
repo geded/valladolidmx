@@ -204,6 +204,7 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
         const nature = (rights.nature as string | undefined) ?? null;
         return {
           id: r.id,
+          storagePath: r.storage_path,
           url: publicProxyUrl(r.storage_path),
           alt: resolveMediaAlt(
             { ...r, translations: r.media_asset_translations ?? [] },
