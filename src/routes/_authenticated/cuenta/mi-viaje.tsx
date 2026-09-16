@@ -63,7 +63,7 @@ import {
 } from "@/lib/traveler/travel-plans.functions";
 import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
-import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
+import { ccListMyCases } from "@/lib/concierge/cc.functions";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
 import { CaseMessages } from "@/components/concierge/CaseMessages";
