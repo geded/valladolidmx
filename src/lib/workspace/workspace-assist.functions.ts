@@ -693,8 +693,10 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       data.workspaceId === "cms" || entityBlock ? CMS_GLOSSARY : null,
       entityBlock,
       reservationBlock,
+      caseBlock,
+      itineraryBlock,
       recentBlock,
-    ]
+
       .filter(Boolean)
       .join("\n\n");
 
