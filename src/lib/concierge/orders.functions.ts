@@ -45,6 +45,11 @@ export interface ConciergeOrderView {
   editorial_summary: string | null;
   destination_name: string | null;
   paid_at: string | null;
+  payment_provider: string | null;
+  payment_provider_intent_id: string | null;
+  traveler_name?: string | null;
+  traveler_email?: string | null;
+  traveler_phone?: string | null;
   cancelled_at: string | null;
   created_at: string;
   items: ConciergeOrderItemView[];
@@ -102,7 +107,7 @@ export const getConciergeOrder = createServerFn({ method: "GET" })
     const { data: order, error } = await context.supabase
       .from("concierge_orders")
       .select(
-        "id, folio, status, source_kind, source_proposal_id, source_case_id, currency, subtotal_amount, discount_amount, tax_amount, total_amount, editorial_title, editorial_summary, destination_name, paid_at, cancelled_at, created_at",
+        "id, folio, status, source_kind, source_proposal_id, source_case_id, currency, subtotal_amount, discount_amount, tax_amount, total_amount, editorial_title, editorial_summary, destination_name, paid_at, payment_provider, payment_provider_intent_id, traveler_name, traveler_email, traveler_phone, cancelled_at, created_at",
       )
       .eq("id", data.orderId)
       .maybeSingle();
@@ -339,4 +344,180 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     return res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
+  });
+
+// ---------- central de reservaciones (sólo personal interno) ----------
+
+export type ReservationPaymentFilter = "all" | "cash" | "online" | "unpaid";
+
+export interface ConciergeReservationRow {
+  id: string;
+  folio: string;
+  source_kind: "concierge_proposal" | "direct_sale";
+  source_case_id: string | null;
+  traveler_name: string | null;
+  destination_name: string | null;
+  editorial_title: string | null;
+  status: string;
+  payment_provider: string | null;
+  payment_provider_intent_id: string | null;
+  paid_at: string | null;
+  created_at: string;
+  total_amount: number;
+  currency: string;
+  trip_start_date: string | null;
+  trip_end_date: string | null;
+}
+
+export interface ConciergeReservationsResult {
+  rows: ConciergeReservationRow[];
+  total: number;
+  totals: { cash: number; online: number; pending: number; reservations: number; currency: string };
+}
+
+const ReservationListInput = z.object({
+  search: z.string().trim().max(120).default(""),
+  status: z.string().max(30).default("all"),
+  payment: z.enum(["all", "cash", "online", "unpaid"]).default("all"),
+  source: z.enum(["all", "direct_sale", "concierge_proposal"]).default("all"),
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(50).default(50),
+});
+
+function assertOperationsRole(claims: Record<string, unknown> | undefined) {
+  const raw = claims?.["user_roles"] ?? claims?.["roles"] ?? claims?.["role"];
+  const roles = Array.isArray(raw) ? raw.map(String) : typeof raw === "string" ? [raw] : [];
+  if (!roles.some((role) => ["admin", "super_admin", "concierge", "concierge_lead"].includes(role))) {
+    throw new Error("forbidden_concierge_operations");
+  }
+}
+
+export const listConciergeReservations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ReservationListInput.parse(data))
+  .handler(async ({ data, context }): Promise<ConciergeReservationsResult> => {
+    assertOperationsRole(context.claims as Record<string, unknown> | undefined);
+    let query = context.supabase
+      .from("concierge_orders")
+      .select("id, folio, source_kind, source_case_id, traveler_name, destination_name, editorial_title, status, payment_provider, payment_provider_intent_id, paid_at, created_at, total_amount, currency, travel_plan_id", { count: "exact" });
+    if (data.search) {
+      const term = data.search.replace(/[%,]/g, "");
+      query = query.or(`folio.ilike.%${term}%,traveler_name.ilike.%${term}%,destination_name.ilike.%${term}%`);
+    }
+    if (data.status !== "all") query = query.eq("status", data.status);
+    if (data.source !== "all") query = query.eq("source_kind", data.source);
+    if (data.payment === "cash") query = query.eq("payment_provider", "cash");
+    if (data.payment === "online") query = query.not("payment_provider", "is", null).not("payment_provider", "in", "(cash,demo)");
+    if (data.payment === "unpaid") query = query.is("paid_at", null);
+    const from = (data.page - 1) * data.pageSize;
+    const { data: orders, error, count } = await query
+      .order("created_at", { ascending: false })
+      .range(from, from + data.pageSize - 1);
+    if (error) throw new Error(error.message);
+
+    const planIds = (orders ?? []).map((o) => o.travel_plan_id).filter((id): id is string => Boolean(id));
+    const { data: plans } = planIds.length
+      ? await context.supabase.from("travel_plans").select("id, start_date, end_date").in("id", planIds)
+      : { data: [] };
+    const planById = new Map((plans ?? []).map((p) => [p.id, p]));
+
+    // Totales de toda la selección; no sólo de la página visible.
+    let totalsQuery = context.supabase.from("concierge_orders").select("status, payment_provider, total_amount, currency");
+    if (data.status !== "all") totalsQuery = totalsQuery.eq("status", data.status);
+    if (data.source !== "all") totalsQuery = totalsQuery.eq("source_kind", data.source);
+    const { data: totalRows, error: totalsError } = await totalsQuery.limit(5000);
+    if (totalsError) throw new Error(totalsError.message);
+    const realRows = (totalRows ?? []).filter((row) => row.payment_provider !== "demo");
+    const totals = realRows.reduce(
+      (sum, row) => {
+        const amount = Number(row.total_amount ?? 0);
+        if (row.payment_provider === "cash" && ["paid", "fulfilled"].includes(row.status)) sum.cash += amount;
+        else if (row.payment_provider && ["paid", "fulfilled"].includes(row.status)) sum.online += amount;
+        else if (!["paid", "fulfilled", "cancelled", "refunded", "expired"].includes(row.status)) sum.pending += amount;
+        return sum;
+      },
+      { cash: 0, online: 0, pending: 0, reservations: realRows.length, currency: "MXN" },
+    );
+
+    return {
+      rows: (orders ?? []).map((order) => {
+        const plan = order.travel_plan_id ? planById.get(order.travel_plan_id) : undefined;
+        return { ...order, trip_start_date: plan?.start_date ?? null, trip_end_date: plan?.end_date ?? null } as ConciergeReservationRow;
+      }),
+      total: count ?? 0,
+      totals,
+    };
+  });
+
+export const getConciergeReservation = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { orderId: string }) => ({ orderId: z.string().uuid().parse(data.orderId) }))
+  .handler(async ({ data, context }) => {
+    assertOperationsRole(context.claims as Record<string, unknown> | undefined);
+    const order = await getOrderForOperations(context.supabase, data.orderId);
+    const [{ data: items, error: itemError }, { data: events, error: eventError }] = await Promise.all([
+      context.supabase.from("concierge_order_items").select("id, title, description, quantity, unit_amount, currency, subtotal_amount, business_id, entity_kind, entity_id").eq("order_id", data.orderId).order("created_at"),
+      context.supabase.from("concierge_order_events").select("id, event_type, actor_user_id, payload, created_at").eq("order_id", data.orderId).order("created_at", { ascending: false }),
+    ]);
+    if (itemError) throw new Error(itemError.message);
+    if (eventError) throw new Error(eventError.message);
+    return { order, items: items ?? [], events: events ?? [] };
+  });
+
+async function getOrderForOperations(supabase: any, orderId: string) {
+  const { data, error } = await supabase.from("concierge_orders").select("*").eq("id", orderId).maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("reservation_not_found");
+  return data;
+}
+
+export const getConciergeReservationForCase = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { caseId: string }) => ({ caseId: z.string().uuid().parse(data.caseId) }))
+  .handler(async ({ data, context }) => {
+    assertOperationsRole(context.claims as Record<string, unknown> | undefined);
+    const { data: order, error } = await context.supabase.from("concierge_orders")
+      .select("id, folio, status, total_amount, currency, payment_provider, paid_at")
+      .eq("source_case_id", data.caseId).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) throw new Error(error.message);
+    return order;
+  });
+
+export const startConciergeOnlinePayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { orderId: string; clientRequestId?: string }) => ({
+    orderId: z.string().uuid().parse(data.orderId),
+    clientRequestId: z.string().max(80).optional().parse(data.clientRequestId),
+  }))
+  .handler(async ({ data, context }) => {
+    const { data: order, error } = await context.supabase.from("concierge_orders")
+      .select("id, folio, user_id, status, total_amount, currency, traveler_email")
+      .eq("id", data.orderId).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!order || order.user_id !== context.userId) throw new Error("reservation_not_found");
+    if (!["draft", "awaiting_payment"].includes(order.status)) throw new Error("reservation_not_payable");
+    const { data: items, error: itemsError } = await context.supabase.from("concierge_order_items")
+      .select("title, quantity, unit_amount").eq("order_id", order.id);
+    if (itemsError) throw new Error(itemsError.message);
+    if (!(items ?? []).length) throw new Error("reservation_has_no_items");
+    const { getActiveProvider } = await import("@/lib/payments/registry.server");
+    const provider = getActiveProvider();
+    const { getRequestHost } = await import("@tanstack/react-start/server");
+    const base = `https://${getRequestHost()}`;
+    const intent = await provider.createIntent({
+      orderId: order.id, userId: context.userId, amount: order.total_amount / 100,
+      currency: order.currency, description: `Reservación ${order.folio} — Valladolid.mx`,
+      customerEmail: order.traveler_email ?? (context.claims?.email as string | undefined),
+      items: (items ?? []).map((item) => ({ name: item.title, quantity: item.quantity, unit_amount: item.unit_amount / 100 })),
+      metadata: { order_id: order.id, reservation_kind: "concierge_order", folio: order.folio },
+      returnUrls: { success: `${base}/cuenta/pagos/exito?order=${order.id}`, cancel: `${base}/cuenta/pagos/error?order=${order.id}` },
+      clientRequestId: data.clientRequestId ?? null,
+    });
+    const { error: updateError } = await context.supabase.from("concierge_orders").update({
+      status: "awaiting_payment", payment_provider: provider.id,
+      payment_provider_intent_id: intent.providerIntentId,
+    }).eq("id", order.id).eq("user_id", context.userId);
+    if (updateError) throw new Error(updateError.message);
+    await context.supabase.from("concierge_order_events").insert({ order_id: order.id, event_type: "payment_initiated", actor_user_id: context.userId, payload: { provider: provider.id, intent_id: intent.providerIntentId, amount: order.total_amount, currency: order.currency } });
+    return { mode: intent.mode, redirectUrl: intent.redirectUrl, clientSecret: intent.clientSecret };
   });
