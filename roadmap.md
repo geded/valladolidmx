@@ -146,3 +146,5 @@
 - [ ] Diseñar carga inteligente obligatoria de imágenes: validación de tamaños, optimización automática y cola segura para cargas masivas.
 - [ ] Definir biblioteca Media por empresa: visibilidad, permisos, búsqueda, filtros y usos portada/galería/logo/miniatura.
 - [ ] Definir continuidad de imágenes al reclamar empresa: conservar asignación, procedencia y permisos del nuevo dueño sin transferir autoría.
+
+- [ ] Folios diarios de reservación: ERL-YYMMDD-### para venta en línea y AVL-YYMMDD-### para Arma tu Viaje.
