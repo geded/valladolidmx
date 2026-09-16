@@ -120,6 +120,22 @@ export function EntityEditor(props: Props) {
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [error, setError] = useState<string | null>(null);
   const [aluxOpen, setAluxOpen] = useState(false);
+  const [autofillOpen, setAutofillOpen] = useState(false);
+
+  /** Nombre de la ficha: base de la búsqueda que hace Alux. */
+  const autofillName = values["name"] || values["title"] || "";
+  /** Sólo campos de texto: Alux no elige catálogos ni relaciones. */
+  const autofillFields = useMemo(
+    () =>
+      fields
+        .filter((f) => f.type === "text" || f.type === "textarea")
+        .map((f) => ({
+          name: f.name,
+          label: f.label,
+          ...(f.helpText ? { help: f.helpText } : {}),
+        })),
+    [fields],
+  );
 
 
   useEffect(() => {
