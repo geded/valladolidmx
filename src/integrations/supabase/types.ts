@@ -7949,6 +7949,10 @@ export type Database = {
       }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
       concierge_my_workload: { Args: never; Returns: Json }
+      concierge_order_create_adjustment: {
+        Args: { _amount_cents: number; _case_id: string; _title?: string }
+        Returns: string
+      }
       concierge_order_has_business_member: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean

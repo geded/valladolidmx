@@ -26,6 +26,8 @@ import {
   BookOpenText,
   ShoppingCart,
   Activity,
+  FileText,
+  MessageCircle,
 } from "lucide-react";
 import {
   Mail,
@@ -594,6 +596,36 @@ const concierge: WorkspaceDefinition = {
       order: 2,
       surfaces: ["sidebar", "bottom", "palette"],
     },
+    {
+      id: "concierge.proposals",
+      workspaceId: "concierge",
+      label: "Propuestas",
+      icon: FileText,
+      to: "/concierge/propuestas",
+      group: "trabajo",
+      order: 3,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
+      id: "concierge.itineraries",
+      workspaceId: "concierge",
+      label: "Itinerarios",
+      icon: MapIcon,
+      to: "/concierge/itinerarios",
+      group: "trabajo",
+      order: 4,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
+      id: "concierge.questions",
+      workspaceId: "concierge",
+      label: "Preguntas",
+      icon: MessageCircle,
+      to: "/concierge/preguntas",
+      group: "trabajo",
+      order: 5,
+      surfaces: ["sidebar", "palette"],
+    },
   ],
   alux: {
     headline: "Hay 4 expedientes que requieren atención hoy.",
@@ -619,6 +651,8 @@ const concierge: WorkspaceDefinition = {
   aluxCapabilities: [
     { id: "concierge.cases.read", label: "Leer expedientes asignados" },
     { id: "concierge.workload.read", label: "Leer carga personal" },
+    { id: "concierge.proposals.read", label: "Leer propuestas del expediente" },
+    { id: "concierge.itineraries.read", label: "Leer itinerarios armados" },
   ],
   commands: [
     {
@@ -632,6 +666,24 @@ const concierge: WorkspaceDefinition = {
       label: "Ver reservaciones",
       icon: CreditCard,
       run: (ctx) => ctx.navigate("/concierge/reservaciones"),
+    },
+    {
+      id: "concierge.cmd.proposals",
+      label: "Ver propuestas",
+      icon: FileText,
+      run: (ctx) => ctx.navigate("/concierge/propuestas"),
+    },
+    {
+      id: "concierge.cmd.itineraries",
+      label: "Ver itinerarios",
+      icon: MapIcon,
+      run: (ctx) => ctx.navigate("/concierge/itinerarios"),
+    },
+    {
+      id: "concierge.cmd.questions",
+      label: "Ver preguntas sin responder",
+      icon: MessageCircle,
+      run: (ctx) => ctx.navigate("/concierge/preguntas"),
     },
     {
       id: "concierge.cmd.public-site",
@@ -659,6 +711,9 @@ const concierge: WorkspaceDefinition = {
       { id: "inbox", label: "Bandeja", kind: "list" },
       { id: "case", label: "Expediente", kind: "detail" },
       { id: "reservations", label: "Reservaciones", kind: "list" },
+      { id: "proposals", label: "Propuestas", kind: "list" },
+      { id: "itineraries", label: "Itinerarios", kind: "list" },
+      { id: "questions", label: "Preguntas", kind: "list" },
     ],
   },
 };
