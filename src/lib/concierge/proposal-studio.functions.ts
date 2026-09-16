@@ -188,7 +188,14 @@ export interface CaseItinerary {
   party_size: number | null;
   status: string | null;
   stops: ItineraryStop[];
+  /** Paradas con día u hora asignados. */
+  scheduled_count: number;
+  /** Propuesta vigente del expediente (para asignar y aplicar horarios). */
+  latest_proposal_id: string | null;
+  /** Partidas de esa propuesta que ya tienen día u hora. */
+  proposal_scheduled_count: number;
 }
+
 
 /** Itinerario del viaje ligado a un expediente (sólo lectura). */
 export const getCaseItinerary = createServerFn({ method: "GET" })
