@@ -42,8 +42,12 @@ function buildEventContext(e: PublicEventDetail): RouteContextDeclaration {
     canonical: `/eventos/${e.slug}`,
     // Paridad con hoteles/restaurantes/casas/lugares: la cadena
     // territorial completa (Inicio → Oriente Maya → Destino → Eventos)
-    // se declara aquí cuando el evento publicó su destino.
-    kindDefaults: [
+    // se declara como ancestros explícitos para que "Eventos" siempre
+    // aparezca, incluso cuando el visitante llega con contexto heredado
+    // (p. ej. desde el Home con destino activo). `kindDefaults` sólo se
+    // aplica cuando no hay ancestros; al heredar el destino se perdía la
+    // miga "Eventos".
+    ancestors: [
       { kind: "region", slug: "oriente-maya", label: "Oriente Maya", href: "/oriente-maya" },
       ...(e.destination_slug && e.destination_name
         ? [
