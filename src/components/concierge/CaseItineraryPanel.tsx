@@ -115,6 +115,30 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
               {plan.end_date ? ` — ${meridaDate(plan.end_date)}` : ""}
               {plan.party_size ? ` · ${plan.party_size} personas` : ""}
             </p>
+            {plan.scheduled_count === 0 && plan.stops.length ? (
+              <div className="mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm">
+                <p className="font-medium">Este viaje todavía no tiene día ni hora asignados.</p>
+                <p className="mt-1 text-muted-foreground">
+                  Por eso se ve igual que la propuesta: son las mismas paradas, pero sin agenda. Los
+                  días y horas se capturan en el Estudio de Propuesta y luego se aplican al viaje.
+                </p>
+                {plan.latest_proposal_id && plan.proposal_scheduled_count > 0 ? (
+                  <Button
+                    className="mt-3"
+                    size="sm"
+                    disabled={applySchedule.isPending}
+                    onClick={() => applySchedule.mutate(plan.latest_proposal_id as string)}
+                  >
+                    Aplicar horarios de la propuesta al viaje
+                  </Button>
+                ) : (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    La propuesta tampoco tiene día ni hora: captúralos primero en el Estudio de
+                    Propuesta.
+                  </p>
+                )}
+              </div>
+            ) : null}
             {days.size ? (
               <div className="mt-4 space-y-4">
                 {[...days.entries()]
@@ -122,8 +146,9 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
                   .map(([day, stops]) => (
                     <div key={day}>
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                        Día {day + 1}
+                        {day < 0 ? "Sin día asignado" : `Día ${day + 1}`}
                       </p>
+
                       <ul className="mt-2 space-y-2">
                         {stops.map((stop) => (
                           <li
