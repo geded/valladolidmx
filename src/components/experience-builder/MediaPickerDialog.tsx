@@ -41,6 +41,10 @@ import {
   type RoleFit,
 } from "@/lib/cms/image-upload";
 import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
+import {
+  AluxPhotoFinderDialog,
+  type AluxPickedPhoto,
+} from "@/components/cms/AluxPhotoFinderDialog";
 
 export interface PickedMedia {
   /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
