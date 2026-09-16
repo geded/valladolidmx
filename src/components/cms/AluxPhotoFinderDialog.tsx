@@ -1,6 +1,6 @@
 /**
- * AluxPhotoFinderDialog — Búsqueda de fotografías de licencia libre verificable
- * (Wikimedia Commons y Openverse) para las fichas del CMS.
+ * AluxPhotoFinderDialog — Búsqueda editorial de fotografías relevantes en la
+ * web, Google y acervos abiertos para las fichas del CMS.
  *
  * No sube nada por su cuenta: entrega la foto elegida al flujo gobernado de
  * siempre (optimización, ampliación opcional con Alux IA, original inmutable y
@@ -62,6 +62,10 @@ export function AluxPhotoFinderDialog({
     if (query.trim().length < 3 || loading) return;
     setLoading(true);
     setError(null);
+    setPhotos([]);
+    setContacts([]);
+    setUsedQuery(null);
+    setSearched(false);
     try {
       const res = await find({
         data: { query: query.trim(), website: site.trim() || null },
@@ -250,9 +254,9 @@ export function AluxPhotoFinderDialog({
 
           {!loading && searched && photos.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No encontramos fotos de esto exactamente como lo escribiste. Prueba con el nombre
-              del lugar o la sede (por ejemplo «Palacio Municipal de Valladolid, Yucatán») o pega
-              la página del negocio o del evento en el campo de arriba: de ahí traemos sus propias
+              No encontramos fotos de esto exactamente como lo escribiste. Prueba con el nombre del
+              lugar o la sede (por ejemplo «Palacio Municipal de Valladolid, Yucatán») o pega la
+              página del negocio o del evento en el campo de arriba: de ahí traemos sus propias
               fotos y guardamos una copia nuestra.
             </p>
           )}

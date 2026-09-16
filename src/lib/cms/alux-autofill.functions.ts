@@ -454,9 +454,7 @@ async function searchCommons(query: string): Promise<PhotoCandidate[]> {
 }
 
 async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
-  const url =
-    "https://api.openverse.org/v1/images/?page_size=20&q=" +
-    encodeURIComponent(query);
+  const url = "https://api.openverse.org/v1/images/?page_size=20&q=" + encodeURIComponent(query);
   const res = await fetch(url, { headers: { "User-Agent": "ValladolidMX-CMS/1.0" } });
   if (!res.ok) return [];
   const json = (await res.json()) as { results?: Array<Record<string, unknown>> };
@@ -479,6 +477,84 @@ async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
     });
   }
   return out;
+}
+
+const SEARCH_FILLER_WORDS = new Set([
+  "a",
+  "al",
+  "con",
+  "de",
+  "del",
+  "el",
+  "en",
+  "la",
+  "las",
+  "los",
+  "para",
+  "por",
+  "una",
+  "unas",
+  "uno",
+  "unos",
+  "y",
+]);
+
+/**
+ * Términos territoriales frecuentes que dan contexto, pero que por sí solos
+ * no acreditan que una foto corresponda al tema solicitado.
+ */
+const SEARCH_CONTEXT_WORDS = new Set([
+  "centro",
+  "historico",
+  "mexico",
+  "oriente",
+  "maya",
+  "yucatan",
+  "valladolid",
+]);
+
+function normalizeSearchText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function searchTokens(value: string): string[] {
+  return [
+    ...new Set(
+      normalizeSearchText(value)
+        .split(/\s+/)
+        .filter((token) => token.length > 1 && !SEARCH_FILLER_WORDS.has(token)),
+    ),
+  ];
+}
+
+/**
+ * Evita que una coincidencia territorial amplia (p. ej. "Valladolid") haga
+ * pasar una foto que no contiene el asunto buscado (p. ej. "video mapping").
+ */
+function photoRelevance(photo: PhotoCandidate, query: string): number {
+  if (photo.provider === "Sitio del negocio" || photo.provider === "Enlace directo") {
+    return 100;
+  }
+
+  const wanted = searchTokens(query);
+  if (wanted.length === 0) return 0;
+  const subject = wanted.filter((token) => !SEARCH_CONTEXT_WORDS.has(token));
+  const available = new Set(
+    searchTokens([photo.title, photo.author, photo.sourceUrl].filter(Boolean).join(" ")),
+  );
+  const totalMatches = wanted.filter((token) => available.has(token)).length;
+  const subjectMatches = subject.filter((token) => available.has(token)).length;
+  const requiredSubjectMatches =
+    subject.length === 0 ? 0 : Math.max(1, Math.ceil(subject.length * 0.6));
+  const requiredTotalMatches = Math.max(2, Math.ceil(wanted.length * 0.4));
+
+  if (subjectMatches < requiredSubjectMatches || totalMatches < requiredTotalMatches) return 0;
+  return subjectMatches * 10 + totalMatches;
 }
 
 /**
@@ -578,9 +654,7 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
       const html = (await res.text().catch(() => "")).slice(0, 400_000);
       if (!html) return;
       const emails = new Set<string>();
-      for (const m of html.matchAll(
-        /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
-      )) {
+      for (const m of html.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)) {
         const value = m[0].toLowerCase();
         if (/\.(png|jpe?g|webp|gif|svg)$/i.test(value)) continue;
         if (/(sentry|wixpress|example|noreply|no-reply)/i.test(value)) continue;
@@ -588,7 +662,9 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
         if (emails.size >= 4) break;
       }
       const phones = new Set<string>();
-      for (const m of html.matchAll(/(?:tel:|whatsapp[^0-9+]{0,20})?(\+?52[\s.-]?)?(\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/gi)) {
+      for (const m of html.matchAll(
+        /(?:tel:|whatsapp[^0-9+]{0,20})?(\+?52[\s.-]?)?(\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/gi,
+      )) {
         const digits = `${m[1] ?? ""}${m[2]}`.replace(/[^\d+]/g, "");
         if (digits.replace(/\D/g, "").length < 10) continue;
         phones.add(digits);
@@ -631,11 +707,15 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     ]);
 
     const seen = new Set<string>();
-    const photos = [...site, ...google, ...web, ...commons, ...openverse].filter((p) => {
-      if (!p.url || seen.has(p.url)) return false;
-      seen.add(p.url);
-      return true;
-    });
+    const photos = [...site, ...web, ...google, ...commons, ...openverse]
+      .map((photo) => ({ photo, relevance: photoRelevance(photo, data.query) }))
+      .filter(({ photo, relevance }) => {
+        if (!photo.url || relevance === 0 || seen.has(photo.url)) return false;
+        seen.add(photo.url);
+        return true;
+      })
+      .sort((a, b) => b.relevance - a.relevance)
+      .map(({ photo }) => photo);
     const visible = photos.slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
@@ -648,9 +728,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       }
       if (pageSet.size >= 6) break;
     }
-    const contacts = await extractOwnerContacts([...pageSet]).catch(
-      () => [] as OwnerContact[],
-    );
+    const contacts = await extractOwnerContacts([...pageSet]).catch(() => [] as OwnerContact[]);
 
     return {
       ok: true as const,
