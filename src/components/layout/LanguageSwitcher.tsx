@@ -12,7 +12,15 @@ import { useTranslation } from "@/i18n/context";
 import { cn } from "@/lib/utils";
 import type { LocaleCode } from "@/config/languages";
 
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({
+  className,
+  align = "end",
+  compact = false,
+}: {
+  className?: string;
+  align?: "start" | "end";
+  compact?: boolean;
+}) {
   const { locale, setLocale, locales, t } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -24,7 +32,10 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("common.language")}
-        className="inline-flex size-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-card p-0 text-foreground transition-all hover:bg-accent active:scale-[0.98]"
+        className={cn(
+          "inline-flex items-center justify-center rounded-full border border-border bg-card p-0 text-foreground transition-all hover:bg-accent active:scale-[0.98]",
+          compact ? "size-7 min-h-7 min-w-7" : "size-11 min-h-11 min-w-11",
+        )}
       >
         <Globe className="size-4" aria-hidden />
         <span className="sr-only">{locale.toUpperCase()}</span>
@@ -40,7 +51,11 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           <ul
             role="listbox"
             aria-label={t("common.language")}
-            className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg"
+            className={cn(
+              "absolute z-40 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg",
+              align === "start" ? "left-0" : "right-0",
+              compact ? "top-24 mt-0" : null,
+            )}
           >
             {locales.map((l) => {
               const active = l.code === locale;

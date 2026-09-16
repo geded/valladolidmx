@@ -122,7 +122,7 @@ function PublicShellBody({
     return (
       <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
         {hasCrumbs ? (
-          <Container className="pb-1 pt-2 sm:pb-2 sm:pt-3">
+          <Container className="pb-5 pt-2 sm:pb-6 sm:pt-3">
             <BreadcrumbTerritorial
               crumbs={crumbs}
               useContextCrumbs={useContextCrumbs}
@@ -167,7 +167,9 @@ function PublicShellBody({
             ) : null}
           </header>
         ) : null}
-        <div className={cn(hasHeader ? "mt-12" : "mt-0")}>{children}</div>
+        <div className={cn(hasHeader ? "mt-12" : hasCrumbs ? "mt-5 sm:mt-6" : "mt-0")}>
+          {children}
+        </div>
       </Container>
     </main>
   );

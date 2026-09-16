@@ -256,7 +256,7 @@ export function PlacePremiumSurface({
           de hotel y restaurante (`PremiumHero`, presentación editorial).
           No existe hero propio de Lugares ni selector visible de
           dirección visual. */}
-      <PlaceContainer className="mt-2 sm:mt-3">
+      <PlaceContainer className={showBreadcrumbs ? "mt-2 sm:mt-3" : undefined}>
         <PremiumHero
           layout="entity"
           vm={{
