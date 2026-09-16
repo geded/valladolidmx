@@ -363,10 +363,12 @@ export const listMediaCms = createServerFn({ method: "POST" })
     // Miniatura editorial: los buckets son privados y los borradores no pasan
     // por el proxy público, así que firmamos URLs temporales (1 h) con la
     // sesión del editor. Sin firma la fila sigue mostrándose, sin miniatura.
-    const list = (rows ?? []) as Array<{
-      storage_bucket: string | null;
-      storage_path: string | null;
-    }>;
+    const list = (rows ?? []) as Array<
+      Record<string, unknown> & {
+        storage_bucket: string | null;
+        storage_path: string | null;
+      }
+    >;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = (context.supabase as any).storage;
     const byBucket = new Map<string, string[]>();
