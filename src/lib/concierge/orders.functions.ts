@@ -384,10 +384,10 @@ const ReservationListInput = z.object({
   pageSize: z.number().int().min(1).max(50).default(50),
 });
 
-function assertOperationsRole(claims: Record<string, unknown> | undefined) {
-  const raw = claims?.["user_roles"] ?? claims?.["roles"] ?? claims?.["role"];
-  const roles = Array.isArray(raw) ? raw.map(String) : typeof raw === "string" ? [raw] : [];
-  if (!roles.some((role) => ["admin", "super_admin", "concierge", "concierge_lead"].includes(role))) {
+async function assertOperationsRole(supabase: any, userId: string) {
+  const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  if (error) throw new Error(error.message);
+  if (!(data ?? []).some((row: { role: string }) => ["admin", "super_admin", "concierge", "concierge_lead"].includes(row.role))) {
     throw new Error("forbidden_concierge_operations");
   }
 }
@@ -396,7 +396,7 @@ export const listConciergeReservations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ReservationListInput.parse(data))
   .handler(async ({ data, context }): Promise<ConciergeReservationsResult> => {
-    assertOperationsRole(context.claims as Record<string, unknown> | undefined);
+    await assertOperationsRole(context.supabase, context.userId);
     let query = context.supabase
       .from("concierge_orders")
       .select("id, folio, source_kind, source_case_id, traveler_name, destination_name, editorial_title, status, payment_provider, payment_provider_intent_id, paid_at, created_at, total_amount, currency, travel_plan_id", { count: "exact" });
@@ -453,7 +453,7 @@ export const getConciergeReservation = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { orderId: string }) => ({ orderId: z.string().uuid().parse(data.orderId) }))
   .handler(async ({ data, context }) => {
-    assertOperationsRole(context.claims as Record<string, unknown> | undefined);
+    await assertOperationsRole(context.supabase, context.userId);
     const order = await getOrderForOperations(context.supabase, data.orderId);
     const [{ data: items, error: itemError }, { data: events, error: eventError }] = await Promise.all([
       context.supabase.from("concierge_order_items").select("id, title, description, quantity, unit_amount, currency, subtotal_amount, business_id, entity_kind, entity_id").eq("order_id", data.orderId).order("created_at"),
@@ -475,7 +475,7 @@ export const getConciergeReservationForCase = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { caseId: string }) => ({ caseId: z.string().uuid().parse(data.caseId) }))
   .handler(async ({ data, context }) => {
-    assertOperationsRole(context.claims as Record<string, unknown> | undefined);
+    await assertOperationsRole(context.supabase, context.userId);
     const { data: order, error } = await context.supabase.from("concierge_orders")
       .select("id, folio, status, total_amount, currency, payment_provider, paid_at")
       .eq("source_case_id", data.caseId).order("created_at", { ascending: false }).limit(1).maybeSingle();

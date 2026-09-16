@@ -584,6 +584,16 @@ const concierge: WorkspaceDefinition = {
       surfaces: ["sidebar", "bottom", "palette"],
       primary: true,
     },
+    {
+      id: "concierge.reservations",
+      workspaceId: "concierge",
+      label: "Reservaciones",
+      icon: CreditCard,
+      to: "/concierge/reservaciones",
+      group: "trabajo",
+      order: 2,
+      surfaces: ["sidebar", "bottom", "palette"],
+    },
   ],
   alux: {
     headline: "Hay 4 expedientes que requieren atención hoy.",
@@ -618,6 +628,12 @@ const concierge: WorkspaceDefinition = {
       run: (ctx) => ctx.navigate("/concierge"),
     },
     {
+      id: "concierge.cmd.reservations",
+      label: "Ver reservaciones",
+      icon: CreditCard,
+      run: (ctx) => ctx.navigate("/concierge/reservaciones"),
+    },
+    {
       id: "concierge.cmd.public-site",
       label: "Abrir sitio público",
       icon: ExternalLink,
@@ -636,11 +652,13 @@ const concierge: WorkspaceDefinition = {
       { type: "case", label: "Expediente" },
       { type: "traveler", label: "Viajero" },
       { type: "message", label: "Mensaje" },
+      { type: "reservation", label: "Reservación" },
     ],
     selectionModes: ["single", "multi"],
     views: [
       { id: "inbox", label: "Bandeja", kind: "list" },
       { id: "case", label: "Expediente", kind: "detail" },
+      { id: "reservations", label: "Reservaciones", kind: "list" },
     ],
   },
 };

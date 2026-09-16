@@ -18,10 +18,12 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   getConciergeOrder,
   markConciergeOrderPaidCash,
+  startConciergeOnlinePayment,
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
 import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
+import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
   component: CheckoutPage,
@@ -42,12 +44,15 @@ function CheckoutPage() {
   const fetchOrder = useServerFn(getConciergeOrder);
   const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
+  const startOnlinePayment = useServerFn(startConciergeOnlinePayment);
+  const fetchPaymentsReady = useServerFn(getPaymentsReadyPublic);
   const notifyAdmin = useServerFn(notifyAdminBookingPaid);
 
   const orderQ = useQuery({
     queryKey: ["concierge-order", orderId],
     queryFn: () => fetchOrder({ data: { orderId } }),
   });
+  const paymentsQ = useQuery({ queryKey: ["payments-ready"], queryFn: () => fetchPaymentsReady() });
 
   const [busy, setBusy] = useState(false);
 
@@ -157,6 +162,18 @@ function CheckoutPage() {
     }
   }
 
+  async function handleOnlinePayment() {
+    setBusy(true);
+    try {
+      const result = await startOnlinePayment({ data: { orderId, clientRequestId: crypto.randomUUID() } });
+      if (result.mode === "redirect" && result.redirectUrl) window.location.assign(result.redirectUrl);
+      else throw new Error("No se pudo abrir el pago en línea");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo iniciar el pago");
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="max-w-3xl">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -258,22 +275,24 @@ function CheckoutPage() {
                 acompañamiento de Alux.
               </p>
             </div>
-            <div
-              aria-disabled="true"
-              className="cursor-not-allowed rounded-md border border-border bg-muted/30 px-4 py-3 opacity-60"
-            >
+            <div className="rounded-md border border-border bg-background px-4 py-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-medium">Pagar con tarjeta</span>
                 <Badge variant="outline" className="text-[10px] uppercase">
-                  Próximamente
+                  {paymentsQ.data?.ready ? "Disponible" : "En preparación"}
                 </Badge>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                El pago con tarjeta estará disponible muy pronto.
+                {paymentsQ.data?.ready
+                  ? "Paga en línea de forma segura. Tu reservación se confirma automáticamente al aprobarse el cobro."
+                  : "El cobro en línea se activará cuando el proveedor de pagos termine su configuración."}
               </p>
             </div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
+            <Button onClick={handleOnlinePayment} disabled={busy || !paymentsQ.data?.ready} size="lg">
+              {busy ? "Abriendo pago…" : "Pagar en línea"}
+            </Button>
             <Button onClick={handleConfirm} disabled={busy} size="lg">
               {busy ? "Confirmando…" : "Confirmar mi viaje (pago en efectivo)"}
             </Button>
