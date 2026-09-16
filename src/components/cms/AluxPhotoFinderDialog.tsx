@@ -187,7 +187,7 @@ export function AluxPhotoFinderDialog({
               type="url"
               value={pasted}
               onChange={(e) => setPasted(e.target.value)}
-              placeholder="O pega el enlace de una foto"
+              placeholder="O pega el enlace de una foto (se guarda una copia)"
               aria-label="Enlace directo de una foto"
               className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
             />
@@ -215,7 +215,7 @@ export function AluxPhotoFinderDialog({
               }
               className="h-10 shrink-0 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
             >
-              Usar enlace
+              Traer copia
             </button>
           </div>
         </div>
