@@ -66,6 +66,7 @@ import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
 import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
+import { CaseMessages } from "@/components/concierge/CaseMessages";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
