@@ -31,6 +31,36 @@ interface Crumb {
   to?: string;
 }
 
+/**
+ * Algunas rutas intermedias no existen como pantalla propia
+ * (p. ej. `/cms/eventos/:id` sólo existe como `/editar`, o
+ * `/concierge/expedientes` sólo existe con expediente). Antes de
+ * enlazar o navegar comprobamos que la ruta realmente resuelva; si no,
+ * subimos al ancestro más cercano que sí exista.
+ */
+function pathResolves(router: ReturnType<typeof useRouter>, path: string): boolean {
+  try {
+    return Boolean(router.getMatchedRoutes(path)?.foundRoute);
+  } catch {
+    return false;
+  }
+}
+
+function nearestExistingAncestor(
+  router: ReturnType<typeof useRouter>,
+  path: string,
+  fallback: string,
+): string {
+  let candidate = path;
+  while (candidate && candidate !== "/") {
+    if (pathResolves(router, candidate)) return candidate;
+    const idx = candidate.lastIndexOf("/");
+    candidate = idx > 0 ? candidate.slice(0, idx) : "/";
+  }
+  return fallback;
+}
+
+
 export function WorkspaceTopbar({
   title,
   titleAsText = false,
