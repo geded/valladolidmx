@@ -272,9 +272,56 @@ async function reservationContext(
  * Panorama reciente de reservaciones (sólo lectura, RLS del propio usuario).
  * Permite responder "¿quién pagó al último?", "¿cuáles faltan por cobrar?".
  */
+/**
+ * Completa nombre/teléfono/correo del viajero cuando la reservación se guardó sin
+ * esos datos: se resuelven desde el expediente y el perfil del viajero (RLS vigente).
+ */
+async function fillTravelerContacts(supabase: any, orders: any[]): Promise<void> {
+  const caseIds = Array.from(
+    new Set(
+      orders
+        .filter((o) => !o.traveler_name || !o.traveler_phone || !o.traveler_email)
+        .map((o) => o.source_case_id)
+        .filter(Boolean),
+    ),
+  );
+  if (!caseIds.length) return;
+
+  const { data: cases } = await supabase
+    .from("concierge_cases")
+    .select("id, traveler_user_id")
+    .in("id", caseIds);
+  const userByCase = new Map<string, string>();
+  for (const k of (cases ?? []) as any[]) {
+    if (k.traveler_user_id) userByCase.set(k.id, k.traveler_user_id);
+  }
+  const userIds = Array.from(new Set(userByCase.values()));
+  if (!userIds.length) return;
+
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("user_id, display_name, first_name, last_name, email, phone")
+    .in("user_id", userIds);
+  const profileByUser = new Map<string, any>();
+  for (const p of (profiles ?? []) as any[]) profileByUser.set(p.user_id, p);
+
+  for (const o of orders) {
+    const userId = o.source_case_id ? userByCase.get(o.source_case_id) : undefined;
+    const p = userId ? profileByUser.get(userId) : undefined;
+    if (!p) continue;
+    const name =
+      p.display_name ||
+      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
+      null;
+    if (!o.traveler_name && name) o.traveler_name = name;
+    if (!o.traveler_phone && p.phone) o.traveler_phone = p.phone;
+    if (!o.traveler_email && p.email) o.traveler_email = p.email;
+  }
+}
+
 async function recentReservationsContext(supabase: any): Promise<string | null> {
   const columns =
-    "folio, source_kind, traveler_name, traveler_phone, traveler_email, destination_name, status, payment_provider, paid_at, created_at, total_amount, currency";
+    "folio, source_kind, source_case_id, traveler_name, traveler_phone, traveler_email, destination_name, status, payment_provider, paid_at, created_at, total_amount, currency";
 
   const [{ data: paid }, { data: pending }] = await Promise.all([
     supabase
