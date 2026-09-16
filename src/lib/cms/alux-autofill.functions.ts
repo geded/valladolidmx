@@ -930,21 +930,16 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    // Paso 1: Alux entiende la frase y la escribe como un experto en buscar
-    // imágenes. Si la IA no responde, se usa el plan determinista de siempre.
+    // Paso 1: Alux escribe la búsqueda. El editor sólo pone el tema; el destino
+    // de trabajo ya viaja en `data.place`, así que la IA compone la consulta
+    // completa como lo haría un buscador de imágenes. El plan determinista
+    // queda únicamente como respaldo cuando la IA no responde.
     const plan = buildQueryPlan(data.query, data.place);
     const ai = await planWithAi(data.query, data.place).catch(() => null);
-    const variants = [...new Set([...(ai?.queries ?? []), ...plan.variants])].slice(0, 5);
-    // La sede escrita por el editor ("centro histórico", "convento") viaja con
-    // la consulta: es lo que distingue una sede de otra dentro del destino.
-    const placeQuery = [
-      ai?.subject || plan.subjectPhrase || data.query,
-      plan.qualifiers.join(" "),
-      data.place,
-    ]
-      .filter(Boolean)
-      .join(" ");
-
+    const variants = (
+      ai?.queries.length ? ai.queries : plan.variants
+    ).slice(0, 5);
+    const placeQuery = variants[0] ?? [data.query, data.place].filter(Boolean).join(" ");
 
     const webBatches = await Promise.all(
       variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
@@ -963,26 +958,23 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       pool.push(photo);
     }
 
+    // Respaldo determinista: orden por coincidencia de palabras.
     const scored = pool
       .map((photo) => ({ photo, ...photoMatch(photo, plan) }))
       .filter((entry) => entry.relevance > 0)
       .sort((a, b) => b.relevance - a.relevance);
-
-    // Si alguna foto sí nombra el territorio, se descartan las que sólo
-    // coinciden con el tema: es material de otro lugar.
     const territorial = scored.filter((entry) => entry.placeMatch);
     const base = plan.place.length && territorial.length ? territorial : scored;
-
-    // Si el editor acotó la sede y hay fotos que la nombran, mandan esas.
     const onSede = base.filter((entry) => entry.qualifierMatch);
     const heuristic = (onSede.length ? onSede : base).map(({ photo }) => photo);
 
-
     // Paso 2: Alux revisa las candidatas y conserva sólo las que muestran lo
-    // pedido. El orden por palabras clave queda como respaldo.
-    const ordered = heuristic.length ? heuristic : pool;
+    // pedido. Cuando la IA planeó la búsqueda, juzga todo el conjunto (no sólo
+    // lo que pasó el filtro de palabras), que es lo que evita perder fotos
+    // buenas con título pobre y descartar las que no son del tema.
+    const ordered = ai ? pool : heuristic.length ? heuristic : pool;
     const curated = await rankWithAi(data.query, data.place, ordered).catch(() => null);
-    const visible = (curated ?? heuristic).slice(0, 24);
+    const visible = (curated ?? (heuristic.length ? heuristic : pool)).slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
     // permiso. Se lee sólo lo que ya está publicado; no se guarda nada.
