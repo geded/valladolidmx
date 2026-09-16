@@ -110,6 +110,7 @@ const PLAN_KIND_TO_TARGET: Record<string, TargetKind> = {
 export function ProposalStudio({ data }: { data: StudioCaseFile }) {
   const router = useRouter();
   const createFn = useServerFn(createConciergeProposal);
+  const scheduleFn = useServerFn(aluxSuggestProposalSchedule);
   const caseId = data.case.id;
   const plan = data.travel_plan ?? null;
   const quotes = (data.quotes ?? []).filter((q) => q.status === "submitted");
@@ -120,6 +121,7 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
   const [terms, setTerms] = useState("");
   const [validUntil, setValidUntil] = useState("");
   const [busy, setBusy] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
   const restored = useRef(false);
 
   const days = tripDayCount(plan?.start_date, plan?.end_date);
