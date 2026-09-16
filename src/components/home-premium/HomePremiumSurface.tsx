@@ -1158,9 +1158,9 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             <Button
               type="button"
               variant={mode === "today" ? "default" : "outline"}
-              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5"
-              onClick={() => {
-                setMode("today");
+                  className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
+                  onClick={() => {
+                    setMode("today");
                 setPage(0);
               }}
             >
