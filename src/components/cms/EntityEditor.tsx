@@ -118,6 +118,8 @@ export function EntityEditor(props: Props) {
 
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [error, setError] = useState<string | null>(null);
+  const [aluxOpen, setAluxOpen] = useState(false);
+
 
   useEffect(() => {
     if (detail.data) {
