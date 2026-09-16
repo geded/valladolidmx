@@ -387,3 +387,141 @@ export const registerItineraryCreditNote = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+/* --------------------- Alux · agenda sugerida (sólo interno) -------------------- */
+
+export interface AluxScheduleSuggestion {
+  index: number;
+  dayIndex: number;
+  startsAt: string;
+  durationMinutes: number | null;
+  reason?: string | null;
+}
+
+const ScheduleInput = z.object({
+  days: z.number().int().min(1).max(30),
+  startDate: z.string().max(20).nullable().optional(),
+  items: z
+    .array(
+      z.object({
+        index: z.number().int().min(0),
+        title: z.string().min(1).max(160),
+        notes: z.string().max(400).optional(),
+        dayIndex: z.number().int().nullable().optional(),
+        startsAt: z.string().max(10).optional(),
+        durationMinutes: z.number().int().positive().max(1440).nullable().optional(),
+      }),
+    )
+    .min(1)
+    .max(40),
+});
+
+const SCHEDULE_SYSTEM = `
+Eres Alux, copiloto interno del Concierge de Valladolid (Oriente Maya de Yucatán).
+Tu tarea: proponer día y hora local (zona America/Merida) para cada actividad de una
+propuesta de viaje, con criterio turístico real del destino.
+
+Criterios:
+· Reparte las actividades entre los días disponibles sin saturar: 2 o 3 actividades por día.
+· Actividades fuera de Valladolid (Ek Balam, Izamal, Chichén Itzá, cenotes lejanos, Río Lagartos)
+  empiezan temprano (08:00–09:00) y duran medio día o más.
+· City tours y recorridos a pie: 09:00–10:00. Comidas: 13:30–15:00. Cenas: 19:00–20:30.
+  Espectáculos y noches culturales: 20:00 en adelante.
+· No encimes horarios dentro del mismo día; deja al menos 30 minutos entre actividades.
+· Si una actividad ya trae día u hora capturados por el concierge, respétalos.
+· Duración estimada realista en minutos.
+
+Responde SÓLO con JSON válido, sin texto adicional, con esta forma exacta:
+{"items":[{"index":0,"dayIndex":0,"startsAt":"09:00","durationMinutes":180,"reason":"…"}]}
+dayIndex empieza en 0 (primer día del viaje). startsAt en formato HH:MM de 24 horas.
+`.trim();
+
+/** Propone día y hora para las partidas de la propuesta. Sólo personal interno. */
+export const aluxSuggestProposalSchedule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => ScheduleInput.parse(data))
+  .handler(async ({ data, context }): Promise<{ items: AluxScheduleSuggestion[] }> => {
+    const { data: editorial } = await context.supabase.rpc("is_editor_or_admin", {
+      _user_id: context.userId,
+    });
+    let allowed = Boolean(editorial);
+    if (!allowed) {
+      for (const role of ["concierge", "concierge_lead"] as const) {
+        const { data: has } = await context.supabase.rpc("has_role", {
+          _user_id: context.userId,
+          _role: role,
+        });
+        if (has) {
+          allowed = true;
+          break;
+        }
+      }
+    }
+    if (!allowed) throw new Error("forbidden_proposal_schedule");
+
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) throw new Error("alux_unavailable");
+
+    const [{ generateText }, { createLovableAiGatewayProvider }] = await Promise.all([
+      import("ai"),
+      import("@/lib/ai-gateway.server"),
+    ]);
+
+    const prompt = [
+      `Días disponibles del viaje: ${data.days}${data.startDate ? ` (inicia ${data.startDate})` : ""}.`,
+      "ACTIVIDADES:",
+      ...data.items.map((it) =>
+        [
+          `- index ${it.index}: ${it.title}`,
+          it.notes ? ` | notas: ${it.notes}` : "",
+          it.dayIndex != null ? ` | día ya capturado: ${it.dayIndex}` : "",
+          it.startsAt ? ` | hora ya capturada: ${it.startsAt}` : "",
+          it.durationMinutes ? ` | duración: ${it.durationMinutes} min` : "",
+        ].join(""),
+      ),
+    ].join("\n");
+
+    const res = await generateText({
+      model: createLovableAiGatewayProvider(apiKey)("google/gemini-3-flash-preview"),
+      system: SCHEDULE_SYSTEM,
+      prompt,
+      temperature: 0.2,
+      maxOutputTokens: 1200,
+      abortSignal: AbortSignal.timeout(30_000),
+    });
+
+    const raw = res.text ?? "";
+    const start = raw.indexOf("{");
+    const end = raw.lastIndexOf("}");
+    if (start < 0 || end <= start) throw new Error("alux_unavailable");
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw.slice(start, end + 1));
+    } catch {
+      throw new Error("alux_unavailable");
+    }
+
+    const list = (parsed as { items?: unknown }).items;
+    if (!Array.isArray(list)) throw new Error("alux_unavailable");
+    const valid = new Set(data.items.map((i) => i.index));
+    const items: AluxScheduleSuggestion[] = [];
+    for (const entry of list) {
+      const e = entry as Record<string, unknown>;
+      const index = typeof e["index"] === "number" ? e["index"] : null;
+      const dayIndex = typeof e["dayIndex"] === "number" ? e["dayIndex"] : null;
+      const startsAt = typeof e["startsAt"] === "string" ? e["startsAt"] : "";
+      if (index == null || !valid.has(index)) continue;
+      if (dayIndex == null || dayIndex < 0 || dayIndex >= data.days) continue;
+      if (!/^\d{2}:\d{2}$/.test(startsAt)) continue;
+      const duration = typeof e["durationMinutes"] === "number" ? e["durationMinutes"] : null;
+      items.push({
+        index,
+        dayIndex,
+        startsAt,
+        durationMinutes: duration && duration > 0 && duration <= 1440 ? duration : null,
+        reason: typeof e["reason"] === "string" ? e["reason"].slice(0, 160) : null,
+      });
+    }
+    if (items.length === 0) throw new Error("alux_unavailable");
+    return { items };
+  });
