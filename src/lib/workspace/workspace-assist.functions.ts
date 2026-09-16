@@ -431,6 +431,21 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       );
     }
 
+    // Sin folio ni caso abierto: panorama reciente para preguntas del tipo
+    // "¿quién pagó al último?" o "¿cuáles faltan por cobrar?".
+    let recentBlock: string | null = null;
+    if (!reservationBlock && data.workspaceId === "concierge") {
+      try {
+        recentBlock = await recentReservationsContext(context.supabase);
+      } catch (err) {
+        console.error(
+          "[alux.workspace-assist] no se pudo leer el panorama de reservaciones",
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
+
+
     const entityBlock =
       data.subject?.kind === "entity"
         ? [
