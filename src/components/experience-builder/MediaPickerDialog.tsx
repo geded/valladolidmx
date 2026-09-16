@@ -457,6 +457,14 @@ export function MediaPickerDialog({
           </div>
           <button
             type="button"
+            onClick={() => setPhotoFinderOpen(true)}
+            className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent"
+          >
+            <Sparkles className="size-3.5 text-alux" aria-hidden />
+            Buscar fotos con Alux
+          </button>
+          <button
+            type="button"
             onClick={() => setMode(mode === "upload" ? "library" : "upload")}
             className="inline-flex h-9 items-center gap-1 rounded-md border border-primary/40 bg-primary/5 px-3 text-xs font-medium text-primary hover:bg-primary/10"
           >
