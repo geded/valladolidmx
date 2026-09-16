@@ -33,6 +33,11 @@ interface UpscaleInput {
   targetLongSide: number;
   /** Uso destino, sólo para contextualizar el prompt. */
   roleLabel?: string;
+  /**
+   * `upscale` amplía a mayor resolución; `editorial` da un afinado editorial
+   * (luz, color, contraste y nitidez) sin alterar la escena.
+   */
+  mode?: "upscale" | "editorial";
 }
 
 export const aluxUpscaleImage = createServerFn({ method: "POST" })
@@ -46,7 +51,7 @@ export const aluxUpscaleImage = createServerFn({ method: "POST" })
     if (!d.mime.startsWith("image/")) throw new Error("invalid_input");
     // base64 ≈ 4/3 del tamaño real.
     if (d.bytesBase64.length * 0.75 > MAX_INPUT_BYTES) throw new Error("image_too_large");
-    return d;
+    return { ...d, mode: d.mode === "editorial" ? ("editorial" as const) : ("upscale" as const) };
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
@@ -54,13 +59,22 @@ export const aluxUpscaleImage = createServerFn({ method: "POST" })
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("missing_lovable_api_key");
 
-    const prompt = [
+    const prompt = (
+      data.mode === "editorial"
+        ? [
+            "Dale un acabado editorial de revista de viajes a esta fotografía, conservando exactamente la misma escena.",
+            data.roleLabel ? `Uso previsto: ${data.roleLabel}.` : "",
+            "Corrige exposición y balance de blancos, recupera detalle en luces y sombras, da color natural y cálido propio de Yucatán, y aporta nitidez y limpieza profesional.",
+            "No cambies el encuadre, la composición, la arquitectura, las personas, los rótulos ni ningún elemento visible. Nada de filtros artificiales, HDR exagerado, saturación irreal, objetos nuevos, texto, marcas de agua ni bordes.",
+          ]
+        : [
       "Amplía esta fotografía a mayor resolución conservando exactamente la misma escena.",
       `Tamaño objetivo aproximado: ${data.targetLongSide} px en el lado mayor (original ${data.width}×${data.height} px).`,
       data.roleLabel ? `Uso previsto: ${data.roleLabel}.` : "",
       "Reconstruye detalle y nitidez de forma realista. No cambies el encuadre, la composición, los colores, las personas, los rótulos ni ningún elemento visible.",
       "No añadas objetos, texto, marcas de agua ni bordes.",
-    ]
+          ]
+    )
       .filter(Boolean)
       .join(" ");
 

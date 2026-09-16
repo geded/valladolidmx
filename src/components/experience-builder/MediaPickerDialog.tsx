@@ -299,10 +299,13 @@ export function MediaPickerDialog({
    * queda por debajo del tamaño recomendado del uso. Nunca es automático y el
    * archivo ampliado vuelve a pasar por el mismo ingreso gobernado.
    */
-  async function handleAluxUpscale() {
+  async function handleAluxUpscale(mode: "upscale" | "editorial" = "upscale") {
     if (!file || !fileBytesBase64 || !fit || upscaling || readingFile || uploading) return;
+    const editorial = mode === "editorial";
     setError(null);
-    setNotice("Alux IA está ampliando la foto…");
+    setNotice(
+      editorial ? "Alux IA está dando el toque editorial…" : "Alux IA está ampliando la foto…",
+    );
     setUpscaling(true);
     try {
       const res = await upscale({
@@ -313,25 +316,34 @@ export function MediaPickerDialog({
           height: fit.height,
           targetLongSide: fit.recommendedLongSide,
           roleLabel: ROLE_LABELS[role],
+          mode,
         },
       });
       const bin = atob(res.bytesBase64);
       const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
-      const enlarged = new File([bytes], `${baseName}-alux.png`, {
+      const enlarged = new File([bytes], `${baseName}-alux${editorial ? "-editorial" : ""}.png`, {
         type: res.mime,
         lastModified: Date.now(),
       });
       const ingest = await applyPreparedFile(enlarged);
       setNotice(
-        ingest.width && ingest.height
-          ? `Alux IA amplió la foto a ${ingest.width}×${ingest.height} px. Revísala antes de subirla.`
-          : "Alux IA amplió la foto. Revísala antes de subirla.",
+        editorial
+          ? "Alux IA dio el toque editorial. Compárala y súbela si te convence."
+          : ingest.width && ingest.height
+            ? `Alux IA amplió la foto a ${ingest.width}×${ingest.height} px. Revísala antes de subirla.`
+            : "Alux IA amplió la foto. Revísala antes de subirla.",
       );
     } catch (err) {
       setNotice(null);
-      setError(err instanceof Error ? humanize(err.message) : "Alux IA no pudo ampliar la foto.");
+      setError(
+        err instanceof Error
+          ? humanize(err.message)
+          : editorial
+            ? "Alux IA no pudo afinar la foto."
+            : "Alux IA no pudo ampliar la foto.",
+      );
     } finally {
       setUpscaling(false);
     }
@@ -636,7 +648,7 @@ function UploadForm({
   onSubmit: () => void;
   fit: RoleFit | null;
   upscaling: boolean;
-  onAluxUpscale: () => void | Promise<void>;
+  onAluxUpscale: (mode?: "upscale" | "editorial") => void | Promise<void>;
 }) {
   const inputCls = "h-9 w-full rounded-md border border-border bg-background px-2 text-xs";
   return (
@@ -683,6 +695,28 @@ function UploadForm({
               <Sparkles className="size-3.5" aria-hidden />
             )}
             {upscaling ? "Alux IA está ampliando…" : "Ampliar con Alux IA"}
+          </button>
+        </div>
+      ) : null}
+
+      {preview ? (
+        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
+          <p className="text-[11px] text-muted-foreground">
+            Toque editorial: Alux IA corrige luz y color y da nitidez de revista de viajes, sin
+            cambiar la escena. Puedes revisarla antes de subirla.
+          </p>
+          <button
+            type="button"
+            onClick={() => void onAluxUpscale("editorial")}
+            disabled={upscaling || uploading}
+            className="mt-2 inline-flex h-9 items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 text-xs font-medium text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {upscaling ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Sparkles className="size-3.5" aria-hidden />
+            )}
+            {upscaling ? "Alux IA está trabajando…" : "Dar toque editorial con Alux IA"}
           </button>
         </div>
       ) : null}
