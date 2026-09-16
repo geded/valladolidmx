@@ -269,6 +269,55 @@ async function reservationContext(
     .join("\n");
 }
 
+/**
+ * Itinerario del viaje ligado a un expediente (sólo lectura, RLS del usuario).
+ * Permite a Alux resumir día a día lo que el concierge ya ve en el panel.
+ */
+async function itineraryContext(supabase: any, caseId: string): Promise<string | null> {
+  const { data: plan } = await supabase
+    .from("travel_plans")
+    .select("id, title, start_date, end_date, party_size")
+    .eq("case_id", caseId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!plan) return null;
+
+  const { data: items } = await supabase
+    .from("travel_plan_items")
+    .select("day_index, position, starts_at_local, duration_minutes, item_kind, notes, snapshot")
+    .eq("plan_id", plan.id)
+    .order("day_index", { ascending: true })
+    .order("position", { ascending: true })
+    .limit(60);
+
+  const rows = (items ?? []) as any[];
+  const lines = rows.map((i) => {
+    const snapshot = (i.snapshot ?? {}) as Record<string, unknown>;
+    const title =
+      (snapshot["title"] as string | null) ?? (snapshot["name"] as string | null) ?? i.item_kind;
+    const day = i.day_index == null ? "Sin día asignado" : `Día ${Number(i.day_index) + 1}`;
+    const hour = i.starts_at_local ? String(i.starts_at_local).slice(0, 5) : "sin hora";
+    const dur = i.duration_minutes ? `, ${i.duration_minutes} min` : "";
+    return `· ${day} — ${hour}${dur}: ${title}${i.notes ? ` (${i.notes})` : ""}.`;
+  });
+
+  const scheduled = rows.filter((i) => i.day_index != null || i.starts_at_local != null).length;
+
+  return [
+    "ITINERARIO DEL VIAJE (dato real, sólo lectura; hora de Mérida)",
+    `· Plan: ${plan.title ?? "Sin título"}.`,
+    plan.start_date
+      ? `· Fechas: del ${plan.start_date} al ${plan.end_date ?? plan.start_date}.`
+      : "· Sin fechas registradas.",
+    plan.party_size ? `· Personas: ${plan.party_size}.` : null,
+    `· Paradas: ${rows.length} en total, ${scheduled} con día u hora asignados.`,
+    ...(lines.length ? lines : ["· Todavía no hay paradas capturadas en este viaje."]),
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 
 /**
  * Panorama reciente de reservaciones (sólo lectura, RLS del propio usuario).
