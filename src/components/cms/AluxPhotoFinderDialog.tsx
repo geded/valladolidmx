@@ -6,15 +6,17 @@
  * siempre (optimización, ampliación opcional con Alux IA, original inmutable y
  * derechos declarados). Sólo editores y administradores.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Search, Sparkles, X } from "lucide-react";
+import { Loader2, MapPin, Search, Sparkles, X } from "lucide-react";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
   type OwnerContact,
   type PhotoCandidate,
 } from "@/lib/cms/alux-autofill.functions";
+import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsTerritoryOptions } from "@/components/cms/CmsTerritoryBar";
 
 export interface AluxPickedPhoto {
   file: File;
@@ -32,6 +34,8 @@ export interface AluxPhotoFinderDialogProps {
   initialQuery: string;
   /** Sitio web del negocio: de ahí se traen sus propias fotos. */
   website?: string | null;
+  /** Territorio explícito. Si se omite, se usa el destino de trabajo del CMS. */
+  place?: string | null;
   onPick: (photo: AluxPickedPhoto) => void;
 }
 
@@ -40,10 +44,21 @@ export function AluxPhotoFinderDialog({
   onClose,
   initialQuery,
   website,
+  place,
   onPick,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
   const fetchBytes = useServerFn(aluxFetchPhotoBytes);
+
+  const { territory } = useCmsTerritory();
+  const options = useCmsTerritoryOptions();
+  const workingPlace = useMemo(() => {
+    if (place && place.trim()) return place.trim();
+    const destination = options.destinations.find((d) => d.id === territory.destinationId);
+    if (!destination) return null;
+    const zone = options.zones.find((z) => z.id === territory.zoneId);
+    return [zone?.name, destination.name, "Yucatán, México"].filter(Boolean).join(", ");
+  }, [place, options.destinations, options.zones, territory.destinationId, territory.zoneId]);
 
   const [query, setQuery] = useState(initialQuery);
   const [site, setSite] = useState(website ?? "");
@@ -55,6 +70,7 @@ export function AluxPhotoFinderDialog({
   const [loading, setLoading] = useState(false);
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
 
   if (!open) return null;
 
@@ -68,8 +84,9 @@ export function AluxPhotoFinderDialog({
     setSearched(false);
     try {
       const res = await find({
-        data: { query: query.trim(), website: site.trim() || null },
+        data: { query: query.trim(), website: site.trim() || null, place: workingPlace },
       });
+
       setPhotos(res.photos);
       setContacts(res.contacts ?? []);
       setUsedQuery(res.relaxed ? res.usedQuery : null);
@@ -169,6 +186,9 @@ export function AluxPhotoFinderDialog({
                 if (e.key === "Enter") void search();
               }}
               aria-label="Qué foto buscas"
+              placeholder={
+                workingPlace ? "Sólo el tema: video mapping, cenote, fachada…" : "Qué foto buscas"
+              }
               className="h-10 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
             />
           </div>
@@ -181,6 +201,14 @@ export function AluxPhotoFinderDialog({
             {loading ? "Buscando…" : "Buscar"}
           </button>
         </div>
+
+        {workingPlace && (
+          <p className="flex items-center gap-1.5 border-b border-border bg-muted/20 px-4 py-1.5 text-[11px] text-muted-foreground">
+            <MapPin className="size-3.5 shrink-0" aria-hidden />
+            Buscando en {workingPlace}. No hace falta escribir el destino.
+          </p>
+        )}
+
 
         <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
           <input
