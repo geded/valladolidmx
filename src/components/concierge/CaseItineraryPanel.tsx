@@ -66,9 +66,8 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   const [amount, setAmount] = useState("");
 
   const sendToStudio = () => {
-    const chosen = (suggestions.data?.suggestions ?? []).filter((s) =>
-      picked.includes(s.label),
-    );
+    const all = (suggestions.data?.suggestions ?? []) as CaseSuggestion[];
+    const chosen = all.filter((s) => picked.includes(s.label));
     if (!chosen.length) return;
     try {
       window.sessionStorage.setItem(
