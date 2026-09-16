@@ -2202,9 +2202,7 @@ interface CaseSummary {
 }
 
 function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string }) {
-  const qc = useQueryClient();
   const fetchFile = useServerFn(getConciergeCaseFile);
-  const appendNote = useServerFn(ccTimelineAppend);
   const q = useQuery({
     queryKey: ["concierge", "case-file", "traveler", caseId],
     queryFn: () => fetchFile({ data: { caseId } }),
