@@ -269,6 +269,134 @@ async function reservationContext(
     .join("\n");
 }
 
+/**
+ * Itinerario del viaje ligado a un expediente (sólo lectura, RLS del usuario).
+ * Permite a Alux resumir día a día lo que el concierge ya ve en el panel.
+ */
+async function itineraryContext(supabase: any, caseId: string): Promise<string | null> {
+  const { data: plan } = await supabase
+    .from("travel_plans")
+    .select("id, title, start_date, end_date, party_size")
+    .eq("case_id", caseId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!plan) return null;
+
+  const { data: items } = await supabase
+    .from("travel_plan_items")
+    .select("day_index, position, starts_at_local, duration_minutes, item_kind, notes, snapshot")
+    .eq("plan_id", plan.id)
+    .order("day_index", { ascending: true })
+    .order("position", { ascending: true })
+    .limit(60);
+
+  const rows = (items ?? []) as any[];
+  const lines = rows.map((i) => {
+    const snapshot = (i.snapshot ?? {}) as Record<string, unknown>;
+    const title =
+      (snapshot["title"] as string | null) ?? (snapshot["name"] as string | null) ?? i.item_kind;
+    const day = i.day_index == null ? "Sin día asignado" : `Día ${Number(i.day_index) + 1}`;
+    const hour = i.starts_at_local ? String(i.starts_at_local).slice(0, 5) : "sin hora";
+    const dur = i.duration_minutes ? `, ${i.duration_minutes} min` : "";
+    return `· ${day} — ${hour}${dur}: ${title}${i.notes ? ` (${i.notes})` : ""}.`;
+  });
+
+  const scheduled = rows.filter((i) => i.day_index != null || i.starts_at_local != null).length;
+
+  return [
+    "ITINERARIO DEL VIAJE (dato real, sólo lectura; hora de Mérida)",
+    `· Plan: ${plan.title ?? "Sin título"}.`,
+    plan.start_date
+      ? `· Fechas: del ${plan.start_date} al ${plan.end_date ?? plan.start_date}.`
+      : "· Sin fechas registradas.",
+    plan.party_size ? `· Personas: ${plan.party_size}.` : null,
+    `· Paradas: ${rows.length} en total, ${scheduled} con día u hora asignados.`,
+    ...(lines.length ? lines : ["· Todavía no hay paradas capturadas en este viaje."]),
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+/**
+ * Expediente completo (sólo lectura, RLS del usuario): estado, prioridad,
+ * propuestas, conversación con el viajero y últimos movimientos.
+ */
+async function caseContext(supabase: any, caseId: string): Promise<string | null> {
+  const { data: kase } = await supabase
+    .from("concierge_cases")
+    .select(
+      "id, status, priority, priority_reason, source, summary, created_at, last_activity_at, target_response_at, traveler_user_id",
+    )
+    .eq("id", caseId)
+    .maybeSingle();
+  if (!kase) return null;
+
+  const [{ data: proposals }, { data: notes }, { data: timeline }] = await Promise.all([
+    supabase
+      .from("concierge_proposals")
+      .select("version, status, total_amount_cents, currency, sent_at, responded_at, summary")
+      .eq("case_id", caseId)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("concierge_case_notes")
+      .select("body, visibility, created_at, author_user_id")
+      .eq("case_id", caseId)
+      .order("created_at", { ascending: false })
+      .limit(8),
+    supabase
+      .from("concierge_case_timeline")
+      .select("event_type, summary, occurred_at")
+      .eq("case_id", caseId)
+      .order("occurred_at", { ascending: false })
+      .limit(8),
+  ]);
+
+  const proposalLines = ((proposals ?? []) as any[]).map(
+    (p) =>
+      `· Propuesta v${p.version} — ${p.status}, ${money(Number(p.total_amount_cents ?? 0), p.currency ?? "MXN")}${
+        p.sent_at ? `, enviada ${String(p.sent_at).slice(0, 10)}` : ""
+      }${p.responded_at ? `, respondida ${String(p.responded_at).slice(0, 10)}` : ""}.`,
+  );
+
+  const noteLines = ((notes ?? []) as any[])
+    .slice()
+    .reverse()
+    .map(
+      (n) =>
+        `· ${String(n.created_at).slice(0, 16).replace("T", " ")} — ${
+          n.visibility === "traveler" ? "conversación con el viajero" : "nota interna"
+        }${n.author_user_id === kase.traveler_user_id ? " (escribió el viajero)" : " (escribió el equipo)"}: ${String(
+          n.body ?? "",
+        ).slice(0, 240)}`,
+    );
+
+  const timelineLines = ((timeline ?? []) as any[]).map(
+    (t) =>
+      `· ${String(t.occurred_at).slice(0, 10)} — ${t.event_type}${t.summary ? `: ${String(t.summary).slice(0, 160)}` : ""}.`,
+  );
+
+  return [
+    "EXPEDIENTE DEL VIAJERO (dato real, sólo lectura)",
+    `· Estado: ${kase.status}. Prioridad: ${kase.priority ?? "sin definir"}${
+      kase.priority_reason ? ` (${kase.priority_reason})` : ""
+    }.`,
+    kase.summary ? `· Resumen: ${String(kase.summary).slice(0, 400)}` : null,
+    kase.source ? `· Origen: ${kase.source}.` : null,
+    `· Creado: ${String(kase.created_at).slice(0, 10)}. Última actividad: ${String(
+      kase.last_activity_at ?? kase.created_at,
+    ).slice(0, 10)}.`,
+    proposalLines.length ? "PROPUESTAS\n" + proposalLines.join("\n") : "· Sin propuestas registradas.",
+    noteLines.length ? "CONVERSACIÓN Y NOTAS (de lo más antiguo a lo más reciente)\n" + noteLines.join("\n") : null,
+    timelineLines.length ? "ÚLTIMOS MOVIMIENTOS\n" + timelineLines.join("\n") : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+
+
 
 /**
  * Panorama reciente de reservaciones (sólo lectura, RLS del propio usuario).
@@ -395,6 +523,11 @@ Tu tarea es acompañar a la persona en el panel que está viendo:
 · Explicar qué significa cada bandeja, etapa, fase, folio, indicador o acción.
 · Si el contexto trae una RESERVACIÓN CONSULTADA, responder sobre ese caso
   concreto: estado, forma de pago, importe, fechas y qué conviene hacer ahora.
+· Si el contexto trae un EXPEDIENTE DEL VIAJERO o un ITINERARIO DEL VIAJE,
+  úsalos para responder al instante: qué se le propuso, qué aceptó, qué se le
+  dijo en la conversación, qué hará cada día y a qué hora (hora de Mérida), qué
+  falta por agendar y qué conviene contestarle ahora al viajero.
+
 · Si el contexto trae una FICHA EN EDICIÓN, explicar qué se escribe en el campo
   o sección por la que preguntan, con qué extensión y tono, y qué falta para
   poder publicar. Puedes sugerir un ejemplo de redacción SIEMPRE marcándolo
@@ -472,15 +605,30 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
     // expediente abierto en la pantalla activa.
     const folioMatch = FOLIO_RE.exec(data.question);
     let reservationBlock: string | null = null;
+    let caseId: string | null = null;
     try {
       if (folioMatch?.[1]) {
-        reservationBlock = await reservationContext(context.supabase, {
-          folio: folioMatch[1].replace(/\s+/g, "-").toUpperCase(),
-        });
+        const folio = folioMatch[1].replace(/\s+/g, "-").toUpperCase();
+        reservationBlock = await reservationContext(context.supabase, { folio });
+        const { data: row } = await context.supabase
+          .from("concierge_orders")
+          .select("source_case_id")
+          .ilike("folio", folio.replace(/[%,]/g, ""))
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        caseId = (row as any)?.source_case_id ?? null;
       } else if (data.subject?.kind === "order" && data.subject.id) {
         reservationBlock = await reservationContext(context.supabase, { orderId: data.subject.id });
+        const { data: row } = await context.supabase
+          .from("concierge_orders")
+          .select("source_case_id")
+          .eq("id", data.subject.id)
+          .maybeSingle();
+        caseId = (row as any)?.source_case_id ?? null;
       } else if (data.subject?.kind === "case" && data.subject.id) {
         reservationBlock = await reservationContext(context.supabase, { caseId: data.subject.id });
+        caseId = data.subject.id;
       }
     } catch (err) {
       console.error(
@@ -489,10 +637,28 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       );
     }
 
+    // Expediente completo e itinerario del viaje: lo mismo que el concierge ve
+    // en pantalla, para poder responderle rápido a un viajero.
+    let caseBlock: string | null = null;
+    let itineraryBlock: string | null = null;
+    if (caseId) {
+      try {
+        [caseBlock, itineraryBlock] = await Promise.all([
+          caseContext(context.supabase, caseId),
+          itineraryContext(context.supabase, caseId),
+        ]);
+      } catch (err) {
+        console.error(
+          "[alux.workspace-assist] no se pudo leer el expediente o el itinerario",
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
+
     // Sin folio ni caso abierto: panorama reciente para preguntas del tipo
     // "¿quién pagó al último?" o "¿cuáles faltan por cobrar?".
     let recentBlock: string | null = null;
-    if (!reservationBlock && data.workspaceId === "concierge") {
+    if (!reservationBlock && !caseBlock && data.workspaceId === "concierge") {
       try {
         recentBlock = await recentReservationsContext(context.supabase);
       } catch (err) {
@@ -502,6 +668,7 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
         );
       }
     }
+
 
 
     const entityBlock =
@@ -531,8 +698,12 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       data.workspaceId === "cms" || entityBlock ? CMS_GLOSSARY : null,
       entityBlock,
       reservationBlock,
+      caseBlock,
+      itineraryBlock,
       recentBlock,
     ]
+
+
       .filter(Boolean)
       .join("\n\n");
 
