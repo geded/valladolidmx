@@ -84,8 +84,9 @@ export function AluxPhotoFinderDialog({
     setSearched(false);
     try {
       const res = await find({
-        data: { query: query.trim(), website: site.trim() || null },
+        data: { query: query.trim(), website: site.trim() || null, place: workingPlace },
       });
+
       setPhotos(res.photos);
       setContacts(res.contacts ?? []);
       setUsedQuery(res.relaxed ? res.usedQuery : null);
