@@ -271,6 +271,9 @@ export function PlaceEditor({ placeId }: Props) {
     );
   };
 
+  /** Última versión del lugar ya volcada al formulario. */
+  const hydratedRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!place) return;
     /* Sólo se recarga el formulario cuando cambia la versión persistida del
