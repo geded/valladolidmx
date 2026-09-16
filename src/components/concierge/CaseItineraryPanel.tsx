@@ -72,13 +72,24 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   });
 
   const plan = itinerary.data;
-  const days = new Map<number, typeof plan extends null ? never : NonNullable<typeof plan>["stops"]>();
+  type Stop = NonNullable<typeof plan>["stops"][number];
+  /** -1 agrupa las paradas que todavía no tienen día asignado. */
+  const days = new Map<number, Stop[]>();
   for (const stop of plan?.stops ?? []) {
-    const day = stop.day_index ?? 0;
+    const day = stop.day_index ?? -1;
     const list = days.get(day) ?? [];
     list.push(stop);
     days.set(day, list);
   }
+  const applySchedule = useMutation({
+    mutationFn: (proposalId: string) => applyFn({ data: { proposalId } }),
+    onSuccess: (r) => {
+      toast.success(`Horarios aplicados al viaje (${r.applied} paradas).`);
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const diff = summary.data?.difference_cents ?? 0;
   const currency = summary.data?.currency ?? "MXN";
