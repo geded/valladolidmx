@@ -296,7 +296,55 @@ export interface PhotoCandidate {
   author: string;
   license: string;
   sourceUrl: string;
-  provider: "Wikimedia Commons" | "Openverse";
+  provider: "Wikimedia Commons" | "Openverse" | "Sitio del negocio" | "Enlace directo";
+}
+
+/**
+ * Fotos publicadas por el propio negocio en su sitio web. Es material que la
+ * empresa difunde para promocionarse y que el editor incorpora a la ficha que
+ * le construimos; se conserva siempre el enlace a la fuente.
+ */
+async function searchBusinessSite(website: string): Promise<PhotoCandidate[]> {
+  let base: URL;
+  try {
+    base = new URL(website);
+  } catch {
+    return [];
+  }
+  if (base.protocol !== "https:") return [];
+  const res = await fetch(base.toString(), {
+    headers: { "User-Agent": "ValladolidMX-CMS/1.0" },
+  }).catch(() => null);
+  if (!res || !res.ok) return [];
+  const html = (await res.text()).slice(0, 400_000);
+  const urls = new Set<string>();
+  const push = (raw: string) => {
+    try {
+      const abs = new URL(raw.trim(), base);
+      if (abs.protocol !== "https:") return;
+      if (!/\.(jpe?g|png|webp|avif)(\?|$)/i.test(abs.pathname + abs.search)) return;
+      urls.add(abs.toString());
+    } catch {
+      /* enlace inválido */
+    }
+  };
+  for (const m of html.matchAll(
+    /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/gi,
+  )) {
+    push(m[1]);
+  }
+  for (const m of html.matchAll(/<img[^>]+src=["']([^"']+)["']/gi)) push(m[1]);
+  return [...urls].slice(0, 12).map((url) => ({
+    url,
+    thumbUrl: url,
+    width: 0,
+    height: 0,
+    title: decodeURIComponent(url.split("/").pop() ?? "foto").slice(0, 120),
+    author: base.hostname.replace(/^www\./, ""),
+    license: "Publicada por el negocio",
+    sourceUrl: base.toString(),
+    provider: "Sitio del negocio" as const,
+  }));
 }
 
 async function searchCommons(query: string): Promise<PhotoCandidate[]> {
