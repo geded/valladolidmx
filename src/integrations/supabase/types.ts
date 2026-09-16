@@ -8058,6 +8058,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      concierge_plan_apply_schedule: {
+        Args: { _case_id: string; _entries: Json }
+        Returns: number
+      }
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json

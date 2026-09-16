@@ -18,6 +18,7 @@ import {
   createItineraryAdjustmentCharge,
   registerItineraryCreditNote,
   applyProposalScheduleToPlan,
+  aluxScheduleCaseItinerary,
 } from "@/lib/concierge/proposal-studio.functions";
 
 
@@ -41,6 +42,7 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   const chargeFn = useServerFn(createItineraryAdjustmentCharge);
   const creditFn = useServerFn(registerItineraryCreditNote);
   const applyFn = useServerFn(applyProposalScheduleToPlan);
+  const aluxScheduleFn = useServerFn(aluxScheduleCaseItinerary);
 
 
   const itinerary = useQuery({
@@ -95,6 +97,26 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   });
 
 
+  const aluxSchedule = useMutation({
+    mutationFn: () => aluxScheduleFn({ data: { caseId } }),
+    onSuccess: (r) => {
+      if (r.applied > 0) {
+        toast.success(
+          `Alux armó la agenda: ${r.applied} paradas con día y hora. El viajero ya la ve en Mi Viaje.`,
+        );
+      } else {
+        toast.info("No había paradas por agendar en este viaje.");
+      }
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) =>
+      toast.error(
+        e.message === "alux_unavailable"
+          ? "Alux no pudo armar la agenda en este momento. Intenta de nuevo."
+          : e.message,
+      ),
+  });
+
   const diff = summary.data?.difference_cents ?? 0;
   const currency = summary.data?.currency ?? "MXN";
   const parsedAmount = Math.round(Number(amount.replace(/[^\d.]/g, "")) * 100);
@@ -115,28 +137,52 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
               {plan.end_date ? ` — ${meridaDate(plan.end_date)}` : ""}
               {plan.party_size ? ` · ${plan.party_size} personas` : ""}
             </p>
-            {plan.scheduled_count === 0 && plan.stops.length ? (
-              <div className="mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm">
-                <p className="font-medium">Este viaje todavía no tiene día ni hora asignados.</p>
-                <p className="mt-1 text-muted-foreground">
-                  Por eso se ve igual que la propuesta: son las mismas paradas, pero sin agenda. Los
-                  días y horas se capturan en el Estudio de Propuesta y luego se aplican al viaje.
-                </p>
-                {plan.latest_proposal_id && plan.proposal_scheduled_count > 0 ? (
-                  <Button
-                    className="mt-3"
-                    size="sm"
-                    disabled={applySchedule.isPending}
-                    onClick={() => applySchedule.mutate(plan.latest_proposal_id as string)}
-                  >
-                    Aplicar horarios de la propuesta al viaje
-                  </Button>
+            {plan.stops.length ? (
+              <div
+                className={
+                  plan.scheduled_count === 0
+                    ? "mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm"
+                    : "mt-3 rounded-md border border-border bg-muted/30 p-3 text-sm"
+                }
+              >
+                {plan.scheduled_count === 0 ? (
+                  <>
+                    <p className="font-medium">
+                      Este viaje todavía no tiene día ni hora asignados.
+                    </p>
+                    <p className="mt-1 text-muted-foreground">
+                      Por eso se ve igual que la propuesta: son las mismas paradas, pero sin agenda.
+                      Alux puede armarla con criterio del destino y el viajero la verá al instante
+                      en Mi Viaje.
+                    </p>
+                  </>
                 ) : (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    La propuesta tampoco tiene día ni hora: captúralos primero en el Estudio de
-                    Propuesta.
+                  <p className="text-muted-foreground">
+                    Alux puede completar los días y horas que falten, respetando lo que ya está
+                    capturado.
                   </p>
                 )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    disabled={aluxSchedule.isPending}
+                    onClick={() => aluxSchedule.mutate()}
+                  >
+                    {aluxSchedule.isPending
+                      ? "Alux está armando la agenda…"
+                      : "Armar agenda con Alux"}
+                  </Button>
+                  {plan.latest_proposal_id && plan.proposal_scheduled_count > 0 ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={applySchedule.isPending}
+                      onClick={() => applySchedule.mutate(plan.latest_proposal_id as string)}
+                    >
+                      Aplicar horarios de la propuesta al viaje
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             ) : null}
             {days.size ? (
