@@ -414,26 +414,67 @@ async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
   return out;
 }
 
-const STOPWORDS = new Set([
-  "de","del","la","el","los","las","en","y","a","un","una","con","por","para","al","que","su","sus","the","of","and",
-]);
-
 /**
- * Los acervos abiertos no indexan frases largas de campaña ("valladolid en la
- * historia video mapping"). Se prueba la consulta completa y, si no hay
- * resultados, se relaja progresivamente a los términos significativos.
+ * Fotos del propio lugar o sede publicadas en Google (ficha del negocio o del
+ * sitio). Es la fuente que de verdad corresponde al territorio: se resuelve la
+ * sede por nombre y se descargan sus fotos por el mismo flujo gobernado.
  */
-function queryVariants(query: string): string[] {
-  const tokens = query
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")
-    .split(/\s+/)
-    .filter((t) => t.length > 1 && !STOPWORDS.has(t));
-  const variants = [query.trim()];
-  if (tokens.length > 3) variants.push(tokens.slice(0, 3).join(" "));
-  if (tokens.length > 2) variants.push(tokens.slice(0, 2).join(" "));
-  if (tokens.length > 1) variants.push(tokens[0]);
-  return [...new Set(variants.filter(Boolean))];
+async function searchGooglePhotos(query: string): Promise<PhotoCandidate[]> {
+  const lovableKey = process.env.LOVABLE_API_KEY;
+  const mapsKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!lovableKey || !mapsKey) return [];
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${lovableKey}`,
+    "X-Connection-Api-Key": mapsKey,
+  };
+  const res = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
+    method: "POST",
+    headers: {
+      ...headers,
+      "X-Goog-FieldMask": "places.id,places.displayName,places.photos",
+    },
+    body: JSON.stringify({ textQuery: query, languageCode: "es", maxResultCount: 3 }),
+  }).catch(() => null);
+  if (!res || !res.ok) return [];
+  const json = (await res.json()) as {
+    places?: Array<{
+      displayName?: { text?: string };
+      id?: string;
+      photos?: Array<{
+        name?: string;
+        widthPx?: number;
+        heightPx?: number;
+        authorAttributions?: Array<{ displayName?: string; uri?: string }>;
+      }>;
+    }>;
+  };
+  const out: PhotoCandidate[] = [];
+  for (const place of json.places ?? []) {
+    for (const photo of (place.photos ?? []).slice(0, 6)) {
+      if (!photo.name) continue;
+      const media = await fetch(
+        `${GATEWAY_URL}/places/v1/${photo.name}/media?maxWidthPx=1600&skipHttpRedirect=true`,
+        { headers },
+      ).catch(() => null);
+      if (!media || !media.ok) continue;
+      const body = (await media.json()) as { photoUri?: string };
+      if (!body.photoUri) continue;
+      const attr = photo.authorAttributions?.[0];
+      out.push({
+        url: body.photoUri,
+        thumbUrl: body.photoUri,
+        width: Number(photo.widthPx ?? 0),
+        height: Number(photo.heightPx ?? 0),
+        title: place.displayName?.text ?? query,
+        author: attr?.displayName ?? "Google",
+        license: "Publicada en Google por el negocio o visitantes",
+        sourceUrl: attr?.uri ?? `https://www.google.com/maps/place/?q=place_id:${place.id ?? ""}`,
+        provider: "Google",
+      });
+    }
+  }
+  return out;
 }
 
 export const aluxFindPhotos = createServerFn({ method: "POST" })
