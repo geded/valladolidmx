@@ -3507,7 +3507,9 @@ export type Database = {
           id: string
           is_demo_seed: boolean
           is_free: boolean
+          latitude: number | null
           locale: Database["public"]["Enums"]["locale_code"]
+          longitude: number | null
           published_at: string | null
           recurrence_frequency: string | null
           recurrence_interval: number
@@ -3542,7 +3544,9 @@ export type Database = {
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
+          latitude?: number | null
           locale?: Database["public"]["Enums"]["locale_code"]
+          longitude?: number | null
           published_at?: string | null
           recurrence_frequency?: string | null
           recurrence_interval?: number
@@ -3577,7 +3581,9 @@ export type Database = {
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
+          latitude?: number | null
           locale?: Database["public"]["Enums"]["locale_code"]
+          longitude?: number | null
           published_at?: string | null
           recurrence_frequency?: string | null
           recurrence_interval?: number
