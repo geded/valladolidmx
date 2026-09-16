@@ -158,7 +158,7 @@ async function reservationContext(
   opts: { folio?: string; orderId?: string; caseId?: string },
 ): Promise<string | null> {
   const columns =
-    "id, folio, source_kind, source_case_id, traveler_name, destination_name, editorial_title, status, payment_provider, paid_at, created_at, total_amount, currency, travel_plan_id";
+    "id, folio, source_kind, source_case_id, traveler_name, traveler_email, traveler_phone, destination_name, editorial_title, status, payment_provider, paid_at, created_at, total_amount, currency, travel_plan_id";
   let query = supabase.from("concierge_orders").select(columns);
   if (opts.orderId) query = query.eq("id", opts.orderId);
   else if (opts.folio) query = query.ilike("folio", opts.folio.replace(/[%,]/g, ""));
