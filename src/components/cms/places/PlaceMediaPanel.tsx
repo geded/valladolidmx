@@ -32,6 +32,7 @@ export interface PlaceMediaAsset {
   id: string;
   storage_path: string;
   alt_text: string | null;
+  previewUrl?: string | null;
   review_state: string | null;
   status: string | null;
   metadata?: {
@@ -142,7 +143,20 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
     const approved = asset?.review_state === "approved";
     const temporary = isTemporaryAiAsset(asset);
     return (
-      <div className="min-w-0 flex-1">
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        {asset?.previewUrl ? (
+          <img
+            src={asset.previewUrl}
+            alt={asset.alt_text ?? ""}
+            loading="lazy"
+            className="h-16 w-24 shrink-0 rounded-md border border-border object-cover"
+          />
+        ) : (
+          <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
+            Sin vista previa
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="truncate text-xs font-medium">
             {asset?.alt_text || "Sin texto alternativo"}
@@ -157,6 +171,7 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
           {approved ? "Aprobada" : "Pendiente de aprobación"} · {asset?.status ?? "draft"}
           {temporary ? " · pendiente de sustitución por fotografía real" : ""}
         </p>
+        </div>
       </div>
     );
   };
