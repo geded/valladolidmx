@@ -414,6 +414,28 @@ async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
   return out;
 }
 
+const STOPWORDS = new Set([
+  "de","del","la","el","los","las","en","y","a","un","una","con","por","para","al","que","su","sus","the","of","and",
+]);
+
+/**
+ * Los acervos abiertos no indexan frases largas de campaña ("valladolid en la
+ * historia video mapping"). Se prueba la consulta completa y, si no hay
+ * resultados, se relaja progresivamente a los términos significativos.
+ */
+function queryVariants(query: string): string[] {
+  const tokens = query
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1 && !STOPWORDS.has(t));
+  const variants = [query.trim()];
+  if (tokens.length > 3) variants.push(tokens.slice(0, 3).join(" "));
+  if (tokens.length > 2) variants.push(tokens.slice(0, 2).join(" "));
+  if (tokens.length > 1) variants.push(tokens[0]);
+  return [...new Set(variants.filter(Boolean))];
+}
+
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { query: string; website?: string | null }) => {
