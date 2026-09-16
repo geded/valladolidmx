@@ -17,6 +17,7 @@ type Row = {
   kind: string | null;
   storage_bucket: string | null;
   storage_path: string | null;
+  previewUrl?: string | null;
   alt_text: string | null;
   alt_text_ai: string | null;
   alt_text_source: "none" | "ai_pending" | "ai" | "human" | null;
@@ -326,6 +327,23 @@ function MediaPage() {
         </div>
       }
       columns={[
+        {
+          key: "thumb",
+          header: "Imagen",
+          render: (r) =>
+            r.previewUrl ? (
+              <img
+                src={r.previewUrl}
+                alt={r.alt_text ?? ""}
+                loading="lazy"
+                className="h-14 w-20 rounded-md border border-border object-cover"
+              />
+            ) : (
+              <div className="flex h-14 w-20 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
+                Sin vista previa
+              </div>
+            ),
+        },
         {
           key: "alt",
           header: "ALT",
