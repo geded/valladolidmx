@@ -150,6 +150,7 @@ import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCuentaAnfitrionRouteImport } from './routes/_authenticated/cuenta/anfitrion'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
+import { Route as AuthenticatedConciergeReservacionesRouteImport } from './routes/_authenticated/concierge/reservaciones'
 import { Route as AuthenticatedCmsVisitorIntelRouteImport } from './routes/_authenticated/cms/visitor-intel'
 import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authenticated/cms/visibilidad'
 import { Route as AuthenticatedCmsVentasEnLineaRouteImport } from './routes/_authenticated/cms/ventas-en-linea'
@@ -222,6 +223,7 @@ import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_aut
 import { Route as AuthenticatedCuentaDocumentosOrderIdRouteImport } from './routes/_authenticated/cuenta/documentos.$orderId'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
 import { Route as AuthenticatedCuentaCheckoutOrderIdRouteImport } from './routes/_authenticated/cuenta/checkout.$orderId'
+import { Route as AuthenticatedConciergeReservacionesOrderIdRouteImport } from './routes/_authenticated/concierge/reservaciones.$orderId'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
 import { Route as AuthenticatedCmsVisitorIntelDecisionsRouteImport } from './routes/_authenticated/cms/visitor-intel_.decisions'
@@ -1046,6 +1048,12 @@ const AuthenticatedCuentaActividadRoute =
     path: '/actividad',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedConciergeReservacionesRoute =
+  AuthenticatedConciergeReservacionesRouteImport.update({
+    id: '/reservaciones',
+    path: '/reservaciones',
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
+  } as any)
 const AuthenticatedCmsVisitorIntelRoute =
   AuthenticatedCmsVisitorIntelRouteImport.update({
     id: '/visitor-intel',
@@ -1465,6 +1473,12 @@ const AuthenticatedCuentaCheckoutOrderIdRoute =
     path: '/checkout/$orderId',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedConciergeReservacionesOrderIdRoute =
+  AuthenticatedConciergeReservacionesOrderIdRouteImport.update({
+    id: '/$orderId',
+    path: '/$orderId',
+    getParentRoute: () => AuthenticatedConciergeReservacionesRoute,
+  } as any)
 const AuthenticatedConciergeExpedientesCaseIdRoute =
   AuthenticatedConciergeExpedientesCaseIdRouteImport.update({
     id: '/expedientes/$caseId',
@@ -1829,6 +1843,7 @@ export interface FileRoutesByFullPath {
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
+  '/concierge/reservaciones': typeof AuthenticatedConciergeReservacionesRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1887,6 +1902,7 @@ export interface FileRoutesByFullPath {
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
+  '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -2073,6 +2089,7 @@ export interface FileRoutesByTo {
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
+  '/concierge/reservaciones': typeof AuthenticatedConciergeReservacionesRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -2129,6 +2146,7 @@ export interface FileRoutesByTo {
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
+  '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -2325,6 +2343,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/_authenticated/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
+  '/_authenticated/concierge/reservaciones': typeof AuthenticatedConciergeReservacionesRouteWithChildren
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -2383,6 +2402,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/visitor-intel_/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
+  '/_authenticated/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/_authenticated/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/_authenticated/cuenta/documentos/$orderId': typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -2580,6 +2600,7 @@ export interface FileRouteTypes {
     | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
     | '/cms/visitor-intel'
+    | '/concierge/reservaciones'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
     | '/cuenta/carrito'
@@ -2638,6 +2659,7 @@ export interface FileRouteTypes {
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
+    | '/concierge/reservaciones/$orderId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
     | '/cuenta/documentos/$orderId'
@@ -2824,6 +2846,7 @@ export interface FileRouteTypes {
     | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
     | '/cms/visitor-intel'
+    | '/concierge/reservaciones'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
     | '/cuenta/carrito'
@@ -2880,6 +2903,7 @@ export interface FileRouteTypes {
     | '/cms/visibilidad/spotlight'
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
+    | '/concierge/reservaciones/$orderId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
     | '/cuenta/documentos/$orderId'
@@ -3075,6 +3099,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/ventas-en-linea'
     | '/_authenticated/cms/visibilidad'
     | '/_authenticated/cms/visitor-intel'
+    | '/_authenticated/concierge/reservaciones'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/anfitrion'
     | '/_authenticated/cuenta/carrito'
@@ -3133,6 +3158,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/visitor-intel_/decisions'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
+    | '/_authenticated/concierge/reservaciones/$orderId'
     | '/_authenticated/cuenta/checkout/$orderId'
     | '/_authenticated/cuenta/concierge/$caseId'
     | '/_authenticated/cuenta/documentos/$orderId'
@@ -4308,6 +4334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaActividadRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/concierge/reservaciones': {
+      id: '/_authenticated/concierge/reservaciones'
+      path: '/reservaciones'
+      fullPath: '/concierge/reservaciones'
+      preLoaderRoute: typeof AuthenticatedConciergeReservacionesRouteImport
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
+    }
     '/_authenticated/cms/visitor-intel': {
       id: '/_authenticated/cms/visitor-intel'
       path: '/visitor-intel'
@@ -4812,6 +4845,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaCheckoutOrderIdRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/concierge/reservaciones/$orderId': {
+      id: '/_authenticated/concierge/reservaciones/$orderId'
+      path: '/$orderId'
+      fullPath: '/concierge/reservaciones/$orderId'
+      preLoaderRoute: typeof AuthenticatedConciergeReservacionesOrderIdRouteImport
+      parentRoute: typeof AuthenticatedConciergeReservacionesRoute
+    }
     '/_authenticated/concierge/expedientes/$caseId': {
       id: '/_authenticated/concierge/expedientes/$caseId'
       path: '/expedientes/$caseId'
@@ -5133,6 +5173,21 @@ const AuthenticatedAdminRouteRouteWithChildren =
     AuthenticatedAdminRouteRouteChildren,
   )
 
+interface AuthenticatedConciergeReservacionesRouteChildren {
+  AuthenticatedConciergeReservacionesOrderIdRoute: typeof AuthenticatedConciergeReservacionesOrderIdRoute
+}
+
+const AuthenticatedConciergeReservacionesRouteChildren: AuthenticatedConciergeReservacionesRouteChildren =
+  {
+    AuthenticatedConciergeReservacionesOrderIdRoute:
+      AuthenticatedConciergeReservacionesOrderIdRoute,
+  }
+
+const AuthenticatedConciergeReservacionesRouteWithChildren =
+  AuthenticatedConciergeReservacionesRoute._addFileChildren(
+    AuthenticatedConciergeReservacionesRouteChildren,
+  )
+
 interface AuthenticatedConciergeExpedientesCaseIdRouteChildren {
   AuthenticatedConciergeExpedientesCaseIdPropuestaRoute: typeof AuthenticatedConciergeExpedientesCaseIdPropuestaRoute
   AuthenticatedConciergeExpedientesCaseIdIndexRoute: typeof AuthenticatedConciergeExpedientesCaseIdIndexRoute
@@ -5152,12 +5207,15 @@ const AuthenticatedConciergeExpedientesCaseIdRouteWithChildren =
   )
 
 interface AuthenticatedConciergeRouteRouteChildren {
+  AuthenticatedConciergeReservacionesRoute: typeof AuthenticatedConciergeReservacionesRouteWithChildren
   AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
   AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
 }
 
 const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRouteChildren =
   {
+    AuthenticatedConciergeReservacionesRoute:
+      AuthenticatedConciergeReservacionesRouteWithChildren,
     AuthenticatedConciergeIndexRoute: AuthenticatedConciergeIndexRoute,
     AuthenticatedConciergeExpedientesCaseIdRoute:
       AuthenticatedConciergeExpedientesCaseIdRouteWithChildren,
