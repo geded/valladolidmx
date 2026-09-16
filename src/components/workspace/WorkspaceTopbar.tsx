@@ -237,6 +237,7 @@ export function WorkspaceTopbar({
         <Command className="h-4 w-4" aria-hidden />
       </button>
       <ConnectivityIndicator />
+      {workspace?.id === "concierge" ? <ConciergeNotificationsBell /> : null}
       <button
         type="button"
         onClick={() => setInspector(inspectorOpen ? "closed" : "docked")}
