@@ -696,6 +696,8 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       caseBlock,
       itineraryBlock,
       recentBlock,
+    ]
+
 
       .filter(Boolean)
       .join("\n\n");
