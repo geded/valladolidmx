@@ -29,6 +29,8 @@ export interface AluxPhotoFinderDialogProps {
   onClose: () => void;
   /** Consulta inicial: nombre de la ficha + destino. */
   initialQuery: string;
+  /** Sitio web del negocio: de ahí se traen sus propias fotos. */
+  website?: string | null;
   onPick: (photo: AluxPickedPhoto) => void;
 }
 
@@ -36,12 +38,15 @@ export function AluxPhotoFinderDialog({
   open,
   onClose,
   initialQuery,
+  website,
   onPick,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
   const fetchBytes = useServerFn(aluxFetchPhotoBytes);
 
   const [query, setQuery] = useState(initialQuery);
+  const [site, setSite] = useState(website ?? "");
+  const [pasted, setPasted] = useState("");
   const [photos, setPhotos] = useState<PhotoCandidate[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -55,7 +60,9 @@ export function AluxPhotoFinderDialog({
     setLoading(true);
     setError(null);
     try {
-      const res = await find({ data: { query: query.trim() } });
+      const res = await find({
+        data: { query: query.trim(), website: site.trim() || null },
+      });
       setPhotos(res.photos);
       setSearched(true);
     } catch (err) {
@@ -125,8 +132,8 @@ export function AluxPhotoFinderDialog({
               Buscar fotos con Alux
             </h2>
             <p className="text-[11px] text-muted-foreground">
-              Sólo acervos de licencia libre verificable. La foto elegida entra por el mismo flujo:
-              se optimiza, puede ampliarse y conserva autor y licencia.
+              Busca fotos del propio sitio del negocio y de acervos abiertos. La foto elegida entra
+              por el mismo flujo: se optimiza, puede ampliarse y conserva autor y fuente.
             </p>
           </div>
           <button
@@ -166,6 +173,53 @@ export function AluxPhotoFinderDialog({
           </button>
         </div>
 
+        <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
+          <input
+            type="url"
+            value={site}
+            onChange={(e) => setSite(e.target.value)}
+            placeholder="Sitio web del negocio (https://…)"
+            aria-label="Sitio web del negocio"
+            className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
+          />
+          <div className="flex flex-1 items-center gap-2">
+            <input
+              type="url"
+              value={pasted}
+              onChange={(e) => setPasted(e.target.value)}
+              placeholder="O pega el enlace de una foto"
+              aria-label="Enlace directo de una foto"
+              className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
+            />
+            <button
+              type="button"
+              disabled={!pasted.trim().startsWith("https://") || picking !== null}
+              onClick={() =>
+                void choose({
+                  url: pasted.trim(),
+                  thumbUrl: pasted.trim(),
+                  width: 0,
+                  height: 0,
+                  title: decodeURIComponent(pasted.trim().split("/").pop() ?? "foto").slice(0, 120),
+                  author: (() => {
+                    try {
+                      return new URL(pasted.trim()).hostname.replace(/^www\./, "");
+                    } catch {
+                      return "";
+                    }
+                  })(),
+                  license: "Publicada por el negocio",
+                  sourceUrl: site.trim() || pasted.trim(),
+                  provider: "Enlace directo",
+                })
+              }
+              className="h-10 shrink-0 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+            >
+              Usar enlace
+            </button>
+          </div>
+        </div>
+
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {error && (
             <p
@@ -179,14 +233,14 @@ export function AluxPhotoFinderDialog({
           {loading && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" aria-hidden />
-              Buscando fotos libres de «{query}»…
+              Buscando fotos de «{query}»…
             </p>
           )}
 
           {!loading && searched && photos.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No hay fotos de licencia libre para esa búsqueda. Prueba con otro nombre o sube
-              fotografía propia.
+              No encontramos fotos con esa búsqueda. Prueba con otro nombre, agrega el sitio web
+              del negocio o pega el enlace de una foto suya.
             </p>
           )}
 
@@ -204,7 +258,8 @@ export function AluxPhotoFinderDialog({
                     {photo.title}
                   </p>
                   <p className="text-muted-foreground">
-                    {photo.width}×{photo.height} px · {photo.license}
+                    {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
+                    {photo.license}
                   </p>
                   <p className="truncate text-muted-foreground">
                     {photo.author || "Autor no declarado"} · {photo.provider}
