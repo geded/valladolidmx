@@ -220,6 +220,20 @@ export function EntityEditor(props: Props) {
           )}
           <button
             type="button"
+            onClick={() => setAutofillOpen(true)}
+            disabled={autofillName.trim().length < 2}
+            title={
+              autofillName.trim().length < 2
+                ? "Escribe primero el nombre de la ficha"
+                : "Alux propone el contenido de esta ficha"
+            }
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            Completar con Alux
+          </button>
+          <button
+            type="button"
             onClick={() => setAluxOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted"
           >
@@ -228,6 +242,15 @@ export function EntityEditor(props: Props) {
           </button>
         </div>
       </header>
+
+      <AluxAutofillDialog
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        entityKind={title}
+        name={autofillName}
+        fields={autofillFields}
+        onApply={(patch) => setValues((v) => ({ ...v, ...patch }))}
+      />
 
       <AluxWorkspaceChat
         open={aluxOpen}
