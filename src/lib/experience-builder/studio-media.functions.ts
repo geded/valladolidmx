@@ -229,8 +229,16 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
         };
       },
     );
+    const visible = filter === "conceptual" ? mapped.filter((r) => r.conceptual) : mapped;
+    const signedByPath = await signPreviewUrls(
+      context.supabase,
+      visible.map((r) => r.storagePath),
+    );
     return {
-      rows: filter === "conceptual" ? mapped.filter((r) => r.conceptual) : mapped,
+      rows: visible.map((r) => ({
+        ...r,
+        previewUrl: signedByPath.get(r.storagePath) ?? r.url,
+      })),
       total: count ?? 0,
       limit,
       offset,
