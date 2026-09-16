@@ -128,7 +128,7 @@ export function AluxWorkspaceChat({
         >
           {turns.length === 0 ? (
             <p className="text-muted-foreground">
-              Escribe tu pregunta o elige una de abajo. Alux sólo explica el panel; no cambia nada.
+              Escribe tu pregunta o elige una de abajo. Alux explica y consulta; nunca cambia nada por su cuenta.
             </p>
           ) : (
             turns.map((t, i) => (
