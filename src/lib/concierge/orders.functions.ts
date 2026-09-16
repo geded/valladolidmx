@@ -375,11 +375,21 @@ export interface ConciergeReservationsResult {
   totals: { cash: number; online: number; pending: number; reservations: number; currency: string };
 }
 
+export function reservationPaymentLabel(provider: string | null, paidAt: string | null) {
+  if (!paidAt) return "Sin pago";
+  if (provider === "cash") return "Efectivo";
+  if (provider === "demo") return "Demostración";
+  return "En línea";
+}
+
 const ReservationListInput = z.object({
   search: z.string().trim().max(120).default(""),
   status: z.string().max(30).default("all"),
   payment: z.enum(["all", "cash", "online", "unpaid"]).default("all"),
   source: z.enum(["all", "direct_sale", "concierge_proposal"]).default("all"),
+  destination: z.string().trim().max(120).default(""),
+  fromDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  toDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(50).default(50),
 });
@@ -406,6 +416,9 @@ export const listConciergeReservations = createServerFn({ method: "POST" })
     }
     if (data.status !== "all") query = query.eq("status", data.status);
     if (data.source !== "all") query = query.eq("source_kind", data.source);
+    if (data.destination) query = query.ilike("destination_name", `%${data.destination.replace(/[%,]/g, "")}%`);
+    if (data.fromDate) query = query.gte("created_at", `${data.fromDate}T00:00:00-06:00`);
+    if (data.toDate) query = query.lte("created_at", `${data.toDate}T23:59:59-06:00`);
     if (data.payment === "cash") query = query.eq("payment_provider", "cash");
     if (data.payment === "online") query = query.not("payment_provider", "is", null).not("payment_provider", "in", "(cash,demo)");
     if (data.payment === "unpaid") query = query.is("paid_at", null);
@@ -425,6 +438,12 @@ export const listConciergeReservations = createServerFn({ method: "POST" })
     let totalsQuery = context.supabase.from("concierge_orders").select("status, payment_provider, total_amount, currency");
     if (data.status !== "all") totalsQuery = totalsQuery.eq("status", data.status);
     if (data.source !== "all") totalsQuery = totalsQuery.eq("source_kind", data.source);
+    if (data.destination) totalsQuery = totalsQuery.ilike("destination_name", `%${data.destination.replace(/[%,]/g, "")}%`);
+    if (data.fromDate) totalsQuery = totalsQuery.gte("created_at", `${data.fromDate}T00:00:00-06:00`);
+    if (data.toDate) totalsQuery = totalsQuery.lte("created_at", `${data.toDate}T23:59:59-06:00`);
+    if (data.payment === "cash") totalsQuery = totalsQuery.eq("payment_provider", "cash");
+    if (data.payment === "online") totalsQuery = totalsQuery.not("payment_provider", "is", null).not("payment_provider", "in", "(cash,demo)");
+    if (data.payment === "unpaid") totalsQuery = totalsQuery.is("paid_at", null);
     const { data: totalRows, error: totalsError } = await totalsQuery.limit(5000);
     if (totalsError) throw new Error(totalsError.message);
     const realRows = (totalRows ?? []).filter((row) => row.payment_provider !== "demo");
