@@ -180,8 +180,8 @@ export function AluxPhotoFinderDialog({
             type="url"
             value={site}
             onChange={(e) => setSite(e.target.value)}
-            placeholder="Sitio web del negocio (https://…)"
-            aria-label="Sitio web del negocio"
+            placeholder="Página del negocio o del evento (https://…)"
+            aria-label="Página del negocio o del evento"
             className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
           />
           <div className="flex flex-1 items-center gap-2">
