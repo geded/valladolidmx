@@ -301,7 +301,69 @@ export interface PhotoCandidate {
     | "Openverse"
     | "Sitio del negocio"
     | "Enlace directo"
-    | "Google";
+    | "Google"
+    | "Web";
+}
+
+/**
+ * Búsqueda abierta de imágenes en la web sobre el tema escrito por el editor
+ * (mismo resultado que un buscador de imágenes). Cada resultado conserva la
+ * página de origen para que el editor verifique el permiso antes de usarla.
+ */
+async function searchWebImages(query: string): Promise<PhotoCandidate[]> {
+  const UA =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+  const base = { "User-Agent": UA, "Accept-Language": "es-MX,es;q=0.9" };
+  const seed = await fetch(
+    `https://duckduckgo.com/?q=${encodeURIComponent(query)}&iar=images&iax=images&ia=images`,
+    { headers: base },
+  ).catch(() => null);
+  if (!seed || !seed.ok) return [];
+  const vqd = (/vqd=["']?([\d-]+)["']?/.exec(await seed.text()) ?? [])[1];
+  if (!vqd) return [];
+  const res = await fetch(
+    `https://duckduckgo.com/i.js?l=es-es&o=json&q=${encodeURIComponent(query)}&vqd=${vqd}&f=,,,,,&p=1`,
+    {
+      headers: {
+        ...base,
+        Referer: "https://duckduckgo.com/",
+        Accept: "application/json, text/javascript, */*; q=0.01",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    },
+  ).catch(() => null);
+  if (!res || !res.ok) return [];
+  const json = (await res.json().catch(() => null)) as {
+    results?: Array<Record<string, unknown>>;
+  } | null;
+  const out: PhotoCandidate[] = [];
+  for (const r of json?.results ?? []) {
+    const url = String(r.image ?? "");
+    if (!url.startsWith("https://")) continue;
+    const width = Number(r.width ?? 0);
+    const height = Number(r.height ?? 0);
+    if (width && height && (width < 600 || height < 400)) continue;
+    const sourceUrl = String(r.url ?? "");
+    let host = "";
+    try {
+      host = new URL(sourceUrl || url).hostname.replace(/^www\./, "");
+    } catch {
+      host = "";
+    }
+    out.push({
+      url,
+      thumbUrl: String(r.thumbnail ?? url),
+      width,
+      height,
+      title: String(r.title ?? query).slice(0, 120),
+      author: String(r.source ?? host),
+      license: "Requiere permiso del titular",
+      sourceUrl: sourceUrl || url,
+      provider: "Web",
+    });
+    if (out.length >= 30) break;
+  }
+  return out;
 }
 
 /**
