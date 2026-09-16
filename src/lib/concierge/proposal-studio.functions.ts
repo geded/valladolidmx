@@ -624,3 +624,95 @@ export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { applied: Number(applied ?? 0) };
   });
+
+type ScheduleCallInput = z.infer<typeof ScheduleInput>;
+
+/** Núcleo compartido: valida rol interno y pide la agenda a Alux. */
+async function aluxScheduleCall(
+  input: ScheduleCallInput,
+  context: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string },
+): Promise<AluxScheduleSuggestion[]> {
+  const { data: editorial } = await context.supabase.rpc("is_editor_or_admin", {
+    _user_id: context.userId,
+  });
+  let allowed = Boolean(editorial);
+  if (!allowed) {
+    for (const role of ["concierge", "concierge_lead"] as const) {
+      const { data: has } = await context.supabase.rpc("has_role", {
+        _user_id: context.userId,
+        _role: role,
+      });
+      if (has) {
+        allowed = true;
+        break;
+      }
+    }
+  }
+  if (!allowed) throw new Error("forbidden_proposal_schedule");
+
+  const apiKey = process.env["LOVABLE_API_KEY"];
+  if (!apiKey) throw new Error("alux_unavailable");
+
+  const [{ generateText }, { createLovableAiGatewayProvider }] = await Promise.all([
+    import("ai"),
+    import("@/lib/ai-gateway.server"),
+  ]);
+
+  const prompt = [
+    `Días disponibles del viaje: ${input.days}${input.startDate ? ` (inicia ${input.startDate})` : ""}.`,
+    "ACTIVIDADES:",
+    ...input.items.map((it) =>
+      [
+        `- index ${it.index}: ${it.title}`,
+        it.notes ? ` | notas: ${it.notes}` : "",
+        it.dayIndex != null ? ` | día ya capturado: ${it.dayIndex}` : "",
+        it.startsAt ? ` | hora ya capturada: ${it.startsAt}` : "",
+        it.durationMinutes ? ` | duración: ${it.durationMinutes} min` : "",
+      ].join(""),
+    ),
+  ].join("\n");
+
+  const res = await generateText({
+    model: createLovableAiGatewayProvider(apiKey)("google/gemini-3-flash-preview"),
+    system: SCHEDULE_SYSTEM,
+    prompt,
+    temperature: 0.2,
+    maxOutputTokens: 1200,
+    abortSignal: AbortSignal.timeout(30_000),
+  });
+
+  const raw = res.text ?? "";
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start < 0 || end <= start) throw new Error("alux_unavailable");
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw.slice(start, end + 1));
+  } catch {
+    throw new Error("alux_unavailable");
+  }
+
+  const list = (parsed as { items?: unknown }).items;
+  if (!Array.isArray(list)) throw new Error("alux_unavailable");
+  const valid = new Set(input.items.map((i) => i.index));
+  const items: AluxScheduleSuggestion[] = [];
+  for (const entry of list) {
+    const e = entry as Record<string, unknown>;
+    const index = typeof e["index"] === "number" ? e["index"] : null;
+    const dayIndex = typeof e["dayIndex"] === "number" ? e["dayIndex"] : null;
+    const startsAt = typeof e["startsAt"] === "string" ? e["startsAt"] : "";
+    if (index == null || !valid.has(index)) continue;
+    if (dayIndex == null || dayIndex < 0 || dayIndex >= input.days) continue;
+    if (!/^\d{2}:\d{2}$/.test(startsAt)) continue;
+    const duration = typeof e["durationMinutes"] === "number" ? e["durationMinutes"] : null;
+    items.push({
+      index,
+      dayIndex,
+      startsAt,
+      durationMinutes: duration && duration > 0 && duration <= 1440 ? duration : null,
+      reason: typeof e["reason"] === "string" ? e["reason"].slice(0, 160) : null,
+    });
+  }
+  if (items.length === 0) throw new Error("alux_unavailable");
+  return items;
+}
