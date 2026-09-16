@@ -778,11 +778,12 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
 
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { query: string; website?: string | null }) => {
+  .inputValidator((d: { query: string; website?: string | null; place?: string | null }) => {
     if (!d?.query || d.query.trim().length < 3) throw new Error("invalid_input");
     return {
       query: d.query.trim().slice(0, 160),
       website: typeof d.website === "string" && d.website.trim() ? d.website.trim() : null,
+      place: typeof d.place === "string" && d.place.trim() ? d.place.trim().slice(0, 120) : null,
     };
   })
   .handler(async ({ data, context }) => {
@@ -791,21 +792,23 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    // La frase del editor se conserva siempre; sólo se añaden formas
-    // equivalentes de preguntar lo mismo (tema + territorio) para que una
-    // fuente que titula distinto también responda. El filtro por tema sigue
-    // siendo obligatorio, así que nunca se muestra material ajeno.
-    const plan = buildQueryPlan(data.query);
+    // La frase del editor se conserva siempre; el destino de trabajo se añade
+    // como contexto y se generan formas equivalentes de preguntar lo mismo
+    // (tema + territorio). El filtro por tema sigue siendo obligatorio, así que
+    // nunca se muestra material ajeno.
+    const plan = buildQueryPlan(data.query, data.place);
+    const placeQuery = [plan.subjectPhrase || data.query, data.place].filter(Boolean).join(" ");
     const webBatches = await Promise.all(
       plan.variants.map((variant) =>
         searchWebImages(variant).catch(() => [] as PhotoCandidate[]),
       ),
     );
     const [google, commons, openverse] = await Promise.all([
-      searchGooglePhotos(data.query).catch(() => [] as PhotoCandidate[]),
-      searchCommons(plan.subjectPhrase || data.query).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(plan.subjectPhrase || data.query).catch(() => [] as PhotoCandidate[]),
+      searchGooglePhotos(placeQuery).catch(() => [] as PhotoCandidate[]),
+      searchCommons(placeQuery).catch(() => [] as PhotoCandidate[]),
+      searchOpenverse(placeQuery).catch(() => [] as PhotoCandidate[]),
     ]);
+
 
     const seen = new Set<string>();
     const scored = [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]
