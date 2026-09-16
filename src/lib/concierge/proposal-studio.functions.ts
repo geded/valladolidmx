@@ -632,10 +632,10 @@ async function aluxScheduleCall(
   input: ScheduleCallInput,
   context: { supabase: unknown; userId: string },
 ): Promise<AluxScheduleSuggestion[]> {
-  const rpc = (context.supabase as { rpc: unknown }).rpc as unknown as (
-    fn: string,
-    args: Record<string, unknown>,
-  ) => Promise<{ data: unknown }>;
+  const client = context.supabase as {
+    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }>;
+  };
+  const rpc = (fn: string, args: Record<string, unknown>) => client.rpc(fn, args);
   const { data: editorial } = await rpc("is_editor_or_admin", {
     _user_id: context.userId,
   });
