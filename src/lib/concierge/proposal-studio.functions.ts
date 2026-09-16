@@ -93,10 +93,6 @@ export const applyProposalScheduleToPlan = createServerFn({ method: "POST" })
     );
     if (error) throw new Error(error.message);
     return { applied: Number(applied ?? 0) };
-    } catch (e) {
-      console.error("[alux-schedule]", e);
-      throw e;
-    }
   });
 
 /* ============================================================
