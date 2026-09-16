@@ -127,6 +127,28 @@ export function EntityEditor(props: Props) {
   const [aluxOpen, setAluxOpen] = useState(false);
   const [autofillOpen, setAutofillOpen] = useState(false);
 
+  /* Altas nuevas: adoptan el contexto de trabajo (p. ej. el destino elegido)
+     sin pisar lo que el editor ya escribió. */
+  const defaultsKey = JSON.stringify(props.defaults ?? {});
+  useEffect(() => {
+    if (isEdit) return;
+    const defaults = JSON.parse(defaultsKey) as Record<string, string>;
+    const entries = Object.entries(defaults).filter(([, v]) => v);
+    if (entries.length === 0) return;
+    setValues((current) => {
+      const next = { ...current };
+      let changed = false;
+      for (const [key, value] of entries) {
+        if (!next[key]) {
+          next[key] = value;
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [defaultsKey, isEdit]);
+
+
   /** Nombre de la ficha: base de la búsqueda que hace Alux. */
   const autofillName = values["name"] || values["title"] || "";
   /** Sólo campos de texto: Alux no elige catálogos ni relaciones. */
