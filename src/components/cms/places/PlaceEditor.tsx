@@ -101,6 +101,19 @@ const TEXT_FIELDS = [
   "price_currency",
 ] as const;
 
+/** Campos que Alux puede proponer al completar la ficha. */
+const AUTOFILL_FIELDS = [
+  { name: "official_name", label: "Nombre oficial" },
+  { name: "short_description", label: "Descripción corta" },
+  { name: "description", label: "Descripción larga" },
+  { name: "directions", label: "Cómo llegar" },
+  { name: "address_line", label: "Dirección" },
+  { name: "best_time_to_visit", label: "Mejor momento para visitar" },
+  { name: "contact_phone", label: "Teléfono" },
+  { name: "contact_website", label: "Sitio web" },
+  { name: "google_place_id", label: "Google Place ID" },
+];
+
 interface Props {
   placeId?: string;
 }
