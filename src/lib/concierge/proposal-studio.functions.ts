@@ -338,6 +338,7 @@ export const registerItineraryCreditNote = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("cc_timeline_append", {
       _case_id: data.caseId,
       _event_type: "note_added",
+      _summary: `Saldo a favor por ajuste de itinerario: ${(data.amountCents / 100).toFixed(2)}`,
       _payload: {
         kind: "itinerary_credit",
         amount_cents: data.amountCents,
