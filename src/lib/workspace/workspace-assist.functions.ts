@@ -235,6 +235,8 @@ async function reservationContext(
         ? "Pago de demostración"
         : "Pagado en línea con tarjeta";
 
+  await fillTravelerContacts(supabase, [order]);
+
   return [
     "RESERVACIÓN CONSULTADA (dato real, sólo lectura)",
     `· Folio: ${order.folio} — ${order.source_kind === "direct_sale" ? "reserva en línea de experiencia" : "venta de Arma tu Viaje"}.`,
