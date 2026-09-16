@@ -447,20 +447,36 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
-    const [site, commons, openverse] = await Promise.all([
-      data.website
-        ? searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
-        : Promise.resolve([] as PhotoCandidate[]),
-      searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
-    ]);
+    const site = data.website
+      ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
+      : [];
+
+    let archives: PhotoCandidate[] = [];
+    let usedQuery = data.query;
+    for (const variant of queryVariants(data.query)) {
+      const [commons, openverse] = await Promise.all([
+        searchCommons(variant).catch(() => [] as PhotoCandidate[]),
+        searchOpenverse(variant).catch(() => [] as PhotoCandidate[]),
+      ]);
+      if (commons.length || openverse.length) {
+        archives = [...commons, ...openverse];
+        usedQuery = variant;
+        break;
+      }
+    }
+
     const seen = new Set<string>();
-    const photos = [...site, ...commons, ...openverse].filter((p) => {
+    const photos = [...site, ...archives].filter((p) => {
       if (!p.url || seen.has(p.url)) return false;
       seen.add(p.url);
       return true;
     });
-    return { ok: true as const, photos: photos.slice(0, 24) };
+    return {
+      ok: true as const,
+      photos: photos.slice(0, 24),
+      usedQuery,
+      relaxed: usedQuery !== data.query.trim(),
+    };
   });
 
 /**
