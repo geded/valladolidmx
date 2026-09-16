@@ -125,8 +125,8 @@ export function WorkspaceTopbar({
     }
 
     return { crumbs: list, parentTo: parent };
+  }, [workspace, pathname, router]);
 
-  }, [workspace, pathname]);
 
   const canGoBack = Boolean(parentTo);
   const handleBack = () => {
