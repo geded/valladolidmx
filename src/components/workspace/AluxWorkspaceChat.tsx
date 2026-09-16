@@ -34,23 +34,40 @@ const STARTERS = [
   "¿Qué debo hacer primero hoy?",
 ];
 
+export interface AluxAssistSubject {
+  kind: "order" | "case" | "entity";
+  id?: string;
+  label?: string;
+  status?: string;
+  fields?: string[];
+}
+
 export function AluxWorkspaceChat({
   open,
   onOpenChange,
+  subject,
+  starters,
+  description,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Reservación, expediente o ficha abierta en la pantalla activa. */
+  subject?: AluxAssistSubject;
+  starters?: string[];
+  description?: string;
 }) {
   const { workspace } = useWorkspace();
   const alux = useAluxBrand();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const ask = useServerFn(aluxWorkspaceAssist);
+  const initialStarters = starters?.length ? starters : STARTERS;
   const [turns, setTurns] = useState<Turn[]>([]);
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [followUps, setFollowUps] = useState<string[]>(STARTERS);
+  const [followUps, setFollowUps] = useState<string[]>(initialStarters);
   const threadRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight });
