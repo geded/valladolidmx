@@ -57,3 +57,25 @@ La forma de pago se lee del dato que ya guarda el sistema, no de una lista fija:
 ## Preservation Gate
 
 Quedan intactos el expediente, el Estudio de Propuesta, el checkout, Mi Viaje, Alux, header, footer, navegación pública y plantillas Premium. Validación visual en 1440, 834, 430 y 390 px; `tsgo`, pruebas de contrato y `git diff --check` limpios. Cualquier diferencia fuera de `/concierge` detiene la entrega.
+
+---
+
+## Añadido: activar el cobro en línea
+
+**Lo que ya existe** (no se rehace): capa neutral de proveedor de pagos, implementación de Stripe, webhook verificado con firma, registro de eventos de pago, revalidación del importe en el servidor y pantalla de estado del proveedor. Hoy está apagada porque faltan las credenciales del proveedor.
+
+**Dos caminos de venta, un solo motor de cobro**
+
+1. **Producto marcado para vender en línea** (`reservar_en_linea` + cobro en línea aceptado): ya hay carrito y orden de marketplace conectados al motor de pago. Se enciende y se conecta el retorno de éxito/error a la reservación del viajero.
+2. **Venta del concierge (Arma tu Viaje)**: la reservación nace de la propuesta aceptada. Se agrega el botón "Pagar en línea" junto al de efectivo en el checkout del viajero, usando el mismo motor: se crea el cobro con el importe y folio de esa reservación, y el webhook la marca pagada, registra proveedor, referencia y fecha, y dispara los mismos avisos y correos que hoy dispara el efectivo.
+
+**Qué hace falta de tu parte**: las credenciales del proveedor de pagos. Si no tienes cuenta aún, te acompaño a crearla desde la plataforma.
+
+**Alcance técnico adicional autorizado**
+
+- Extender el motor de pago existente para aceptar reservaciones del concierge (mismo contrato de proveedor, sin SDK nuevo ni segunda implementación).
+- Ampliar el webhook ya existente para marcar pagada la reservación del concierge de forma idempotente, con su evento en la bitácora.
+- Botón "Pagar en línea" en el checkout del viajero, junto al efectivo; el efectivo sigue disponible sin cambios.
+- Configurar las credenciales del proveedor como secretos del proyecto.
+
+**Sigue sin autorizarse**: reembolsos y disputas automáticos, comisiones, cobro dentro del Portal Empresarial, cambios al modelo de reservación y publicar.
