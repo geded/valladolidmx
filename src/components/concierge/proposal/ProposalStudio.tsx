@@ -261,6 +261,62 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
     return list;
   }, [prepared, plan?.start_date]);
 
+  /* ------------------- Alux · propone día y hora del destino ------------------- */
+
+  const suggestSchedule = useCallback(async () => {
+    if (scheduling) return;
+    const candidates = lines
+      .map((line, index) => ({ line, index }))
+      .filter((e) => e.line.title.trim().length >= 3);
+    if (candidates.length === 0) return;
+    setScheduling(true);
+    try {
+      const res = await scheduleFn({
+        data: {
+          days,
+          startDate: plan?.start_date ?? null,
+          items: candidates.map((e) => ({
+            index: e.index,
+            title: e.line.title.trim(),
+            ...(e.line.notes.trim() ? { notes: e.line.notes.trim().slice(0, 400) } : {}),
+            dayIndex: e.line.dayIndex,
+            ...(normalizeTime(e.line.startsAt) ? { startsAt: normalizeTime(e.line.startsAt)! } : {}),
+            durationMinutes: e.line.durationMinutes ? Number(e.line.durationMinutes) : null,
+          })),
+        },
+      });
+      const byIndex = new Map(res.items.map((s) => [s.index, s]));
+      setLines((prev) =>
+        prev.map((line, index) => {
+          const s = byIndex.get(index);
+          if (!s) return line;
+          return {
+            ...line,
+            dayIndex: line.dayIndex ?? s.dayIndex,
+            startsAt: normalizeTime(line.startsAt) ? line.startsAt : s.startsAt,
+            durationMinutes: line.durationMinutes
+              ? line.durationMinutes
+              : s.durationMinutes
+                ? String(s.durationMinutes)
+                : "",
+          };
+        }),
+      );
+      toast.success(
+        `Alux propuso día y hora para ${res.items.length} partida(s). Revísalas y ajusta lo que haga falta.`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      toast.error(
+        msg.includes("forbidden")
+          ? "Sólo el equipo interno puede pedirle a Alux que arme la agenda."
+          : "Alux no pudo armar la agenda ahora. Inténtalo de nuevo en un momento.",
+      );
+    } finally {
+      setScheduling(false);
+    }
+  }, [scheduling, lines, scheduleFn, days, plan?.start_date]);
+
   /* ------------------------------ Guardar ------------------------------ */
 
   const saveDraft = useCallback(async () => {
