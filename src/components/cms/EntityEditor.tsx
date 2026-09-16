@@ -149,6 +149,7 @@ export function EntityEditor(props: Props) {
   }, [defaultsKey, isEdit]);
 
 
+
   /** Nombre de la ficha: base de la búsqueda que hace Alux. */
   const autofillName = values["name"] || values["title"] || "";
   /** Sólo campos de texto: Alux no elige catálogos ni relaciones. */
