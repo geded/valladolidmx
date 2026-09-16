@@ -114,9 +114,10 @@ export function AluxWorkspaceChat({
             {alux.copy("workspaceTitle")}
           </DialogTitle>
           <DialogDescription>
-            Pregunta cómo funciona {workspace?.label ?? "este panel"}: bandejas, etapas, fases del
-            viaje, folios y pagos.
+            {description ??
+              `Pregunta cómo funciona ${workspace?.label ?? "este panel"}: bandejas, etapas, fases del viaje, folios y pagos. También puedes escribir un folio (por ejemplo AVL-260915-001) para consultar esa reservación.`}
           </DialogDescription>
+
         </DialogHeader>
 
         <div
