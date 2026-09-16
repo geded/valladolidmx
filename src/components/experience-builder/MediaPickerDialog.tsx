@@ -71,6 +71,8 @@ export interface MediaPickerDialogProps {
 interface Row {
   id: string;
   url: string;
+  /** Vista previa firmada (borradores no publicados no pasan por el proxy). */
+  previewUrl?: string | null;
   alt: string | null;
   credit: string | null;
   author: string | null;
@@ -574,7 +576,7 @@ function MediaCard({
     <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
       <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
         <img
-          src={row.url}
+          src={row.previewUrl || row.url}
           alt={row.alt ?? ""}
           loading="lazy"
           className="h-full w-full object-cover"
