@@ -791,3 +791,234 @@ export const getConciergeCasesFollowUp = createServerFn({ method: "POST" })
 
     return Array.from(byCase.values()).map(({ latest_proposal_version: _v, ...rest }) => rest);
   });
+
+/* ============================================================
+ * Escritorio Concierge (2026-09-16) — lecturas agregadas para
+ * las pantallas Propuestas y Preguntas. No crea estados nuevos:
+ * lee `concierge_proposals`, `concierge_cases`, `concierge_orders`
+ * y `concierge_case_notes` con la RLS vigente del usuario.
+ * ============================================================ */
+
+export interface ProposalDeskRow {
+  id: string;
+  case_id: string;
+  version: number;
+  status: string;
+  summary: string | null;
+  total_amount_cents: number;
+  currency: string;
+  valid_until: string | null;
+  sent_at: string | null;
+  viewed_at: string | null;
+  responded_at: string | null;
+  updated_at: string;
+  items_count: number;
+  case_summary: string | null;
+  traveler_name: string | null;
+  order_folio: string | null;
+  order_paid_at: string | null;
+}
+
+const ProposalDeskInput = z.object({
+  search: z.string().trim().max(120).optional().default(""),
+  status: z.string().trim().max(40).optional().default("all"),
+  page: z.number().int().min(1).max(200).optional().default(1),
+  pageSize: z.number().int().min(10).max(100).optional().default(50),
+});
+
+export const listConciergeProposals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalDeskInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const from = (data.page - 1) * data.pageSize;
+    let query = context.supabase
+      .from("concierge_proposals")
+      .select(
+        "id, case_id, version, status, summary, total_amount_cents, currency, valid_until, sent_at, viewed_at, responded_at, updated_at",
+        { count: "exact" },
+      )
+      .order("updated_at", { ascending: false })
+      .range(from, from + data.pageSize - 1);
+
+    if (data.status && data.status !== "all") query = query.eq("status", data.status);
+    if (data.search) query = query.ilike("summary", `%${data.search}%`);
+
+    const { data: rows, error, count } = await query;
+    if (error) throw new Error(error.message);
+
+    const proposals = (rows ?? []) as Array<Record<string, unknown>>;
+    const caseIds = Array.from(new Set(proposals.map((p) => p["case_id"] as string)));
+    const proposalIds = proposals.map((p) => p["id"] as string);
+
+    const [casesRes, ordersRes, itemsRes] = await Promise.all([
+      caseIds.length
+        ? context.supabase
+            .from("concierge_cases")
+            .select("id, summary, traveler_user_id")
+            .in("id", caseIds)
+        : Promise.resolve({ data: [], error: null }),
+      caseIds.length
+        ? context.supabase
+            .from("concierge_orders")
+            .select("source_case_id, folio, paid_at, created_at")
+            .in("source_case_id", caseIds)
+            .order("created_at", { ascending: false })
+        : Promise.resolve({ data: [], error: null }),
+      proposalIds.length
+        ? context.supabase
+            .from("concierge_proposal_items")
+            .select("proposal_id")
+            .in("proposal_id", proposalIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+    const cases = new Map<string, { summary: string | null; traveler_user_id: string | null }>();
+    for (const c of (casesRes.data ?? []) as Array<Record<string, unknown>>) {
+      cases.set(c["id"] as string, {
+        summary: (c["summary"] as string | null) ?? null,
+        traveler_user_id: (c["traveler_user_id"] as string | null) ?? null,
+      });
+    }
+
+    const travelerIds = Array.from(
+      new Set(Array.from(cases.values()).map((c) => c.traveler_user_id).filter(Boolean)),
+    ) as string[];
+    const names = new Map<string, string | null>();
+    if (travelerIds.length) {
+      const { data: profiles } = await context.supabase
+        .from("profiles")
+        .select("user_id, display_name, first_name, last_name")
+        .in("user_id", travelerIds);
+      for (const p of (profiles ?? []) as Array<Record<string, unknown>>) {
+        const full = [p["first_name"], p["last_name"]].filter(Boolean).join(" ").trim();
+        names.set(
+          p["user_id"] as string,
+          (p["display_name"] as string | null) || (full || null),
+        );
+      }
+    }
+
+    const orders = new Map<string, { folio: string | null; paid_at: string | null }>();
+    for (const o of (ordersRes.data ?? []) as Array<Record<string, unknown>>) {
+      const key = o["source_case_id"] as string;
+      const paid = (o["paid_at"] as string | null) ?? null;
+      const current = orders.get(key);
+      if (!current || (paid && !current.paid_at)) {
+        orders.set(key, { folio: (o["folio"] as string | null) ?? null, paid_at: paid });
+      }
+    }
+
+    const itemCount = new Map<string, number>();
+    for (const i of (itemsRes.data ?? []) as Array<Record<string, unknown>>) {
+      const key = i["proposal_id"] as string;
+      itemCount.set(key, (itemCount.get(key) ?? 0) + 1);
+    }
+
+    const result: ProposalDeskRow[] = proposals.map((p) => {
+      const caseId = p["case_id"] as string;
+      const c = cases.get(caseId);
+      const order = orders.get(caseId);
+      return {
+        id: p["id"] as string,
+        case_id: caseId,
+        version: Number(p["version"] ?? 1),
+        status: (p["status"] as string) ?? "draft",
+        summary: (p["summary"] as string | null) ?? null,
+        total_amount_cents: Number(p["total_amount_cents"] ?? 0),
+        currency: (p["currency"] as string) ?? "MXN",
+        valid_until: (p["valid_until"] as string | null) ?? null,
+        sent_at: (p["sent_at"] as string | null) ?? null,
+        viewed_at: (p["viewed_at"] as string | null) ?? null,
+        responded_at: (p["responded_at"] as string | null) ?? null,
+        updated_at: (p["updated_at"] as string) ?? new Date().toISOString(),
+        items_count: itemCount.get(p["id"] as string) ?? 0,
+        case_summary: c?.summary ?? null,
+        traveler_name: c?.traveler_user_id ? (names.get(c.traveler_user_id) ?? null) : null,
+        order_folio: order?.folio ?? null,
+        order_paid_at: order?.paid_at ?? null,
+      };
+    });
+
+    return { rows: result, total: count ?? result.length, page: data.page, pageSize: data.pageSize };
+  });
+
+export interface PendingQuestionRow {
+  case_id: string;
+  case_summary: string | null;
+  traveler_name: string | null;
+  body: string;
+  asked_at: string;
+}
+
+/** Expedientes cuyo último mensaje con el viajero lo escribió el viajero. */
+export const listConciergePendingQuestions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: notes, error } = await context.supabase
+      .from("concierge_case_notes")
+      .select("case_id, author_user_id, body, created_at")
+      .eq("visibility", "traveler")
+      .order("created_at", { ascending: true })
+      .limit(1000);
+    if (error) throw new Error(error.message);
+
+    const last = new Map<string, { author: string | null; body: string; at: string }>();
+    for (const n of (notes ?? []) as Array<Record<string, unknown>>) {
+      last.set(n["case_id"] as string, {
+        author: (n["author_user_id"] as string | null) ?? null,
+        body: (n["body"] as string) ?? "",
+        at: (n["created_at"] as string) ?? "",
+      });
+    }
+    const caseIds = Array.from(last.keys());
+    if (!caseIds.length) return [] as PendingQuestionRow[];
+
+    const { data: cases } = await context.supabase
+      .from("concierge_cases")
+      .select("id, summary, traveler_user_id")
+      .in("id", caseIds);
+
+    const travelerByCase = new Map<string, { summary: string | null; traveler: string | null }>();
+    for (const c of (cases ?? []) as Array<Record<string, unknown>>) {
+      travelerByCase.set(c["id"] as string, {
+        summary: (c["summary"] as string | null) ?? null,
+        traveler: (c["traveler_user_id"] as string | null) ?? null,
+      });
+    }
+
+    const pending = caseIds.filter((id) => {
+      const entry = last.get(id);
+      const info = travelerByCase.get(id);
+      return Boolean(entry?.author && info?.traveler && entry.author === info.traveler);
+    });
+    if (!pending.length) return [] as PendingQuestionRow[];
+
+    const travelerIds = Array.from(
+      new Set(pending.map((id) => travelerByCase.get(id)?.traveler).filter(Boolean)),
+    ) as string[];
+    const names = new Map<string, string | null>();
+    if (travelerIds.length) {
+      const { data: profiles } = await context.supabase
+        .from("profiles")
+        .select("user_id, display_name, first_name, last_name")
+        .in("user_id", travelerIds);
+      for (const p of (profiles ?? []) as Array<Record<string, unknown>>) {
+        const full = [p["first_name"], p["last_name"]].filter(Boolean).join(" ").trim();
+        names.set(p["user_id"] as string, (p["display_name"] as string | null) || (full || null));
+      }
+    }
+
+    return pending
+      .map<PendingQuestionRow>((id) => {
+        const entry = last.get(id)!;
+        const info = travelerByCase.get(id);
+        return {
+          case_id: id,
+          case_summary: info?.summary ?? null,
+          traveler_name: info?.traveler ? (names.get(info.traveler) ?? null) : null,
+          body: entry.body,
+          asked_at: entry.at,
+        };
+      })
+      .sort((a, b) => a.asked_at.localeCompare(b.asked_at));
+  });
