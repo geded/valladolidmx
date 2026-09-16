@@ -544,6 +544,68 @@ async function searchGooglePhotos(query: string): Promise<PhotoCandidate[]> {
   return out;
 }
 
+export interface OwnerContact {
+  host: string;
+  sourceUrl: string;
+  emails: string[];
+  phones: string[];
+}
+
+/**
+ * Datos de contacto publicados en las mismas páginas de origen de las fotos,
+ * para que el editor pueda pedir permiso al titular. Sólo se lee lo que la
+ * página ya publica; no se almacena nada.
+ */
+async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
+  const out: OwnerContact[] = [];
+  await Promise.all(
+    pages.map(async (page) => {
+      let base: URL;
+      try {
+        base = new URL(page);
+      } catch {
+        return;
+      }
+      if (base.protocol !== "https:") return;
+      const res = await fetch(base.toString(), {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+          "Accept-Language": "es-MX,es;q=0.9",
+        },
+      }).catch(() => null);
+      if (!res || !res.ok) return;
+      const html = (await res.text().catch(() => "")).slice(0, 400_000);
+      if (!html) return;
+      const emails = new Set<string>();
+      for (const m of html.matchAll(
+        /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
+      )) {
+        const value = m[0].toLowerCase();
+        if (/\.(png|jpe?g|webp|gif|svg)$/i.test(value)) continue;
+        if (/(sentry|wixpress|example|noreply|no-reply)/i.test(value)) continue;
+        emails.add(value);
+        if (emails.size >= 4) break;
+      }
+      const phones = new Set<string>();
+      for (const m of html.matchAll(/(?:tel:|whatsapp[^0-9+]{0,20})?(\+?52[\s.-]?)?(\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/gi)) {
+        const digits = `${m[1] ?? ""}${m[2]}`.replace(/[^\d+]/g, "");
+        if (digits.replace(/\D/g, "").length < 10) continue;
+        phones.add(digits);
+        if (phones.size >= 4) break;
+      }
+      if (!emails.size && !phones.size) return;
+      out.push({
+        host: base.hostname.replace(/^www\./, ""),
+        sourceUrl: base.toString(),
+        emails: [...emails],
+        phones: [...phones],
+      });
+    }),
+  );
+  return out;
+}
+
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { query: string; website?: string | null }) => {
@@ -574,9 +636,26 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       seen.add(p.url);
       return true;
     });
+    const visible = photos.slice(0, 24);
+
+    // Contacto publicado por el titular en las páginas de origen, para pedirle
+    // permiso. Se lee sólo lo que ya está publicado; no se guarda nada.
+    const pageSet = new Set<string>();
+    if (data.website) pageSet.add(data.website);
+    for (const p of visible) {
+      if (p.provider === "Web" && p.sourceUrl?.startsWith("https://")) {
+        pageSet.add(p.sourceUrl);
+      }
+      if (pageSet.size >= 6) break;
+    }
+    const contacts = await extractOwnerContacts([...pageSet]).catch(
+      () => [] as OwnerContact[],
+    );
+
     return {
       ok: true as const,
-      photos: photos.slice(0, 24),
+      photos: visible,
+      contacts,
       usedQuery: data.query,
       relaxed: false,
     };

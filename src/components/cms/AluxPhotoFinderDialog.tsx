@@ -12,6 +12,7 @@ import { Loader2, Search, Sparkles, X } from "lucide-react";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
+  type OwnerContact,
   type PhotoCandidate,
 } from "@/lib/cms/alux-autofill.functions";
 
@@ -48,6 +49,7 @@ export function AluxPhotoFinderDialog({
   const [site, setSite] = useState(website ?? "");
   const [pasted, setPasted] = useState("");
   const [photos, setPhotos] = useState<PhotoCandidate[]>([]);
+  const [contacts, setContacts] = useState<OwnerContact[]>([]);
   const [usedQuery, setUsedQuery] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,6 +67,7 @@ export function AluxPhotoFinderDialog({
         data: { query: query.trim(), website: site.trim() || null },
       });
       setPhotos(res.photos);
+      setContacts(res.contacts ?? []);
       setUsedQuery(res.relaxed ? res.usedQuery : null);
       setSearched(true);
     } catch (err) {
@@ -252,6 +255,30 @@ export function AluxPhotoFinderDialog({
               la página del negocio o del evento en el campo de arriba: de ahí traemos sus propias
               fotos y guardamos una copia nuestra.
             </p>
+          )}
+
+          {!loading && contacts.length > 0 && (
+            <div className="mb-4 rounded-lg border border-border bg-muted/40 p-3">
+              <p className="mb-2 text-xs font-medium">
+                Contacto publicado por el titular (para pedir permiso)
+              </p>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                {contacts.map((c) => (
+                  <li key={c.sourceUrl}>
+                    <a
+                      href={c.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-foreground underline underline-offset-2"
+                    >
+                      {c.host}
+                    </a>
+                    {c.emails.length > 0 && <> · {c.emails.join(", ")}</>}
+                    {c.phones.length > 0 && <> · {c.phones.join(", ")}</>}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
