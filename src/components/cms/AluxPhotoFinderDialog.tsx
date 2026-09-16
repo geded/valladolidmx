@@ -239,10 +239,17 @@ export function AluxPhotoFinderDialog({
             </p>
           )}
 
+          {!loading && searched && usedQuery && photos.length > 0 && (
+            <p className="mb-3 text-xs text-muted-foreground">
+              No había resultados exactos; mostramos fotos de «{usedQuery}».
+            </p>
+          )}
+
           {!loading && searched && photos.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No encontramos fotos con esa búsqueda. Prueba con otro nombre, agrega el sitio web
-              del negocio o pega el enlace de una foto suya.
+              Los acervos abiertos no tienen fotos de esto. Pega la página del negocio o del
+              evento (su web, su página pública) en el campo de arriba: de ahí traemos sus propias
+              fotos y guardamos una copia nuestra.
             </p>
           )}
 
