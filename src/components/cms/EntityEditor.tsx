@@ -60,6 +60,11 @@ interface Props {
   backTo: string;
   listQueryKey: string;
   fields: EditorField[];
+  /** Valores iniciales sólo para altas nuevas (p. ej. el destino de trabajo). */
+  defaults?: Record<string, string>;
+  /** Territorio con el que Alux debe investigar esta ficha. */
+  autofillDestination?: string;
+  autofillZone?: string;
   /** Slot para paneles extra (imágenes, galería...) que reciben el id. */
   renderExtras?: (args: {
     id?: string;
