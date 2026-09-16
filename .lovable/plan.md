@@ -16,7 +16,9 @@ En la cabecera del editor aparece un acceso "Completar con Alux". Al pulsarlo, A
 
 Cada dato llega con su origen visible y un control de tres opciones: aceptar, corregir o dejar vacío. Los campos que Alux no pueda acreditar quedan vacíos con la nota "sin fuente"; nunca se rellenan por aproximación. Nada se escribe en la ficha hasta que el editor pulsa Guardar, como hoy.
 
-Decisión pendiente para esta parte: para consultar internet en vivo hace falta contratar un buscador y guardar su clave. Sin él, Alux sólo puede proponer a partir de su conocimiento general, que envejece y puede equivocarse en horarios y teléfonos. Recomendado: activar la búsqueda real y mostrar siempre los enlaces de origen.
+Fuente: Google, como pediste. La ficha de Google (Places) es la mejor fuente para nombre oficial, dirección, teléfono, sitio web, horarios y coordenadas exactas del lugar. Una salvedad comprobada: la clave de Google que hoy usa la plataforma sólo está habilitada para mapas, geocodificación y rutas; la búsqueda de lugares está bloqueada. Para activarla hace falta habilitar Places en la cuenta de Google de Valladolid.mx y guardar esa clave en el proyecto. Es un trámite de minutos y el consumo se factura por consulta a esa misma cuenta.
+
+Mientras no esté habilitada, el asistente redacta las descripciones a partir del nombre, destino y zona, y deja vacíos teléfono, horarios y coordenadas en vez de suponerlos.
 
 ## Parte 2 · Alux propone fotografías
 
