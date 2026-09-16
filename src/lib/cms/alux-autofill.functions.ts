@@ -895,16 +895,17 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    // La frase del editor se conserva siempre; el destino de trabajo se añade
-    // como contexto y se generan formas equivalentes de preguntar lo mismo
-    // (tema + territorio). El filtro por tema sigue siendo obligatorio, así que
-    // nunca se muestra material ajeno.
+    // Paso 1: Alux entiende la frase y la escribe como un experto en buscar
+    // imágenes. Si la IA no responde, se usa el plan determinista de siempre.
     const plan = buildQueryPlan(data.query, data.place);
-    const placeQuery = [plan.subjectPhrase || data.query, data.place].filter(Boolean).join(" ");
+    const ai = await planWithAi(data.query, data.place).catch(() => null);
+    const variants = [...new Set([...(ai?.queries ?? []), ...plan.variants])].slice(0, 5);
+    const placeQuery = [ai?.subject || plan.subjectPhrase || data.query, data.place]
+      .filter(Boolean)
+      .join(" ");
+
     const webBatches = await Promise.all(
-      plan.variants.map((variant) =>
-        searchWebImages(variant).catch(() => [] as PhotoCandidate[]),
-      ),
+      variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
     );
     const [google, commons, openverse] = await Promise.all([
       searchGooglePhotos(placeQuery).catch(() => [] as PhotoCandidate[]),
@@ -912,24 +913,31 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       searchOpenverse(placeQuery).catch(() => [] as PhotoCandidate[]),
     ]);
 
-
     const seen = new Set<string>();
-    const scored = [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]
+    const pool: PhotoCandidate[] = [];
+    for (const photo of [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]) {
+      if (!photo.url || seen.has(photo.url)) continue;
+      seen.add(photo.url);
+      pool.push(photo);
+    }
+
+    const scored = pool
       .map((photo) => ({ photo, ...photoMatch(photo, plan) }))
-      .filter(({ photo, relevance }) => {
-        if (!photo.url || relevance === 0 || seen.has(photo.url)) return false;
-        seen.add(photo.url);
-        return true;
-      })
+      .filter((entry) => entry.relevance > 0)
       .sort((a, b) => b.relevance - a.relevance);
 
     // Si alguna foto sí nombra el territorio, se descartan las que sólo
     // coinciden con el tema: es material de otro lugar.
     const territorial = scored.filter((entry) => entry.placeMatch);
-    const photos = (plan.place.length && territorial.length ? territorial : scored).map(
+    const heuristic = (plan.place.length && territorial.length ? territorial : scored).map(
       ({ photo }) => photo,
     );
-    const visible = photos.slice(0, 24);
+
+    // Paso 2: Alux revisa las candidatas y conserva sólo las que muestran lo
+    // pedido. El orden por palabras clave queda como respaldo.
+    const ordered = heuristic.length ? heuristic : pool;
+    const curated = await rankWithAi(data.query, data.place, ordered).catch(() => null);
+    const visible = (curated ?? heuristic).slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
     // permiso. Se lee sólo lo que ya está publicado; no se guarda nada.
