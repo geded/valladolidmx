@@ -148,3 +148,6 @@
 - [ ] Definir continuidad de imágenes al reclamar empresa: conservar asignación, procedencia y permisos del nuevo dueño sin transferir autoría.
 
 - [ ] Folios diarios de reservación: ERL-YYMMDD-### para venta en línea y AVL-YYMMDD-### para Arma tu Viaje.
+
+- [ ] Portada: corregir apariencia del calendario "Buscar por fecha" en escritorio (elegante, alineado con DSL)
+- [ ] Portada: restablecer miniaturas de eventos (acreditación de medios)
