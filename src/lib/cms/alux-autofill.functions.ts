@@ -969,9 +969,12 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // Si alguna foto sí nombra el territorio, se descartan las que sólo
     // coinciden con el tema: es material de otro lugar.
     const territorial = scored.filter((entry) => entry.placeMatch);
-    const heuristic = (plan.place.length && territorial.length ? territorial : scored).map(
-      ({ photo }) => photo,
-    );
+    const base = plan.place.length && territorial.length ? territorial : scored;
+
+    // Si el editor acotó la sede y hay fotos que la nombran, mandan esas.
+    const onSede = base.filter((entry) => entry.qualifierMatch);
+    const heuristic = (onSede.length ? onSede : base).map(({ photo }) => photo);
+
 
     // Paso 2: Alux revisa las candidatas y conserva sólo las que muestran lo
     // pedido. El orden por palabras clave queda como respaldo.
