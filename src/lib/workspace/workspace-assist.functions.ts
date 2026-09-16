@@ -380,7 +380,9 @@ async function recentReservationsContext(supabase: any): Promise<string | null> 
     pendingRows.length
       ? `Pendientes de cobro:\n${pendingRows.map((o) => line(o, "created")).join("\n")}`
       : "Pendientes de cobro: ninguna visible.",
-  ].join("\n\n");
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 const SYSTEM = `
