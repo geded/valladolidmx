@@ -177,6 +177,39 @@ export function MediaPickerDialog({
   const [rights, setRights] = useState({ ...emptyRights });
   const [fit, setFit] = useState<RoleFit | null>(null);
   const [upscaling, setUpscaling] = useState(false);
+  const [photoFinderOpen, setPhotoFinderOpen] = useState(false);
+
+  /**
+   * Foto de acervo libre elegida con Alux: entra por el mismo ingreso
+   * gobernado que una foto del equipo y llega con autoría y licencia ya
+   * declaradas para que el editor sólo las confirme.
+   */
+  async function handleAluxPhoto(photo: AluxPickedPhoto) {
+    setMode("upload");
+    setError(null);
+    setReadingFile(true);
+    try {
+      const ingest = await applyPreparedFile(photo.file);
+      setRights((r) => ({
+        ...r,
+        alt: r.alt || photo.title,
+        author: photo.author || r.author,
+        credit: photo.author ? `${photo.author} (${photo.provider})` : r.credit,
+        source: photo.sourceUrl || r.source,
+        license: photo.license || r.license,
+        nature: "documentary",
+      }));
+      setNotice(
+        ingest.width && ingest.height
+          ? `Foto traída de ${photo.provider} (${ingest.width}×${ingest.height} px). Revisa derechos y descripción antes de subirla.`
+          : `Foto traída de ${photo.provider}. Revisa derechos y descripción antes de subirla.`,
+      );
+    } catch {
+      setError("No pudimos preparar esa foto. Elige otra.");
+    } finally {
+      setReadingFile(false);
+    }
+  }
 
   const refresh = useCallback(() => {
     setLoading(true);
