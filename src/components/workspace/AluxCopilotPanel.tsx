@@ -31,6 +31,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
   const [summary, setSummary] = useState<string | undefined>();
   const [actions, setActions] = useState<AluxAction[]>([]);
   const [openExpl, setOpenExpl] = useState<Record<string, boolean>>({});
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     if (!workspace) return;
