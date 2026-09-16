@@ -6,7 +6,7 @@
  * toda validación y autorización efectiva ocurre en las server functions
  * de `places-cms.functions.ts`.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -271,8 +271,18 @@ export function PlaceEditor({ placeId }: Props) {
     );
   };
 
+  /** Última versión del lugar ya volcada al formulario. */
+  const hydratedRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!place) return;
+    /* Sólo se recarga el formulario cuando cambia la versión persistida del
+       lugar. Un refresco en segundo plano (guardar medios, horarios…) ya no
+       descarta los cambios que el editor todavía no ha guardado, como la
+       subzona recién elegida. */
+    const stamp = `${String(place.id ?? "")}:${String(place.updated_at ?? "")}`;
+    if (hydratedRef.current === stamp) return;
+    hydratedRef.current = stamp;
     const next: Values = {};
     for (const key of TEXT_FIELDS) next[key] = (place[key] as string | null) ?? "";
     setValues(next);
