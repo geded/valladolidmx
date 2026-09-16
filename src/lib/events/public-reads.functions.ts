@@ -103,7 +103,7 @@ function isSlug(s: unknown): s is string {
 }
 
 const SELECT_CARD =
-  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, filter_attributes, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
+  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, latitude, longitude, filter_attributes, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
 
 type CardRow = {
   id: string;
@@ -114,6 +114,8 @@ type CardRow = {
   ends_at: string | null;
   venue_name: string | null;
   is_free: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
   filter_attributes?: unknown;
   destination_id: string | null;
   cover_media_id: string | null;
@@ -133,6 +135,23 @@ type CardRow = {
   media_assets?: { storage_bucket?: string | null; storage_path?: string | null } | null;
 };
 
+/**
+ * Ubicación de la sede capturada en el CMS (pin arrastrable). Si el evento
+ * todavía no tiene punto propio, se degrada al centro del destino; nunca se
+ * inventa una coordenada.
+ */
+function eventLat(r: CardRow): number | null {
+  const own = Number(r.latitude);
+  if (Number.isFinite(own) && own !== 0) return own;
+  return typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null;
+}
+
+function eventLng(r: CardRow): number | null {
+  const own = Number(r.longitude);
+  if (Number.isFinite(own) && own !== 0) return own;
+  return typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null;
+}
+
 async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEventCard[]> {
   const cards = await Promise.all(
     rows.map(async (r) => {
@@ -151,8 +170,8 @@ async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEven
         destination_slug: r.destinations?.slug ?? null,
         destination_name: r.destinations?.name ?? null,
         filter_attributes: normalizeFilterAttributes(r.filter_attributes),
-        latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
-        longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
+        latitude: eventLat(r),
+        longitude: eventLng(r),
         recurrence_frequency: r.recurrence_frequency ?? null,
         recurrence_interval: r.recurrence_interval ?? 1,
         recurrence_weekdays: r.recurrence_weekdays ?? [],
@@ -343,7 +362,7 @@ export const getEventBySlug = createServerFn({ method: "GET" })
         `id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, filter_attributes,
          recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until,
          schedule_times, exception_dates, event_timezone,
-         external_url, destination_id, business_id, cover_media_id, published_at, updated_at,
+         latitude, longitude, external_url, destination_id, business_id, cover_media_id, published_at, updated_at,
          destinations:destination_id ( slug, name, latitude, longitude ),
          media_assets:cover_media_id ( storage_bucket, storage_path ),
          businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )`,
@@ -391,8 +410,8 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const next = nextEventOccurrence({ ...r, schedule_times: scheduleTimes, exception_dates: exceptionDates });
     return {
       filter_attributes: normalizeFilterAttributes(r.filter_attributes),
-      latitude: typeof r.destinations?.latitude === "number" ? r.destinations.latitude : null,
-      longitude: typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null,
+      latitude: eventLat(r),
+      longitude: eventLng(r),
       id: r.id,
 
       slug: r.slug,
