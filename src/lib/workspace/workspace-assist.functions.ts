@@ -365,10 +365,17 @@ async function recentReservationsContext(supabase: any): Promise<string | null> 
   const pendingRows = (pending ?? []) as any[];
   if (!paidRows.length && !pendingRows.length) return null;
 
+  await fillTravelerContacts(supabase, [...paidRows, ...pendingRows]);
+
+  const latest = paidRows[0];
+
   return [
-    "RESERVACIONES RECIENTES (datos reales, sólo lectura; la primera de cada lista es la más reciente)",
+    "RESERVACIONES RECIENTES (datos reales, sólo lectura). Las listas ya vienen ordenadas de más reciente a más antigua: NO reordenes por tu cuenta.",
+    latest
+      ? `El pago MÁS RECIENTE es el folio ${latest.folio} — ${latest.traveler_name ?? "sin nombre registrado"} — ${money(Number(latest.total_amount ?? 0), latest.currency ?? "MXN")} — ${latest.paid_at?.slice(0, 10) ?? "—"}. Si te preguntan quién pagó al último, responde con ese folio.`
+      : null,
     paidRows.length
-      ? `Últimas pagadas:\n${paidRows.map((o) => line(o, "paid")).join("\n")}`
+      ? `Últimas pagadas (de más reciente a más antigua):\n${paidRows.map((o) => line(o, "paid")).join("\n")}`
       : "Últimas pagadas: todavía no hay reservaciones pagadas visibles.",
     pendingRows.length
       ? `Pendientes de cobro:\n${pendingRows.map((o) => line(o, "created")).join("\n")}`
