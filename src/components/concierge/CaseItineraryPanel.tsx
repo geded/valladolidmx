@@ -17,7 +17,9 @@ import {
   getCaseAdjustmentSummary,
   createItineraryAdjustmentCharge,
   registerItineraryCreditNote,
+  applyProposalScheduleToPlan,
 } from "@/lib/concierge/proposal-studio.functions";
+
 
 const money = (cents: number, currency = "MXN") =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(cents / 100);
