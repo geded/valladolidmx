@@ -318,6 +318,85 @@ async function itineraryContext(supabase: any, caseId: string): Promise<string |
     .join("\n");
 }
 
+/**
+ * Expediente completo (sólo lectura, RLS del usuario): estado, prioridad,
+ * propuestas, conversación con el viajero y últimos movimientos.
+ */
+async function caseContext(supabase: any, caseId: string): Promise<string | null> {
+  const { data: kase } = await supabase
+    .from("concierge_cases")
+    .select(
+      "id, status, priority, priority_reason, source, summary, created_at, last_activity_at, target_response_at, traveler_user_id",
+    )
+    .eq("id", caseId)
+    .maybeSingle();
+  if (!kase) return null;
+
+  const [{ data: proposals }, { data: notes }, { data: timeline }] = await Promise.all([
+    supabase
+      .from("concierge_proposals")
+      .select("version, status, total_amount_cents, currency, sent_at, responded_at, summary")
+      .eq("case_id", caseId)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("concierge_case_notes")
+      .select("body, visibility, created_at, author_user_id")
+      .eq("case_id", caseId)
+      .order("created_at", { ascending: false })
+      .limit(8),
+    supabase
+      .from("concierge_case_timeline")
+      .select("event_type, summary, occurred_at")
+      .eq("case_id", caseId)
+      .order("occurred_at", { ascending: false })
+      .limit(8),
+  ]);
+
+  const proposalLines = ((proposals ?? []) as any[]).map(
+    (p) =>
+      `· Propuesta v${p.version} — ${p.status}, ${money(Number(p.total_amount_cents ?? 0), p.currency ?? "MXN")}${
+        p.sent_at ? `, enviada ${String(p.sent_at).slice(0, 10)}` : ""
+      }${p.responded_at ? `, respondida ${String(p.responded_at).slice(0, 10)}` : ""}.`,
+  );
+
+  const noteLines = ((notes ?? []) as any[])
+    .slice()
+    .reverse()
+    .map(
+      (n) =>
+        `· ${String(n.created_at).slice(0, 16).replace("T", " ")} — ${
+          n.visibility === "traveler" ? "conversación con el viajero" : "nota interna"
+        }${n.author_user_id === kase.traveler_user_id ? " (escribió el viajero)" : " (escribió el equipo)"}: ${String(
+          n.body ?? "",
+        ).slice(0, 240)}`,
+    );
+
+  const timelineLines = ((timeline ?? []) as any[]).map(
+    (t) =>
+      `· ${String(t.occurred_at).slice(0, 10)} — ${t.event_type}${t.summary ? `: ${String(t.summary).slice(0, 160)}` : ""}.`,
+  );
+
+  return [
+    "EXPEDIENTE DEL VIAJERO (dato real, sólo lectura)",
+    `· Estado: ${kase.status}. Prioridad: ${kase.priority ?? "sin definir"}${
+      kase.priority_reason ? ` (${kase.priority_reason})` : ""
+    }.`,
+    kase.summary ? `· Resumen: ${String(kase.summary).slice(0, 400)}` : null,
+    kase.source ? `· Origen: ${kase.source}.` : null,
+    `· Creado: ${String(kase.created_at).slice(0, 10)}. Última actividad: ${String(
+      kase.last_activity_at ?? kase.created_at,
+    ).slice(0, 10)}.`,
+    proposalLines.length ? "PROPUESTAS\n" + proposalLines.join("\n") : "· Sin propuestas registradas.",
+    noteLines.length ? "CONVERSACIÓN Y NOTAS (de lo más antiguo a lo más reciente)\n" + noteLines.join("\n") : null,
+    timelineLines.length ? "ÚLTIMOS MOVIMIENTOS\n" + timelineLines.join("\n") : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+
+
 
 /**
  * Panorama reciente de reservaciones (sólo lectura, RLS del propio usuario).
