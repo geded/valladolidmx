@@ -2,7 +2,8 @@
  * AluxCopilotPanel — capa transversal del Workspace Engine.
  * Lee el contexto Alux del workspace activo desde el Alux Registry.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { Sparkles, ArrowUpRight, Info, Undo2, ChevronDown, ChevronUp } from "lucide-react";
 import { useWorkspace } from "./WorkspaceProvider";
 import {
@@ -32,6 +33,17 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
   const [actions, setActions] = useState<AluxAction[]>([]);
   const [openExpl, setOpenExpl] = useState<Record<string, boolean>>({});
   const [chatOpen, setChatOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Si la pantalla activa es un expediente o una reservación, Alux puede
+  // consultar ese caso concreto (sólo lectura).
+  const chatSubject = useMemo(() => {
+    const uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+    const caseMatch = new RegExp(`/concierge/expedientes/(${uuid})`, "i").exec(pathname);
+    if (caseMatch?.[1]) return { kind: "case" as const, id: caseMatch[1] };
+    const orderMatch = new RegExp(`/concierge/reservaciones/(${uuid})`, "i").exec(pathname);
+    if (orderMatch?.[1]) return { kind: "order" as const, id: orderMatch[1] };
+    return undefined;
+  }, [pathname]);
 
   useEffect(() => {
     if (!workspace) return;
@@ -221,7 +233,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
           {alux.copy("workspaceOpen")}
         </Button>
       </footer>
-      <AluxWorkspaceChat open={chatOpen} onOpenChange={setChatOpen} />
+      <AluxWorkspaceChat open={chatOpen} onOpenChange={setChatOpen} subject={chatSubject} />
     </section>
   );
 }
