@@ -1211,7 +1211,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             <Button
               type="button"
               variant={mode === "month" ? "default" : "outline"}
-              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5"
+              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
               onClick={() => {
                 setMode("month");
                 setPage(0);
