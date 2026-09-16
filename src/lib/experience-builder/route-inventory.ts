@@ -601,6 +601,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/api/public/maps/static.ts",
   "src/routes/api/public/alux/chat.ts",
   "src/routes/api/public/payments/$provider/webhook.ts",
+  "src/routes/api/public/media-derived.$.ts",
   "src/routes/api/public/studio-media.$.ts",
   "src/routes/arma-tu-viaje.tsx",
   "src/routes/auth.tsx",
