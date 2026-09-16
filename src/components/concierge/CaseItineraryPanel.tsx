@@ -97,6 +97,26 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   });
 
 
+  const aluxSchedule = useMutation({
+    mutationFn: () => aluxScheduleFn({ data: { caseId } }),
+    onSuccess: (r) => {
+      if (r.applied > 0) {
+        toast.success(
+          `Alux armó la agenda: ${r.applied} paradas con día y hora. El viajero ya la ve en Mi Viaje.`,
+        );
+      } else {
+        toast.info("No había paradas por agendar en este viaje.");
+      }
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) =>
+      toast.error(
+        e.message === "alux_unavailable"
+          ? "Alux no pudo armar la agenda en este momento. Intenta de nuevo."
+          : e.message,
+      ),
+  });
+
   const diff = summary.data?.difference_cents ?? 0;
   const currency = summary.data?.currency ?? "MXN";
   const parsedAmount = Math.round(Number(amount.replace(/[^\d.]/g, "")) * 100);
