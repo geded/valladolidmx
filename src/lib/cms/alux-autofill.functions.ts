@@ -561,14 +561,15 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
 
     // Consulta literal en todas las fuentes: nunca se amplía la búsqueda, para
     // no mostrar material ajeno al lugar o al evento solicitado.
-    const [google, commons, openverse] = await Promise.all([
+    const [web, google, commons, openverse] = await Promise.all([
+      searchWebImages(data.query).catch(() => [] as PhotoCandidate[]),
       searchGooglePhotos(data.query).catch(() => [] as PhotoCandidate[]),
       searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
       searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
     ]);
 
     const seen = new Set<string>();
-    const photos = [...site, ...google, ...commons, ...openverse].filter((p) => {
+    const photos = [...site, ...google, ...web, ...commons, ...openverse].filter((p) => {
       if (!p.url || seen.has(p.url)) return false;
       seen.add(p.url);
       return true;
