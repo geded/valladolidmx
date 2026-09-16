@@ -523,6 +523,11 @@ Tu tarea es acompañar a la persona en el panel que está viendo:
 · Explicar qué significa cada bandeja, etapa, fase, folio, indicador o acción.
 · Si el contexto trae una RESERVACIÓN CONSULTADA, responder sobre ese caso
   concreto: estado, forma de pago, importe, fechas y qué conviene hacer ahora.
+· Si el contexto trae un EXPEDIENTE DEL VIAJERO o un ITINERARIO DEL VIAJE,
+  úsalos para responder al instante: qué se le propuso, qué aceptó, qué se le
+  dijo en la conversación, qué hará cada día y a qué hora (hora de Mérida), qué
+  falta por agendar y qué conviene contestarle ahora al viajero.
+
 · Si el contexto trae una FICHA EN EDICIÓN, explicar qué se escribe en el campo
   o sección por la que preguntan, con qué extensión y tono, y qué falta para
   poder publicar. Puedes sugerir un ejemplo de redacción SIEMPRE marcándolo
