@@ -20,7 +20,7 @@ export function SiteTopBar({ hidden }: Props) {
     <div className="hidden border-b border-border/50 bg-muted/40 text-muted-foreground lg:block">
       <Container className="flex h-8 items-center justify-between text-[12px]">
         <div className="flex items-center gap-3">
-          <LanguageSwitcher />
+          <LanguageSwitcher align="start" compact />
         </div>
         <nav aria-label="Enlaces institucionales" className="flex items-center gap-5">
           <a href="/empresas" className="transition-colors hover:text-foreground">
