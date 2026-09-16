@@ -7,6 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
 import { CaseMessages } from "@/components/concierge/CaseMessages";
+import { CaseItineraryPanel } from "@/components/concierge/CaseItineraryPanel";
 import { getConciergeReservationForCase, reservationPaymentLabel } from "@/lib/concierge/orders.functions";
 
 export const Route = createFileRoute("/_authenticated/concierge/expedientes/$caseId/")({
@@ -51,6 +52,7 @@ function StaffCasePage() {
           {!reservation.data.paid_at ? <p className="mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm text-warning-foreground">La propuesta fue aceptada, pero el cobro sigue pendiente.</p> : null}
         </section>
       ) : null}
+      <CaseItineraryPanel caseId={caseId} />
       <CaseFileView data={q.data} />
     </section>
   );
