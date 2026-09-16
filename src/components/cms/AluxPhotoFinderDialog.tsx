@@ -12,6 +12,7 @@ import { Loader2, Search, Sparkles, X } from "lucide-react";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
+  type OwnerContact,
   type PhotoCandidate,
 } from "@/lib/cms/alux-autofill.functions";
 
