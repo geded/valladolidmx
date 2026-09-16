@@ -639,16 +639,18 @@ function tokenPresent(token: string, available: Set<string>, haystack: string): 
 export interface PhotoMatch {
   relevance: number;
   placeMatch: boolean;
+  /** La foto nombra la sede escrita por el editor ("centro histórico"). */
+  qualifierMatch: boolean;
 }
 
 /**
  * Evita que una coincidencia territorial amplia (p. ej. "Valladolid") haga
  * pasar una foto que no contiene el asunto buscado (p. ej. "video mapping"),
- * y prioriza las que sí nombran el territorio.
+ * y prioriza las que sí nombran el territorio y la sede pedida.
  */
 function photoMatch(photo: PhotoCandidate, plan: QueryPlan): PhotoMatch {
   if (photo.provider === "Sitio del negocio" || photo.provider === "Enlace directo") {
-    return { relevance: 100, placeMatch: true };
+    return { relevance: 100, placeMatch: true, qualifierMatch: true };
   }
 
   const haystack = normalizeSearchText(
@@ -658,19 +660,29 @@ function photoMatch(photo: PhotoCandidate, plan: QueryPlan): PhotoMatch {
 
   const subjectMatches = plan.subject.filter((t) => tokenPresent(t, available, haystack)).length;
   const placeMatches = plan.place.filter((t) => tokenPresent(t, available, haystack)).length;
+  const qualifierMatches = plan.qualifiers.filter((t) =>
+    tokenPresent(t, available, haystack),
+  ).length;
   const required =
     plan.subject.length === 0 ? 0 : Math.max(1, Math.ceil(plan.subject.length * 0.6));
 
-  if (subjectMatches < required) return { relevance: 0, placeMatch: false };
-  if (plan.subject.length === 0 && placeMatches === 0) return { relevance: 0, placeMatch: false };
+  if (subjectMatches < required) return { relevance: 0, placeMatch: false, qualifierMatch: false };
+  if (plan.subject.length === 0 && placeMatches === 0) {
+    return { relevance: 0, placeMatch: false, qualifierMatch: false };
+  }
 
-  let relevance = subjectMatches * 10 + placeMatches * 4;
+  let relevance = subjectMatches * 10 + placeMatches * 4 + qualifierMatches * 12;
   if (plan.subjectPhrase && haystack.includes(plan.subjectPhrase)) relevance += 25;
   if (photo.provider === "Google") relevance += 6;
   if (photo.width >= 1200 && photo.height >= 800) relevance += 3;
 
-  return { relevance, placeMatch: placeMatches > 0 };
+  return {
+    relevance,
+    placeMatch: placeMatches > 0,
+    qualifierMatch: plan.qualifiers.length > 0 && qualifierMatches > 0,
+  };
 }
+
 
 /**
  * Fotos del propio lugar o sede publicadas en Google (ficha del negocio o del
