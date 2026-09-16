@@ -337,6 +337,41 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return fallback(data.question);
 
+    // Dato real, sólo lectura: folio escrito en la pregunta o reservación /
+    // expediente abierto en la pantalla activa.
+    const folioMatch = FOLIO_RE.exec(data.question);
+    let reservationBlock: string | null = null;
+    try {
+      if (folioMatch?.[1]) {
+        reservationBlock = await reservationContext(context.supabase, {
+          folio: folioMatch[1].replace(/\s+/g, "-").toUpperCase(),
+        });
+      } else if (data.subject?.kind === "order" && data.subject.id) {
+        reservationBlock = await reservationContext(context.supabase, { orderId: data.subject.id });
+      } else if (data.subject?.kind === "case" && data.subject.id) {
+        reservationBlock = await reservationContext(context.supabase, { caseId: data.subject.id });
+      }
+    } catch (err) {
+      console.error(
+        "[alux.workspace-assist] no se pudo leer la reservación",
+        err instanceof Error ? err.message : err,
+      );
+    }
+
+    const entityBlock =
+      data.subject?.kind === "entity"
+        ? [
+            "FICHA EN EDICIÓN",
+            data.subject.label ? `· Ficha: ${data.subject.label}.` : null,
+            data.subject.status ? `· Estado de publicación: ${data.subject.status}.` : null,
+            data.subject.fields?.length
+              ? `· Campos del formulario: ${data.subject.fields.join(", ")}.`
+              : null,
+          ]
+            .filter(Boolean)
+            .join("\n")
+        : null;
+
     const [{ generateText }, { createLovableAiGatewayProvider }] = await Promise.all([
       import("ai"),
       import("@/lib/ai-gateway.server"),
@@ -347,9 +382,13 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       data.route ? `Pantalla actual: ${data.route}.` : null,
       data.areas?.length ? `Secciones del panel: ${data.areas.join(", ")}.` : null,
       data.workspaceId === "concierge" ? CONCIERGE_GLOSSARY : null,
+      data.workspaceId === "cms" || entityBlock ? CMS_GLOSSARY : null,
+      entityBlock,
+      reservationBlock,
     ]
       .filter(Boolean)
       .join("\n\n");
+
 
     const historyBlock = (data.history ?? [])
       .map((h) => `${h.role === "user" ? "Persona" : "Alux"}: ${h.content}`)
