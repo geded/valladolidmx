@@ -89,11 +89,13 @@ export function AluxWorkspaceChat({
           route: pathname,
           areas: getNavItemsForWorkspace(workspace.id, "sidebar").map((i) => i.label),
           question: q,
+          ...(subject ? { subject } : {}),
           history,
         },
       });
       setTurns((t) => [...t, { role: "assistant", content: res.answer }]);
-      setFollowUps(res.followUps.length ? res.followUps : STARTERS);
+      setFollowUps(res.followUps.length ? res.followUps : initialStarters);
+
     } catch {
       setError("No se pudo abrir la conversación. Inténtalo de nuevo en un momento.");
     } finally {
