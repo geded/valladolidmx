@@ -466,9 +466,20 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
             >
               Agregar sugerencia sin costo
             </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              disabled={scheduling || lines.filter((l) => l.title.trim().length >= 3).length === 0}
+              onClick={suggestSchedule}
+            >
+              {scheduling ? "Alux está armando la agenda…" : "Armar agenda con Alux"}
+            </Button>
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Atajos: Ctrl/Cmd + Enter guarda el borrador · Ctrl/Cmd + D duplica la última partida.
+            Alux propone día, hora del destino y duración para cada partida; puedes ajustar todo
+            antes de guardar. Atajos: Ctrl/Cmd + Enter guarda el borrador · Ctrl/Cmd + D duplica la
+            última partida.
           </p>
         </Panel>
       </section>
