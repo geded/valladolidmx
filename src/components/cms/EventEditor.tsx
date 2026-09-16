@@ -62,6 +62,7 @@ export function EventEditor({ id }: Props) {
       renderExtras={({ id: entityId }) =>
         entityId ? (
           <div className="space-y-6">
+            <EventLocationPanel eventId={entityId} />
             <EventRecurrencePanel eventId={entityId} />
             <EventAttributesPanel eventId={entityId} />
           </div>
