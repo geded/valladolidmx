@@ -537,6 +537,13 @@ export function MediaPickerDialog({
           )}
         </div>
       </div>
+
+      <AluxPhotoFinderDialog
+        open={photoFinderOpen}
+        onClose={() => setPhotoFinderOpen(false)}
+        initialQuery={searchHint?.trim() || search.trim() || "Valladolid Yucatán"}
+        onPick={(photo) => void handleAluxPhoto(photo)}
+      />
     </div>
   );
 }
