@@ -138,7 +138,12 @@ imagen de portada.
 
 /** Formato de dinero en pesos, sin depender del navegador. */
 function money(amount: number, currency: string) {
-  return `${new Intl.NumberFormat("es-MX", { minimumFractionDigits: 2 }).format(amount)} ${currency}`;
+  // Los importes se guardan en centavos, igual que en la pantalla de reservaciones.
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: currency || "MXN",
+    maximumFractionDigits: 0,
+  }).format(amount / 100);
 }
 
 const FOLIO_RE = /\b((?:ERL|AVL|VMX)[-\s]?[A-Za-z0-9]{2,8}(?:[-\s]?\d{1,3})?)\b/i;
