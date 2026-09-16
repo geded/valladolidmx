@@ -27,6 +27,7 @@ import {
 import { meridaDateTime } from "@/lib/time/merida";
 import { Sparkles } from "lucide-react";
 import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
+import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
 
 
 export type FieldType =
@@ -119,6 +120,22 @@ export function EntityEditor(props: Props) {
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [error, setError] = useState<string | null>(null);
   const [aluxOpen, setAluxOpen] = useState(false);
+  const [autofillOpen, setAutofillOpen] = useState(false);
+
+  /** Nombre de la ficha: base de la búsqueda que hace Alux. */
+  const autofillName = values["name"] || values["title"] || "";
+  /** Sólo campos de texto: Alux no elige catálogos ni relaciones. */
+  const autofillFields = useMemo(
+    () =>
+      fields
+        .filter((f) => f.type === "text" || f.type === "textarea")
+        .map((f) => ({
+          name: f.name,
+          label: f.label,
+          ...(f.helpText ? { help: f.helpText } : {}),
+        })),
+    [fields],
+  );
 
 
   useEffect(() => {
@@ -220,6 +237,20 @@ export function EntityEditor(props: Props) {
           )}
           <button
             type="button"
+            onClick={() => setAutofillOpen(true)}
+            disabled={autofillName.trim().length < 2}
+            title={
+              autofillName.trim().length < 2
+                ? "Escribe primero el nombre de la ficha"
+                : "Alux propone el contenido de esta ficha"
+            }
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            Completar con Alux
+          </button>
+          <button
+            type="button"
             onClick={() => setAluxOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted"
           >
@@ -228,6 +259,15 @@ export function EntityEditor(props: Props) {
           </button>
         </div>
       </header>
+
+      <AluxAutofillDialog
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        entityKind={title}
+        name={autofillName}
+        fields={autofillFields}
+        onApply={(patch) => setValues((v) => ({ ...v, ...patch }))}
+      />
 
       <AluxWorkspaceChat
         open={aluxOpen}

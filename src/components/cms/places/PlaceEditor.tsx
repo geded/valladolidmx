@@ -10,7 +10,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
+import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import {
   checkPlaceDuplicates,
@@ -100,6 +102,19 @@ const TEXT_FIELDS = [
   "contact_website",
   "price_currency",
 ] as const;
+
+/** Campos que Alux puede proponer al completar la ficha. */
+const AUTOFILL_FIELDS = [
+  { name: "official_name", label: "Nombre oficial" },
+  { name: "short_description", label: "Descripción corta" },
+  { name: "description", label: "Descripción larga" },
+  { name: "directions", label: "Cómo llegar" },
+  { name: "address_line", label: "Dirección" },
+  { name: "best_time_to_visit", label: "Mejor momento para visitar" },
+  { name: "contact_phone", label: "Teléfono" },
+  { name: "contact_website", label: "Sitio web" },
+  { name: "google_place_id", label: "Google Place ID" },
+];
 
 interface Props {
   placeId?: string;
@@ -273,6 +288,7 @@ export function PlaceEditor({ placeId }: Props) {
 
   /** Última versión del lugar ya volcada al formulario. */
   const hydratedRef = useRef<string | null>(null);
+  const [autofillOpen, setAutofillOpen] = useState(false);
 
   useEffect(() => {
     if (!place) return;
@@ -668,6 +684,12 @@ export function PlaceEditor({ placeId }: Props) {
   }
 
   const status = (place.status as ContentStatus) ?? "draft";
+  /** Territorio de la ficha: acota la búsqueda que hace Alux. */
+  const destinationName =
+    (opts.destinations ?? []).find(
+      (d: { id: string; name: string }) => d.id === (place.destination_id as string | undefined),
+    )?.name ?? "";
+  const zoneName = editZones.find((z) => z.id === zoneId)?.name ?? "";
   const set = (key: string) => (value: string) => setValues((v) => ({ ...v, [key]: value }));
 
   return (
@@ -684,11 +706,37 @@ export function PlaceEditor({ placeId }: Props) {
             <code>/{String(place.slug)}</code> · nombre, slug y destino son campos protegidos.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => setAutofillOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            Completar con Alux
+          </button>
           <span>Estado:</span>
           <StatusBadge value={status} />
         </div>
       </header>
+
+      <AluxAutofillDialog
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        entityKind="lugar o sitio de interés"
+        name={String(place.name ?? "")}
+        destination={destinationName}
+        zone={zoneName}
+        fields={AUTOFILL_FIELDS}
+        onApply={(patch, facts) => {
+          setValues((v) => ({ ...v, ...patch }));
+          if (facts?.latitude != null && facts.longitude != null && !latitude && !longitude) {
+            setLatitude(String(facts.latitude));
+            setLongitude(String(facts.longitude));
+          }
+        }}
+      />
+
 
       {fieldError && (
         <div
