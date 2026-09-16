@@ -288,6 +288,7 @@ export function PlaceEditor({ placeId }: Props) {
 
   /** Última versión del lugar ya volcada al formulario. */
   const hydratedRef = useRef<string | null>(null);
+  const [autofillOpen, setAutofillOpen] = useState(false);
 
   useEffect(() => {
     if (!place) return;
