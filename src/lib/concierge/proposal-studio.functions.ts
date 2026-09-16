@@ -237,6 +237,26 @@ export const getCaseItinerary = createServerFn({ method: "GET" })
       };
     });
 
+    // Propuesta vigente del expediente: de ahí salen el día y la hora.
+    const { data: proposals } = await context.supabase
+      .from("concierge_proposals")
+      .select("id, status, created_at")
+      .eq("case_id", data.caseId)
+      .order("created_at", { ascending: false });
+    const proposalRows = (proposals ?? []) as Array<Record<string, unknown>>;
+    const current =
+      proposalRows.find((p) => p["status"] === "accepted") ?? proposalRows[0] ?? null;
+    let proposalScheduled = 0;
+    if (current) {
+      const { data: pItems } = await context.supabase
+        .from("concierge_proposal_items")
+        .select("day_index, starts_at_local")
+        .eq("proposal_id", current["id"] as string);
+      proposalScheduled = ((pItems ?? []) as Array<Record<string, unknown>>).filter(
+        (i) => i["day_index"] != null || i["starts_at_local"] != null,
+      ).length;
+    }
+
     const p = plan as Record<string, unknown>;
     return {
       plan_id: p["id"] as string,
@@ -246,7 +266,11 @@ export const getCaseItinerary = createServerFn({ method: "GET" })
       party_size: (p["party_size"] as number | null) ?? null,
       status: (p["status"] as string | null) ?? null,
       stops,
+      scheduled_count: stops.filter((s) => s.day_index != null || s.starts_at_local != null).length,
+      latest_proposal_id: current ? (current["id"] as string) : null,
+      proposal_scheduled_count: proposalScheduled,
     } satisfies CaseItinerary;
+
   });
 
 export interface AdjustmentSummary {
