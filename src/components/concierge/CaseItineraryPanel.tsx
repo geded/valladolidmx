@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,8 @@ import {
   registerItineraryCreditNote,
   applyProposalScheduleToPlan,
   aluxScheduleCaseItinerary,
+  listCaseSuggestions,
+  type CaseSuggestion,
 } from "@/lib/concierge/proposal-studio.functions";
 
 
