@@ -17,6 +17,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createConciergeProposal } from "@/lib/concierge/concierge.functions";
+import { aluxSuggestProposalSchedule } from "@/lib/concierge/proposal-studio.functions";
 import {
   dayLabel,
   formatDurationLabel,
