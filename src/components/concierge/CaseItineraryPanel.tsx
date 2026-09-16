@@ -11,7 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { meridaClock, meridaDate } from "@/lib/time/merida";
+import { meridaDate } from "@/lib/time/merida";
 import {
   getCaseItinerary,
   getCaseAdjustmentSummary,
@@ -207,7 +207,7 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {stop.starts_at_local
-                                  ? meridaClock(stop.starts_at_local)
+                                  ? stop.starts_at_local.slice(0, 5)
                                   : "Sin hora"}
                                 {stop.duration_minutes ? ` · ${stop.duration_minutes} min` : ""}
                               </p>
