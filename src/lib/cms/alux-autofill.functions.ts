@@ -933,9 +933,16 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     const plan = buildQueryPlan(data.query, data.place);
     const ai = await planWithAi(data.query, data.place).catch(() => null);
     const variants = [...new Set([...(ai?.queries ?? []), ...plan.variants])].slice(0, 5);
-    const placeQuery = [ai?.subject || plan.subjectPhrase || data.query, data.place]
+    // La sede escrita por el editor ("centro histórico", "convento") viaja con
+    // la consulta: es lo que distingue una sede de otra dentro del destino.
+    const placeQuery = [
+      ai?.subject || plan.subjectPhrase || data.query,
+      plan.qualifiers.join(" "),
+      data.place,
+    ]
       .filter(Boolean)
       .join(" ");
+
 
     const webBatches = await Promise.all(
       variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
