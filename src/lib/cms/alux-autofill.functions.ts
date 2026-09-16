@@ -497,22 +497,16 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    let archives: PhotoCandidate[] = [];
-    let usedQuery = data.query;
-    for (const variant of queryVariants(data.query)) {
-      const [commons, openverse] = await Promise.all([
-        searchCommons(variant).catch(() => [] as PhotoCandidate[]),
-        searchOpenverse(variant).catch(() => [] as PhotoCandidate[]),
-      ]);
-      if (commons.length || openverse.length) {
-        archives = [...commons, ...openverse];
-        usedQuery = variant;
-        break;
-      }
-    }
+    // Consulta literal en todas las fuentes: nunca se amplía la búsqueda, para
+    // no mostrar material ajeno al lugar o al evento solicitado.
+    const [google, commons, openverse] = await Promise.all([
+      searchGooglePhotos(data.query).catch(() => [] as PhotoCandidate[]),
+      searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
+      searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
+    ]);
 
     const seen = new Set<string>();
-    const photos = [...site, ...archives].filter((p) => {
+    const photos = [...site, ...google, ...commons, ...openverse].filter((p) => {
       if (!p.url || seen.has(p.url)) return false;
       seen.add(p.url);
       return true;
@@ -520,8 +514,8 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     return {
       ok: true as const,
       photos: photos.slice(0, 24),
-      usedQuery,
-      relaxed: usedQuery !== data.query.trim(),
+      usedQuery: data.query,
+      relaxed: false,
     };
   });
 
