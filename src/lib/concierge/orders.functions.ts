@@ -532,11 +532,12 @@ export const startConciergeOnlinePayment = createServerFn({ method: "POST" })
       returnUrls: { success: `${base}/cuenta/pagos/exito?order=${order.id}`, cancel: `${base}/cuenta/pagos/error?order=${order.id}` },
       clientRequestId: data.clientRequestId ?? null,
     });
-    const { error: updateError } = await context.supabase.from("concierge_orders").update({
-      status: "awaiting_payment", payment_provider: provider.id,
-      payment_provider_intent_id: intent.providerIntentId,
-    }).eq("id", order.id).eq("user_id", context.userId);
-    if (updateError) throw new Error(updateError.message);
-    await context.supabase.from("concierge_order_events").insert({ order_id: order.id, event_type: "payment_initiated", actor_user_id: context.userId, payload: { provider: provider.id, intent_id: intent.providerIntentId, amount: order.total_amount, currency: order.currency } });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: startError } = await supabaseAdmin.rpc("concierge_order_start_online_payment", {
+      _order_id: order.id,
+      _provider: provider.id,
+      _intent_id: intent.providerIntentId,
+    });
+    if (startError) throw new Error(startError.message);
     return { mode: intent.mode, redirectUrl: intent.redirectUrl, clientSecret: intent.clientSecret };
   });
