@@ -153,3 +153,6 @@
 - [x] Portada: restablecer miniaturas de eventos (acreditación de medios)
 
 - [x] Identificar y comparar la última versión Premium aprobada de Zazil Tunich.
+
+- [ ] Reconstruir la autoridad documental de Experiencias, venta en línea y Concierge desde GitHub y el repositorio.
+- [ ] Definir el delta mínimo para administrar Experiencias desde CMS sin duplicar reservas, pagos ni operación Concierge.
