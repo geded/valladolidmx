@@ -93,6 +93,10 @@ export const applyProposalScheduleToPlan = createServerFn({ method: "POST" })
     );
     if (error) throw new Error(error.message);
     return { applied: Number(applied ?? 0) };
+    } catch (e) {
+      console.error("[alux-schedule]", e);
+      throw e;
+    }
   });
 
 /* ============================================================
@@ -537,6 +541,7 @@ export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ caseId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
+    try {
     const { data: plan, error: planError } = await context.supabase
       .from("travel_plans")
       .select("id, start_date, end_date")
@@ -623,6 +628,10 @@ export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
     } as never);
     if (error) throw new Error(error.message);
     return { applied: Number(applied ?? 0) };
+    } catch (e) {
+      console.error("[alux-schedule]", e);
+      throw e;
+    }
   });
 
 type ScheduleCallInput = z.infer<typeof ScheduleInput>;
