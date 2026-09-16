@@ -511,7 +511,36 @@ const SEARCH_CONTEXT_WORDS = new Set([
   "maya",
   "yucatan",
   "valladolid",
+  "izamal",
+  "espita",
+  "tizimin",
+  "temozon",
+  "chichen",
+  "itza",
+  "ekbalam",
 ]);
+
+/**
+ * Variantes equivalentes del mismo concepto turístico (español/inglés,
+ * singular/plural y formas compuestas). Permiten reconocer la misma foto
+ * aunque la página la titule de otra manera.
+ */
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  video: ["video", "videomapping", "mapping"],
+  mapping: ["mapping", "videomapping", "proyeccion", "proyecciones", "proyectado"],
+  proyeccion: ["proyeccion", "proyecciones", "mapping", "videomapping"],
+  espectaculo: ["espectaculo", "show", "funcion"],
+  cenote: ["cenote", "cenotes"],
+  hotel: ["hotel", "hoteles", "hospedaje", "hostal"],
+  restaurante: ["restaurante", "restaurant", "restaurantes", "cocina", "comida"],
+  iglesia: ["iglesia", "templo", "parroquia", "convento", "catedral"],
+  museo: ["museo", "museum"],
+  ruinas: ["ruinas", "arqueologica", "arqueologico", "zona"],
+  fiesta: ["fiesta", "festival", "feria", "carnaval"],
+  noche: ["noche", "nocturno", "nocturna", "night", "iluminado", "iluminada"],
+  artesania: ["artesania", "artesanias", "artesanal"],
+  gastronomia: ["gastronomia", "gastronomico", "culinario"],
+};
 
 function normalizeSearchText(value: string): string {
   return value
@@ -532,29 +561,89 @@ function searchTokens(value: string): string[] {
   ];
 }
 
+interface QueryPlan {
+  /** Tokens que identifican el tema central (sin relleno ni territorio). */
+  subject: string[];
+  /** Tokens territoriales presentes en la frase del editor. */
+  place: string[];
+  /** Frase del tema, normalizada, para detectar coincidencia exacta. */
+  subjectPhrase: string;
+  /** Consultas a lanzar en las fuentes abiertas, de la más precisa a la más amplia. */
+  variants: string[];
+}
+
+/**
+ * Descompone la frase del editor en tema + territorio y arma consultas
+ * complementarias. Nunca sustituye la frase original: sólo añade formas de
+ * preguntar lo mismo para que una fuente que titula distinto también responda.
+ */
+function buildQueryPlan(query: string): QueryPlan {
+  const normalized = normalizeSearchText(query);
+  const all = searchTokens(query);
+  const subject = all.filter((token) => !SEARCH_CONTEXT_WORDS.has(token));
+  const place = all.filter((token) => SEARCH_CONTEXT_WORDS.has(token));
+  const subjectPhrase = subject.join(" ");
+  const placePhrase = place.join(" ");
+
+  const variants = new Set<string>();
+  variants.add(query.trim());
+  if (subjectPhrase && placePhrase) {
+    variants.add(`"${subjectPhrase}" ${placePhrase}`);
+    variants.add(`${subjectPhrase} ${placePhrase}`);
+  }
+  if (subjectPhrase && subject.length > 1) variants.add(`"${subjectPhrase}"`);
+  if (subjectPhrase && !placePhrase) variants.add(subjectPhrase);
+
+  return { subject, place, subjectPhrase, variants: [...variants].slice(0, 4) };
+}
+
+/** Un token cuenta como presente si aparece igual, como sinónimo o como raíz. */
+function tokenPresent(token: string, available: Set<string>, haystack: string): boolean {
+  if (available.has(token)) return true;
+  for (const alt of SEARCH_SYNONYMS[token] ?? []) {
+    if (available.has(alt)) return true;
+  }
+  if (token.length >= 5) {
+    const root = token.slice(0, Math.max(5, token.length - 2));
+    if (haystack.includes(root)) return true;
+  }
+  return false;
+}
+
+export interface PhotoMatch {
+  relevance: number;
+  placeMatch: boolean;
+}
+
 /**
  * Evita que una coincidencia territorial amplia (p. ej. "Valladolid") haga
- * pasar una foto que no contiene el asunto buscado (p. ej. "video mapping").
+ * pasar una foto que no contiene el asunto buscado (p. ej. "video mapping"),
+ * y prioriza las que sí nombran el territorio.
  */
-function photoRelevance(photo: PhotoCandidate, query: string): number {
+function photoMatch(photo: PhotoCandidate, plan: QueryPlan): PhotoMatch {
   if (photo.provider === "Sitio del negocio" || photo.provider === "Enlace directo") {
-    return 100;
+    return { relevance: 100, placeMatch: true };
   }
 
-  const wanted = searchTokens(query);
-  if (wanted.length === 0) return 0;
-  const subject = wanted.filter((token) => !SEARCH_CONTEXT_WORDS.has(token));
-  const available = new Set(
-    searchTokens([photo.title, photo.author, photo.sourceUrl].filter(Boolean).join(" ")),
+  const haystack = normalizeSearchText(
+    [photo.title, photo.author, photo.sourceUrl, photo.url].filter(Boolean).join(" "),
   );
-  const totalMatches = wanted.filter((token) => available.has(token)).length;
-  const subjectMatches = subject.filter((token) => available.has(token)).length;
-  const requiredSubjectMatches =
-    subject.length === 0 ? 0 : Math.max(1, Math.ceil(subject.length * 0.6));
-  const requiredTotalMatches = Math.max(2, Math.ceil(wanted.length * 0.4));
+  const available = new Set(haystack.split(/\s+/).filter(Boolean));
 
-  if (subjectMatches < requiredSubjectMatches || totalMatches < requiredTotalMatches) return 0;
-  return subjectMatches * 10 + totalMatches;
+  const subjectMatches = plan.subject.filter((t) => tokenPresent(t, available, haystack)).length;
+  const placeMatches = plan.place.filter((t) => tokenPresent(t, available, haystack)).length;
+  const required =
+    plan.subject.length === 0 ? 0 : Math.max(1, Math.ceil(plan.subject.length * 0.6));
+
+  if (subjectMatches < required) return { relevance: 0, placeMatch: false };
+  if (plan.subject.length === 0 && placeMatches === 0) return { relevance: 0, placeMatch: false };
+
+  let relevance = subjectMatches * 10 + placeMatches * 4;
+  if (plan.subjectPhrase && haystack.includes(plan.subjectPhrase)) relevance += 25;
+  if (photo.provider === "Google") relevance += 6;
+  if (photo.width >= 1200 && photo.height >= 800) relevance += 3;
+
+  return { relevance, placeMatch: placeMatches > 0 };
 }
 
 /**
@@ -697,25 +786,38 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    // Consulta literal en todas las fuentes: nunca se amplía la búsqueda, para
-    // no mostrar material ajeno al lugar o al evento solicitado.
-    const [web, google, commons, openverse] = await Promise.all([
-      searchWebImages(data.query).catch(() => [] as PhotoCandidate[]),
+    // La frase del editor se conserva siempre; sólo se añaden formas
+    // equivalentes de preguntar lo mismo (tema + territorio) para que una
+    // fuente que titula distinto también responda. El filtro por tema sigue
+    // siendo obligatorio, así que nunca se muestra material ajeno.
+    const plan = buildQueryPlan(data.query);
+    const webBatches = await Promise.all(
+      plan.variants.map((variant) =>
+        searchWebImages(variant).catch(() => [] as PhotoCandidate[]),
+      ),
+    );
+    const [google, commons, openverse] = await Promise.all([
       searchGooglePhotos(data.query).catch(() => [] as PhotoCandidate[]),
-      searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
+      searchCommons(plan.subjectPhrase || data.query).catch(() => [] as PhotoCandidate[]),
+      searchOpenverse(plan.subjectPhrase || data.query).catch(() => [] as PhotoCandidate[]),
     ]);
 
     const seen = new Set<string>();
-    const photos = [...site, ...web, ...google, ...commons, ...openverse]
-      .map((photo) => ({ photo, relevance: photoRelevance(photo, data.query) }))
+    const scored = [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]
+      .map((photo) => ({ photo, ...photoMatch(photo, plan) }))
       .filter(({ photo, relevance }) => {
         if (!photo.url || relevance === 0 || seen.has(photo.url)) return false;
         seen.add(photo.url);
         return true;
       })
-      .sort((a, b) => b.relevance - a.relevance)
-      .map(({ photo }) => photo);
+      .sort((a, b) => b.relevance - a.relevance);
+
+    // Si alguna foto sí nombra el territorio, se descartan las que sólo
+    // coinciden con el tema: es material de otro lugar.
+    const territorial = scored.filter((entry) => entry.placeMatch);
+    const photos = (plan.place.length && territorial.length ? territorial : scored).map(
+      ({ photo }) => photo,
+    );
     const visible = photos.slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
