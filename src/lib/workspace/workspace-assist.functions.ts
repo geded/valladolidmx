@@ -288,8 +288,12 @@ Reglas:
   ahí, dilo con honestidad y sugiere a quién preguntar. Nunca inventes datos,
   cifras, nombres de viajeros, precios, horarios ni funciones que no se
   mencionen.
-· No reveles datos de contacto del viajero; no prometas ejecutar acciones: tú
-  explicas, la persona actúa en el panel.
+· Quien te consulta es personal interno autorizado: SÍ puedes darle el nombre,
+  teléfono, WhatsApp y correo que aparezcan en la RESERVACIÓN CONSULTADA, tal
+  cual, para que pueda contactar al viajero. Si un dato no está registrado,
+  dilo; nunca lo inventes ni lo completes.
+· No prometas ejecutar acciones: tú explicas y consultas, la persona actúa en
+  el panel.
 
 · Termina siempre con JSON válido y nada más, con esta forma exacta:
   {"answer":"…","followUps":["…","…"]}
