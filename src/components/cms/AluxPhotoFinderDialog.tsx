@@ -6,15 +6,17 @@
  * siempre (optimización, ampliación opcional con Alux IA, original inmutable y
  * derechos declarados). Sólo editores y administradores.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Search, Sparkles, X } from "lucide-react";
+import { Loader2, MapPin, Search, Sparkles, X } from "lucide-react";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
   type OwnerContact,
   type PhotoCandidate,
 } from "@/lib/cms/alux-autofill.functions";
+import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsTerritoryOptions } from "@/components/cms/CmsTerritoryBar";
 
 export interface AluxPickedPhoto {
   file: File;
@@ -32,6 +34,8 @@ export interface AluxPhotoFinderDialogProps {
   initialQuery: string;
   /** Sitio web del negocio: de ahí se traen sus propias fotos. */
   website?: string | null;
+  /** Territorio explícito. Si se omite, se usa el destino de trabajo del CMS. */
+  place?: string | null;
   onPick: (photo: AluxPickedPhoto) => void;
 }
 
@@ -40,10 +44,21 @@ export function AluxPhotoFinderDialog({
   onClose,
   initialQuery,
   website,
+  place,
   onPick,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
   const fetchBytes = useServerFn(aluxFetchPhotoBytes);
+
+  const { territory } = useCmsTerritory();
+  const options = useCmsTerritoryOptions();
+  const workingPlace = useMemo(() => {
+    if (place && place.trim()) return place.trim();
+    const destination = options.destinations.find((d) => d.id === territory.destinationId);
+    if (!destination) return null;
+    const zone = options.zones.find((z) => z.id === territory.zoneId);
+    return [zone?.name, destination.name, "Yucatán, México"].filter(Boolean).join(", ");
+  }, [place, options.destinations, options.zones, territory.destinationId, territory.zoneId]);
 
   const [query, setQuery] = useState(initialQuery);
   const [site, setSite] = useState(website ?? "");
@@ -55,6 +70,7 @@ export function AluxPhotoFinderDialog({
   const [loading, setLoading] = useState(false);
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
 
   if (!open) return null;
 
