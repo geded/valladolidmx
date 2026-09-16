@@ -18,6 +18,7 @@ import {
   createItineraryAdjustmentCharge,
   registerItineraryCreditNote,
   applyProposalScheduleToPlan,
+  aluxScheduleCaseItinerary,
 } from "@/lib/concierge/proposal-studio.functions";
 
 
