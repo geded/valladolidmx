@@ -648,7 +648,7 @@ function UploadForm({
   onSubmit: () => void;
   fit: RoleFit | null;
   upscaling: boolean;
-  onAluxUpscale: () => void | Promise<void>;
+  onAluxUpscale: (mode?: "upscale" | "editorial") => void | Promise<void>;
 }) {
   const inputCls = "h-9 w-full rounded-md border border-border bg-background px-2 text-xs";
   return (
@@ -695,6 +695,28 @@ function UploadForm({
               <Sparkles className="size-3.5" aria-hidden />
             )}
             {upscaling ? "Alux IA está ampliando…" : "Ampliar con Alux IA"}
+          </button>
+        </div>
+      ) : null}
+
+      {preview ? (
+        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
+          <p className="text-[11px] text-muted-foreground">
+            Toque editorial: Alux IA corrige luz y color y da nitidez de revista de viajes, sin
+            cambiar la escena. Puedes revisarla antes de subirla.
+          </p>
+          <button
+            type="button"
+            onClick={() => void onAluxUpscale("editorial")}
+            disabled={upscaling || uploading}
+            className="mt-2 inline-flex h-9 items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 text-xs font-medium text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {upscaling ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Sparkles className="size-3.5" aria-hidden />
+            )}
+            {upscaling ? "Alux IA está trabajando…" : "Dar toque editorial con Alux IA"}
           </button>
         </div>
       ) : null}
