@@ -625,6 +625,135 @@ export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
     return { applied: Number(applied ?? 0) };
   });
 
+/* ---------------- Sugerencias de venta para el expediente ---------------- */
+
+export interface CaseSuggestion {
+  kind: string;
+  entity_id: string | null;
+  label: string;
+  reason: string;
+}
+
+export interface CaseSuggestionsView {
+  suggestions: CaseSuggestion[];
+  interests: string[];
+  territories: string[];
+  free_days: number[];
+  total_days: number;
+}
+
+/**
+ * Lo que el viajero vio y guardó y todavía NO está en su viaje, más sus
+ * afinidades. Sólo lectura: no crea ni cobra nada, el concierge decide.
+ */
+export const listCaseSuggestions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ caseId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }): Promise<CaseSuggestionsView> => {
+    const empty: CaseSuggestionsView = {
+      suggestions: [],
+      interests: [],
+      territories: [],
+      free_days: [],
+      total_days: 0,
+    };
+
+    const { data: raw, error } = await context.supabase.rpc(
+      "concierge_traveler_interests",
+      { _case_id: data.caseId } as never,
+    );
+    if (error) throw new Error(error.message);
+
+    const info = (raw ?? {}) as Record<string, unknown>;
+    if (!info["has_traveler"]) return empty;
+
+    const memory = (info["memory"] ?? {}) as Record<string, unknown>;
+    const interests = Array.isArray(memory["categoryAffinity"])
+      ? (memory["categoryAffinity"] as unknown[]).map(String).slice(0, 12)
+      : [];
+    const territories = Array.isArray(memory["territoryAffinity"])
+      ? (memory["territoryAffinity"] as unknown[]).map(String).slice(0, 12)
+      : [];
+
+    const favorites = Array.isArray(info["favorites"])
+      ? (info["favorites"] as Array<Record<string, unknown>>)
+      : [];
+    const planned = Array.isArray(info["planned"])
+      ? (info["planned"] as Array<Record<string, unknown>>)
+      : [];
+
+    const plannedIds = new Set(
+      planned.map((p) => String(p["entity_id"] ?? "")).filter(Boolean),
+    );
+    const plannedLabels = new Set(
+      planned
+        .map((p) => String(p["label"] ?? "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+
+    const suggestions: CaseSuggestion[] = favorites
+      .filter((f) => {
+        const id = String(f["entity_id"] ?? "");
+        const label = String(f["label"] ?? "").trim().toLowerCase();
+        if (id && plannedIds.has(id)) return false;
+        if (label && plannedLabels.has(label)) return false;
+        return Boolean(label);
+      })
+      .slice(0, 12)
+      .map((f) => ({
+        kind: String(f["kind"] ?? "note"),
+        entity_id: (f["entity_id"] as string | null) ?? null,
+        label: String(f["label"]),
+        reason: "Lo guardó al navegar y todavía no está en su viaje",
+      }));
+
+    // Días del viaje que hoy no tienen ninguna parada agendada.
+    const { data: plan } = await context.supabase
+      .from("travel_plans")
+      .select("id, start_date, end_date")
+      .eq("case_id", data.caseId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let totalDays = 0;
+    const freeDays: number[] = [];
+    if (plan) {
+      const planRow = plan as Record<string, unknown>;
+      const startDate = planRow["start_date"] as string | null;
+      const endDate = planRow["end_date"] as string | null;
+      if (startDate && endDate) {
+        const diff =
+          (new Date(`${endDate}T00:00:00Z`).getTime() -
+            new Date(`${startDate}T00:00:00Z`).getTime()) /
+          86_400_000;
+        totalDays = Math.min(30, Math.max(1, Math.round(diff) + 1));
+      }
+      const { data: stops } = await context.supabase
+        .from("travel_plan_items")
+        .select("day_index")
+        .eq("plan_id", planRow["id"] as string);
+      const used = new Set(
+        ((stops ?? []) as Array<Record<string, unknown>>)
+          .map((s) => s["day_index"] as number | null)
+          .filter((d): d is number => typeof d === "number"),
+      );
+      for (let d = 0; d < totalDays; d += 1) {
+        if (!used.has(d)) freeDays.push(d);
+      }
+    }
+
+    return {
+      suggestions,
+      interests,
+      territories,
+      free_days: freeDays,
+      total_days: totalDays,
+    };
+  });
+
+
+
 type ScheduleCallInput = z.infer<typeof ScheduleInput>;
 
 /** Núcleo compartido: valida rol interno y pide la agenda a Alux. */
