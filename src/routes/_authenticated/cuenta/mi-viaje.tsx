@@ -2276,36 +2276,10 @@ function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string })
         </Link>
       </div>
 
-      <form
-        className="mb-5 space-y-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const t = note.trim();
-          if (t.length >= 3 && !send.isPending) send.mutate(t);
-        }}
-      >
-        <label className="text-xs font-medium text-foreground/80">
-          Enviar una nota rápida a tu concierge
-        </label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={2}
-          maxLength={1000}
-          placeholder="Ej. Preferimos comenzar el segundo día un poco más tarde…"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-        />
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{note.length}/1000</span>
-          <button
-            type="submit"
-            disabled={note.trim().length < 3 || send.isPending}
-            className="rounded-pill bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
-          >
-            {send.isPending ? "Enviando…" : "Enviar nota"}
-          </button>
-        </div>
-      </form>
+      {/* Conversación real con el concierge (misma superficie que ve el equipo). */}
+      <div className="mb-5">
+        <CaseMessages caseId={caseId} />
+      </div>
 
       {q.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando expediente…</p>
