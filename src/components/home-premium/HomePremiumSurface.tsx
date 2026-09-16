@@ -1154,13 +1154,13 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
               className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
             />
           ) : null}
-          <div className="mt-4 grid grid-cols-3 gap-2 md:grid-cols-1 lg:grid-cols-3">
+          <div className="mt-4 grid grid-cols-3 gap-2 md:grid-cols-1 lg:flex lg:flex-wrap lg:items-center lg:gap-2">
             <Button
               type="button"
               variant={mode === "today" ? "default" : "outline"}
-              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5"
-              onClick={() => {
-                setMode("today");
+                  className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
+                  onClick={() => {
+                    setMode("today");
                 setPage(0);
               }}
             >
@@ -1171,7 +1171,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 <Button
                   type="button"
                   variant={mode === "date" ? "default" : "outline"}
-                  className="h-10 w-full justify-center gap-2 rounded-pill px-2 text-xs font-semibold sm:px-5"
+                  className="h-10 w-full justify-center gap-2 rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
                   onClick={() => {
                     setMode("date");
                     setPage(0);
@@ -1211,7 +1211,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             <Button
               type="button"
               variant={mode === "month" ? "default" : "outline"}
-              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5"
+              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
               onClick={() => {
                 setMode("month");
                 setPage(0);
