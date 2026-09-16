@@ -48,6 +48,7 @@ export function AluxPhotoFinderDialog({
   const [site, setSite] = useState(website ?? "");
   const [pasted, setPasted] = useState("");
   const [photos, setPhotos] = useState<PhotoCandidate[]>([]);
+  const [contacts, setContacts] = useState<OwnerContact[]>([]);
   const [usedQuery, setUsedQuery] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
