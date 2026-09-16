@@ -365,10 +365,9 @@ async function searchCommons(query: string): Promise<PhotoCandidate[]> {
     if (!info) continue;
     const meta = (info.extmetadata ?? {}) as Record<string, { value?: string }>;
     const license = String(meta.LicenseShortName?.value ?? "").trim();
-    if (!license || /non[- ]?commercial|nc\b/i.test(license)) continue;
     const width = Number(info.width ?? 0);
     const height = Number(info.height ?? 0);
-    if (width < 800 || height < 500) continue;
+    if (width < 600 || height < 400) continue;
     out.push({
       url: String(info.url ?? ""),
       thumbUrl: String(info.thumburl ?? info.url ?? ""),
@@ -389,7 +388,7 @@ async function searchCommons(query: string): Promise<PhotoCandidate[]> {
 
 async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
   const url =
-    "https://api.openverse.org/v1/images/?license_type=commercial&page_size=20&q=" +
+    "https://api.openverse.org/v1/images/?page_size=20&q=" +
     encodeURIComponent(query);
   const res = await fetch(url, { headers: { "User-Agent": "ValladolidMX-CMS/1.0" } });
   if (!res.ok) return [];
@@ -398,9 +397,8 @@ async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
   for (const r of json.results ?? []) {
     const width = Number(r.width ?? 0);
     const height = Number(r.height ?? 0);
-    if (width < 800 || height < 500) continue;
+    if (width < 600 || height < 400) continue;
     const license = String(r.license ?? "").toUpperCase();
-    if (/NC/.test(license)) continue;
     out.push({
       url: String(r.url ?? ""),
       thumbUrl: String(r.thumbnail ?? r.url ?? ""),
@@ -418,18 +416,24 @@ async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
 
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { query: string }) => {
+  .inputValidator((d: { query: string; website?: string | null }) => {
     if (!d?.query || d.query.trim().length < 3) throw new Error("invalid_input");
-    return { query: d.query.trim().slice(0, 160) };
+    return {
+      query: d.query.trim().slice(0, 160),
+      website: typeof d.website === "string" && d.website.trim() ? d.website.trim() : null,
+    };
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
-    const [commons, openverse] = await Promise.all([
+    const [site, commons, openverse] = await Promise.all([
+      data.website
+        ? searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
+        : Promise.resolve([] as PhotoCandidate[]),
       searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
       searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
     ]);
     const seen = new Set<string>();
-    const photos = [...commons, ...openverse].filter((p) => {
+    const photos = [...site, ...commons, ...openverse].filter((p) => {
       if (!p.url || seen.has(p.url)) return false;
       seen.add(p.url);
       return true;
