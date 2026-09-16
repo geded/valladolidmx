@@ -149,5 +149,5 @@
 
 - [ ] Folios diarios de reservación: ERL-YYMMDD-### para venta en línea y AVL-YYMMDD-### para Arma tu Viaje.
 
-- [ ] Portada: corregir apariencia del calendario "Buscar por fecha" en escritorio (elegante, alineado con DSL)
-- [ ] Portada: restablecer miniaturas de eventos (acreditación de medios)
+- [x] Portada: corregir apariencia del calendario "Buscar por fecha" en escritorio (elegante, alineado con DSL)
+- [x] Portada: restablecer miniaturas de eventos (acreditación de medios)
