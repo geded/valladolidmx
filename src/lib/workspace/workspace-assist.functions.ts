@@ -600,15 +600,30 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
     // expediente abierto en la pantalla activa.
     const folioMatch = FOLIO_RE.exec(data.question);
     let reservationBlock: string | null = null;
+    let caseId: string | null = null;
     try {
       if (folioMatch?.[1]) {
-        reservationBlock = await reservationContext(context.supabase, {
-          folio: folioMatch[1].replace(/\s+/g, "-").toUpperCase(),
-        });
+        const folio = folioMatch[1].replace(/\s+/g, "-").toUpperCase();
+        reservationBlock = await reservationContext(context.supabase, { folio });
+        const { data: row } = await context.supabase
+          .from("concierge_orders")
+          .select("source_case_id")
+          .ilike("folio", folio.replace(/[%,]/g, ""))
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        caseId = (row as any)?.source_case_id ?? null;
       } else if (data.subject?.kind === "order" && data.subject.id) {
         reservationBlock = await reservationContext(context.supabase, { orderId: data.subject.id });
+        const { data: row } = await context.supabase
+          .from("concierge_orders")
+          .select("source_case_id")
+          .eq("id", data.subject.id)
+          .maybeSingle();
+        caseId = (row as any)?.source_case_id ?? null;
       } else if (data.subject?.kind === "case" && data.subject.id) {
         reservationBlock = await reservationContext(context.supabase, { caseId: data.subject.id });
+        caseId = data.subject.id;
       }
     } catch (err) {
       console.error(
@@ -617,10 +632,28 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       );
     }
 
+    // Expediente completo e itinerario del viaje: lo mismo que el concierge ve
+    // en pantalla, para poder responderle rápido a un viajero.
+    let caseBlock: string | null = null;
+    let itineraryBlock: string | null = null;
+    if (caseId) {
+      try {
+        [caseBlock, itineraryBlock] = await Promise.all([
+          caseContext(context.supabase, caseId),
+          itineraryContext(context.supabase, caseId),
+        ]);
+      } catch (err) {
+        console.error(
+          "[alux.workspace-assist] no se pudo leer el expediente o el itinerario",
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
+
     // Sin folio ni caso abierto: panorama reciente para preguntas del tipo
     // "¿quién pagó al último?" o "¿cuáles faltan por cobrar?".
     let recentBlock: string | null = null;
-    if (!reservationBlock && data.workspaceId === "concierge") {
+    if (!reservationBlock && !caseBlock && data.workspaceId === "concierge") {
       try {
         recentBlock = await recentReservationsContext(context.supabase);
       } catch (err) {
@@ -630,6 +663,7 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
         );
       }
     }
+
 
 
     const entityBlock =
