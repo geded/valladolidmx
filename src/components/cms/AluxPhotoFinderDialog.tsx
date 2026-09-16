@@ -39,6 +39,22 @@ export interface AluxPhotoFinderDialogProps {
   onPick: (photo: AluxPickedPhoto) => void;
 }
 
+/** Quita del texto escrito las palabras del destino de trabajo (ya implícito). */
+function stripPlaceTokens(value: string, place: string | null): string {
+  if (!value || !place) return value ?? "";
+  const tokens = place
+    .split(/[,·]/)
+    .flatMap((part) => part.trim().split(/\s+/))
+    .map((t) => t.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase())
+    .filter((t) => t.length > 2);
+  if (tokens.length === 0) return value;
+  const kept = value
+    .split(/\s+/)
+    .filter((w) => !tokens.includes(w.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase()));
+  const next = kept.join(" ").trim();
+  return next.length > 0 ? next : "";
+}
+
 export function AluxPhotoFinderDialog({
   open,
   onClose,
