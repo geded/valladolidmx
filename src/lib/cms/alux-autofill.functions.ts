@@ -296,7 +296,12 @@ export interface PhotoCandidate {
   author: string;
   license: string;
   sourceUrl: string;
-  provider: "Wikimedia Commons" | "Openverse" | "Sitio del negocio" | "Enlace directo";
+  provider:
+    | "Wikimedia Commons"
+    | "Openverse"
+    | "Sitio del negocio"
+    | "Enlace directo"
+    | "Google";
 }
 
 /**
