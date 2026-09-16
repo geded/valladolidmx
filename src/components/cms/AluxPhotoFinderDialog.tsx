@@ -60,7 +60,8 @@ export function AluxPhotoFinderDialog({
     return [zone?.name, destination.name, "Yucatán, México"].filter(Boolean).join(", ");
   }, [place, options.destinations, options.zones, territory.destinationId, territory.zoneId]);
 
-  const [query, setQuery] = useState(initialQuery);
+  // El destino ya lo aporta el contexto del CMS: no se repite en el buscador.
+  const [query, setQuery] = useState(() => stripPlaceTokens(initialQuery, workingPlace));
   const [site, setSite] = useState(website ?? "");
   const [pasted, setPasted] = useState("");
   const [photos, setPhotos] = useState<PhotoCandidate[]>([]);
