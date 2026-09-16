@@ -40,6 +40,8 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   const summaryFn = useServerFn(getCaseAdjustmentSummary);
   const chargeFn = useServerFn(createItineraryAdjustmentCharge);
   const creditFn = useServerFn(registerItineraryCreditNote);
+  const applyFn = useServerFn(applyProposalScheduleToPlan);
+
 
   const itinerary = useQuery({
     queryKey: ["concierge", "case-itinerary", caseId],
