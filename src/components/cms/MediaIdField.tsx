@@ -42,7 +42,7 @@ export function MediaIdField({
     }
     resolve({ data: { mediaId: value } })
       .then((res) => {
-        if (!cancelled) setPreview(res ? { url: res.url, alt: res.alt } : null);
+        if (!cancelled) setPreview(res ? { url: res.previewUrl || res.url, alt: res.alt } : null);
       })
       .catch(() => {
         if (!cancelled) setPreview(null);
