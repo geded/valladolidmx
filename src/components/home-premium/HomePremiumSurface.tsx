@@ -1171,7 +1171,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 <Button
                   type="button"
                   variant={mode === "date" ? "default" : "outline"}
-                  className="h-10 w-full justify-center gap-2 rounded-pill px-2 text-xs font-semibold sm:px-5"
+                  className="h-10 w-full justify-center gap-2 rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
                   onClick={() => {
                     setMode("date");
                     setPage(0);
