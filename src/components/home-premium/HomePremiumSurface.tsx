@@ -1181,7 +1181,11 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                   <CalendarDays className="size-4 shrink-0" aria-hidden />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent
+                className="w-auto rounded-3xl border border-border/70 bg-popover p-0 shadow-elevated"
+                align="start"
+                sideOffset={10}
+              >
                 <Calendar
                   mode="single"
                   locale={es}
@@ -1193,7 +1197,14 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                     setPage(0);
                   }}
                   defaultMonth={calendarDateFromKey(queryKey)}
-                  className="pointer-events-auto p-3"
+                  className="pointer-events-auto rounded-3xl bg-popover p-4 [--cell-size:2.35rem]"
+                  classNames={{
+                    caption_label: "select-none text-sm font-semibold capitalize tracking-tight",
+                    weekday:
+                      "flex-1 select-none text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground",
+                    day: "group/day relative aspect-square h-full w-full select-none p-0 text-center",
+                    today: "rounded-full ring-1 ring-primary/40",
+                  }}
                 />
               </PopoverContent>
             </Popover>
