@@ -566,6 +566,12 @@ interface QueryPlan {
   subject: string[];
   /** Tokens territoriales presentes en la frase del editor. */
   place: string[];
+  /**
+   * Matices de sede escritos por el editor ("centro histórico", "convento")
+   * que no forman parte del nombre del destino de trabajo. No filtran, pero
+   * mandan en el orden: si el editor los escribió, quiere esas fotos.
+   */
+  qualifiers: string[];
   /** Frase del tema, normalizada, para detectar coincidencia exacta. */
   subjectPhrase: string;
   /** Consultas a lanzar en las fuentes abiertas, de la más precisa a la más amplia. */
@@ -585,10 +591,18 @@ function buildQueryPlan(query: string, place?: string | null): QueryPlan {
     (token) => !SEARCH_CONTEXT_WORDS.has(token) && !contextTokens.includes(token),
   );
   const place_ = [...new Set([...all.filter((t) => SEARCH_CONTEXT_WORDS.has(t)), ...contextTokens])];
+  // Lo que el editor escribió y no es el destino de trabajo: acota la sede.
+  const qualifiers = [
+    ...new Set(all.filter((t) => SEARCH_CONTEXT_WORDS.has(t) && !contextTokens.includes(t))),
+  ];
   const subjectPhrase = subject.join(" ");
+  const qualifierPhrase = qualifiers.join(" ");
   const placePhrase = (place?.trim() || place_.join(" ")).trim();
 
   const variants = new Set<string>();
+  if (subjectPhrase && qualifierPhrase && placePhrase) {
+    variants.add(`"${subjectPhrase}" ${qualifierPhrase} ${placePhrase}`);
+  }
   if (subjectPhrase && placePhrase) {
     variants.add(`"${subjectPhrase}" ${placePhrase}`);
     variants.add(`${subjectPhrase} ${placePhrase} fotos`);
@@ -598,8 +612,15 @@ function buildQueryPlan(query: string, place?: string | null): QueryPlan {
   if (subjectPhrase && subject.length > 1) variants.add(`"${subjectPhrase}"`);
   if (subjectPhrase && !placePhrase) variants.add(subjectPhrase);
 
-  return { subject, place: place_, subjectPhrase, variants: [...variants].slice(0, 4) };
+  return {
+    subject,
+    place: place_,
+    qualifiers,
+    subjectPhrase,
+    variants: [...variants].slice(0, 5),
+  };
 }
+
 
 
 /** Un token cuenta como presente si aparece igual, como sinónimo o como raíz. */
