@@ -48,6 +48,7 @@ export function AluxPhotoFinderDialog({
   const [site, setSite] = useState(website ?? "");
   const [pasted, setPasted] = useState("");
   const [photos, setPhotos] = useState<PhotoCandidate[]>([]);
+  const [usedQuery, setUsedQuery] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [picking, setPicking] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export function AluxPhotoFinderDialog({
         data: { query: query.trim(), website: site.trim() || null },
       });
       setPhotos(res.photos);
+      setUsedQuery(res.relaxed ? res.usedQuery : null);
       setSearched(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
@@ -178,8 +180,8 @@ export function AluxPhotoFinderDialog({
             type="url"
             value={site}
             onChange={(e) => setSite(e.target.value)}
-            placeholder="Sitio web del negocio (https://…)"
-            aria-label="Sitio web del negocio"
+            placeholder="Página del negocio o del evento (https://…)"
+            aria-label="Página del negocio o del evento"
             className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
           />
           <div className="flex flex-1 items-center gap-2">
@@ -237,10 +239,17 @@ export function AluxPhotoFinderDialog({
             </p>
           )}
 
+          {!loading && searched && usedQuery && photos.length > 0 && (
+            <p className="mb-3 text-xs text-muted-foreground">
+              No había resultados exactos; mostramos fotos de «{usedQuery}».
+            </p>
+          )}
+
           {!loading && searched && photos.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No encontramos fotos con esa búsqueda. Prueba con otro nombre, agrega el sitio web
-              del negocio o pega el enlace de una foto suya.
+              Los acervos abiertos no tienen fotos de esto. Pega la página del negocio o del
+              evento (su web, su página pública) en el campo de arriba: de ahí traemos sus propias
+              fotos y guardamos una copia nuestra.
             </p>
           )}
 

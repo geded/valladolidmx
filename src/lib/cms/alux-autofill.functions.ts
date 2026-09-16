@@ -414,6 +414,28 @@ async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
   return out;
 }
 
+const STOPWORDS = new Set([
+  "de","del","la","el","los","las","en","y","a","un","una","con","por","para","al","que","su","sus","the","of","and",
+]);
+
+/**
+ * Los acervos abiertos no indexan frases largas de campaña ("valladolid en la
+ * historia video mapping"). Se prueba la consulta completa y, si no hay
+ * resultados, se relaja progresivamente a los términos significativos.
+ */
+function queryVariants(query: string): string[] {
+  const tokens = query
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1 && !STOPWORDS.has(t));
+  const variants = [query.trim()];
+  if (tokens.length > 3) variants.push(tokens.slice(0, 3).join(" "));
+  if (tokens.length > 2) variants.push(tokens.slice(0, 2).join(" "));
+  if (tokens.length > 1) variants.push(tokens[0]);
+  return [...new Set(variants.filter(Boolean))];
+}
+
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { query: string; website?: string | null }) => {
@@ -425,20 +447,36 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
-    const [site, commons, openverse] = await Promise.all([
-      data.website
-        ? searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
-        : Promise.resolve([] as PhotoCandidate[]),
-      searchCommons(data.query).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(data.query).catch(() => [] as PhotoCandidate[]),
-    ]);
+    const site = data.website
+      ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
+      : [];
+
+    let archives: PhotoCandidate[] = [];
+    let usedQuery = data.query;
+    for (const variant of queryVariants(data.query)) {
+      const [commons, openverse] = await Promise.all([
+        searchCommons(variant).catch(() => [] as PhotoCandidate[]),
+        searchOpenverse(variant).catch(() => [] as PhotoCandidate[]),
+      ]);
+      if (commons.length || openverse.length) {
+        archives = [...commons, ...openverse];
+        usedQuery = variant;
+        break;
+      }
+    }
+
     const seen = new Set<string>();
-    const photos = [...site, ...commons, ...openverse].filter((p) => {
+    const photos = [...site, ...archives].filter((p) => {
       if (!p.url || seen.has(p.url)) return false;
       seen.add(p.url);
       return true;
     });
-    return { ok: true as const, photos: photos.slice(0, 24) };
+    return {
+      ok: true as const,
+      photos: photos.slice(0, 24),
+      usedQuery,
+      relaxed: usedQuery !== data.query.trim(),
+    };
   });
 
 /**
