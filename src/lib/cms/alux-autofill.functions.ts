@@ -890,6 +890,8 @@ async function rankWithAi(
       "Devuelves SOLO JSON válido: {\"keep\":[índices en orden de utilidad]}.",
       "Conserva únicamente las que razonablemente muestran lo pedido en el lugar indicado.",
       "Descarta lo ajeno al tema aunque mencione el lugar, y lo de otra ciudad o país.",
+      "Si la frase nombra una sede concreta (centro histórico, convento, parque, plaza),",
+      "descarta las fotos que claramente corresponden a otra sede del mismo destino.",
       "Si ninguna sirve, devuelve una lista vacía.",
     ].join(" "),
     [
