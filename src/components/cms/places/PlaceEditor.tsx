@@ -10,7 +10,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
+import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import {
   checkPlaceDuplicates,
