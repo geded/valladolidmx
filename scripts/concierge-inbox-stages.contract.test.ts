@@ -11,6 +11,7 @@ import {
   deriveTripPhase,
   type CaseFollowUp,
 } from "../src/lib/concierge/case-stage";
+import { reservationPaymentLabel } from "../src/lib/concierge/orders.functions";
 
 const base = (over: Partial<CaseFollowUp> = {}): CaseFollowUp => ({
   case_id: "ccd06712-cbe5-4ba7-9a92-68782e1ab100",
@@ -234,5 +235,14 @@ describe("Ciclo de vida del viaje", () => {
   it("incluye la bandeja de preguntas sin responder", () => {
     const questions = CONCIERGE_INBOXES.find((i) => i.id === "questions");
     expect(questions?.pendingQuestion).toBe(true);
+  });
+});
+
+describe("formas de pago de reservaciones", () => {
+  it("distingue efectivo, en línea, pendiente y demostración", () => {
+    expect(reservationPaymentLabel("cash", "2026-09-15T18:00:00Z")).toBe("Efectivo");
+    expect(reservationPaymentLabel("stripe", "2026-09-15T18:00:00Z")).toBe("En línea");
+    expect(reservationPaymentLabel(null, null)).toBe("Sin pago");
+    expect(reservationPaymentLabel("demo", "2026-09-15T18:00:00Z")).toBe("Demostración");
   });
 });

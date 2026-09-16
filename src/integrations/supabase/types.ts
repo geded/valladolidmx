@@ -7957,6 +7957,103 @@ export type Database = {
         Args: { _note?: string; _order_id: string }
         Returns: Json
       }
+      concierge_order_mark_paid_online: {
+        Args: {
+          _event_id: string
+          _intent_id: string
+          _order_id: string
+          _provider: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          commission_amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          destination_name: string | null
+          discount_amount: number
+          editorial_summary: string | null
+          editorial_title: string | null
+          email_post_sent_at: string | null
+          email_t14_sent_at: string | null
+          email_t3_sent_at: string | null
+          email_welcome_sent_at: string | null
+          expires_at: string | null
+          folio: string
+          id: string
+          metadata: Json
+          paid_at: string | null
+          payment_provider: string | null
+          payment_provider_intent_id: string | null
+          source_case_id: string | null
+          source_kind: string
+          source_proposal_id: string | null
+          status: string
+          subtotal_amount: number
+          tax_amount: number
+          total_amount: number
+          travel_plan_id: string | null
+          traveler_email: string | null
+          traveler_locale: string | null
+          traveler_name: string | null
+          traveler_phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "concierge_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      concierge_order_start_online_payment: {
+        Args: { _intent_id: string; _order_id: string; _provider: string }
+        Returns: {
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          commission_amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          destination_name: string | null
+          discount_amount: number
+          editorial_summary: string | null
+          editorial_title: string | null
+          email_post_sent_at: string | null
+          email_t14_sent_at: string | null
+          email_t3_sent_at: string | null
+          email_welcome_sent_at: string | null
+          expires_at: string | null
+          folio: string
+          id: string
+          metadata: Json
+          paid_at: string | null
+          payment_provider: string | null
+          payment_provider_intent_id: string | null
+          source_case_id: string | null
+          source_kind: string
+          source_proposal_id: string | null
+          status: string
+          subtotal_amount: number
+          tax_amount: number
+          total_amount: number
+          travel_plan_id: string | null
+          traveler_email: string | null
+          traveler_locale: string | null
+          traveler_name: string | null
+          traveler_phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "concierge_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json
