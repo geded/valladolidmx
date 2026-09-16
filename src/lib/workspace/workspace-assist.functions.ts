@@ -12,7 +12,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { CONCIERGE_INBOXES } from "@/lib/concierge/case-stage";
+import {
+  CONCIERGE_INBOXES,
+  deriveCaseStage,
+  deriveTripPhase,
+  type CaseFollowUp,
+} from "@/lib/concierge/case-stage";
 
 const InputSchema = z.object({
   workspaceId: z.string().min(1).max(64),
@@ -20,6 +25,16 @@ const InputSchema = z.object({
   route: z.string().max(200).optional(),
   areas: z.array(z.string().max(80)).max(40).optional(),
   question: z.string().min(1).max(600),
+  /** Ficha, expediente o reservación abierta en la pantalla activa. */
+  subject: z
+    .object({
+      kind: z.enum(["order", "case", "entity"]),
+      id: z.string().max(80).optional(),
+      label: z.string().max(160).optional(),
+      status: z.string().max(40).optional(),
+      fields: z.array(z.string().max(80)).max(60).optional(),
+    })
+    .optional(),
   history: z
     .array(
       z.object({
@@ -30,6 +45,7 @@ const InputSchema = z.object({
     .max(12)
     .optional(),
 });
+
 
 export interface WorkspaceAssistResponse {
   answer: string;
