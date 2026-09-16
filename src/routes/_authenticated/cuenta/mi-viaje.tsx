@@ -2236,27 +2236,6 @@ function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string })
     }, 80);
     return () => window.clearTimeout(id);
   }, [focus, q.data]);
-  const [note, setNote] = useState("");
-  const send = useMutation({
-    mutationFn: (summary: string) =>
-      appendNote({
-        data: {
-          caseId,
-          eventType: "traveler_note",
-          summary,
-          severity: "info",
-        },
-      }),
-    onSuccess: () => {
-      setNote("");
-      qc.invalidateQueries({ queryKey: ["concierge", "case-file", "traveler", caseId] });
-      toast.success("Nota enviada a tu concierge");
-    },
-    onError: (e) =>
-      toast.error("No se pudo enviar la nota", {
-        description: e instanceof Error ? e.message : undefined,
-      }),
-  });
   return (
     <section className="rounded-2xl border bg-card p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
