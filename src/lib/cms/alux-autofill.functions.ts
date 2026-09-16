@@ -776,6 +776,109 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
   return out;
 }
 
+/* ------------------------------------------------------------------ *
+ * Alux IA aplicado a la búsqueda de fotos
+ *
+ * Dos pasos, ambos opcionales: si el proveedor no responde, la búsqueda
+ * sigue funcionando con el plan y el filtro determinista de siempre.
+ *  1. Entender la frase del editor y escribirla como la escribiría alguien
+ *     experto en buscar imágenes (frase exacta, sinónimos, español/inglés).
+ *  2. Revisar las candidatas y quedarse sólo con las que de verdad muestran
+ *     lo pedido, en el orden en que conviene verlas.
+ * ------------------------------------------------------------------ */
+
+const PHOTO_AI_MODEL = "openai/gpt-6-astra";
+
+async function askAlux(system: string, prompt: string): Promise<string | null> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const [{ streamText }, { createLovableAiGatewayProvider }] = await Promise.all([
+      import("ai"),
+      import("@/lib/ai-gateway.server"),
+    ]);
+    const result = streamText({
+      model: createLovableAiGatewayProvider(apiKey)(PHOTO_AI_MODEL),
+      system,
+      prompt,
+      providerOptions: { lovable: { reasoningEffort: "low" } },
+    });
+    return await result.text;
+  } catch (err) {
+    console.error("[alux.photos] IA no disponible", err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
+interface AiSearchPlan {
+  subject: string;
+  queries: string[];
+}
+
+/** Paso 1: convertir la frase del editor en consultas de buscador de imágenes. */
+async function planWithAi(query: string, place: string | null): Promise<AiSearchPlan | null> {
+  const text = await askAlux(
+    [
+      "Eres experto en buscar fotografías en buscadores de imágenes.",
+      "Devuelves SOLO JSON válido con la forma:",
+      '{"subject":"tema central en pocas palabras","queries":["consulta 1","consulta 2","consulta 3","consulta 4"]}',
+      "Reglas: la primera consulta lleva el tema entre comillas junto al lugar;",
+      "incluye una variante con el nombre propio del sitio o sede si se deduce del tema;",
+      "incluye una variante en inglés; no inventes lugares de otra región.",
+    ].join(" "),
+    [
+      `FRASE DEL EDITOR: ${query}`,
+      `LUGAR DE TRABAJO: ${place ?? "Oriente Maya de Yucatán, México"}`,
+    ].join("\n"),
+  );
+  const parsed = extractJson(text ?? "") as { subject?: unknown; queries?: unknown } | null;
+  const queries = Array.isArray(parsed?.queries)
+    ? parsed.queries.filter((q): q is string => typeof q === "string" && q.trim().length > 2)
+    : [];
+  if (!queries.length) return null;
+  return {
+    subject: typeof parsed?.subject === "string" ? parsed.subject.trim() : query,
+    queries: queries.slice(0, 4).map((q) => q.trim().slice(0, 160)),
+  };
+}
+
+/** Paso 2: quedarse sólo con las fotos que muestran lo pedido, ya ordenadas. */
+async function rankWithAi(
+  query: string,
+  place: string | null,
+  candidates: PhotoCandidate[],
+): Promise<PhotoCandidate[] | null> {
+  if (candidates.length < 2) return null;
+  const listed = candidates.slice(0, 40);
+  const text = await askAlux(
+    [
+      "Filtras resultados de búsqueda de imágenes para una guía turística.",
+      "Recibes candidatas con su título, autor y página de origen.",
+      "Devuelves SOLO JSON válido: {\"keep\":[índices en orden de utilidad]}.",
+      "Conserva únicamente las que razonablemente muestran lo pedido en el lugar indicado.",
+      "Descarta lo ajeno al tema aunque mencione el lugar, y lo de otra ciudad o país.",
+      "Si ninguna sirve, devuelve una lista vacía.",
+    ].join(" "),
+    [
+      `SE BUSCA: ${query}`,
+      `LUGAR: ${place ?? "Oriente Maya de Yucatán, México"}`,
+      "CANDIDATAS:",
+      ...listed.map(
+        (p, i) =>
+          `${i}. ${p.title} | autor: ${p.author} | origen: ${p.sourceUrl} | fuente: ${p.provider}`,
+      ),
+    ].join("\n"),
+  );
+  const parsed = extractJson(text ?? "") as { keep?: unknown } | null;
+  if (!Array.isArray(parsed?.keep)) return null;
+  const kept = parsed.keep
+    .map((i) => Number(i))
+    .filter((i) => Number.isInteger(i) && i >= 0 && i < listed.length)
+    .map((i) => listed[i]!);
+  return kept.length ? kept : null;
+}
+
+
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { query: string; website?: string | null; place?: string | null }) => {
@@ -792,16 +895,17 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
       : [];
 
-    // La frase del editor se conserva siempre; el destino de trabajo se añade
-    // como contexto y se generan formas equivalentes de preguntar lo mismo
-    // (tema + territorio). El filtro por tema sigue siendo obligatorio, así que
-    // nunca se muestra material ajeno.
+    // Paso 1: Alux entiende la frase y la escribe como un experto en buscar
+    // imágenes. Si la IA no responde, se usa el plan determinista de siempre.
     const plan = buildQueryPlan(data.query, data.place);
-    const placeQuery = [plan.subjectPhrase || data.query, data.place].filter(Boolean).join(" ");
+    const ai = await planWithAi(data.query, data.place).catch(() => null);
+    const variants = [...new Set([...(ai?.queries ?? []), ...plan.variants])].slice(0, 5);
+    const placeQuery = [ai?.subject || plan.subjectPhrase || data.query, data.place]
+      .filter(Boolean)
+      .join(" ");
+
     const webBatches = await Promise.all(
-      plan.variants.map((variant) =>
-        searchWebImages(variant).catch(() => [] as PhotoCandidate[]),
-      ),
+      variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
     );
     const [google, commons, openverse] = await Promise.all([
       searchGooglePhotos(placeQuery).catch(() => [] as PhotoCandidate[]),
@@ -809,24 +913,31 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       searchOpenverse(placeQuery).catch(() => [] as PhotoCandidate[]),
     ]);
 
-
     const seen = new Set<string>();
-    const scored = [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]
+    const pool: PhotoCandidate[] = [];
+    for (const photo of [...site, ...webBatches.flat(), ...google, ...commons, ...openverse]) {
+      if (!photo.url || seen.has(photo.url)) continue;
+      seen.add(photo.url);
+      pool.push(photo);
+    }
+
+    const scored = pool
       .map((photo) => ({ photo, ...photoMatch(photo, plan) }))
-      .filter(({ photo, relevance }) => {
-        if (!photo.url || relevance === 0 || seen.has(photo.url)) return false;
-        seen.add(photo.url);
-        return true;
-      })
+      .filter((entry) => entry.relevance > 0)
       .sort((a, b) => b.relevance - a.relevance);
 
     // Si alguna foto sí nombra el territorio, se descartan las que sólo
     // coinciden con el tema: es material de otro lugar.
     const territorial = scored.filter((entry) => entry.placeMatch);
-    const photos = (plan.place.length && territorial.length ? territorial : scored).map(
+    const heuristic = (plan.place.length && territorial.length ? territorial : scored).map(
       ({ photo }) => photo,
     );
-    const visible = photos.slice(0, 24);
+
+    // Paso 2: Alux revisa las candidatas y conserva sólo las que muestran lo
+    // pedido. El orden por palabras clave queda como respaldo.
+    const ordered = heuristic.length ? heuristic : pool;
+    const curated = await rankWithAi(data.query, data.place, ordered).catch(() => null);
+    const visible = (curated ?? heuristic).slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
     // permiso. Se lee sólo lo que ya está publicado; no se guarda nada.
