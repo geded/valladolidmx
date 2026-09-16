@@ -143,14 +143,18 @@ export const listConciergeItineraries = createServerFn({ method: "GET" })
     const plans = (rows ?? []) as Array<Record<string, unknown>>;
     const planIds = plans.map((p) => p["id"] as string);
     const counts = new Map<string, number>();
+    const scheduled = new Map<string, number>();
     if (planIds.length) {
       const { data: items } = await context.supabase
         .from("travel_plan_items")
-        .select("plan_id")
+        .select("plan_id, day_index, starts_at_local")
         .in("plan_id", planIds);
       for (const i of (items ?? []) as Array<Record<string, unknown>>) {
         const key = i["plan_id"] as string;
         counts.set(key, (counts.get(key) ?? 0) + 1);
+        if (i["day_index"] != null || i["starts_at_local"] != null) {
+          scheduled.set(key, (scheduled.get(key) ?? 0) + 1);
+        }
       }
     }
 
@@ -163,8 +167,10 @@ export const listConciergeItineraries = createServerFn({ method: "GET" })
       start_date: (p["start_date"] as string | null) ?? null,
       end_date: (p["end_date"] as string | null) ?? null,
       items_count: counts.get(p["id"] as string) ?? 0,
+      scheduled_count: scheduled.get(p["id"] as string) ?? 0,
       updated_at: (p["updated_at"] as string) ?? new Date().toISOString(),
     }));
+
 
     return { rows: result, total: count ?? result.length, page: data.page, pageSize: data.pageSize };
   });
