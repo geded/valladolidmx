@@ -43,7 +43,8 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   const creditFn = useServerFn(registerItineraryCreditNote);
   const applyFn = useServerFn(applyProposalScheduleToPlan);
   const aluxScheduleFn = useServerFn(aluxScheduleCaseItinerary);
-
+  const suggestionsFn = useServerFn(listCaseSuggestions);
+  const navigate = useNavigate();
 
   const itinerary = useQuery({
     queryKey: ["concierge", "case-itinerary", caseId],
@@ -53,8 +54,40 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
     queryKey: ["concierge", "case-adjustment", caseId],
     queryFn: () => summaryFn({ data: { caseId } }),
   });
+  const suggestions = useQuery({
+    queryKey: ["concierge", "case-suggestions", caseId],
+    queryFn: () => suggestionsFn({ data: { caseId } }),
+  });
 
+  const [picked, setPicked] = useState<string[]>([]);
   const [amount, setAmount] = useState("");
+
+  const sendToStudio = () => {
+    const chosen = (suggestions.data?.suggestions ?? []).filter((s) =>
+      picked.includes(s.label),
+    );
+    if (!chosen.length) return;
+    try {
+      window.sessionStorage.setItem(
+        `vll:proposal-suggestions:${caseId}`,
+        JSON.stringify(
+          chosen.map((s) => ({
+            title: s.label,
+            notes: s.reason,
+            targetKind: s.kind,
+            targetId: s.entity_id,
+          })),
+        ),
+      );
+    } catch {
+      /* el prellenado es opcional */
+    }
+    void navigate({
+      to: "/concierge/expedientes/$caseId/propuesta",
+      params: { caseId },
+    });
+  };
+
 
   const charge = useMutation({
     mutationFn: (cents: number) =>
