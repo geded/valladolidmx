@@ -614,7 +614,7 @@ const concierge: WorkspaceDefinition = {
       to: "/concierge/itinerarios",
       group: "trabajo",
       order: 4,
-      surfaces: ["sidebar", "palette"],
+      surfaces: ["sidebar", "bottom", "palette"],
     },
     {
       id: "concierge.questions",
