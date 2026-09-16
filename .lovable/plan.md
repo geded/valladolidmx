@@ -1,6 +1,6 @@
 # Alux copiloto real del Concierge y de los editores
 
-Objetivo: que Alux deje de ser sólo un explicador del panel y pueda (1) responder sobre una reservación, pago o expediente concreto y (2) acompañar a los editores campo por campo mientras llenan una ficha.
+Objetivo: que Alux deje de ser sólo un explicador del panel y sea copiloto real del equipo interno —concierge, editores y administradores— pudiendo (1) responder sobre una reservación, pago o expediente concreto y (2) acompañar campo por campo mientras se llena una ficha.
 
 Se construye como delta mínimo sobre lo que ya existe: la conversación `AluxWorkspaceChat`, el asistente `aluxWorkspaceAssist` y las consultas de reservaciones y expedientes ya implementadas. Sin tablas nuevas, sin motores nuevos, sin pantallas paralelas, sin publicar.
 
