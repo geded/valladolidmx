@@ -454,9 +454,7 @@ async function searchCommons(query: string): Promise<PhotoCandidate[]> {
 }
 
 async function searchOpenverse(query: string): Promise<PhotoCandidate[]> {
-  const url =
-    "https://api.openverse.org/v1/images/?page_size=20&q=" +
-    encodeURIComponent(query);
+  const url = "https://api.openverse.org/v1/images/?page_size=20&q=" + encodeURIComponent(query);
   const res = await fetch(url, { headers: { "User-Agent": "ValladolidMX-CMS/1.0" } });
   if (!res.ok) return [];
   const json = (await res.json()) as { results?: Array<Record<string, unknown>> };
@@ -656,9 +654,7 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
       const html = (await res.text().catch(() => "")).slice(0, 400_000);
       if (!html) return;
       const emails = new Set<string>();
-      for (const m of html.matchAll(
-        /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
-      )) {
+      for (const m of html.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)) {
         const value = m[0].toLowerCase();
         if (/\.(png|jpe?g|webp|gif|svg)$/i.test(value)) continue;
         if (/(sentry|wixpress|example|noreply|no-reply)/i.test(value)) continue;
@@ -666,7 +662,9 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
         if (emails.size >= 4) break;
       }
       const phones = new Set<string>();
-      for (const m of html.matchAll(/(?:tel:|whatsapp[^0-9+]{0,20})?(\+?52[\s.-]?)?(\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/gi)) {
+      for (const m of html.matchAll(
+        /(?:tel:|whatsapp[^0-9+]{0,20})?(\+?52[\s.-]?)?(\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/gi,
+      )) {
         const digits = `${m[1] ?? ""}${m[2]}`.replace(/[^\d+]/g, "");
         if (digits.replace(/\D/g, "").length < 10) continue;
         phones.add(digits);
@@ -730,9 +728,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       }
       if (pageSet.size >= 6) break;
     }
-    const contacts = await extractOwnerContacts([...pageSet]).catch(
-      () => [] as OwnerContact[],
-    );
+    const contacts = await extractOwnerContacts([...pageSet]).catch(() => [] as OwnerContact[]);
 
     return {
       ok: true as const,
