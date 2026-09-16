@@ -9,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { EventAttributesPanel } from "@/components/cms/EventAttributesPanel";
 import { EventRecurrencePanel } from "@/components/cms/EventRecurrencePanel";
+import { EventLocationPanel } from "@/components/cms/EventLocationPanel";
 import { EVENT_FIELDS } from "@/lib/cms/editor-fields";
 import { listDestinationsForSelect } from "@/lib/cms/businesses-media.functions";
 import { listBusinessesForProductSelect } from "@/lib/cms/products-media.functions";
