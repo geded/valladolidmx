@@ -268,6 +268,66 @@ async function reservationContext(
 }
 
 
+/**
+ * Panorama reciente de reservaciones (sólo lectura, RLS del propio usuario).
+ * Permite responder "¿quién pagó al último?", "¿cuáles faltan por cobrar?".
+ */
+async function recentReservationsContext(supabase: any): Promise<string | null> {
+  const columns =
+    "folio, source_kind, traveler_name, traveler_phone, traveler_email, destination_name, status, payment_provider, paid_at, created_at, total_amount, currency";
+
+  const [{ data: paid }, { data: pending }] = await Promise.all([
+    supabase
+      .from("concierge_orders")
+      .select(columns)
+      .not("paid_at", "is", null)
+      .order("paid_at", { ascending: false })
+      .limit(8),
+    supabase
+      .from("concierge_orders")
+      .select(columns)
+      .is("paid_at", null)
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
+
+  const line = (o: any, withDate: "paid" | "created") =>
+    [
+      `· ${o.folio}`,
+      o.traveler_name ? `— ${o.traveler_name}` : "— sin nombre registrado",
+      o.destination_name ? `(${o.destination_name})` : null,
+      `· ${money(Number(o.total_amount ?? 0), o.currency ?? "MXN")}`,
+      withDate === "paid"
+        ? `· pagado ${o.paid_at?.slice(0, 10) ?? "—"} (${
+            o.payment_provider === "cash"
+              ? "efectivo"
+              : o.payment_provider === "demo"
+                ? "demostración"
+                : "tarjeta en línea"
+          })`
+        : `· creada ${o.created_at?.slice(0, 10) ?? "—"} · sin pago`,
+      o.traveler_phone
+        ? `· tel ${o.traveler_phone} (https://wa.me/${String(o.traveler_phone).replace(/\D/g, "")})`
+        : null,
+      o.traveler_email ? `· ${o.traveler_email}` : null,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+  const paidRows = (paid ?? []) as any[];
+  const pendingRows = (pending ?? []) as any[];
+  if (!paidRows.length && !pendingRows.length) return null;
+
+  return [
+    "RESERVACIONES RECIENTES (datos reales, sólo lectura; la primera de cada lista es la más reciente)",
+    paidRows.length
+      ? `Últimas pagadas:\n${paidRows.map((o) => line(o, "paid")).join("\n")}`
+      : "Últimas pagadas: todavía no hay reservaciones pagadas visibles.",
+    pendingRows.length
+      ? `Pendientes de cobro:\n${pendingRows.map((o) => line(o, "created")).join("\n")}`
+      : "Pendientes de cobro: ninguna visible.",
+  ].join("\n\n");
+}
 
 const SYSTEM = `
 Eres Alux, el copiloto interno de Valladolid.mx (Oriente Maya de Yucatán).
