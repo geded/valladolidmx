@@ -42,6 +42,7 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   const chargeFn = useServerFn(createItineraryAdjustmentCharge);
   const creditFn = useServerFn(registerItineraryCreditNote);
   const applyFn = useServerFn(applyProposalScheduleToPlan);
+  const aluxScheduleFn = useServerFn(aluxScheduleCaseItinerary);
 
 
   const itinerary = useQuery({
