@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,8 @@ import {
   registerItineraryCreditNote,
   applyProposalScheduleToPlan,
   aluxScheduleCaseItinerary,
+  listCaseSuggestions,
+  type CaseSuggestion,
 } from "@/lib/concierge/proposal-studio.functions";
 
 
@@ -43,7 +46,8 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
   const creditFn = useServerFn(registerItineraryCreditNote);
   const applyFn = useServerFn(applyProposalScheduleToPlan);
   const aluxScheduleFn = useServerFn(aluxScheduleCaseItinerary);
-
+  const suggestionsFn = useServerFn(listCaseSuggestions);
+  const navigate = useNavigate();
 
   const itinerary = useQuery({
     queryKey: ["concierge", "case-itinerary", caseId],
@@ -53,8 +57,39 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
     queryKey: ["concierge", "case-adjustment", caseId],
     queryFn: () => summaryFn({ data: { caseId } }),
   });
+  const suggestions = useQuery({
+    queryKey: ["concierge", "case-suggestions", caseId],
+    queryFn: () => suggestionsFn({ data: { caseId } }),
+  });
 
+  const [picked, setPicked] = useState<string[]>([]);
   const [amount, setAmount] = useState("");
+
+  const sendToStudio = () => {
+    const all = (suggestions.data?.suggestions ?? []) as CaseSuggestion[];
+    const chosen = all.filter((s) => picked.includes(s.label));
+    if (!chosen.length) return;
+    try {
+      window.sessionStorage.setItem(
+        `vll:proposal-suggestions:${caseId}`,
+        JSON.stringify(
+          chosen.map((s) => ({
+            title: s.label,
+            notes: s.reason,
+            targetKind: s.kind,
+            targetId: s.entity_id,
+          })),
+        ),
+      );
+    } catch {
+      /* el prellenado es opcional */
+    }
+    void navigate({
+      to: "/concierge/expedientes/$caseId/propuesta",
+      params: { caseId },
+    });
+  };
+
 
   const charge = useMutation({
     mutationFn: (cents: number) =>
@@ -233,6 +268,84 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
           </p>
         )}
       </section>
+
+      {suggestions.data &&
+      (suggestions.data.suggestions.length ||
+        suggestions.data.interests.length ||
+        suggestions.data.free_days.length) ? (
+        <section className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Sugerencias de Alux para este viaje
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Lo que el viajero vio y guardó y todavía no está en su viaje. Sin precio: tú eliges qué
+            proponerle y lo cotizas en el Estudio de Propuesta.
+          </p>
+
+          {suggestions.data.free_days.length && suggestions.data.total_days ? (
+            <p className="mt-3 rounded-md bg-muted/50 p-2 text-xs">
+              Días del viaje todavía sin nada agendado:{" "}
+              <span className="font-medium">
+                {suggestions.data.free_days.map((d) => `Día ${d + 1}`).join(", ")}
+              </span>
+            </p>
+          ) : null}
+
+          {suggestions.data.suggestions.length ? (
+            <>
+              <ul className="mt-3 space-y-2">
+                {suggestions.data.suggestions.map((s) => {
+                  const checked = picked.includes(s.label);
+                  return (
+                    <li
+                      key={`${s.kind}-${s.entity_id ?? s.label}`}
+                      className="flex items-start gap-3 rounded-md border border-border/60 bg-background p-3"
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-primary"
+                        checked={checked}
+                        aria-label={`Proponer ${s.label}`}
+                        onChange={() =>
+                          setPicked((prev) =>
+                            checked ? prev.filter((l) => l !== s.label) : [...prev, s.label],
+                          )
+                        }
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{s.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {KIND_LABEL[s.kind] ?? s.kind} · {s.reason}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-3">
+                <Button size="sm" disabled={!picked.length} onClick={sendToStudio}>
+                  Agregar a la propuesta ({picked.length})
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Todo lo que el viajero guardó ya está en su viaje.
+            </p>
+          )}
+
+          {suggestions.data.interests.length || suggestions.data.territories.length ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Le interesan: {suggestions.data.interests.join(", ") || "sin datos"}.
+              {suggestions.data.territories.length
+                ? ` Destinos que estuvo viendo: ${suggestions.data.territories.join(", ")}.`
+                : ""}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+
 
       <section className="rounded-lg border border-border bg-card p-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

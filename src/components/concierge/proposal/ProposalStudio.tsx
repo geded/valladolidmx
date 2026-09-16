@@ -150,6 +150,40 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
     }
   }, [storageKey]);
 
+  /* Sugerencias enviadas desde el expediente: entran sin precio. */
+  useEffect(() => {
+    const key = `vll:proposal-suggestions:${caseId}`;
+    try {
+      const raw = window.sessionStorage.getItem(key);
+      if (!raw) return;
+      window.sessionStorage.removeItem(key);
+      const picked = JSON.parse(raw) as Array<{
+        title?: string;
+        notes?: string;
+        targetKind?: string;
+        targetId?: string | null;
+      }>;
+      if (!Array.isArray(picked) || !picked.length) return;
+      setLines((prev) => [
+        ...prev,
+        ...picked.map((p) =>
+          newLine({
+            source: "alux",
+            title: (p.title ?? "").slice(0, 160),
+            notes: (p.notes ?? "").slice(0, 400),
+            amount: "",
+            isSuggestion: true,
+            targetKind: (p.targetKind as TargetKind | undefined) ?? null,
+            targetId: p.targetId ?? null,
+          }),
+        ),
+      ]);
+      toast.success("Sugerencias agregadas. Ponles precio y envía la propuesta.");
+    } catch {
+      /* el prellenado es opcional */
+    }
+  }, [caseId]);
+
   useEffect(() => {
     if (!restored.current) return;
     try {
