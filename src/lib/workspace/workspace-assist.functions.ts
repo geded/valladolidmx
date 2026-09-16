@@ -750,6 +750,7 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       reservationBlock,
       caseBlock,
       itineraryBlock,
+      interestsBlock,
       recentBlock,
     ]
 
