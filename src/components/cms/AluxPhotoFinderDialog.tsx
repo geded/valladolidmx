@@ -254,6 +254,30 @@ export function AluxPhotoFinderDialog({
             </p>
           )}
 
+          {!loading && contacts.length > 0 && (
+            <div className="mb-4 rounded-lg border border-border bg-muted/40 p-3">
+              <p className="mb-2 text-xs font-medium">
+                Contacto publicado por el titular (para pedir permiso)
+              </p>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                {contacts.map((c) => (
+                  <li key={c.sourceUrl}>
+                    <a
+                      href={c.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-foreground underline underline-offset-2"
+                    >
+                      {c.host}
+                    </a>
+                    {c.emails.length > 0 && <> · {c.emails.join(", ")}</>}
+                    {c.phones.length > 0 && <> · {c.phones.join(", ")}</>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {photos.map((photo) => (
               <figure key={photo.url} className="overflow-hidden rounded-lg border border-border">
