@@ -247,8 +247,9 @@ export function AluxPhotoFinderDialog({
 
           {!loading && searched && photos.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              Los acervos abiertos no tienen fotos de esto. Pega la página del negocio o del
-              evento (su web, su página pública) en el campo de arriba: de ahí traemos sus propias
+              No encontramos fotos de esto exactamente como lo escribiste. Prueba con el nombre
+              del lugar o la sede (por ejemplo «Palacio Municipal de Valladolid, Yucatán») o pega
+              la página del negocio o del evento en el campo de arriba: de ahí traemos sus propias
               fotos y guardamos una copia nuestra.
             </p>
           )}
