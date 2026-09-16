@@ -27,6 +27,7 @@ import {
 import { meridaDateTime } from "@/lib/time/merida";
 import { Sparkles } from "lucide-react";
 import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
+import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
 
 
 export type FieldType =
