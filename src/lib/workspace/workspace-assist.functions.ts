@@ -689,11 +689,13 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
     // en pantalla, para poder responderle rápido a un viajero.
     let caseBlock: string | null = null;
     let itineraryBlock: string | null = null;
+    let interestsBlock: string | null = null;
     if (caseId) {
       try {
-        [caseBlock, itineraryBlock] = await Promise.all([
+        [caseBlock, itineraryBlock, interestsBlock] = await Promise.all([
           caseContext(context.supabase, caseId),
           itineraryContext(context.supabase, caseId),
+          interestsContext(context.supabase, caseId).catch(() => null),
         ]);
       } catch (err) {
         console.error(
