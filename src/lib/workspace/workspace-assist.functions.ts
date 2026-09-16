@@ -395,6 +395,54 @@ async function caseContext(supabase: any, caseId: string): Promise<string | null
     .join("\n");
 }
 
+/**
+ * Intereses que el viajero mostró navegando: afinidad de categorías y destinos,
+ * lo que guardó como favorito y lo que ya agregó a su viaje (sólo lectura).
+ * Permite a Alux sugerir paradas de lo que vio y NO agregó.
+ */
+async function interestsContext(supabase: any, caseId: string): Promise<string | null> {
+  const { data } = await supabase.rpc("concierge_traveler_interests", { _case_id: caseId });
+  const info = (data ?? null) as any;
+  if (!info?.has_traveler) return null;
+
+  const memory = (info.memory ?? null) as any;
+  const categories: string[] = Array.isArray(memory?.categoryAffinity) ? memory.categoryAffinity : [];
+  const territories: string[] = Array.isArray(memory?.territoryAffinity) ? memory.territoryAffinity : [];
+  const favorites = (Array.isArray(info.favorites) ? info.favorites : []) as any[];
+  const planned = (Array.isArray(info.planned) ? info.planned : []) as any[];
+
+  const plannedIds = new Set(planned.map((p) => String(p.entity_id ?? "")).filter(Boolean));
+  const plannedLabels = new Set(
+    planned.map((p) => String(p.label ?? "").toLowerCase()).filter(Boolean),
+  );
+
+  const notAdded = favorites.filter(
+    (f) =>
+      !plannedIds.has(String(f.entity_id ?? "")) &&
+      !plannedLabels.has(String(f.label ?? "").toLowerCase()),
+  );
+
+  if (!categories.length && !territories.length && !favorites.length) return null;
+
+  return [
+    "INTERESES DETECTADOS DEL VIAJERO (dato real, sólo lectura; de su navegación y lo que guardó)",
+    categories.length ? `· Le interesan: ${categories.join(", ")}.` : null,
+    territories.length ? `· Destinos que estuvo viendo: ${territories.join(", ")}.` : null,
+    notAdded.length
+      ? "· Guardó y TODAVÍA NO agregó a su viaje:\n" +
+        notAdded
+          .slice(0, 12)
+          .map((f) => `  · ${f.label ?? f.kind} (${f.kind}).`)
+          .join("\n")
+      : "· No hay guardados pendientes de agregar al viaje.",
+    "· La navegación anónima no se guarda por persona: sólo existen estas afinidades y los guardados. No inventes fichas concretas que no estén en esta lista.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+
+
 
 
 
@@ -527,6 +575,10 @@ Tu tarea es acompañar a la persona en el panel que está viendo:
   úsalos para responder al instante: qué se le propuso, qué aceptó, qué se le
   dijo en la conversación, qué hará cada día y a qué hora (hora de Mérida), qué
   falta por agendar y qué conviene contestarle ahora al viajero.
+· Si el contexto trae INTERESES DETECTADOS DEL VIAJERO, úsalos para sugerir qué
+  proponerle: prioriza lo que guardó y todavía NO agregó a su viaje, y después
+  sus categorías y destinos de afinidad. Nombra sólo lo que aparezca en esa
+  lista; si algo no está, dilo y sugiere buscarlo en el catálogo.
 
 · Si el contexto trae una FICHA EN EDICIÓN, explicar qué se escribe en el campo
   o sección por la que preguntan, con qué extensión y tono, y qué falta para
@@ -641,11 +693,13 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
     // en pantalla, para poder responderle rápido a un viajero.
     let caseBlock: string | null = null;
     let itineraryBlock: string | null = null;
+    let interestsBlock: string | null = null;
     if (caseId) {
       try {
-        [caseBlock, itineraryBlock] = await Promise.all([
+        [caseBlock, itineraryBlock, interestsBlock] = await Promise.all([
           caseContext(context.supabase, caseId),
           itineraryContext(context.supabase, caseId),
+          interestsContext(context.supabase, caseId).catch(() => null),
         ]);
       } catch (err) {
         console.error(
@@ -700,6 +754,7 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       reservationBlock,
       caseBlock,
       itineraryBlock,
+      interestsBlock,
       recentBlock,
     ]
 
