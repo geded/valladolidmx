@@ -110,9 +110,19 @@ function ItinerariesDeskPage() {
                   </td>
                   <td className="p-3 tabular-nums">{row.party_size ?? "—"}</td>
                   <td className="p-3 tabular-nums">{row.items_count}</td>
+                  <td className="p-3 text-xs">
+                    {row.scheduled_count > 0 ? (
+                      <span className="text-success">
+                        Con horarios ({row.scheduled_count}/{row.items_count})
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">Sin día ni hora</span>
+                    )}
+                  </td>
                   <td className="p-3">
                     {row.status ? (PLAN_STATUS[row.status] ?? row.status) : "—"}
                   </td>
+
                   <td className="p-3">
                     {row.case_id ? (
                       <Link
