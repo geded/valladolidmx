@@ -566,6 +566,12 @@ interface QueryPlan {
   subject: string[];
   /** Tokens territoriales presentes en la frase del editor. */
   place: string[];
+  /**
+   * Matices de sede escritos por el editor ("centro histórico", "convento")
+   * que no forman parte del nombre del destino de trabajo. No filtran, pero
+   * mandan en el orden: si el editor los escribió, quiere esas fotos.
+   */
+  qualifiers: string[];
   /** Frase del tema, normalizada, para detectar coincidencia exacta. */
   subjectPhrase: string;
   /** Consultas a lanzar en las fuentes abiertas, de la más precisa a la más amplia. */
@@ -585,10 +591,18 @@ function buildQueryPlan(query: string, place?: string | null): QueryPlan {
     (token) => !SEARCH_CONTEXT_WORDS.has(token) && !contextTokens.includes(token),
   );
   const place_ = [...new Set([...all.filter((t) => SEARCH_CONTEXT_WORDS.has(t)), ...contextTokens])];
+  // Lo que el editor escribió y no es el destino de trabajo: acota la sede.
+  const qualifiers = [
+    ...new Set(all.filter((t) => SEARCH_CONTEXT_WORDS.has(t) && !contextTokens.includes(t))),
+  ];
   const subjectPhrase = subject.join(" ");
+  const qualifierPhrase = qualifiers.join(" ");
   const placePhrase = (place?.trim() || place_.join(" ")).trim();
 
   const variants = new Set<string>();
+  if (subjectPhrase && qualifierPhrase && placePhrase) {
+    variants.add(`"${subjectPhrase}" ${qualifierPhrase} ${placePhrase}`);
+  }
   if (subjectPhrase && placePhrase) {
     variants.add(`"${subjectPhrase}" ${placePhrase}`);
     variants.add(`${subjectPhrase} ${placePhrase} fotos`);
@@ -598,8 +612,15 @@ function buildQueryPlan(query: string, place?: string | null): QueryPlan {
   if (subjectPhrase && subject.length > 1) variants.add(`"${subjectPhrase}"`);
   if (subjectPhrase && !placePhrase) variants.add(subjectPhrase);
 
-  return { subject, place: place_, subjectPhrase, variants: [...variants].slice(0, 4) };
+  return {
+    subject,
+    place: place_,
+    qualifiers,
+    subjectPhrase,
+    variants: [...variants].slice(0, 5),
+  };
 }
+
 
 
 /** Un token cuenta como presente si aparece igual, como sinónimo o como raíz. */
@@ -618,16 +639,18 @@ function tokenPresent(token: string, available: Set<string>, haystack: string): 
 export interface PhotoMatch {
   relevance: number;
   placeMatch: boolean;
+  /** La foto nombra la sede escrita por el editor ("centro histórico"). */
+  qualifierMatch: boolean;
 }
 
 /**
  * Evita que una coincidencia territorial amplia (p. ej. "Valladolid") haga
  * pasar una foto que no contiene el asunto buscado (p. ej. "video mapping"),
- * y prioriza las que sí nombran el territorio.
+ * y prioriza las que sí nombran el territorio y la sede pedida.
  */
 function photoMatch(photo: PhotoCandidate, plan: QueryPlan): PhotoMatch {
   if (photo.provider === "Sitio del negocio" || photo.provider === "Enlace directo") {
-    return { relevance: 100, placeMatch: true };
+    return { relevance: 100, placeMatch: true, qualifierMatch: true };
   }
 
   const haystack = normalizeSearchText(
@@ -637,19 +660,29 @@ function photoMatch(photo: PhotoCandidate, plan: QueryPlan): PhotoMatch {
 
   const subjectMatches = plan.subject.filter((t) => tokenPresent(t, available, haystack)).length;
   const placeMatches = plan.place.filter((t) => tokenPresent(t, available, haystack)).length;
+  const qualifierMatches = plan.qualifiers.filter((t) =>
+    tokenPresent(t, available, haystack),
+  ).length;
   const required =
     plan.subject.length === 0 ? 0 : Math.max(1, Math.ceil(plan.subject.length * 0.6));
 
-  if (subjectMatches < required) return { relevance: 0, placeMatch: false };
-  if (plan.subject.length === 0 && placeMatches === 0) return { relevance: 0, placeMatch: false };
+  if (subjectMatches < required) return { relevance: 0, placeMatch: false, qualifierMatch: false };
+  if (plan.subject.length === 0 && placeMatches === 0) {
+    return { relevance: 0, placeMatch: false, qualifierMatch: false };
+  }
 
-  let relevance = subjectMatches * 10 + placeMatches * 4;
+  let relevance = subjectMatches * 10 + placeMatches * 4 + qualifierMatches * 12;
   if (plan.subjectPhrase && haystack.includes(plan.subjectPhrase)) relevance += 25;
   if (photo.provider === "Google") relevance += 6;
   if (photo.width >= 1200 && photo.height >= 800) relevance += 3;
 
-  return { relevance, placeMatch: placeMatches > 0 };
+  return {
+    relevance,
+    placeMatch: placeMatches > 0,
+    qualifierMatch: plan.qualifiers.length > 0 && qualifierMatches > 0,
+  };
 }
+
 
 /**
  * Fotos del propio lugar o sede publicadas en Google (ficha del negocio o del
@@ -857,6 +890,8 @@ async function rankWithAi(
       "Devuelves SOLO JSON válido: {\"keep\":[índices en orden de utilidad]}.",
       "Conserva únicamente las que razonablemente muestran lo pedido en el lugar indicado.",
       "Descarta lo ajeno al tema aunque mencione el lugar, y lo de otra ciudad o país.",
+      "Si la frase nombra una sede concreta (centro histórico, convento, parque, plaza),",
+      "descarta las fotos que claramente corresponden a otra sede del mismo destino.",
       "Si ninguna sirve, devuelve una lista vacía.",
     ].join(" "),
     [
@@ -900,9 +935,16 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     const plan = buildQueryPlan(data.query, data.place);
     const ai = await planWithAi(data.query, data.place).catch(() => null);
     const variants = [...new Set([...(ai?.queries ?? []), ...plan.variants])].slice(0, 5);
-    const placeQuery = [ai?.subject || plan.subjectPhrase || data.query, data.place]
+    // La sede escrita por el editor ("centro histórico", "convento") viaja con
+    // la consulta: es lo que distingue una sede de otra dentro del destino.
+    const placeQuery = [
+      ai?.subject || plan.subjectPhrase || data.query,
+      plan.qualifiers.join(" "),
+      data.place,
+    ]
       .filter(Boolean)
       .join(" ");
+
 
     const webBatches = await Promise.all(
       variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
@@ -929,9 +971,12 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // Si alguna foto sí nombra el territorio, se descartan las que sólo
     // coinciden con el tema: es material de otro lugar.
     const territorial = scored.filter((entry) => entry.placeMatch);
-    const heuristic = (plan.place.length && territorial.length ? territorial : scored).map(
-      ({ photo }) => photo,
-    );
+    const base = plan.place.length && territorial.length ? territorial : scored;
+
+    // Si el editor acotó la sede y hay fotos que la nombran, mandan esas.
+    const onSede = base.filter((entry) => entry.qualifierMatch);
+    const heuristic = (onSede.length ? onSede : base).map(({ photo }) => photo);
+
 
     // Paso 2: Alux revisa las candidatas y conserva sólo las que muestran lo
     // pedido. El orden por palabras clave queda como respaldo.
