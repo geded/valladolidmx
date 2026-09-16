@@ -574,28 +574,33 @@ interface QueryPlan {
 
 /**
  * Descompone la frase del editor en tema + territorio y arma consultas
- * complementarias. Nunca sustituye la frase original: sólo añade formas de
- * preguntar lo mismo para que una fuente que titula distinto también responda.
+ * complementarias al estilo de un buscador de imágenes. El destino de trabajo
+ * (`place`) se añade siempre, aunque el editor no lo escriba: si ya entró a
+ * Valladolid, no tiene que repetirlo en cada búsqueda.
  */
-function buildQueryPlan(query: string): QueryPlan {
-  const normalized = normalizeSearchText(query);
+function buildQueryPlan(query: string, place?: string | null): QueryPlan {
   const all = searchTokens(query);
-  const subject = all.filter((token) => !SEARCH_CONTEXT_WORDS.has(token));
-  const place = all.filter((token) => SEARCH_CONTEXT_WORDS.has(token));
+  const contextTokens = place ? searchTokens(place) : [];
+  const subject = all.filter(
+    (token) => !SEARCH_CONTEXT_WORDS.has(token) && !contextTokens.includes(token),
+  );
+  const place_ = [...new Set([...all.filter((t) => SEARCH_CONTEXT_WORDS.has(t)), ...contextTokens])];
   const subjectPhrase = subject.join(" ");
-  const placePhrase = place.join(" ");
+  const placePhrase = (place?.trim() || place_.join(" ")).trim();
 
   const variants = new Set<string>();
-  variants.add(query.trim());
   if (subjectPhrase && placePhrase) {
     variants.add(`"${subjectPhrase}" ${placePhrase}`);
+    variants.add(`${subjectPhrase} ${placePhrase} fotos`);
     variants.add(`${subjectPhrase} ${placePhrase}`);
   }
+  variants.add(query.trim());
   if (subjectPhrase && subject.length > 1) variants.add(`"${subjectPhrase}"`);
   if (subjectPhrase && !placePhrase) variants.add(subjectPhrase);
 
-  return { subject, place, subjectPhrase, variants: [...variants].slice(0, 4) };
+  return { subject, place: place_, subjectPhrase, variants: [...variants].slice(0, 4) };
 }
+
 
 /** Un token cuenta como presente si aparece igual, como sinónimo o como raíz. */
 function tokenPresent(token: string, available: Set<string>, haystack: string): boolean {
