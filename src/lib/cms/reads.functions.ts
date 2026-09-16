@@ -82,10 +82,11 @@ export const listDestinationsCms = createServerFn({ method: "POST" })
 
 export const listZonesCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: (ListInput & { destinationId?: string }) | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
+    const destinationId = (data?.destinationId ?? "").trim();
     let q = context.supabase
       .from("destination_zones")
       .select("id, slug, name, status, destination_id, updated_at", {
@@ -94,6 +95,7 @@ export const listZonesCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
+    if (destinationId) q = q.eq("destination_id", destinationId);
     if (search) q = q.ilike("name", `%${search}%`);
     const { data: rows, count, error } = await q;
     if (error) throw error;

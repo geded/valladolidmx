@@ -60,6 +60,11 @@ interface Props {
   backTo: string;
   listQueryKey: string;
   fields: EditorField[];
+  /** Valores iniciales sólo para altas nuevas (p. ej. el destino de trabajo). */
+  defaults?: Record<string, string>;
+  /** Territorio con el que Alux debe investigar esta ficha. */
+  autofillDestination?: string;
+  autofillZone?: string;
   /** Slot para paneles extra (imágenes, galería...) que reciben el id. */
   renderExtras?: (args: {
     id?: string;
@@ -121,6 +126,29 @@ export function EntityEditor(props: Props) {
   const [error, setError] = useState<string | null>(null);
   const [aluxOpen, setAluxOpen] = useState(false);
   const [autofillOpen, setAutofillOpen] = useState(false);
+
+  /* Altas nuevas: adoptan el contexto de trabajo (p. ej. el destino elegido)
+     sin pisar lo que el editor ya escribió. */
+  const defaultsKey = JSON.stringify(props.defaults ?? {});
+  useEffect(() => {
+    if (isEdit) return;
+    const defaults = JSON.parse(defaultsKey) as Record<string, string>;
+    const entries = Object.entries(defaults).filter(([, v]) => v);
+    if (entries.length === 0) return;
+    setValues((current) => {
+      const next = { ...current };
+      let changed = false;
+      for (const [key, value] of entries) {
+        if (!next[key]) {
+          next[key] = value;
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [defaultsKey, isEdit]);
+
+
 
   /** Nombre de la ficha: base de la búsqueda que hace Alux. */
   const autofillName = values["name"] || values["title"] || "";
@@ -235,20 +263,27 @@ export function EntityEditor(props: Props) {
               <StatusBadge value={status} />
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => setAutofillOpen(true)}
-            disabled={autofillName.trim().length < 2}
-            title={
-              autofillName.trim().length < 2
-                ? "Escribe primero el nombre de la ficha"
-                : "Alux propone el contenido de esta ficha"
-            }
-            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
-            Completar con Alux
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              type="button"
+              onClick={() => setAutofillOpen(true)}
+              disabled={autofillName.trim().length < 2}
+              title={
+                autofillName.trim().length < 2
+                  ? "Escribe primero el nombre de la ficha"
+                  : "Alux propone el contenido de esta ficha"
+              }
+              className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+              Completar con Alux
+            </button>
+            {autofillName.trim().length < 2 && (
+              <span className="text-[11px] text-muted-foreground">
+                Escribe primero el nombre para que Alux investigue.
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => setAluxOpen(true)}
@@ -265,6 +300,8 @@ export function EntityEditor(props: Props) {
         onClose={() => setAutofillOpen(false)}
         entityKind={title}
         name={autofillName}
+        {...(props.autofillDestination ? { destination: props.autofillDestination } : {})}
+        {...(props.autofillZone ? { zone: props.autofillZone } : {})}
         fields={autofillFields}
         onApply={(patch) => setValues((v) => ({ ...v, ...patch }))}
       />
