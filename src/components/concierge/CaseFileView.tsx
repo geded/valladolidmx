@@ -295,6 +295,8 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   "Concierge.Proposal.Sent": "Propuesta enviada al viajero",
   "Concierge.Proposal.Viewed": "Propuesta vista por el viajero",
   "Concierge.Proposal.Accepted": "Propuesta aceptada",
+  "Concierge.Itinerary.Scheduled": "Itinerario armado con los horarios de la propuesta",
+  "Concierge.Message.Received": "Mensaje nuevo en la conversación",
 };
 
 const FIELD_LABELS: Record<string, string> = {
