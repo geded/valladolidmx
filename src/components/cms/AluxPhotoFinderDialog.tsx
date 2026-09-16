@@ -64,6 +64,7 @@ export function AluxPhotoFinderDialog({
         data: { query: query.trim(), website: site.trim() || null },
       });
       setPhotos(res.photos);
+      setUsedQuery(res.relaxed ? res.usedQuery : null);
       setSearched(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
