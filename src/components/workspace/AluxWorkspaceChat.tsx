@@ -34,23 +34,40 @@ const STARTERS = [
   "¿Qué debo hacer primero hoy?",
 ];
 
+export interface AluxAssistSubject {
+  kind: "order" | "case" | "entity";
+  id?: string;
+  label?: string;
+  status?: string;
+  fields?: string[];
+}
+
 export function AluxWorkspaceChat({
   open,
   onOpenChange,
+  subject,
+  starters,
+  description,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Reservación, expediente o ficha abierta en la pantalla activa. */
+  subject?: AluxAssistSubject;
+  starters?: string[];
+  description?: string;
 }) {
   const { workspace } = useWorkspace();
   const alux = useAluxBrand();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const ask = useServerFn(aluxWorkspaceAssist);
+  const initialStarters = starters?.length ? starters : STARTERS;
   const [turns, setTurns] = useState<Turn[]>([]);
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [followUps, setFollowUps] = useState<string[]>(STARTERS);
+  const [followUps, setFollowUps] = useState<string[]>(initialStarters);
   const threadRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight });
@@ -72,11 +89,13 @@ export function AluxWorkspaceChat({
           route: pathname,
           areas: getNavItemsForWorkspace(workspace.id, "sidebar").map((i) => i.label),
           question: q,
+          ...(subject ? { subject } : {}),
           history,
         },
       });
       setTurns((t) => [...t, { role: "assistant", content: res.answer }]);
-      setFollowUps(res.followUps.length ? res.followUps : STARTERS);
+      setFollowUps(res.followUps.length ? res.followUps : initialStarters);
+
     } catch {
       setError("No se pudo abrir la conversación. Inténtalo de nuevo en un momento.");
     } finally {
@@ -95,9 +114,10 @@ export function AluxWorkspaceChat({
             {alux.copy("workspaceTitle")}
           </DialogTitle>
           <DialogDescription>
-            Pregunta cómo funciona {workspace?.label ?? "este panel"}: bandejas, etapas, fases del
-            viaje, folios y pagos.
+            {description ??
+              `Pregunta cómo funciona ${workspace?.label ?? "este panel"}: bandejas, etapas, fases del viaje, folios y pagos. También puedes escribir un folio (por ejemplo AVL-260915-001) para consultar esa reservación.`}
           </DialogDescription>
+
         </DialogHeader>
 
         <div
@@ -108,7 +128,7 @@ export function AluxWorkspaceChat({
         >
           {turns.length === 0 ? (
             <p className="text-muted-foreground">
-              Escribe tu pregunta o elige una de abajo. Alux sólo explica el panel; no cambia nada.
+              Escribe tu pregunta o elige una de abajo. Alux explica y consulta; nunca cambia nada por su cuenta.
             </p>
           ) : (
             turns.map((t, i) => (

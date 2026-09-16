@@ -25,6 +25,9 @@ import {
   getEditorialStatusGuidance,
 } from "@/lib/cms/editorial-language";
 import { meridaDateTime } from "@/lib/time/merida";
+import { Sparkles } from "lucide-react";
+import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
+
 
 export type FieldType =
   | "text"
@@ -115,6 +118,8 @@ export function EntityEditor(props: Props) {
 
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [error, setError] = useState<string | null>(null);
+  const [aluxOpen, setAluxOpen] = useState(false);
+
 
   useEffect(() => {
     if (detail.data) {
@@ -206,13 +211,42 @@ export function EntityEditor(props: Props) {
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
           )}
         </div>
-        {isEdit && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Estado actual:</span>
-            <StatusBadge value={status} />
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {isEdit && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Estado actual:</span>
+              <StatusBadge value={status} />
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setAluxOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            ¿Qué escribo aquí?
+          </button>
+        </div>
       </header>
+
+      <AluxWorkspaceChat
+        open={aluxOpen}
+        onOpenChange={setAluxOpen}
+        subject={{
+          kind: "entity",
+          id: id ?? undefined,
+          label: `${title}${values["name"] || values["title"] ? ` · ${values["name"] || values["title"]}` : ""}`,
+          status: isEdit ? status : "draft",
+          fields: fields.map((f) => `${f.label}${f.required ? " (obligatorio)" : ""}`),
+        }}
+        starters={[
+          "¿Qué escribo en el resumen de esta ficha?",
+          "¿Qué campos me faltan para poder publicarla?",
+          "¿Cómo debe ser la descripción larga?",
+        ]}
+        description="Pregunta qué escribir en cada campo de esta ficha, con qué extensión y qué falta para publicarla."
+      />
+
 
       {error && (
         <div
