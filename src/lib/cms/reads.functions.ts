@@ -363,16 +363,14 @@ export const listMediaCms = createServerFn({ method: "POST" })
     // Miniatura editorial: los buckets son privados y los borradores no pasan
     // por el proxy público, así que firmamos URLs temporales (1 h) con la
     // sesión del editor. Sin firma la fila sigue mostrándose, sin miniatura.
-    const list = (rows ?? []) as Array<
-      Record<string, unknown> & {
-        storage_bucket: string | null;
-        storage_path: string | null;
-      }
-    >;
+    const list = rows ?? [];
+    const pathOf = (r: unknown) =>
+      r as { storage_bucket: string | null; storage_path: string | null };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = (context.supabase as any).storage;
     const byBucket = new Map<string, string[]>();
-    for (const r of list) {
+    for (const row of list) {
+      const r = pathOf(row);
       if (!r.storage_bucket || !r.storage_path) continue;
       byBucket.set(r.storage_bucket, [...(byBucket.get(r.storage_bucket) ?? []), r.storage_path]);
     }
@@ -392,10 +390,13 @@ export const listMediaCms = createServerFn({ method: "POST" })
     }
 
     return {
-      rows: list.map((r) => ({
-        ...r,
-        previewUrl: signedByKey.get(`${r.storage_bucket}:${r.storage_path}`) ?? null,
-      })),
+      rows: list.map((row) => {
+        const r = pathOf(row);
+        return {
+          ...row,
+          previewUrl: signedByKey.get(`${r.storage_bucket}:${r.storage_path}`) ?? null,
+        };
+      }),
       total: count ?? 0,
       limit,
       offset,
