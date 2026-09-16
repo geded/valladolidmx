@@ -60,6 +60,8 @@ export interface MediaPickerDialogProps {
   onPick: (media: PickedMedia) => void;
   /** Rol para el pipeline (define ratio + tamaño). Default: gallery. */
   role?: ImageRole;
+  /** Consulta sugerida al buscar fotos libres con Alux (nombre + destino). */
+  searchHint?: string;
 }
 
 interface Row {
