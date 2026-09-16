@@ -16,6 +16,7 @@ import { workspaceToast } from "@/lib/workspace/toast-bus";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAluxBrand } from "@/lib/brand/brand-context";
+import { AluxWorkspaceChat } from "./AluxWorkspaceChat";
 
 const IMPACT_TONE: Record<NonNullable<AluxAction["impact"]>, string> = {
   low: "bg-muted text-muted-foreground",
@@ -210,10 +211,16 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
       </div>
 
       <footer>
-        <Button variant="outline" className="w-full" size="sm">
+        <Button
+          variant="outline"
+          className="w-full"
+          size="sm"
+          onClick={() => setChatOpen(true)}
+        >
           {alux.copy("workspaceOpen")}
         </Button>
       </footer>
+      <AluxWorkspaceChat open={chatOpen} onOpenChange={setChatOpen} />
     </section>
   );
 }
