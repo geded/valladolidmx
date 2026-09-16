@@ -31,6 +31,43 @@ interface Crumb {
   to?: string;
 }
 
+/**
+ * Algunas rutas intermedias no existen como pantalla propia
+ * (p. ej. `/cms/eventos/:id` sólo existe como `/editar`, o
+ * `/concierge/expedientes` sólo existe con expediente). Antes de
+ * enlazar o navegar comprobamos que la ruta realmente resuelva; si no,
+ * subimos al ancestro más cercano que sí exista.
+ */
+function pathResolves(router: ReturnType<typeof useRouter>, path: string): boolean {
+  try {
+    const found = router.getMatchedRoutes(path)?.foundRoute;
+    if (!found?.fullPath) return false;
+    // `getMatchedRoutes` cae al layout más cercano cuando la ruta no
+    // existe, así que exigimos que la plantilla encontrada tenga el
+    // mismo número de segmentos que la ruta solicitada.
+    const seg = (p: string) => p.split("/").filter(Boolean).length;
+    return seg(found.fullPath) === seg(path);
+  } catch {
+    return false;
+  }
+}
+
+
+function nearestExistingAncestor(
+  router: ReturnType<typeof useRouter>,
+  path: string,
+  fallback: string,
+): string {
+  let candidate = path;
+  while (candidate && candidate !== "/") {
+    if (pathResolves(router, candidate)) return candidate;
+    const idx = candidate.lastIndexOf("/");
+    candidate = idx > 0 ? candidate.slice(0, idx) : "/";
+  }
+  return fallback;
+}
+
+
 export function WorkspaceTopbar({
   title,
   titleAsText = false,
@@ -79,9 +116,10 @@ export function WorkspaceTopbar({
       const rest = pathname.slice(base.length).split("/").filter(Boolean);
       rest.forEach((seg, idx) => {
         const isLast = idx === rest.length - 1;
+        const to = `${base}/${rest.slice(0, idx + 1).join("/")}`;
         list.push({
           label: humanizeSegment(seg),
-          to: isLast ? undefined : `${base}/${rest.slice(0, idx + 1).join("/")}`,
+          to: isLast || !pathResolves(router, to) ? undefined : to,
         });
       });
       // Padre inmediato = el nav item matched, o el crumb previo si hay más de un segmento.
@@ -90,10 +128,12 @@ export function WorkspaceTopbar({
       } else {
         parent = base;
       }
+      parent = nearestExistingAncestor(router, parent, rootTo);
     }
 
     return { crumbs: list, parentTo: parent };
-  }, [workspace, pathname]);
+  }, [workspace, pathname, router]);
+
 
   const canGoBack = Boolean(parentTo);
   const handleBack = () => {
