@@ -40,11 +40,18 @@ interface Crumb {
  */
 function pathResolves(router: ReturnType<typeof useRouter>, path: string): boolean {
   try {
-    return Boolean(router.getMatchedRoutes(path)?.foundRoute);
+    const found = router.getMatchedRoutes(path)?.foundRoute;
+    if (!found?.fullPath) return false;
+    // `getMatchedRoutes` cae al layout más cercano cuando la ruta no
+    // existe, así que exigimos que la plantilla encontrada tenga el
+    // mismo número de segmentos que la ruta solicitada.
+    const seg = (p: string) => p.split("/").filter(Boolean).length;
+    return seg(found.fullPath) === seg(path);
   } catch {
     return false;
   }
 }
+
 
 function nearestExistingAncestor(
   router: ReturnType<typeof useRouter>,
