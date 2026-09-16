@@ -111,6 +111,9 @@ export interface ItineraryDeskRow {
   start_date: string | null;
   end_date: string | null;
   items_count: number;
+  /** Paradas con día u hora asignados. */
+  scheduled_count: number;
+
   updated_at: string;
 }
 
