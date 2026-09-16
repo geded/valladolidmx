@@ -150,6 +150,7 @@ export function MediaPickerDialog({
   onClose,
   onPick,
   role = "gallery",
+  searchHint,
 }: MediaPickerDialogProps) {
   const list = useServerFn(listStudioMediaLibrary);
   const serverUpload = useServerFn(uploadStudioMediaViaServer);
