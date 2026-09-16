@@ -17,6 +17,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createConciergeProposal } from "@/lib/concierge/concierge.functions";
+import { aluxSuggestProposalSchedule } from "@/lib/concierge/proposal-studio.functions";
 import {
   dayLabel,
   formatDurationLabel,
@@ -110,6 +111,7 @@ const PLAN_KIND_TO_TARGET: Record<string, TargetKind> = {
 export function ProposalStudio({ data }: { data: StudioCaseFile }) {
   const router = useRouter();
   const createFn = useServerFn(createConciergeProposal);
+  const scheduleFn = useServerFn(aluxSuggestProposalSchedule);
   const caseId = data.case.id;
   const plan = data.travel_plan ?? null;
   const quotes = (data.quotes ?? []).filter((q) => q.status === "submitted");
@@ -120,6 +122,7 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
   const [terms, setTerms] = useState("");
   const [validUntil, setValidUntil] = useState("");
   const [busy, setBusy] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
   const restored = useRef(false);
 
   const days = tripDayCount(plan?.start_date, plan?.end_date);
@@ -257,6 +260,62 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
     }
     return list;
   }, [prepared, plan?.start_date]);
+
+  /* ------------------- Alux · propone día y hora del destino ------------------- */
+
+  const suggestSchedule = useCallback(async () => {
+    if (scheduling) return;
+    const candidates = lines
+      .map((line, index) => ({ line, index }))
+      .filter((e) => e.line.title.trim().length >= 3);
+    if (candidates.length === 0) return;
+    setScheduling(true);
+    try {
+      const res = await scheduleFn({
+        data: {
+          days,
+          startDate: plan?.start_date ?? null,
+          items: candidates.map((e) => ({
+            index: e.index,
+            title: e.line.title.trim(),
+            ...(e.line.notes.trim() ? { notes: e.line.notes.trim().slice(0, 400) } : {}),
+            dayIndex: e.line.dayIndex,
+            ...(normalizeTime(e.line.startsAt) ? { startsAt: normalizeTime(e.line.startsAt)! } : {}),
+            durationMinutes: e.line.durationMinutes ? Number(e.line.durationMinutes) : null,
+          })),
+        },
+      });
+      const byIndex = new Map(res.items.map((s) => [s.index, s]));
+      setLines((prev) =>
+        prev.map((line, index) => {
+          const s = byIndex.get(index);
+          if (!s) return line;
+          return {
+            ...line,
+            dayIndex: line.dayIndex ?? s.dayIndex,
+            startsAt: normalizeTime(line.startsAt) ? line.startsAt : s.startsAt,
+            durationMinutes: line.durationMinutes
+              ? line.durationMinutes
+              : s.durationMinutes
+                ? String(s.durationMinutes)
+                : "",
+          };
+        }),
+      );
+      toast.success(
+        `Alux propuso día y hora para ${res.items.length} partida(s). Revísalas y ajusta lo que haga falta.`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      toast.error(
+        msg.includes("forbidden")
+          ? "Sólo el equipo interno puede pedirle a Alux que arme la agenda."
+          : "Alux no pudo armar la agenda ahora. Inténtalo de nuevo en un momento.",
+      );
+    } finally {
+      setScheduling(false);
+    }
+  }, [scheduling, lines, scheduleFn, days, plan?.start_date]);
 
   /* ------------------------------ Guardar ------------------------------ */
 
@@ -463,9 +522,20 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
             >
               Agregar sugerencia sin costo
             </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              disabled={scheduling || lines.filter((l) => l.title.trim().length >= 3).length === 0}
+              onClick={suggestSchedule}
+            >
+              {scheduling ? "Alux está armando la agenda…" : "Armar agenda con Alux"}
+            </Button>
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Atajos: Ctrl/Cmd + Enter guarda el borrador · Ctrl/Cmd + D duplica la última partida.
+            Alux propone día, hora del destino y duración para cada partida; puedes ajustar todo
+            antes de guardar. Atajos: Ctrl/Cmd + Enter guarda el borrador · Ctrl/Cmd + D duplica la
+            última partida.
           </p>
         </Panel>
       </section>
