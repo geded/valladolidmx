@@ -1,6 +1,6 @@
 # Alux copiloto real del Concierge y de los editores
 
-Objetivo: que Alux deje de ser sólo un explicador del panel y pueda (1) responder sobre una reservación, pago o expediente concreto y (2) acompañar a los editores campo por campo mientras llenan una ficha.
+Objetivo: que Alux deje de ser sólo un explicador del panel y sea copiloto real del equipo interno —concierge, editores y administradores— pudiendo (1) responder sobre una reservación, pago o expediente concreto y (2) acompañar campo por campo mientras se llena una ficha.
 
 Se construye como delta mínimo sobre lo que ya existe: la conversación `AluxWorkspaceChat`, el asistente `aluxWorkspaceAssist` y las consultas de reservaciones y expedientes ya implementadas. Sin tablas nuevas, sin motores nuevos, sin pantallas paralelas, sin publicar.
 
@@ -16,14 +16,14 @@ Cuando el concierge escriba un folio (ERL-260915-001, AVL-…, VMX-…) o pregun
 
 Reglas de cuidado:
 
-- Sólo personal interno (editor, administración, concierge). Misma verificación de acceso que ya usa el asistente.
+- Sólo personal interno: concierge, editores y administradores (super_admin, admin, editor, concierge, concierge_lead). Misma verificación de acceso que ya usa el asistente. Empresarios del Portal quedan fuera.
 - Alux sólo lee; nunca marca pagos, cancela, ni cambia estados. Las acciones siguen siendo del panel.
 - No expone datos de contacto del viajero salvo el nombre que el panel ya muestra.
 - Si el folio no existe o no corresponde, lo dice claramente en lugar de suponer.
 
 ## Parte 2 · Alux acompaña a los editores en cada campo
 
-Dentro de los editores del CMS (empresas, productos, eventos, lugares, destinos, zonas, regiones), Alux podrá responder "¿qué escribo aquí?" para el campo o la sección en la que se está trabajando:
+Dentro de los editores del CMS (empresas, productos, eventos, lugares, destinos, zonas, regiones), editores y administradores podrán preguntar a Alux "¿qué escribo aquí?" para el campo o la sección en la que se está trabajando:
 
 - Para qué sirve el campo y dónde se ve publicado.
 - Qué conviene escribir, con qué extensión y en qué tono editorial de la marca.
