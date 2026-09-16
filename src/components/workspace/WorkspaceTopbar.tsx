@@ -7,6 +7,7 @@ import { ConnectivityIndicator } from "./ConnectivityIndicator";
 import { getNavItemsForWorkspace } from "@/lib/workspace/navigation-registry";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { ConciergeNotificationsBell } from "@/components/concierge/ConciergeNotificationsBell";
 
 /** Humaniza un segmento de URL para usarlo como crumb. */
 function humanizeSegment(seg: string): string {
