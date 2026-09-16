@@ -684,6 +684,12 @@ export function PlaceEditor({ placeId }: Props) {
   }
 
   const status = (place.status as ContentStatus) ?? "draft";
+  /** Territorio de la ficha: acota la búsqueda que hace Alux. */
+  const destinationName =
+    (opts.destinations ?? []).find(
+      (d: { id: string; name: string }) => d.id === (place.destination_id as string | undefined),
+    )?.name ?? "";
+  const zoneName = editZones.find((z) => z.id === zoneId)?.name ?? "";
   const set = (key: string) => (value: string) => setValues((v) => ({ ...v, [key]: value }));
 
   return (
