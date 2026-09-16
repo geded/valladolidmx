@@ -525,3 +525,102 @@ export const aluxSuggestProposalSchedule = createServerFn({ method: "POST" })
     if (items.length === 0) throw new Error("alux_unavailable");
     return { items };
   });
+
+/* --------- Alux · arma la agenda directamente sobre el viaje del viajero -------- */
+
+/**
+ * Asigna día, hora local (America/Merida) y duración a las paradas del viaje
+ * ligado al expediente, respetando lo que ya estaba capturado. El resultado se
+ * ve igual en el expediente del Concierge y en Mi Viaje del viajero.
+ */
+export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ caseId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: plan, error: planError } = await context.supabase
+      .from("travel_plans")
+      .select("id, start_date, end_date")
+      .eq("case_id", data.caseId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (planError) throw new Error(planError.message);
+    if (!plan) return { applied: 0 };
+
+    const planRow = plan as Record<string, unknown>;
+    const planId = planRow["id"] as string;
+    const startDate = (planRow["start_date"] as string | null) ?? null;
+    const endDate = (planRow["end_date"] as string | null) ?? null;
+
+    const { data: items } = await context.supabase
+      .from("travel_plan_items")
+      .select("id, day_index, position, starts_at_local, duration_minutes, notes, snapshot")
+      .eq("plan_id", planId)
+      .order("position", { ascending: true });
+
+    const stops = ((items ?? []) as Array<Record<string, unknown>>).map((i, index) => {
+      const snapshot = (i["snapshot"] ?? {}) as Record<string, unknown>;
+      return {
+        index,
+        id: i["id"] as string,
+        title:
+          ((snapshot["title"] as string | null) ??
+            (snapshot["name"] as string | null) ??
+            (i["notes"] as string | null) ??
+            "Parada del itinerario").slice(0, 160),
+        notes: ((i["notes"] as string | null) ?? "").slice(0, 400),
+        dayIndex: (i["day_index"] as number | null) ?? null,
+        startsAt: (i["starts_at_local"] as string | null) ?? null,
+        durationMinutes: (i["duration_minutes"] as number | null) ?? null,
+      };
+    });
+    if (!stops.length) return { applied: 0 };
+
+    let days = 1;
+    if (startDate && endDate) {
+      const diff =
+        (new Date(`${endDate}T00:00:00Z`).getTime() - new Date(`${startDate}T00:00:00Z`).getTime()) /
+        86_400_000;
+      days = Math.min(30, Math.max(1, Math.round(diff) + 1));
+    } else {
+      days = Math.min(30, Math.max(1, Math.ceil(stops.length / 2)));
+    }
+
+    const suggestion = await aluxScheduleCall(
+      {
+        days,
+        startDate,
+        items: stops.map((s) => ({
+          index: s.index,
+          title: s.title,
+          ...(s.notes ? { notes: s.notes } : {}),
+          dayIndex: s.dayIndex,
+          ...(s.startsAt ? { startsAt: s.startsAt.slice(0, 5) } : {}),
+          durationMinutes: s.durationMinutes,
+        })),
+      },
+      context,
+    );
+
+    const byIndex = new Map(suggestion.map((s) => [s.index, s]));
+    const entries = stops
+      .map((s) => {
+        const hit = byIndex.get(s.index);
+        if (!hit) return null;
+        return {
+          item_id: s.id,
+          day_index: s.dayIndex ?? hit.dayIndex,
+          starts_at_local: s.startsAt ?? `${hit.startsAt}:00`,
+          duration_minutes: s.durationMinutes ?? hit.durationMinutes,
+        };
+      })
+      .filter(Boolean);
+    if (!entries.length) return { applied: 0 };
+
+    const { data: applied, error } = await context.supabase.rpc("concierge_plan_apply_schedule", {
+      _case_id: data.caseId,
+      _entries: entries as never,
+    } as never);
+    if (error) throw new Error(error.message);
+    return { applied: Number(applied ?? 0) };
+  });
