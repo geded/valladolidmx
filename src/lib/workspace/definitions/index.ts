@@ -26,6 +26,8 @@ import {
   BookOpenText,
   ShoppingCart,
   Activity,
+  FileText,
+  MessageCircle,
 } from "lucide-react";
 import {
   Mail,
@@ -608,7 +610,7 @@ const concierge: WorkspaceDefinition = {
       id: "concierge.itineraries",
       workspaceId: "concierge",
       label: "Itinerarios",
-      icon: Map,
+      icon: MapIcon,
       to: "/concierge/itinerarios",
       group: "trabajo",
       order: 4,
