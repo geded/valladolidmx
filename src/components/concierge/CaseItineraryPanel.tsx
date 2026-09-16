@@ -207,7 +207,7 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {stop.starts_at_local
-                                  ? meridaClock(stop.starts_at_local)
+                                  ? stop.starts_at_local.slice(0, 5)
                                   : "Sin hora"}
                                 {stop.duration_minutes ? ` · ${stop.duration_minutes} min` : ""}
                               </p>
