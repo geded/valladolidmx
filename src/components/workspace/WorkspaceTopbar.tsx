@@ -109,9 +109,10 @@ export function WorkspaceTopbar({
       const rest = pathname.slice(base.length).split("/").filter(Boolean);
       rest.forEach((seg, idx) => {
         const isLast = idx === rest.length - 1;
+        const to = `${base}/${rest.slice(0, idx + 1).join("/")}`;
         list.push({
           label: humanizeSegment(seg),
-          to: isLast ? undefined : `${base}/${rest.slice(0, idx + 1).join("/")}`,
+          to: isLast || !pathResolves(router, to) ? undefined : to,
         });
       });
       // Padre inmediato = el nav item matched, o el crumb previo si hay más de un segmento.
@@ -120,9 +121,11 @@ export function WorkspaceTopbar({
       } else {
         parent = base;
       }
+      parent = nearestExistingAncestor(router, parent, rootTo);
     }
 
     return { crumbs: list, parentTo: parent };
+
   }, [workspace, pathname]);
 
   const canGoBack = Boolean(parentTo);
