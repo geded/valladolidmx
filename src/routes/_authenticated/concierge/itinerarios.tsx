@@ -87,14 +87,16 @@ function ItinerariesDeskPage() {
               <th className="p-3">Fechas</th>
               <th className="p-3">Personas</th>
               <th className="p-3">Paradas</th>
+              <th className="p-3">Agenda</th>
               <th className="p-3">Estado</th>
               <th className="p-3">Expediente</th>
+
             </tr>
           </thead>
           <tbody>
             {query.isLoading ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
                   Cargando itinerarios…
                 </td>
               </tr>
@@ -108,9 +110,19 @@ function ItinerariesDeskPage() {
                   </td>
                   <td className="p-3 tabular-nums">{row.party_size ?? "—"}</td>
                   <td className="p-3 tabular-nums">{row.items_count}</td>
+                  <td className="p-3 text-xs">
+                    {row.scheduled_count > 0 ? (
+                      <span className="text-success">
+                        Con horarios ({row.scheduled_count}/{row.items_count})
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">Sin día ni hora</span>
+                    )}
+                  </td>
                   <td className="p-3">
                     {row.status ? (PLAN_STATUS[row.status] ?? row.status) : "—"}
                   </td>
+
                   <td className="p-3">
                     {row.case_id ? (
                       <Link
@@ -128,7 +140,7 @@ function ItinerariesDeskPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
                   Todavía no hay viajes con itinerario armado.
                 </td>
               </tr>

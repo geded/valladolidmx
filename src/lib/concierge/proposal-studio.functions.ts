@@ -111,6 +111,9 @@ export interface ItineraryDeskRow {
   start_date: string | null;
   end_date: string | null;
   items_count: number;
+  /** Paradas con día u hora asignados. */
+  scheduled_count: number;
+
   updated_at: string;
 }
 
@@ -143,14 +146,18 @@ export const listConciergeItineraries = createServerFn({ method: "GET" })
     const plans = (rows ?? []) as Array<Record<string, unknown>>;
     const planIds = plans.map((p) => p["id"] as string);
     const counts = new Map<string, number>();
+    const scheduled = new Map<string, number>();
     if (planIds.length) {
       const { data: items } = await context.supabase
         .from("travel_plan_items")
-        .select("plan_id")
+        .select("plan_id, day_index, starts_at_local")
         .in("plan_id", planIds);
       for (const i of (items ?? []) as Array<Record<string, unknown>>) {
         const key = i["plan_id"] as string;
         counts.set(key, (counts.get(key) ?? 0) + 1);
+        if (i["day_index"] != null || i["starts_at_local"] != null) {
+          scheduled.set(key, (scheduled.get(key) ?? 0) + 1);
+        }
       }
     }
 
@@ -163,8 +170,10 @@ export const listConciergeItineraries = createServerFn({ method: "GET" })
       start_date: (p["start_date"] as string | null) ?? null,
       end_date: (p["end_date"] as string | null) ?? null,
       items_count: counts.get(p["id"] as string) ?? 0,
+      scheduled_count: scheduled.get(p["id"] as string) ?? 0,
       updated_at: (p["updated_at"] as string) ?? new Date().toISOString(),
     }));
+
 
     return { rows: result, total: count ?? result.length, page: data.page, pageSize: data.pageSize };
   });
@@ -188,7 +197,14 @@ export interface CaseItinerary {
   party_size: number | null;
   status: string | null;
   stops: ItineraryStop[];
+  /** Paradas con día u hora asignados. */
+  scheduled_count: number;
+  /** Propuesta vigente del expediente (para asignar y aplicar horarios). */
+  latest_proposal_id: string | null;
+  /** Partidas de esa propuesta que ya tienen día u hora. */
+  proposal_scheduled_count: number;
 }
+
 
 /** Itinerario del viaje ligado a un expediente (sólo lectura). */
 export const getCaseItinerary = createServerFn({ method: "GET" })
@@ -230,6 +246,26 @@ export const getCaseItinerary = createServerFn({ method: "GET" })
       };
     });
 
+    // Propuesta vigente del expediente: de ahí salen el día y la hora.
+    const { data: proposals } = await context.supabase
+      .from("concierge_proposals")
+      .select("id, status, created_at")
+      .eq("case_id", data.caseId)
+      .order("created_at", { ascending: false });
+    const proposalRows = (proposals ?? []) as Array<Record<string, unknown>>;
+    const current =
+      proposalRows.find((p) => p["status"] === "accepted") ?? proposalRows[0] ?? null;
+    let proposalScheduled = 0;
+    if (current) {
+      const { data: pItems } = await context.supabase
+        .from("concierge_proposal_items")
+        .select("day_index, starts_at_local")
+        .eq("proposal_id", current["id"] as string);
+      proposalScheduled = ((pItems ?? []) as Array<Record<string, unknown>>).filter(
+        (i) => i["day_index"] != null || i["starts_at_local"] != null,
+      ).length;
+    }
+
     const p = plan as Record<string, unknown>;
     return {
       plan_id: p["id"] as string,
@@ -239,7 +275,11 @@ export const getCaseItinerary = createServerFn({ method: "GET" })
       party_size: (p["party_size"] as number | null) ?? null,
       status: (p["status"] as string | null) ?? null,
       stops,
+      scheduled_count: stops.filter((s) => s.day_index != null || s.starts_at_local != null).length,
+      latest_proposal_id: current ? (current["id"] as string) : null,
+      proposal_scheduled_count: proposalScheduled,
     } satisfies CaseItinerary;
+
   });
 
 export interface AdjustmentSummary {
