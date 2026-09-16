@@ -8137,6 +8137,10 @@ export type Database = {
         Args: { _business_id: string; _limit?: number; _scope?: string }
         Returns: Json[]
       }
+      concierge_traveler_interests: {
+        Args: { _case_id: string }
+        Returns: Json
+      }
       concierge_workload_for_lead: { Args: never; Returns: Json[] }
       create_business_claim_snapshot: {
         Args: { _business_id: string; _claim_id?: string; _reason: string }
