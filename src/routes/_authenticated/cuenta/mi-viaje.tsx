@@ -63,9 +63,10 @@ import {
 } from "@/lib/traveler/travel-plans.functions";
 import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
-import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
+import { ccListMyCases } from "@/lib/concierge/cc.functions";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
+import { CaseMessages } from "@/components/concierge/CaseMessages";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
@@ -2201,9 +2202,7 @@ interface CaseSummary {
 }
 
 function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string }) {
-  const qc = useQueryClient();
   const fetchFile = useServerFn(getConciergeCaseFile);
-  const appendNote = useServerFn(ccTimelineAppend);
   const q = useQuery({
     queryKey: ["concierge", "case-file", "traveler", caseId],
     queryFn: () => fetchFile({ data: { caseId } }),
@@ -2235,27 +2234,6 @@ function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string })
     }, 80);
     return () => window.clearTimeout(id);
   }, [focus, q.data]);
-  const [note, setNote] = useState("");
-  const send = useMutation({
-    mutationFn: (summary: string) =>
-      appendNote({
-        data: {
-          caseId,
-          eventType: "traveler_note",
-          summary,
-          severity: "info",
-        },
-      }),
-    onSuccess: () => {
-      setNote("");
-      qc.invalidateQueries({ queryKey: ["concierge", "case-file", "traveler", caseId] });
-      toast.success("Nota enviada a tu concierge");
-    },
-    onError: (e) =>
-      toast.error("No se pudo enviar la nota", {
-        description: e instanceof Error ? e.message : undefined,
-      }),
-  });
   return (
     <section className="rounded-2xl border bg-card p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -2276,36 +2254,10 @@ function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string })
         </Link>
       </div>
 
-      <form
-        className="mb-5 space-y-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const t = note.trim();
-          if (t.length >= 3 && !send.isPending) send.mutate(t);
-        }}
-      >
-        <label className="text-xs font-medium text-foreground/80">
-          Enviar una nota rápida a tu concierge
-        </label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={2}
-          maxLength={1000}
-          placeholder="Ej. Preferimos comenzar el segundo día un poco más tarde…"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-        />
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{note.length}/1000</span>
-          <button
-            type="submit"
-            disabled={note.trim().length < 3 || send.isPending}
-            className="rounded-pill bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
-          >
-            {send.isPending ? "Enviando…" : "Enviar nota"}
-          </button>
-        </div>
-      </form>
+      {/* Conversación real con el concierge (misma superficie que ve el equipo). */}
+      <div className="mb-5">
+        <CaseMessages caseId={caseId} />
+      </div>
 
       {q.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando expediente…</p>
