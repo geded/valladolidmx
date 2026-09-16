@@ -152,4 +152,4 @@
 - [x] Portada: corregir apariencia del calendario "Buscar por fecha" en escritorio (elegante, alineado con DSL)
 - [x] Portada: restablecer miniaturas de eventos (acreditación de medios)
 
-- [ ] Identificar y comparar la última versión Premium aprobada de Zazil Tunich.
+- [x] Identificar y comparar la última versión Premium aprobada de Zazil Tunich.
