@@ -636,9 +636,26 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       seen.add(p.url);
       return true;
     });
+    const visible = photos.slice(0, 24);
+
+    // Contacto publicado por el titular en las páginas de origen, para pedirle
+    // permiso. Se lee sólo lo que ya está publicado; no se guarda nada.
+    const pageSet = new Set<string>();
+    if (data.website) pageSet.add(data.website);
+    for (const p of visible) {
+      if (p.provider === "Web" && p.sourceUrl?.startsWith("https://")) {
+        pageSet.add(p.sourceUrl);
+      }
+      if (pageSet.size >= 6) break;
+    }
+    const contacts = await extractOwnerContacts([...pageSet]).catch(
+      () => [] as OwnerContact[],
+    );
+
     return {
       ok: true as const,
-      photos: photos.slice(0, 24),
+      photos: visible,
+      contacts,
       usedQuery: data.query,
       relaxed: false,
     };
