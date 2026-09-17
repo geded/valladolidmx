@@ -37,7 +37,6 @@ import {
 } from "@/lib/businesses/business-copy-resolution";
 import { BUSINESS_PREMIUM_COPY_DEFAULTS } from "@/components/surfaces/business-premium-copy";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
-import { ZazilTunichPremiumSurface } from "@/routes/lovable/founder-zazil-premium-preview";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {

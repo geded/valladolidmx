@@ -273,6 +273,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
           ) : null}
 
           <div className="order-2 flex min-w-0 flex-col justify-center gap-2.5 p-5 sm:p-7 lg:order-1 lg:p-9">
+            <LandingBrandLogo entityRef={vm.entityRef} />
             {hero.eyebrow ? (
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
                 {hero.eyebrow}
