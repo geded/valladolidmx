@@ -266,6 +266,7 @@ export function HeroSearchPill({
           className={cn(
             "inline-flex size-11 min-h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-primary p-0 text-primary-foreground shadow-md",
             "sm:ml-1 sm:w-auto sm:px-3 sm:py-0",
+            hasExtras && "size-auto min-h-11 w-full basis-full px-4 py-2 sm:ml-0 sm:w-full",
             "transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
           )}
         >
