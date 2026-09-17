@@ -815,6 +815,7 @@ export function BusinessSurface({
             slug={b.slug}
             {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
           />
+          </span>
         </div>
       )}
 
