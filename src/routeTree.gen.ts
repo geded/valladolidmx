@@ -194,6 +194,7 @@ import { Route as AuthenticatedCmsRelacionadosIndexRouteImport } from './routes/
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsProductosIndexRouteImport } from './routes/_authenticated/cms/productos.index'
 import { Route as AuthenticatedCmsLugaresIndexRouteImport } from './routes/_authenticated/cms/lugares.index'
+import { Route as AuthenticatedCmsExperienciasIndexRouteImport } from './routes/_authenticated/cms/experiencias.index'
 import { Route as AuthenticatedCmsEventosIndexRouteImport } from './routes/_authenticated/cms/eventos.index'
 import { Route as AuthenticatedCmsEmpresasIndexRouteImport } from './routes/_authenticated/cms/empresas.index'
 import { Route as AuthenticatedCmsDestinosIndexRouteImport } from './routes/_authenticated/cms/destinos.index'
@@ -1309,6 +1310,12 @@ const AuthenticatedCmsLugaresIndexRoute =
     path: '/lugares/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsExperienciasIndexRoute =
+  AuthenticatedCmsExperienciasIndexRouteImport.update({
+    id: '/experiencias/',
+    path: '/experiencias/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsEventosIndexRoute =
   AuthenticatedCmsEventosIndexRouteImport.update({
     id: '/eventos/',
@@ -1968,6 +1975,7 @@ export interface FileRoutesByFullPath {
   '/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
   '/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
   '/cms/eventos/': typeof AuthenticatedCmsEventosIndexRoute
+  '/cms/experiencias/': typeof AuthenticatedCmsExperienciasIndexRoute
   '/cms/lugares/': typeof AuthenticatedCmsLugaresIndexRoute
   '/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
@@ -2215,6 +2223,7 @@ export interface FileRoutesByTo {
   '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasIndexRoute
   '/cms/eventos': typeof AuthenticatedCmsEventosIndexRoute
+  '/cms/experiencias': typeof AuthenticatedCmsExperienciasIndexRoute
   '/cms/lugares': typeof AuthenticatedCmsLugaresIndexRoute
   '/cms/productos': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
@@ -2476,6 +2485,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
   '/_authenticated/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
   '/_authenticated/cms/eventos/': typeof AuthenticatedCmsEventosIndexRoute
+  '/_authenticated/cms/experiencias/': typeof AuthenticatedCmsExperienciasIndexRoute
   '/_authenticated/cms/lugares/': typeof AuthenticatedCmsLugaresIndexRoute
   '/_authenticated/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
@@ -2737,6 +2747,7 @@ export interface FileRouteTypes {
     | '/cms/destinos/'
     | '/cms/empresas/'
     | '/cms/eventos/'
+    | '/cms/experiencias/'
     | '/cms/lugares/'
     | '/cms/productos/'
     | '/cms/regiones/'
@@ -2984,6 +2995,7 @@ export interface FileRouteTypes {
     | '/cms/destinos'
     | '/cms/empresas'
     | '/cms/eventos'
+    | '/cms/experiencias'
     | '/cms/lugares'
     | '/cms/productos'
     | '/cms/regiones'
@@ -3244,6 +3256,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/destinos/'
     | '/_authenticated/cms/empresas/'
     | '/_authenticated/cms/eventos/'
+    | '/_authenticated/cms/experiencias/'
     | '/_authenticated/cms/lugares/'
     | '/_authenticated/cms/productos/'
     | '/_authenticated/cms/regiones/'
@@ -4695,6 +4708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsLugaresIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/experiencias/': {
+      id: '/_authenticated/cms/experiencias/'
+      path: '/experiencias'
+      fullPath: '/cms/experiencias/'
+      preLoaderRoute: typeof AuthenticatedCmsExperienciasIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/eventos/': {
       id: '/_authenticated/cms/eventos/'
       path: '/eventos'
@@ -5560,6 +5580,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsDestinosIndexRoute: typeof AuthenticatedCmsDestinosIndexRoute
   AuthenticatedCmsEmpresasIndexRoute: typeof AuthenticatedCmsEmpresasIndexRoute
   AuthenticatedCmsEventosIndexRoute: typeof AuthenticatedCmsEventosIndexRoute
+  AuthenticatedCmsExperienciasIndexRoute: typeof AuthenticatedCmsExperienciasIndexRoute
   AuthenticatedCmsLugaresIndexRoute: typeof AuthenticatedCmsLugaresIndexRoute
   AuthenticatedCmsProductosIndexRoute: typeof AuthenticatedCmsProductosIndexRoute
   AuthenticatedCmsRegionesIndexRoute: typeof AuthenticatedCmsRegionesIndexRoute
@@ -5619,6 +5640,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsDestinosIndexRoute: AuthenticatedCmsDestinosIndexRoute,
   AuthenticatedCmsEmpresasIndexRoute: AuthenticatedCmsEmpresasIndexRoute,
   AuthenticatedCmsEventosIndexRoute: AuthenticatedCmsEventosIndexRoute,
+  AuthenticatedCmsExperienciasIndexRoute:
+    AuthenticatedCmsExperienciasIndexRoute,
   AuthenticatedCmsLugaresIndexRoute: AuthenticatedCmsLugaresIndexRoute,
   AuthenticatedCmsProductosIndexRoute: AuthenticatedCmsProductosIndexRoute,
   AuthenticatedCmsRegionesIndexRoute: AuthenticatedCmsRegionesIndexRoute,
