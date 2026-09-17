@@ -126,11 +126,21 @@ export function aggregatePageRows(
   let totalViews = 0;
   let totalEngaged = 0;
   let addedToPlan = 0;
+  let deepExplorers = 0;
 
   for (const row of rows) {
+    // A4 · sólo se agrega lo declarado con propósito de medición.
+    const purpose = parseConsentPurpose(row.surface);
+    if (purpose && purpose !== "measurement") continue;
     const action = actionOf(row.payload);
     if (action === "add_to_plan" || action === "favorite") {
       addedToPlan += 1;
+      visitors.add(row.subject_id);
+      continue;
+    }
+    if (action === "exploration_deepened") {
+      deepExplorers += 1;
+      visitors.add(row.subject_id);
       continue;
     }
     if (action !== "page_view" && action !== "page_engaged") continue;
