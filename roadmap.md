@@ -175,3 +175,5 @@
 - [ ] Cierre global de Governance Integrity: bloqueado por 69 artefactos/fingerprints acumulados no registrados, incluidos cambios anteriores fuera de este delta; Route Inventory 262/262 y proyecciones PASS. El linter de Lovable Cloud conserva 328 avisos globales históricos; la función nueva de ubicación no es SECURITY DEFINER y sólo puede ejecutarla el servicio interno.
 
 - [x] Logotipos de empresa: logo transparente de Zazil Tunich cargado en CMS y visible en su experiencia (ficha de Lugar pendiente de autorización).
+
+- [ ] Perfil Zazil Tunich: retirar la excepción hardcodeada `business.slug === "zazil-tunich"` en `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx` que fuerza `ZazilTunichPremiumSurface` (preview founder) en lugar de la plantilla oficial de empresa; mover esa landing a su URL de campaña `/l/<slug>` y enlazarla desde el perfil. Pendiente de autorización Founder.
