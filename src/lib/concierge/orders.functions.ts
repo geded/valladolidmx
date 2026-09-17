@@ -539,6 +539,15 @@ export const refundConciergeReservation = createServerFn({ method: "POST" })
       _amount: data.amount ?? undefined,
     });
     if (error) throw new Error(error.message);
+
+    // Aviso por correo al viajero (sólo reservaciones en línea, folio ERL).
+    try {
+      const { sendBookingTravelerEmail } = await import("@/lib/commerce/booking-emails.server");
+      await sendBookingTravelerEmail(data.orderId, "refunded");
+    } catch {
+      // El reembolso ya quedó registrado; el aviso en plataforma sigue vigente.
+    }
+
     return res as {
       ok: boolean;
       status: string;
