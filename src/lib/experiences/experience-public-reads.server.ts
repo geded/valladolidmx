@@ -214,7 +214,7 @@ export async function listExperiencesListing(
     client
       .from("products")
       .select(
-        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
+        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
       )
       .eq("product_type", "experiencia")
       .in("status", statuses)
