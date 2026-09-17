@@ -6243,6 +6243,7 @@ export type Database = {
           generates_commission: boolean
           id: string
           is_demo_seed: boolean
+          location_id: string | null
           metadata: Json
           name: string
           price_amount: number | null
@@ -6287,6 +6288,7 @@ export type Database = {
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
+          location_id?: string | null
           metadata?: Json
           name: string
           price_amount?: number | null
@@ -6331,6 +6333,7 @@ export type Database = {
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
+          location_id?: string | null
           metadata?: Json
           name?: string
           price_amount?: number | null
@@ -6368,6 +6371,13 @@ export type Database = {
             columns: ["cover_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "business_locations"
             referencedColumns: ["id"]
           },
         ]
