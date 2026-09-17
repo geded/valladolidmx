@@ -18,6 +18,7 @@ import {
   type PageType,
   type TrafficSource,
 } from "./page-signals";
+import { parseConsentPurpose } from "./session-signals";
 
 export const PAGE_PERFORMANCE_CONTRACT_VERSION = "1.0.0" as const;
 
