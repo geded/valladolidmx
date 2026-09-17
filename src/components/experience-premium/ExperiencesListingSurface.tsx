@@ -675,7 +675,7 @@ function PillDateSegment({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-label="Fecha tentativa de la experiencia"
-          className="min-w-0 bg-transparent text-xs text-foreground outline-none sm:text-[13px]"
+          className="w-full min-w-0 bg-transparent text-xs text-foreground outline-none sm:text-[13px]"
         />
       </span>
     </label>
