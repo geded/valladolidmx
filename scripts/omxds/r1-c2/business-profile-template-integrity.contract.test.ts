@@ -15,7 +15,7 @@ const routeSource = readFileSync(routePath, "utf8");
 
 describe("Ficha territorial de empresa · autoridad Premium única", () => {
   it("usa BusinessSurface como respaldo para todas las familias", () => {
-    expect(routeSource).toContain('legacy={<BusinessSurface copy={businessCopy} />}');
+    expect(routeSource).toContain("legacy={<BusinessSurface copy={businessCopy} />}");
   });
 
   it("no permite que CompositionRenderer sustituya el perfil empresarial", () => {
