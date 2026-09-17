@@ -23,6 +23,7 @@ import {
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
 import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
+import { getOrderBooking } from "@/lib/commerce/booking.functions";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
