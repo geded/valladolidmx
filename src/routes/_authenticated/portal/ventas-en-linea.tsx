@@ -342,6 +342,53 @@ function ProductDirectSaleCard({
         </div>
       </div>
 
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-border/70 bg-muted/30 p-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium">
+            {request ? (
+              <>
+                Solicitud: {DIRECT_SALE_REQUEST_LABEL[request.status]}
+                {request.decided_at ? (
+                  <span className="ml-1 font-normal text-muted-foreground">
+                    · {new Date(request.decided_at).toLocaleDateString("es-MX")}
+                  </span>
+                ) : null}
+              </>
+            ) : (
+              "Sin solicitud de venta en línea"
+            )}
+          </p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {request?.decision_note
+              ? request.decision_note
+              : pending
+                ? "Administración revisará el precio y definirá la comisión."
+                : enabled
+                  ? "La venta en línea está autorizada por Administración."
+                  : "Guarda el precio y solicita la autorización de venta en línea."}
+          </p>
+        </div>
+        {enabled ? null : pending ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => cancelMutation.mutate()}
+            disabled={cancelMutation.isPending}
+          >
+            Retirar solicitud
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            onClick={() => submitMutation.mutate()}
+            disabled={submitMutation.isPending || dirty}
+            title={dirty ? "Guarda los cambios antes de solicitar" : undefined}
+          >
+            {submitMutation.isPending ? "Enviando…" : "Solicitar venta en línea"}
+          </Button>
+        )}
+      </div>
+
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field
           label="Precio final al viajero"
