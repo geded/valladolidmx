@@ -744,6 +744,9 @@ export function BusinessSurface({
           // D-03 · La ruta territorial navegable la emite PublicShell.
           // El Hero no repite el breadcrumb decorativo.
           eyebrow: variant.eyebrow,
+          identity: businessLogoUrl ? (
+            <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
+          ) : undefined,
           title: b.display_name,
           description: b.tagline || undefined,
           media: activePremium?.cover
@@ -760,18 +763,7 @@ export function BusinessSurface({
           badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
         }}
       />
-      <div
-        className={cn(
-          "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
-          businessLogoUrl ? "justify-between" : "justify-end",
-        )}
-      >
-        {businessLogoUrl ? (
-          <span className="flex min-w-0 items-center gap-3">
-            <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
-            <span className="truncate text-sm font-semibold">{b.display_name}</span>
-          </span>
-        ) : null}
+      <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center justify-end gap-2 px-5 sm:px-8 lg:px-12">
         <span className="flex flex-wrap items-center justify-end gap-2">
           <ShareButton title={b.display_name} />
           <FavoriteButton entityKind="business" entityId={b.id} />
@@ -807,9 +799,9 @@ export function BusinessSurface({
         longitude={b.primary_location?.longitude ?? b.longitude ?? null}
       />
 
-      {/* Casa de vacaciones: la fotografía encabeza la lectura, como en las
-          fichas de alojamiento de referencia, antes de los datos. */}
-      {isImmersive && galleryDto ? (
+      {/* La galería acreditada conserva una posición única en toda ficha
+          empresarial Premium, inmediatamente después de identidad y Alux. */}
+      {galleryDto ? (
         <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24">
           <ExperienceGallery dto={galleryDto} />
         </section>
@@ -915,12 +907,6 @@ export function BusinessSurface({
       ) : infoGridDto ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
           <ExperienceInfoGrid dto={infoGridDto} />
-        </section>
-      ) : null}
-
-      {!isImmersive && galleryDto ? (
-        <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
-          <ExperienceGallery dto={galleryDto} />
         </section>
       ) : null}
 
