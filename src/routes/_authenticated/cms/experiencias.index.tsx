@@ -161,7 +161,9 @@ function ExperienciasCmsPage() {
           header: "Precio",
           render: (r) => (
             <span className="text-xs">
-              {money(r.direct_sale_price_amount ?? r.price_amount, r.direct_sale_currency)}
+              {r.direct_sale_price_amount != null
+                ? money(r.direct_sale_price_amount, r.direct_sale_currency)
+                : listPrice(r.price_amount, r.price_currency)}
             </span>
           ),
         },
