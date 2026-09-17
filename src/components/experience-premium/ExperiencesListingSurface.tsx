@@ -685,34 +685,33 @@ function ExperienceStoreCard({
 
   return (
     <article className={cn("group min-w-0", compact && "grid grid-cols-[8rem_minmax(0,1fr)] gap-3")}>
-      <a
-        href={vm.href ?? "/experiencias"}
+      <div
         className={cn(
-          "relative block overflow-hidden rounded-xl bg-muted ring-focus",
+          "relative overflow-hidden rounded-xl bg-muted",
           compact ? "h-32" : "aspect-[4/3]",
         )}
       >
-        {vm.mediaUrl ? (
-          <img
-            src={vm.mediaUrl}
-            alt={vm.mediaAlt ?? vm.name}
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
-            loading="lazy"
-          />
-        ) : (
-          <span className="grid size-full place-items-center text-xs text-muted-foreground">
-            Sin fotografía publicada
-          </span>
-        )}
+        <a href={vm.href ?? "/experiencias"} className="block size-full ring-focus">
+          {vm.mediaUrl ? (
+            <img
+              src={vm.mediaUrl}
+              alt={vm.mediaAlt ?? vm.name}
+              className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
+              loading="lazy"
+            />
+          ) : (
+            <span className="grid size-full place-items-center text-xs text-muted-foreground">
+              Sin fotografía publicada
+            </span>
+          )}
+        </a>
         {!compact && (reviewBadge || onlineSale) ? (
           <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-3 py-1 text-[10px] font-semibold uppercase shadow-soft">
             {reviewBadge ?? "Reserva en línea"}
           </span>
         ) : null}
-      </a>
-      {!compact && eligibility.eligible ? (
-        <div className="relative">
-          <div className="absolute bottom-full right-3 -translate-y-3">
+        {!compact && eligibility.eligible ? (
+          <div className="absolute right-3 top-3 rounded-pill bg-background/90 shadow-soft">
             <AddToTravelPlanButton
               kind="product"
               targetId={vm.id}
@@ -721,8 +720,8 @@ function ExperienceStoreCard({
               imageUrl={vm.mediaUrl}
             />
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <div className={cn("pt-3", compact && "flex min-w-0 flex-col justify-center pt-0")}>
         <div className="flex items-center justify-between gap-2 text-xs">
           <p className="truncate font-semibold text-primary">
