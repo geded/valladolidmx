@@ -37,7 +37,6 @@ import {
 } from "@/lib/businesses/business-copy-resolution";
 import { BUSINESS_PREMIUM_COPY_DEFAULTS } from "@/components/surfaces/business-premium-copy";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
-import { ZazilTunichPremiumSurface } from "@/routes/lovable/founder-zazil-premium-preview";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {
@@ -212,13 +211,6 @@ function EmpresaTerritorialPage() {
   // G8-R1-C2 — punto único de decisión: el resolutor canónico.
   const premiumEnabled = canonicalBinding.surface === "premium";
 
-  if (business.slug === "zazil-tunich") {
-    return (
-      <ContextEngineProvider declaration={declaration}>
-        <ZazilTunichPremiumSurface />
-      </ContextEngineProvider>
-    );
-  }
 
   /* Textos de sección editables desde el constructor. Cuando la
      composición publicada declara el bloque `vmx.business.premium`, la

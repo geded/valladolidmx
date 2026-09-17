@@ -13,7 +13,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles } from "lucide-react";
+import { Link as LinkIcon, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -68,7 +68,9 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
 
   const state = resolution.data?.state ?? "none";
   const existingId = resolution.data?.composition?.id ?? null;
+  const existingSlug = resolution.data?.composition?.slug ?? null;
   const label = resolution.data?.actionLabel ?? "Crear Landing SEO";
+  const promoPath = existingSlug ? `/l/${existingSlug}` : null;
 
   return (
     <section className="rounded-2xl border border-border bg-card p-4">
@@ -104,6 +106,42 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
           {create.isPending ? "Creando…" : label}
         </button>
       </div>
+
+      {promoPath ? (
+        <div className="mt-3 rounded-xl border border-border bg-surface p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Enlace de promoción
+          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <a
+              href={promoPath}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 break-all text-sm font-medium text-primary underline underline-offset-4 ring-focus"
+            >
+              <LinkIcon className="h-3.5 w-3.5" aria-hidden />
+              {promoPath}
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard
+                  ?.writeText(`${window.location.origin}${promoPath}`)
+                  .then(() => toast.success("Enlace copiado."))
+                  .catch(() => toast.error("No fue posible copiar el enlace."));
+              }}
+              className="rounded-pill border border-border px-3 py-1 text-xs font-medium ring-focus"
+            >
+              Copiar
+            </button>
+          </div>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            {state === "published"
+              ? "Publicada: este enlace ya es visible para buscadores y campañas."
+              : "En borrador: el enlace sólo funcionará cuando publiques la landing."}
+          </p>
+        </div>
+      ) : null}
     </section>
   );
 }
