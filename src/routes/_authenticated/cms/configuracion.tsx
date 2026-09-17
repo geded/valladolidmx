@@ -79,6 +79,20 @@ function PlatformConfigPage() {
   }, [configQ.data]);
 
   const gateway = configQ.data?.gateway;
+  const forbidden =
+    configQ.isError && (configQ.error as Error | undefined)?.message?.includes("forbidden");
+
+  if (forbidden) {
+    return (
+      <div className="mx-auto max-w-2xl py-16 text-center">
+        <h1 className="font-serif text-2xl">Configuración de la plataforma</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Esta sección es exclusiva de Administración. Pide acceso a tu administrador si necesitas
+          cambiar formas de pago, reglas de reservación o avisos.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl pb-16">
