@@ -53,6 +53,39 @@ type StoreCardVM = TourismCardVM & {
 
 const ALL = "__todas__";
 
+/** Iconos de marca realmente disponibles en `public/brand/category-icons`. */
+const CATEGORY_ICON_SLUGS = [
+  "zonas-arqueologicas",
+  "casas-de-vacaciones",
+  "vida-nocturna",
+  "gastronomia",
+  "comunidades",
+  "artesanias",
+  "promociones",
+  "restaurantes",
+  "experiencias",
+  "naturaleza",
+  "bienestar",
+  "que-hacer",
+  "destinos",
+  "eventos",
+  "cenotes",
+  "compras",
+  "cultura",
+  "hoteles",
+  "lugares",
+  "pueblos",
+  "tours",
+  "mapas",
+  "rutas",
+] as const;
+
+/** Icono de marca para la etiqueta CMS; sin coincidencia, símbolo neutro. */
+function categoryIconSlug(label: string): string | null {
+  const slug = slugify(label);
+  return CATEGORY_ICON_SLUGS.find((icon) => slug.includes(icon)) ?? null;
+}
+
 const TRAVELER_OPTIONS = ["1 persona", "2 personas", "3 personas", "4 personas", "5 o más"];
 
 const PARTY_PROMPT: Record<PartyComposition, string> = {
@@ -414,7 +447,7 @@ export function ExperiencesListingSurface({
               <CategoryTile
                 key={option.value}
                 label={option.label}
-                slug={slugify(option.value)}
+                slug={categoryIconSlug(option.label)}
                 selected={category === option.value}
                 onSelect={() => selectCategory(option.value)}
               />
@@ -595,9 +628,6 @@ function CategoryTile({
   selected: boolean;
   onSelect: () => void;
 }) {
-  /* El ícono de marca sólo se usa cuando existe; si no, la categoría se
-     presenta con el símbolo neutro del sistema (nunca un hueco roto). */
-  const [hasIcon, setHasIcon] = useState(Boolean(slug));
   return (
     <Button
       type="button"
@@ -609,12 +639,11 @@ function CategoryTile({
         selected ? "border-primary bg-primary/10 shadow-soft" : "border-border bg-card hover:bg-muted",
       )}
     >
-      {slug && hasIcon ? (
+      {slug ? (
         <img
           src={`/brand/category-icons/${slug}.png`}
           alt=""
           className="size-10 object-contain"
-          onError={() => setHasIcon(false)}
         />
       ) : (
         <span className="grid size-10 place-items-center rounded-full bg-selva/10 text-selva">
