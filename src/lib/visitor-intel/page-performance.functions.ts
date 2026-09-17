@@ -295,15 +295,26 @@ export const aggregatePagePerformance = createServerFn({ method: "POST" })
     ]);
     if (!isAdmin && !isSuper) throw new Response("Forbidden", { status: 403 });
 
+    const key = `admin|${data.window_days}|${data.page_type ?? ""}|${data.route_prefix ?? ""}|${data.limit}`;
+    const hit = cached(key);
+    if (hit) return hit;
+
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
-    const [rows, extras] = await Promise.all([
+    const [rows, extras, newSessions] = await Promise.all([
       readEvents(since, { route_prefix: data.route_prefix }),
       readFunnelExtras(since),
+      readNewSessions(since),
     ]);
     const filtered = data.page_type
       ? rows.filter((row) => parsePageSurface(row.surface)?.pageType === data.page_type)
       : rows;
-    return aggregatePageRows(filtered, data.window_days, data.limit, extras);
+    return remember(
+      key,
+      aggregatePageRows(filtered, data.window_days, data.limit, {
+        ...extras,
+        new_sessions: newSessions,
+      }),
+    );
   });
 
 const BusinessInputSchema = z.object({
@@ -338,8 +349,18 @@ export const getBusinessPagePerformance = createServerFn({ method: "POST" })
     const slug = business?.slug;
     if (!slug) throw new Response("Not found", { status: 404 });
 
+    const key = `business|${data.business_id}|${data.window_days}`;
+    const hit = cached(key);
+    if (hit) return hit;
+
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
     const rows = await readEvents(since, {});
     const own = rows.filter((row) => row.route.includes(slug));
-    return aggregatePageRows(own, data.window_days, 25, { plans_created: 0, orders_paid: 0 });
+    // A5 · k-anonimato: muestras menores a 25 sujetos no se detallan.
+    return remember(
+      key,
+      suppressSmallSample(
+        aggregatePageRows(own, data.window_days, 25, { plans_created: 0, orders_paid: 0 }),
+      ),
+    );
   });
