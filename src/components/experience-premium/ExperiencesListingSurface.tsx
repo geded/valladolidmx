@@ -14,7 +14,7 @@
  * acreditada (modo de conversión + pago en línea autorizado).
  */
 import { useEffect, useMemo, useState } from "react";
-import { Heart, List, Map as MapIcon, MapPin, Search, Sparkles, Star } from "lucide-react";
+import { List, Map as MapIcon, MapPin, Search, Star } from "lucide-react";
 
 import {
   PremiumAluxBar,
@@ -28,6 +28,7 @@ import {
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { Button } from "@/components/ui/button";
+import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
@@ -39,6 +40,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import { resolveExperienceCommerce } from "@/lib/experiences/experience-commerce";
 import { cn } from "@/lib/utils";
+import { CATEGORY_ICON_SLUGS } from "@/lib/omxds/category-icon-registry";
 
 /** Campos comerciales/territoriales reales que agrega la lectura pública. */
 type StoreCardVM = TourismCardVM & {
@@ -53,37 +55,19 @@ type StoreCardVM = TourismCardVM & {
 
 const ALL = "__todas__";
 
-/** Iconos de marca realmente disponibles en `public/brand/category-icons`. */
-const CATEGORY_ICON_SLUGS = [
-  "zonas-arqueologicas",
-  "casas-de-vacaciones",
-  "vida-nocturna",
-  "gastronomia",
-  "comunidades",
-  "artesanias",
-  "promociones",
-  "restaurantes",
-  "experiencias",
-  "naturaleza",
-  "bienestar",
-  "que-hacer",
-  "destinos",
-  "eventos",
-  "cenotes",
-  "compras",
-  "cultura",
-  "hoteles",
-  "lugares",
-  "pueblos",
-  "tours",
-  "mapas",
-  "rutas",
-] as const;
-
-/** Icono de marca para la etiqueta CMS; sin coincidencia, símbolo neutro. */
+/** Resuelve etiquetas CMS contra la autoridad iconográfica; falla cerrado. */
 function categoryIconSlug(label: string): string | null {
   const slug = slugify(label);
-  return CATEGORY_ICON_SLUGS.find((icon) => slug.includes(icon)) ?? null;
+  const aliases: Record<string, string> = {
+    experiencia: "experiencias",
+    tour: "tours",
+    evento: "eventos",
+    transporte: "rutas",
+    servicio: "que-hacer",
+    artesanal: "artesanias",
+  };
+  const exact = CATEGORY_ICON_SLUGS.find((icon) => icon === slug);
+  return exact ?? aliases[slug] ?? null;
 }
 
 const TRAVELER_OPTIONS = ["1 persona", "2 personas", "3 personas", "4 personas", "5 o más"];
@@ -334,7 +318,7 @@ export function ExperiencesListingSurface({
   const heroMedia = items.find((item) => item.mediaUrl);
 
   return (
-    <div className={cn("flex flex-col gap-9", className)}>
+    <div className={cn("flex flex-col gap-10", className)}>
       {reviewNotice ? (
         <p className="rounded-pill border border-dashed border-border bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
           {reviewNotice}
@@ -352,8 +336,8 @@ export function ExperiencesListingSurface({
         }
         caption={dto.destinationLabel ? `Experiencias en ${dto.destinationLabel}` : undefined}
         searchSlot={
-          <div className="rounded-2xl border border-border bg-background p-2 shadow-elevated">
-            <label className="block rounded-xl border border-border bg-card px-3 py-2">
+          <div className="rounded-2xl border border-border bg-background/95 p-2 shadow-elevated backdrop-blur-sm">
+            <label className="block rounded-xl px-3 py-2.5">
               <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
                 Qué quieres vivir
               </span>
@@ -365,7 +349,7 @@ export function ExperiencesListingSurface({
                 className="mt-0.5 min-h-6 w-full bg-transparent text-sm outline-none"
               />
             </label>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <div className="mt-1 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
               {destinationFacet ? (
                 <SearchSelect
                   label="Destino"
@@ -394,7 +378,7 @@ export function ExperiencesListingSurface({
                   ]}
                 />
               ) : null}
-              <label className="rounded-xl border border-border bg-card px-3 py-2">
+              <label className="bg-card px-3 py-2.5">
                 <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
                   Fecha tentativa
                 </span>
@@ -436,7 +420,7 @@ export function ExperiencesListingSurface({
             kicker="Qué quieres vivir"
             title="Explora por categoría"
           />
-          <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+          <div className="-mx-4 mt-2 flex snap-x gap-7 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:px-0">
             <CategoryTile
               label="Todas"
               slug={null}
@@ -572,7 +556,7 @@ export function ExperiencesListingSurface({
             </Button>
           </div>
         ) : view === "lista" ? (
-          <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((vm) => (
               <ExperienceStoreCard key={vm.id} vm={vm} valueLabels={attributeValueLabels} />
             ))}
@@ -597,7 +581,7 @@ function SearchSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="rounded-xl border border-border bg-card px-3 py-2">
+    <label className="bg-card px-3 py-2.5">
       <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
         {label}
       </span>
@@ -635,19 +619,17 @@ function CategoryTile({
       aria-pressed={selected}
       onClick={onSelect}
       className={cn(
-        "h-24 min-w-28 snap-start flex-col gap-2 rounded-xl border px-3 py-3 whitespace-normal",
-        selected ? "border-primary bg-primary/10 shadow-soft" : "border-border bg-card hover:bg-muted",
+        "h-24 min-w-20 snap-start flex-col gap-1 rounded-none border-x-0 border-t-0 border-b-2 bg-transparent px-1 py-2 whitespace-normal shadow-none hover:bg-transparent",
+        selected
+          ? "border-foreground text-foreground"
+          : "border-transparent text-muted-foreground hover:border-border hover:text-foreground",
       )}
     >
       {slug ? (
-        <img
-          src={`/brand/category-icons/${slug}.png`}
-          alt=""
-          className="size-10 object-contain"
-        />
+        <TourismCategoryIcon slug={slug} variant="standard" size={44} />
       ) : (
-        <span className="grid size-10 place-items-center rounded-full bg-selva/10 text-selva">
-          <Sparkles className="size-5" aria-hidden />
+        <span className="grid size-11 place-items-center font-display text-xl" aria-hidden>
+          ···
         </span>
       )}
       <span className="line-clamp-2 text-center text-xs leading-tight">{label}</span>
@@ -688,7 +670,7 @@ function ExperienceStoreCard({
       <div
         className={cn(
           "relative overflow-hidden rounded-xl bg-muted",
-          compact ? "h-32" : "aspect-[4/3]",
+          compact ? "h-32" : "aspect-[4/5]",
         )}
       >
         <a href={vm.href ?? "/experiencias"} className="block size-full ring-focus">
@@ -734,7 +716,7 @@ function ExperienceStoreCard({
           ) : null}
         </div>
         <h3
-          className={cn("mt-1 line-clamp-2 font-display leading-snug", compact ? "text-base" : "text-lg")}
+          className={cn("mt-1 line-clamp-2 font-semibold leading-snug", compact ? "text-base" : "text-[15px]")}
         >
           <a href={vm.href ?? "/experiencias"} className="ring-focus">
             {vm.name}
