@@ -615,6 +615,40 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
 
     const cover = media.find((m) => m.role === "cover") ?? media[0] ?? null;
 
+    /* Logotipo de la empresa operadora (`business_media` role `logo`).
+       Es opcional: sin logotipo acreditado la ficha conserva su composición
+       actual y jamás se inventa una imagen de marca. */
+    let businessLogoUrl: string | null = null;
+    try {
+      const { data: logoRow } = await supabase
+        .from("business_media")
+        .select("media_assets:media_assets ( storage_bucket, storage_path, status, deleted_at )")
+        .eq("business_id", String(biz.id))
+        .eq("role", "logo")
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      const logoAsset = (
+        logoRow as {
+          media_assets?: {
+            storage_bucket?: string;
+            storage_path?: string;
+            status?: string | null;
+            deleted_at?: string | null;
+          } | null;
+        } | null
+      )?.media_assets;
+      if (logoAsset?.storage_bucket && logoAsset.storage_path && !logoAsset.deleted_at) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: signedLogo } = await supabaseAdmin.storage
+          .from(logoAsset.storage_bucket)
+          .createSignedUrl(logoAsset.storage_path, 3600);
+        businessLogoUrl = signedLogo?.signedUrl ?? null;
+      }
+    } catch {
+      businessLogoUrl = null;
+    }
+
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
     const planTier = resolveBusinessPlanTier(
