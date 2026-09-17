@@ -225,6 +225,11 @@ export interface ProductBusinessContext {
     latitude: number | null;
     longitude: number | null;
   } | null;
+  /**
+   * Logotipo firmado de la empresa operadora (`business_media` role `logo`).
+   * Opcional: `null` cuando la empresa aún no lo tiene cargado en CMS.
+   */
+  logo_url?: string | null;
 }
 
 export interface ProductFaqItem {
@@ -775,6 +780,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         plan_tier: planTier,
         primary_contact: primaryContact,
         primary_location: primaryLocation,
+        logo_url: businessLogoUrl,
       },
       effective_location: primaryLocation,
       related,
