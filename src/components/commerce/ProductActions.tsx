@@ -12,7 +12,7 @@
  *  - Esquema abierto: nuevas acciones secundarias pueden agregarse sin
  *    cambios al modelo de datos (mode es texto).
  */
-import { AddToCartButton } from "@/components/commerce/AddToCartButton";
+import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
