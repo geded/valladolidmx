@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Download, RefreshCw } from "lucide-react";
 import { DirectSaleRequestsPanel } from "@/components/commerce/DirectSaleRequestsPanel";
+import { HostSettlementsPanel } from "@/components/commerce/HostSettlementsPanel";
 
 export const Route = createFileRoute("/_authenticated/cms/ventas-en-linea")({
   head: () => ({
