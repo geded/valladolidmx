@@ -128,6 +128,21 @@ export function PagePerformancePanel() {
             <Stat label="Reservas pagadas" value={snapshot.funnel.orders_paid} />
           </div>
 
+          <div className="mt-4 rounded-xl border border-border bg-card p-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Avance de personas (visitantes anónimos)
+            </h3>
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <Stat label="Sesiones nuevas" value={snapshot.journey.new_sessions} />
+              <Stat label="Exploradores" value={snapshot.journey.deep_explorers} />
+              <Stat label="Primera intención" value={snapshot.journey.anonymous_intents} />
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Hitos del recorrido, no clics: llegada, exploración profunda (varias páginas o
+              permanencia) y primera señal de interés sin cuenta.
+            </p>
+          </div>
+
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-3">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
