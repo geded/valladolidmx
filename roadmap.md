@@ -181,3 +181,5 @@
 
 - [x] Inteligencia del Visitante · profundidad anónima (CV8): sesión anónima T1, exploración profunda T3, intención anónima T4, consentimiento por propósito y k-anonimato k≥25 en lecturas agregadas.
 - [x] Inteligencia del Visitante · menús por módulo del blueprint CV8.3 (12 módulos: Embudo, Anónimos, Conversión, Travel Plans, Alux, Concierge, Empresas, Destinos, Revenue, Permanencia, Embajadores, Alertas) dentro de `/cms/visitor-intel`.
+
+- [ ] Unificar todas las fichas de empresa en la plantilla Premium aprobada y retirar el formato editorial antiguo, preservando landings SEO independientes.
