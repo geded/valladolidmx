@@ -175,6 +175,41 @@ export function resolveCanonicalEntityTemplate(
   return { ...base, canonicalFamily: null, variant: null };
 }
 
+/* ------------------------------------------------------------------ *
+ * Superficie premium de producto vendible (presentación, no familia).
+ *
+ * Los seis tipos de producto autorizados para venta en línea comparten la
+ * MISMA superficie premium aprobada (la de Experiencia). Esto NO cambia la
+ * familia, el preset ni el JSON-LD de cada tipo: sólo declara, en un único
+ * punto, qué productos renderizan con la ficha premium en vez de la
+ * superficie estándar. Fail-closed: tipo no declarado ⇒ superficie estándar.
+ * ------------------------------------------------------------------ */
+
+export const PREMIUM_PRODUCT_SURFACE_TYPES: readonly string[] = [
+  "experiencia",
+  "experiencias",
+  "experience",
+  "tour",
+  "tours",
+  "recorrido",
+  "recorridos",
+  "evento",
+  "eventos",
+  "transporte",
+  "transportes",
+  "servicio",
+  "servicios",
+  "artesanal",
+  "artesania",
+  "artesanias",
+] as const;
+
+/** `true` si el producto debe renderizar la ficha premium aprobada. */
+export function usesPremiumProductSurface(productType: string | null | undefined): boolean {
+  const slug = normalize(productType);
+  return slug.length > 0 && PREMIUM_PRODUCT_SURFACE_TYPES.includes(slug);
+}
+
 /** Preset premium acreditado por familia canónica (null si no aplica). */
 export function canonicalFamilyPresetId(family: CanonicalEntityFamily): string | null {
   if (family === "place") return PLACE_PREMIUM_TEMPLATE_ID;

@@ -244,7 +244,9 @@ function MarketplaceProductPage() {
      resolutor canónico ⇒ superficie oficial de Experiencia. El resto de
      productos conserva íntegra su ruta de render actual. */
   const isExperience =
-    canonicalBinding.family === "experience" || canonicalBinding.family === "tour";
+    canonicalBinding.family === "experience" ||
+    canonicalBinding.family === "tour" ||
+    usesPremiumProductSurface(product.product_type);
   if (isExperience) {
     const vm = buildExperienceVMFromProduct(product);
     return (
