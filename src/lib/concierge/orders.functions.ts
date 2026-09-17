@@ -367,6 +367,13 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
     } catch {
       // El pago ya quedó registrado; la confirmación de lugares se reintenta.
     }
+    // Aviso por correo al viajero (sólo reservaciones en línea, folio ERL).
+    try {
+      const { sendBookingTravelerEmail } = await import("@/lib/commerce/booking-emails.server");
+      await sendBookingTravelerEmail(data.orderId, "paid");
+    } catch {
+      // El pago ya quedó registrado; el aviso en plataforma sigue vigente.
+    }
     return res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
   });
 
