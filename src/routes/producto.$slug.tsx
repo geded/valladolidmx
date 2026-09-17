@@ -24,6 +24,7 @@ import {
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { bindProductRoute } from "@/lib/experience-builder/canonical-entity-binding";
+import { usesPremiumProductSurface } from "@/lib/experience-builder/canonical-entity-resolver";
 import {
   ProductSurface,
   ProductSurfaceContractBoundary,
