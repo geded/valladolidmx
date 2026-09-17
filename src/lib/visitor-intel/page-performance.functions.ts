@@ -197,6 +197,12 @@ export function aggregatePageRows(
       plans_created: extra.plans_created,
       orders_paid: extra.orders_paid,
     },
+    journey: {
+      new_sessions: extra.new_sessions ?? 0,
+      deep_explorers: deepExplorers,
+      anonymous_intents: addedToPlan,
+    },
+    suppressed: false,
     contract_version: PAGE_PERFORMANCE_CONTRACT_VERSION,
   };
 }
