@@ -1,17 +1,17 @@
-# Armonización Premium de listados territoriales de empresas
+# Unificación Premium de listados de empresas por categoría
 
 ## Diagnóstico confirmado
 
-La ruta `/oriente-maya/:destino/:categoria` tiene dos caminos visuales:
+La ruta `/oriente-maya/:destino/:categoria` —que lista empresas de una categoría dentro de un destino— tiene dos caminos visuales:
 
-- Las categorías asociadas en el CMS a una familia reconocida —como Hoteles y Restaurantes— usan `ListingPremiumSurfaceFromDTO` y la plantilla territorial Premium aprobada.
-- Las demás categorías —como Cenotes— caen a un render anterior de `TourismListingSurface`, con hero, filtros, tarjetas, mapa y acciones distintos.
+- Las empresas de categorías asociadas en el CMS a una familia cerrada —como Hoteles y Restaurantes— usan `ListingPremiumSurfaceFromDTO` y la plantilla territorial Premium aprobada.
+- Las empresas de las demás categorías —como Cenotes, Artesanías o Transportes— caen a un render anterior de `TourismListingSurface`, con hero, filtros, tarjetas, mapa y acciones distintos.
 
 Esta bifurcación explica por qué parecen sitios diferentes. Además, el camino anterior abre una vista rápida y añade una banda de Mi Viaje diferente, mientras el listado Premium navega directamente al perfil completo.
 
 ## Scope Gate
 
-**Cambio autorizado:** corregir los listados territoriales de categorías empresariales para que todos adopten el mismo formato aprobado que Hoteles del Oriente Maya.
+**Cambio autorizado:** corregir los listados de empresas por categoría y destino para que todos adopten el mismo formato aprobado que el listado de empresas de Hoteles del Oriente Maya.
 
 **Superficies editables:**
 
@@ -23,10 +23,10 @@ Esta bifurcación explica por qué parecen sitios diferentes. Además, el camino
 
 ## Implementación
 
-1. Evolucionar la plantilla territorial Premium existente para aceptar una categoría empresarial genérica sin crear otra superficie ni otra tarjeta.
-2. Proyectar las empresas reales del CMS al mismo formato visual de Hoteles: introducción editorial, banda de Alux, búsqueda y filtros compactos, tarjetas Premium y mapa sincronizado.
+1. Evolucionar la plantilla territorial Premium existente para aceptar cualquier categoría empresarial publicada en el CMS, sin exigir que pertenezca a una de las familias cerradas y sin crear otra superficie ni otra tarjeta.
+2. Proyectar las empresas reales de Cenotes, Artesanías, Transportes y categorías futuras al mismo formato visual ya aprobado para las empresas de Hoteles: introducción editorial, banda de Alux, búsqueda y filtros compactos, tarjetas Premium y mapa sincronizado.
 3. Conservar el título, categoría, destino, fotografías, ubicación y enlaces canónicos propios de cada categoría; no reutilizar textos ni imágenes de Hoteles.
-4. Retirar el camino visual anterior y la vista rápida exclusiva de categorías no reconocidas; las tarjetas abrirán el perfil empresarial territorial completo, igual que en Hoteles.
+4. Retirar el camino visual anterior y la vista rápida exclusiva de categorías empresariales no reconocidas; todas las tarjetas abrirán el perfil empresarial territorial completo, igual que las empresas de Hoteles.
 5. Mantener la sección existente “Sigue descubriendo” después del listado cuando tenga contenido real.
 6. Añadir una prueba que impida que una categoría empresarial vuelva a caer en un render distinto.
 
@@ -43,7 +43,7 @@ Debe permanecer sin cambios:
 
 ## Validación
 
-- Comparar `/hoteles?destino=valladolid` contra `/oriente-maya/valladolid/cenotes` y otra categoría empresarial real.
+- Comparar el listado de empresas de Hoteles contra `/oriente-maya/valladolid/cenotes` y al menos una categoría empresarial adicional, como Artesanías o Transportes si tiene datos publicados.
 - Revisar plantilla completa en 1440, 834, 430 y 390 px: header, breadcrumb, introducción, Alux, filtros, tarjetas, mapa, relacionados y footer.
 - Confirmar un solo H1, ausencia de desbordamiento y navegación correcta al perfil empresarial.
 - Ejecutar pruebas contractuales dirigidas, comprobación de tipos, Route Inventory y controles de gobernanza aplicables.
