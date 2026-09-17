@@ -192,3 +192,4 @@
 - [x] Refinar la ficha Premium empresarial sin cambiar forma ni colores de marca: logotipo ligeramente dominante junto al nombre y experiencias/productos en carrusel compacto tipo Airbnb; validado en 1440/834/430/390.
 - [x] Retirar de la ficha empresarial las tarjetas redundantes Destino/Categoría/Estado; conservar breadcrumb y contexto territorial canónico.
 - [ ] Unificar tarjetas de experiencias/servicios como acceso de descubrimiento: corazón sobre la foto y un único CTA “Ver experiencia”; reservar y agregar a Mi Viaje viven exclusivamente dentro de la ficha completa.
+- [ ] Añadir en la ficha de experiencia un regreso visible al perfil territorial de la empresa para explorar sus demás experiencias.
