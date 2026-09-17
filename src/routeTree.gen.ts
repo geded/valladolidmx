@@ -88,6 +88,7 @@ import { Route as LovableG4DestinationMicrositePreviewRouteImport } from './rout
 import { Route as LovableG4DestinationListingPremiumPreviewRouteImport } from './routes/lovable/g4-destination-listing-premium-preview'
 import { Route as LovableFounderZazilPremiumPreviewRouteImport } from './routes/lovable/founder-zazil-premium-preview'
 import { Route as LovableFounderHomePremiumPreviewRouteImport } from './routes/lovable/founder-home-premium-preview'
+import { Route as LovableExperienciasTiendaMaquetaRouteImport } from './routes/lovable/experiencias-tienda-maqueta'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
 import { Route as LovableExperienceReviewsPreviewRouteImport } from './routes/lovable/experience-reviews-preview'
 import { Route as LovableExperienceRelatedCollectionPreviewRouteImport } from './routes/lovable/experience-related-collection-preview'
@@ -692,6 +693,12 @@ const LovableFounderHomePremiumPreviewRoute =
   LovableFounderHomePremiumPreviewRouteImport.update({
     id: '/lovable/founder-home-premium-preview',
     path: '/lovable/founder-home-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableExperienciasTiendaMaquetaRoute =
+  LovableExperienciasTiendaMaquetaRouteImport.update({
+    id: '/lovable/experiencias-tienda-maqueta',
+    path: '/lovable/experiencias-tienda-maqueta',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableExperienceSubnavCtabarPreviewRoute =
@@ -1788,6 +1795,7 @@ export interface FileRoutesByFullPath {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/experiencias-tienda-maqueta': typeof LovableExperienciasTiendaMaquetaRoute
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
   '/lovable/g4-destination-listing-premium-preview': typeof LovableG4DestinationListingPremiumPreviewRoute
@@ -2039,6 +2047,7 @@ export interface FileRoutesByTo {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/experiencias-tienda-maqueta': typeof LovableExperienciasTiendaMaquetaRoute
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
   '/lovable/g4-destination-listing-premium-preview': typeof LovableG4DestinationListingPremiumPreviewRoute
@@ -2294,6 +2303,7 @@ export interface FileRoutesById {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/experiencias-tienda-maqueta': typeof LovableExperienciasTiendaMaquetaRoute
   '/lovable/founder-home-premium-preview': typeof LovableFounderHomePremiumPreviewRoute
   '/lovable/founder-zazil-premium-preview': typeof LovableFounderZazilPremiumPreviewRoute
   '/lovable/g4-destination-listing-premium-preview': typeof LovableG4DestinationListingPremiumPreviewRoute
@@ -2554,6 +2564,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/experiencias-tienda-maqueta'
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
     | '/lovable/g4-destination-listing-premium-preview'
@@ -2805,6 +2816,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/experiencias-tienda-maqueta'
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
     | '/lovable/g4-destination-listing-premium-preview'
@@ -3059,6 +3071,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/experiencias-tienda-maqueta'
     | '/lovable/founder-home-premium-preview'
     | '/lovable/founder-zazil-premium-preview'
     | '/lovable/g4-destination-listing-premium-preview'
@@ -3310,6 +3323,7 @@ export interface RootRouteChildren {
   LovableExperienceRelatedCollectionPreviewRoute: typeof LovableExperienceRelatedCollectionPreviewRoute
   LovableExperienceReviewsPreviewRoute: typeof LovableExperienceReviewsPreviewRoute
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
+  LovableExperienciasTiendaMaquetaRoute: typeof LovableExperienciasTiendaMaquetaRoute
   LovableFounderHomePremiumPreviewRoute: typeof LovableFounderHomePremiumPreviewRoute
   LovableFounderZazilPremiumPreviewRoute: typeof LovableFounderZazilPremiumPreviewRoute
   LovableG4DestinationListingPremiumPreviewRoute: typeof LovableG4DestinationListingPremiumPreviewRoute
@@ -3937,6 +3951,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/founder-home-premium-preview'
       fullPath: '/lovable/founder-home-premium-preview'
       preLoaderRoute: typeof LovableFounderHomePremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/experiencias-tienda-maqueta': {
+      id: '/lovable/experiencias-tienda-maqueta'
+      path: '/lovable/experiencias-tienda-maqueta'
+      fullPath: '/lovable/experiencias-tienda-maqueta'
+      preLoaderRoute: typeof LovableExperienciasTiendaMaquetaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/experience-subnav-ctabar-preview': {
@@ -5809,6 +5830,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableExperienceReviewsPreviewRoute: LovableExperienceReviewsPreviewRoute,
   LovableExperienceSubnavCtabarPreviewRoute:
     LovableExperienceSubnavCtabarPreviewRoute,
+  LovableExperienciasTiendaMaquetaRoute: LovableExperienciasTiendaMaquetaRoute,
   LovableFounderHomePremiumPreviewRoute: LovableFounderHomePremiumPreviewRoute,
   LovableFounderZazilPremiumPreviewRoute:
     LovableFounderZazilPremiumPreviewRoute,
