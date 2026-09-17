@@ -58,4 +58,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "booking-paid-admin": bookingPaidAdminTemplate,
   "proposal-payment-reminder": proposalPaymentReminderTemplate,
   "proposal-payment-stalled-team": proposalPaymentStalledTeamTemplate,
+  "booking-created": bookingCreatedTemplate,
+  "booking-paid": bookingPaidTemplate,
+  "booking-cancelled": bookingCancelledTemplate,
+  "booking-refunded": bookingRefundedTemplate,
 };
