@@ -23,6 +23,7 @@ import {
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
 import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
+import { getOrderBooking } from "@/lib/commerce/booking.functions";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
@@ -53,6 +54,11 @@ function CheckoutPage() {
     queryFn: () => fetchOrder({ data: { orderId } }),
   });
   const paymentsQ = useQuery({ queryKey: ["payments-ready"], queryFn: () => fetchPaymentsReady() });
+  const fetchBooking = useServerFn(getOrderBooking);
+  const bookingQ = useQuery({
+    queryKey: ["order-booking", orderId],
+    queryFn: () => fetchBooking({ data: { orderId } }),
+  });
 
   const [busy, setBusy] = useState(false);
 
@@ -223,6 +229,39 @@ function CheckoutPage() {
           <span className="font-serif text-2xl">{money(order.total_amount, order.currency)}</span>
         </div>
       </section>
+
+      {(bookingQ.data ?? []).length > 0 ? (
+        <section className="mt-6 rounded-lg border border-border bg-card p-5">
+          <h2 className="font-serif text-xl">Fecha y lugares apartados</h2>
+          <ul className="mt-3 space-y-3">
+            {(bookingQ.data ?? []).map((b) => (
+              <li key={b.hold_id} className="text-sm">
+                <p className="font-medium">
+                  {new Intl.DateTimeFormat("es-MX", {
+                    timeZone: b.timezone,
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(new Date(b.starts_at))}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {b.product_name} · {b.quantity}{" "}
+                  {b.quantity === 1 ? "persona" : "personas"} ·{" "}
+                  {b.status === "confirmed"
+                    ? "Lugares confirmados"
+                    : `Lugares apartados hasta las ${new Intl.DateTimeFormat("es-MX", {
+                        timeZone: b.timezone,
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(b.expires_at))}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {isFinal ? (
         <section className="mt-6 rounded-lg border border-border bg-muted/30 p-5">

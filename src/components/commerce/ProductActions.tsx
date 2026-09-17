@@ -12,7 +12,7 @@
  *  - Esquema abierto: nuevas acciones secundarias pueden agregarse sin
  *    cambios al modelo de datos (mode es texto).
  */
-import { AddToCartButton } from "@/components/commerce/AddToCartButton";
+import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
@@ -53,7 +53,12 @@ const SECONDARY_DEFAULT_LABEL: Record<string, string> = {
 function PrimaryButton({ product }: { product: ProductActionsProduct }) {
   const mode = product.conversion_mode || "informacion";
   if (mode === "reservar_en_linea" && product.accepts_online_payment) {
-    return <AddToCartButton productId={product.id} />;
+    return (
+      <ReserveOnlineButton
+        productId={product.id}
+        label={product.primary_action_label ?? PRIMARY_DEFAULT_LABEL["reservar_en_linea"]!}
+      />
+    );
   }
   /* `arma_tu_viaje` se materializa con el botón oficial de Mi Viaje cuando la
      tarjeta aporta el nombre CMS; sin él conserva el comportamiento previo. */
