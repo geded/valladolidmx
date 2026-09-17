@@ -332,6 +332,19 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     notes:
       "G4-PLACES · Listado contextual de Lugares dentro del destino (contexto bloqueado, cercanos separados).",
   },
+  "src/routes/_authenticated/cms/experiencias.index.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+    notes:
+      "Paso 3 · Vista comercial de experiencias vendibles (no duplica el editor de productos).",
+  },
+  "src/routes/_authenticated/cms/experiencias.$productId.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+    notes: "Paso 3 · Ficha comercial de una experiencia (lectura + accesos al editor).",
+  },
   "src/routes/_authenticated/cms/eventos.index.tsx": {
     businessPriority: "high",
     maturity: "L3",
