@@ -277,6 +277,31 @@ export function HomePremiumSurface({
           </Container>
         ) : null}
 
+        <Container className="mt-6 sm:mt-8" data-home-journey="experiencias-access">
+          <a
+            href="/experiencias"
+            className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <TourismCategoryIcon slug="experiencias" label="Experiencias" variant="standard" />
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
+                  {content.experiencias.kicker}
+                </span>
+                <span className="block truncate text-base font-semibold sm:text-lg">
+                  {content.experiencias.title}
+                </span>
+                <span className="block text-sm text-muted-foreground">
+                  {content.experiencias.description}
+                </span>
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
+              {content.experiencias.action}
+            </span>
+          </a>
+        </Container>
+
         <Container className="mt-6 sm:mt-8" data-home-journey="categories">
           {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
           <section
