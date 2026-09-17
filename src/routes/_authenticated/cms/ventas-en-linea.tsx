@@ -176,6 +176,8 @@ function DirectSalesAdminPage() {
 
       <DirectSaleRequestsPanel />
 
+      <HostSettlementsPanel />
+
       {/* KPIs */}
       <section className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <KpiCard
