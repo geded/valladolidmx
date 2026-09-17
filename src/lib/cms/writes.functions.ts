@@ -107,6 +107,7 @@ const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
     "price_currency",
     "duration_minutes",
     "capacity",
+    "location_id",
     "cover_media_id",
     "metadata",
   ],
@@ -463,11 +464,26 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       } else if (data.table === "products") {
         const { data: prod, error: prodErr } = await db
           .from("products")
-          .select("business_id")
+          .select("business_id, location_id")
           .eq("id", data.id)
           .maybeSingle();
         if (prodErr) throw prodErr;
-        businessIdToCheck = (prod?.business_id as string | null) ?? null;
+        if (prod?.location_id) {
+          const { data: productLocation, error: productLocationError } = await db
+            .from("business_locations")
+            .select("id, latitude, longitude")
+            .eq("id", prod.location_id)
+            .eq("business_id", prod.business_id)
+            .is("deleted_at", null)
+            .maybeSingle();
+          if (productLocationError) throw productLocationError;
+          if (!productLocation || productLocation.latitude == null || productLocation.longitude == null) {
+            throw new Error("Falta ubicar el punto de encuentro de la experiencia en el mapa.");
+          }
+          businessIdToCheck = null;
+        } else {
+          businessIdToCheck = (prod?.business_id as string | null) ?? null;
+        }
       }
       if (businessIdToCheck) {
         const { data: loc, error: locErr } = await db

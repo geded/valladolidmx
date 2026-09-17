@@ -229,7 +229,7 @@ export async function listExperiencesListing(
     client
       .from("products")
       .select(
-        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
+        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, location_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
       )
       .eq("product_type", "experiencia")
       .in("status", statuses)
@@ -266,10 +266,11 @@ export async function listExperiencesListing(
     ...new Set(products.map((product) => String(product.business_id)).filter(Boolean)),
   ];
   const locationByBusiness = new Map<string, { lat: number; lng: number }>();
+  const locationById = new Map<string, { lat: number; lng: number }>();
   if (businessIds.length) {
     const { data: locations } = await client
       .from("business_locations")
-      .select("business_id, latitude, longitude, is_primary")
+      .select("id, business_id, latitude, longitude, is_primary")
       .in("business_id", businessIds)
       .is("deleted_at", null)
       .order("is_primary", { ascending: false });
@@ -279,6 +280,7 @@ export async function listExperiencesListing(
       const lat = row.latitude != null ? Number(row.latitude) : null;
       const lng = row.longitude != null ? Number(row.longitude) : null;
       if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) continue;
+      locationById.set(String(row.id), { lat, lng });
       locationByBusiness.set(id, { lat, lng });
     }
   }
@@ -334,7 +336,10 @@ export async function listExperiencesListing(
         onlineSalePriceCurrency: (product.direct_sale_currency as string | null) ?? null,
         durationMinutes:
           product.duration_minutes != null ? Number(product.duration_minutes) : null,
-        coordinates: locationByBusiness.get(String(product.business_id)) ?? null,
+        coordinates:
+          (product.location_id ? locationById.get(String(product.location_id)) : null) ??
+          locationByBusiness.get(String(product.business_id)) ??
+          null,
       } as ExperienceListingItem;
     })
     .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);
@@ -402,7 +407,7 @@ export async function readExperienceReviewDetail(
   const { data: prod, error } = await client
     .from("products")
     .select(
-      "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
+      "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, location_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
     )
     .eq("slug", slug)
     .eq("product_type", "experiencia")
@@ -425,11 +430,10 @@ export async function readExperienceReviewDetail(
         .maybeSingle(),
       client
         .from("business_locations")
-        .select("label, address_line1, address_line2, latitude, longitude, is_primary")
+        .select("id, label, address_line1, address_line2, latitude, longitude, is_primary")
         .eq("business_id", row.business_id)
         .is("deleted_at", null)
-        .order("is_primary", { ascending: false })
-        .limit(1),
+        .order("is_primary", { ascending: false }),
       client
         .from("business_contacts")
         .select("contact_type, value, label, is_public, sort_order")
@@ -467,7 +471,12 @@ export async function readExperienceReviewDetail(
       : null;
 
   const cover = covers.get(String(row.id)) ?? null;
-  const loc = ((locations ?? []) as Row[])[0] ?? null;
+  const locationRows = (locations ?? []) as Row[];
+  const loc =
+    locationRows.find((location) => location.id === row.location_id) ??
+    locationRows.find((location) => location.is_primary === true) ??
+    locationRows[0] ??
+    null;
   const contact = ((contacts ?? []) as Row[])[0] ?? null;
 
   return {
@@ -540,6 +549,15 @@ export async function readExperienceReviewDetail(
           }
         : null,
     },
+    effective_location: loc
+      ? {
+          label: (loc.label as string | null) ?? null,
+          address_line1: (loc.address_line1 as string | null) ?? null,
+          address_line2: (loc.address_line2 as string | null) ?? null,
+          latitude: loc.latitude != null ? Number(loc.latitude) : null,
+          longitude: loc.longitude != null ? Number(loc.longitude) : null,
+        }
+      : null,
     related: [],
     promotions: [],
     reviews: [],
