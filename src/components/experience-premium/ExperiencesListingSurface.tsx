@@ -661,7 +661,7 @@ function PillDateSegment({
   return (
     <label
       className={cn(
-        "group relative flex min-h-12 min-w-0 flex-1 basis-[calc(50%-0.25rem)] items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:py-1.5 xl:basis-auto",
+        "group relative flex min-h-12 min-w-0 flex-1 basis-[calc(50%-0.25rem)] flex-none items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:py-1.5",
         "hover:bg-muted/60 focus-within:bg-muted/70",
       )}
     >
@@ -699,7 +699,7 @@ function PillTravelersSegment({
           type="button"
           aria-label={`Viajeros: ${value}`}
           className={cn(
-            "group relative flex min-h-12 min-w-0 flex-1 basis-[calc(50%-0.25rem)] items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:py-1.5 xl:basis-auto",
+            "group relative flex min-h-12 min-w-0 flex-1 basis-[calc(50%-0.25rem)] flex-none items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:py-1.5",
             "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
             open && "bg-muted/70",
           )}

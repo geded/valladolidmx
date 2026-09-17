@@ -158,7 +158,7 @@ export function HeroSearchPill({
               aria-label={`${destinoLabel}: ${destino?.name ?? destinoPlaceholder}`}
               className={cn(
                 "group relative flex min-h-12 min-w-0 items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:flex-[1.12] sm:px-3 sm:py-1.5",
-                hasExtras && "basis-[calc(50%-0.25rem)] flex-1",
+                hasExtras && "basis-[calc(50%-0.25rem)] flex-1 sm:flex-[unset] sm:basis-[calc(50%-0.25rem)]",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
