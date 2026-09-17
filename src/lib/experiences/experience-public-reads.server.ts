@@ -245,6 +245,29 @@ export async function listExperiencesListing(
     products.map((product) => String(product.id)),
   );
 
+  /* Ubicación real de la empresa operadora (regla Geolocation Mandatory).
+     Sólo coordenadas ya guardadas en el CMS: nunca se aproxima un punto. */
+  const businessIds = [
+    ...new Set(products.map((product) => String(product.business_id)).filter(Boolean)),
+  ];
+  const locationByBusiness = new Map<string, { lat: number; lng: number }>();
+  if (businessIds.length) {
+    const { data: locations } = await client
+      .from("business_locations")
+      .select("business_id, latitude, longitude, is_primary")
+      .in("business_id", businessIds)
+      .is("deleted_at", null)
+      .order("is_primary", { ascending: false });
+    for (const row of (locations ?? []) as Row[]) {
+      const id = String(row.business_id);
+      if (locationByBusiness.has(id)) continue;
+      const lat = row.latitude != null ? Number(row.latitude) : null;
+      const lng = row.longitude != null ? Number(row.longitude) : null;
+      if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) continue;
+      locationByBusiness.set(id, { lat, lng });
+    }
+  }
+
   const items: TourismCardVM[] = products
     .map((product) => {
       const business = (product.businesses as Row | null) ?? null;
