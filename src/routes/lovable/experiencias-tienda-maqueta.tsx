@@ -5,7 +5,7 @@
  * sólo es referencia de facilidad para descubrir por destino y categoría.
  * No modifica `/experiencias`, datos CMS, reservaciones ni pagos.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Heart, List, Map, MapPin, Search, Star } from "lucide-react";
 
@@ -22,8 +22,16 @@ import {
   PremiumEditorialHero,
   PremiumSectionHead,
 } from "@/components/home-premium/shared/PremiumShowcase";
+import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import { Button } from "@/components/ui/button";
-import type { PartyComposition } from "@/lib/traveler/party-composition";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
+import { emitAluxSignal } from "@/lib/alux/signal-emitter";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
+import {
+  PARTY_OPTIONS,
+  compositionFromPartySize,
+  type PartyComposition,
+} from "@/lib/traveler/party-composition";
 import { cn } from "@/lib/utils";
 
 const PAGE_TITLE = "Maqueta de Experiencias · Valladolid.mx";
@@ -165,6 +173,17 @@ function Page() {
   const [category, setCategory] = useState<CategorySlug>("all");
   const [destination, setDestination] = useState<Destination>("Todos los destinos");
   const [party, setParty] = useState<PartyComposition | null>(null);
+  const anonymousTrip = useAnonymousTrip();
+
+  useEffect(() => {
+    const travelers = anonymousTrip.trip?.travelerCount;
+    if (!travelers || party) return;
+    setParty(
+      (travelers.children ?? 0) > 0
+        ? "familiar"
+        : compositionFromPartySize(travelers.adults + (travelers.children ?? 0)),
+    );
+  }, [anonymousTrip.trip?.travelerCount, party]);
 
   const filtered = useMemo(
     () =>
@@ -177,6 +196,65 @@ function Page() {
   );
 
   const goToResults = () => document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
+
+  const rememberContext = (
+    kind: "territory_viewed" | "category_explored",
+    key: string,
+  ) => {
+    void emitAluxSignal({
+      kind,
+      key,
+      purpose: "continuity",
+      context: {
+        isAuthenticated: false,
+        surface: "experiences-store-review",
+        route: window.location.pathname,
+      },
+    });
+  };
+
+  const selectDestination = (value: Destination) => {
+    setDestination(value);
+    if (value !== "Todos los destinos") {
+      rememberContext("territory_viewed", value.toLocaleLowerCase("es-MX"));
+    }
+  };
+
+  const selectCategory = (value: CategorySlug) => {
+    setCategory(value);
+    if (value !== "all") rememberContext("category_explored", value);
+  };
+
+  const selectParty = (value: PartyComposition) => {
+    const option = PARTY_OPTIONS.find((item) => item.value === value);
+    if (!option) return;
+    setParty(value);
+    void anonymousTrip.setTravelerCount(
+      value === "familiar"
+        ? { adults: 2, children: 2 }
+        : { adults: option.partySize, children: 0 },
+    );
+  };
+
+  const askAlux = () => {
+    const partyLabel = PARTY_OPTIONS.find((item) => item.value === party)?.label ?? null;
+    const categoryLabel = CATEGORIES.find((item) => item.slug === category)?.label ?? null;
+    const context = [
+      destination !== "Todos los destinos" ? `Destino: ${destination}` : null,
+      category !== "all" ? `Categoría: ${categoryLabel}` : null,
+      partyLabel ? `Compañía: ${partyLabel}` : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    askAluxWithPreferenceMemory({
+      surface: "experiences-store-review",
+      ...(partyLabel ? { prompt: partyLabel } : {}),
+      hint: buildAluxStageAwareHint(
+        "Ayúdame a comparar experiencias publicadas y convertir las elegidas en una propuesta para el concierge humano.",
+        context || undefined,
+      ),
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -199,15 +277,23 @@ function Page() {
               <ExperienceSearch
                 destination={destination}
                 category={category}
-                onDestination={setDestination}
-                onCategory={setCategory}
+                onDestination={selectDestination}
+                onCategory={selectCategory}
                 onSearch={goToResults}
               />
             }
           />
 
-          <CategoryRail active={category} onSelect={setCategory} />
-          <DestinationRail active={destination} onSelect={setDestination} />
+          <PremiumAluxBar
+            question="¿Con quién vivirás esta experiencia?"
+            selectedParty={party}
+            onSelectParty={selectParty}
+            onContinue={askAlux}
+            continueLabel="Ver sugerencias de Alux"
+          />
+
+          <CategoryRail active={category} onSelect={selectCategory} />
+          <DestinationRail active={destination} onSelect={selectDestination} />
 
           <section id="resultados" aria-labelledby="resultados-title" className="scroll-mt-32">
             <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -228,13 +314,6 @@ function Page() {
             )}
           </section>
 
-          <PremiumAluxBar
-            question="Dime qué te interesa y te ayudo a comparar estas experiencias."
-            selectedParty={party}
-            onSelectParty={setParty}
-            onContinue={() => undefined}
-            continueLabel="Planear con Alux"
-          />
         </div>
       </PublicShell>
     </div>
