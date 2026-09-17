@@ -2,8 +2,8 @@
  * /cms/experiencias/$productId — Ficha comercial de una experiencia.
  *
  * Sólo lectura comercial + accesos al editor editorial existente y a las
- * solicitudes de venta en línea. El calendario y el cupo real llegan en el
- * paso 4 del plan.
+ * solicitudes de venta en línea, más el calendario de salidas y el cupo real
+ * (paso 4 del plan).
  */
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import {
   DIRECT_SALE_REQUEST_LABEL,
   listDirectSaleRequests,
 } from "@/lib/commerce/direct-sale-authorizations.functions";
+import { ExperienceInventoryPanel } from "@/components/cms/commerce/ExperienceInventoryPanel";
 
 const money = (amount: number | null | undefined, currency: string) =>
   amount == null
@@ -185,7 +186,7 @@ function ExperienciaFichaPage() {
             />
           </dl>
           <p className="mt-3 text-xs text-muted-foreground">
-            El calendario con horarios y bloqueo de lugares llega en el siguiente paso.
+            El calendario de salidas, el cupo real y los apartados se administran más abajo.
           </p>
         </Card>
 
@@ -199,6 +200,8 @@ function ExperienciaFichaPage() {
           </dl>
         </Card>
       </div>
+
+      <ExperienceInventoryPanel productId={productId} />
 
       <Card title="Ventas recientes">
         {d.recent_orders.length === 0 ? (
