@@ -156,9 +156,7 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
           subtitle: p.tagline ?? null,
         });
         const item = marketplaceProductToItem(p);
-        return lodging && item.priceAmount != null
-          ? { ...item, priceHint: "por noche" }
-          : item;
+        return lodging && item.priceAmount != null ? { ...item, priceHint: "por noche" } : item;
       });
     } else {
       baseItems = cfg.items;

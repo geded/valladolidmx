@@ -74,10 +74,7 @@ describe("Ficha territorial de empresa · autoridad Premium única", () => {
 
   it("la ficha completa permite regresar al perfil territorial de la empresa", () => {
     const experienceSource = readFileSync(
-      resolve(
-        process.cwd(),
-        "src/components/experience-premium/ExperiencePremiumSurface.tsx",
-      ),
+      resolve(process.cwd(), "src/components/experience-premium/ExperiencePremiumSurface.tsx"),
       "utf8",
     );
     expect(experienceSource).toContain("Ver perfil de {vm.operatorName}");

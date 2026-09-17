@@ -15,9 +15,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, Share2, Star } from "lucide-react";
 
-import {
-  PremiumSectionHead,
-} from "@/components/home-premium/shared/PremiumShowcase";
+import { PremiumSectionHead } from "@/components/home-premium/shared/PremiumShowcase";
 import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
 import { BusinessLogo } from "@/components/common/BusinessLogo";
 import { PremiumHero } from "@/components/premium";
@@ -61,29 +59,96 @@ export function ExperiencePremiumSurface({
   useEffect(() => registerStickyCta(), []);
   const galleryItems = [vm.cover, ...vm.gallery]
     .filter((media): media is NonNullable<typeof media> => Boolean(media))
-    .filter((media, index, all) => all.findIndex((candidate) => candidate.url === media.url) === index)
+    .filter(
+      (media, index, all) => all.findIndex((candidate) => candidate.url === media.url) === index,
+    )
     .map((media) => ({ kind: "image" as const, url: media.url, alt: media.alt }));
   const anchors = [
     { id: "resumen", label: "Resumen", iconKey: "info" },
     ...(galleryItems.length > 1 ? [{ id: "galeria", label: "Galería", iconKey: "camera" }] : []),
-    ...(vm.includes.length || vm.itinerary.length || vm.requirements.length ? [{ id: "detalles", label: "Detalles", iconKey: "badge-check" }] : []),
-    ...(vm.location?.latitude != null && vm.location.longitude != null ? [{ id: "ubicacion", label: "Ubicación", iconKey: "map-pin" }] : []),
+    ...(vm.includes.length || vm.itinerary.length || vm.requirements.length
+      ? [{ id: "detalles", label: "Detalles", iconKey: "badge-check" }]
+      : []),
+    ...(vm.location?.latitude != null && vm.location.longitude != null
+      ? [{ id: "ubicacion", label: "Ubicación", iconKey: "map-pin" }]
+      : []),
     ...(vm.reviews.length ? [{ id: "resenas", label: "Reseñas", iconKey: "star" }] : []),
   ];
   const reviewsDto: ExperienceReviewsDTO = {
-    variant: "list", heading: "Reseñas de viajeros", subheading: null,
-    emptyMessage: "Aún no hay reseñas publicadas.", columns: 2, groupBy: "none", sortBy: "recent",
+    variant: "list",
+    heading: "Reseñas de viajeros",
+    subheading: null,
+    emptyMessage: "Aún no hay reseñas publicadas.",
+    columns: 2,
+    groupBy: "none",
+    sortBy: "recent",
     ariaLabel: "Reseñas de la experiencia",
     items: vm.reviews.map((review) => ({
-      id: review.id, platform: "internal", externalUrl: null, rating: review.rating, ratingScale: 5,
-      title: review.title, body: review.body, language: review.language, publishedAt: review.published_at,
-      author: { displayName: review.author_display_name, avatarUrl: null, location: null, travelerType: review.visit_type, verified: review.verified_source !== null && review.verified_source !== "declared_visitor" },
-      helpfulCount: null, travelerType: review.visit_type, tags: [],
-      response: review.business_response ? { authorName: vm.operatorName, authorRole: null, body: review.business_response, publishedAt: review.business_response_at } : null,
-      moderationStatus: "approved", featured: false, aluxRationale: null,
+      id: review.id,
+      platform: "internal",
+      externalUrl: null,
+      rating: review.rating,
+      ratingScale: 5,
+      title: review.title,
+      body: review.body,
+      language: review.language,
+      publishedAt: review.published_at,
+      author: {
+        displayName: review.author_display_name,
+        avatarUrl: null,
+        location: null,
+        travelerType: review.visit_type,
+        verified: review.verified_source !== null && review.verified_source !== "declared_visitor",
+      },
+      helpfulCount: null,
+      travelerType: review.visit_type,
+      tags: [],
+      response: review.business_response
+        ? {
+            authorName: vm.operatorName,
+            authorRole: null,
+            body: review.business_response,
+            publishedAt: review.business_response_at,
+          }
+        : null,
+      moderationStatus: "approved",
+      featured: false,
+      aluxRationale: null,
     })),
-    aggregate: vm.reviewStats.count > 0 ? { average: vm.reviewStats.average, count: vm.reviewStats.count, distribution: { 1: vm.reviewStats.distribution["1"], 2: vm.reviewStats.distribution["2"], 3: vm.reviewStats.distribution["3"], 4: vm.reviewStats.distribution["4"], 5: vm.reviewStats.distribution["5"] }, byPlatform: [] } : null,
-    capabilities: { showAggregate: true, showAggregateDistribution: true, showByPlatform: false, showBusinessResponse: true, showTravelerType: true, showLanguage: false, showHelpful: false, showTags: false, showPlatformBadge: false, showExternalLink: false, moderationAware: true, sourceMixed: false, seoJsonLd: true, compact: false, contextAware: false, aluxRecommended: false, translateOnDemand: false },
+    aggregate:
+      vm.reviewStats.count > 0
+        ? {
+            average: vm.reviewStats.average,
+            count: vm.reviewStats.count,
+            distribution: {
+              1: vm.reviewStats.distribution["1"],
+              2: vm.reviewStats.distribution["2"],
+              3: vm.reviewStats.distribution["3"],
+              4: vm.reviewStats.distribution["4"],
+              5: vm.reviewStats.distribution["5"],
+            },
+            byPlatform: [],
+          }
+        : null,
+    capabilities: {
+      showAggregate: true,
+      showAggregateDistribution: true,
+      showByPlatform: false,
+      showBusinessResponse: true,
+      showTravelerType: true,
+      showLanguage: false,
+      showHelpful: false,
+      showTags: false,
+      showPlatformBadge: false,
+      showExternalLink: false,
+      moderationAware: true,
+      sourceMixed: false,
+      seoJsonLd: true,
+      compact: false,
+      contextAware: false,
+      aluxRecommended: false,
+      translateOnDemand: false,
+    },
     contextRefs: { productSlug: vm.slug },
   };
 
@@ -108,8 +173,22 @@ export function ExperiencePremiumSurface({
           }}
         />
         <div className="flex flex-wrap justify-end gap-2">
-          <Button type="button" variant="outline" className="min-h-11 rounded-pill" onClick={() => setShareOpen(true)}><Share2 aria-hidden /> Compartir</Button>
-          <FavoriteButton entityKind="product" entityId={vm.id} entityTitle={vm.name} entitySlug={vm.slug} entityImageUrl={vm.cover?.url} className="min-h-11 rounded-pill px-4 text-sm" />
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 rounded-pill"
+            onClick={() => setShareOpen(true)}
+          >
+            <Share2 aria-hidden /> Compartir
+          </Button>
+          <FavoriteButton
+            entityKind="product"
+            entityId={vm.id}
+            entityTitle={vm.name}
+            entitySlug={vm.slug}
+            entityImageUrl={vm.cover?.url}
+            className="min-h-11 rounded-pill px-4 text-sm"
+          />
           {tripEligibility.eligible ? (
             <AddToTravelPlanButton
               kind="product"
@@ -123,101 +202,136 @@ export function ExperiencePremiumSurface({
         </div>
         {galleryItems.length ? (
           <ExperienceGallery
-            dto={{ variant: "mosaic", heading: null, subheading: null, items: galleryItems, maxVisible: 5, aspect: "landscape", ariaLabel: `Galería de ${vm.name}`, capabilities: { lightbox: true, captions: false, video: false, panorama360: false, model3d: false, ar: false, ugc: false } }}
+            dto={{
+              variant: "mosaic",
+              heading: null,
+              subheading: null,
+              items: galleryItems,
+              maxVisible: 5,
+              aspect: "landscape",
+              ariaLabel: `Galería de ${vm.name}`,
+              capabilities: {
+                lightbox: true,
+                captions: false,
+                video: false,
+                panorama360: false,
+                model3d: false,
+                ar: false,
+                ugc: false,
+              },
+            }}
             className={galleryItems.length === 1 ? "[&>div>div]:sm:col-span-4" : undefined}
           />
         ) : (
-          <div className="grid min-h-64 place-items-center rounded-3xl border border-dashed border-border bg-muted/40 px-6 text-center text-sm text-muted-foreground">Esta experiencia aún no tiene fotografías publicadas.</div>
+          <div className="grid min-h-64 place-items-center rounded-3xl border border-dashed border-border bg-muted/40 px-6 text-center text-sm text-muted-foreground">
+            Esta experiencia aún no tiene fotografías publicadas.
+          </div>
         )}
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="min-w-0">
-          <p className="flex items-center gap-2 text-sm">
-            <BusinessLogo url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
-            <span className="min-w-0">
-              <span className="text-muted-foreground">Operada por </span>
-              {vm.operatorHref ? (
-                <Link to={vm.operatorHref} className="font-semibold hover:underline">
-                  {vm.operatorName}
-                </Link>
-              ) : (
-                <span className="font-semibold">{vm.operatorName}</span>
-              )}
-            </span>
-          </p>
-           {vm.operatorHref ? (
-             <Button asChild variant="outline" className="mt-3 min-h-11 rounded-pill">
-               <Link to={vm.operatorHref}>Ver perfil de {vm.operatorName}</Link>
-             </Button>
-           ) : null}
-          {vm.rating ? (
-            <p className="mt-2 flex items-center gap-1.5 text-sm">
-              <Star className="size-4 fill-primary text-primary" aria-hidden />
-              <span className="font-semibold">{vm.rating.value.toFixed(1)}</span>{" "}
-              <span className="text-muted-foreground">
-                · {vm.rating.count} {vm.rating.count === 1 ? "reseña" : "reseñas"} publicadas
+            <p className="flex items-center gap-2 text-sm">
+              <BusinessLogo url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
+              <span className="min-w-0">
+                <span className="text-muted-foreground">Operada por </span>
+                {vm.operatorHref ? (
+                  <Link to={vm.operatorHref} className="font-semibold hover:underline">
+                    {vm.operatorName}
+                  </Link>
+                ) : (
+                  <span className="font-semibold">{vm.operatorName}</span>
+                )}
               </span>
             </p>
-          ) : null}
+            {vm.operatorHref ? (
+              <Button asChild variant="outline" className="mt-3 min-h-11 rounded-pill">
+                <Link to={vm.operatorHref}>Ver perfil de {vm.operatorName}</Link>
+              </Button>
+            ) : null}
+            {vm.rating ? (
+              <p className="mt-2 flex items-center gap-1.5 text-sm">
+                <Star className="size-4 fill-primary text-primary" aria-hidden />
+                <span className="font-semibold">{vm.rating.value.toFixed(1)}</span>{" "}
+                <span className="text-muted-foreground">
+                  · {vm.rating.count} {vm.rating.count === 1 ? "reseña" : "reseñas"} publicadas
+                </span>
+              </p>
+            ) : null}
           </div>
           <aside className="rounded-2xl border border-border bg-card p-5 shadow-elevated lg:sticky lg:top-24">
-            {commerce.priceLabel ? <p className="font-display text-2xl">Desde {commerce.priceLabel}</p> : <p className="text-sm font-semibold">Planea esta experiencia</p>}
+            {commerce.priceLabel ? (
+              <p className="font-display text-2xl">Desde {commerce.priceLabel}</p>
+            ) : (
+              <p className="text-sm font-semibold">Planea esta experiencia</p>
+            )}
             <div className="mt-4 flex flex-col gap-2">
-            {commerce.canBookOnline ? (
-              <ReserveOnlineButton
-                productId={vm.id}
-                label={commerce.bookLabel ?? "Reservar en línea"}
-                className="min-h-11 w-full rounded-pill px-5 text-sm font-semibold"
-              />
-            ) : null}
-            {tripEligibility.eligible ? (
-              <AddToTravelPlanButton
-                kind="product"
-                targetId={vm.id}
-                title={vm.name}
-                slug={vm.slug}
-                subtitle={vm.operatorName}
-                imageUrl={vm.cover?.url ?? null}
-                variant="full"
-              />
-            ) : null}
-            {!commerce.canBookOnline && commerce.contactLabel && commerce.contactHref &&
-              (!tripEligibility.eligible || !commerce.contactLabel.toLocaleLowerCase("es-MX").includes("mi viaje")) ? (
-              <a
-                href={commerce.contactHref}
-                target={commerce.contactHref.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center justify-center rounded-pill border border-border bg-background px-5 text-sm font-semibold"
-              >
-                {commerce.contactLabel}
-              </a>
-            ) : null}
-          </div>
+              {commerce.canBookOnline ? (
+                <ReserveOnlineButton
+                  productId={vm.id}
+                  label={commerce.bookLabel ?? "Reservar en línea"}
+                  className="min-h-11 w-full rounded-pill px-5 text-sm font-semibold"
+                />
+              ) : null}
+              {tripEligibility.eligible ? (
+                <AddToTravelPlanButton
+                  kind="product"
+                  targetId={vm.id}
+                  title={vm.name}
+                  slug={vm.slug}
+                  subtitle={vm.operatorName}
+                  imageUrl={vm.cover?.url ?? null}
+                  variant="full"
+                />
+              ) : null}
+              {!commerce.canBookOnline &&
+              commerce.contactLabel &&
+              commerce.contactHref &&
+              (!tripEligibility.eligible ||
+                !commerce.contactLabel.toLocaleLowerCase("es-MX").includes("mi viaje")) ? (
+                <a
+                  href={commerce.contactHref}
+                  target={commerce.contactHref.startsWith("http") ? "_blank" : undefined}
+                  rel="noreferrer"
+                  className="inline-flex min-h-11 items-center justify-center rounded-pill border border-border bg-background px-5 text-sm font-semibold"
+                >
+                  {commerce.contactLabel}
+                </a>
+              ) : null}
+            </div>
 
-          {commerce.saleGapNotice ? (
-            <p className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-              {commerce.saleGapNotice}
-            </p>
-          ) : null}
-          <p className="mt-3 text-xs text-muted-foreground">{commerce.rationale}</p>
+            {commerce.saleGapNotice ? (
+              <p className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                {commerce.saleGapNotice}
+              </p>
+            ) : null}
+            <p className="mt-3 text-xs text-muted-foreground">{commerce.rationale}</p>
           </aside>
         </div>
       </section>
 
-      <ExperienceSubnav dto={{ anchors, variant: "underline", sticky: true, scrollOffset: 88, ariaLabel: "Secciones de la experiencia", capabilities: { scrollSpy: true, showIcons: false, collapseOnMobile: false } }} />
+      <ExperienceSubnav
+        dto={{
+          anchors,
+          variant: "underline",
+          sticky: true,
+          scrollOffset: 88,
+          ariaLabel: "Secciones de la experiencia",
+          capabilities: { scrollSpy: true, showIcons: false, collapseOnMobile: false },
+        }}
+      />
 
       <section id="resumen" data-eb-anchor className="scroll-mt-24">
         {vm.facts.length > 0 ? (
-            <dl className="mt-5 grid grid-cols-2 gap-2 border-t border-border pt-4 sm:grid-cols-3">
-              {vm.facts.slice(0, 9).map((fact) => (
-                <div key={fact.label} className="min-w-0">
-                  <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
-                    {fact.label}
-                  </dt>
-                  <dd className="mt-0.5 text-sm leading-snug">{fact.value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
+          <dl className="mt-5 grid grid-cols-2 gap-2 border-t border-border pt-4 sm:grid-cols-3">
+            {vm.facts.slice(0, 9).map((fact) => (
+              <div key={fact.label} className="min-w-0">
+                <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+                  {fact.label}
+                </dt>
+                <dd className="mt-0.5 text-sm leading-snug">{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
       </section>
 
       {aluxSlot}
@@ -235,10 +349,17 @@ export function ExperiencePremiumSurface({
         </section>
       ) : null}
 
-      {galleryItems.length > 1 ? <div id="galeria" data-eb-anchor className="scroll-mt-24" /> : null}
+      {galleryItems.length > 1 ? (
+        <div id="galeria" data-eb-anchor className="scroll-mt-24" />
+      ) : null}
 
       {vm.includes.length > 0 || vm.excludes.length > 0 ? (
-        <section id="detalles" data-eb-anchor aria-labelledby="experiencia-incluye" className="scroll-mt-24">
+        <section
+          id="detalles"
+          data-eb-anchor
+          aria-labelledby="experiencia-incluye"
+          className="scroll-mt-24"
+        >
           <PremiumSectionHead
             id="experiencia-incluye"
             kicker="Qué contempla"
@@ -335,12 +456,30 @@ export function ExperiencePremiumSurface({
       ) : null}
 
       {vm.location ? (
-        <section id="ubicacion" data-eb-anchor aria-labelledby="experiencia-ubicacion" className="scroll-mt-24">
-          {vm.location.latitude != null && vm.location.longitude != null ? <BusinessLocationBlock lat={vm.location.latitude} lng={vm.location.longitude} name={vm.location.label} addressLine1={vm.location.address} presentation="premium" layout="stacked" /> : null}
+        <section
+          id="ubicacion"
+          data-eb-anchor
+          aria-labelledby="experiencia-ubicacion"
+          className="scroll-mt-24"
+        >
+          {vm.location.latitude != null && vm.location.longitude != null ? (
+            <BusinessLocationBlock
+              lat={vm.location.latitude}
+              lng={vm.location.longitude}
+              name={vm.location.label}
+              addressLine1={vm.location.address}
+              presentation="premium"
+              layout="stacked"
+            />
+          ) : null}
         </section>
       ) : null}
 
-      {vm.reviews.length > 0 ? <section id="resenas" data-eb-anchor className="scroll-mt-24"><ExperienceReviews dto={reviewsDto} /></section> : null}
+      {vm.reviews.length > 0 ? (
+        <section id="resenas" data-eb-anchor className="scroll-mt-24">
+          <ExperienceReviews dto={reviewsDto} />
+        </section>
+      ) : null}
 
       {vm.policies.length > 0 ? (
         <section aria-labelledby="experiencia-politicas">
@@ -385,20 +524,119 @@ export function ExperiencePremiumSurface({
 
       {vm.related.length > 0 ? (
         <section aria-labelledby="experiencia-relacionadas">
-          <ExperienceRelatedCollection dto={{ variant: "carousel", entityKind: "experience", columns: 3, density: "compact", groupBy: "none", heading: "Experiencias cercanas", subheading: null, emptyMessage: "Aún no hay experiencias relacionadas.", ariaLabel: "Experiencias relacionadas", groups: [{ id: "relacionadas", entityKind: "experience", heading: null, subheading: null, emptyMessage: null, variant: "carousel", seeAllHref: null, seeAllLabel: null, items: vm.related.map((item) => ({ ...EXPERIENCE_RELATED_ITEM_V11_DEFAULTS, id: item.id, kind: "experience", title: item.name, subtitle: item.note, description: null, href: item.href, imageUrl: item.media?.url ?? null, imageAlt: item.media?.alt ?? null, meta: [], badges: [], tags: [], priceAmount: null, priceCurrency: null, dateStart: null, dateEnd: null, destinationSlug: vm.destinationSlug, categorySlug: null, rationale: null, sourceHint: "product", score: null })) }], capabilities: { showImage: true, showMeta: true, showBadges: true, showTags: false, showPrice: false, showDate: false, showRationale: false, showKindBadge: false, dedupe: true, compact: true, contextAware: false, aluxRecommended: false, aluxDynamicGroups: false, showRating: false, showDistance: false, showAvailability: false, showFavorite: true, showSecondaryAction: false, showTerritorialContext: true, showInstitutionalBadges: true, showHighlights: true }, contextRefs: { destinationSlug: vm.destinationSlug, productSlug: vm.slug } }} />
+          <ExperienceRelatedCollection
+            dto={{
+              variant: "carousel",
+              entityKind: "experience",
+              columns: 3,
+              density: "compact",
+              groupBy: "none",
+              heading: "Experiencias cercanas",
+              subheading: null,
+              emptyMessage: "Aún no hay experiencias relacionadas.",
+              ariaLabel: "Experiencias relacionadas",
+              groups: [
+                {
+                  id: "relacionadas",
+                  entityKind: "experience",
+                  heading: null,
+                  subheading: null,
+                  emptyMessage: null,
+                  variant: "carousel",
+                  seeAllHref: null,
+                  seeAllLabel: null,
+                  items: vm.related.map((item) => ({
+                    ...EXPERIENCE_RELATED_ITEM_V11_DEFAULTS,
+                    id: item.id,
+                    kind: "experience",
+                    title: item.name,
+                    subtitle: item.note,
+                    description: null,
+                    href: item.href,
+                    imageUrl: item.media?.url ?? null,
+                    imageAlt: item.media?.alt ?? null,
+                    meta: [],
+                    badges: [],
+                    tags: [],
+                    priceAmount: null,
+                    priceCurrency: null,
+                    dateStart: null,
+                    dateEnd: null,
+                    destinationSlug: vm.destinationSlug,
+                    categorySlug: null,
+                    rationale: null,
+                    sourceHint: "product",
+                    score: null,
+                  })),
+                },
+              ],
+              capabilities: {
+                showImage: true,
+                showMeta: true,
+                showBadges: true,
+                showTags: false,
+                showPrice: false,
+                showDate: false,
+                showRationale: false,
+                showKindBadge: false,
+                dedupe: true,
+                compact: true,
+                contextAware: false,
+                aluxRecommended: false,
+                aluxDynamicGroups: false,
+                showRating: false,
+                showDistance: false,
+                showAvailability: false,
+                showFavorite: true,
+                showSecondaryAction: false,
+                showTerritorialContext: true,
+                showInstitutionalBadges: true,
+                showHighlights: true,
+              },
+              contextRefs: { destinationSlug: vm.destinationSlug, productSlug: vm.slug },
+            }}
+          />
         </section>
       ) : null}
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 shadow-floating backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <div className="min-w-0">{commerce.priceLabel ? <p className="truncate text-sm font-semibold">Desde {commerce.priceLabel}</p> : <p className="text-sm font-semibold">Mi Viaje</p>}</div>
+          <div className="min-w-0">
+            {commerce.priceLabel ? (
+              <p className="truncate text-sm font-semibold">Desde {commerce.priceLabel}</p>
+            ) : (
+              <p className="text-sm font-semibold">Mi Viaje</p>
+            )}
+          </div>
           <div className="flex shrink-0 items-center gap-2">
-            {tripEligibility.eligible ? <AddToTravelPlanButton kind="product" targetId={vm.id} title={vm.name} slug={vm.slug} subtitle={vm.operatorName} imageUrl={vm.cover?.url ?? null} /> : null}
-            {commerce.canBookOnline ? <ReserveOnlineButton productId={vm.id} label={commerce.bookLabel ?? "Reservar"} className="rounded-pill" /> : null}
+            {tripEligibility.eligible ? (
+              <AddToTravelPlanButton
+                kind="product"
+                targetId={vm.id}
+                title={vm.name}
+                slug={vm.slug}
+                subtitle={vm.operatorName}
+                imageUrl={vm.cover?.url ?? null}
+              />
+            ) : null}
+            {commerce.canBookOnline ? (
+              <ReserveOnlineButton
+                productId={vm.id}
+                label={commerce.bookLabel ?? "Reservar"}
+                className="rounded-pill"
+              />
+            ) : null}
           </div>
         </div>
       </div>
-      <ShareSheet open={shareOpen} onOpenChange={setShareOpen} title={vm.name} url={typeof window !== "undefined" ? window.location.href : `/producto/${vm.slug}`} text="Descubre esta experiencia en el Oriente Maya." heading="Compartir experiencia" />
+      <ShareSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={vm.name}
+        url={typeof window !== "undefined" ? window.location.href : `/producto/${vm.slug}`}
+        text="Descubre esta experiencia en el Oriente Maya."
+        heading="Compartir experiencia"
+      />
     </div>
   );
 }
