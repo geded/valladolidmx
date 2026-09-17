@@ -271,7 +271,14 @@ export function HeroSearchPill({
           )}
         >
           <Search className="size-4" aria-hidden />
-          <span className="sr-only text-sm font-semibold sm:not-sr-only">{submitLabel}</span>
+          <span
+            className={cn(
+              "sr-only text-sm font-semibold sm:not-sr-only",
+              hasExtras && "not-sr-only",
+            )}
+          >
+            {submitLabel}
+          </span>
         </button>
       </div>
     </form>
