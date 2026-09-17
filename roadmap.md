@@ -191,4 +191,4 @@
 - [x] Unificar todas las fichas de empresa en la plantilla Premium aprobada y retirar el formato editorial antiguo, preservando landings SEO independientes. La ruta territorial usa exclusivamente `BusinessSurface`; las composiciones `biz-*` sólo pueden aportar textos compatibles y `/l/<slug>` permanece independiente.
 - [x] Refinar la ficha Premium empresarial sin cambiar forma ni colores de marca: logotipo ligeramente dominante junto al nombre y experiencias/productos en carrusel compacto tipo Airbnb; validado en 1440/834/430/390.
 - [x] Retirar de la ficha empresarial las tarjetas redundantes Destino/Categoría/Estado; conservar breadcrumb y contexto territorial canónico.
-- [ ] Unificar acciones en tarjetas de experiencias/servicios: corazón sobre la foto, “Agregar a Mi Viaje” siempre y “Reservar” sólo con autorización comercial; retirar contacto.
+- [ ] Unificar tarjetas de experiencias/servicios como acceso de descubrimiento: corazón sobre la foto y un único CTA “Ver experiencia”; reservar y agregar a Mi Viaje viven exclusivamente dentro de la ficha completa.
