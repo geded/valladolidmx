@@ -76,6 +76,7 @@ import {
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
 import { PremiumHero } from "@/components/premium";
 import { BusinessLogo } from "@/components/common/BusinessLogo";
+import { cn } from "@/lib/utils";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
