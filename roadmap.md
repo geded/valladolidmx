@@ -156,3 +156,9 @@
 
 - [ ] Reconstruir la autoridad documental de Experiencias, venta en línea y Concierge desde GitHub y el repositorio.
 - [ ] Definir el delta mínimo para administrar Experiencias desde CMS sin duplicar reservas, pagos ni operación Concierge.
+
+## Experiencias · venta en línea (Carril A)
+
+- [ ] Sección de Experiencias tipo Airbnb con reservación en línea, sobre la plantilla existente de `/experiencias` y con la marca actual (botón propio de Experiencias en el menú).
+- [ ] Alta por parte de las empresas autorizadas, eligiendo si su producto se vende en línea, se usa en Arma tu Viaje o ambos.
+- [ ] Todo lo vendido (en línea y por propuesta del concierge) llega al Centro Concierge con control, reportes y corte del día.
