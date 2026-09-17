@@ -75,6 +75,21 @@ function DirectSalesPage() {
     staleTime: 30_000,
   });
 
+  const fetchRequests = useServerFn(listDirectSaleRequests);
+  const { data: requests = [] } = useQuery({
+    queryKey: ["portal", "direct-sale-requests", businessId],
+    queryFn: () =>
+      fetchRequests({ data: { status: "all", businessId: businessId as string, limit: 200 } }),
+    enabled: Boolean(businessId),
+    staleTime: 15_000,
+  });
+
+  const latestByProduct = useMemo(() => {
+    const map = new Map<string, DirectSaleRequestRow>();
+    for (const r of requests) if (!map.has(r.product_id)) map.set(r.product_id, r);
+    return map;
+  }, [requests]);
+
   if (!businessId) {
     return (
       <EmptyState
