@@ -189,5 +189,5 @@
 - [x] Inteligencia del Visitante · menús por módulo del blueprint CV8.3 (12 módulos: Embudo, Anónimos, Conversión, Travel Plans, Alux, Concierge, Empresas, Destinos, Revenue, Permanencia, Embajadores, Alertas) dentro de `/cms/visitor-intel`.
 
 - [x] Unificar todas las fichas de empresa en la plantilla Premium aprobada y retirar el formato editorial antiguo, preservando landings SEO independientes. La ruta territorial usa exclusivamente `BusinessSurface`; las composiciones `biz-*` sólo pueden aportar textos compatibles y `/l/<slug>` permanece independiente.
-- [ ] Refinar la ficha Premium empresarial sin cambiar forma ni colores de marca: logotipo ligeramente dominante junto al nombre y experiencias/productos en carrusel compacto tipo Airbnb; validar 1440/834/430/390.
-- [ ] Retirar de la ficha empresarial las tarjetas redundantes Destino/Categoría/Estado; conservar breadcrumb y contexto territorial canónico.
+- [x] Refinar la ficha Premium empresarial sin cambiar forma ni colores de marca: logotipo ligeramente dominante junto al nombre y experiencias/productos en carrusel compacto tipo Airbnb; validado en 1440/834/430/390.
+- [x] Retirar de la ficha empresarial las tarjetas redundantes Destino/Categoría/Estado; conservar breadcrumb y contexto territorial canónico.
