@@ -39,6 +39,21 @@ import {
 } from "@/lib/experiences/experience-attributes";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
+/**
+ * Tarjeta del listado de Experiencias: el contrato turístico compartido más
+ * los datos comerciales y territoriales reales que la tienda necesita para
+ * decidir qué puede reservarse en línea y dónde se vive la experiencia.
+ */
+export type ExperienceListingItem = TourismCardVM & {
+  readonly destinationSlug: string | null;
+  readonly conversionMode: string | null;
+  readonly acceptsOnlinePayment: boolean;
+  readonly onlineSalePriceAmount: number | null;
+  readonly onlineSalePriceCurrency: string | null;
+  readonly durationMinutes: number | null;
+  readonly coordinates: { lat: number; lng: number } | null;
+};
+
 export interface ExperienceAxisDTO {
   readonly key: string;
   readonly label: string;
