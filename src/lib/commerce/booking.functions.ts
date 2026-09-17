@@ -94,7 +94,17 @@ export const startBooking = createServerFn({ method: "POST" })
       },
     );
     if (error) throw new Error(translateBookingError(error.message));
-    return res as { order_id: string; hold_id: string | null; expires_at: string | null };
+    const booking = res as { order_id: string; hold_id: string | null; expires_at: string | null };
+
+    // Aviso por correo al viajero. No bloquea la reservación si falla.
+    try {
+      const { sendBookingTravelerEmail } = await import("./booking-emails.server");
+      await sendBookingTravelerEmail(booking.order_id, "created");
+    } catch {
+      // La reservación ya quedó registrada; el aviso en plataforma sigue vigente.
+    }
+
+    return booking;
   });
 
 /** Salida apartada para una reservación (viajero dueño o equipo interno). */

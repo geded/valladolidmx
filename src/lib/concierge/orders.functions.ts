@@ -239,6 +239,14 @@ export const cancelConciergeOrder = createServerFn({ method: "POST" })
       payload: { reason: data.reason ?? null },
     });
 
+    // Aviso por correo al viajero (sólo reservaciones en línea, folio ERL).
+    try {
+      const { sendBookingTravelerEmail } = await import("@/lib/commerce/booking-emails.server");
+      await sendBookingTravelerEmail(data.orderId, "cancelled");
+    } catch {
+      // La cancelación ya quedó registrada; el aviso en plataforma sigue vigente.
+    }
+
     return { ok: true as const };
   });
 
@@ -358,6 +366,13 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
       await context.supabase.rpc("commerce_order_holds_confirm", { _order_id: data.orderId });
     } catch {
       // El pago ya quedó registrado; la confirmación de lugares se reintenta.
+    }
+    // Aviso por correo al viajero (sólo reservaciones en línea, folio ERL).
+    try {
+      const { sendBookingTravelerEmail } = await import("@/lib/commerce/booking-emails.server");
+      await sendBookingTravelerEmail(data.orderId, "paid");
+    } catch {
+      // El pago ya quedó registrado; el aviso en plataforma sigue vigente.
     }
     return res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
   });
@@ -524,6 +539,15 @@ export const refundConciergeReservation = createServerFn({ method: "POST" })
       _amount: data.amount ?? undefined,
     });
     if (error) throw new Error(error.message);
+
+    // Aviso por correo al viajero (sólo reservaciones en línea, folio ERL).
+    try {
+      const { sendBookingTravelerEmail } = await import("@/lib/commerce/booking-emails.server");
+      await sendBookingTravelerEmail(data.orderId, "refunded");
+    } catch {
+      // El reembolso ya quedó registrado; el aviso en plataforma sigue vigente.
+    }
+
     return res as {
       ok: boolean;
       status: string;

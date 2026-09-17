@@ -2534,6 +2534,10 @@ export type Database = {
           discount_amount: number
           editorial_summary: string | null
           editorial_title: string | null
+          email_booking_cancelled_at: string | null
+          email_booking_created_at: string | null
+          email_booking_paid_at: string | null
+          email_booking_refunded_at: string | null
           email_post_sent_at: string | null
           email_t14_sent_at: string | null
           email_t3_sent_at: string | null
@@ -2571,6 +2575,10 @@ export type Database = {
           discount_amount?: number
           editorial_summary?: string | null
           editorial_title?: string | null
+          email_booking_cancelled_at?: string | null
+          email_booking_created_at?: string | null
+          email_booking_paid_at?: string | null
+          email_booking_refunded_at?: string | null
           email_post_sent_at?: string | null
           email_t14_sent_at?: string | null
           email_t3_sent_at?: string | null
@@ -2608,6 +2616,10 @@ export type Database = {
           discount_amount?: number
           editorial_summary?: string | null
           editorial_title?: string | null
+          email_booking_cancelled_at?: string | null
+          email_booking_created_at?: string | null
+          email_booking_paid_at?: string | null
+          email_booking_refunded_at?: string | null
           email_post_sent_at?: string | null
           email_t14_sent_at?: string | null
           email_t3_sent_at?: string | null
@@ -8494,6 +8506,10 @@ export type Database = {
           discount_amount: number
           editorial_summary: string | null
           editorial_title: string | null
+          email_booking_cancelled_at: string | null
+          email_booking_created_at: string | null
+          email_booking_paid_at: string | null
+          email_booking_refunded_at: string | null
           email_post_sent_at: string | null
           email_t14_sent_at: string | null
           email_t3_sent_at: string | null
@@ -8544,6 +8560,10 @@ export type Database = {
           discount_amount: number
           editorial_summary: string | null
           editorial_title: string | null
+          email_booking_cancelled_at: string | null
+          email_booking_created_at: string | null
+          email_booking_paid_at: string | null
+          email_booking_refunded_at: string | null
           email_post_sent_at: string | null
           email_t14_sent_at: string | null
           email_t3_sent_at: string | null
@@ -8987,6 +9007,27 @@ export type Database = {
       get_available_modes: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["profile_mode"][]
+      }
+      get_booking_email_payload: {
+        Args: { _kind: string; _order_id: string }
+        Returns: {
+          cancelled_reason: string
+          currency: string
+          departure_starts_at: string
+          departure_timezone: string
+          destination_name: string
+          folio: string
+          items: Json
+          order_id: string
+          paid_at: string
+          refunded_amount: number
+          seats: number
+          status: string
+          total_amount: number
+          traveler_email: string
+          traveler_locale: string
+          traveler_name: string
+        }[]
       }
       get_business_active_plan: {
         Args: { _business_id: string }
