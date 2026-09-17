@@ -147,7 +147,8 @@ export function buildPageSignalEvent(input: PageSignalInput): VisitorEvent {
       ...(input.locale ? { locale: input.locale } : {}),
     },
     context: {
-      surface: `page:${input.pageType}|src:${input.source}|dev:${input.device}`,
+      // `cns:` declara el propósito del tratamiento (A4 · consentimiento).
+      surface: `page:${input.pageType}|src:${input.source}|dev:${input.device}|cns:measurement`,
       route: input.route,
     },
     intent: {
