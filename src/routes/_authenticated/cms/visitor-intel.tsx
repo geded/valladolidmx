@@ -55,6 +55,7 @@ import {
 } from "@/lib/visitor-intel/decisions";
 import { getDecisionActorAccess, proposeDecision } from "@/lib/visitor-intel/decisions.functions";
 import { PagePerformancePanel } from "@/components/visitor-intel/PagePerformancePanel";
+import { VisitorIntelModuleNav } from "@/components/visitor-intel/VisitorIntelModuleNav";
 
 export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
   validateSearch: z.object({
@@ -165,8 +166,13 @@ function VisitorIntelCenter() {
         </p>
       ) : null}
 
-      <IntelModules snapshot={q.data} loading={q.isLoading} />
-      <PagePerformancePanel />
+      <VisitorIntelModuleNav />
+      <div id="mod-conversion" className="scroll-mt-24">
+        <IntelModules snapshot={q.data} loading={q.isLoading} />
+      </div>
+      <div id="mod-embudo" className="scroll-mt-24">
+        <PagePerformancePanel />
+      </div>
       <SegmentationSection window={win} />
       <OpportunitySection window={win} />
       <PrioritizationSection window={win} />

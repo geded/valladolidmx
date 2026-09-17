@@ -17,7 +17,9 @@ import {
   type DeviceClass,
   type PageType,
   type TrafficSource,
+  parseConsentPurpose,
 } from "./page-signals";
+
 
 export const PAGE_PERFORMANCE_CONTRACT_VERSION = "1.0.0" as const;
 
@@ -47,7 +49,37 @@ export interface PagePerformanceSnapshot {
     plans_created: number;
     orders_paid: number;
   };
+  /** A1–A3 · Avance de personas (hitos de sesión), no de páginas. */
+  journey: {
+    new_sessions: number;
+    deep_explorers: number;
+    anonymous_intents: number;
+  };
+  /** A5 · true cuando la muestra es menor a `MIN_SUBJECTS_FOR_READ`. */
+  suppressed: boolean;
   contract_version: typeof PAGE_PERFORMANCE_CONTRACT_VERSION;
+}
+
+/** A5 · k-anonimato acreditado por el contrato CV8.1. */
+export const MIN_SUBJECTS_FOR_READ = 25;
+
+/** Devuelve la instantánea sin cifras cuando la muestra es insuficiente. */
+export function suppressSmallSample(
+  snapshot: PagePerformanceSnapshot,
+): PagePerformanceSnapshot {
+  if (snapshot.total_visitors >= MIN_SUBJECTS_FOR_READ) return snapshot;
+  return {
+    ...snapshot,
+    total_views: 0,
+    total_visitors: 0,
+    pages: [],
+    by_source: { campaign: 0, organic: 0, referral: 0, direct: 0 },
+    by_device: { mobile: 0, tablet: 0, desktop: 0 },
+    by_locale: {},
+    funnel: { views: 0, engaged: 0, added_to_plan: 0, plans_created: 0, orders_paid: 0 },
+    journey: { new_sessions: 0, deep_explorers: 0, anonymous_intents: 0 },
+    suppressed: true,
+  };
 }
 
 const InputSchema = z.object({
@@ -83,7 +115,7 @@ export function aggregatePageRows(
   rows: EventRow[],
   windowDays: 7 | 30 | 90,
   limit: number,
-  extra: { plans_created: number; orders_paid: number },
+  extra: { plans_created: number; orders_paid: number; new_sessions?: number },
 ): PagePerformanceSnapshot {
   const pages = new Map<
     string,
@@ -96,11 +128,21 @@ export function aggregatePageRows(
   let totalViews = 0;
   let totalEngaged = 0;
   let addedToPlan = 0;
+  let deepExplorers = 0;
 
   for (const row of rows) {
+    // A4 · sólo se agrega lo declarado con propósito de medición.
+    const purpose = parseConsentPurpose(row.surface);
+    if (purpose && purpose !== "measurement") continue;
     const action = actionOf(row.payload);
     if (action === "add_to_plan" || action === "favorite") {
       addedToPlan += 1;
+      visitors.add(row.subject_id);
+      continue;
+    }
+    if (action === "exploration_deepened") {
+      deepExplorers += 1;
+      visitors.add(row.subject_id);
       continue;
     }
     if (action !== "page_view" && action !== "page_engaged") continue;
@@ -157,6 +199,12 @@ export function aggregatePageRows(
       plans_created: extra.plans_created,
       orders_paid: extra.orders_paid,
     },
+    journey: {
+      new_sessions: extra.new_sessions ?? 0,
+      deep_explorers: deepExplorers,
+      anonymous_intents: addedToPlan,
+    },
+    suppressed: false,
     contract_version: PAGE_PERFORMANCE_CONTRACT_VERSION,
   };
 }
@@ -183,6 +231,35 @@ async function readEvents(
     throw new Response("Read failed", { status: 500 });
   }
   return data ?? [];
+}
+
+/** A1 · Sesiones anónimas nuevas (transición T1) dentro de la ventana. */
+async function readNewSessions(since: string): Promise<number> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count } = (await (supabaseAdmin as any)
+    .schema("visitor_intel")
+    .from("events")
+    .select("event_id", { count: "exact", head: true })
+    .eq("kind", "journey.transition")
+    .gte("occurred_at", since)) as { count: number | null };
+  return count ?? 0;
+}
+
+/** A7 · Caché corta de lectura; siempre reemplazable por recálculo. */
+const readCache = new Map<string, { at: number; snapshot: PagePerformanceSnapshot }>();
+const CACHE_TTL_MS = 60_000;
+
+function cached(key: string): PagePerformanceSnapshot | null {
+  const hit = readCache.get(key);
+  if (!hit || Date.now() - hit.at > CACHE_TTL_MS) return null;
+  return hit.snapshot;
+}
+
+function remember(key: string, snapshot: PagePerformanceSnapshot): PagePerformanceSnapshot {
+  readCache.set(key, { at: Date.now(), snapshot });
+  if (readCache.size > 200) readCache.clear();
+  return snapshot;
 }
 
 async function readFunnelExtras(since: string): Promise<{
@@ -218,15 +295,26 @@ export const aggregatePagePerformance = createServerFn({ method: "POST" })
     ]);
     if (!isAdmin && !isSuper) throw new Response("Forbidden", { status: 403 });
 
+    const key = `admin|${data.window_days}|${data.page_type ?? ""}|${data.route_prefix ?? ""}|${data.limit}`;
+    const hit = cached(key);
+    if (hit) return hit;
+
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
-    const [rows, extras] = await Promise.all([
+    const [rows, extras, newSessions] = await Promise.all([
       readEvents(since, { route_prefix: data.route_prefix }),
       readFunnelExtras(since),
+      readNewSessions(since),
     ]);
     const filtered = data.page_type
       ? rows.filter((row) => parsePageSurface(row.surface)?.pageType === data.page_type)
       : rows;
-    return aggregatePageRows(filtered, data.window_days, data.limit, extras);
+    return remember(
+      key,
+      aggregatePageRows(filtered, data.window_days, data.limit, {
+        ...extras,
+        new_sessions: newSessions,
+      }),
+    );
   });
 
 const BusinessInputSchema = z.object({
@@ -261,8 +349,18 @@ export const getBusinessPagePerformance = createServerFn({ method: "POST" })
     const slug = business?.slug;
     if (!slug) throw new Response("Not found", { status: 404 });
 
+    const key = `business|${data.business_id}|${data.window_days}`;
+    const hit = cached(key);
+    if (hit) return hit;
+
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
     const rows = await readEvents(since, {});
     const own = rows.filter((row) => row.route.includes(slug));
-    return aggregatePageRows(own, data.window_days, 25, { plans_created: 0, orders_paid: 0 });
+    // A5 · k-anonimato: muestras menores a 25 sujetos no se detallan.
+    return remember(
+      key,
+      suppressSmallSample(
+        aggregatePageRows(own, data.window_days, 25, { plans_created: 0, orders_paid: 0 }),
+      ),
+    );
   });

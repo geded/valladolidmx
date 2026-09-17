@@ -45,6 +45,11 @@ export function BusinessPagePerformancePanel({
         <p className="mt-3 text-sm text-muted-foreground">Calculando…</p>
       ) : query.isError ? (
         <p className="mt-3 text-sm text-destructive">No fue posible leer las visitas.</p>
+      ) : snapshot?.suppressed ? (
+        <p className="mt-3 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
+          Muestra insuficiente: para proteger la privacidad de las personas, las cifras se
+          muestran a partir de 25 visitantes en el periodo.
+        </p>
       ) : !snapshot || snapshot.total_views === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
           Aún sin visitas registradas en este periodo.

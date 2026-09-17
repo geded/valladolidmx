@@ -147,7 +147,8 @@ export function buildPageSignalEvent(input: PageSignalInput): VisitorEvent {
       ...(input.locale ? { locale: input.locale } : {}),
     },
     context: {
-      surface: `page:${input.pageType}|src:${input.source}|dev:${input.device}`,
+      // `cns:` declara el propósito del tratamiento (A4 · consentimiento).
+      surface: `page:${input.pageType}|src:${input.source}|dev:${input.device}|cns:measurement`,
       route: input.route,
     },
     intent: {
@@ -159,13 +160,28 @@ export function buildPageSignalEvent(input: PageSignalInput): VisitorEvent {
   } as VisitorEvent;
 }
 
+
+/** A4 · Propósitos declarables del tratamiento. */
+export const CONSENT_PURPOSES = ["measurement", "personalization"] as const;
+export type ConsentPurpose = (typeof CONSENT_PURPOSES)[number];
+
+/** Lee el propósito declarado en el contexto (`|cns:...`). */
+export function parseConsentPurpose(surface: string): ConsentPurpose | null {
+  const match = /\|cns:([a-z_]+)/.exec(surface);
+  if (!match) return null;
+  const value = match[1];
+  return (CONSENT_PURPOSES as readonly string[]).includes(value)
+    ? (value as ConsentPurpose)
+    : null;
+}
+
 /** Lee del contexto codificado en `surface` (lectura del monitor). */
 export function parsePageSurface(surface: string): {
   pageType: PageType;
   source: TrafficSource;
   device: DeviceClass;
 } | null {
-  const match = /^page:([a-z_]+)\|src:([a-z]+)\|dev:([a-z]+)$/.exec(surface);
+  const match = /^page:([a-z_]+)\|src:([a-z]+)\|dev:([a-z]+)(?:\|cns:[a-z_]+)?$/.exec(surface);
   if (!match) return null;
   const [, pageType, source, device] = match;
   if (!(PAGE_TYPES as readonly string[]).includes(pageType)) return null;
