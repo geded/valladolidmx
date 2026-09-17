@@ -163,4 +163,4 @@
 - [ ] Alta por parte de las empresas autorizadas, eligiendo si su producto se vende en línea, se usa en Arma tu Viaje o ambos.
 - [ ] Todo lo vendido (en línea y por propuesta del concierge) llega al Centro Concierge con control, reportes y corte del día.
 
-- [ ] Botón/acceso propio de Experiencias: portada, exploración por categorías y menú (normal y hamburguesa).
+- [x] Botón/acceso propio de Experiencias: acceso destacado en portada (antes de la rejilla de categorías); ya existía en rejilla de categorías, buscador, menú normal y hamburguesa.

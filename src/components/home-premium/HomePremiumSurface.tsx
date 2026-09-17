@@ -29,6 +29,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
+import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { useHeroAutoplay } from "@/components/premium/use-hero-autoplay";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -276,6 +277,31 @@ export function HomePremiumSurface({
             <div data-cinematic-section={cinematic || undefined}>{renderSection("destinos")}</div>
           </Container>
         ) : null}
+
+        <Container className="mt-6 sm:mt-8" data-home-journey="experiencias-access">
+          <a
+            href="/experiencias"
+            className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <TourismCategoryIcon slug="experiencias" variant="standard" />
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
+                  {content.experiencias.kicker}
+                </span>
+                <span className="block text-base font-semibold sm:truncate sm:text-lg">
+                  {content.experiencias.title}
+                </span>
+                <span className="block text-sm text-muted-foreground">
+                  {content.experiencias.description}
+                </span>
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
+              {content.experiencias.action}
+            </span>
+          </a>
+        </Container>
 
         <Container className="mt-6 sm:mt-8" data-home-journey="categories">
           {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
