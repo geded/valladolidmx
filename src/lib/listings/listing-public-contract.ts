@@ -40,6 +40,7 @@ export const LISTING_FAMILY_IDS = [
   "lugares",
   "casas-de-vacaciones",
   "que-hacer",
+  "empresas",
 ] as const;
 
 export type ListingFamilyId = (typeof LISTING_FAMILY_IDS)[number];
@@ -187,6 +188,25 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     },
     emptyMessage:
       "Aún estamos armando ideas editoriales. Explora destinos y eventos del Oriente Maya.",
+  },
+  /* Familia genérica de empresas por categoría del CMS. Permite que
+     cualquier categoría publicada (cenotes, artesanías, transporte…)
+     use la MISMA autoridad Premium de los listados aprobados, sin
+     crear superficies paralelas ni degradar a un render anterior.
+     La ruta siempre entrega `categorySlugs` explícitos. */
+  empresas: {
+    id: "empresas",
+    label: "Empresas",
+    route: "/oriente-maya",
+    source: "businesses",
+    categorySlugs: [],
+    forcedCategorySlug: null,
+    hero: {
+      eyebrow: "Descubre el Oriente Maya",
+      title: "Empresas",
+      subtitle: "Negocios verificados del Oriente Maya de Yucatán.",
+    },
+    emptyMessage: "Aún no hay empresas publicadas en esta categoría.",
   },
 };
 

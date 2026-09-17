@@ -703,6 +703,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
   "src/routes/oriente-maya/$destino.$categoria.$empresa.tsx",
   "src/routes/oriente-maya/$destino.$categoria.index.tsx",
+  "src/routes/oriente-maya/categoria.$categoria.tsx",
   "src/routes/oriente-maya/$destino.$categoria.tsx",
   "src/routes/oriente-maya/$destino.index.tsx",
   "src/routes/oriente-maya/$destino.lugares.$slug.tsx",

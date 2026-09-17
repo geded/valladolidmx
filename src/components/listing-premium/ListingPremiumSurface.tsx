@@ -21,7 +21,10 @@ import {
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
-import { TerritorialListingReviewSurface } from "./TerritorialListingReviewSurface";
+import {
+  TerritorialListingReviewSurface,
+  type TerritorialListingProfileOverride,
+} from "./TerritorialListingReviewSurface";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
@@ -154,6 +157,8 @@ export interface ListingPremiumSurfaceFromDTOProps {
   nearbyItems?: readonly TourismCardVM[];
   /** Contexto territorial bloqueado del listado contextual. */
   lockedDestinationLabel?: string | null;
+  /** Copy de la categoría activa para la familia genérica de empresas. */
+  profileOverride?: TerritorialListingProfileOverride;
 }
 
 /**
@@ -172,6 +177,7 @@ export function ListingPremiumSurfaceFromDTO({
   className,
   nearbyItems,
   lockedDestinationLabel,
+  profileOverride,
 }: ListingPremiumSurfaceFromDTOProps) {
   // Perfiles visuales aprobados dentro de la única entrada canónica. Comparten
   // el mismo PublicListingDTO, mapa, Alux, Mi Viaje y expediente de concierge;
@@ -183,7 +189,8 @@ export function ListingPremiumSurfaceFromDTO({
     dto.family === "casas-de-vacaciones" ||
     dto.family === "eventos" ||
     dto.family === "lugares" ||
-    dto.family === "que-hacer"
+    dto.family === "que-hacer" ||
+    dto.family === "empresas"
   ) {
     return (
       <TerritorialListingReviewSurface
@@ -196,6 +203,7 @@ export function ListingPremiumSurfaceFromDTO({
             | "eventos"
             | "lugares"
             | "que-hacer"
+            | "empresas"
         }
         dto={dto}
         titleOverride={titleOverride}
@@ -203,6 +211,7 @@ export function ListingPremiumSurfaceFromDTO({
         facets={facets}
         nearbyItems={nearbyItems}
         lockedDestinationLabel={lockedDestinationLabel}
+        profileOverride={profileOverride}
       />
     );
   }
