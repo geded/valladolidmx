@@ -178,3 +178,6 @@
 
 - [x] Perfil Zazil Tunich: retirada la excepción hardcodeada `business.slug === "zazil-tunich"`; el perfil vuelve a la plantilla oficial de empresa con logotipo. Landing de promoción vive en `/l/<slug>` (Experience Builder) y su enlace se muestra en el panel "Landing SEO premium" del editor de empresa. Logotipo acreditado también en el hero de la landing (`LandingBrandLogo`, fail-closed).
 - [ ] Publicar la Landing SEO de Zazil Tunich (`landing-business-zazil-tunich`, hoy borrador) — pendiente de autorización Founder.
+
+- [ ] Inteligencia del Visitante · profundidad anónima (CV8): sesión anónima T1, exploración profunda T3, intención anónima T4, consentimiento por propósito y k-anonimato k≥25 en lecturas agregadas.
+- [ ] Inteligencia del Visitante · menús por módulo del blueprint CV8.3 (12 módulos: Embudo, Anónimos, Conversión, Travel Plans, Alux, Concierge, Empresas, Destinos, Revenue, Permanencia, Embajadores, Alertas) dentro de `/cms/visitor-intel`.
