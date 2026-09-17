@@ -29,6 +29,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
+import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { useHeroAutoplay } from "@/components/premium/use-hero-autoplay";
 import { SiteHeader } from "@/components/layout/SiteHeader";
