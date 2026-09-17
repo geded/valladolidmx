@@ -71,6 +71,8 @@ function CategoriaRegionalPage() {
     >
       <ListingPremiumSurfaceFromDTO
         dto={dto}
+        titleOverride={dto.hero.title}
+        subtitleOverride={dto.hero.subtitle}
         facets={facets}
         showAddToTrip
         showFavorite
