@@ -36,4 +36,15 @@ describe("Ficha territorial de empresa · autoridad Premium única", () => {
     expect(surfaceSource).not.toContain("import { ExperienceHero }");
     expect(surfaceSource).toContain("const usesApprovedFamilyTemplate = true;");
   });
+
+  it("integra el logo en el hero sin repetir el nombre debajo", () => {
+    const surfaceSource = readFileSync(
+      resolve(process.cwd(), "src/components/surfaces/BusinessSurface.tsx"),
+      "utf8",
+    );
+    expect(surfaceSource).toContain("identity: businessLogoUrl ? (");
+    expect(surfaceSource).not.toContain(
+      '<span className="truncate text-sm font-semibold">{b.display_name}</span>',
+    );
+  });
 });

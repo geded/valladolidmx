@@ -35,9 +35,12 @@ export function PremiumHero({
                 {vm.eyebrow}
               </p>
             ) : null}
-            <h1 className="mt-3 text-balance font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              {vm.title}
-            </h1>
+            <div className="mt-3 flex min-w-0 items-center gap-4 sm:gap-5">
+              {vm.identity ? <span className="shrink-0">{vm.identity}</span> : null}
+              <h1 className="min-w-0 text-balance font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-6xl">
+                {vm.title}
+              </h1>
+            </div>
             {vm.description ? (
               <p className="mt-4 max-w-xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
                 {vm.description}

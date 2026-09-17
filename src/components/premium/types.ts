@@ -13,6 +13,8 @@ export type PremiumHeroVM = {
   presentation: PremiumPresentation;
   crumbs?: CrumbVM[];
   eyebrow?: string;
+  /** Identidad acreditada que acompaña al nombre, por ejemplo el logo empresarial. */
+  identity?: ReactNode;
   title: string;
   description?: string;
   media?: MediaVM | null;
