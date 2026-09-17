@@ -1719,6 +1719,306 @@ export type Database = {
           },
         ]
       }
+      commerce_blackouts: {
+        Row: {
+          business_id: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          product_id: string | null
+          reason: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          product_id?: string | null
+          reason: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          product_id?: string | null
+          reason?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_blackouts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "commerce_blackouts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_blackouts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_departures: {
+        Row: {
+          capacity_reservable: number
+          capacity_total: number
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          notes: string | null
+          product_id: string
+          starts_at: string
+          status: string
+          template_id: string | null
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          capacity_reservable: number
+          capacity_total: number
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          notes?: string | null
+          product_id: string
+          starts_at: string
+          status?: string
+          template_id?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          capacity_reservable?: number
+          capacity_total?: number
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          product_id?: string
+          starts_at?: string
+          status?: string
+          template_id?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_departures_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_departures_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_schedule_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_inventory_adjustments: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delta: number
+          departure_id: string
+          id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delta: number
+          departure_id: string
+          id?: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delta?: number
+          departure_id?: string
+          id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_inventory_adjustments_departure_id_fkey"
+            columns: ["departure_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_departures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_reservation_holds: {
+        Row: {
+          created_at: string
+          departure_id: string
+          expires_at: string
+          id: string
+          idempotency_key: string
+          order_id: string | null
+          product_id: string
+          quantity: number
+          released_reason: string | null
+          status: string
+          traveler_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          departure_id: string
+          expires_at: string
+          id?: string
+          idempotency_key: string
+          order_id?: string | null
+          product_id: string
+          quantity: number
+          released_reason?: string | null
+          status?: string
+          traveler_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          departure_id?: string
+          expires_at?: string
+          id?: string
+          idempotency_key?: string
+          order_id?: string | null
+          product_id?: string
+          quantity?: number
+          released_reason?: string | null
+          status?: string
+          traveler_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_reservation_holds_departure_id_fkey"
+            columns: ["departure_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_departures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_reservation_holds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_reservation_holds_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_schedule_templates: {
+        Row: {
+          active: boolean
+          capacity_reservable: number | null
+          capacity_total: number
+          created_at: string
+          created_by: string | null
+          cutoff_minutes: number
+          duration_minutes: number
+          id: string
+          label: string | null
+          max_participants: number | null
+          min_lead_hours: number
+          min_participants: number
+          product_id: string
+          sale_horizon_days: number
+          start_times: string[]
+          timezone: string
+          updated_at: string
+          valid_from: string
+          valid_until: string | null
+          weekdays: number[]
+        }
+        Insert: {
+          active?: boolean
+          capacity_reservable?: number | null
+          capacity_total?: number
+          created_at?: string
+          created_by?: string | null
+          cutoff_minutes?: number
+          duration_minutes?: number
+          id?: string
+          label?: string | null
+          max_participants?: number | null
+          min_lead_hours?: number
+          min_participants?: number
+          product_id: string
+          sale_horizon_days?: number
+          start_times: string[]
+          timezone?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          weekdays?: number[]
+        }
+        Update: {
+          active?: boolean
+          capacity_reservable?: number | null
+          capacity_total?: number
+          created_at?: string
+          created_by?: string | null
+          cutoff_minutes?: number
+          duration_minutes?: number
+          id?: string
+          label?: string | null
+          max_participants?: number | null
+          min_lead_hours?: number
+          min_participants?: number
+          product_id?: string
+          sale_horizon_days?: number
+          start_times?: string[]
+          timezone?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_schedule_templates_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       composition_preview_tokens: {
         Row: {
           composition_id: string
@@ -7889,6 +8189,82 @@ export type Database = {
       claim_business: {
         Args: { _business_id: string; _notes?: string }
         Returns: string
+      }
+      commerce_can_view_product_inventory: {
+        Args: { _product_id: string; _user_id: string }
+        Returns: boolean
+      }
+      commerce_departure_adjust: {
+        Args: { _delta: number; _departure_id: string; _reason: string }
+        Returns: string
+      }
+      commerce_departure_availability: {
+        Args: { _departure_id: string }
+        Returns: number
+      }
+      commerce_departure_set_status: {
+        Args: { _departure_id: string; _reason?: string; _status: string }
+        Returns: undefined
+      }
+      commerce_generate_departures: {
+        Args: { _template_id: string; _until?: string }
+        Returns: number
+      }
+      commerce_hold_confirm: {
+        Args: { _hold_id: string; _order_id?: string }
+        Returns: undefined
+      }
+      commerce_hold_create: {
+        Args: {
+          _departure_id: string
+          _idempotency_key: string
+          _quantity: number
+          _traveler_user_id?: string
+          _ttl_minutes?: number
+        }
+        Returns: {
+          created_at: string
+          departure_id: string
+          expires_at: string
+          id: string
+          idempotency_key: string
+          order_id: string | null
+          product_id: string
+          quantity: number
+          released_reason: string | null
+          status: string
+          traveler_user_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "commerce_reservation_holds"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      commerce_hold_release: {
+        Args: { _hold_id: string; _reason?: string }
+        Returns: undefined
+      }
+      commerce_holds_expire: { Args: never; Returns: number }
+      commerce_list_departures: {
+        Args: { _from?: string; _product_id: string; _to?: string }
+        Returns: {
+          adjustments: number
+          available: number
+          blacked_out: boolean
+          capacity_reservable: number
+          capacity_total: number
+          confirmed: number
+          ends_at: string
+          held: number
+          id: string
+          notes: string
+          starts_at: string
+          status: string
+          timezone: string
+        }[]
       }
       concierge_alux_context_for_case: {
         Args: { _case_id: string }
