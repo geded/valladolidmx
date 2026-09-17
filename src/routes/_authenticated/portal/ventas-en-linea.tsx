@@ -87,10 +87,10 @@ function DirectSalesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Ventas en línea</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Activa la venta directa de tus experiencias: precio final para el viajero, moneda,
-          comisión de la plataforma, políticas y anticipación mínima. Sólo las experiencias que
-          marques aquí podrán venderse directo desde su ficha y desde los recorridos que arme el
-          Concierge en el Oriente Maya de Yucatán.
+          Prepara el precio, las políticas y los términos de tus experiencias. La activación de
+          la venta en línea y la comisión de la plataforma las autoriza y fija Administración tras
+          revisión. Una vez activada, la experiencia se vende directo desde su ficha y llega al
+          Concierge como reservación con folio ERL.
         </p>
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{enabledCount} activas</Badge>
@@ -167,18 +167,13 @@ function ProductDirectSaleCard({
   const qc = useQueryClient();
   const update = useServerFn(updateProductDirectSaleSettings);
 
-  const [enabled, setEnabled] = useState(product.direct_sale_enabled);
+  const [enabled] = useState(product.direct_sale_enabled);
   const [price, setPrice] = useState<string>(
     product.direct_sale_price_amount != null
       ? String((product.direct_sale_price_amount / 100).toFixed(2))
       : "",
   );
   const [currency, setCurrency] = useState(product.direct_sale_currency ?? "MXN");
-  const [commissionPct, setCommissionPct] = useState<string>(
-    product.direct_sale_commission_bps != null
-      ? String((product.direct_sale_commission_bps / 100).toFixed(2))
-      : "10",
-  );
   const [cancellationPolicy, setCancellationPolicy] = useState(
     product.direct_sale_cancellation_policy ?? "",
   );
@@ -192,22 +187,17 @@ function ProductDirectSaleCard({
 
   const dirty = useMemo(() => {
     const priceCents = price ? Math.round(Number(price) * 100) : null;
-    const commissionBps = commissionPct ? Math.round(Number(commissionPct) * 100) : null;
     return (
-      enabled !== product.direct_sale_enabled ||
       priceCents !== product.direct_sale_price_amount ||
       currency !== (product.direct_sale_currency ?? "MXN") ||
-      commissionBps !== product.direct_sale_commission_bps ||
       cancellationPolicy !== (product.direct_sale_cancellation_policy ?? "") ||
       terms !== (product.direct_sale_terms ?? "") ||
       (minLeadHours ? Number(minLeadHours) : null) !== product.direct_sale_min_lead_hours ||
       (maxQuantity ? Number(maxQuantity) : null) !== product.direct_sale_max_quantity
     );
   }, [
-    enabled,
     price,
     currency,
-    commissionPct,
     cancellationPolicy,
     terms,
     minLeadHours,
@@ -218,14 +208,13 @@ function ProductDirectSaleCard({
   const mutation = useMutation({
     mutationFn: async () => {
       const priceCents = price ? Math.round(Number(price) * 100) : null;
-      const commissionBps = commissionPct ? Math.round(Number(commissionPct) * 100) : null;
       return update({
         data: {
           productId: product.id,
-          enabled,
+          enabled: product.direct_sale_enabled,
           priceAmount: priceCents,
           currency: currency || "MXN",
-          commissionBps,
+          commissionBps: null,
           cancellationPolicy: cancellationPolicy || null,
           terms: terms || null,
           minLeadHours: minLeadHours ? Number(minLeadHours) : null,
@@ -242,8 +231,8 @@ function ProductDirectSaleCard({
       const label =
         msg === "direct_sale_price_required"
           ? "Ingresa un precio para activar la venta en línea."
-          : msg === "invalid_commission_bps"
-            ? "La comisión debe estar entre 0 y 100%."
+          : msg === "forbidden_direct_sale_authorization_required"
+            ? "Sólo Administración puede activar la venta en línea o cambiar la comisión."
             : msg;
       toast.error(label);
     },
@@ -269,12 +258,19 @@ function ProductDirectSaleCard({
             <p className="mt-1 text-xs text-muted-foreground">{product.tagline}</p>
           ) : null}
         </div>
-        <label className="flex items-center gap-2 text-sm">
-          <Switch checked={enabled} onCheckedChange={setEnabled} />
-          <span className="font-medium">
-            {enabled ? "Venta en línea activa" : "Venta en línea inactiva"}
-          </span>
-        </label>
+        <div className="flex flex-col items-end gap-1">
+          <label className="flex items-center gap-2 text-sm">
+            <Switch checked={enabled} disabled />
+            <span className="font-medium">
+              {enabled ? "Venta en línea activa" : "Venta en línea inactiva"}
+            </span>
+          </label>
+          <p className="text-[11px] text-muted-foreground">
+            {enabled
+              ? "Activada por Administración."
+              : "La activa Administración tras revisión."}
+          </p>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -307,7 +303,7 @@ function ProductDirectSaleCard({
 
         <Field
           label="Comisión de la plataforma"
-          hint="Porcentaje que Valladolid.mx retiene por cada venta directa."
+          hint="La fija Administración al autorizar la venta."
         >
           <div className="flex items-center gap-2">
             <Input
@@ -316,8 +312,13 @@ function ProductDirectSaleCard({
               min="0"
               max="100"
               step="0.5"
-              value={commissionPct}
-              onChange={(e) => setCommissionPct(e.target.value)}
+              value={
+                product.direct_sale_commission_bps != null
+                  ? String((product.direct_sale_commission_bps / 100).toFixed(2))
+                  : ""
+              }
+              disabled
+              placeholder="Por definir"
             />
             <span className="text-sm text-muted-foreground">%</span>
           </div>
