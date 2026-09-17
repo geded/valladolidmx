@@ -54,6 +54,11 @@ function CheckoutPage() {
     queryFn: () => fetchOrder({ data: { orderId } }),
   });
   const paymentsQ = useQuery({ queryKey: ["payments-ready"], queryFn: () => fetchPaymentsReady() });
+  const fetchBooking = useServerFn(getOrderBooking);
+  const bookingQ = useQuery({
+    queryKey: ["order-booking", orderId],
+    queryFn: () => fetchBooking({ data: { orderId } }),
+  });
 
   const [busy, setBusy] = useState(false);
 
