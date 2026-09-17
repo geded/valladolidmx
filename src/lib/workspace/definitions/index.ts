@@ -884,6 +884,16 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.experiencias",
+      workspaceId: "cms",
+      label: "Experiencias",
+      icon: Sparkles,
+      to: "/cms/experiencias",
+      group: "operacion",
+      order: 10.06,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.visibilidad",
       workspaceId: "cms",
       label: "Paquetes de visibilidad",
