@@ -308,9 +308,21 @@ export async function listExperiencesListing(
         secondaryAction: null,
         filterAttributes,
         destinationSlug: destination ? String(destination.slug) : null,
-      } as TourismCardVM & { destinationSlug: string | null };
+        /* Capacidad comercial real acreditada en el CMS. La tarjeta jamás
+           anuncia "Reserva en línea" sin estas dos banderas. */
+        conversionMode: (product.conversion_mode as string | null) ?? null,
+        acceptsOnlinePayment: product.accepts_online_payment === true,
+        onlineSalePriceAmount:
+          product.direct_sale_enabled === true && product.direct_sale_price_amount != null
+            ? Number(product.direct_sale_price_amount)
+            : null,
+        onlineSalePriceCurrency: (product.direct_sale_currency as string | null) ?? null,
+        durationMinutes:
+          product.duration_minutes != null ? Number(product.duration_minutes) : null,
+        coordinates: locationByBusiness.get(String(product.business_id)) ?? null,
+      } as ExperienceListingItem;
     })
-    .filter((item) => !destino || item.destinationSlug === destino);
+    .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);
 
   const destinationLabel = destino
     ? (destinationName ??
