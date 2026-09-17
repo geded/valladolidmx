@@ -222,6 +222,16 @@ export const cancelConciergeOrder = createServerFn({ method: "POST" })
       .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
 
+    // Devuelve al cupo los lugares apartados de esta reservación.
+    try {
+      await context.supabase.rpc("commerce_order_holds_release", {
+        _order_id: data.orderId,
+        _reason: "reservación cancelada por el viajero",
+      });
+    } catch {
+      // Los apartados vencen solos; no bloquea la cancelación.
+    }
+
     await context.supabase.from("concierge_order_events").insert({
       order_id: data.orderId,
       event_type: "cancelled_by_traveler",
