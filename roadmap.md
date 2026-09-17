@@ -176,4 +176,5 @@
 
 - [x] Logotipos de empresa: logo transparente de Zazil Tunich cargado en CMS y visible en su experiencia (ficha de Lugar pendiente de autorización).
 
-- [ ] Perfil Zazil Tunich: retirar la excepción hardcodeada `business.slug === "zazil-tunich"` en `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx` que fuerza `ZazilTunichPremiumSurface` (preview founder) en lugar de la plantilla oficial de empresa; mover esa landing a su URL de campaña `/l/<slug>` y enlazarla desde el perfil. Pendiente de autorización Founder.
+- [x] Perfil Zazil Tunich: retirada la excepción hardcodeada `business.slug === "zazil-tunich"`; el perfil vuelve a la plantilla oficial de empresa con logotipo. Landing de promoción vive en `/l/<slug>` (Experience Builder) y su enlace se muestra en el panel "Landing SEO premium" del editor de empresa. Logotipo acreditado también en el hero de la landing (`LandingBrandLogo`, fail-closed).
+- [ ] Publicar la Landing SEO de Zazil Tunich (`landing-business-zazil-tunich`, hoy borrador) — pendiente de autorización Founder.
