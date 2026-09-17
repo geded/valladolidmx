@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceReviews } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviews";
-import { BusinessLocationBlock } from "@/components/experience-builder/blocks/business-location/BusinessLocationBlock";
+import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { ExperienceRelatedCollection } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection";
 import { EXPERIENCE_RELATED_ITEM_V11_DEFAULTS } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
 import type { ExperienceReviewsDTO } from "@/lib/experience-builder/blocks/experience-reviews/contract";
@@ -94,7 +94,10 @@ export function ExperiencePremiumSurface({
 
       <section aria-label={vm.name} className="space-y-5">
         {galleryItems.length ? (
-          <ExperienceGallery dto={{ variant: "mosaic", heading: null, subheading: null, items: galleryItems, maxVisible: 5, aspect: "landscape", ariaLabel: `Galería de ${vm.name}`, capabilities: { lightbox: true, captions: false, video: false, panorama360: false, model3d: false, ar: false, ugc: false } }} />
+          <ExperienceGallery
+            dto={{ variant: "mosaic", heading: null, subheading: null, items: galleryItems, maxVisible: 5, aspect: "landscape", ariaLabel: `Galería de ${vm.name}`, capabilities: { lightbox: true, captions: false, video: false, panorama360: false, model3d: false, ar: false, ugc: false } }}
+            className={galleryItems.length === 1 ? "[&>div>div]:sm:col-span-4" : undefined}
+          />
         ) : (
           <div className="grid min-h-64 place-items-center rounded-3xl border border-dashed border-border bg-muted/40 px-6 text-center text-sm text-muted-foreground">Esta experiencia aún no tiene fotografías publicadas.</div>
         )}
@@ -154,7 +157,8 @@ export function ExperiencePremiumSurface({
                 productId={vm.id}
                 className="min-h-11 rounded-pill bg-primary px-5 text-sm font-semibold text-primary-foreground"
               />
-            ) : commerce.contactLabel && commerce.contactHref ? (
+            ) : commerce.contactLabel && commerce.contactHref &&
+              (!tripEligibility.eligible || !commerce.contactLabel.toLocaleLowerCase("es-MX").includes("mi viaje")) ? (
               <a
                 href={commerce.contactHref}
                 target={commerce.contactHref.startsWith("http") ? "_blank" : undefined}
@@ -176,7 +180,7 @@ export function ExperiencePremiumSurface({
         </div>
       </section>
 
-      <ExperienceSubnav dto={{ anchors, variant: "underline", sticky: true, scrollOffset: 88, ariaLabel: "Secciones de la experiencia", capabilities: { scrollSpy: true, showIcons: false, collapseMobile: false } }} />
+      <ExperienceSubnav dto={{ anchors, variant: "underline", sticky: true, scrollOffset: 88, ariaLabel: "Secciones de la experiencia", capabilities: { scrollSpy: true, showIcons: false, collapseOnMobile: false } }} />
 
       <section id="resumen" data-eb-anchor className="scroll-mt-24">
         {vm.facts.length > 0 ? (
