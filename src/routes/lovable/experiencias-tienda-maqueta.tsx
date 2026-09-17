@@ -1,24 +1,13 @@
 /**
- * MAQUETA de revisión — Sección pública de Experiencias como tienda en línea.
+ * MAQUETA de revisión — mejora localizada del explorador de Experiencias.
  *
- * Ruta interna noindex/nofollow, sin conexión a datos reales. Todo el
- * contenido es de muestra y está marcado como tal. No sustituye ni modifica
- * la plantilla Premium aprobada de `/experiencias`; existe únicamente para
- * aceptación visual del Founder antes de construir el paso 5 del plan de
- * Comercio, Experiencias y Liquidación (Blueprint 13 · Plan 18.02).
+ * Reutiliza la autoridad Premium, la marca y los controles existentes. Airbnb
+ * sólo es referencia de facilidad para descubrir por destino y categoría.
+ * No modifica `/experiencias`, datos CMS, reservaciones ni pagos.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/lovable/experiencias-tienda-maqueta")({
-  head: () => ({
-    meta: [
-      { title: "Maqueta · Experiencias (visitante)" },
-      { name: "robots", content: "noindex,nofollow" },
-    ],
-  }),
-  component: Page,
-});
+import { Heart, List, Map, MapPin, Search, Star } from "lucide-react";
 
 import sampleCenote from "@/assets/maqueta-experiencias/cenote.jpg";
 import sampleCocina from "@/assets/maqueta-experiencias/cocina.jpg";
@@ -27,24 +16,57 @@ import sampleHamaca from "@/assets/maqueta-experiencias/hamaca.jpg";
 import sampleConventos from "@/assets/maqueta-experiencias/conventos.jpg";
 import sampleTemazcal from "@/assets/maqueta-experiencias/temazcal.jpg";
 import sampleHero from "@/assets/maqueta-experiencias/hero.jpg";
+import { PublicShell } from "@/components/discovery";
+import {
+  PremiumAluxBar,
+  PremiumEditorialHero,
+  PremiumSectionHead,
+} from "@/components/home-premium/shared/PremiumShowcase";
+import { Button } from "@/components/ui/button";
+import type { PartyComposition } from "@/lib/traveler/party-composition";
+import { cn } from "@/lib/utils";
+
+const PAGE_TITLE = "Maqueta de Experiencias · Valladolid.mx";
+const PAGE_DESCRIPTION =
+  "Maqueta interna del explorador de experiencias del Oriente Maya por destino y categoría.";
+
+export const Route = createFileRoute("/lovable/experiencias-tienda-maqueta")({
+  head: () => ({
+    meta: [
+      { title: PAGE_TITLE },
+      { name: "description", content: PAGE_DESCRIPTION },
+      { property: "og:title", content: PAGE_TITLE },
+      { property: "og:description", content: PAGE_DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex,nofollow,noarchive" },
+    ],
+  }),
+  component: Page,
+});
 
 const CATEGORIES = [
+  { slug: "all", label: "Todas" },
   { slug: "cenotes", label: "Cenotes y naturaleza" },
   { slug: "cultura", label: "Cultura maya" },
   { slug: "gastronomia", label: "Gastronomía" },
   { slug: "tours", label: "Recorridos" },
   { slug: "bienestar", label: "Bienestar" },
-  { slug: "comunidades", label: "Comunidades" },
-  { slug: "zonas-arqueologicas", label: "Zonas arqueológicas" },
   { slug: "artesanias", label: "Artesanías" },
-];
+] as const;
+
+const DESTINATIONS = ["Todos los destinos", "Valladolid", "Izamal", "Espita", "Temozón"] as const;
+
+type CategorySlug = (typeof CATEGORIES)[number]["slug"];
+type Destination = (typeof DESTINATIONS)[number];
 
 type Card = {
   id: string;
   title: string;
-  place: string;
+  place: Exclude<Destination, "Todos los destinos">;
   image: string;
   category: string;
+  categorySlug: Exclude<CategorySlug, "all">;
   duration: string;
   languages: string;
   rating: string;
@@ -60,6 +82,7 @@ const CARDS: Card[] = [
     place: "Valladolid",
     image: sampleCenote,
     category: "Cenotes y naturaleza",
+    categorySlug: "cenotes",
     duration: "3 h",
     languages: "Español · Inglés",
     rating: "4.9",
@@ -73,6 +96,7 @@ const CARDS: Card[] = [
     place: "Temozón",
     image: sampleCocina,
     category: "Gastronomía",
+    categorySlug: "gastronomia",
     duration: "4 h",
     languages: "Español",
     rating: "4.8",
@@ -86,6 +110,7 @@ const CARDS: Card[] = [
     place: "Izamal",
     image: sampleIzamal,
     category: "Cultura maya",
+    categorySlug: "cultura",
     duration: "2 h",
     languages: "Español · Inglés · Francés",
     rating: "4.7",
@@ -99,6 +124,7 @@ const CARDS: Card[] = [
     place: "Espita",
     image: sampleHamaca,
     category: "Artesanías",
+    categorySlug: "artesanias",
     duration: "2.5 h",
     languages: "Español · Maya",
     rating: "5.0",
@@ -111,6 +137,7 @@ const CARDS: Card[] = [
     place: "Valladolid",
     image: sampleConventos,
     category: "Recorridos",
+    categorySlug: "tours",
     duration: "5 h",
     languages: "Español · Inglés",
     rating: "4.6",
@@ -124,6 +151,7 @@ const CARDS: Card[] = [
     place: "Valladolid",
     image: sampleTemazcal,
     category: "Bienestar",
+    categorySlug: "bienestar",
     duration: "2 h",
     languages: "Español",
     rating: "4.9",
@@ -134,19 +162,81 @@ const CARDS: Card[] = [
 
 function Page() {
   const [view, setView] = useState<"lista" | "mapa">("lista");
-  const [category, setCategory] = useState<string>("cenotes");
+  const [category, setCategory] = useState<CategorySlug>("all");
+  const [destination, setDestination] = useState<Destination>("Todos los destinos");
+  const [party, setParty] = useState<PartyComposition | null>(null);
+
+  const filtered = useMemo(
+    () =>
+      CARDS.filter(
+        (card) =>
+          (category === "all" || card.categorySlug === category) &&
+          (destination === "Todos los destinos" || card.place === destination),
+      ),
+    [category, destination],
+  );
+
+  const goToResults = () => document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <MaquetaBanner />
+      <PublicShell
+        crumbs={[{ label: "Experiencias", to: "/experiencias" }, { label: "Maqueta de revisión" }]}
+        compactCrumbsOnMobile
+      >
+        <div className="flex flex-col gap-9">
+          <PremiumEditorialHero
+            eyebrow="Experiencias del Oriente Maya"
+            title="Encuentra algo inolvidable para vivir"
+            subtitle="Explora por destino o por lo que quieres hacer. Elige la fecha y reserva cuando estés listo."
+            media={{
+              url: sampleHero,
+              alt: "Fotografía de muestra de una experiencia en un cenote del Oriente Maya",
+            }}
+            caption="Oriente Maya de Yucatán"
+            searchSlot={
+              <ExperienceSearch
+                destination={destination}
+                category={category}
+                onDestination={setDestination}
+                onCategory={setCategory}
+                onSearch={goToResults}
+              />
+            }
+          />
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-20 pt-6">
-        <Hero />
-        <Categories active={category} onSelect={setCategory} />
-        <FilterBar view={view} onView={setView} />
-        {view === "lista" ? <Results /> : <MapView />}
-        <TripStrip />
-      </main>
+          <CategoryRail active={category} onSelect={setCategory} />
+          <DestinationRail active={destination} onSelect={setDestination} />
+
+          <section id="resultados" aria-labelledby="resultados-title" className="scroll-mt-32">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <PremiumSectionHead
+                id="resultados-title"
+                kicker="Explora y compara"
+                title={`${filtered.length} ${filtered.length === 1 ? "experiencia" : "experiencias"} para ti`}
+                description="Fotos grandes, información esencial y precio visible para decidir con facilidad."
+              />
+              <ViewSwitch view={view} onView={setView} />
+            </div>
+            {filtered.length === 0 ? (
+              <EmptyResults onClear={() => { setCategory("all"); setDestination("Todos los destinos"); }} />
+            ) : view === "lista" ? (
+              <Results cards={filtered} />
+            ) : (
+              <MapView cards={filtered} />
+            )}
+          </section>
+
+          <PremiumAluxBar
+            question="Dime qué te interesa y te ayudo a comparar estas experiencias."
+            selectedParty={party}
+            onSelectParty={setParty}
+            onContinue={() => undefined}
+            continueLabel="Planear con Alux"
+          />
+        </div>
+      </PublicShell>
     </div>
   );
 }
@@ -154,7 +244,7 @@ function Page() {
 function MaquetaBanner() {
   return (
     <div className="border-b border-border bg-muted/60">
-      <div className="mx-auto max-w-6xl px-4 py-3">
+      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Maqueta de revisión · contenido y fotografías de muestra · no publicada
         </p>
@@ -163,89 +253,133 @@ function MaquetaBanner() {
   );
 }
 
-function Hero() {
+function ExperienceSearch({
+  destination,
+  category,
+  onDestination,
+  onCategory,
+  onSearch,
+}: {
+  destination: Destination;
+  category: CategorySlug;
+  onDestination: (value: Destination) => void;
+  onCategory: (value: CategorySlug) => void;
+  onSearch: () => void;
+}) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-border shadow-soft">
-      <div className="grid md:grid-cols-[42%_58%]">
-        <div className="flex flex-col justify-center gap-5 bg-card p-8 md:p-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Vive el Oriente Maya
-          </p>
-          <h1 className="font-serif text-4xl leading-tight md:text-5xl">
-            Reserva hoy tu experiencia en el Oriente Maya
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Elige el día, las personas y paga en línea. Tu confirmación llega al instante y queda
-            guardada en Mi Viaje.
-          </p>
-
-          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-3 shadow-soft">
-            <input
-              className="h-11 rounded-pill border border-border bg-card px-4 text-sm outline-none"
-              placeholder="¿Qué experiencia quieres vivir?"
-              readOnly
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <FakeField label="Fecha" value="Vie 25 sep" />
-              <FakeField label="Personas" value="2 adultos" />
-            </div>
-            <button className="h-11 rounded-pill bg-primary text-sm font-semibold text-primary-foreground">
-              Ver disponibilidad
-            </button>
-          </div>
-        </div>
-        <div
-          className="min-h-[280px] bg-cover bg-center md:min-h-[420px]"
-          style={{ backgroundImage: `url(${sampleHero})` }}
-          role="img"
-          aria-label="Fotografía de muestra de un cenote del Oriente Maya"
+    <div className="rounded-2xl border border-border bg-background p-2 shadow-elevated">
+      <div className="grid gap-2 sm:grid-cols-2">
+        <SearchSelect
+          label="Destino"
+          value={destination}
+          onChange={(value) => onDestination(value as Destination)}
+          options={DESTINATIONS.map((value) => ({ value, label: value }))}
+        />
+        <SearchSelect
+          label="Categoría"
+          value={category}
+          onChange={(value) => onCategory(value as CategorySlug)}
+          options={CATEGORIES.map((item) => ({ value: item.slug, label: item.label }))}
+        />
+        <label className="rounded-xl border border-border bg-card px-3 py-2">
+          <span className="block text-[10px] font-semibold uppercase text-muted-foreground">Fecha</span>
+          <input
+            type="date"
+            aria-label="Fecha de la experiencia"
+            className="mt-0.5 min-h-6 w-full bg-transparent text-sm outline-none"
+          />
+        </label>
+        <SearchSelect
+          label="Viajeros"
+          value="2 personas"
+          onChange={() => undefined}
+          options={["1 persona", "2 personas", "3 personas", "4 personas", "5 o más"].map(
+            (value) => ({ value, label: value }),
+          )}
         />
       </div>
-    </section>
-  );
-}
-
-function FakeField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card px-4 py-2">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="text-sm">{value}</p>
+      <Button type="button" onClick={onSearch} className="mt-2 min-h-11 w-full rounded-pill">
+        <Search aria-hidden />
+        Buscar experiencias
+      </Button>
     </div>
   );
 }
 
-function Categories({
+function SearchSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: readonly { value: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="rounded-xl border border-border bg-card px-3 py-2">
+      <span className="block text-[10px] font-semibold uppercase text-muted-foreground">{label}</span>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-0.5 min-h-6 w-full bg-transparent text-sm outline-none"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function CategoryRail({
   active,
   onSelect,
 }: {
-  active: string;
-  onSelect: (slug: string) => void;
+  active: CategorySlug;
+  onSelect: (slug: CategorySlug) => void;
 }) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="font-serif text-2xl">Explora por lo que te mueve</h2>
-      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2">
-        {CATEGORIES.map((c) => {
-          const on = c.slug === active;
+    <section aria-labelledby="categorias-title">
+      <PremiumSectionHead
+        id="categorias-title"
+        kicker="Qué quieres vivir"
+        title="Explora por categoría"
+      />
+      <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+        {CATEGORIES.map((item) => {
+          const selected = item.slug === active;
           return (
-            <button
-              key={c.slug}
-              onClick={() => onSelect(c.slug)}
-              className={`flex min-w-[118px] flex-col items-center gap-2 rounded-2xl border px-4 py-3 transition ${
-                on
-                  ? "border-primary bg-card shadow-soft"
-                  : "border-border bg-card/60 hover:shadow-soft"
-              }`}
+            <Button
+              key={item.slug}
+              type="button"
+              variant="ghost"
+              aria-pressed={selected}
+              onClick={() => onSelect(item.slug)}
+              className={cn(
+                "h-24 min-w-28 snap-start flex-col gap-2 rounded-xl border px-3 py-3 whitespace-normal",
+                selected
+                  ? "border-primary bg-primary/10 shadow-soft"
+                  : "border-border bg-card hover:bg-muted",
+              )}
             >
-              <img
-                src={`/brand/category-icons/${c.slug}.png`}
-                alt=""
-                className="h-10 w-10 object-contain"
-              />
-              <span className="text-center text-xs font-medium leading-tight">{c.label}</span>
-            </button>
+              {item.slug === "all" ? (
+                <span className="grid size-10 place-items-center rounded-full bg-selva/10 text-selva">
+                  <Search className="size-5" aria-hidden />
+                </span>
+              ) : (
+                <img
+                  src={`/brand/category-icons/${item.slug}.png`}
+                  alt=""
+                  className="size-10 object-contain"
+                />
+              )}
+              <span className="line-clamp-2 text-center text-xs leading-tight">{item.label}</span>
+            </Button>
           );
         })}
       </div>
@@ -253,176 +387,182 @@ function Categories({
   );
 }
 
-function FilterBar({
+function DestinationRail({
+  active,
+  onSelect,
+}: {
+  active: Destination;
+  onSelect: (value: Destination) => void;
+}) {
+  return (
+    <section aria-labelledby="destinos-title" className="border-y border-border py-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className="min-w-52">
+          <p className="text-xs font-semibold uppercase text-primary">Dónde quieres ir</p>
+          <h2 id="destinos-title" className="mt-1 font-display text-2xl">
+            Explora por destino
+          </h2>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1 lg:ml-auto">
+          {DESTINATIONS.map((value) => (
+            <Button
+              key={value}
+              type="button"
+              variant={active === value ? "default" : "outline"}
+              aria-pressed={active === value}
+              onClick={() => onSelect(value)}
+              className="min-h-11 shrink-0 rounded-pill px-5"
+            >
+              {value !== "Todos los destinos" ? <MapPin aria-hidden /> : null}
+              {value}
+            </Button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ViewSwitch({
   view,
   onView,
 }: {
   view: "lista" | "mapa";
-  onView: (v: "lista" | "mapa") => void;
+  onView: (value: "lista" | "mapa") => void;
 }) {
   return (
-    <section className="sticky top-0 z-10 flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-background/95 p-3 shadow-soft backdrop-blur">
-      {["Fecha", "Personas", "Precio", "Duración", "Idioma", "Accesibilidad", "Destino"].map(
-        (f) => (
-          <span
-            key={f}
-            className="rounded-pill border border-border bg-card px-4 py-2 text-xs font-medium"
-          >
-            {f}
-          </span>
-        ),
-      )}
-      <div className="ml-auto flex rounded-pill border border-border bg-card p-1">
-        {(["lista", "mapa"] as const).map((v) => (
-          <button
-            key={v}
-            onClick={() => onView(v)}
-            className={`rounded-pill px-4 py-1.5 text-xs font-semibold capitalize ${
-              view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-            }`}
-          >
-            {v}
-          </button>
-        ))}
-      </div>
-    </section>
+    <div className="flex shrink-0 rounded-pill border border-border bg-card p-1" aria-label="Vista de resultados">
+      <Button
+        type="button"
+        variant={view === "lista" ? "default" : "ghost"}
+        size="sm"
+        onClick={() => onView("lista")}
+        className="rounded-pill px-4"
+      >
+        <List aria-hidden />
+        Lista
+      </Button>
+      <Button
+        type="button"
+        variant={view === "mapa" ? "default" : "ghost"}
+        size="sm"
+        onClick={() => onView("mapa")}
+        className="rounded-pill px-4"
+      >
+        <Map aria-hidden />
+        Mapa
+      </Button>
+    </div>
   );
 }
 
-function Results() {
+function Results({ cards }: { cards: readonly Card[] }) {
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-baseline justify-between">
-        <h2 className="font-serif text-2xl">86 experiencias disponibles</h2>
-        <span className="text-xs text-muted-foreground">Ordenar por: recomendadas</span>
-      </div>
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {CARDS.map((c) => (
-          <ExperienceCard key={c.id} card={c} />
-        ))}
-      </div>
-    </section>
+    <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {cards.map((card) => (
+        <ExperienceCard key={card.id} card={card} />
+      ))}
+    </div>
   );
 }
 
-function ExperienceCard({ card }: { card: Card }) {
+function ExperienceCard({ card, compact = false }: { card: Card; compact?: boolean }) {
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition hover:shadow-elevated">
-      <div className="relative">
+    <article className={cn("group min-w-0", compact && "grid grid-cols-[8rem_minmax(0,1fr)] gap-3")}>
+      <div className={cn("relative overflow-hidden rounded-xl bg-muted", compact ? "h-32" : "aspect-[4/3]")}>
         <img
           src={card.image}
           alt={`Fotografía de muestra: ${card.title}`}
-          className="h-48 w-full object-cover"
+          className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
           loading="lazy"
         />
-        {card.badge ? (
-          <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]">
+        {card.badge && !compact ? (
+          <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-3 py-1 text-[10px] font-semibold uppercase shadow-soft">
             {card.badge}
           </span>
         ) : null}
+        {!compact ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            aria-label={`Guardar ${card.title} en Mi Viaje`}
+            title="Guardar en Mi Viaje"
+            className="absolute right-3 top-3 rounded-full bg-background/90"
+          >
+            <Heart aria-hidden />
+          </Button>
+        ) : null}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-          {card.category} · {card.place}
-        </p>
-        <h3 className="font-serif text-lg leading-snug">{card.title}</h3>
-        <p className="text-xs text-muted-foreground">
+      <div className={cn("pt-3", compact && "flex min-w-0 flex-col justify-center pt-0")}>
+        <div className="flex items-center justify-between gap-2 text-xs">
+          <p className="truncate font-semibold text-primary">{card.place} · {card.category}</p>
+          <span className="inline-flex shrink-0 items-center gap-1 font-medium">
+            <Star className="size-3 fill-current" aria-hidden /> {card.rating}
+          </span>
+        </div>
+        <h3 className={cn("mt-1 line-clamp-2 font-display leading-snug", compact ? "text-base" : "text-lg")}>
+          {card.title}
+        </h3>
+        <p className="mt-1 truncate text-xs text-muted-foreground">
           {card.duration} · {card.languages}
         </p>
-        <p className="text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground">★ {card.rating}</span> ({card.reviews}{" "}
-          reseñas)
-        </p>
-        <div className="mt-auto flex items-end justify-between pt-3">
-          <p className="text-sm">
-            <span className="text-xs text-muted-foreground">Desde </span>
-            <span className="font-semibold">${card.price.toLocaleString("es-MX")}</span>
-            <span className="text-xs text-muted-foreground"> MXN / persona</span>
+        {!compact ? (
+          <p className="mt-2 text-sm">
+            <span className="font-semibold">${card.price.toLocaleString("es-MX")} MXN</span>
+            <span className="text-muted-foreground"> por persona</span>
           </p>
-        </div>
-        <div className="grid grid-cols-2 gap-2 pt-2">
-          <button className="h-9 rounded-pill bg-primary text-xs font-semibold text-primary-foreground">
-            Reservar
-          </button>
-          <button className="h-9 rounded-pill border border-border text-xs font-semibold">
-            Agregar a Mi Viaje
-          </button>
-        </div>
+        ) : null}
       </div>
     </article>
   );
 }
 
-function MapView() {
+function MapView({ cards }: { cards: readonly Card[] }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-[38%_62%]">
-      <div className="flex flex-col gap-3">
-        {CARDS.slice(0, 4).map((c) => (
-          <article
-            key={c.id}
-            className="flex gap-3 overflow-hidden rounded-2xl border border-border bg-card shadow-soft"
-          >
-            <img
-              src={c.image}
-              alt={`Fotografía de muestra: ${c.title}`}
-              className="h-28 w-28 shrink-0 object-cover"
-              loading="lazy"
-            />
-            <div className="flex flex-col justify-center gap-1 py-2 pr-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-                {c.place}
-              </p>
-              <h3 className="font-serif text-base leading-snug">{c.title}</h3>
-              <p className="text-xs text-muted-foreground">
-                {c.duration} · ★ {c.rating} · Desde ${c.price.toLocaleString("es-MX")}
-              </p>
-            </div>
-          </article>
+    <div className="grid gap-5 xl:grid-cols-[minmax(20rem,0.8fr)_minmax(0,1.2fr)]">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+        {cards.slice(0, 4).map((card) => (
+          <ExperienceCard key={card.id} card={card} compact />
         ))}
       </div>
-      <div className="relative min-h-[420px] overflow-hidden rounded-2xl border border-border bg-muted">
-        <div className="absolute inset-0 grid place-items-center">
-          <p className="max-w-xs text-center text-xs text-muted-foreground">
-            Aquí va el mapa del Oriente Maya con un pin por experiencia y el precio visible en cada
-            pin. En la maqueta se muestra el espacio reservado.
-          </p>
-        </div>
+      <div className="relative min-h-[32rem] overflow-hidden rounded-xl border border-border bg-caliza/50 shadow-soft">
+        <div className="absolute inset-x-8 top-1/4 border-t border-selva/20" />
+        <div className="absolute inset-x-12 top-2/3 border-t border-selva/20" />
+        <div className="absolute inset-y-10 left-1/3 border-l border-selva/20" />
+        <div className="absolute inset-y-16 right-1/4 border-l border-selva/20" />
         {[
-          { top: "22%", left: "28%", price: "$890" },
-          { top: "44%", left: "58%", price: "$1,250" },
-          { top: "66%", left: "36%", price: "$450" },
-          { top: "34%", left: "76%", price: "$1,490" },
-        ].map((p) => (
+          { position: "left-[18%] top-[20%]", price: "$890" },
+          { position: "left-[55%] top-[38%]", price: "$1,250" },
+          { position: "left-[31%] top-[67%]", price: "$450" },
+          { position: "right-[12%] top-[57%]", price: "$1,490" },
+        ].map((pin) => (
           <span
-            key={p.price}
-            style={{ top: p.top, left: p.left }}
-            className="absolute rounded-pill border border-border bg-background px-3 py-1 text-xs font-semibold shadow-soft"
+            key={pin.price}
+            className={cn(
+              "absolute inline-flex items-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-xs font-semibold shadow-elevated",
+              pin.position,
+            )}
           >
-            {p.price}
+            <MapPin className="size-3.5 text-primary" aria-hidden />
+            {pin.price}
           </span>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
-function TripStrip() {
+function EmptyResults({ onClear }: { onClear: () => void }) {
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-      <h2 className="font-serif text-2xl">¿Prefieres que te lo armen?</h2>
-      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Guarda las experiencias que te gusten en Mi Viaje y un concierge del Oriente Maya te arma la
-        propuesta completa con hospedaje, traslados y horarios. Pagues como pagues, tu reservación
-        queda registrada con folio.
+    <div className="border-y border-border py-12 text-center">
+      <h3 className="font-display text-2xl">Prueba otra combinación</h3>
+      <p className="mt-2 text-sm text-muted-foreground">
+        No hay experiencias de muestra para ese destino y categoría.
       </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button className="h-10 rounded-pill bg-primary px-5 text-xs font-semibold text-primary-foreground">
-          Arma tu viaje
-        </button>
-        <button className="h-10 rounded-pill border border-border px-5 text-xs font-semibold">
-          Hablar con Alux
-        </button>
-      </div>
-    </section>
+      <Button type="button" variant="outline" onClick={onClear} className="mt-5 rounded-pill">
+        Ver todas las experiencias
+      </Button>
+    </div>
   );
 }
