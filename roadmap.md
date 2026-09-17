@@ -170,3 +170,5 @@
 - [ ] Replantear la maqueta de la tienda pública con funcionalidad de exploración inspirada en Airbnb Experiences (búsqueda, filtros, tarjetas y mapa sincronizado), preservando íntegramente la marca Premium Valladolid.mx; requiere comparación y aprobación visual antes de sustituir `/experiencias`.
 - [ ] Reutilizar exactamente el buscador turístico ya aprobado del Home, ampliado sólo con fecha y viajeros para Tours; conservar sin cambios los iconos bordados y la imagen/colores oficiales de Alux, y reutilizar el patrón existente de listados con mapa.
 - [ ] Filtros de la tienda de Experiencias: barra compacta, profesional e intuitiva (criterios rápidos visibles, panel completo, conteo de resultados y limpieza); Alux queda fuera del alcance de esta iniciativa.
+- [ ] Unificar la ficha pública de Experiencias con los bloques Premium oficiales de hoteles/restaurantes, preservando sus secciones turísticas propias y la venta fail-closed.
+- [ ] Añadir ubicación efectiva de Experiencia en CMS con herencia de la ubicación principal del negocio y excepción mediante punto de encuentro específico, sin duplicar coordenadas.
