@@ -1,35 +1,50 @@
-# Unificación de tarjetas de descubrimiento de experiencias
+# Armonización Premium de listados territoriales de empresas
 
-## Alcance autorizado
+## Diagnóstico confirmado
 
-- Aplicar el cambio únicamente a las tarjetas de experiencias y servicios dentro de perfiles empresariales Premium.
-- Mantener una sola familia oficial de tarjeta turística; no crear variantes paralelas.
-- Mostrar el corazón de guardado superpuesto en la esquina superior derecha de la fotografía.
-- Mostrar un único CTA **Ver experiencia** que abre la ficha completa del producto.
-- Eliminar de estas tarjetas las acciones de reservar, agregar a Mi Viaje, contacto, cotización, teléfono, WhatsApp y sitio externo.
-- Mantener **Reservar** y **Agregar a Mi Viaje** dentro de la ficha completa: reservar sólo cuando el producto tenga venta en línea autorizada.
-- Incorporar dentro de la ficha completa un enlace visible **Ver perfil de [empresa]** hacia su perfil territorial, para regresar y explorar más experiencias.
+La ruta `/oriente-maya/:destino/:categoria` tiene dos caminos visuales:
 
-## Preservación obligatoria
+- Las categorías asociadas en el CMS a una familia reconocida —como Hoteles y Restaurantes— usan `ListingPremiumSurfaceFromDTO` y la plantilla territorial Premium aprobada.
+- Las demás categorías —como Cenotes— caen a un render anterior de `TourismListingSurface`, con hero, filtros, tarjetas, mapa y acciones distintos.
 
-- No cambiar la ficha, el orden de secciones, la marca, colores, tipografía, fotografías, precios ni datos del CMS.
-- No modificar la lógica de autorización comercial ni habilitar pagos nuevos.
-- Mantener el acceso a la ficha al pulsar el nombre o el CTA **Ver experiencia**.
-- Resolver el regreso con la ruta territorial canónica existente; no crear una ruta paralela ni depender del historial del navegador.
-- No alterar acciones de otros listados o superficies.
+Esta bifurcación explica por qué parecen sitios diferentes. Además, el camino anterior abre una vista rápida y añade una banda de Mi Viaje diferente, mientras el listado Premium navega directamente al perfil completo.
+
+## Scope Gate
+
+**Cambio autorizado:** corregir los listados territoriales de categorías empresariales para que todos adopten el mismo formato aprobado que Hoteles del Oriente Maya.
+
+**Superficies editables:**
+
+- Ruta territorial de categoría `/oriente-maya/:destino/:categoria`.
+- Autoridad existente del listado territorial Premium, únicamente para admitir categorías empresariales genéricas por configuración.
+- Pruebas de contrato y evidencia visual de esta ruta.
+
+**Fuera de alcance:** perfiles de empresa, fichas de producto, Home, listados globales, CMS editorial, pagos, reservaciones, navegación principal y publicación.
 
 ## Implementación
 
-- Extender la tarjeta turística oficial con un espacio de acción sobre la fotografía.
-- Dar al botón Guardar una presentación de corazón circular, con estado accesible y comportamiento actual intacto.
-- Sustituir en el bloque de productos la estrategia genérica de acciones por un único CTA **Ver experiencia**.
-- Añadir a la ficha de experiencia el enlace contextual al perfil de su empresa.
-- Añadir pruebas de contrato que impidan reintroducir acciones transaccionales o de contacto en estas tarjetas.
+1. Evolucionar la plantilla territorial Premium existente para aceptar una categoría empresarial genérica sin crear otra superficie ni otra tarjeta.
+2. Proyectar las empresas reales del CMS al mismo formato visual de Hoteles: introducción editorial, banda de Alux, búsqueda y filtros compactos, tarjetas Premium y mapa sincronizado.
+3. Conservar el título, categoría, destino, fotografías, ubicación y enlaces canónicos propios de cada categoría; no reutilizar textos ni imágenes de Hoteles.
+4. Retirar el camino visual anterior y la vista rápida exclusiva de categorías no reconocidas; las tarjetas abrirán el perfil empresarial territorial completo, igual que en Hoteles.
+5. Mantener la sección existente “Sigue descubriendo” después del listado cuando tenga contenido real.
+6. Añadir una prueba que impida que una categoría empresarial vuelva a caer en un render distinto.
+
+## Preservation Gate
+
+Debe permanecer sin cambios:
+
+- `PublicShell`, header, footer, selector territorial y breadcrumb.
+- Marca, tipografía, colores, iconos oficiales y diseño Premium aprobado.
+- Datos, medios, taxonomía y visibilidad administrados desde CMS.
+- Alux, Mi Viaje, favoritos, mapa, ubicación y navegación canónica.
+- Formato vigente de Hoteles, Restaurantes, Experiencias, Casas de vacaciones, Eventos, Lugares y Qué hacer.
+- SEO y JSON-LD territorial actuales.
 
 ## Validación
 
-- Pruebas contractuales y comprobación de tipos.
-- Revisión visual completa de Zazil Tunich y perfiles Premium comparables en 1440, 834, 430 y 390 px.
-- Confirmar ausencia de desbordamientos y que las decisiones de viaje/reserva permanezcan en la ficha completa.
-- Confirmar que el enlace de empresa regresa al perfil correcto y permite continuar viendo su oferta.
-- Sin publicación.
+- Comparar `/hoteles?destino=valladolid` contra `/oriente-maya/valladolid/cenotes` y otra categoría empresarial real.
+- Revisar plantilla completa en 1440, 834, 430 y 390 px: header, breadcrumb, introducción, Alux, filtros, tarjetas, mapa, relacionados y footer.
+- Confirmar un solo H1, ausencia de desbordamiento y navegación correcta al perfil empresarial.
+- Ejecutar pruebas contractuales dirigidas, comprobación de tipos, Route Inventory y controles de gobernanza aplicables.
+- No publicar sin autorización expresa del Founder.
