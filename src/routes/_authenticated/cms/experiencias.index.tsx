@@ -37,6 +37,17 @@ const money = (amount: number | null, currency: string) =>
     ? "—"
     : new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(amount / 100);
 
+// `products.price_amount` se guarda en unidades enteras (pesos), a diferencia de
+// `direct_sale_price_amount`, que se guarda en centavos.
+const listPrice = (amount: number | null, currency: string) =>
+  amount == null
+    ? "—"
+    : new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: currency || "MXN",
+        maximumFractionDigits: 0,
+      }).format(amount);
+
 export const Route = createFileRoute("/_authenticated/cms/experiencias/")({
   head: () => ({
     meta: [
