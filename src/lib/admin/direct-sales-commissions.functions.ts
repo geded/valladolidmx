@@ -18,14 +18,14 @@ async function assertAdmin(context: {
   supabase: { rpc: (fn: never, args: never) => unknown };
   userId: string;
 }): Promise<void> {
-  const rpc = (
-    context.supabase as unknown as {
-      rpc: (
-        fn: string,
-        args: Record<string, unknown>,
-      ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
-    }
-  ).rpc;
+  const client = context.supabase as unknown as {
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
+  };
+  // El cliente debe conservar su `this`; llamarlo suelto rompe PostgREST.
+  const rpc = (fn: string, args: Record<string, unknown>) => client.rpc(fn, args);
   const [a, b] = await Promise.all([
     rpc("has_role", { _user_id: context.userId, _role: "super_admin" }),
     rpc("has_role", { _user_id: context.userId, _role: "admin" }),

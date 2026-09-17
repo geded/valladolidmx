@@ -14,21 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _tmp_notify_test: {
-        Row: {
-          msg: string | null
-          seq: number
-        }
-        Insert: {
-          msg?: string | null
-          seq?: number
-        }
-        Update: {
-          msg?: string | null
-          seq?: number
-        }
-        Relationships: []
-      }
       admin_profiles: {
         Row: {
           active: boolean

@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Download, RefreshCw } from "lucide-react";
 import { DirectSaleRequestsPanel } from "@/components/commerce/DirectSaleRequestsPanel";
+import { HostSettlementsPanel } from "@/components/commerce/HostSettlementsPanel";
 
 export const Route = createFileRoute("/_authenticated/cms/ventas-en-linea")({
   head: () => ({
@@ -174,6 +175,8 @@ function DirectSalesAdminPage() {
       </header>
 
       <DirectSaleRequestsPanel />
+
+      <HostSettlementsPanel />
 
       {/* KPIs */}
       <section className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
