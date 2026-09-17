@@ -166,7 +166,7 @@ export function parsePageSurface(surface: string): {
   source: TrafficSource;
   device: DeviceClass;
 } | null {
-  const match = /^page:([a-z_]+)\|src:([a-z]+)\|dev:([a-z]+)$/.exec(surface);
+  const match = /^page:([a-z_]+)\|src:([a-z]+)\|dev:([a-z]+)(?:\|cns:[a-z_]+)?$/.exec(surface);
   if (!match) return null;
   const [, pageType, source, device] = match;
   if (!(PAGE_TYPES as readonly string[]).includes(pageType)) return null;
