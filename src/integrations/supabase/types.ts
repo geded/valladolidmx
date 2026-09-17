@@ -7805,6 +7805,14 @@ export type Database = {
       }
     }
     Functions: {
+      _commerce_notify_booking: {
+        Args: {
+          _category: Database["public"]["Enums"]["notification_category"]
+          _event: string
+          _order: Database["public"]["Tables"]["concierge_orders"]["Row"]
+        }
+        Returns: undefined
+      }
       _concierge_first_response_at: {
         Args: { _case_id: string }
         Returns: string
