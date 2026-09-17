@@ -962,6 +962,8 @@ const cms: WorkspaceDefinition = {
       group: "operacion",
       order: 14.5,
       surfaces: ["sidebar", "palette"],
+      // La autorización efectiva permanece en el servidor (admin/super_admin).
+      roles: ["super_admin", "admin"],
     },
     {
       id: "cms.contenido-evaluacion",
