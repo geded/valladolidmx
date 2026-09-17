@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft } from "lucide-react";
 import { getConciergeReservation } from "@/lib/concierge/orders.functions";
+import { ReservationRefundPanel } from "@/components/commerce/ReservationRefundPanel";
 
 export const Route = createFileRoute("/_authenticated/concierge/reservaciones/$orderId")({
   head: () => ({ meta: [
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/concierge/reservaciones/$o
   ] }), component: ReservationDetailPage,
 });
 const money = (value: number, currency = "MXN") => new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(value / 100);
-const eventLabels: Record<string,string> = { payment_initiated: "Cobro en línea iniciado", payment_succeeded: "Pago confirmado", payment_failed: "Pago no completado", paid_demo: "Pago de demostración", cancelled_by_traveler: "Cancelada por el viajero" };
+const eventLabels: Record<string,string> = { payment_initiated: "Cobro en línea iniciado", payment_succeeded: "Pago confirmado", payment_failed: "Pago no completado", paid_demo: "Pago de demostración", cancelled_by_traveler: "Cancelada por el viajero", payment_refunded: "Reembolso registrado" };
 function ReservationDetailPage() {
   const { orderId } = Route.useParams(); const getReservation = useServerFn(getConciergeReservation);
   const query = useQuery({ queryKey: ["concierge-reservation", orderId], queryFn: () => getReservation({ data: { orderId } }) });
@@ -28,6 +29,7 @@ function ReservationDetailPage() {
     <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[["Estado", order.status], ["Forma de pago", order.paid_at ? order.payment_provider === "cash" ? "Efectivo" : "En línea" : "Sin pago"], ["Fecha de cobro", order.paid_at ? new Date(order.paid_at).toLocaleString("es-MX", { timeZone: "America/Merida", dateStyle: "medium", timeStyle: "short" }) : "Pendiente"], ["Contacto", order.traveler_email ?? order.traveler_phone ?? "No disponible"]].map(([label,value]) => <article key={label} className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 break-words text-sm font-semibold">{value}</p></article>)}</section>
     {booking.length ? <section><h2 className="font-serif text-2xl">Salida reservada</h2><div className="mt-3 divide-y divide-border rounded-lg border border-border bg-card">{booking.map((b) => <div key={b.hold_id} className="p-4"><p className="font-medium">{new Intl.DateTimeFormat("es-MX", { timeZone: b.timezone, weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date(b.starts_at))}</p><p className="mt-1 text-sm text-muted-foreground">{b.product_name} · {b.quantity} {b.quantity === 1 ? "persona" : "personas"}</p><p className="mt-1 text-xs text-muted-foreground">{b.status === "confirmed" ? "Lugares confirmados" : b.status === "released" ? "Lugares liberados" : `Lugares apartados hasta las ${new Intl.DateTimeFormat("es-MX", { timeZone: b.timezone, hour: "2-digit", minute: "2-digit" }).format(new Date(b.expires_at))}`}</p></div>)}</div></section> : null}
     <section><h2 className="font-serif text-2xl">Servicios reservados</h2><div className="mt-3 divide-y divide-border rounded-lg border border-border bg-card">{items.map((item) => <div key={item.id} className="flex items-start justify-between gap-4 p-4"><div><p className="font-medium">{item.title}</p>{item.description ? <p className="mt-1 text-sm text-muted-foreground">{item.description}</p> : null}<p className="mt-1 text-xs text-muted-foreground">Cantidad: {item.quantity}</p></div><p className="font-mono text-sm">{money(item.subtotal_amount, item.currency)}</p></div>)}</div></section>
+    <ReservationRefundPanel orderId={order.id} folio={order.folio} status={order.status} totalAmount={order.total_amount} currency={order.currency} paidAt={order.paid_at} refund={(order.metadata as { refund?: { amount?: number; reason?: string | null; at?: string } } | null)?.refund ?? null} />
     <section><h2 className="font-serif text-2xl">Bitácora de pago</h2><ol className="mt-3 space-y-3 border-l border-border pl-5">{events.map((event) => <li key={event.id}><p className="text-sm font-semibold">{eventLabels[event.event_type] ?? event.event_type}</p><time className="text-xs text-muted-foreground">{new Date(event.created_at).toLocaleString("es-MX", { timeZone: "America/Merida", dateStyle: "medium", timeStyle: "short" })}</time></li>)}</ol></section>
   </div>;
 }

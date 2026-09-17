@@ -180,6 +180,9 @@ export function HostSettlementsPanel() {
           <p className="mt-3 text-xs text-muted-foreground">
             Cobrado en efectivo {money(result.totals.cash_amount, currency)} · con tarjeta{" "}
             {money(result.totals.card_amount, currency)}
+            {result.totals.refunded_amount > 0 ? (
+              <> · reembolsado y descontado {money(result.totals.refunded_amount, currency)}</>
+            ) : null}
           </p>
 
           <div className="mt-5 space-y-3">

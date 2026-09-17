@@ -59,6 +59,7 @@ export interface HostSettlementRow {
   net_amount: number;
   cash_amount: number;
   card_amount: number;
+  refunded_amount: number;
   lines: HostSettlementOrderLine[];
 }
 
@@ -73,6 +74,7 @@ export interface HostSettlementsResult {
     net_amount: number;
     cash_amount: number;
     card_amount: number;
+    refunded_amount: number;
   };
   rows: HostSettlementRow[];
 }
@@ -108,7 +110,7 @@ export const getHostSettlements = createServerFn({ method: "POST" })
     let query = context.supabase
       .from("concierge_orders")
       .select(
-        `id, folio, paid_at, source_kind, currency, payment_provider,
+        `id, folio, paid_at, source_kind, status, currency, payment_provider,
          items:concierge_order_items!inner(
            title, quantity, currency, subtotal_amount, commission_amount,
            business_id, business:businesses(display_name, legal_name)
@@ -134,6 +136,7 @@ export const getHostSettlements = createServerFn({ method: "POST" })
       const folio = r.folio as string;
       const paidAt = (r.paid_at as string | null) ?? null;
       const sourceKind = (r.source_kind as string) ?? "direct_sale";
+      const isRefunded = ((r.status as string | null) ?? "") === "refunded";
       const method = paymentMethod((r.payment_provider as string | null) ?? null);
       currency = (r.currency as string) ?? currency;
 
@@ -165,10 +168,17 @@ export const getHostSettlements = createServerFn({ method: "POST" })
             net_amount: 0,
             cash_amount: 0,
             card_amount: 0,
+            refunded_amount: 0,
             lines: [],
           };
           byBusiness.set(businessId, row);
           seenOrders.set(businessId, new Set());
+        }
+
+        // Lo reembolsado no se le liquida al anfitrión: se reporta aparte.
+        if (isRefunded) {
+          row.refunded_amount += gross;
+          continue;
         }
 
         const seen = seenOrders.get(businessId)!;
@@ -210,6 +220,7 @@ export const getHostSettlements = createServerFn({ method: "POST" })
         net_amount: 0,
         cash_amount: 0,
         card_amount: 0,
+        refunded_amount: 0,
       },
       rows: [...byBusiness.values()].sort((a, b) => b.net_amount - a.net_amount),
     };
@@ -221,6 +232,7 @@ export const getHostSettlements = createServerFn({ method: "POST" })
       result.totals.net_amount += row.net_amount;
       result.totals.cash_amount += row.cash_amount;
       result.totals.card_amount += row.card_amount;
+      result.totals.refunded_amount += row.refunded_amount;
     }
 
     return result;
