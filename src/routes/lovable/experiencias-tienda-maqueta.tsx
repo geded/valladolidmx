@@ -196,7 +196,7 @@ function Hero() {
         </div>
         <div
           className="min-h-[280px] bg-cover bg-center md:min-h-[420px]"
-          style={{ backgroundImage: `url(${IMG}/zazil-tunich-hero-preview.webp)` }}
+          style={{ backgroundImage: `url(${sampleHero})` }}
           role="img"
           aria-label="Fotografía de muestra de un cenote del Oriente Maya"
         />
