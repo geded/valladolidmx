@@ -190,6 +190,13 @@ function demoProduct(): MarketplaceProductDetail {
         longitude: -88.2011,
       },
     },
+    effective_location: {
+      label: "Sede",
+      address_line1: "Calle 41 s/n",
+      address_line2: "Centro, Valladolid, Yuc.",
+      latitude: 20.6893,
+      longitude: -88.2011,
+    },
     related: [],
     promotions: [],
     reviews: [],

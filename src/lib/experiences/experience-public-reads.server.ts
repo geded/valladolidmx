@@ -407,7 +407,7 @@ export async function readExperienceReviewDetail(
   const { data: prod, error } = await client
     .from("products")
     .select(
-      "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
+      "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, location_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
     )
     .eq("slug", slug)
     .eq("product_type", "experiencia")
@@ -430,11 +430,10 @@ export async function readExperienceReviewDetail(
         .maybeSingle(),
       client
         .from("business_locations")
-        .select("label, address_line1, address_line2, latitude, longitude, is_primary")
+        .select("id, label, address_line1, address_line2, latitude, longitude, is_primary")
         .eq("business_id", row.business_id)
         .is("deleted_at", null)
-        .order("is_primary", { ascending: false })
-        .limit(1),
+        .order("is_primary", { ascending: false }),
       client
         .from("business_contacts")
         .select("contact_type, value, label, is_public, sort_order")
@@ -472,7 +471,12 @@ export async function readExperienceReviewDetail(
       : null;
 
   const cover = covers.get(String(row.id)) ?? null;
-  const loc = ((locations ?? []) as Row[])[0] ?? null;
+  const locationRows = (locations ?? []) as Row[];
+  const loc =
+    locationRows.find((location) => location.id === row.location_id) ??
+    locationRows.find((location) => location.is_primary === true) ??
+    locationRows[0] ??
+    null;
   const contact = ((contacts ?? []) as Row[])[0] ?? null;
 
   return {
@@ -545,6 +549,15 @@ export async function readExperienceReviewDetail(
           }
         : null,
     },
+    effective_location: loc
+      ? {
+          label: (loc.label as string | null) ?? null,
+          address_line1: (loc.address_line1 as string | null) ?? null,
+          address_line2: (loc.address_line2 as string | null) ?? null,
+          latitude: loc.latitude != null ? Number(loc.latitude) : null,
+          longitude: loc.longitude != null ? Number(loc.longitude) : null,
+        }
+      : null,
     related: [],
     promotions: [],
     reviews: [],
