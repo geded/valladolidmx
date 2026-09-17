@@ -139,7 +139,19 @@ function ExperienciaFichaPage() {
         <Card title="Condiciones comerciales">
           <dl className="grid grid-cols-2 gap-3">
             <Field label="Precio de venta" value={money(d.direct_sale_price_amount, currency)} />
-            <Field label="Precio de ficha" value={money(d.price_amount, d.price_currency)} />
+            <Field
+              label="Precio de ficha"
+              value={
+                d.price_amount == null
+                  ? "—"
+                  : new Intl.NumberFormat("es-MX", {
+                      style: "currency",
+                      currency: d.price_currency || "MXN",
+                      maximumFractionDigits: 0,
+                    }).format(d.price_amount)
+              }
+            />
+
             <Field
               label="Comisión"
               value={
