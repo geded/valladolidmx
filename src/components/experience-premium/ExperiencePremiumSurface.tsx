@@ -130,15 +130,18 @@ export function ExperiencePremiumSurface({
         )}
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="min-w-0">
-          <p className="text-sm">
-            <span className="text-muted-foreground">Operada por </span>
-            {vm.operatorHref ? (
-              <Link to={vm.operatorHref} className="font-semibold hover:underline">
-                {vm.operatorName}
-              </Link>
-            ) : (
-              <span className="font-semibold">{vm.operatorName}</span>
-            )}
+          <p className="flex items-center gap-2 text-sm">
+            <BusinessLogo url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
+            <span className="min-w-0">
+              <span className="text-muted-foreground">Operada por </span>
+              {vm.operatorHref ? (
+                <Link to={vm.operatorHref} className="font-semibold hover:underline">
+                  {vm.operatorName}
+                </Link>
+              ) : (
+                <span className="font-semibold">{vm.operatorName}</span>
+              )}
+            </span>
           </p>
           {vm.rating ? (
             <p className="mt-2 flex items-center gap-1.5 text-sm">
