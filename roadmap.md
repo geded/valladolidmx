@@ -162,3 +162,5 @@
 - [ ] Sección de Experiencias tipo Airbnb con reservación en línea, sobre la plantilla existente de `/experiencias` y con la marca actual (botón propio de Experiencias en el menú).
 - [ ] Alta por parte de las empresas autorizadas, eligiendo si su producto se vende en línea, se usa en Arma tu Viaje o ambos.
 - [ ] Todo lo vendido (en línea y por propuesta del concierge) llega al Centro Concierge con control, reportes y corte del día.
+
+- [ ] Botón/acceso propio de Experiencias: portada, exploración por categorías y menú (normal y hamburguesa).

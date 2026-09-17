@@ -39,6 +39,21 @@ import {
 } from "@/lib/experiences/experience-attributes";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
+/**
+ * Tarjeta del listado de Experiencias: el contrato turístico compartido más
+ * los datos comerciales y territoriales reales que la tienda necesita para
+ * decidir qué puede reservarse en línea y dónde se vive la experiencia.
+ */
+export type ExperienceListingItem = TourismCardVM & {
+  readonly destinationSlug: string | null;
+  readonly conversionMode: string | null;
+  readonly acceptsOnlinePayment: boolean;
+  readonly onlineSalePriceAmount: number | null;
+  readonly onlineSalePriceCurrency: string | null;
+  readonly durationMinutes: number | null;
+  readonly coordinates: { lat: number; lng: number } | null;
+};
+
 export interface ExperienceAxisDTO {
   readonly key: string;
   readonly label: string;
@@ -214,7 +229,7 @@ export async function listExperiencesListing(
     client
       .from("products")
       .select(
-        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
+        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
       )
       .eq("product_type", "experiencia")
       .in("status", statuses)
@@ -244,6 +259,29 @@ export async function listExperiencesListing(
     client,
     products.map((product) => String(product.id)),
   );
+
+  /* Ubicación real de la empresa operadora (regla Geolocation Mandatory).
+     Sólo coordenadas ya guardadas en el CMS: nunca se aproxima un punto. */
+  const businessIds = [
+    ...new Set(products.map((product) => String(product.business_id)).filter(Boolean)),
+  ];
+  const locationByBusiness = new Map<string, { lat: number; lng: number }>();
+  if (businessIds.length) {
+    const { data: locations } = await client
+      .from("business_locations")
+      .select("business_id, latitude, longitude, is_primary")
+      .in("business_id", businessIds)
+      .is("deleted_at", null)
+      .order("is_primary", { ascending: false });
+    for (const row of (locations ?? []) as Row[]) {
+      const id = String(row.business_id);
+      if (locationByBusiness.has(id)) continue;
+      const lat = row.latitude != null ? Number(row.latitude) : null;
+      const lng = row.longitude != null ? Number(row.longitude) : null;
+      if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) continue;
+      locationByBusiness.set(id, { lat, lng });
+    }
+  }
 
   const items: TourismCardVM[] = products
     .map((product) => {
@@ -285,9 +323,21 @@ export async function listExperiencesListing(
         secondaryAction: null,
         filterAttributes,
         destinationSlug: destination ? String(destination.slug) : null,
-      } as TourismCardVM & { destinationSlug: string | null };
+        /* Capacidad comercial real acreditada en el CMS. La tarjeta jamás
+           anuncia "Reserva en línea" sin estas dos banderas. */
+        conversionMode: (product.conversion_mode as string | null) ?? null,
+        acceptsOnlinePayment: product.accepts_online_payment === true,
+        onlineSalePriceAmount:
+          product.direct_sale_enabled === true && product.direct_sale_price_amount != null
+            ? Number(product.direct_sale_price_amount)
+            : null,
+        onlineSalePriceCurrency: (product.direct_sale_currency as string | null) ?? null,
+        durationMinutes:
+          product.duration_minutes != null ? Number(product.duration_minutes) : null,
+        coordinates: locationByBusiness.get(String(product.business_id)) ?? null,
+      } as ExperienceListingItem;
     })
-    .filter((item) => !destino || item.destinationSlug === destino);
+    .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);
 
   const destinationLabel = destino
     ? (destinationName ??
