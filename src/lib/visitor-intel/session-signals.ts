@@ -17,11 +17,14 @@ import { ensureAluxMemory } from "@/lib/alux/memory-store";
 
 import type { VisitorEvent } from "./events";
 import { VISITOR_EVENT_SCHEMA_VERSION } from "./events";
-import { classifyDevice, classifyTrafficSource, normalizeRoute } from "./page-signals";
+import {
+  classifyDevice,
+  classifyTrafficSource,
+  normalizeRoute,
+  type ConsentPurpose,
+} from "./page-signals";
 
-/** A4 · Propósitos declarables. El servidor descarta lo que quede fuera. */
-export const CONSENT_PURPOSES = ["measurement", "personalization"] as const;
-export type ConsentPurpose = (typeof CONSENT_PURPOSES)[number];
+export { CONSENT_PURPOSES, parseConsentPurpose, type ConsentPurpose } from "./page-signals";
 
 /** Umbrales de exploración profunda (T3): permanencia y superficies. */
 export const DEEP_EXPLORATION_SURFACES = 3;
@@ -110,16 +113,6 @@ export function buildSessionSurface(input: {
   purpose: ConsentPurpose;
 }): string {
   return `session|src:${input.source}|dev:${input.device}|cns:${input.purpose}`;
-}
-
-/** Lee el propósito declarado en el contexto (lectura del monitor). */
-export function parseConsentPurpose(surface: string): ConsentPurpose | null {
-  const match = /\|cns:([a-z_]+)/.exec(surface);
-  if (!match) return null;
-  const value = match[1];
-  return (CONSENT_PURPOSES as readonly string[]).includes(value)
-    ? (value as ConsentPurpose)
-    : null;
 }
 
 interface EmitBase {
