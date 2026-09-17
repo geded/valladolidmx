@@ -239,6 +239,14 @@ export const cancelConciergeOrder = createServerFn({ method: "POST" })
       payload: { reason: data.reason ?? null },
     });
 
+    // Aviso por correo al viajero (sólo reservaciones en línea, folio ERL).
+    try {
+      const { sendBookingTravelerEmail } = await import("@/lib/commerce/booking-emails.server");
+      await sendBookingTravelerEmail(data.orderId, "cancelled");
+    } catch {
+      // La cancelación ya quedó registrada; el aviso en plataforma sigue vigente.
+    }
+
     return { ok: true as const };
   });
 
