@@ -954,6 +954,16 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.configuracion",
+      workspaceId: "cms",
+      label: "Configuración",
+      icon: Settings,
+      to: "/cms/configuracion",
+      group: "operacion",
+      order: 14.5,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.contenido-evaluacion",
       workspaceId: "cms",
       label: "Contenido de evaluación",
