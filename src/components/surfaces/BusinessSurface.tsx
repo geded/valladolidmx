@@ -515,7 +515,11 @@ export function BusinessSurface({
   /* Familias con composición editorial de ficha completa. */
   const isImmersive = isLodging || isDining;
   const priceUnitLabel = isLodging ? "por noche" : "por platillo";
-  const priceOwnerLabel = isVacationRental ? "el anfitrión" : isDining ? "el restaurante" : "el hotel";
+  const priceOwnerLabel = isVacationRental
+    ? "el anfitrión"
+    : isDining
+      ? "el restaurante"
+      : "el hotel";
   /* Casa de vacaciones con una sola tarifa publicada: la tarifa vive en el
      bloque de estancia y no se repite como tarjeta genérica de producto. */
   const hidesGenericOffer =
@@ -769,15 +773,15 @@ export function BusinessSurface({
           </span>
         ) : null}
         <span className="flex flex-wrap items-center justify-end gap-2">
-            <ShareButton title={b.display_name} />
-            <FavoriteButton entityKind="business" entityId={b.id} />
-            <AddToTravelPlanButton
-              kind="business"
-              targetId={b.id}
-              title={b.display_name}
-              slug={b.slug}
-              {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
-            />
+          <ShareButton title={b.display_name} />
+          <FavoriteButton entityKind="business" entityId={b.id} />
+          <AddToTravelPlanButton
+            kind="business"
+            targetId={b.id}
+            title={b.display_name}
+            slug={b.slug}
+            {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+          />
         </span>
       </div>
 
@@ -823,7 +827,9 @@ export function BusinessSurface({
                 <p className="text-3xl font-semibold tracking-tight text-foreground">
                   <span className="text-base font-normal text-muted-foreground">Desde </span>
                   {stayFromPriceLabel}{" "}
-                  <span className="text-base font-normal text-muted-foreground">{priceUnitLabel}</span>
+                  <span className="text-base font-normal text-muted-foreground">
+                    {priceUnitLabel}
+                  </span>
                 </p>
                 {stayHighlightLine ? (
                   <p className="mt-2 text-sm text-muted-foreground">{stayHighlightLine}</p>
@@ -853,8 +859,7 @@ export function BusinessSurface({
               </div>
             </div>
             <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-              Tarifa orientativa publicada por {priceOwnerLabel}. Sin cobro ni reservación en
-              línea.
+              Tarifa orientativa publicada por {priceOwnerLabel}. Sin cobro ni reservación en línea.
             </p>
           </div>
         </section>
@@ -940,8 +945,7 @@ export function BusinessSurface({
       {/* Casa de vacaciones: si la única tarifa publicada ya se presenta en el
           bloque de estancia, no se repite la tarjeta genérica de producto.
           Con dos o más servicios publicados el catálogo se mantiene. */}
-      {!activeContract?.omissions.includes("offer") &&
-      !hidesGenericOffer ? (
+      {!activeContract?.omissions.includes("offer") && !hidesGenericOffer ? (
         <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceProductsBlock
             config={{
@@ -954,7 +958,6 @@ export function BusinessSurface({
               columns: isImmersive ? 3 : 2,
               capabilities: { compact: isImmersive },
             }}
-
           />
         </section>
       ) : null}

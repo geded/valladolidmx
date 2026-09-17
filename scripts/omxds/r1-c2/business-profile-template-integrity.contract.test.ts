@@ -33,7 +33,7 @@ describe("Ficha territorial de empresa · autoridad Premium única", () => {
       resolve(process.cwd(), "src/components/surfaces/BusinessSurface.tsx"),
       "utf8",
     );
-    expect(surfaceSource).not.toContain('import { ExperienceHero }');
+    expect(surfaceSource).not.toContain("import { ExperienceHero }");
     expect(surfaceSource).toContain("const usesApprovedFamilyTemplate = true;");
   });
 });
