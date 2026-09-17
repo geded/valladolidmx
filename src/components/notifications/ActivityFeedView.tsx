@@ -29,6 +29,22 @@ const severityClass: Record<string, string> = {
   info: "bg-primary",
 };
 
+/** Texto legible para los avisos de reservaciones (sólo presentación). */
+const eventLabel: Record<string, string> = {
+  "Concierge.Booking.Created": "Nueva reservación registrada",
+  "Concierge.Booking.Paid": "Reservación pagada",
+  "Concierge.Booking.Refunded": "Reservación reembolsada",
+  "Concierge.Booking.Cancelled": "Reservación cancelada",
+  "Concierge.Message.Received": "Mensaje nuevo en la conversación",
+};
+
+const readableSummary = (eventType: string, summary: string, payload: unknown): string => {
+  const label = eventLabel[eventType];
+  if (!label) return summary;
+  const ref = (payload as { payload_ref?: { folio?: string } } | null)?.payload_ref;
+  return ref?.folio ? `${label} · ${ref.folio}` : label;
+};
+
 const categoryLabel: Record<string, string> = {
   transactional: "Transaccional",
   operational: "Operativa",
