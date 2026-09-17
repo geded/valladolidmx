@@ -229,7 +229,7 @@ export async function listExperiencesListing(
     client
       .from("products")
       .select(
-        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
+        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, location_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
       )
       .eq("product_type", "experiencia")
       .in("status", statuses)
@@ -266,10 +266,11 @@ export async function listExperiencesListing(
     ...new Set(products.map((product) => String(product.business_id)).filter(Boolean)),
   ];
   const locationByBusiness = new Map<string, { lat: number; lng: number }>();
+  const locationById = new Map<string, { lat: number; lng: number }>();
   if (businessIds.length) {
     const { data: locations } = await client
       .from("business_locations")
-      .select("business_id, latitude, longitude, is_primary")
+      .select("id, business_id, latitude, longitude, is_primary")
       .in("business_id", businessIds)
       .is("deleted_at", null)
       .order("is_primary", { ascending: false });
@@ -279,6 +280,7 @@ export async function listExperiencesListing(
       const lat = row.latitude != null ? Number(row.latitude) : null;
       const lng = row.longitude != null ? Number(row.longitude) : null;
       if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) continue;
+      locationById.set(String(row.id), { lat, lng });
       locationByBusiness.set(id, { lat, lng });
     }
   }
@@ -334,7 +336,10 @@ export async function listExperiencesListing(
         onlineSalePriceCurrency: (product.direct_sale_currency as string | null) ?? null,
         durationMinutes:
           product.duration_minutes != null ? Number(product.duration_minutes) : null,
-        coordinates: locationByBusiness.get(String(product.business_id)) ?? null,
+        coordinates:
+          (product.location_id ? locationById.get(String(product.location_id)) : null) ??
+          locationByBusiness.get(String(product.business_id)) ??
+          null,
       } as ExperienceListingItem;
     })
     .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);

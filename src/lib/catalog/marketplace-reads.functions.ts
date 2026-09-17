@@ -308,6 +308,7 @@ export interface MarketplaceProductDetail {
   attributes: ProductAttributeItem[];
   /** Etiqueta editorial de tipo (`metadata.category_label`) si la empresa la capturó. */
   category_label: string | null;
+  effective_location: ProductBusinessContext["primary_location"];
 }
 
 export interface ProductAttributeItem {
@@ -399,7 +400,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     const { data: prod, error } = await supabase
       .from("products")
       .select(
-        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, location_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -455,8 +456,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .select("label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at")
         .eq("business_id", businessId)
         .is("deleted_at", null)
-        .order("is_primary", { ascending: false })
-        .limit(1),
+        .order("is_primary", { ascending: false }),
       supabase
         .from("promotions")
         .select(
@@ -634,15 +634,20 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         }
       : null;
 
-    const locRow = (
+    const locationRows = (
       (locations ?? []) as Array<{
+        id?: string;
         label: string | null;
         address_line1: string | null;
         address_line2: string | null;
         latitude: number | string | null;
         longitude: number | string | null;
       }>
-    )[0];
+    );
+    const locRow =
+      locationRows.find((row) => row.id === (prod as { location_id?: string | null }).location_id) ??
+      locationRows.find((row) => (row as { is_primary?: boolean }).is_primary) ??
+      locationRows[0];
     const primaryLocation = locRow
       ? {
           label: locRow.label,
@@ -737,6 +742,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         primary_contact: primaryContact,
         primary_location: primaryLocation,
       },
+      effective_location: primaryLocation,
       related,
       promotions: (promos ?? []).map((p) => ({
         id: p.id as string,
