@@ -75,6 +75,7 @@ import {
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
 import { PremiumHero } from "@/components/premium";
+import { BusinessLogo } from "@/components/common/BusinessLogo";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
@@ -778,6 +779,7 @@ export function BusinessSurface({
               slug={b.slug}
               {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
             />
+            </span>
           </div>
         </>
       ) : (
