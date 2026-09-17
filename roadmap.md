@@ -174,4 +174,4 @@
 - [x] Añadir ubicación efectiva de Experiencia en CMS con herencia de la ubicación principal del negocio y excepción mediante punto de encuentro específico, sin duplicar coordenadas. Validación de pertenencia activa y función interna sin ejecución pública.
 - [ ] Cierre global de Governance Integrity: bloqueado por 69 artefactos/fingerprints acumulados no registrados, incluidos cambios anteriores fuera de este delta; Route Inventory 262/262 y proyecciones PASS. El linter de Lovable Cloud conserva 328 avisos globales históricos; la función nueva de ubicación no es SECURITY DEFINER y sólo puede ejecutarla el servicio interno.
 
-- [ ] Logotipos de empresa: cargar logo transparente de Zazil Tunich y mostrarlo en su ficha y en sus experiencias.
+- [x] Logotipos de empresa: logo transparente de Zazil Tunich cargado en CMS y visible en su experiencia (ficha de Lugar pendiente de autorización).
