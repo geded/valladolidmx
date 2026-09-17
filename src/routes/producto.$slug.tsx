@@ -24,6 +24,7 @@ import {
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { bindProductRoute } from "@/lib/experience-builder/canonical-entity-binding";
+import { usesPremiumProductSurface } from "@/lib/experience-builder/canonical-entity-resolver";
 import {
   ProductSurface,
   ProductSurfaceContractBoundary,
@@ -244,7 +245,9 @@ function MarketplaceProductPage() {
      resolutor canónico ⇒ superficie oficial de Experiencia. El resto de
      productos conserva íntegra su ruta de render actual. */
   const isExperience =
-    canonicalBinding.family === "experience" || canonicalBinding.family === "tour";
+    canonicalBinding.family === "experience" ||
+    canonicalBinding.family === "tour" ||
+    usesPremiumProductSurface(product.product_type);
   if (isExperience) {
     const vm = buildExperienceVMFromProduct(product);
     return (
