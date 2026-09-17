@@ -496,7 +496,8 @@ export const getConciergeReservation = createServerFn({ method: "GET" })
     ]);
     if (itemError) throw new Error(itemError.message);
     if (eventError) throw new Error(eventError.message);
-    return { order, items: items ?? [], events: events ?? [] };
+    const { data: booking } = await context.supabase.rpc("commerce_order_booking", { _order_id: data.orderId });
+    return { order, items: items ?? [], events: events ?? [], booking: booking ?? [] };
   });
 
 async function getOrderForOperations(supabase: any, orderId: string) {
