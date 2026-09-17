@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceReviews } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviews";
-import { BusinessLocationBlock } from "@/components/experience-builder/blocks/business-location/BusinessLocationBlock";
+import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { ExperienceRelatedCollection } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection";
 import { EXPERIENCE_RELATED_ITEM_V11_DEFAULTS } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
 import type { ExperienceReviewsDTO } from "@/lib/experience-builder/blocks/experience-reviews/contract";
@@ -176,7 +176,7 @@ export function ExperiencePremiumSurface({
         </div>
       </section>
 
-      <ExperienceSubnav dto={{ anchors, variant: "underline", sticky: true, scrollOffset: 88, ariaLabel: "Secciones de la experiencia", capabilities: { scrollSpy: true, showIcons: false, collapseMobile: false } }} />
+      <ExperienceSubnav dto={{ anchors, variant: "underline", sticky: true, scrollOffset: 88, ariaLabel: "Secciones de la experiencia", capabilities: { scrollSpy: true, showIcons: false, collapseOnMobile: false } }} />
 
       <section id="resumen" data-eb-anchor className="scroll-mt-24">
         {vm.facts.length > 0 ? (
