@@ -67,7 +67,10 @@ function categoryIconSlug(label: string): string | null {
     artesanal: "artesanias",
   };
   const exact = CATEGORY_ICON_SLUGS.find((icon) => icon === slug);
-  return exact ?? aliases[slug] ?? null;
+  const canonicalWithinLabel = CATEGORY_ICON_SLUGS.find(
+    (icon) => slug.startsWith(`${icon}-`) || slug.endsWith(`-${icon}`),
+  );
+  return exact ?? aliases[slug] ?? canonicalWithinLabel ?? null;
 }
 
 const TRAVELER_OPTIONS = ["1 persona", "2 personas", "3 personas", "4 personas", "5 o más"];
