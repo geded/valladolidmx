@@ -23,6 +23,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { DirectSaleBuyButton } from "@/components/commerce/DirectSaleBuyButton";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
+import {
+  listDirectSaleRequests,
+  submitDirectSaleRequest,
+  cancelDirectSaleRequest,
+  DIRECT_SALE_REQUEST_LABEL,
+  type DirectSaleRequestRow,
+} from "@/lib/commerce/direct-sale-authorizations.functions";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -67,6 +74,21 @@ function DirectSalesPage() {
     enabled: Boolean(businessId),
     staleTime: 30_000,
   });
+
+  const fetchRequests = useServerFn(listDirectSaleRequests);
+  const { data: requests = [] } = useQuery({
+    queryKey: ["portal", "direct-sale-requests", businessId],
+    queryFn: () =>
+      fetchRequests({ data: { status: "all", businessId: businessId as string, limit: 200 } }),
+    enabled: Boolean(businessId),
+    staleTime: 15_000,
+  });
+
+  const latestByProduct = useMemo(() => {
+    const map = new Map<string, DirectSaleRequestRow>();
+    for (const r of requests) if (!map.has(r.product_id)) map.set(r.product_id, r);
+    return map;
+  }, [requests]);
 
   if (!businessId) {
     return (
@@ -122,7 +144,12 @@ function DirectSalesPage() {
       ) : (
         <ul className="space-y-4">
           {products.map((p) => (
-            <ProductDirectSaleCard key={p.id} product={p} businessId={businessId} />
+            <ProductDirectSaleCard
+              key={p.id}
+              product={p}
+              businessId={businessId}
+              request={latestByProduct.get(p.id) ?? null}
+            />
           ))}
         </ul>
       )}
@@ -160,9 +187,11 @@ function PaymentsStatusBanner({ ready }: { ready: boolean }) {
 function ProductDirectSaleCard({
   product,
   businessId,
+  request,
 }: {
   product: PortalProduct;
   businessId: string;
+  request: DirectSaleRequestRow | null;
 }) {
   const qc = useQueryClient();
   const update = useServerFn(updateProductDirectSaleSettings);
@@ -238,6 +267,46 @@ function ProductDirectSaleCard({
     },
   });
 
+  const submit = useServerFn(submitDirectSaleRequest);
+  const cancelRequest = useServerFn(cancelDirectSaleRequest);
+
+  const invalidateRequests = () => {
+    qc.invalidateQueries({ queryKey: ["portal", "direct-sale-requests", businessId] });
+    qc.invalidateQueries({ queryKey: ["portal", "products", businessId] });
+  };
+
+  const requestError = (e: unknown) => {
+    const msg = e instanceof Error ? e.message : "No se pudo completar la solicitud.";
+    const label = msg.includes("direct_sale_price_required")
+      ? "Captura y guarda el precio antes de solicitar la venta en línea."
+      : msg.includes("direct_sale_request_pending")
+        ? "Ya tienes una solicitud en revisión para esta experiencia."
+        : msg.includes("direct_sale_already_enabled")
+          ? "Esta experiencia ya tiene la venta en línea autorizada."
+          : msg;
+    toast.error(label);
+  };
+
+  const submitMutation = useMutation({
+    mutationFn: () => submit({ data: { productId: product.id } }),
+    onSuccess: () => {
+      toast.success("Solicitud enviada a Administración.");
+      invalidateRequests();
+    },
+    onError: requestError,
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: () => cancelRequest({ data: { requestId: request?.id as string } }),
+    onSuccess: () => {
+      toast.success("Solicitud retirada.");
+      invalidateRequests();
+    },
+    onError: requestError,
+  });
+
+  const pending = request?.status === "pending";
+
   return (
     <li className="rounded-xl border border-border bg-card p-5 shadow-soft">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -271,6 +340,53 @@ function ProductDirectSaleCard({
               : "La activa Administración tras revisión."}
           </p>
         </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-border/70 bg-muted/30 p-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium">
+            {request ? (
+              <>
+                Solicitud: {DIRECT_SALE_REQUEST_LABEL[request.status]}
+                {request.decided_at ? (
+                  <span className="ml-1 font-normal text-muted-foreground">
+                    · {new Date(request.decided_at).toLocaleDateString("es-MX")}
+                  </span>
+                ) : null}
+              </>
+            ) : (
+              "Sin solicitud de venta en línea"
+            )}
+          </p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {request?.decision_note
+              ? request.decision_note
+              : pending
+                ? "Administración revisará el precio y definirá la comisión."
+                : enabled
+                  ? "La venta en línea está autorizada por Administración."
+                  : "Guarda el precio y solicita la autorización de venta en línea."}
+          </p>
+        </div>
+        {enabled ? null : pending ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => cancelMutation.mutate()}
+            disabled={cancelMutation.isPending}
+          >
+            Retirar solicitud
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            onClick={() => submitMutation.mutate()}
+            disabled={submitMutation.isPending || dirty}
+            title={dirty ? "Guarda los cambios antes de solicitar" : undefined}
+          >
+            {submitMutation.isPending ? "Enviando…" : "Solicitar venta en línea"}
+          </Button>
+        )}
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
