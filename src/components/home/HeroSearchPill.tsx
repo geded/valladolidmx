@@ -145,7 +145,7 @@ export function HeroSearchPill({
           hasExtras
             ? /* Con segmentos adicionales la píldora fluye en varias líneas
                  y sólo se vuelve una sola fila cuando hay ancho real. */
-              "flex flex-wrap gap-y-1 xl:flex-nowrap xl:gap-0 xl:rounded-full"
+              "flex flex-wrap gap-1"
             : "grid grid-cols-[minmax(0,1fr)_2.75rem_2.75rem] rounded-full sm:flex sm:flex-row sm:gap-0",
           maxWidthClass,
         )}
@@ -158,7 +158,7 @@ export function HeroSearchPill({
               aria-label={`${destinoLabel}: ${destino?.name ?? destinoPlaceholder}`}
               className={cn(
                 "group relative flex min-h-12 min-w-0 items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:flex-[1.12] sm:px-3 sm:py-1.5",
-                hasExtras && "basis-full sm:basis-auto",
+                hasExtras && "basis-[calc(50%-0.25rem)] flex-1",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
