@@ -267,6 +267,46 @@ function ProductDirectSaleCard({
     },
   });
 
+  const submit = useServerFn(submitDirectSaleRequest);
+  const cancelRequest = useServerFn(cancelDirectSaleRequest);
+
+  const invalidateRequests = () => {
+    qc.invalidateQueries({ queryKey: ["portal", "direct-sale-requests", businessId] });
+    qc.invalidateQueries({ queryKey: ["portal", "products", businessId] });
+  };
+
+  const requestError = (e: unknown) => {
+    const msg = e instanceof Error ? e.message : "No se pudo completar la solicitud.";
+    const label = msg.includes("direct_sale_price_required")
+      ? "Captura y guarda el precio antes de solicitar la venta en línea."
+      : msg.includes("direct_sale_request_pending")
+        ? "Ya tienes una solicitud en revisión para esta experiencia."
+        : msg.includes("direct_sale_already_enabled")
+          ? "Esta experiencia ya tiene la venta en línea autorizada."
+          : msg;
+    toast.error(label);
+  };
+
+  const submitMutation = useMutation({
+    mutationFn: () => submit({ data: { productId: product.id } }),
+    onSuccess: () => {
+      toast.success("Solicitud enviada a Administración.");
+      invalidateRequests();
+    },
+    onError: requestError,
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: () => cancelRequest({ data: { requestId: request?.id as string } }),
+    onSuccess: () => {
+      toast.success("Solicitud retirada.");
+      invalidateRequests();
+    },
+    onError: requestError,
+  });
+
+  const pending = request?.status === "pending";
+
   return (
     <li className="rounded-xl border border-border bg-card p-5 shadow-soft">
       <div className="flex flex-wrap items-start justify-between gap-3">
