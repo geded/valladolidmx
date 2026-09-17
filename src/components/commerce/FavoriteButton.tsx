@@ -23,6 +23,8 @@ import {
 } from "@/lib/traveler/traveler-favorites.functions";
 import { useAnonymousTrip, ANON_COPY } from "@/lib/traveler/anonymous-draft";
 import { useProgressiveRegistration } from "@/lib/traveler/anonymous-draft/use-progressive-registration";
+import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   entityKind: FavoriteEntityKind;
@@ -31,6 +33,7 @@ interface Props {
   entityTitle?: string;
   entitySlug?: string;
   entityImageUrl?: string;
+  variant?: "default" | "media-overlay";
   className?: string;
 }
 
@@ -40,6 +43,7 @@ export function FavoriteButton({
   entityTitle,
   entitySlug,
   entityImageUrl,
+  variant = "default",
   className,
 }: Props) {
   const { user } = useAuth();
@@ -130,26 +134,38 @@ export function FavoriteButton({
   const active = optimistic ?? isActive;
   const disabled = mutation.isPending || anonBusy;
 
+  const label = active ? "Quitar de guardados" : "Guardar";
+
   return (
-    <button
+    <Button
       type="button"
+      variant={variant === "media-overlay" ? "secondary" : "outline"}
+      size={variant === "media-overlay" ? "icon" : "sm"}
       disabled={disabled}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
         void handleClick();
       }}
+      aria-label={label}
       aria-pressed={active}
       className={[
-        "inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60",
-        active
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-background hover:bg-accent",
+        variant === "media-overlay"
+          ? "rounded-full border border-background/70 bg-background/90 text-foreground shadow-elevated backdrop-blur hover:bg-background"
+          : active
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border bg-background hover:bg-accent",
         className ?? "",
       ].join(" ")}
     >
-      <span aria-hidden>{active ? "★" : "☆"}</span>
-      <span>{active ? "Guardado" : "Guardar"}</span>
-    </button>
+      {variant === "media-overlay" ? (
+        <Heart aria-hidden className={active ? "fill-primary text-primary" : undefined} />
+      ) : (
+        <>
+          <Heart aria-hidden className={active ? "fill-primary text-primary" : undefined} />
+          <span>{active ? "Guardado" : "Guardar"}</span>
+        </>
+      )}
+    </Button>
   );
 }

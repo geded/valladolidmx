@@ -312,6 +312,8 @@ export interface TourismCardProps {
   className?: string;
   /** Slot para inyectar acciones interactivas (FavoriteButton, etc.). */
   renderActions?: (vm: TourismCardVM) => ReactNode;
+  /** Acción contextual superpuesta al medio, por ejemplo Guardar. */
+  renderMediaActions?: (vm: TourismCardVM) => ReactNode;
   /** Contrato semántico I2; ausente conserva el renderer legacy. */
   contractFamily?: "destination";
   contractVariant?: "compact" | "standard" | "editorial" | "featured";
@@ -322,6 +324,7 @@ export function TourismCard({
   capabilities,
   className,
   renderActions,
+  renderMediaActions,
   contractFamily,
   contractVariant,
 }: TourismCardProps) {
@@ -422,6 +425,9 @@ export function TourismCard({
             <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-pill bg-success/90 px-2.5 py-1 text-[11px] font-semibold text-success-foreground shadow-soft backdrop-blur">
               {vm.availabilityLabel}
             </span>
+          ) : null}
+          {renderMediaActions ? (
+            <div className="absolute right-3 top-3 z-10">{renderMediaActions(vm)}</div>
           ) : null}
         </div>
       ) : null}

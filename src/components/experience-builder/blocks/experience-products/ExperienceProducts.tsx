@@ -30,6 +30,8 @@ export interface ExperienceProductsProps {
    * Mantiene el bloque de presentación 100% puro.
    */
   renderItemActions?: (item: ExperienceProductItem) => ReactNode;
+  /** Slot de acción sobre la fotografía, sin alterar otros consumidores. */
+  renderItemMediaActions?: (item: ExperienceProductItem) => ReactNode;
 }
 
 /* ------------------------------------------------------------------ *
@@ -102,7 +104,12 @@ function groupItems(
   }));
 }
 
-export function ExperienceProducts({ dto, className, renderItemActions }: ExperienceProductsProps) {
+export function ExperienceProducts({
+  dto,
+  className,
+  renderItemActions,
+  renderItemMediaActions,
+}: ExperienceProductsProps) {
   const {
     variant,
     heading,
@@ -120,6 +127,12 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
     ? (vm: TourismCardVM) => {
         const original = items.find((it) => it.id === vm.id);
         return original ? renderItemActions(original) : null;
+      }
+    : undefined;
+  const wrapMediaRender = renderItemMediaActions
+    ? (vm: TourismCardVM) => {
+        const original = items.find((it) => it.id === vm.id);
+        return original ? renderItemMediaActions(original) : null;
       }
     : undefined;
 
@@ -169,6 +182,7 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
                     vm={productItemToVM(it)}
                     capabilities={vmCaps}
                     renderActions={wrapRender}
+                    renderMediaActions={wrapMediaRender}
                   />
                 </li>
               ))}
@@ -181,6 +195,7 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
                     vm={productItemToVM(it)}
                     capabilities={vmCaps}
                     renderActions={wrapRender}
+                    renderMediaActions={wrapMediaRender}
                   />
                 </li>
               ))}
