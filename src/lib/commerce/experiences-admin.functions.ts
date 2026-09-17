@@ -114,7 +114,15 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => ListInput.parse(raw ?? {}))
   .handler(
-    async ({ data, context }): Promise<{ rows: CommerceExperienceRow[]; total: number }> => {
+    async ({
+      data,
+      context,
+    }): Promise<{
+      rows: CommerceExperienceRow[];
+      total: number;
+      limit: number;
+      offset: number;
+    }> => {
       await assertStaff(context);
 
       let query = context.supabase
