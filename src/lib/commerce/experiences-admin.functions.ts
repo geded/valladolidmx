@@ -224,6 +224,11 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
         };
       });
 
-      return { rows: mapped, total: count ?? mapped.length };
+      return {
+        rows: mapped,
+        total: count ?? mapped.length,
+        limit: data.limit,
+        offset: data.offset,
+      };
     },
   );
