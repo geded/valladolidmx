@@ -238,6 +238,9 @@ function Page() {
 
   const askAlux = () => {
     const partyLabel = PARTY_OPTIONS.find((item) => item.value === party)?.label ?? null;
+    const partyPreference = party
+      ? ({ solo: "Viajo solo", pareja: "En pareja", familiar: "En familia", amigos: "Con amigos" } as const)[party]
+      : null;
     const categoryLabel = CATEGORIES.find((item) => item.slug === category)?.label ?? null;
     const context = [
       destination !== "Todos los destinos" ? `Destino: ${destination}` : null,
@@ -248,7 +251,7 @@ function Page() {
       .join(" · ");
     askAluxWithPreferenceMemory({
       surface: "experiences-store-review",
-      ...(partyLabel ? { prompt: partyLabel } : {}),
+      ...(partyPreference ? { prompt: partyPreference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a comparar experiencias publicadas y convertir las elegidas en una propuesta para el concierge humano.",
         context || undefined,
