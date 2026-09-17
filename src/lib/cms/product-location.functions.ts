@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
 export interface ProductLocationDTO {
   mode: "inherited" | "specific";
@@ -21,7 +23,7 @@ function coordinate(value: unknown, min: number, max: number): number {
 }
 
 async function assertProductAccess(
-  supabase: Parameters<Parameters<typeof createServerFn>[0]>[0] extends never ? never : any,
+  supabase: SupabaseClient<Database>,
   userId: string,
   productId: string,
 ) {
