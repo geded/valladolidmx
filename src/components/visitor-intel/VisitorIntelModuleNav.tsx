@@ -17,7 +17,7 @@ export interface IntelModuleEntry {
 
 export const INTEL_MODULES: readonly IntelModuleEntry[] = [
   { id: "funnel", label: "Embudo del viaje", anchor: "mod-embudo" },
-  { id: "anonymous", label: "Visitantes anónimos", anchor: "mod-anonimos" },
+  { id: "anonymous", label: "Visitantes anónimos", anchor: "mod-embudo" },
   { id: "conversion", label: "Conversión del journey", anchor: "mod-conversion" },
   { id: "plans", label: "Travel Plans", anchor: "mod-conversion" },
   { id: "alux", label: "Alux", anchor: "mod-conversion" },

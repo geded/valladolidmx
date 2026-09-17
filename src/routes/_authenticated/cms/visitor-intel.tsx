@@ -173,7 +173,6 @@ function VisitorIntelCenter() {
       <div id="mod-embudo" className="scroll-mt-24">
         <PagePerformancePanel />
       </div>
-      <div id="mod-anonimos" className="sr-only" aria-hidden="true" />
       <SegmentationSection window={win} />
       <OpportunitySection window={win} />
       <PrioritizationSection window={win} />
