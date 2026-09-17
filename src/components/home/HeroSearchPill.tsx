@@ -158,7 +158,7 @@ export function HeroSearchPill({
               aria-label={`${destinoLabel}: ${destino?.name ?? destinoPlaceholder}`}
               className={cn(
                 "group relative flex min-h-12 min-w-0 items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:flex-[1.12] sm:px-3 sm:py-1.5",
-                hasExtras && "basis-[calc(50%-0.25rem)] flex-1 sm:flex-[unset] sm:basis-[calc(50%-0.25rem)]",
+                hasExtras && "!w-[calc(50%-0.25rem)] !flex-none",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
@@ -210,7 +210,7 @@ export function HeroSearchPill({
               className={cn(
                 "group relative flex size-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-border/70 p-0 text-left transition-colors sm:flex sm:min-h-12 sm:min-w-0 sm:flex-1 sm:justify-start sm:gap-2 sm:border-0 sm:px-3 sm:py-1.5",
                 hasExtras &&
-                  "size-auto min-h-12 w-auto min-w-0 flex-1 basis-[calc(50%-0.25rem)] justify-start gap-2 border-0 px-3 py-1.5",
+                  "!size-auto min-h-12 !w-[calc(50%-0.25rem)] !flex-none min-w-0 justify-start gap-2 border-0 px-3 py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openCategoria && "bg-muted/70",
               )}
