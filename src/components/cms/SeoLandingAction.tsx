@@ -13,7 +13,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles } from "lucide-react";
+import { Link as LinkIcon, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
