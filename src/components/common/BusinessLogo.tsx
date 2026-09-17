@@ -11,14 +11,15 @@ import { cn } from "@/lib/utils";
 export interface BusinessLogoProps {
   url: string | null | undefined;
   businessName: string;
-  /** Diámetro del contenedor. `sm` para líneas de texto, `md` para cabeceras. */
-  size?: "sm" | "md";
+  /** Diámetro del contenedor. `sm` para líneas, `md` para operador y `lg` para cabeceras. */
+  size?: "sm" | "md" | "lg";
   className?: string;
 }
 
 const SIZE_CLASS: Record<NonNullable<BusinessLogoProps["size"]>, string> = {
   sm: "size-8",
   md: "size-12",
+  lg: "size-16 sm:size-20",
 };
 
 export function BusinessLogo({ url, businessName, size = "sm", className }: BusinessLogoProps) {

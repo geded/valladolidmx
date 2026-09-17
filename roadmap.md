@@ -101,7 +101,9 @@
 
 - [x] Dar presencia a Alux tras enviar a Concierge: acompañar la espera y avisar desde Mi Viaje cuando exista una propuesta nueva.
 - [x] Reparar asignación y cotización del expediente: autoasignación ligada a la sesión desde la bandeja y el detalle, avisos claros, solicitud de cotización por servicio con empresa y refresco inmediato; validado con sesión Concierge y QA en 1440/834/430/390.
+
 ## Mejora de expedientes Concierge
+
 - [x] Auditar documentación oficial: contacto, alcance de cotización y autoría de propuesta.
 - [x] Comparar contrato documentado con captura e implementación actual.
 - [x] Definir delta mínimo con Scope Gate y Preservation Gate antes de modificar.
@@ -110,10 +112,12 @@
 - [x] Validar contratos Concierge, typecheck, formato y diff check. El render autenticado completo requiere una sesión de QA; 1440/834/430/390 alcanzaron correctamente el control de sesión sin desbordamiento.
 
 ## Propuesta con partidas propias del Concierge (2026-09-14)
+
 - [x] Permitir partidas escritas por el Concierge (título, importe, notas) sin empresa ni cotización, mezclables con cotizaciones recibidas.
 - [ ] Dejar claro en el compositor que la empresa sólo se involucra cuando se le solicita cotización desde el servicio.
 
 ## Itinerario tras aceptación + pago en efectivo (2026-09-14)
+
 - [x] La reservación creada desde la propuesta queda enlazada al viaje del cliente.
 - [x] Pago en efectivo: el viajero confirma y queda pagado; el concierge también puede registrarlo desde el expediente.
 - [x] Al pagar, el expediente pasa a cerrado ganado y se abre el itinerario confirmado del viajero.
@@ -121,17 +125,19 @@
 - [x] Confirmación de viaje antes de enviar al Concierge (TripBriefForm 3 secciones: datos del viaje, quiénes viajan, transportación con 'aún no lo decido'). Brief en travel_plans.meta.trip_brief, incluido en handoff context, mostrado en CaseFileView. Typecheck + build + Playwright 1440/834/430/390 OK. No publicado.
 
 ## Recordatorios de pago de propuesta aceptada (2026-09-14)
+
 - Propuesta `accepted` sin reservación pagada → correo al viajero a 1 h, 24 h y 72 h, y aviso interno al equipo a las 72 h.
 - Fuentes reales: `concierge_proposals.status`, `concierge_cases.status`, `concierge_orders.status`. Sin estados nuevos.
 - Idempotencia: columnas `pay_reminder_r1/r2/r3/team_sent_at` en `concierge_proposals`.
 - Selección: `get_proposals_needing_payment_reminder(_kind)` (SECURITY DEFINER, sólo `service_role`).
 - Trabajo `src/lib/cron/jobs/proposal-payment-reminders.server.ts` + gancho `/api/public/hooks/proposal-payment-reminders` (x-cron-secret, dry-run soportado).
-- Cron horario `proposal-payment-reminders-hourly` ('20 * * * *').
+- Cron horario `proposal-payment-reminders-hourly` ('20 \* \* \* \*').
 - Plantillas `proposal-payment-reminder` y `proposal-payment-stalled-team`.
 - 2026-09-14: verificado en producción — r1 enviado 15:20 UTC a Kafir (`email_send_log` = sent); r2 enviado manualmente 17:49 UTC a petición del Founder y marcado `pay_reminder_r2_sent_at`.
 - 2026-09-14: cron `eb-process-scheduled-publish` devolvía 401 cada 5 min (enviaba `apikey`, la ruta exigía `EB_CRON_SECRET`). Se migró el job a `cron_hooks_invoke(...)` y la ruta acepta también `CRON_HOOKS_SECRET`. Efectivo en producción al publicar.
 
 ## Zona horaria oficial fija: America/Merida (2026-09-14)
+
 - `src/lib/time/merida.ts` es la fuente única: `MERIDA_TIME_ZONE`, `formatInMerida`, `meridaDate/DateTime/LongDate/DayMonth/Clock`, `meridaToday`.
 - Aplicado en expedientes Concierge, bandejas, Mi Viaje, itinerario, reservaciones, historial, documentos, cupones, recuerdos, recap en vivo, portal empresarial y todas las plantillas/cron de correo.
 - Regla: prohibido formatear fechas visibles con la zona del dispositivo o del servidor.
@@ -183,3 +189,5 @@
 - [x] Inteligencia del Visitante · menús por módulo del blueprint CV8.3 (12 módulos: Embudo, Anónimos, Conversión, Travel Plans, Alux, Concierge, Empresas, Destinos, Revenue, Permanencia, Embajadores, Alertas) dentro de `/cms/visitor-intel`.
 
 - [x] Unificar todas las fichas de empresa en la plantilla Premium aprobada y retirar el formato editorial antiguo, preservando landings SEO independientes. La ruta territorial usa exclusivamente `BusinessSurface`; las composiciones `biz-*` sólo pueden aportar textos compatibles y `/l/<slug>` permanece independiente.
+- [x] Refinar la ficha Premium empresarial sin cambiar forma ni colores de marca: logotipo ligeramente dominante junto al nombre y experiencias/productos en carrusel compacto tipo Airbnb; validado en 1440/834/430/390.
+- [x] Retirar de la ficha empresarial las tarjetas redundantes Destino/Categoría/Estado; conservar breadcrumb y contexto territorial canónico.

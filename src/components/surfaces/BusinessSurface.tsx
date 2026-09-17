@@ -42,7 +42,6 @@ import { ExperienceGallery } from "@/components/experience-builder/blocks/experi
 import {
   businessToSubnavDTO,
   businessToDescriptionSectionDTO,
-  businessToInfoGridDTO,
   businessToCtaBarDTO,
   businessToStayEssentialsDTO,
   businessToStayAmenitiesDTO,
@@ -553,7 +552,6 @@ export function BusinessSurface({
     }),
   };
   const descriptionSection = businessToDescriptionSectionDTO(b);
-  const infoGridDto = businessToInfoGridDTO(b);
   const legacyCtaBarDto = businessToCtaBarDTO(b);
   const dominantAction = activeContract?.actions.find((action) => action.role === "dominant");
   const ctaBarDto = activeContract
@@ -745,7 +743,7 @@ export function BusinessSurface({
           // El Hero no repite el breadcrumb decorativo.
           eyebrow: variant.eyebrow,
           identity: businessLogoUrl ? (
-            <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
+            <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="lg" />
           ) : undefined,
           title: b.display_name,
           description: b.tagline || undefined,
@@ -902,11 +900,6 @@ export function BusinessSurface({
       ) : descriptionBeforeGallery && descriptionSection ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
           <ExperienceSection dto={descriptionSection} />
-          {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
-        </section>
-      ) : infoGridDto ? (
-        <section id="resumen" data-eb-anchor className="scroll-mt-24">
-          <ExperienceInfoGrid dto={infoGridDto} />
         </section>
       ) : null}
 
@@ -936,13 +929,13 @@ export function BusinessSurface({
           <ExperienceProductsBlock
             config={{
               source: "business",
-              /* Hospedaje: una sola fila horizontal deslizable con
-                 habitaciones compactas. */
-              variant: isImmersive ? "carousel" : "grid",
+              /* Una sola fila horizontal y compacta permite explorar la oferta
+                 sin convertir el perfil en un catálogo de tarjetas gigantes. */
+              variant: "carousel",
               heading: variant.productsHeading,
               emptyMessage: variant.productsEmpty,
-              columns: isImmersive ? 3 : 2,
-              capabilities: { compact: isImmersive },
+              columns: 3,
+              capabilities: { compact: true },
             }}
           />
         </section>
