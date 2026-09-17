@@ -284,7 +284,7 @@ export function HomePremiumSurface({
             className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
           >
             <span className="flex min-w-0 items-center gap-3">
-              <TourismCategoryIcon slug="experiencias" label="Experiencias" variant="standard" />
+              <TourismCategoryIcon slug="experiencias" variant="standard" />
               <span className="min-w-0">
                 <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
                   {content.experiencias.kicker}
