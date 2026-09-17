@@ -8190,6 +8190,19 @@ export type Database = {
         Args: { _business_id: string; _notes?: string }
         Returns: string
       }
+      commerce_booking_start: {
+        Args: {
+          _departure_id: string
+          _idempotency_key: string
+          _product_id: string
+          _quantity: number
+        }
+        Returns: Json
+      }
+      commerce_can_manage_order_holds: {
+        Args: { _order_id: string }
+        Returns: boolean
+      }
       commerce_can_view_product_inventory: {
         Args: { _product_id: string; _user_id: string }
         Returns: boolean
@@ -8265,6 +8278,42 @@ export type Database = {
           status: string
           timezone: string
         }[]
+      }
+      commerce_order_booking: {
+        Args: { _order_id: string }
+        Returns: {
+          departure_id: string
+          ends_at: string
+          expires_at: string
+          hold_id: string
+          product_name: string
+          quantity: number
+          starts_at: string
+          status: string
+          timezone: string
+        }[]
+      }
+      commerce_order_holds_confirm: {
+        Args: { _order_id: string }
+        Returns: number
+      }
+      commerce_order_holds_release: {
+        Args: { _order_id: string; _reason?: string }
+        Returns: number
+      }
+      commerce_public_departures: {
+        Args: { _from?: string; _product_id: string; _to?: string }
+        Returns: {
+          available: number
+          ends_at: string
+          id: string
+          starts_at: string
+          timezone: string
+        }[]
+      }
+      commerce_setting_int: {
+        Args: { _default: number; _key: string }
+        Returns: number
       }
       concierge_alux_context_for_case: {
         Args: { _case_id: string }
