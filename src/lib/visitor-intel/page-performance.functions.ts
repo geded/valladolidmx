@@ -263,8 +263,6 @@ export const getBusinessPagePerformance = createServerFn({ method: "POST" })
 
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
     const rows = await readEvents(since, {});
-    const own = rows.filter(
-      (row) => row.route.includes(`/${slug}`) || row.route.startsWith(`/l/`) === false ? row.route.includes(`/${slug}`) : row.route.includes(slug),
-    );
+    const own = rows.filter((row) => row.route.includes(slug));
     return aggregatePageRows(own, data.window_days, 25, { plans_created: 0, orders_paid: 0 });
   });
