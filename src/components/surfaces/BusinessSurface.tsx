@@ -75,6 +75,8 @@ import {
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
 import { PremiumHero } from "@/components/premium";
+import { BusinessLogo } from "@/components/common/BusinessLogo";
+import { cn } from "@/lib/utils";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
@@ -605,8 +607,11 @@ export function BusinessSurface({
   /* Sin composición Premium activa, la ficha conserva su galería editorial a
      partir de las fotografías publicadas en CMS (`business_media`). Sin
      fotografías no se renderiza nada: jamás se inventan medios. */
+  /* El logotipo es identidad de marca, no fotografía de la ficha: se muestra
+     junto al nombre y queda fuera del mosaico editorial. */
+  const businessLogoUrl = (b.media ?? []).find((m) => m.role === "logo" && m.url)?.url ?? null;
   const cmsGalleryItems = (b.media ?? [])
-    .filter((m) => Boolean(m.url))
+    .filter((m) => Boolean(m.url) && m.role !== "logo")
     .map((m) => ({
       kind: "image" as const,
       url: m.url,
@@ -753,7 +758,19 @@ export function BusinessSurface({
               badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
             }}
           />
-          <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
+          <div
+            className={cn(
+              "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
+              businessLogoUrl ? "justify-between" : "justify-end",
+            )}
+          >
+            {businessLogoUrl ? (
+              <span className="flex min-w-0 items-center gap-3">
+                <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
+                <span className="truncate text-sm font-semibold">{b.display_name}</span>
+              </span>
+            ) : null}
+            <span className="flex flex-wrap items-center justify-end gap-2">
             <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
             <AddToTravelPlanButton
@@ -763,6 +780,7 @@ export function BusinessSurface({
               slug={b.slug}
               {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
             />
+            </span>
           </div>
         </>
       ) : (
@@ -775,7 +793,19 @@ export function BusinessSurface({
       )}
 
       {usesApprovedFamilyTemplate ? null : (
-        <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap justify-end gap-2 px-5 sm:px-8 lg:px-12">
+        <div
+          className={cn(
+            "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
+            businessLogoUrl ? "justify-between" : "justify-end",
+          )}
+        >
+          {businessLogoUrl ? (
+            <span className="flex min-w-0 items-center gap-3">
+              <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
+              <span className="truncate text-sm font-semibold">{b.display_name}</span>
+            </span>
+          ) : null}
+          <span className="flex flex-wrap items-center justify-end gap-2">
           <ShareButton title={b.display_name} />
           <FavoriteButton entityKind="business" entityId={b.id} />
           <AddToTravelPlanButton
@@ -785,6 +815,7 @@ export function BusinessSurface({
             slug={b.slug}
             {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
           />
+          </span>
         </div>
       )}
 
