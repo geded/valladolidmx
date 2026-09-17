@@ -134,9 +134,6 @@ export function ExperienceInventoryPanel({ productId }: { productId: string }) {
   const invalidate = () =>
     qc.invalidateQueries({ queryKey: ["cms", "commerce-inventory", productId] });
 
-  const run = <T,>(fn: (payload: T) => Promise<unknown>, ok: string) =>
-    useMutationLike(fn, ok, invalidate);
-
   const templateMutation = useMutation({
     mutationFn: (payload: DraftTemplate) =>
       saveTemplate({
@@ -681,20 +678,4 @@ export function ExperienceInventoryPanel({ productId }: { productId: string }) {
       </Section>
     </div>
   );
-}
-
-// Helper reservado para futuras acciones de inventario.
-function useMutationLike<T>(
-  fn: (payload: T) => Promise<unknown>,
-  ok: string,
-  invalidate: () => Promise<void> | void,
-) {
-  return useMutation({
-    mutationFn: fn,
-    onSuccess: () => {
-      toast.success(ok);
-      void invalidate();
-    },
-    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Operación fallida."),
-  });
 }
