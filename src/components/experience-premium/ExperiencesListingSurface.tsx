@@ -1,48 +1,66 @@
 /**
- * `ExperiencesListingSurface` — listado maestro de Experiencias.
+ * `ExperiencesListingSurface` — tienda pública de Experiencias.
  *
- * Autoridad visual: Home Premium aprobado. Reutiliza EXACTAMENTE las
- * piezas compartidas ya extraídas del Home (`PremiumEditorialHero`,
- * `PremiumAluxBar`, `PremiumSectionHead`, `PremiumShowcaseGrid`,
- * `PremiumCompactRow`). No introduce hero, tarjetas ni tokens nuevos.
+ * Autoridad visual: maqueta de tienda aprobada (`/lovable/experiencias-
+ * tienda-maqueta`) construida sobre las piezas Premium ya aprobadas
+ * (`PremiumEditorialHero`, `PremiumAluxBar`, `PremiumSectionHead`).
+ * No introduce hero, tarjetas ni tokens nuevos ni superficies paralelas:
+ * esta misma superficie sirve la ruta pública y la revisión interna.
  *
  * Datos: exclusivamente el DTO público real (`PublicListingDTO`). Los
- * filtros se derivan de valores realmente publicados en el CMS; si un
- * eje no tiene datos, no se muestra. Nada inventado.
+ * filtros, categorías, destinos, precios, duraciones y coordenadas se
+ * derivan de lo publicado en el CMS; si un dato no existe, no se muestra.
+ * La etiqueta "Reserva en línea" sólo aparece con la capacidad comercial
+ * acreditada (modo de conversión + pago en línea autorizado).
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Heart, List, Map as MapIcon, MapPin, Search, Sparkles, Star } from "lucide-react";
 
 import {
   PremiumAluxBar,
-  PremiumCompactRow,
   PremiumEditorialHero,
   PremiumSectionHead,
-  PremiumShowcaseGrid,
-  type PremiumShowcaseItem,
 } from "@/components/home-premium/shared/PremiumShowcase";
 import {
   ExperienceFiltersBar,
   type FilterSelection,
 } from "@/components/experience-premium/ExperienceFiltersBar";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { InteractiveMap } from "@/components/maps/InteractiveMap";
+import { Button } from "@/components/ui/button";
 
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
-import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
+import { emitAluxSignal } from "@/lib/alux/memory";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
+import { compositionFromPartySize, type PartyComposition } from "@/lib/traveler/party-composition";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
-import type { PartyComposition } from "@/lib/traveler/party-composition";
 import { resolveExperienceCommerce } from "@/lib/experiences/experience-commerce";
 import { cn } from "@/lib/utils";
 
-const INTENT_PROMPTS = [
-  "Cultura maya",
-  "Cenotes y naturaleza",
-  "Con guía local",
-  "En familia",
-  "Medio día",
-] as const;
+/** Campos comerciales/territoriales reales que agrega la lectura pública. */
+type StoreCardVM = TourismCardVM & {
+  readonly destinationSlug?: string | null;
+  readonly conversionMode?: string | null;
+  readonly acceptsOnlinePayment?: boolean;
+  readonly onlineSalePriceAmount?: number | null;
+  readonly onlineSalePriceCurrency?: string | null;
+  readonly durationMinutes?: number | null;
+  readonly coordinates?: { lat: number; lng: number } | null;
+};
+
+const ALL = "__todas__";
+
+const TRAVELER_OPTIONS = ["1 persona", "2 personas", "3 personas", "4 personas", "5 o más"];
+
+const PARTY_PROMPT: Record<PartyComposition, string> = {
+  solo: "Viajo solo",
+  pareja: "En pareja",
+  familiar: "En familia",
+  amigos: "Con amigos",
+};
 
 interface FacetGroup {
   id: string;
@@ -66,22 +84,13 @@ function humanizeValue(value: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function toShowcaseItem(vm: TourismCardVM): PremiumShowcaseItem {
-  /* Kicker con datos reales: el tipo de experiencia capturado en el CMS
-     (eje `tipo_experiencia`); "Experiencia" sólo cuando no hay dato. En la
-     superficie de revisión interna el distintivo DEMO tiene prioridad. */
-  const reviewBadge = (vm.badges ?? [])
-    .map((badge) => (typeof badge === "string" ? badge : badge.label))
-    .find((label) => /DEMO/i.test(label));
-  return {
-    key: vm.id,
-    name: vm.name,
-    note: vm.tagline ?? vm.businessName ?? "Experiencia publicada en el Oriente Maya",
-    media: vm.mediaUrl ? { url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name } : null,
-    to: vm.href ?? "/experiencias",
-    kicker: reviewBadge ?? vm.eyebrow ?? "Experiencia",
-    meta: vm.territorialContext,
-  };
+function slugify(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function attributeValues(vm: TourismCardVM, key: string): string[] {
@@ -143,6 +152,18 @@ function buildFacets(
     .filter((facet) => facet.options.length > 1);
 }
 
+/** Duración publicada: minutos reales o el eje administrable `duracion`. */
+function durationLabelOf(vm: StoreCardVM, valueLabels: Record<string, string>): string | null {
+  const minutes = vm.durationMinutes ?? null;
+  if (minutes && minutes > 0) {
+    if (minutes < 60) return `${minutes} min`;
+    const hours = minutes / 60;
+    return Number.isInteger(hours) ? `${hours} h` : `${hours.toFixed(1).replace(".0", "")} h`;
+  }
+  const raw = attributeValues(vm, "duracion")[0] ?? null;
+  return raw ? (valueLabels[raw] ?? humanizeValue(raw)) : null;
+}
+
 export interface ExperiencesListingSurfaceProps {
   dto: PublicListingDTO;
   /** Aviso de superficie de revisión interna (preview noindex). */
@@ -164,12 +185,33 @@ export function ExperiencesListingSurface({
   const [query, setQuery] = useState("");
   const [party, setParty] = useState<PartyComposition | null>(null);
   const [active, setActive] = useState<FilterSelection>({});
+  const [view, setView] = useState<"lista" | "mapa">("lista");
+  const [category, setCategory] = useState<string>(ALL);
+  const [destination, setDestination] = useState<string>(ALL);
+  const [date, setDate] = useState("");
+  const [travelers, setTravelers] = useState("2 personas");
+  const anonymousTrip = useAnonymousTrip();
 
-  const items = dto.items;
+  const items = dto.items as readonly StoreCardVM[];
   const facets = useMemo(
     () => buildFacets(items, attributeAxes, attributeValueLabels),
     [items, attributeAxes, attributeValueLabels],
   );
+  const categoryFacet = facets.find((facet) => facet.id === "tipo") ?? null;
+  const destinationFacet = facets.find((facet) => facet.id === "destino") ?? null;
+  /* Los ejes de las barras (categoría y destino) no se duplican en la barra
+     de filtros para que el visitante tenga un solo control por eje. */
+  const barFacets = facets.filter((facet) => facet.id !== "tipo" && facet.id !== "destino");
+
+  useEffect(() => {
+    const count = anonymousTrip.trip?.travelerCount;
+    if (!count || party) return;
+    setParty(
+      (count.children ?? 0) > 0
+        ? "familiar"
+        : compositionFromPartySize(count.adults + (count.children ?? 0)),
+    );
+  }, [anonymousTrip.trip?.travelerCount, party]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -180,14 +222,16 @@ export function ExperiencesListingSurface({
           .filter(Boolean)
           .some((value) => (value as string).toLowerCase().includes(needle));
       if (!matchesQuery) return false;
-      return facets.every((facet) => {
+      if (category !== ALL && vm.eyebrow !== category) return false;
+      if (destination !== ALL && vm.territorialContext !== destination) return false;
+      return barFacets.every((facet) => {
         const selected = active[facet.id] ?? [];
         if (selected.length === 0) return true;
         const values = facet.values(vm);
         return selected.some((value) => values.includes(value));
       });
     });
-  }, [items, facets, active, query]);
+  }, [items, barFacets, active, query, category, destination]);
 
   const toggleFacet = (groupId: string, value: string) =>
     setActive((current) => {
@@ -198,23 +242,66 @@ export function ExperiencesListingSurface({
       return { ...current, [groupId]: next };
     });
 
-  const featured = filtered.slice(0, 4).map(toShowcaseItem);
-  const rest = filtered.slice(4);
+  const rememberContext = (kind: "territory_viewed" | "category_explored", key: string) => {
+    if (typeof window === "undefined") return;
+    void emitAluxSignal({
+      kind,
+      key,
+      purpose: "continuity",
+      context: {
+        isAuthenticated: false,
+        surface: "experiences-listing",
+        route: window.location.pathname,
+      },
+    });
+  };
 
-  const askAlux = (preference?: string) =>
+  const selectDestination = (value: string) => {
+    setDestination(value);
+    if (value !== ALL) rememberContext("territory_viewed", slugify(value));
+  };
+
+  const selectCategory = (value: string) => {
+    setCategory(value);
+    if (value !== ALL) rememberContext("category_explored", slugify(value));
+  };
+
+  const selectParty = (value: PartyComposition) => {
+    setParty(value);
+    const adults = value === "solo" ? 1 : value === "pareja" ? 2 : value === "familiar" ? 2 : 4;
+    void anonymousTrip.setTravelerCount(
+      value === "familiar" ? { adults: 2, children: 2 } : { adults, children: 0 },
+    );
+  };
+
+  const askAlux = (preference?: string) => {
+    const context = [
+      destination !== ALL ? `Destino: ${destination}` : null,
+      category !== ALL ? `Categoría: ${category}` : null,
+      party ? `Compañía: ${PARTY_PROMPT[party]}` : null,
+      date ? `Fecha tentativa: ${date}` : null,
+      travelers ? `Viajeros: ${travelers}` : null,
+      preference,
+    ]
+      .filter(Boolean)
+      .join(" · ");
     askAluxWithPreferenceMemory({
       surface: "experiences-listing",
-      ...(preference ? { prompt: preference } : {}),
+      ...(preference ? { prompt: preference } : party ? { prompt: PARTY_PROMPT[party] } : {}),
       hint: buildAluxStageAwareHint(
-        "Ayúdame a elegir experiencias reales publicadas en el Oriente Maya.",
-        [preference, party ? `Viajo ${party}` : null].filter(Boolean).join(" · ") || undefined,
+        "Ayúdame a elegir experiencias publicadas del Oriente Maya y a convertirlas en una propuesta para el concierge humano.",
+        context || undefined,
       ),
     });
+  };
+
+  const goToResults = () =>
+    document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
 
   const heroMedia = items.find((item) => item.mediaUrl);
 
   return (
-    <div className={cn("space-y-8", className)}>
+    <div className={cn("flex flex-col gap-9", className)}>
       {reviewNotice ? (
         <p className="rounded-pill border border-dashed border-border bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
           {reviewNotice}
@@ -232,155 +319,479 @@ export function ExperiencesListingSurface({
         }
         caption={dto.destinationLabel ? `Experiencias en ${dto.destinationLabel}` : undefined}
         searchSlot={
-          <label className="block">
-            <span className="sr-only">¿Qué experiencia quieres vivir?</span>
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="¿Qué experiencia quieres vivir?"
-              className="min-h-11 w-full rounded-pill border border-border bg-background px-5 text-sm"
-            />
-          </label>
+          <div className="rounded-2xl border border-border bg-background p-2 shadow-elevated">
+            <label className="block rounded-xl border border-border bg-card px-3 py-2">
+              <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
+                Qué quieres vivir
+              </span>
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Cenotes, cocina maya, bicicleta…"
+                className="mt-0.5 min-h-6 w-full bg-transparent text-sm outline-none"
+              />
+            </label>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {destinationFacet ? (
+                <SearchSelect
+                  label="Destino"
+                  value={destination}
+                  onChange={selectDestination}
+                  options={[
+                    { value: ALL, label: "Todos los destinos" },
+                    ...destinationFacet.options.map((option) => ({
+                      value: option.value,
+                      label: option.label,
+                    })),
+                  ]}
+                />
+              ) : null}
+              {categoryFacet ? (
+                <SearchSelect
+                  label="Categoría"
+                  value={category}
+                  onChange={selectCategory}
+                  options={[
+                    { value: ALL, label: "Todas las categorías" },
+                    ...categoryFacet.options.map((option) => ({
+                      value: option.value,
+                      label: option.label,
+                    })),
+                  ]}
+                />
+              ) : null}
+              <label className="rounded-xl border border-border bg-card px-3 py-2">
+                <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
+                  Fecha tentativa
+                </span>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(event) => setDate(event.target.value)}
+                  aria-label="Fecha tentativa de la experiencia"
+                  className="mt-0.5 min-h-6 w-full bg-transparent text-sm outline-none"
+                />
+              </label>
+              <SearchSelect
+                label="Viajeros"
+                value={travelers}
+                onChange={setTravelers}
+                options={TRAVELER_OPTIONS.map((value) => ({ value, label: value }))}
+              />
+            </div>
+            <Button type="button" onClick={goToResults} className="mt-2 min-h-11 w-full rounded-pill">
+              <Search aria-hidden />
+              Buscar experiencias
+            </Button>
+          </div>
         }
       />
 
-      <ExperienceFiltersBar
-        groups={facets.map((facet) => ({
-          id: facet.id,
-          label: facet.label,
-          options: facet.options,
-        }))}
-        selection={active}
-        onToggle={toggleFacet}
-        onClear={() => setActive({})}
-        resultCount={filtered.length}
-      />
-
-      {filtered.length === 0 ? (
-        <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-          {query || Object.values(active).some(Boolean)
-            ? "Ninguna experiencia publicada coincide con esos filtros."
-            : dto.emptyMessage}
-        </p>
-      ) : (
-        <>
-          <section aria-labelledby="experiencias-destacadas">
-            <PremiumSectionHead
-              id="experiencias-destacadas"
-              kicker="Empieza por aquí"
-              title={
-                reviewNotice
-                  ? "Experiencias publicadas y en revisión del Oriente Maya"
-                  : "Experiencias publicadas del Oriente Maya"
-              }
-              description="Vivencias con guías, cocineros y comunidades verificadas por Valladolid.mx."
-            />
-            <PremiumShowcaseGrid
-              items={featured}
-              featuredKicker="Experiencia"
-              detailLabel="Ver experiencia"
-            />
-          </section>
-
-          {rest.length > 0 ? (
-            <section aria-labelledby="experiencias-todas">
-              <PremiumSectionHead
-                id="experiencias-todas"
-                kicker="Todas las experiencias"
-                title={
-                  reviewNotice
-                    ? `${filtered.length} experiencias publicadas o en revisión`
-                    : `${filtered.length} experiencias publicadas`
-                }
-              />
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {rest.map((vm) => (
-                  <ExperienceListCard key={vm.id} vm={vm} valueLabels={attributeValueLabels} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </>
-      )}
-
-      {/* Alux y sus atajos viven bajo los resultados: la rejilla debe
-          quedar visible en el primer viewport tras el hero. */}
       <PremiumAluxBar
-        question="¿Qué quieres vivir en el Oriente Maya?"
+        question="¿Con quién vivirás esta experiencia?"
         selectedParty={party}
-        onSelectParty={(value) => {
-          setParty(value);
-          askAlux();
-        }}
+        onSelectParty={selectParty}
         onContinue={() => askAlux()}
+        continueLabel="Ver sugerencias de Alux"
       />
 
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Intereses sugeridos">
-        {INTENT_PROMPTS.map((prompt) => (
-          <button
-            key={prompt}
-            type="button"
-            onClick={() => askAlux(prompt)}
-            className="min-h-11 rounded-pill border border-border bg-background px-4 text-sm"
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
+      {categoryFacet ? (
+        <section aria-labelledby="categorias-title">
+          <PremiumSectionHead
+            id="categorias-title"
+            kicker="Qué quieres vivir"
+            title="Explora por categoría"
+          />
+          <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+            <CategoryTile
+              label="Todas"
+              slug={null}
+              selected={category === ALL}
+              onSelect={() => selectCategory(ALL)}
+            />
+            {categoryFacet.options.map((option) => (
+              <CategoryTile
+                key={option.value}
+                label={option.label}
+                slug={slugify(option.value)}
+                selected={category === option.value}
+                onSelect={() => selectCategory(option.value)}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {destinationFacet ? (
+        <section aria-labelledby="destinos-title" className="border-y border-border py-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="min-w-52">
+              <p className="text-xs font-semibold uppercase text-primary">Dónde quieres ir</p>
+              <h2 id="destinos-title" className="mt-1 font-display text-2xl">
+                Explora por destino
+              </h2>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 lg:ml-auto">
+              {[
+                { value: ALL, label: "Todos los destinos" },
+                ...destinationFacet.options.map((option) => ({
+                  value: option.value,
+                  label: option.label,
+                })),
+              ].map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={destination === option.value ? "default" : "outline"}
+                  aria-pressed={destination === option.value}
+                  onClick={() => selectDestination(option.value)}
+                  className="min-h-11 shrink-0 rounded-pill px-5"
+                >
+                  {option.value !== ALL ? <MapPin aria-hidden /> : null}
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {barFacets.length ? (
+        <ExperienceFiltersBar
+          groups={barFacets.map((facet) => ({
+            id: facet.id,
+            label: facet.label,
+            options: facet.options,
+          }))}
+          selection={active}
+          onToggle={toggleFacet}
+          onClear={() => setActive({})}
+          resultCount={filtered.length}
+        />
+      ) : null}
+
+      <section id="resultados" aria-labelledby="resultados-title" className="scroll-mt-32">
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <PremiumSectionHead
+            id="resultados-title"
+            kicker="Explora y compara"
+            title={
+              filtered.length === 1
+                ? "1 experiencia para ti"
+                : `${filtered.length} experiencias para ti`
+            }
+            description={
+              reviewNotice
+                ? "Incluye registros en revisión interna, marcados como DEMO."
+                : "Fotos grandes, información esencial y precio visible para decidir con facilidad."
+            }
+          />
+          {filtered.length ? (
+            <div
+              className="flex shrink-0 rounded-pill border border-border bg-card p-1"
+              aria-label="Vista de resultados"
+            >
+              <Button
+                type="button"
+                variant={view === "lista" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setView("lista")}
+                className="rounded-pill px-4"
+              >
+                <List aria-hidden />
+                Lista
+              </Button>
+              <Button
+                type="button"
+                variant={view === "mapa" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setView("mapa")}
+                className="rounded-pill px-4"
+              >
+                <MapIcon aria-hidden />
+                Mapa
+              </Button>
+            </div>
+          ) : null}
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="border-y border-border py-12 text-center">
+            <h3 className="font-display text-2xl">Prueba otra combinación</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {query || category !== ALL || destination !== ALL || Object.values(active).some((v) => v?.length)
+                ? "Ninguna experiencia publicada coincide con esa búsqueda."
+                : dto.emptyMessage}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-5 rounded-pill"
+              onClick={() => {
+                setQuery("");
+                setCategory(ALL);
+                setDestination(ALL);
+                setActive({});
+              }}
+            >
+              Ver todas las experiencias
+            </Button>
+          </div>
+        ) : view === "lista" ? (
+          <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((vm) => (
+              <ExperienceStoreCard key={vm.id} vm={vm} valueLabels={attributeValueLabels} />
+            ))}
+          </div>
+        ) : (
+          <ExperiencesMapView cards={filtered} valueLabels={attributeValueLabels} />
+        )}
+      </section>
     </div>
   );
 }
 
-function ExperienceListCard({
+function SearchSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: readonly { value: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="rounded-xl border border-border bg-card px-3 py-2">
+      <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
+        {label}
+      </span>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-0.5 min-h-6 w-full bg-transparent text-sm outline-none"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function CategoryTile({
+  label,
+  slug,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  slug: string | null;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  /* El ícono de marca sólo se usa cuando existe; si no, la categoría se
+     presenta con el símbolo neutro del sistema (nunca un hueco roto). */
+  const [hasIcon, setHasIcon] = useState(Boolean(slug));
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      aria-pressed={selected}
+      onClick={onSelect}
+      className={cn(
+        "h-24 min-w-28 snap-start flex-col gap-2 rounded-xl border px-3 py-3 whitespace-normal",
+        selected ? "border-primary bg-primary/10 shadow-soft" : "border-border bg-card hover:bg-muted",
+      )}
+    >
+      {slug && hasIcon ? (
+        <img
+          src={`/brand/category-icons/${slug}.png`}
+          alt=""
+          className="size-10 object-contain"
+          onError={() => setHasIcon(false)}
+        />
+      ) : (
+        <span className="grid size-10 place-items-center rounded-full bg-selva/10 text-selva">
+          <Sparkles className="size-5" aria-hidden />
+        </span>
+      )}
+      <span className="line-clamp-2 text-center text-xs leading-tight">{label}</span>
+    </Button>
+  );
+}
+
+function ExperienceStoreCard({
   vm,
   valueLabels,
+  compact = false,
 }: {
-  vm: TourismCardVM;
+  vm: StoreCardVM;
   valueLabels: Record<string, string>;
+  compact?: boolean;
 }) {
   const eligibility = evaluateTripEligibility({
     kind: "product",
     targetId: vm.id,
     title: vm.name,
   });
-  /* Capacidad comercial real: el listado nunca muestra "Reservar" sin
-     acreditación; el precio sólo aparece si está publicado. */
+  /* Capacidad comercial real acreditada en el CMS: la tarjeta nunca ofrece
+     reservar en línea sin modo de conversión y pago autorizado. */
   const commerce = resolveExperienceCommerce({
-    conversionMode: null,
-    acceptsOnlinePayment: false,
-    priceAmount: vm.priceAmount,
-    priceCurrency: vm.priceCurrency,
+    conversionMode: vm.conversionMode ?? null,
+    acceptsOnlinePayment: vm.acceptsOnlinePayment === true,
+    priceAmount: vm.onlineSalePriceAmount ?? vm.priceAmount,
+    priceCurrency: vm.onlineSalePriceCurrency ?? vm.priceCurrency,
   });
-  /* Duración publicada (eje `duracion`); se omite si no hay dato. */
-  const durationRaw = attributeValues(vm, "duracion")[0] ?? null;
-  const durationLabel = durationRaw
-    ? (valueLabels[durationRaw] ?? humanizeValue(durationRaw))
-    : null;
+  const onlineSale = vm.conversionMode === "reservar_en_linea" && vm.acceptsOnlinePayment === true;
+  const duration = durationLabelOf(vm, valueLabels);
+  const reviewBadge = (vm.badges ?? [])
+    .map((badge) => (typeof badge === "string" ? badge : badge.label))
+    .find((label) => /DEMO/i.test(label));
+
   return (
-    <div className="flex flex-col gap-2">
-      <PremiumCompactRow item={toShowcaseItem(vm)} />
-      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-        {durationLabel ? (
-          <span className="rounded-pill border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
-            {durationLabel}
+    <article className={cn("group min-w-0", compact && "grid grid-cols-[8rem_minmax(0,1fr)] gap-3")}>
+      <a
+        href={vm.href ?? "/experiencias"}
+        className={cn(
+          "relative block overflow-hidden rounded-xl bg-muted ring-focus",
+          compact ? "h-32" : "aspect-[4/3]",
+        )}
+      >
+        {vm.mediaUrl ? (
+          <img
+            src={vm.mediaUrl}
+            alt={vm.mediaAlt ?? vm.name}
+            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
+            loading="lazy"
+          />
+        ) : (
+          <span className="grid size-full place-items-center text-xs text-muted-foreground">
+            Sin fotografía publicada
+          </span>
+        )}
+        {!compact && (reviewBadge || onlineSale) ? (
+          <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-3 py-1 text-[10px] font-semibold uppercase shadow-soft">
+            {reviewBadge ?? "Reserva en línea"}
           </span>
         ) : null}
-        {commerce.priceLabel ? (
-          <span className="text-xs text-muted-foreground">Desde {commerce.priceLabel}</span>
-        ) : (
-          <span className="text-xs text-muted-foreground">Precio no publicado</span>
-        )}
-        {eligibility.eligible ? (
-          <AddToTravelPlanButton
-            kind="product"
-            targetId={vm.id}
-            title={vm.name}
-            subtitle={vm.businessName ?? undefined}
-            imageUrl={vm.mediaUrl}
-          />
+      </a>
+      {!compact && eligibility.eligible ? (
+        <div className="relative">
+          <div className="absolute bottom-full right-3 -translate-y-3">
+            <AddToTravelPlanButton
+              kind="product"
+              targetId={vm.id}
+              title={vm.name}
+              subtitle={vm.businessName ?? undefined}
+              imageUrl={vm.mediaUrl}
+            />
+          </div>
+        </div>
+      ) : null}
+      <div className={cn("pt-3", compact && "flex min-w-0 flex-col justify-center pt-0")}>
+        <div className="flex items-center justify-between gap-2 text-xs">
+          <p className="truncate font-semibold text-primary">
+            {[vm.territorialContext, vm.eyebrow].filter(Boolean).join(" · ")}
+          </p>
+          {vm.rating ? (
+            <span className="inline-flex shrink-0 items-center gap-1 font-medium">
+              <Star className="size-3 fill-current" aria-hidden /> {vm.rating}
+            </span>
+          ) : null}
+        </div>
+        <h3
+          className={cn("mt-1 line-clamp-2 font-display leading-snug", compact ? "text-base" : "text-lg")}
+        >
+          <a href={vm.href ?? "/experiencias"} className="ring-focus">
+            {vm.name}
+          </a>
+        </h3>
+        <p className="mt-1 truncate text-xs text-muted-foreground">
+          {[duration, vm.businessName].filter(Boolean).join(" · ") || "Experiencia publicada"}
+        </p>
+        <p className="mt-2 text-sm">
+          {commerce.priceLabel ? (
+            <>
+              <span className="font-semibold">{commerce.priceLabel}</span>
+              <span className="text-muted-foreground"> por persona</span>
+            </>
+          ) : (
+            <span className="text-muted-foreground">Precio a consultar</span>
+          )}
+        </p>
+        {compact && eligibility.eligible ? (
+          <div className="mt-2">
+            <AddToTravelPlanButton
+              kind="product"
+              targetId={vm.id}
+              title={vm.name}
+              subtitle={vm.businessName ?? undefined}
+              imageUrl={vm.mediaUrl}
+            />
+          </div>
         ) : null}
       </div>
+    </article>
+  );
+}
+
+function ExperiencesMapView({
+  cards,
+  valueLabels,
+}: {
+  cards: readonly StoreCardVM[];
+  valueLabels: Record<string, string>;
+}) {
+  /* Sólo se dibujan coordenadas reales guardadas en el CMS. */
+  const located = cards.filter((card) => card.coordinates);
+  const markers = located.map((card) => ({
+    lat: card.coordinates!.lat,
+    lng: card.coordinates!.lng,
+    title: card.name,
+    key: card.id,
+    href: card.href ?? null,
+  }));
+  const center = markers.length
+    ? {
+        lat: markers.reduce((sum, marker) => sum + marker.lat, 0) / markers.length,
+        lng: markers.reduce((sum, marker) => sum + marker.lng, 0) / markers.length,
+      }
+    : null;
+
+  return (
+    <div className="grid gap-5 xl:grid-cols-[minmax(20rem,0.8fr)_minmax(0,1.2fr)]">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+        {cards.slice(0, 4).map((card) => (
+          <ExperienceStoreCard key={card.id} vm={card} valueLabels={valueLabels} compact />
+        ))}
+      </div>
+      {center ? (
+        <div className="min-h-[32rem] overflow-hidden rounded-xl border border-border shadow-soft">
+          <InteractiveMap
+            lat={center.lat}
+            lng={center.lng}
+            markers={markers}
+            showMarkerNames
+            className="size-full min-h-[32rem]"
+          />
+        </div>
+      ) : (
+        <div className="grid min-h-[20rem] place-items-center rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+          Estas experiencias todavía no tienen su ubicación publicada en el mapa.
+        </div>
+      )}
+      {located.length < cards.length && center ? (
+        <p className="text-xs text-muted-foreground xl:col-span-2">
+          {cards.length - located.length} de {cards.length} experiencias aún no tienen ubicación
+          publicada y no aparecen en el mapa.
+        </p>
+      ) : null}
     </div>
   );
 }
