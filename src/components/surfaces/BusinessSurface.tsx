@@ -605,8 +605,11 @@ export function BusinessSurface({
   /* Sin composición Premium activa, la ficha conserva su galería editorial a
      partir de las fotografías publicadas en CMS (`business_media`). Sin
      fotografías no se renderiza nada: jamás se inventan medios. */
+  /* El logotipo es identidad de marca, no fotografía de la ficha: se muestra
+     junto al nombre y queda fuera del mosaico editorial. */
+  const businessLogoUrl = (b.media ?? []).find((m) => m.role === "logo" && m.url)?.url ?? null;
   const cmsGalleryItems = (b.media ?? [])
-    .filter((m) => Boolean(m.url))
+    .filter((m) => Boolean(m.url) && m.role !== "logo")
     .map((m) => ({
       kind: "image" as const,
       url: m.url,
