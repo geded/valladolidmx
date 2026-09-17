@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
-import { emitAluxSignal } from "@/lib/alux/memory";
+import { emitAluxSignal } from "@/lib/alux/signal-emitter";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft/hooks";
 import { compositionFromPartySize, type PartyComposition } from "@/lib/traveler/party-composition";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
