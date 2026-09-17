@@ -47,4 +47,14 @@ describe("Ficha territorial de empresa · autoridad Premium única", () => {
       '<span className="truncate text-sm font-semibold">{b.display_name}</span>',
     );
   });
+
+  it("mantiene una identidad dominante y la oferta en formato compacto", () => {
+    const surfaceSource = readFileSync(
+      resolve(process.cwd(), "src/components/surfaces/BusinessSurface.tsx"),
+      "utf8",
+    );
+    expect(surfaceSource).toContain('businessName={b.display_name} size="lg"');
+    expect(surfaceSource).toContain('variant: "carousel"');
+    expect(surfaceSource).toContain("capabilities: { compact: true }");
+  });
 });
