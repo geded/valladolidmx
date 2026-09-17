@@ -18,7 +18,9 @@ import { Heart, Share2, Star } from "lucide-react";
 import {
   PremiumSectionHead,
 } from "@/components/home-premium/shared/PremiumShowcase";
-import { AddToCartButton } from "@/components/commerce/AddToCartButton";
+import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { ShareSheet } from "@/components/share/ShareSheet";
@@ -93,6 +95,31 @@ export function ExperiencePremiumSurface({
       ) : null}
 
       <section aria-label={vm.name} className="space-y-5">
+        <PremiumHero
+          layout="entity"
+          vm={{
+            presentation: DEFAULT_PREMIUM_PRESENTATION,
+            eyebrow: [vm.eyebrow, vm.destinationLabel].filter(Boolean).join(" · ") || undefined,
+            title: vm.name,
+            description: vm.tagline || undefined,
+            media: vm.cover ? { url: vm.cover.url, alt: vm.cover.alt } : null,
+            badges: [],
+          }}
+        />
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button type="button" variant="outline" className="min-h-11 rounded-pill" onClick={() => setShareOpen(true)}><Share2 aria-hidden /> Compartir</Button>
+          <FavoriteButton entityKind="product" entityId={vm.id} entityTitle={vm.name} entitySlug={vm.slug} entityImageUrl={vm.cover?.url} className="min-h-11 rounded-pill px-4 text-sm" />
+          {tripEligibility.eligible ? (
+            <AddToTravelPlanButton
+              kind="product"
+              targetId={vm.id}
+              title={vm.name}
+              slug={vm.slug}
+              subtitle={vm.operatorName}
+              imageUrl={vm.cover?.url ?? null}
+            />
+          ) : null}
+        </div>
         {galleryItems.length ? (
           <ExperienceGallery
             dto={{ variant: "mosaic", heading: null, subheading: null, items: galleryItems, maxVisible: 5, aspect: "landscape", ariaLabel: `Galería de ${vm.name}`, capabilities: { lightbox: true, captions: false, video: false, panorama360: false, model3d: false, ar: false, ugc: false } }}
@@ -103,17 +130,7 @@ export function ExperiencePremiumSurface({
         )}
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-            {[vm.eyebrow, vm.destinationLabel].filter(Boolean).join(" · ")}
-          </p>
-          <h1 className="mt-2 text-balance font-serif text-3xl leading-tight sm:text-4xl">
-            {vm.name}
-          </h1>
-          {vm.tagline ? (
-            <p className="mt-3 text-base leading-relaxed text-muted-foreground">{vm.tagline}</p>
-          ) : null}
-
-          <p className="mt-4 text-sm">
+          <p className="text-sm">
             <span className="text-muted-foreground">Operada por </span>
             {vm.operatorHref ? (
               <Link to={vm.operatorHref} className="font-semibold hover:underline">
@@ -132,15 +149,17 @@ export function ExperiencePremiumSurface({
               </span>
             </p>
           ) : null}
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <FavoriteButton entityKind="product" entityId={vm.id} entityTitle={vm.name} entitySlug={vm.slug} entityImageUrl={vm.cover?.url} className="min-h-11 rounded-pill px-4 text-sm" />
-            <Button type="button" variant="outline" className="min-h-11 rounded-pill" onClick={() => setShareOpen(true)}><Share2 aria-hidden /> Compartir</Button>
-          </div>
           </div>
           <aside className="rounded-2xl border border-border bg-card p-5 shadow-elevated lg:sticky lg:top-24">
             {commerce.priceLabel ? <p className="font-display text-2xl">Desde {commerce.priceLabel}</p> : <p className="text-sm font-semibold">Planea esta experiencia</p>}
             <div className="mt-4 flex flex-col gap-2">
+            {commerce.canBookOnline ? (
+              <ReserveOnlineButton
+                productId={vm.id}
+                label={commerce.bookLabel ?? "Reservar en línea"}
+                className="min-h-11 w-full rounded-pill px-5 text-sm font-semibold"
+              />
+            ) : null}
             {tripEligibility.eligible ? (
               <AddToTravelPlanButton
                 kind="product"
@@ -152,12 +171,7 @@ export function ExperiencePremiumSurface({
                 variant="full"
               />
             ) : null}
-            {commerce.canBookOnline ? (
-              <AddToCartButton
-                productId={vm.id}
-                className="min-h-11 rounded-pill bg-primary px-5 text-sm font-semibold text-primary-foreground"
-              />
-            ) : commerce.contactLabel && commerce.contactHref &&
+            {!commerce.canBookOnline && commerce.contactLabel && commerce.contactHref &&
               (!tripEligibility.eligible || !commerce.contactLabel.toLocaleLowerCase("es-MX").includes("mi viaje")) ? (
               <a
                 href={commerce.contactHref}
@@ -369,7 +383,10 @@ export function ExperiencePremiumSurface({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 shadow-floating backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <div className="min-w-0">{commerce.priceLabel ? <p className="truncate text-sm font-semibold">Desde {commerce.priceLabel}</p> : <p className="text-sm font-semibold">Mi Viaje</p>}</div>
-          {commerce.canBookOnline ? <AddToCartButton productId={vm.id} /> : tripEligibility.eligible ? <AddToTravelPlanButton kind="product" targetId={vm.id} title={vm.name} slug={vm.slug} subtitle={vm.operatorName} imageUrl={vm.cover?.url ?? null} /> : null}
+          <div className="flex shrink-0 items-center gap-2">
+            {tripEligibility.eligible ? <AddToTravelPlanButton kind="product" targetId={vm.id} title={vm.name} slug={vm.slug} subtitle={vm.operatorName} imageUrl={vm.cover?.url ?? null} /> : null}
+            {commerce.canBookOnline ? <ReserveOnlineButton productId={vm.id} label={commerce.bookLabel ?? "Reservar"} className="rounded-pill" /> : null}
+          </div>
         </div>
       </div>
       <ShareSheet open={shareOpen} onOpenChange={setShareOpen} title={vm.name} url={typeof window !== "undefined" ? window.location.href : `/producto/${vm.slug}`} text="Descubre esta experiencia en el Oriente Maya." heading="Compartir experiencia" />
