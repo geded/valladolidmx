@@ -29,7 +29,6 @@ import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 import type { BusinessRelatedDTO } from "@/lib/catalog/business-related.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
-import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
@@ -41,7 +40,6 @@ import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/e
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import {
-  businessToHeroDTO,
   businessToSubnavDTO,
   businessToDescriptionSectionDTO,
   businessToInfoGridDTO,
@@ -454,7 +452,10 @@ export function BusinessSurface({
     sourceBusiness.category_slug,
     activeContract?.family,
   );
-  const usesApprovedFamilyTemplate = approvedFamily !== null;
+  /* Una sola gramática Premium para toda ficha empresarial. La familia
+     conserva su semántica y bloques especializados, pero una categoría nueva
+     o sin `listing_family_key` nunca degrada a la presentación genérica. */
+  const usesApprovedFamilyTemplate = true;
 
   const b: MarketplaceBusinessDetail = activePremium
     ? {
@@ -485,7 +486,6 @@ export function BusinessSurface({
   // Responsabilidades restantes: proveer contexto (BusinessSurfaceProvider),
   // adaptar datos (adapters), y componer la secuencia declarativa de
   // bloques + anchors que la sub-navegación necesita.
-  const heroDto = businessToHeroDTO(b);
   const subnavDto = businessToSubnavDTO(b);
   /* Contacto acreditado: dato Premium cuando existe y, si no, el contacto
      público ya publicado en el CMS. Autoridad única para la sección
@@ -733,44 +733,42 @@ export function BusinessSurface({
       useContextCrumbs
       compactCrumbsOnMobile
     >
-      {usesApprovedFamilyTemplate ? (
-        <>
-          <PremiumHero
-            layout="entity"
-            vm={{
-              presentation: DEFAULT_PREMIUM_PRESENTATION,
-              // D-03 · La ruta territorial navegable la emite PublicShell.
-              // El Hero no repite el breadcrumb decorativo.
-              eyebrow: variant.eyebrow,
-              title: b.display_name,
-              description: b.tagline || undefined,
-              media: activePremium?.cover
-                ? {
-                    url: activePremium.cover.url,
-                    alt: activePremium.cover.alt,
-                  }
-                : b.cover_url
-                  ? {
-                      url: b.cover_url,
-                      alt: b.display_name,
-                    }
-                  : null,
-              badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
-            }}
-          />
-          <div
-            className={cn(
-              "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
-              businessLogoUrl ? "justify-between" : "justify-end",
-            )}
-          >
-            {businessLogoUrl ? (
-              <span className="flex min-w-0 items-center gap-3">
-                <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
-                <span className="truncate text-sm font-semibold">{b.display_name}</span>
-              </span>
-            ) : null}
-            <span className="flex flex-wrap items-center justify-end gap-2">
+      <PremiumHero
+        layout="entity"
+        vm={{
+          presentation: DEFAULT_PREMIUM_PRESENTATION,
+          // D-03 · La ruta territorial navegable la emite PublicShell.
+          // El Hero no repite el breadcrumb decorativo.
+          eyebrow: variant.eyebrow,
+          title: b.display_name,
+          description: b.tagline || undefined,
+          media: activePremium?.cover
+            ? {
+                url: activePremium.cover.url,
+                alt: activePremium.cover.alt,
+              }
+            : b.cover_url
+              ? {
+                  url: b.cover_url,
+                  alt: b.display_name,
+                }
+              : null,
+          badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
+        }}
+      />
+      <div
+        className={cn(
+          "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
+          businessLogoUrl ? "justify-between" : "justify-end",
+        )}
+      >
+        {businessLogoUrl ? (
+          <span className="flex min-w-0 items-center gap-3">
+            <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
+            <span className="truncate text-sm font-semibold">{b.display_name}</span>
+          </span>
+        ) : null}
+        <span className="flex flex-wrap items-center justify-end gap-2">
             <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
             <AddToTravelPlanButton
@@ -780,44 +778,8 @@ export function BusinessSurface({
               slug={b.slug}
               {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
             />
-            </span>
-          </div>
-        </>
-      ) : (
-        <ExperienceHero
-          dto={heroDto}
-          headingLevel="h1"
-          headerActionsSlot={null}
-          extensionsSlot={null}
-        />
-      )}
-
-      {usesApprovedFamilyTemplate ? null : (
-        <div
-          className={cn(
-            "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
-            businessLogoUrl ? "justify-between" : "justify-end",
-          )}
-        >
-          {businessLogoUrl ? (
-            <span className="flex min-w-0 items-center gap-3">
-              <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
-              <span className="truncate text-sm font-semibold">{b.display_name}</span>
-            </span>
-          ) : null}
-          <span className="flex flex-wrap items-center justify-end gap-2">
-          <ShareButton title={b.display_name} />
-          <FavoriteButton entityKind="business" entityId={b.id} />
-          <AddToTravelPlanButton
-            kind="business"
-            targetId={b.id}
-            title={b.display_name}
-            slug={b.slug}
-            {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
-          />
-          </span>
-        </div>
-      )}
+        </span>
+      </div>
 
       <TourismAluxPanel
         className="mx-auto mt-4 w-full max-w-7xl"

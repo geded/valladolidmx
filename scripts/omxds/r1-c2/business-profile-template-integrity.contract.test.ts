@@ -27,4 +27,13 @@ describe("Ficha territorial de empresa · autoridad Premium única", () => {
     expect(routeSource).toContain("resolveBusinessPremiumCopyFromTree(");
     expect(routeSource).toContain("BUSINESS_PREMIUM_BLOCK_TYPE");
   });
+
+  it("la plantilla madre no conserva un hero genérico alternativo", () => {
+    const surfaceSource = readFileSync(
+      resolve(process.cwd(), "src/components/surfaces/BusinessSurface.tsx"),
+      "utf8",
+    );
+    expect(surfaceSource).not.toContain('import { ExperienceHero }');
+    expect(surfaceSource).toContain("const usesApprovedFamilyTemplate = true;");
+  });
 });
