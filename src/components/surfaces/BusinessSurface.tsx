@@ -793,7 +793,19 @@ export function BusinessSurface({
       )}
 
       {usesApprovedFamilyTemplate ? null : (
-        <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap justify-end gap-2 px-5 sm:px-8 lg:px-12">
+        <div
+          className={cn(
+            "mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center gap-2 px-5 sm:px-8 lg:px-12",
+            businessLogoUrl ? "justify-between" : "justify-end",
+          )}
+        >
+          {businessLogoUrl ? (
+            <span className="flex min-w-0 items-center gap-3">
+              <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="md" />
+              <span className="truncate text-sm font-semibold">{b.display_name}</span>
+            </span>
+          ) : null}
+          <span className="flex flex-wrap items-center justify-end gap-2">
           <ShareButton title={b.display_name} />
           <FavoriteButton entityKind="business" entityId={b.id} />
           <AddToTravelPlanButton
