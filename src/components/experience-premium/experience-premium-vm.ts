@@ -7,6 +7,7 @@
  * dato real se omite.
  */
 import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
+import type { ProductReviewItem, ProductReviewStats } from "@/lib/catalog/marketplace-reads.functions";
 import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import {
   resolveExperienceCommerce,
@@ -79,6 +80,8 @@ export interface ExperiencePremiumVM {
   readonly location: ExperienceLocationVM | null;
   /** Valoración sólo cuando existen reseñas reales publicadas. */
   readonly rating: { readonly value: number; readonly count: number } | null;
+  readonly reviews: readonly ProductReviewItem[];
+  readonly reviewStats: ProductReviewStats;
   readonly related: readonly ExperienceRelatedVM[];
   readonly commerce: ExperienceCommerceDecision;
   /** Aviso visible sólo en superficies de revisión interna. */
@@ -194,7 +197,7 @@ export function buildExperienceVMFromProduct(
     hasProvider: Boolean(product.business.id),
   });
 
-  const loc = product.business.primary_location;
+  const loc = product.effective_location ?? product.business.primary_location;
   const location: ExperienceLocationVM | null =
     loc && (loc.label || loc.address_line1)
       ? {
@@ -260,6 +263,8 @@ export function buildExperienceVMFromProduct(
       product.review_stats.count > 0
         ? { value: product.review_stats.average, count: product.review_stats.count }
         : null,
+    reviews: product.reviews,
+    reviewStats: product.review_stats,
     related,
     commerce,
     demoNotice: null,
