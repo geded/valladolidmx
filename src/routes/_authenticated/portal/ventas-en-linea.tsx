@@ -87,10 +87,10 @@ function DirectSalesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Ventas en línea</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Activa la venta directa de tus experiencias: precio final para el viajero, moneda,
-          comisión de la plataforma, políticas y anticipación mínima. Sólo las experiencias que
-          marques aquí podrán venderse directo desde su ficha y desde los recorridos que arme el
-          Concierge en el Oriente Maya de Yucatán.
+          Prepara el precio, las políticas y los términos de tus experiencias. La activación de
+          la venta en línea y la comisión de la plataforma las autoriza y fija Administración tras
+          revisión. Una vez activada, la experiencia se vende directo desde su ficha y llega al
+          Concierge como reservación con folio ERL.
         </p>
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{enabledCount} activas</Badge>
