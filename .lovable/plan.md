@@ -55,6 +55,25 @@ Una sección nueva, **Experiencias**, con:
 
 El plan anterior hablaba de "sustituir autorizaciones". Lo digo en claro: hoy cualquier empresa con acceso a su portal puede encender ella misma la venta en línea y escribir su propio porcentaje de comisión. Eso significa que podría venderle a un turista y fijar cuánto nos toca. Antes de abrir cobros reales hay que cerrar esa puerta y dejar que la empresa **solicite** la venta en línea y que Administración la **autorice** y fije la comisión. No se le quita nada a la empresa: se le quita solamente la capacidad de autoaprobarse.
 
+## Tipos de producto (definido el 16 de septiembre)
+
+| Tipo | Informativa | Arma tu Viaje | Cotización | Venta en línea | Calendario y cupo |
+| --- | --- | --- | --- | --- | --- |
+| Experiencia | Sí | Sí | Sí | Sí | Día y hora |
+| Tour | Sí | Sí | Sí | Sí | Día y hora |
+| Evento | Sí | Sí | Sí | Sí | Fecha fija y boletos |
+| Transporte | Sí | Sí | Sí | Sí | Día y hora |
+| Servicio | Sí | Sí | Sí | Sí | Día y hora (se trata como experiencia) |
+| Artesanal | Sí | No | Sí | Sí, sólo recoger en tienda | No, sólo existencias |
+| Hotel | Sí | Sí | Sí | No en esta etapa | Por noches, motor aparte |
+| Restaurante | Sí | Sí | Sí | No en esta etapa | Reserva de mesa, sin cobro |
+
+Decisiones tomadas:
+
+- Hotel y restaurante quedan fuera del cobro en línea en esta etapa; siguen en Arma tu Viaje y en cotización.
+- Las artesanías vendidas en línea se pagan y se recogen en tienda. Sin envíos ni paqueterías por ahora.
+- Servicio se trata igual que una experiencia: con calendario, horarios y cupo.
+
 ## Orden de trabajo
 
 Cada paso se entrega, se revisa contigo y hasta entonces empieza el siguiente.
