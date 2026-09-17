@@ -14,6 +14,10 @@
  * degradados gigantes sustituyendo fotografía ausente.
  */
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { BusinessLogo } from "@/components/common/BusinessLogo";
+import { getPublicBusinessLogo } from "@/lib/catalog/business-logo.functions";
 import {
   Accessibility,
   ArrowRight,
@@ -205,6 +209,24 @@ function AluxPanel({
       </button>
     </section>
   );
+}
+
+/**
+ * Logotipo acreditado de la empresa de origen (`entityRef = business:<id>`).
+ * Fail-closed: sin entidad empresa o sin logo aprobado no renderiza nada y
+ * el hero conserva exactamente su composición aprobada.
+ */
+function LandingBrandLogo({ entityRef }: { entityRef: string | null }) {
+  const businessId = entityRef?.startsWith("business:") ? entityRef.slice("business:".length) : null;
+  const logoFn = useServerFn(getPublicBusinessLogo);
+  const q = useQuery({
+    queryKey: ["public", "business-logo", businessId],
+    queryFn: () => logoFn({ data: { businessId: businessId as string } }),
+    enabled: Boolean(businessId),
+    staleTime: 5 * 60_000,
+  });
+  if (!q.data?.url) return null;
+  return <BusinessLogo url={q.data.url} businessName={q.data.name ?? ""} size="md" />;
 }
 
 export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {

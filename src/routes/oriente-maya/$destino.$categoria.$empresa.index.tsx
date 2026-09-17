@@ -212,13 +212,6 @@ function EmpresaTerritorialPage() {
   // G8-R1-C2 — punto único de decisión: el resolutor canónico.
   const premiumEnabled = canonicalBinding.surface === "premium";
 
-  if (business.slug === "zazil-tunich") {
-    return (
-      <ContextEngineProvider declaration={declaration}>
-        <ZazilTunichPremiumSurface />
-      </ContextEngineProvider>
-    );
-  }
 
   /* Textos de sección editables desde el constructor. Cuando la
      composición publicada declara el bloque `vmx.business.premium`, la
