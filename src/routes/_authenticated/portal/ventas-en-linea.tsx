@@ -167,18 +167,13 @@ function ProductDirectSaleCard({
   const qc = useQueryClient();
   const update = useServerFn(updateProductDirectSaleSettings);
 
-  const [enabled, setEnabled] = useState(product.direct_sale_enabled);
+  const [enabled] = useState(product.direct_sale_enabled);
   const [price, setPrice] = useState<string>(
     product.direct_sale_price_amount != null
       ? String((product.direct_sale_price_amount / 100).toFixed(2))
       : "",
   );
   const [currency, setCurrency] = useState(product.direct_sale_currency ?? "MXN");
-  const [commissionPct, setCommissionPct] = useState<string>(
-    product.direct_sale_commission_bps != null
-      ? String((product.direct_sale_commission_bps / 100).toFixed(2))
-      : "10",
-  );
   const [cancellationPolicy, setCancellationPolicy] = useState(
     product.direct_sale_cancellation_policy ?? "",
   );
