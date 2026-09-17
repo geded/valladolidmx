@@ -233,6 +233,35 @@ async function readEvents(
   return data ?? [];
 }
 
+/** A1 · Sesiones anónimas nuevas (transición T1) dentro de la ventana. */
+async function readNewSessions(since: string): Promise<number> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count } = (await (supabaseAdmin as any)
+    .schema("visitor_intel")
+    .from("events")
+    .select("event_id", { count: "exact", head: true })
+    .eq("kind", "journey.transition")
+    .gte("occurred_at", since)) as { count: number | null };
+  return count ?? 0;
+}
+
+/** A7 · Caché corta de lectura; siempre reemplazable por recálculo. */
+const readCache = new Map<string, { at: number; snapshot: PagePerformanceSnapshot }>();
+const CACHE_TTL_MS = 60_000;
+
+function cached(key: string): PagePerformanceSnapshot | null {
+  const hit = readCache.get(key);
+  if (!hit || Date.now() - hit.at > CACHE_TTL_MS) return null;
+  return hit.snapshot;
+}
+
+function remember(key: string, snapshot: PagePerformanceSnapshot): PagePerformanceSnapshot {
+  readCache.set(key, { at: Date.now(), snapshot });
+  if (readCache.size > 200) readCache.clear();
+  return snapshot;
+}
+
 async function readFunnelExtras(since: string): Promise<{
   plans_created: number;
   orders_paid: number;
