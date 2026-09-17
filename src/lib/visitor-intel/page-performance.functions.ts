@@ -113,7 +113,7 @@ export function aggregatePageRows(
   rows: EventRow[],
   windowDays: 7 | 30 | 90,
   limit: number,
-  extra: { plans_created: number; orders_paid: number },
+  extra: { plans_created: number; orders_paid: number; new_sessions?: number },
 ): PagePerformanceSnapshot {
   const pages = new Map<
     string,
