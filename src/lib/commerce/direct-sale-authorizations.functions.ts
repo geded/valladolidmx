@@ -123,7 +123,7 @@ export const submitDirectSaleRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ requestId: string }> => {
     const { data: id, error } = await context.supabase.rpc(
       "product_direct_sale_request_submit",
-      { _product_id: data.productId, _note: data.note ?? null },
+      { _product_id: data.productId, _note: data.note ?? undefined },
     );
     if (error) throw new Error(error.message);
     return { requestId: id as unknown as string };
@@ -142,7 +142,7 @@ export const cancelDirectSaleRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { error } = await context.supabase.rpc("product_direct_sale_request_cancel", {
       _request_id: data.requestId,
-      _note: data.note ?? null,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -166,8 +166,8 @@ export const decideDirectSaleRequest = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("product_direct_sale_request_decide", {
       _request_id: data.requestId,
       _approve: data.approve,
-      _commission_bps: data.approve ? (data.commissionBps ?? null) : null,
-      _note: data.note ?? null,
+      _commission_bps: data.approve ? (data.commissionBps ?? undefined) : undefined,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -186,7 +186,7 @@ export const revokeDirectSaleAuthorization = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { error } = await context.supabase.rpc("product_direct_sale_revoke", {
       _product_id: data.productId,
-      _note: data.note ?? null,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
