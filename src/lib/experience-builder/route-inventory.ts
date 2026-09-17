@@ -631,6 +631,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/email/transactional/preview.ts",
   "src/routes/lovable/email/transactional/send.ts",
   "src/routes/lovable/experience-map-preview.tsx",
+  "src/routes/lovable/experiencias-tienda-maqueta.tsx",
   "src/routes/lovable/founder-home-premium-preview.tsx",
   "src/routes/lovable/founder-zazil-premium-preview.tsx",
   "src/routes/lovable/g4-destination-listing-premium-preview.tsx",
