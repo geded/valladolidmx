@@ -144,7 +144,12 @@ function DirectSalesPage() {
       ) : (
         <ul className="space-y-4">
           {products.map((p) => (
-            <ProductDirectSaleCard key={p.id} product={p} businessId={businessId} />
+            <ProductDirectSaleCard
+              key={p.id}
+              product={p}
+              businessId={businessId}
+              request={latestByProduct.get(p.id) ?? null}
+            />
           ))}
         </ul>
       )}
