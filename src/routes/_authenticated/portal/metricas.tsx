@@ -30,6 +30,7 @@ import {
   getBusinessCouponMetrics,
   type CouponMetrics,
 } from "@/lib/promotions/coupon-metrics.functions";
+import { BusinessPagePerformancePanel } from "@/components/portal/BusinessPagePerformancePanel";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -104,6 +105,13 @@ function MetricsPage() {
           Selecciona una empresa activa arriba para ver métricas.
         </div>
       )}
+
+      {businessId && (windowDays === 7 || windowDays === 30 || windowDays === 90) ? (
+        <BusinessPagePerformancePanel
+          businessId={businessId}
+          windowDays={windowDays as 7 | 30 | 90}
+        />
+      ) : null}
 
       {businessId && q.isLoading && (
         <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground shadow-soft">
