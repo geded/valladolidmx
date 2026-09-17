@@ -248,7 +248,7 @@ function ItemsLayout({
             className={cn(
               "shrink-0 snap-start",
               tourismCaps.compact
-                ? "min-w-[210px] max-w-[240px] sm:min-w-[230px]"
+                ? "min-w-[190px] max-w-[240px] sm:min-w-[230px]"
                 : "min-w-[260px] max-w-[300px]",
             )}
           >

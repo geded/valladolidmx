@@ -23,7 +23,7 @@ export function PremiumHero({
         data-premium-layout="entity"
         className="overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
       >
-        <div className={cn("grid", hasMedia && "lg:grid-cols-[.84fr_1.16fr]")}>
+        <div className={cn("grid", hasMedia && "lg:grid-cols-[.9fr_1.1fr]")}>
           <div
             className={cn(
               "order-2 flex min-h-72 flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 lg:order-1 lg:px-12",
@@ -37,7 +37,7 @@ export function PremiumHero({
             ) : null}
             <div className="mt-3 flex min-w-0 items-center gap-4 sm:gap-5">
               {vm.identity ? <span className="shrink-0">{vm.identity}</span> : null}
-              <h1 className="min-w-0 text-balance font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-6xl">
+              <h1 className="min-w-0 text-balance font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-5xl">
                 {vm.title}
               </h1>
             </div>
