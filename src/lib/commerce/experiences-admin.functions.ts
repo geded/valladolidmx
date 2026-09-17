@@ -32,7 +32,8 @@ type RpcClient = {
 };
 
 async function assertStaff(context: { supabase: unknown; userId: string }): Promise<void> {
-  const rpc = (context.supabase as unknown as RpcClient).rpc;
+  const client = context.supabase as unknown as RpcClient;
+  const rpc: RpcClient["rpc"] = (fn, args) => client.rpc(fn, args);
   const roles = ["super_admin", "admin", "editor"] as const;
   const results = await Promise.all(
     roles.map((role) => rpc("has_role", { _user_id: context.userId, _role: role })),
