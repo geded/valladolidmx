@@ -187,9 +187,11 @@ function PaymentsStatusBanner({ ready }: { ready: boolean }) {
 function ProductDirectSaleCard({
   product,
   businessId,
+  request,
 }: {
   product: PortalProduct;
   businessId: string;
+  request: DirectSaleRequestRow | null;
 }) {
   const qc = useQueryClient();
   const update = useServerFn(updateProductDirectSaleSettings);
