@@ -68,7 +68,9 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
 
   const state = resolution.data?.state ?? "none";
   const existingId = resolution.data?.composition?.id ?? null;
+  const existingSlug = resolution.data?.composition?.slug ?? null;
   const label = resolution.data?.actionLabel ?? "Crear Landing SEO";
+  const promoPath = existingSlug ? `/l/${existingSlug}` : null;
 
   return (
     <section className="rounded-2xl border border-border bg-card p-4">
