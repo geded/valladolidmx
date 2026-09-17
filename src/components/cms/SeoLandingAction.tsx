@@ -16,6 +16,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link as LinkIcon, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { useAuth } from "@/hooks/useAuth";
+import { LandingPerformanceCard } from "@/components/cms/LandingPerformanceCard";
 import {
   canManageSeoLandings,
   type SeoLandingEntityType,
