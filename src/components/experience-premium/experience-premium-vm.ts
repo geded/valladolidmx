@@ -60,6 +60,8 @@ export interface ExperiencePremiumVM {
   readonly description: string;
   readonly operatorName: string;
   readonly operatorHref: string | null;
+  /** Logotipo firmado de la empresa operadora; `null` si no está cargado. */
+  readonly operatorLogoUrl: string | null;
   readonly destinationSlug: string | null;
   readonly destinationLabel: string | null;
   readonly cover: ExperienceMediaVM | null;
@@ -243,6 +245,7 @@ export function buildExperienceVMFromProduct(
     description: product.description || "",
     operatorName: product.business.display_name,
     operatorHref,
+    operatorLogoUrl: product.business.logo_url ?? null,
     destinationSlug,
     destinationLabel: destinationSlug ? humanize(destinationSlug) : null,
     cover,
