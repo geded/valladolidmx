@@ -214,7 +214,9 @@ function FeedSection({ items }: { items: AluxFeedItem[] }) {
                 aria-hidden
               />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{it.summary}</p>
+                <p className="text-sm font-medium">
+                  {readableSummary(it.event_type, it.summary, it.payload)}
+                </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {it.event_type} · {categoryLabel[it.category] ?? it.category} ·{" "}
                   {new Date(it.occurred_at).toLocaleString()}
