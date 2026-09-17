@@ -20,7 +20,13 @@ export const Route = createFileRoute("/lovable/experiencias-tienda-maqueta")({
   component: Page,
 });
 
-const IMG = "/api/public/studio-media/conceptual-preview/2026-09-01";
+import sampleCenote from "@/assets/maqueta-experiencias/cenote.jpg";
+import sampleCocina from "@/assets/maqueta-experiencias/cocina.jpg";
+import sampleIzamal from "@/assets/maqueta-experiencias/izamal.jpg";
+import sampleHamaca from "@/assets/maqueta-experiencias/hamaca.jpg";
+import sampleConventos from "@/assets/maqueta-experiencias/conventos.jpg";
+import sampleTemazcal from "@/assets/maqueta-experiencias/temazcal.jpg";
+import sampleHero from "@/assets/maqueta-experiencias/hero.jpg";
 
 const CATEGORIES = [
   { slug: "cenotes", label: "Cenotes y naturaleza" },
