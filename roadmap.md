@@ -164,3 +164,5 @@
 - [ ] Todo lo vendido (en línea y por propuesta del concierge) llega al Centro Concierge con control, reportes y corte del día.
 
 - [x] Botón/acceso propio de Experiencias: acceso destacado en portada (antes de la rejilla de categorías); ya existía en rejilla de categorías, buscador, menú normal y hamburguesa.
+
+- [ ] Afinar visualmente /experiencias sin modificar el acabado oficial de los iconos de categorías; preservar TourismCategoryIcon y sus activos canónicos.
