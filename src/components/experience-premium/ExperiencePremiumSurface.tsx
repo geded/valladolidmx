@@ -19,6 +19,7 @@ import {
   PremiumSectionHead,
 } from "@/components/home-premium/shared/PremiumShowcase";
 import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
+import { BusinessLogo } from "@/components/common/BusinessLogo";
 import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
