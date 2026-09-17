@@ -51,7 +51,7 @@ function PlatformConfigPage() {
 
   const configQ = useQuery({
     queryKey: ["cms", "configuracion"],
-    queryFn: () => fetchConfig({ data: {} }),
+    queryFn: () => fetchConfig(),
     staleTime: 15_000,
   });
 
