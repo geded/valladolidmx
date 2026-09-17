@@ -5785,6 +5785,82 @@ export type Database = {
           },
         ]
       }
+      product_direct_sale_requests: {
+        Row: {
+          business_id: string
+          commission_bps: number | null
+          created_at: string
+          currency: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          product_id: string
+          proposed_price_amount: number | null
+          request_note: string | null
+          requested_at: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          commission_bps?: number | null
+          created_at?: string
+          currency?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          product_id: string
+          proposed_price_amount?: number | null
+          request_note?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          commission_bps?: number | null
+          created_at?: string
+          currency?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          product_id?: string
+          proposed_price_amount?: number | null
+          request_note?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_direct_sale_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "product_direct_sale_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_direct_sale_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_media: {
         Row: {
           created_at: string
@@ -8881,6 +8957,27 @@ export type Database = {
         }[]
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      product_direct_sale_request_cancel: {
+        Args: { _note?: string; _request_id: string }
+        Returns: undefined
+      }
+      product_direct_sale_request_decide: {
+        Args: {
+          _approve: boolean
+          _commission_bps?: number
+          _note?: string
+          _request_id: string
+        }
+        Returns: undefined
+      }
+      product_direct_sale_request_submit: {
+        Args: { _note?: string; _product_id: string }
+        Returns: string
+      }
+      product_direct_sale_revoke: {
+        Args: { _note?: string; _product_id: string }
+        Returns: undefined
+      }
       publish_business: {
         Args: { _approve: boolean; _business_id: string; _notes?: string }
         Returns: undefined
