@@ -144,6 +144,11 @@ export function ExperiencePremiumSurface({
               )}
             </span>
           </p>
+           {vm.operatorHref ? (
+             <Button asChild variant="outline" className="mt-3 min-h-11 rounded-pill">
+               <Link to={vm.operatorHref}>Ver perfil de {vm.operatorName}</Link>
+             </Button>
+           ) : null}
           {vm.rating ? (
             <p className="mt-2 flex items-center gap-1.5 text-sm">
               <Star className="size-4 fill-primary text-primary" aria-hidden />

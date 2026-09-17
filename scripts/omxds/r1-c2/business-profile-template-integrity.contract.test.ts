@@ -57,4 +57,30 @@ describe("Ficha territorial de empresa · autoridad Premium única", () => {
     expect(surfaceSource).toContain('variant: "carousel"');
     expect(surfaceSource).toContain("capabilities: { compact: true }");
   });
+
+  it("usa las tarjetas vendibles para descubrir, sin acciones de contacto o reserva", () => {
+    const blockSource = readFileSync(
+      resolve(
+        process.cwd(),
+        "src/components/experience-builder/blocks/experience-products/ExperienceProductsBlock.tsx",
+      ),
+      "utf8",
+    );
+    expect(blockSource).toContain('variant="media-overlay"');
+    expect(blockSource).toContain("Ver experiencia");
+    expect(blockSource).not.toContain("ReserveOnlineButton");
+    expect(blockSource).not.toContain("RequestConciergeButton");
+  });
+
+  it("la ficha completa permite regresar al perfil territorial de la empresa", () => {
+    const experienceSource = readFileSync(
+      resolve(
+        process.cwd(),
+        "src/components/experience-premium/ExperiencePremiumSurface.tsx",
+      ),
+      "utf8",
+    );
+    expect(experienceSource).toContain("Ver perfil de {vm.operatorName}");
+    expect(experienceSource).toContain("vm.operatorHref");
+  });
 });
