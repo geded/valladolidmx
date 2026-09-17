@@ -500,6 +500,39 @@ export const getConciergeReservation = createServerFn({ method: "GET" })
     return { order, items: items ?? [], events: events ?? [], booking: booking ?? [] };
   });
 
+// ---------- cancelación con reembolso (sólo personal interno) ----------
+
+const RefundInput = z.object({
+  orderId: z.string().uuid(),
+  reason: z.string().trim().min(3).max(500),
+  /** Importe a devolver en centavos; vacío = reembolso total. */
+  amount: z.number().int().min(0).optional().nullable(),
+});
+
+/**
+ * Cancela una reservación PAGADA y registra el reembolso.
+ * Devuelve al cupo los lugares confirmados o apartados de esa reservación.
+ * La autorización real vive en `concierge_order_refund` (SECURITY DEFINER).
+ */
+export const refundConciergeReservation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => RefundInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: res, error } = await context.supabase.rpc("concierge_order_refund", {
+      _order_id: data.orderId,
+      _reason: data.reason,
+      _amount: data.amount ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return res as {
+      ok: boolean;
+      status: string;
+      folio: string;
+      amount: number;
+      released: number;
+    };
+  });
+
 async function getOrderForOperations(supabase: any, orderId: string) {
   const { data, error } = await supabase.from("concierge_orders").select("*").eq("id", orderId).maybeSingle();
   if (error) throw new Error(error.message);
