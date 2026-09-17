@@ -47,7 +47,37 @@ export interface PagePerformanceSnapshot {
     plans_created: number;
     orders_paid: number;
   };
+  /** A1–A3 · Avance de personas (hitos de sesión), no de páginas. */
+  journey: {
+    new_sessions: number;
+    deep_explorers: number;
+    anonymous_intents: number;
+  };
+  /** A5 · true cuando la muestra es menor a `MIN_SUBJECTS_FOR_READ`. */
+  suppressed: boolean;
   contract_version: typeof PAGE_PERFORMANCE_CONTRACT_VERSION;
+}
+
+/** A5 · k-anonimato acreditado por el contrato CV8.1. */
+export const MIN_SUBJECTS_FOR_READ = 25;
+
+/** Devuelve la instantánea sin cifras cuando la muestra es insuficiente. */
+export function suppressSmallSample(
+  snapshot: PagePerformanceSnapshot,
+): PagePerformanceSnapshot {
+  if (snapshot.total_visitors >= MIN_SUBJECTS_FOR_READ) return snapshot;
+  return {
+    ...snapshot,
+    total_views: 0,
+    total_visitors: 0,
+    pages: [],
+    by_source: { campaign: 0, organic: 0, referral: 0, direct: 0 },
+    by_device: { mobile: 0, tablet: 0, desktop: 0 },
+    by_locale: {},
+    funnel: { views: 0, engaged: 0, added_to_plan: 0, plans_created: 0, orders_paid: 0 },
+    journey: { new_sessions: 0, deep_explorers: 0, anonymous_intents: 0 },
+    suppressed: true,
+  };
 }
 
 const InputSchema = z.object({
