@@ -65,6 +65,12 @@ const AnonymousDraftImportRunner = React.lazy(() =>
     default: m.AnonymousDraftImportRunner,
   })),
 );
+// Monitor de usuarios · M1 — sonda de señales de página (no pinta nada).
+const PageSignalsProbe = React.lazy(() =>
+  import("@/components/analytics/PageSignalsProbe").then((m) => ({
+    default: m.PageSignalsProbe,
+  })),
+);
 const SyncStatusBanner = React.lazy(() =>
   import("@/components/discovery/SyncStatusBanner").then((m) => ({
     default: m.SyncStatusBanner,
@@ -412,6 +418,11 @@ function RootComponent() {
           sessionStorage (deep-links, refresh, back/forward).
         */}
             <GlobalNavigationSessionBridge />
+            {!isAppShellRoute ? (
+              <React.Suspense fallback={null}>
+                <PageSignalsProbe />
+              </React.Suspense>
+            ) : null}
           </AuthProvider>
         </BrandProvider>
       </I18nProvider>

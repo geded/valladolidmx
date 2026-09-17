@@ -140,6 +140,7 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
               ? "Publicada: este enlace ya es visible para buscadores y campañas."
               : "En borrador: el enlace sólo funcionará cuando publiques la landing."}
           </p>
+          {state === "published" ? <LandingPerformanceCard landingPath={promoPath} /> : null}
         </div>
       ) : null}
     </section>
