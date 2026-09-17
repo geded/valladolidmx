@@ -137,8 +137,16 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
         query = query.eq("businesses.destination_id", data.destinationId);
       }
       if (data.businessId) query = query.eq("business_id", data.businessId);
-      if (data.productType) query = query.eq("product_type", data.productType);
-      if (data.status) query = query.eq("status", data.status);
+      if (data.productType)
+        query = query.eq(
+          "product_type",
+          data.productType as (typeof SELLABLE_PRODUCT_TYPES)[number],
+        );
+      if (data.status)
+        query = query.eq(
+          "status",
+          data.status as "draft" | "in_review" | "approved" | "published" | "archived",
+        );
       if (data.sellable === "sellable") query = query.eq("direct_sale_enabled", true);
       if (data.sellable === "not_sellable") query = query.eq("direct_sale_enabled", false);
       if (data.search) query = query.ilike("name", `%${data.search}%`);
