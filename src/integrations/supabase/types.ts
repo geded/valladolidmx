@@ -8527,6 +8527,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      concierge_order_refund: {
+        Args: { _amount?: number; _order_id: string; _reason?: string }
+        Returns: Json
+      }
       concierge_order_start_online_payment: {
         Args: { _intent_id: string; _order_id: string; _provider: string }
         Returns: {
