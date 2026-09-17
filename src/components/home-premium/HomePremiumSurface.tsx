@@ -289,7 +289,7 @@ export function HomePremiumSurface({
                 <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
                   {content.experiencias.kicker}
                 </span>
-                <span className="block truncate text-base font-semibold sm:text-lg">
+                <span className="block text-base font-semibold sm:truncate sm:text-lg">
                   {content.experiencias.title}
                 </span>
                 <span className="block text-sm text-muted-foreground">
