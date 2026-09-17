@@ -231,8 +231,8 @@ function ProductDirectSaleCard({
       const label =
         msg === "direct_sale_price_required"
           ? "Ingresa un precio para activar la venta en línea."
-          : msg === "invalid_commission_bps"
-            ? "La comisión debe estar entre 0 y 100%."
+          : msg === "forbidden_direct_sale_authorization_required"
+            ? "Sólo Administración puede activar la venta en línea o cambiar la comisión."
             : msg;
       toast.error(label);
     },
