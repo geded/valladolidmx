@@ -343,6 +343,12 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
       _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
+    // Los lugares apartados quedan confirmados al registrarse el pago.
+    try {
+      await context.supabase.rpc("commerce_order_holds_confirm", { _order_id: data.orderId });
+    } catch {
+      // El pago ya quedó registrado; la confirmación de lugares se reintenta.
+    }
     return res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
   });
 
