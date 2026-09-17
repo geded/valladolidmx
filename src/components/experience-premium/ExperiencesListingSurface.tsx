@@ -701,7 +701,7 @@ function ExperienceStoreCard({
           </p>
           {vm.rating ? (
             <span className="inline-flex shrink-0 items-center gap-1 font-medium">
-              <Star className="size-3 fill-current" aria-hidden /> {vm.rating}
+              <Star className="size-3 fill-current" aria-hidden /> {vm.rating.value.toFixed(1)}
             </span>
           ) : null}
         </div>
