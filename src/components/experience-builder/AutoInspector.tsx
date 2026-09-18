@@ -1025,9 +1025,32 @@ function StructuredListControl({
         </button>
       ) : null}
       {rows.map((row, index) => (
-        <div key={index} className="rounded-lg border border-border bg-background p-2">
+        <div
+          key={index}
+          className="rounded-lg border border-border bg-background p-2"
+          onDragOver={(e) => {
+            if (dragIndex === null) return;
+            e.preventDefault();
+          }}
+          onDrop={(e) => {
+            if (dragIndex === null) return;
+            e.preventDefault();
+            moveTo(dragIndex, index);
+            setDragIndex(null);
+          }}
+        >
           <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="text-[11px] font-semibold">
+            <p className="flex items-center gap-1.5 text-[11px] font-semibold">
+              <span
+                draggable
+                onDragStart={() => setDragIndex(index)}
+                onDragEnd={() => setDragIndex(null)}
+                aria-label="Arrastrar para reordenar"
+                title="Arrastrar para reordenar"
+                className="inline-flex size-6 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
+              >
+                <GripVertical className="size-3.5" aria-hidden />
+              </span>
               {def.item?.label ?? "Elemento"} {index + 1}
             </p>
             <div className="flex items-center gap-1">
