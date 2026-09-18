@@ -11,10 +11,7 @@
  * debe consumirlo en lugar de emitir `<img>` sin fallback.
  */
 import { cn } from "@/lib/utils";
-import {
-  resolveMediaSource,
-  type MediaUsageContext,
-} from "@/lib/media/resolve-source";
+import { resolveMediaSource, type MediaUsageContext } from "@/lib/media/resolve-source";
 import { hasEditorialMedia, type EditorialMedia } from "./editorial-media";
 
 export type { EditorialMedia };
@@ -54,7 +51,7 @@ export function EditorialMediaFrame({
       priority: fetchPriority,
     });
     return (
-      <picture>
+      <picture className={cn("contents", className?.includes("absolute") && "absolute inset-0")}>
         {resolved.sources.map((source) => (
           <source
             key={source.type}
@@ -72,7 +69,7 @@ export function EditorialMediaFrame({
           {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
           {...(fetchPriority ? { fetchPriority } : {})}
           data-omxds-media="g8-m1"
-          className={className}
+          className={cn(className, "max-w-full")}
         />
       </picture>
     );

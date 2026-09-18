@@ -38,6 +38,7 @@ import {
   Minimize2,
   PanelLeftClose,
   PanelLeftOpen,
+  PanelsTopLeft,
   Pencil,
   Plus,
   Redo2,
@@ -2185,6 +2186,18 @@ function PageVisualEditor({
       ) : null}
 
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        {!previewMode && structureCollapsed ? (
+          <button
+            type="button"
+            onClick={() => setStructureCollapsed(false)}
+            className="absolute bottom-4 left-4 z-[65] inline-flex h-11 items-center gap-2 rounded-pill border border-border bg-background px-4 text-xs font-semibold text-foreground shadow-floating hover:bg-accent"
+            aria-label="Mostrar estructura de la página"
+            title="Mostrar estructura de la página"
+          >
+            <PanelsTopLeft className="size-4" aria-hidden />
+            Estructura
+          </button>
+        ) : null}
         {!previewMode && !structureCollapsed ? (
           <>
             <button
@@ -2846,7 +2859,7 @@ function HomeCanvas({
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const preset = getDevicePreset(deviceViewport);
-  const [available, setAvailable] = useState({ width: preset.width, height: preset.height });
+  const [availableWidth, setAvailableWidth] = useState(preset.width);
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
@@ -2858,20 +2871,14 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
-  // G7-C · La altura del canvas se deriva SIEMPRE del contenedor acotado del
-  // editor (medición + ResizeObserver), nunca de una altura mágica.
+  // El ancho disponible determina únicamente la escala. El alto del lienzo se
+  // adapta al documento real para poder recorrer y editar la página completa.
   useEffect(() => {
     const measure = () => {
       const el = outerRef.current;
       if (!el) return;
       const width = Math.max(120, el.clientWidth - 24);
-      // 24px de padding + 32px reservados para la barra indicadora del canvas.
-      const height = Math.max(240, el.clientHeight - 24 - 32);
-      setAvailable((current) =>
-        Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
-          ? { width, height }
-          : current,
-      );
+      setAvailableWidth((current) => (Math.abs(current - width) > 1 ? width : current));
     };
     measure();
     const outer = outerRef.current;
@@ -2889,7 +2896,7 @@ function HomeCanvas({
   // verticalmente, evitando lienzos ilegibles (27%) en pantallas bajas.
   // El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
   // por lo que container queries y breakpoints no se ven alterados.
-  const scale = Math.min(1, available.width / preset.width);
+  const scale = Math.min(1, availableWidth / preset.width);
   const headerVariant = resolveCanvasHeaderVariant(tree);
   const renderedTree =
     pageType === "home"
@@ -2905,7 +2912,7 @@ function HomeCanvas({
       <CanvasViewport
         device={deviceViewport}
         width={preset.width}
-        height={preset.height}
+        minimumHeight={preset.height}
         scale={scale}
         presetLabel={preset.label}
       >
@@ -2979,20 +2986,21 @@ function HomeCanvas({
 function CanvasViewport({
   device,
   width,
-  height,
+  minimumHeight,
   scale,
   presetLabel: _presetLabel,
   children,
 }: {
   device: DeviceViewport;
   width: number;
-  height: number;
+  minimumHeight: number;
   scale: number;
   presetLabel: string;
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
+  const [documentHeight, setDocumentHeight] = useState(minimumHeight);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3050,15 +3058,37 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    setMount(doc.body);
+    const canvasRoot = doc.createElement("div");
+    canvasRoot.setAttribute("data-eb-canvas-root", "");
+    doc.body.appendChild(canvasRoot);
+    setMount(canvasRoot);
     return () => {
+      setMount(null);
       cancelAnimationFrame(frame);
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
       viewportStyle.remove();
+      canvasRoot.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!mount) return;
+    const readHeight = () => {
+      const next = Math.max(minimumHeight, Math.ceil(mount.getBoundingClientRect().height));
+      setDocumentHeight((current) => (Math.abs(current - next) > 1 ? next : current));
+    };
+    readHeight();
+    const observer = new ResizeObserver(readHeight);
+    observer.observe(mount);
+    const win = mount.ownerDocument.defaultView;
+    win?.addEventListener("load", readHeight);
+    return () => {
+      observer.disconnect();
+      win?.removeEventListener("load", readHeight);
+    };
+  }, [minimumHeight, mount]);
 
   // HUD de medición (sólo entornos no productivos): innerWidth real del
   // iframe, overflow horizontal y posición efectiva del encabezado.
@@ -3110,7 +3140,7 @@ function CanvasViewport({
         data-eb-canvas-indicator=""
         className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
       >
-        <span>{`${width} × ${height} · ${Math.round(scaled * 100)}%`}</span>
+        <span>{`${width} px · página completa · ${Math.round(scaled * 100)}%`}</span>
         {hud && metrics ? (
           <span data-eb-canvas-hud="">
             innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
@@ -3122,19 +3152,19 @@ function CanvasViewport({
       <div
         data-eb-canvas-frame=""
         className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-        style={{ width: Math.round(width * scaled), height: Math.round(height * scaled) }}
+        style={{ width: Math.round(width * scaled), height: Math.round(documentHeight * scaled) }}
       >
         <iframe
           ref={iframeRef}
           title="Vista previa del canvas"
           data-eb-canvas-device={device}
           data-eb-canvas-width={width}
-          data-eb-canvas-height={height}
+          data-eb-canvas-height={documentHeight}
           data-eb-canvas-scale={scaled}
           className="block border-0 bg-background"
           style={{
             width,
-            height,
+            height: documentHeight,
             transform: `scale(${scaled})`,
             transformOrigin: "top left",
           }}
