@@ -218,7 +218,7 @@ export function EventPremiumSurface({
             ? { url: event.cover_url, alt: event.title }
             : null,
           badges: event.destination_name
-            ? [{ label: `${event.destination_name} · Oriente Maya`, tone: "neutral" as const }]
+            ? [{ label: `${event.destination_name} · Oriente Maya de Yucatán`, tone: "neutral" as const }]
             : [],
         }}
       />
@@ -240,7 +240,7 @@ export function EventPremiumSurface({
           onOpenChange={setShareOpen}
           title={event.title}
           url={typeof window !== "undefined" ? window.location.href : ""}
-          text="Descubre este evento en el Oriente Maya."
+          text="Descubre este evento en el Oriente Maya de Yucatán."
           heading="Compartir evento"
         />
         {!readOnlyPreview ? (
@@ -270,7 +270,7 @@ export function EventPremiumSurface({
         className="mx-auto mt-4 w-full max-w-7xl"
         title={fillEventCopy(copy.aluxTitle, event.title)}
         description={copy.aluxDescription}
-        task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya.`}
+        task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya de Yucatán.`}
         selection={{
           entityRef: `event:${event.id}`,
           title: event.title,
