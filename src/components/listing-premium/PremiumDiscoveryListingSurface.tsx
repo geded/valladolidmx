@@ -24,6 +24,10 @@ import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
@@ -376,16 +380,38 @@ export function PremiumDiscoveryListingSurface({
             </p>
             {filtered.length ? (
               <div className="space-y-3">
-                {filtered.map((item, index) => (
-                  <PremiumListingCard
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    profile={profile}
-                    featured={index === 0}
-                    cinematic={cinematic}
-                  />
-                ))}
+                {filtered.map((item, index) => {
+                  const tracking = {
+                    businessId: item.operatorId ?? null,
+                    surface: dto.family,
+                    rail: "listado",
+                    entityKind: item.entityKind,
+                    entityId: item.id,
+                  };
+                  const card = (
+                    <PremiumListingCard
+                      item={item}
+                      index={index}
+                      profile={profile}
+                      featured={index === 0}
+                      cinematic={cinematic}
+                    />
+                  );
+                  return (
+                    <div key={item.id}>
+                      {tracking.businessId ? (
+                        <>
+                          <BusinessImpressionTracker {...tracking} />
+                          <TrackClick {...tracking} eventType="click_card">
+                            {card}
+                          </TrackClick>
+                        </>
+                      ) : (
+                        card
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="rounded-2xl border border-border bg-card p-8 text-sm text-muted-foreground">
