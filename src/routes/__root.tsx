@@ -190,20 +190,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome, siteDomains] =
       await Promise.all([
         getOmxdsVisualFoundationsFlag(),
-      context.queryClient
-        .ensureQueryData(brandSettingsQueryOptions)
-        .catch(() => BRAND_SETTINGS_DEFAULTS),
-      // Lote 3B · C — Autoridad institucional vigente (distintivos).
-      context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
-      // El chrome público debe llegar en la primera respuesta para evitar que
-      // header y footer cambien de geometría después de hidratar React.
-      context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
-    ]);
+        context.queryClient
+          .ensureQueryData(brandSettingsQueryOptions)
+          .catch(() => BRAND_SETTINGS_DEFAULTS),
+        // Lote 3B · C — Autoridad institucional vigente (distintivos).
+        context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+        // El chrome público debe llegar en la primera respuesta para evitar que
+        // header y footer cambien de geometría después de hidratar React.
+        context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
+        // Configuración → Dominios: dominio canónico administrable.
+        getSiteDomainSettings().catch(() => SITE_DOMAIN_DEFAULTS),
+      ]);
+
+    // Aplica el dominio canónico vigente en SSR (antes de generar head/canonical).
+    setCanonicalDomain(siteDomains.primaryDomain);
 
     return {
       omxdsVisualFoundationsEnabled,
       brandSettings: normalizeBrandSettings(brandSettings),
       publishedHome,
+      siteDomains,
     };
   },
 
