@@ -740,11 +740,14 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const travelPlan = surface.indexOf('data-home-journey="travel-plan"');
     const remaining = surface.indexOf("remainingDiscoveryOrder.map");
 
+    // Alux abre el recorrido; después Territorio → Categorías → Rutas →
+    // Mi Viaje y al final el resto del descubrimiento.
     expect(territory).toBeGreaterThan(-1);
+    expect(alux).toBeGreaterThan(-1);
+    expect(alux).toBeLessThan(territory);
     expect(territory).toBeLessThan(categories);
     expect(categories).toBeLessThan(routes);
-    expect(routes).toBeLessThan(alux);
-    expect(alux).toBeLessThan(travelPlan);
+    expect(routes).toBeLessThan(travelPlan);
     expect(travelPlan).toBeLessThan(remaining);
     expect(surface).toContain('key !== "destinos" && key !== "rutas"');
     expect(surface).toContain('heroVariant === "editorial"');
@@ -784,7 +787,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(business).toContain("sourceBusiness.category_family_key");
     expect(business).toContain("sourceBusiness.category_slug");
     expect(business).toContain("activeContract?.family");
-    expect(business).toContain("const usesApprovedFamilyTemplate = approvedFamily !== null");
+    // Toda ficha usa ya la plantilla Premium aprobada de su familia.
+    expect(business).toContain("const usesApprovedFamilyTemplate = true");
     expect(business).toContain('hoteles: "hotel"');
     expect(business).toContain('restaurantes: "restaurant"');
     expect(business).toContain('"casas-de-vacaciones": "vacation_rental"');
