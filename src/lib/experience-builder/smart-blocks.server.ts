@@ -154,7 +154,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
   },
   products: {
     select:
-      "id, slug, name, tagline, cover_media_id, price_amount, price_currency, metadata, businesses:business_id ( slug, status, deleted_at, source_review_state, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
+      "id, slug, name, tagline, cover_media_id, price_amount, price_currency, metadata, businesses:business_id ( id, slug, status, deleted_at, source_review_state, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
     filterable: ["status", "deleted_at", "slug", "name"],
     defaultOrder: { column: "name", ascending: true },
     adapt: (row) => {
@@ -174,6 +174,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
       const priceRaw = row.price_amount;
       return {
         id: str(row.id),
+        business_id: str(biz.id),
         slug,
         name,
         short_description: str(row.tagline),
@@ -761,6 +762,8 @@ async function resolveRouteStopPoints(
  * ------------------------------------------------------------------ */
 
 export interface HomeRealCard {
+  /** Empresa operadora acreditada, cuando la fuente la declara. */
+  businessId: string | null;
   title: string;
   subtitle: string;
   category: string;
@@ -818,6 +821,7 @@ const EMPTY_HOME: HomeRealContent = {
 function cardsFrom(
   result: SmartBlockResolveResult,
   category: (item: Record<string, SmartBlockJsonValue>) => string,
+  businessIdOf?: (item: Record<string, SmartBlockJsonValue>) => string | null,
 ): HomeRealCard[] {
   const out: HomeRealCard[] = [];
   for (const item of result.items) {
@@ -829,6 +833,7 @@ function cardsFrom(
       (typeof item.cover_image_url === "string" ? item.cover_image_url : null) ??
       "";
     out.push({
+      businessId: businessIdOf?.(item) ?? null,
       title,
       subtitle: typeof item.short_description === "string" ? item.short_description : "",
       category: category(item),
@@ -904,8 +909,10 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       ? [valladolidItem, ...destRes.items.filter((item) => item.slug !== "valladolid")].slice(0, 8)
       : destRes.items;
     const destinos = cardsFrom({ ...destRes, items: destinationItems }, () => "Destino");
-    const businesses = cardsFrom(bizRes, (item) =>
-      typeof item.category_slug === "string" ? item.category_slug : "",
+    const businesses = cardsFrom(
+      bizRes,
+      (item) => (typeof item.category_slug === "string" ? item.category_slug : ""),
+      (item) => (typeof item.id === "string" ? item.id : null),
     );
     const byCategory = (slug: string) => businesses.filter((b) => b.category === slug);
     const stays = byCategory("hoteles")
@@ -915,7 +922,11 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       .slice(0, 4)
       .map((b) => ({ ...b, category: "Gastronomía" }));
     const experiencias = [
-      ...cardsFrom(prodRes, () => "Experiencia"),
+      ...cardsFrom(
+        prodRes,
+        () => "Experiencia",
+        (item) => (typeof item.business_id === "string" ? item.business_id : null),
+      ),
       ...byCategory("experiencias").map((b) => ({ ...b, category: "Experiencias" })),
       ...byCategory("cenotes").map((b) => ({ ...b, category: "Cenotes" })),
     ].slice(0, 6);
