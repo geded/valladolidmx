@@ -1,49 +1,97 @@
-# Plan · Qué hacer como portada editorial configurable
+# Plan · Qué hacer: inspiración y visibilidad empresarial
 
-## Clasificación
+## Decisión de producto
 
-Extensión localizada de la superficie Premium existente `/que-hacer`; no es un rediseño ni un segundo catálogo de Lugares.
+`/que-hacer` será una portada editorial para descubrir el Oriente Maya y una superficie comercial gobernada para empresas, no otro catálogo de Lugares.
 
-## Criterio de destacados
+La selección combinará tres carriles claramente separados:
 
-- Modelo híbrido: cada sección permite fijar manualmente contenidos y su orden desde el Experience Builder.
-- Los espacios no fijados se completan con rotación automática diaria y estable durante todo el día.
-- Sólo son elegibles fichas publicadas, visibles, con portada acreditada y datos mínimos completos.
-- Eventos: prioridad por vigencia y proximidad de fecha; nunca mostrar eventos vencidos.
-- Experiencias: prioridad para venta aprobada o ficha completa, sin inventar disponibilidad, precio ni autorización comercial.
-- Lugares: prioridad editorial y calidad de ficha; `/lugares` permanece como catálogo autoritativo.
-- Destinos: equilibrio territorial para evitar que un solo destino monopolice la selección.
-- Desempate: orden editorial, calidad de ficha, actualidad y variedad; no usar pago o comisión como criterio oculto.
-- Si faltan candidatos válidos, la sección reduce elementos o se oculta; nunca usa fixtures ni contenido incompleto.
+1. **Recomendados por Valladolid.mx**: selección editorial manual por calidad, interés turístico, vigencia y diversidad territorial.
+2. **Descubrimiento orgánico**: rotación diaria entre fichas publicadas y completas, respetando destino, categoría y preferencias explícitas del visitante.
+3. **Visibilidad contratada**: contenidos de empresas con paquete vigente, siempre identificados como **Destacado** o **Patrocinado**, relevantes para la sección y con cupo máximo.
+
+## Autoridad revisada
+
+- La estrategia 14.40.B propone separación entre catálogo editorial y monetización, etiquetado obligatorio, auditoría y máximo orientativo de 25 % de espacios patrocinados. El índice maestro la clasifica como `Draft`; por tanto sirve como base para esta aprobación, no como autorización previa de implementación.
+- Los paquetes, solicitudes, activación y vigencia ya existen en Portal Empresa y Administración mediante `visibility_plans` y `business_visibility_grants`.
+- El ranking público actual ya consume `business_effective_visibility` y `active_founder_spotlights` para empresas, pero hoy suma sus impulsos y ordena por ellos antes del criterio orgánico. Esa conducta no se extenderá a `/que-hacer` sin acotarla mediante espacios explícitos.
+- `Founder Spotlight` es una sobreexposición administrativa temporal y distinta de un paquete contratado.
+- La propuesta 14.40.B no autoriza por sí sola nuevas tablas o un motor nuevo; este plan reutiliza exclusivamente la infraestructura vigente y requiere autorización específica antes de implementar el enlace con `/que-hacer`.
+
+## Criterios de elegibilidad
+
+Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigente, territorialmente coherente y con portada acreditada y ficha mínima completa.
+
+- **Destinos recomendados:** exclusivamente editoriales; no se venden como espacios comerciales.
+- **Eventos:** prioridad orgánica por fecha próxima; los vencidos nunca participan.
+- **Experiencias:** deben tener ficha completa; la visibilidad contratada no activa venta, precio, cupo ni reservación.
+- **Lugares de interés:** `/lugares` conserva la autoridad de entidad; sólo se presentan accesos a sus fichas existentes.
+- **Contenido contratado:** requiere grant activo de la empresa y aprobación editorial del elemento mostrado.
+- **Founder Spotlight:** puede ocupar un espacio destacado temporal, separado del editorial y del contratado, con motivo y vigencia auditables.
+
+## Reglas de orden y rotación
+
+- El editor puede fijar y ordenar contenidos editoriales desde el Experience Builder.
+- Los espacios orgánicos restantes rotan una vez al día, de forma determinista y estable durante el día.
+- Máximo **1 contenido contratado por cada 4 tarjetas visibles**; nunca se ocultan empresas sin plan.
+- Los filtros y la intención explícita del viajero siempre prevalecen sobre cualquier impulso comercial.
+- Un pago nunca hace elegible una ficha incompleta ni desplaza un resultado claramente más relevante.
+- Desempate orgánico: calidad de ficha, actualidad, cercanía temática y variedad entre destinos.
+- Si faltan candidatos válidos, se muestran menos tarjetas o se oculta el carril; nunca se rellenan con fixtures.
 
 ## Scope Gate
 
-- Modernizar únicamente `/que-hacer` sobre su autoridad `ListingPremiumSurfaceFromDTO → TerritorialListingReviewSurface`.
-- Incorporar encabezados y carriles compactos: Destinos recomendados, Eventos, Experiencias y Lugares de interés.
-- Reutilizar cards, medios, rutas y lecturas CMS-first ya aprobadas para cada familia.
-- Habilitar en el Experience Builder la selección, orden, visibilidad, límite y modo de relleno de cada sección.
-- Reutilizar el contrato oficial de colección relacionada para selección y orden; no crear otro motor de destacados.
+- Evolucionar únicamente la composición publicada de `/que-hacer` sobre su autoridad Premium actual.
+- Incorporar carriles compactos con encabezados: Destinos recomendados, Próximos eventos, Experiencias para vivir y Lugares de interés.
+- Reutilizar las tarjetas, rutas, medios y lecturas CMS-first oficiales de cada familia.
+- Añadir a la composición controles de título, visibilidad, límite, selección manual, orden y relleno orgánico.
+- Declarar en la composición qué carriles admiten visibilidad contratada y su cupo, sin crear otro sistema de planes ni ranking.
+
+## Operación en CMS y Portal Empresa
+
+### Experience Builder
+
+- El equipo editorial configura encabezados, orden de carriles, selección manual y límite de elementos.
+- Puede aprobar o excluir una ficha de los espacios contratados sin alterar su publicación normal.
+- Constructor, preview y ruta pública consumen la misma composición.
+
+### Administración · Visibilidad
+
+- Conserva el catálogo de paquetes, solicitudes, vigencia y cancelación actuales.
+- Añade `/que-hacer` como superficie disponible sólo mediante una palanca configurable del paquete vigente.
+- Muestra cupo disponible, vigencia, empresa, etiqueta e impresiones/clics agregados de la superficie.
+- `Founder Spotlight` permanece separado, temporal y auditado.
+
+### Portal Empresa
+
+- La empresa solicita o consulta su paquete como hoy.
+- El grant vigente hace elegibles sus fichas publicadas y completas; no permite elegir ni autoimpulsar contenido incompleto.
+- La contratación no publica ni posiciona automáticamente: la elegibilidad final pasa por las reglas editoriales fail-closed.
+- El Portal explica alcance, vigencia y resultados sin prometer una posición fija permanente.
 
 ## Preservation Gate
 
 - Conservar header, footer, breadcrumb, búsqueda, idioma, Alux global, Mi Viaje, marca y responsive vigentes.
-- No modificar las plantillas ni los datos de Destinos, Eventos, Experiencias o Lugares.
-- No convertir `/que-hacer` en un listado duplicado de `/lugares`.
-- Constructor, preview y ruta pública deben consumir la misma composición publicada.
-- No publicar ni desplegar sin autorización expresa.
+- No modificar plantillas ni datos fuente de Destinos, Eventos, Experiencias o Lugares.
+- No mezclar señales comerciales dentro del razonamiento de Alux.
+- No cambiar la estrategia de conversión ni habilitar reservación por contratar visibilidad.
+- No crear tablas, planes, cards, rankings, landings ni superficies paralelas.
+- No publicar, cobrar ni activar paquetes nuevos sin autorización expresa.
 
-## Implementación por aprobación
+## Implementación por etapas
 
-1. Capturar la línea base completa en 1440, 834, 430 y 390 px.
-2. Extender la composición oficial de `/que-hacer` con las cuatro colecciones configurables.
-3. Añadir controles editoriales claros: fijar, ordenar, ocultar, límite y completar automáticamente.
-4. Renderizar carriles compactos y navegables con las tarjetas oficiales; cada tarjeta conduce a su ficha completa.
-5. Mantener la rotación determinista por día para medición, caché y consistencia entre usuarios.
+1. **Contrato y maqueta:** definir composición, proporción 3 orgánicos + 1 contratado y estados visuales; aprobación Founder antes de código público.
+2. **Curaduría editorial:** conectar selección, orden, límites y rotación diaria usando el contrato oficial de colecciones.
+3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; asignar únicamente los espacios comerciales declarados, con elegibilidad editorial y etiqueta visible.
+4. **Flujo empresa–administración:** reutilizar solicitud, revisión, activación, vencimiento y cancelación del paquete; la curaduría del contenido permanece en el Experience Builder.
+5. **Medición:** registrar impresión, clic y entrada a ficha diferenciando editorial, orgánico, contratado y Spotlight.
 
 ## Validación
 
 - Comparativa antes/después en 1440, 834, 430 y 390 px.
-- Un H1, cero overflow, targets táctiles accesibles y navegación por teclado.
-- Verificar selección manual, orden, rotación diaria, estados vacíos y contenido no elegible.
-- Verificar paridad Experience Builder, preview y `/que-hacer` pública.
+- Un H1, cero overflow, controles táctiles accesibles y navegación por teclado.
+- Verificar cupo comercial, etiquetas, vigencia, filtros, rotación estable y estados sin candidatos.
+- Confirmar que contenido sin plan sigue apareciendo orgánicamente y que un grant vencido pierde el impulso.
+- Confirmar paridad Experience Builder, preview y `/que-hacer` pública.
 - Ejecutar typecheck, pruebas focalizadas, Route Inventory y controles de gobernanza disponibles.
+- No publicar ni desplegar.

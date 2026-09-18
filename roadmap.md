@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Qué hacer · Evolución editorial CMS-first: definir y aprobar selección híbrida de destacados (fijos por editor + rotación automática diaria), secciones Destinos recomendados, Eventos, Experiencias y Lugares de interés, y vista compacta sobre la plantilla Premium existente; sin duplicar el catálogo de Lugares ni crear superficies paralelas.
+- [ ] Qué hacer · Evolución editorial CMS-first: revisar la documentación autorizada de visibilidad comercial y combinarla con la selección híbrida de destacados, distinguiendo claramente contenido editorial, orgánico y visibilidad contratada; secciones Destinos recomendados, Eventos, Experiencias y Lugares de interés sobre la plantilla Premium existente, sin duplicar Lugares ni crear superficies paralelas.
 
 - [x] Reservación de productos · Calendario oficial con días disponibles en verde y cupo visible, selección progresiva día → horario → personas y horario único preseleccionado. Inventario, apartados, checkout ERL, ficha Premium y datos CMS preservados; contratos, typecheck, `git diff --check` y QA 1440/834/430/390 en PASS, sin overflow. El aviso de Google Maps en localhost es externo al flujo.
 
