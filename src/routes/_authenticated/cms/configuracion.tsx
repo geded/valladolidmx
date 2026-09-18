@@ -42,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/cms/configuracion")({
   component: PlatformConfigPage,
 });
 
-const GROUP_ORDER: SettingDefinition["group"][] = ["pagos", "reservas", "avisos"];
+const GROUP_ORDER: SettingDefinition["group"][] = ["dominios", "pagos", "reservas", "avisos"];
 
 function PlatformConfigPage() {
   const fetchConfig = useServerFn(getPlatformConfig);
