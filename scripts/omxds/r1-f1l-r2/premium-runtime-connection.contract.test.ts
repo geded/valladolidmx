@@ -583,7 +583,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(territorial).toContain("titleOverride?.trim() || territorialize(baseProfile.title");
     expect(territorial).toContain("subtitleOverride?.trim() || baseProfile.description");
     expect(territorial).toContain("facet.extract(item.source) !== selected");
-    expect(route).toContain("facets={tipoFacet ? [tipoFacet] : []}");
+    expect(route).toContain("<ListingPremiumSurfaceFromDTO");
+    expect(territorial).toContain("QueHacerDiscoveryBody");
   });
 
   test("la Home expone enlaces en el constructor y convierte las acciones visibles en navegación", () => {

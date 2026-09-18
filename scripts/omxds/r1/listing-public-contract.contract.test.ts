@@ -156,6 +156,12 @@ describe("G8-R1 · R1-A · contrato de listados (casos 1-7)", () => {
     });
     expect(queHacer.source).toBe("editorial");
     expect(queHacer.items).toHaveLength(2);
+    expect(queHacer.discoveryRails?.map((rail) => rail.id)).toEqual([
+      "destinations",
+      "events",
+      "experiences",
+      "places",
+    ]);
     expect(queHacer.items[0].mediaUrl).toBe("/api/public/studio-media/destinos/valladolid.jpg");
     expect(queHacer.items[0].mediaAlt).toContain("Valladolid");
     expect(queHacer.hero.title).toBe("¿Qué hacer en el Oriente Maya de Yucatán?");

@@ -238,9 +238,64 @@ export interface PublicListingDTO {
     readonly metaLabel: string | null;
   };
   readonly items: readonly TourismCardVM[];
+  /** Carriles editoriales de descubrimiento. Sólo `que-hacer` los publica. */
+  readonly discoveryRails?: readonly PublicListingDiscoveryRail[];
   readonly destinationSlug: string | null;
   readonly destinationLabel: string | null;
   readonly emptyMessage: string;
+}
+
+export type PublicListingDiscoveryRailId = "destinations" | "events" | "experiences" | "places";
+
+export interface PublicListingDiscoveryRail {
+  readonly id: PublicListingDiscoveryRailId;
+  readonly title: string;
+  readonly subtitle: string;
+  readonly seeAllHref: string;
+  readonly items: readonly TourismCardVM[];
+}
+
+interface PublicDiscoveryRailConfig {
+  readonly id?: unknown;
+  readonly enabled?: unknown;
+  readonly title?: unknown;
+  readonly subtitle?: unknown;
+  readonly max_items?: unknown;
+}
+
+/** Aplica únicamente configuración editorial publicada; nunca crea contenido. */
+export function configurePublicDiscoveryRails(
+  dto: PublicListingDTO,
+  value: unknown,
+): PublicListingDTO {
+  if (dto.family !== "que-hacer" || !Array.isArray(value) || !dto.discoveryRails) return dto;
+  const available = new Map(dto.discoveryRails.map((rail) => [rail.id, rail]));
+  const rails = value.flatMap((raw) => {
+    if (!raw || typeof raw !== "object") return [];
+    const config = raw as PublicDiscoveryRailConfig;
+    if (typeof config.id !== "string") return [];
+    const rail = available.get(config.id as PublicListingDiscoveryRailId);
+    if (!rail || config.enabled === false) return [];
+    const maxItems =
+      typeof config.max_items === "number"
+        ? Math.max(1, Math.min(24, Math.round(config.max_items)))
+        : 12;
+    return [
+      {
+        ...rail,
+        title:
+          typeof config.title === "string" && config.title.trim()
+            ? config.title.trim()
+            : rail.title,
+        subtitle:
+          typeof config.subtitle === "string" && config.subtitle.trim()
+            ? config.subtitle.trim()
+            : rail.subtitle,
+        items: rail.items.slice(0, maxItems),
+      },
+    ];
+  });
+  return { ...dto, discoveryRails: rails };
 }
 
 export interface ListingFeedInput {
@@ -248,6 +303,15 @@ export interface ListingFeedInput {
   readonly events?: readonly PublicEventCard[];
   readonly places?: readonly PublicPlaceCard[];
   readonly destinations?: readonly Destination[];
+  readonly zones?: readonly PublicDestinationZone[];
+}
+
+export interface PublicDestinationZone {
+  readonly id: string;
+  readonly slug: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly destinationSlug: string;
 }
 
 export interface BuildPublicListingInput extends ListingFeedInput {
@@ -304,8 +368,94 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
     items = [
       ...(input.destinations ?? []).map(destinationToTourismCard),
       ...(input.events ?? []).map(eventToTourismCard),
+      ...(input.businesses ?? [])
+        .filter((business) => !destino || business.destination_slug === destino)
+        .map((business) =>
+          businessToTourismCard(business, {
+            destinationLabel: labelOf(business.destination_slug),
+            regionLabel: ORIENTE_MAYA.name,
+          }),
+        ),
+      ...(input.places ?? [])
+        .filter((place) => !destino || place.destination_slug === destino)
+        .map(placeToTourismCard),
     ];
   }
+
+  const discoveryRails: PublicListingDiscoveryRail[] | undefined =
+    contract.id === "que-hacer"
+      ? [
+          {
+            id: "destinations",
+            title: destino ? "Zonas por descubrir" : "Destinos a descubrir",
+            subtitle: destino
+              ? `Explora los distintos rincones de ${destinationLabel}.`
+              : "Elige un punto de partida para recorrer el Oriente Maya.",
+            seeAllHref: destino ? `/oriente-maya/${destino}` : "/oriente-maya",
+            items: destino
+              ? (input.zones ?? [])
+                  .filter((zone) => zone.destinationSlug === destino)
+                  .map((zone) => ({
+                    id: zone.id,
+                    entityKind: "region" as const,
+                    eyebrow: "Zona",
+                    name: zone.name,
+                    href: `/oriente-maya/${destino}?zona=${encodeURIComponent(zone.slug)}`,
+                    tagline: zone.description,
+                    businessName: null,
+                    mediaUrl: null,
+                    mediaAlt: null,
+                    rating: null,
+                    location: { label: destinationLabel ?? labelOf(destino), distanceKm: null },
+                    territorialContext: destinationLabel ?? labelOf(destino),
+                    highlights: [],
+                    badges: [],
+                    institutionalBadges: [],
+                    dateLabel: null,
+                    availabilityLabel: null,
+                    priceAmount: null,
+                    priceCurrency: null,
+                    priceHint: null,
+                    primaryAction: null,
+                    secondaryAction: null,
+                    filterAttributes: { zone: [zone.slug] },
+                  }))
+              : (input.destinations ?? []).map(destinationToTourismCard),
+          },
+          {
+            id: "events",
+            title: "Eventos que no te puedes perder",
+            subtitle: "Fechas, celebraciones y encuentros para sumar a tu viaje.",
+            seeAllHref: destino ? `/oriente-maya/${destino}/eventos` : "/eventos",
+            items: (input.events ?? [])
+              .filter((event) => !destino || event.destination_slug === destino)
+              .map(eventToTourismCard),
+          },
+          {
+            id: "experiences",
+            title: "Experiencias para vivir el territorio",
+            subtitle: "Actividades auténticas operadas por anfitriones locales.",
+            seeAllHref: destino ? `/oriente-maya/${destino}/experiencias` : "/experiencias",
+            items: (input.businesses ?? [])
+              .filter((business) => !destino || business.destination_slug === destino)
+              .map((business) =>
+                businessToTourismCard(business, {
+                  destinationLabel: labelOf(business.destination_slug),
+                  regionLabel: ORIENTE_MAYA.name,
+                }),
+              ),
+          },
+          {
+            id: "places",
+            title: "Lugares y sitios de interés preferidos",
+            subtitle: "Cenotes, patrimonio y rincones que cuentan la historia de la región.",
+            seeAllHref: destino ? `/oriente-maya/${destino}/lugares` : "/lugares",
+            items: (input.places ?? [])
+              .filter((place) => !destino || place.destination_slug === destino)
+              .map(placeToTourismCard),
+          },
+        ]
+      : undefined;
 
   // Alcance territorial del título: entrada global ⇒ toda la región;
   // entrada desde micrositio ⇒ destino activo. Nunca un destino por defecto.
@@ -337,6 +487,7 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
       metaLabel: destinationLabel ?? ORIENTE_MAYA.name,
     },
     items,
+    ...(discoveryRails ? { discoveryRails } : {}),
     destinationSlug: destino,
     destinationLabel,
     emptyMessage,

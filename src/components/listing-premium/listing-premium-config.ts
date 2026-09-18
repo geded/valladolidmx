@@ -17,6 +17,50 @@ export const LISTING_PREMIUM_G5_BLOCK_TYPE = "vmx.listing.premium-g5" as const;
 export const LISTING_PREMIUM_G5_CONTRACT_VERSION = "1.0.0" as const;
 export const LISTING_PREMIUM_G5_VARIANT = "listado-premium-g5-approved" as const;
 
+export const QUE_HACER_DISCOVERY_RAILS = [
+  {
+    id: "destinations",
+    enabled: true,
+    title: "Destinos a descubrir",
+    subtitle: "Elige un punto de partida para recorrer el Oriente Maya.",
+    max_items: 12,
+    sort_by: "manual",
+  },
+  {
+    id: "events",
+    enabled: true,
+    title: "Eventos que no te puedes perder",
+    subtitle: "Fechas, celebraciones y encuentros para sumar a tu viaje.",
+    max_items: 12,
+    sort_by: "recent",
+  },
+  {
+    id: "experiences",
+    enabled: true,
+    title: "Experiencias para vivir el territorio",
+    subtitle: "Actividades auténticas operadas por anfitriones locales.",
+    max_items: 12,
+    sort_by: "manual",
+  },
+  {
+    id: "places",
+    enabled: true,
+    title: "Lugares y sitios de interés preferidos",
+    subtitle: "Cenotes, patrimonio y rincones que cuentan la historia de la región.",
+    max_items: 12,
+    sort_by: "manual",
+  },
+] as const;
+
+export interface QueHacerDiscoveryRailConfig {
+  id: (typeof QUE_HACER_DISCOVERY_RAILS)[number]["id"];
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  max_items: number;
+  sort_by: "manual" | "recent" | "popular";
+}
+
 type Cfg = Record<string, unknown>;
 
 const str = (value: unknown, fallback: string): string =>
@@ -51,6 +95,7 @@ export interface ListingPremiumG5Resolved {
   emptyMessage: string;
   showAddToTrip: boolean;
   showFavorite: boolean;
+  discoveryRails: readonly QueHacerDiscoveryRailConfig[];
 }
 
 export function resolveListingPremiumG5(config: Cfg = {}): ListingPremiumG5Resolved {
@@ -96,6 +141,25 @@ export function resolveListingPremiumG5(config: Cfg = {}): ListingPremiumG5Resol
     ),
     showAddToTrip: bool(config.show_add_to_trip, false),
     showFavorite: bool(config.show_favorite, false),
+    discoveryRails:
+      family.id === "que-hacer"
+        ? rows(config.discovery_rails).length
+          ? rows(config.discovery_rails).map((row, index) => {
+              const fallback = QUE_HACER_DISCOVERY_RAILS[index % QUE_HACER_DISCOVERY_RAILS.length];
+              return {
+                id: str(row.id, fallback.id) as (typeof QUE_HACER_DISCOVERY_RAILS)[number]["id"],
+                enabled: bool(row.enabled, fallback.enabled),
+                title: str(row.title, fallback.title),
+                subtitle: str(row.subtitle, fallback.subtitle),
+                max_items:
+                  typeof row.max_items === "number"
+                    ? Math.max(1, Math.min(24, Math.round(row.max_items)))
+                    : fallback.max_items,
+                sort_by: str(row.sort_by, fallback.sort_by) as "manual" | "recent" | "popular",
+              };
+            })
+          : [...QUE_HACER_DISCOVERY_RAILS]
+        : [],
   };
 }
 
@@ -115,6 +179,7 @@ export function listingPremiumG5DefaultConfig(familyId = "hoteles"): Cfg {
     empty_message: "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya.",
     show_add_to_trip: false,
     show_favorite: false,
+    discovery_rails: family.id === "que-hacer" ? QUE_HACER_DISCOVERY_RAILS : [],
     items: family.items.map((it) => ({
       id: it.id,
       name: it.name,

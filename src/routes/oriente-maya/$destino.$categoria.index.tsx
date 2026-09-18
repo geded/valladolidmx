@@ -32,12 +32,14 @@ import { ExperienceRelatedCollectionBlock } from "@/components/experience-builde
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import {
   buildPublicListing,
+  configurePublicDiscoveryRails,
   listingFamilyContract,
   isListingFamilyId,
   type ListingFamilyId,
 } from "@/lib/listings/listing-public-contract";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { getListingFamilyTaxonomy } from "@/lib/listings/listing-family-taxonomy.functions";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 
 const CANONICAL_LISTING_FAMILIES: Partial<Record<string, ListingFamilyId>> = {
   hoteles: "hoteles",
@@ -102,7 +104,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
             }),
           )
         : getPublicListing({ data: { family, destino: params.destino } }).catch(() => null);
-    const [relatedRaw, premiumListing] = await Promise.all([
+    const [relatedRaw, premiumListingRaw, queHacerComposition] = await Promise.all([
       getCategoryRelated({
         data: {
           destinationSlug: params.destino,
@@ -110,7 +112,16 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
         },
       }).catch(() => null),
       premiumListingPromise,
+      family === "que-hacer"
+        ? getPublishedCompositionBySlug({ data: { slug: "que-hacer" } }).catch(() => null)
+        : Promise.resolve(null),
     ]);
+    const railNode = queHacerComposition?.snapshot.root.children.find(
+      (candidate) => candidate.type === "vmx.listing.premium-g5" && !candidate.hidden,
+    );
+    const premiumListing = premiumListingRaw
+      ? configurePublicDiscoveryRails(premiumListingRaw, railNode?.config.discovery_rails)
+      : null;
     // Las tarjetas de "Sigue descubriendo" deben usar la MISMA portada
     // acreditada del CMS que el listado Premium. La lectura relacionada
     // no la trae, así que se reutiliza la portada ya resuelta por la
@@ -196,8 +207,8 @@ function CategoriaEnDestinoPage() {
   };
   const hasRelated = Boolean(
     related &&
-      (related.otherCategoriesInDestination.length > 0 ||
-        related.sameCategoryOtherDestinations.length > 0),
+    (related.otherCategoriesInDestination.length > 0 ||
+      related.sameCategoryOtherDestinations.length > 0),
   );
 
   return (

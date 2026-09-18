@@ -20,6 +20,7 @@ import {
   isListingFamilyId,
   listingFamilyContract,
   type ListingFamilyId,
+  type PublicDestinationZone,
   type PublicListingDTO,
 } from "./listing-public-contract";
 import {
@@ -36,6 +37,33 @@ export interface GetPublicListingInput {
    * públicas jamás lo activan.
    */
   previewMedia?: boolean;
+}
+
+async function listPublishedZones(
+  destinationSlug: string | null,
+): Promise<PublicDestinationZone[]> {
+  if (!destinationSlug) return [];
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return [];
+  const client = createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await client
+    .from("destination_zones")
+    .select("id, slug, name, description, destinations!inner(slug)")
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .eq("destinations.slug", destinationSlug)
+    .order("name", { ascending: true });
+  if (error) throw new Error(`destination_zones_read_failed: ${error.message}`);
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description ?? null,
+    destinationSlug,
+  }));
 }
 
 export const getPublicListing = createServerFn({ method: "GET" })
@@ -84,15 +112,31 @@ export const getPublicListing = createServerFn({ method: "GET" })
       return buildPublicListing({ family: contract.id, destino: data.destino, places });
     }
 
-    const [destinations, events] = await Promise.all([
+    const [destinations, events, businesses, places, taxonomy, zones] = await Promise.all([
       listPublishedDestinations().catch(() => []),
       listPublishedEvents({ data: { upcomingOnly: true, limit: 24 } }).catch(() => []),
+      listMarketplaceBusinesses().catch(() => []),
+      listPublishedPlaces({ data: { destinationSlug: data.destino, previewMedia: false } }).catch(
+        () => [],
+      ),
+      getListingFamilyTaxonomy().catch(
+        (): ListingFamilyTaxonomyResult => ({ available: false, taxonomy: {} }),
+      ),
+      listPublishedZones(data.destino).catch(() => []),
     ]);
+    const experienceSlugs = new Set(
+      taxonomy.available
+        ? (taxonomy.taxonomy.experiencias ?? [])
+        : listingFamilyContract("experiencias").categorySlugs,
+    );
     return buildPublicListing({
       family: contract.id,
       destino: data.destino,
       destinations,
       events,
+      businesses: businesses.filter((business) => experienceSlugs.has(business.category_slug)),
+      places,
+      zones,
     });
   });
 
@@ -106,11 +150,7 @@ export const getPublicListing = createServerFn({ method: "GET" })
  */
 export const getPublicBusinessCategoryListing = createServerFn({ method: "GET" })
   .inputValidator(
-    (
-      data:
-        | { categorySlug?: unknown; categoryLabel?: unknown; destino?: unknown }
-        | undefined,
-    ) => ({
+    (data: { categorySlug?: unknown; categoryLabel?: unknown; destino?: unknown } | undefined) => ({
       categorySlug:
         typeof data?.categorySlug === "string" && data.categorySlug.trim()
           ? data.categorySlug.trim().toLowerCase()
