@@ -432,7 +432,6 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
   },
 };
 
-
 /**
  * Resuelve el alcance territorial del copy aprobado. El copy base está
  * redactado con Valladolid como marcador territorial; aquí se sustituye
