@@ -2436,15 +2436,18 @@ function PageVisualEditor({
                       items={tree.root.children.map((n) => n.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      {tree.root.children.map((n) => (
-                        <SortableSectionItem
-                          key={n.id}
-                          node={n}
-                          selected={selectedId === n.id}
-                          onSelect={() => setSelectedId(n.id)}
-                          onToggleHidden={() => toggleHiddenNode(n.id)}
-                        />
+                      {tree.root.children.map((n, index) => (
+                        <div key={n.id}>
+                          <InsertHere onClick={() => openLibrary(index)} />
+                          <SortableSectionItem
+                            node={n}
+                            selected={selectedId === n.id}
+                            onSelect={() => setSelectedId(n.id)}
+                            onToggleHidden={() => toggleHiddenNode(n.id)}
+                          />
+                        </div>
                       ))}
+                      <InsertHere onClick={() => openLibrary(tree.root.children.length)} />
                     </SortableContext>
                   </DndContext>
                 )}
