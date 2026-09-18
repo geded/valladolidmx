@@ -143,22 +143,22 @@ export function resolveListingPremiumG5(config: Cfg = {}): ListingPremiumG5Resol
     showFavorite: bool(config.show_favorite, false),
     discoveryRails:
       family.id === "que-hacer"
-        ? (rows(config.discovery_rails).length
-            ? rows(config.discovery_rails).map((row, index) => {
-                const fallback = QUE_HACER_DISCOVERY_RAILS[index % QUE_HACER_DISCOVERY_RAILS.length];
-                return {
-                  id: str(row.id, fallback.id) as (typeof QUE_HACER_DISCOVERY_RAILS)[number]["id"],
-                  enabled: bool(row.enabled, fallback.enabled),
-                  title: str(row.title, fallback.title),
-                  subtitle: str(row.subtitle, fallback.subtitle),
-                  max_items:
-                    typeof row.max_items === "number"
-                      ? Math.max(1, Math.min(24, Math.round(row.max_items)))
-                      : fallback.max_items,
-                  sort_by: str(row.sort_by, fallback.sort_by) as "manual" | "recent" | "popular",
-                };
-              })
-            : [...QUE_HACER_DISCOVERY_RAILS])
+        ? rows(config.discovery_rails).length
+          ? rows(config.discovery_rails).map((row, index) => {
+              const fallback = QUE_HACER_DISCOVERY_RAILS[index % QUE_HACER_DISCOVERY_RAILS.length];
+              return {
+                id: str(row.id, fallback.id) as (typeof QUE_HACER_DISCOVERY_RAILS)[number]["id"],
+                enabled: bool(row.enabled, fallback.enabled),
+                title: str(row.title, fallback.title),
+                subtitle: str(row.subtitle, fallback.subtitle),
+                max_items:
+                  typeof row.max_items === "number"
+                    ? Math.max(1, Math.min(24, Math.round(row.max_items)))
+                    : fallback.max_items,
+                sort_by: str(row.sort_by, fallback.sort_by) as "manual" | "recent" | "popular",
+              };
+            })
+          : [...QUE_HACER_DISCOVERY_RAILS]
         : [],
   };
 }
