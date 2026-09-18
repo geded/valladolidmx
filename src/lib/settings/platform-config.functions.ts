@@ -287,6 +287,17 @@ export const setPlatformConfigValue = createServerFn({ method: "POST" })
       value = Math.round(n);
     } else {
       value = String(data.value);
+      if (def.key === "site.primary_domain") {
+        const host = normalizeDomain(value);
+        if (!host) throw new Error("invalid_domain");
+        value = host;
+      }
+      if (def.key === "site.alternate_domains") {
+        const raw = value.trim();
+        const list = normalizeDomainList(raw);
+        if (raw.length > 0 && list.length === 0) throw new Error("invalid_domain");
+        value = list.join(", ");
+      }
     }
 
     const { error } = await client(context)
