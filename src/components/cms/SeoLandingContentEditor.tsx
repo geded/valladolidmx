@@ -436,8 +436,8 @@ export function SeoLandingContentEditor({
         <header className="mb-3">
           <h3 className="font-serif text-lg leading-tight">Orden de secciones</h3>
           <p className="text-xs text-muted-foreground">
-            Arrastra para cambiar el orden de las secciones reordenables de la landing. La portada
-            y el cierre conservan su posición aprobada.
+            Arrastra para cambiar el orden de las secciones reordenables de la landing. La portada y
+            el cierre conservan su posición aprobada.
           </p>
         </header>
         <ul className="space-y-2">
@@ -487,7 +487,6 @@ export function SeoLandingContentEditor({
           ))}
         </ul>
       </section>
-
 
       <Group
         title="Portada"
