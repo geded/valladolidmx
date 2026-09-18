@@ -42,47 +42,16 @@ import { cn } from "@/lib/utils";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import {
   PLACE_PREMIUM_DEMO_CONTENT,
+  PLACE_PREMIUM_RENDER_ORDER,
   type PlacePremiumContent,
   type PlacePremiumMedia,
+  type PlacePremiumRenderSectionKey,
 } from "./place-premium-content";
 import {
   PLACE_PREMIUM_COPY_DEFAULTS,
   fillPlaceCopy,
   type PlacePremiumCopy,
 } from "./place-premium-copy";
-
-/**
- * Secciones reales de la ficha de Lugar tal como se publican hoy. El orden
- * por defecto es el aprobado; el Experience Builder sólo puede reordenarlas.
- */
-export type PlacePremiumRenderSectionKey =
-  | "hero"
-  | "alux"
-  | "gallery"
-  | "intro"
-  | "essentials"
-  | "map"
-  | "services"
-  | "experiences"
-  | "events"
-  | "nearbyBusinesses"
-  | "nearby"
-  | "trip";
-
-export const PLACE_PREMIUM_RENDER_ORDER: readonly PlacePremiumRenderSectionKey[] = [
-  "hero",
-  "alux",
-  "gallery",
-  "intro",
-  "essentials",
-  "map",
-  "services",
-  "experiences",
-  "events",
-  "nearbyBusinesses",
-  "nearby",
-  "trip",
-];
 
 export interface PlacePremiumSurfaceProps {
   content?: PlacePremiumContent;

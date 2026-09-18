@@ -417,3 +417,36 @@ export const PLACE_PREMIUM_SECTION_ORDER: readonly PlacePremiumSectionKey[] = [
   "trip",
   "alux",
 ];
+
+/**
+ * Secciones reales de la ficha de Lugar tal como se publican hoy. El orden
+ * por defecto es el aprobado; el Experience Builder sólo puede reordenarlas.
+ */
+export type PlacePremiumRenderSectionKey =
+  | "hero"
+  | "alux"
+  | "gallery"
+  | "intro"
+  | "essentials"
+  | "map"
+  | "services"
+  | "experiences"
+  | "events"
+  | "nearbyBusinesses"
+  | "nearby"
+  | "trip";
+
+export const PLACE_PREMIUM_RENDER_ORDER: readonly PlacePremiumRenderSectionKey[] = [
+  "hero",
+  "alux",
+  "gallery",
+  "intro",
+  "essentials",
+  "map",
+  "services",
+  "experiences",
+  "events",
+  "nearbyBusinesses",
+  "nearby",
+  "trip",
+];

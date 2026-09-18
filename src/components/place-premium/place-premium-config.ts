@@ -18,7 +18,12 @@
  *    se activa sin reconstruir la ficha (sólo cambia la resolución).
  */
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
-import { PLACE_PREMIUM_DEMO_CONTENT, type PlacePremiumContent } from "./place-premium-content";
+import {
+  PLACE_PREMIUM_DEMO_CONTENT,
+  PLACE_PREMIUM_RENDER_ORDER,
+  type PlacePremiumContent,
+  type PlacePremiumRenderSectionKey,
+} from "./place-premium-content";
 import {
   placePremiumCopyDefaultConfig,
   resolvePlacePremiumCopy,
