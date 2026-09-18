@@ -94,6 +94,8 @@ export interface ListingPremiumSurfaceProps {
   familyLabel?: string;
   intentPrompts?: readonly string[];
   mapSlot?: ReactNode;
+  /** Superficie pública para medición de visibilidad (aditiva). */
+  trackingSurface?: string | null;
   className?: string;
 }
 
@@ -111,6 +113,7 @@ export function ListingPremiumSurface({
   familyLabel,
   intentPrompts,
   mapSlot,
+  trackingSurface = null,
   className,
 }: ListingPremiumSurfaceProps) {
   return (
@@ -134,6 +137,8 @@ export function ListingPremiumSurface({
       familyLabel={familyLabel}
       intentPrompts={intentPrompts}
       mapSlot={mapSlot}
+      trackingSurface={trackingSurface}
+      trackingRail="listado"
       emptyMessage={
         emptyMessage ?? "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya."
       }
@@ -274,6 +279,7 @@ export function ListingPremiumSurfaceFromDTO({
       familyLabel={family.label}
       intentPrompts={family.prompts}
       mapSlot={mapSlot}
+      trackingSurface={dto.family}
       className={className}
     />
   );
