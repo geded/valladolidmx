@@ -38,6 +38,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 - Máximo **2 apariciones por empresa en toda la página y 1 por carril**, aplicable también al contenido contratado.
 - Este mismo cupo, la prioridad de posición y la indicación discreta se aplican además a los listados de Hoteles, Restaurantes, Casas de vacaciones, Eventos, Lugares y listados territoriales, para acotar el impulso comercial que hoy actúa sin límite.
 - La fotografía permanece limpia: sin badges, cintillos ni etiquetas comerciales superpuestas. La indicación breve `Recomendado` aparece como texto secundario junto a los datos de la ficha y no ocupa un espacio editorial adicional.
+- Para evitar confusión con la curaduría editorial, el carril editorial se titula `Recomendados por Valladolid.mx` y la ficha contratada usa únicamente la palabra `Recomendado` en su información. Sólo son elegibles fichas que el equipo editorial aprobó, de modo que la palabra siga siendo verdadera para el viajero; la trazabilidad comercial queda auditada en Administración.
 - Los filtros y la intención explícita del viajero siempre prevalecen sobre cualquier impulso comercial.
 - Un pago nunca hace elegible una ficha incompleta ni desplaza un resultado claramente más relevante fuera de su espacio comercial asignado.
 - Desempate orgánico: calidad de ficha, actualidad, cercanía temática y variedad entre destinos.
