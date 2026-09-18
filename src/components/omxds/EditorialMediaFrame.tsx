@@ -50,8 +50,14 @@ export function EditorialMediaFrame({
       sizes,
       priority: fetchPriority,
     });
+    const isAbsolute = className?.includes("absolute") ?? false;
     return (
-      <picture className={className?.includes("absolute") ? "absolute inset-0" : undefined}>
+      <picture
+        className={cn(
+          "block min-w-0 max-w-full overflow-hidden",
+          isAbsolute && "absolute inset-0",
+        )}
+      >
         {resolved.sources.map((source) => (
           <source
             key={source.type}
@@ -69,7 +75,7 @@ export function EditorialMediaFrame({
           {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
           {...(fetchPriority ? { fetchPriority } : {})}
           data-omxds-media="g8-m1"
-          className={cn(className, "max-w-full")}
+          className={cn(className, "block max-w-full")}
         />
       </picture>
     );
