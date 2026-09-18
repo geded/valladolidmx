@@ -110,7 +110,11 @@ function RendimientoPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Calculando…</p>
       ) : isError ? (
-        <p className="text-sm text-destructive">No fue posible leer el rendimiento.</p>
+        <p className="text-sm text-destructive">
+          {/forbidden/i.test(error instanceof Error ? error.message : "")
+            ? "Este tablero está reservado a la administración de Valladolid.mx."
+            : "No fue posible leer el rendimiento."}
+        </p>
       ) : data.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           Todavía no hay contratos de visibilidad registrados.
