@@ -270,6 +270,15 @@ const EMPTY_SEO: SeoLandingSeoModel = {
 
 const ORDER_OPTIONS = [1, 2, 3, 4].map((n) => ({ value: String(n), label: `Posición ${n}` }));
 
+/** Slots de la landing cuya posición es editable (el resto es estructura aprobada). */
+const REORDERABLE_SLOTS = ["intro", "offers", "infoGrid", "map"] as const;
+const REORDERABLE_LABELS: Record<string, string> = {
+  intro: "Por qué visitar",
+  offers: "Oferta publicada",
+  infoGrid: "Información práctica",
+  map: "Ubicación y mapa",
+};
+
 export function SeoLandingContentEditor({
   compositionId,
   onClose,
