@@ -209,7 +209,13 @@ export function ReserveOnlineButton({
                         className="h-auto min-h-11 justify-between px-3 py-2"
                       >
                         <span>{timeLabel(t.starts_at, t.timezone)}</span>
-                        <span className={departureId === t.id ? "text-primary-foreground/80" : "text-muted-foreground"}>
+                        <span
+                          className={
+                            departureId === t.id
+                              ? "text-primary-foreground/80"
+                              : "text-muted-foreground"
+                          }
+                        >
                           {availabilityLabel(t.available)}
                         </span>
                       </Button>

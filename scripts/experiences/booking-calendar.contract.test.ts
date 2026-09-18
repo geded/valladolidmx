@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-  defaultDepartureId,
-  groupDeparturesByDay,
-} from "../../src/lib/commerce/booking-calendar";
+import { defaultDepartureId, groupDeparturesByDay } from "../../src/lib/commerce/booking-calendar";
 import type { PublicDeparture } from "../../src/lib/commerce/booking.functions";
 
 const departures: PublicDeparture[] = [

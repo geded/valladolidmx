@@ -66,5 +66,5 @@ export function groupDeparturesByDay(departures: PublicDeparture[]): DepartureDa
 }
 
 export function defaultDepartureId(departures: PublicDeparture[]): string | null {
-  return departures.length === 1 ? departures[0]?.id ?? null : null;
+  return departures.length === 1 ? (departures[0]?.id ?? null) : null;
 }
