@@ -255,6 +255,47 @@ export interface PublicListingDiscoveryRail {
   readonly items: readonly TourismCardVM[];
 }
 
+interface PublicDiscoveryRailConfig {
+  readonly id?: unknown;
+  readonly enabled?: unknown;
+  readonly title?: unknown;
+  readonly subtitle?: unknown;
+  readonly max_items?: unknown;
+}
+
+/** Aplica únicamente configuración editorial publicada; nunca crea contenido. */
+export function configurePublicDiscoveryRails(
+  dto: PublicListingDTO,
+  value: unknown,
+): PublicListingDTO {
+  if (dto.family !== "que-hacer" || !Array.isArray(value) || !dto.discoveryRails) return dto;
+  const available = new Map(dto.discoveryRails.map((rail) => [rail.id, rail]));
+  const rails = value.flatMap((raw) => {
+    if (!raw || typeof raw !== "object") return [];
+    const config = raw as PublicDiscoveryRailConfig;
+    if (typeof config.id !== "string") return [];
+    const rail = available.get(config.id as PublicListingDiscoveryRailId);
+    if (!rail || config.enabled === false) return [];
+    const maxItems =
+      typeof config.max_items === "number"
+        ? Math.max(1, Math.min(24, Math.round(config.max_items)))
+        : 12;
+    return [
+      {
+        ...rail,
+        title:
+          typeof config.title === "string" && config.title.trim() ? config.title.trim() : rail.title,
+        subtitle:
+          typeof config.subtitle === "string" && config.subtitle.trim()
+            ? config.subtitle.trim()
+            : rail.subtitle,
+        items: rail.items.slice(0, maxItems),
+      },
+    ];
+  });
+  return { ...dto, discoveryRails: rails };
+}
+
 export interface ListingFeedInput {
   readonly businesses?: readonly MarketplaceBusinessCard[];
   readonly events?: readonly PublicEventCard[];

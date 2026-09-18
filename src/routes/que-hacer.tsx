@@ -15,11 +15,20 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import { configurePublicDiscoveryRails } from "@/lib/listings/listing-public-contract";
 
 export const Route = createFileRoute("/que-hacer")({
-  loader: async () => ({
-    dto: await getPublicListing({ data: { family: "que-hacer", destino: null } }),
-  }),
+  loader: async () => {
+    const [dto, composition] = await Promise.all([
+      getPublicListing({ data: { family: "que-hacer", destino: null } }),
+      getPublishedCompositionBySlug({ data: { slug: "que-hacer" } }).catch(() => null),
+    ]);
+    const node = composition?.snapshot.root.children.find(
+      (candidate) => candidate.type === "vmx.listing.premium-g5" && !candidate.hidden,
+    );
+    return { dto: configurePublicDiscoveryRails(dto, node?.config.discovery_rails) };
+  },
   head: () =>
     buildPublicHead({
       title: `¿Qué hacer? · ${SITE.name}`,
