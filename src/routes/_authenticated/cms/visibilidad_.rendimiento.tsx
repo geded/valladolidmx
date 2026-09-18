@@ -20,7 +20,7 @@ import {
 
 const WINDOWS = [7, 30, 90] as const;
 
-export const Route = createFileRoute("/_authenticated/cms/visibilidad/rendimiento")({
+export const Route = createFileRoute("/_authenticated/cms/visibilidad_/rendimiento")({
   head: () => ({
     meta: [
       { title: "Rendimiento de visibilidad · CMS Studio" },

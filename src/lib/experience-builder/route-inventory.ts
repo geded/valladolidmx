@@ -539,7 +539,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/simulation.tsx",
   "src/routes/_authenticated/cms/travel-plans.tsx",
   "src/routes/_authenticated/cms/ventas-en-linea.tsx",
-  "src/routes/_authenticated/cms/visibilidad.rendimiento.tsx",
+  "src/routes/_authenticated/cms/visibilidad_.rendimiento.tsx",
   "src/routes/_authenticated/cms/visibilidad.solicitudes.tsx",
   "src/routes/_authenticated/cms/visibilidad.spotlight.tsx",
   "src/routes/_authenticated/cms/visibilidad.tsx",
