@@ -658,15 +658,18 @@ function TerritorialListingBody({
             </div>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {filteredItems.map((item, index) => (
-                <ListingCard
-                  key={item.name}
-                  item={item}
-                  featured={index === 0}
-                  profile={profile}
-                  compactFallback={compactDiscovery}
-                />
-              ))}
+              {filteredItems.map((item, index) =>
+                compactDiscovery ? (
+                  <QueHacerDiscoveryCard key={item.source?.id ?? item.name} item={item} />
+                ) : (
+                  <ListingCard
+                    key={item.name}
+                    item={item}
+                    featured={index === 0}
+                    profile={profile}
+                  />
+                ),
+              )}
               {!filteredItems.length ? (
                 <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
                   No encontramos opciones con esos filtros. Prueba quitando una selección.
