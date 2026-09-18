@@ -1091,6 +1091,12 @@ function PageVisualEditor({
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
+  /** Posición donde se insertará el elemento elegido en la biblioteca. */
+  const [insertAt, setInsertAt] = useState<number | null>(null);
+  const openLibrary = (atIndex?: number) => {
+    setInsertAt(typeof atIndex === "number" ? atIndex : null);
+    setShowLibrary(true);
+  };
   const [showVersions, setShowVersions] = useState(false);
   const [restoringPublished, setRestoringPublished] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
@@ -2331,6 +2337,18 @@ function PageVisualEditor({
             Estructura
           </button>
         ) : null}
+        {!previewMode && structureCollapsed ? (
+          <button
+            type="button"
+            onClick={() => openLibrary()}
+            className="absolute bottom-4 left-36 z-[65] inline-flex h-11 items-center gap-2 rounded-pill border border-border bg-background px-4 text-xs font-semibold text-foreground shadow-floating hover:bg-accent"
+            aria-label="Ver elementos que puedo añadir"
+            title="Ver elementos que puedo añadir"
+          >
+            <Plus className="size-4" aria-hidden />
+            Elementos
+          </button>
+        ) : null}
         {!previewMode && !structureCollapsed ? (
           <>
             <button
@@ -2418,15 +2436,18 @@ function PageVisualEditor({
                       items={tree.root.children.map((n) => n.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      {tree.root.children.map((n) => (
-                        <SortableSectionItem
-                          key={n.id}
-                          node={n}
-                          selected={selectedId === n.id}
-                          onSelect={() => setSelectedId(n.id)}
-                          onToggleHidden={() => toggleHiddenNode(n.id)}
-                        />
+                      {tree.root.children.map((n, index) => (
+                        <div key={n.id}>
+                          <InsertHere onClick={() => openLibrary(index)} />
+                          <SortableSectionItem
+                            node={n}
+                            selected={selectedId === n.id}
+                            onSelect={() => setSelectedId(n.id)}
+                            onToggleHidden={() => toggleHiddenNode(n.id)}
+                          />
+                        </div>
                       ))}
+                      <InsertHere onClick={() => openLibrary(tree.root.children.length)} />
                     </SortableContext>
                   </DndContext>
                 )}
@@ -2758,7 +2779,8 @@ function PageVisualEditor({
             surface={editorialSurface}
             actor={editorialActor}
             onClose={() => setShowLibrary(false)}
-            onPick={(type) => insertBlock(type)}
+            insertAt={insertAt}
+            onPick={(type) => insertBlock(type, insertAt ?? undefined)}
             onPickReusable={(entry) => insertReusable(entry)}
           />
         ) : null}
@@ -3899,6 +3921,27 @@ function ToolBtn({
   );
 }
 
+/**
+ * Zona de inserción entre secciones: abre la biblioteca de elementos
+ * aprobados y coloca el elegido exactamente en esa posición.
+ */
+function InsertHere({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex h-5 w-full items-center gap-1 text-[10px] font-medium uppercase tracking-[0.12em] text-transparent transition hover:text-primary"
+      aria-label="Insertar un elemento aquí"
+      title="Insertar un elemento aquí"
+    >
+      <span className="h-px flex-1 bg-transparent transition group-hover:bg-primary/40" />
+      <Plus className="size-3" aria-hidden />
+      Insertar aquí
+      <span className="h-px flex-1 bg-transparent transition group-hover:bg-primary/40" />
+    </button>
+  );
+}
+
 function BlockLibraryModal({
   onClose,
   onPick,
@@ -3906,9 +3949,12 @@ function BlockLibraryModal({
   onPickReusable,
   surface,
   actor,
+  insertAt = null,
 }: {
   onClose: () => void;
   onPick: (type: string) => void;
+  /** Posición donde se colocará el elemento; `null` ⇒ al final. */
+  insertAt?: number | null;
   advanced?: boolean;
   onPickReusable?: (entry: ReusableBlock) => void;
   surface: EditorialSurface | null;
@@ -3972,9 +4018,11 @@ function BlockLibraryModal({
       <div className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-card p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold">Añadir una sección</h3>
+            <h3 className="text-sm font-semibold">Elementos que puedes añadir</h3>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Elige un tipo de sección para insertarlo al final de la página.
+              {insertAt === null
+                ? "Elige un elemento para colocarlo al final de la página."
+                : `Elige un elemento para colocarlo en la posición ${insertAt + 1}.`}
             </p>
           </div>
           <button
