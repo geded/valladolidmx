@@ -12,6 +12,7 @@
  *  - Sólo los activos aprobados pueden seleccionarse para un slot.
  */
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import {
   BadgeCheck,
@@ -402,18 +403,18 @@ export function MediaPickerDialog({
     }
   }
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Seleccionar o subir imagen"
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="flex h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-background shadow-2xl"
+        className="flex h-[calc(100dvh-1rem)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-background shadow-2xl sm:h-[85dvh]"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
@@ -558,7 +559,8 @@ export function MediaPickerDialog({
         initialQuery={searchHint?.trim() || search.trim() || ""}
         onPick={(photo) => void handleAluxPhoto(photo)}
       />
-    </div>
+    </div>,
+    document.body,
   );
 }
 
