@@ -286,17 +286,17 @@ export const setPlatformConfigValue = createServerFn({ method: "POST" })
       if (def.max != null && n > def.max) throw new Error("value_above_max");
       value = Math.round(n);
     } else {
-      value = String(data.value);
+      const text = String(data.value);
       if (def.key === "site.primary_domain") {
-        const host = normalizeDomain(value);
+        const host = normalizeDomain(text);
         if (!host) throw new Error("invalid_domain");
         value = host;
-      }
-      if (def.key === "site.alternate_domains") {
-        const raw = value.trim();
-        const list = normalizeDomainList(raw);
-        if (raw.length > 0 && list.length === 0) throw new Error("invalid_domain");
+      } else if (def.key === "site.alternate_domains") {
+        const list = normalizeDomainList(text);
+        if (text.trim().length > 0 && list.length === 0) throw new Error("invalid_domain");
         value = list.join(", ");
+      } else {
+        value = text;
       }
     }
 
