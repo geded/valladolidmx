@@ -43,6 +43,24 @@ export const SETTING_GROUP_LABEL: Record<SettingDefinition["group"], string> = {
  */
 export const PLATFORM_SETTINGS: SettingDefinition[] = [
   {
+    key: "site.primary_domain",
+    group: "dominios",
+    label: "Dominio principal del sitio",
+    help: "Dirección oficial que se usa en buscadores, enlaces compartidos y correos. Cámbialo sólo cuando el dominio ya esté conectado y funcionando.",
+    kind: "text",
+    defaultValue: "quehacerenvalladolid.com",
+    isPublic: true,
+  },
+  {
+    key: "site.alternate_domains",
+    group: "dominios",
+    label: "Otros dominios conectados",
+    help: "Direcciones adicionales que también llevan al sitio, separadas por coma. Ejemplo: orientemaya.com, valladolid.mx",
+    kind: "text",
+    defaultValue: "",
+    isPublic: true,
+  },
+  {
     key: "payments.cash_enabled",
     group: "pagos",
     label: "Pago en efectivo",
