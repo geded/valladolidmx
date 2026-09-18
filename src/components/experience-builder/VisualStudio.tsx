@@ -2019,12 +2019,13 @@ function PageVisualEditor({
       );
     };
     measure();
-    const observer = new ResizeObserver(measure);
-    if (shellRef.current) observer.observe(shellRef.current);
+    // No se observa el propio shell: su altura es la que este efecto escribe y
+    // observarla provoca un bucle de medición (parpadeo/vibración del editor).
     window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
     return () => {
-      observer.disconnect();
       window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
     };
   }, [page, tree]);
 
