@@ -55,6 +55,7 @@ import {
   DndContext,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
@@ -1827,6 +1828,8 @@ function PageVisualEditor({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
   const onDragEnd = (e: DragEndEvent) => {
@@ -2972,6 +2975,8 @@ function HomeCanvas({
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
   const handleCanvasDragEnd = (e: DragEndEvent) => {
@@ -3383,10 +3388,13 @@ function SortableSectionItem({
         {...attributes}
         {...listeners}
         aria-label="Arrastrar para reordenar"
-        className="cursor-grab text-muted-foreground active:cursor-grabbing"
+        title="Arrastra para mover la sección"
+        style={{ touchAction: "none" }}
+        className="inline-flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
       >
-        ⋮⋮
+        <GripVertical className="size-3.5" aria-hidden />
       </button>
+
       <button
         type="button"
         onClick={onSelect}
@@ -3518,7 +3526,8 @@ function BlockOverlay({
               onClick={(e) => e.stopPropagation()}
               aria-label="Arrastrar para reordenar"
               title="Arrastrar para reordenar"
-              className="inline-flex h-6 w-6 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
+              style={{ touchAction: "none" }}
+              className="inline-flex size-7 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
             >
               <GripVertical className="size-3" />
             </button>
