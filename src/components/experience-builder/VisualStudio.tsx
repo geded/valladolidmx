@@ -3539,15 +3539,12 @@ function CanvasViewport({
       const touch = event.touches[0];
       if (!touch) return;
       touchMoved = true;
-      const parentScroller = iframeRef.current?.parentElement?.closest(
-        "[data-eb-canvas-scrollport]",
-      ) as HTMLElement | null;
-      if (parentScroller) {
-        const visibleTop = parentScroller.scrollTop / Math.max(scale, 0.01);
-        const visibleBottom = visibleTop + parentScroller.clientHeight / Math.max(scale, 0.01);
+      // El lienzo se desplaza con su propio scroll interno mientras se arrastra.
+      const win = doc.defaultView;
+      if (win) {
         const edge = 96;
-        if (touch.clientY < visibleTop + edge) parentScroller.scrollTop -= 22;
-        if (touch.clientY > visibleBottom - edge) parentScroller.scrollTop += 22;
+        if (touch.clientY < edge) win.scrollBy(0, -22);
+        if (touch.clientY > win.innerHeight - edge) win.scrollBy(0, 22);
       }
       const over = doc
         .elementFromPoint(touch.clientX, touch.clientY)
@@ -3640,7 +3637,7 @@ function CanvasViewport({
         data-eb-canvas-indicator=""
         className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
       >
-        <span>{`${width} px · página completa · ${Math.round(scaled * 100)}%`}</span>
+        <span>{`${width} px · ${Math.round(scaled * 100)}%`}</span>
         {hud && metrics ? (
           <span data-eb-canvas-hud="">
             innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
