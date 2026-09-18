@@ -207,8 +207,8 @@ function CategoriaEnDestinoPage() {
   };
   const hasRelated = Boolean(
     related &&
-      (related.otherCategoriesInDestination.length > 0 ||
-        related.sameCategoryOtherDestinations.length > 0),
+    (related.otherCategoriesInDestination.length > 0 ||
+      related.sameCategoryOtherDestinations.length > 0),
   );
 
   return (

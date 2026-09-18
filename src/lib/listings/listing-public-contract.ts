@@ -284,7 +284,9 @@ export function configurePublicDiscoveryRails(
       {
         ...rail,
         title:
-          typeof config.title === "string" && config.title.trim() ? config.title.trim() : rail.title,
+          typeof config.title === "string" && config.title.trim()
+            ? config.title.trim()
+            : rail.title,
         subtitle:
           typeof config.subtitle === "string" && config.subtitle.trim()
             ? config.subtitle.trim()
