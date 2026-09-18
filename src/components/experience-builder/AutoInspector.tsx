@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   CloudUpload,
+  GripVertical,
   ImageIcon,
   Languages,
   Loader2,
@@ -981,6 +982,7 @@ function StructuredListControl({
   simple?: boolean;
 }) {
   const rows = Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const fields = def.item?.fields ?? {};
   const defaultRows = Array.isArray(def.default) ? (def.default as Record<string, unknown>[]) : [];
   const makeDefault = () =>
