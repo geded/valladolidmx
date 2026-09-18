@@ -44,6 +44,19 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 - Desempate orgánico: calidad de ficha, actualidad, cercanía temática y variedad entre destinos.
 - Si faltan candidatos válidos, se muestran menos tarjetas o se oculta el carril; nunca se rellenan con fixtures.
 
+## Reparto cuando hay muchos contratos
+
+Con decenas o cientos de empresas contratadas, los espacios comerciales son escasos y se reparten por turnos, no por orden de llegada ni por quién pague más en una subasta.
+
+- **Elegibilidad primero:** sólo entran al sorteo las fichas de empresas con grant vigente, aprobadas editorialmente, con ficha completa y pertinentes al carril, destino y filtros activos.
+- **Turnos justos (fair share):** cada empresa elegible acumula un derecho de exposición proporcional al nivel de su paquete (`discovery_boost`, `home_boost`, `search_weight` del plan contratado). Un paquete superior recibe más turnos por periodo, no una posición permanente.
+- **Rotación determinista:** el turno se calcula por día y superficie con una semilla estable, de modo que la página no cambia en cada recarga y todas las empresas del mismo nivel reciben exposición comparable a lo largo del mes.
+- **Deuda de exposición:** el sistema prioriza a quien ha recibido menos impresiones respecto a su derecho acumulado, evitando que las mismas cinco empresas ocupen siempre los espacios.
+- **Techo por empresa:** máximo 2 apariciones por página y 1 por carril, sin importar el nivel del paquete.
+- **Cupo por superficie:** Administración define cuántos espacios comerciales admite cada superficie; si la demanda supera el cupo, se informa a la empresa que su paquete entra en rotación y no garantiza posición fija.
+- **Vigencia y pausa:** grant vencido, suspendido o ficha despublicada sale de la rotación de inmediato y su espacio lo toma el siguiente elegible o un orgánico.
+- **Medición:** impresiones, clics y turnos servidos se registran por empresa y periodo para acreditar el cumplimiento del paquete.
+
 ## Scope Gate
 
 - Evolucionar únicamente la composición publicada de `/que-hacer` sobre su autoridad Premium actual.
