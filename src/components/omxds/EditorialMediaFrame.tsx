@@ -11,10 +11,7 @@
  * debe consumirlo en lugar de emitir `<img>` sin fallback.
  */
 import { cn } from "@/lib/utils";
-import {
-  resolveMediaSource,
-  type MediaUsageContext,
-} from "@/lib/media/resolve-source";
+import { resolveMediaSource, type MediaUsageContext } from "@/lib/media/resolve-source";
 import { hasEditorialMedia, type EditorialMedia } from "./editorial-media";
 
 export type { EditorialMedia };
