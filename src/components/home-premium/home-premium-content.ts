@@ -400,8 +400,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   mapa: {
     kicker: "Del relato al territorio",
     title: "Mira en el mapa la ruta seleccionada",
-    description:
-      "Visualiza en el territorio tu próximo recorrido por el Oriente Maya de Yucatán.",
+    description: "Visualiza en el territorio tu próximo recorrido por el Oriente Maya de Yucatán.",
     dto: MAP_DTO,
   },
   travelPlan: {

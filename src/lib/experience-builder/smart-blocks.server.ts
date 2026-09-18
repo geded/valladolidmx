@@ -194,7 +194,8 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
     },
   },
   events: {
-    select: "id, slug, title, summary, cover_media_id, starts_at, ends_at, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
+    select:
+      "id, slug, title, summary, cover_media_id, starts_at, ends_at, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
     filterable: ["status", "deleted_at", "slug", "starts_at", "ends_at"],
     defaultOrder: { column: "starts_at", ascending: true },
     adapt: (row) => {
@@ -205,12 +206,17 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         starts_at: str(row.starts_at) ?? "",
         ends_at: str(row.ends_at),
         recurrence_frequency:
-          row.recurrence_frequency === "daily" || row.recurrence_frequency === "weekly" ||
-          row.recurrence_frequency === "monthly" || row.recurrence_frequency === "yearly"
+          row.recurrence_frequency === "daily" ||
+          row.recurrence_frequency === "weekly" ||
+          row.recurrence_frequency === "monthly" ||
+          row.recurrence_frequency === "yearly"
             ? row.recurrence_frequency
             : null,
-        recurrence_interval: typeof row.recurrence_interval === "number" ? row.recurrence_interval : 1,
-        recurrence_weekdays: Array.isArray(row.recurrence_weekdays) ? row.recurrence_weekdays.filter((day): day is number => typeof day === "number") : [],
+        recurrence_interval:
+          typeof row.recurrence_interval === "number" ? row.recurrence_interval : 1,
+        recurrence_weekdays: Array.isArray(row.recurrence_weekdays)
+          ? row.recurrence_weekdays.filter((day): day is number => typeof day === "number")
+          : [],
         recurrence_until: str(row.recurrence_until),
         schedule_times: normalizeScheduleTimes(row.schedule_times),
         exception_dates: normalizeExceptionDates(row.exception_dates),
@@ -317,7 +323,6 @@ export async function resolveStableMediaAssets(
     ]);
     const assets = [...(listed.data ?? []), ...(governed.data ?? [])];
     if (assets.length === 0) return out;
-
 
     const ready = assets.filter((a) => a.pipeline_status === "ready");
     if (ready.length === 0) return out;
@@ -791,7 +796,13 @@ export interface HomeRealContent {
   experiencias: HomeRealCard[];
   stays: HomeRealCard[];
   food: HomeRealCard[];
-  eventos: Array<HomeRealCard & { day: string; startsAt: string | null; recurrence: EventRecurrencePayload | null }>;
+  eventos: Array<
+    HomeRealCard & {
+      day: string;
+      startsAt: string | null;
+      recurrence: EventRecurrencePayload | null;
+    }
+  >;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
   /**
