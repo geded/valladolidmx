@@ -39,7 +39,9 @@ export interface GetPublicListingInput {
   previewMedia?: boolean;
 }
 
-async function listPublishedZones(destinationSlug: string | null): Promise<PublicDestinationZone[]> {
+async function listPublishedZones(
+  destinationSlug: string | null,
+): Promise<PublicDestinationZone[]> {
   if (!destinationSlug) return [];
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
