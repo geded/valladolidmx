@@ -105,6 +105,11 @@ import { GlobalNavigationSessionBridge } from "@/components/navigation/Navigatio
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { getOmxdsVisualFoundationsFlag } from "@/lib/omxds/visual-foundations-flag.server";
+import {
+  SITE_DOMAIN_DEFAULTS,
+  getSiteDomainSettings,
+} from "@/lib/settings/site-domains.functions";
+import { setCanonicalDomain } from "@/config/site";
 
 const OMXDS_THEME_BOOTSTRAP = `(()=>{try{const r=document.documentElement;if(r.dataset.omxdsVisualFoundations!=="enabled")return;const k="valladolidmx:theme";const s=localStorage.getItem(k);const t=s==="sol"||s==="luna"?s:matchMedia("(prefers-color-scheme: dark)").matches?"luna":"sol";r.classList.toggle("dark",t==="luna");r.dataset.theme=t;r.style.colorScheme=t==="luna"?"dark":"light"}catch{}})();`;
 
