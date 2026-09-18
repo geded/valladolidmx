@@ -1091,6 +1091,12 @@ function PageVisualEditor({
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
+  /** Posición donde se insertará el elemento elegido en la biblioteca. */
+  const [insertAt, setInsertAt] = useState<number | null>(null);
+  const openLibrary = (atIndex?: number) => {
+    setInsertAt(typeof atIndex === "number" ? atIndex : null);
+    setShowLibrary(true);
+  };
   const [showVersions, setShowVersions] = useState(false);
   const [restoringPublished, setRestoringPublished] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
@@ -2329,6 +2335,18 @@ function PageVisualEditor({
           >
             <PanelsTopLeft className="size-4" aria-hidden />
             Estructura
+          </button>
+        ) : null}
+        {!previewMode && structureCollapsed ? (
+          <button
+            type="button"
+            onClick={() => openLibrary()}
+            className="absolute bottom-4 left-36 z-[65] inline-flex h-11 items-center gap-2 rounded-pill border border-border bg-background px-4 text-xs font-semibold text-foreground shadow-floating hover:bg-accent"
+            aria-label="Ver elementos que puedo añadir"
+            title="Ver elementos que puedo añadir"
+          >
+            <Plus className="size-4" aria-hidden />
+            Elementos
           </button>
         ) : null}
         {!previewMode && !structureCollapsed ? (
