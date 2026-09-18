@@ -275,7 +275,10 @@ export function resolveHomeSectionVisibility(
   declared: Partial<Record<HomePremiumSectionKey, boolean>>,
 ): Partial<Record<HomePremiumSectionKey, boolean>> {
   const nonEmpty: Record<HomePremiumSectionKey, boolean> = {
+    hero: true,
+    alux: true,
     destinos: content.destinos.items.length > 0,
+    categorias: content.categorias.items.length > 0,
     pueblosMagicos: content.destinos.items.some((item) => item.puebloMagico),
     rutas: content.rutas.items.length > 0,
     experiencias: content.experiencias.items.length > 0,
@@ -283,6 +286,7 @@ export function resolveHomeSectionVisibility(
     eventos: content.eventos.items.length > 0,
     queHacer: content.queHacer.items.length > 0,
     mapa: content.mapa.dto.points.length > 0,
+    travelPlan: true,
   };
 
   const out: Partial<Record<HomePremiumSectionKey, boolean>> = {};
