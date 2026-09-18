@@ -202,5 +202,5 @@
 ## Menú de escritorio compacto (2026-09-18)
 
 - [x] Barra principal de escritorio reducida a Oriente Maya, Hoteles, Restaurantes y Experiencias; se retira la opción “Más”.
-- [x] Panel de menú (hamburguesa) disponible también en escritorio con Casas de vacaciones, ¿Qué hacer?, Eventos, Promociones, Mapa, Blog, Contacto, “Arma tu Viaje”, inicio de sesión e idioma.
+- [x] Panel de menú (hamburguesa) disponible también en escritorio con Casas de vacaciones, ¿Qué hacer?, Eventos, Promociones, Mapa, Blog, Contacto, “Arma tu Viaje” e inicio de sesión; el idioma permanece exclusivamente en el header para evitar duplicación y fallos.
 - [x] Validado en 1440/834/430/390 sin desbordamiento; logotipo, buscador, Mi Viaje, cuenta y rutas preservados. Sin publicar.

@@ -311,11 +311,6 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                     <UserMenu />
                   </div>
                 ) : null}
-                {showLanguage ? (
-                  <div className="flex items-center justify-center pt-0.5">
-                    <LanguageSwitcher align="start" />
-                  </div>
-                ) : null}
               </div>
             </aside>
           </>,
@@ -394,10 +389,8 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   const { isOverlay, open, setOpen, menuButtonRef, ctaFallback } = ctx;
 
   if (btn.kind === "language") {
-    // v1.1: el selector de idioma vive en SiteTopBar (desktop) y en el drawer
-    // (mobile). En la fila principal sólo se muestra bajo `lg` cuando la
-    // topbar está oculta, para preservar acceso al cambio de idioma sobre
-    // el Hero (overlay) o en tabletas.
+    // El selector permanece en SiteTopBar y en la fila principal cuando la
+    // topbar no está disponible. No se duplica dentro del menú hamburguesa.
     return (
       <div key={key} className="xl:hidden">
         <LanguageSwitcher />
