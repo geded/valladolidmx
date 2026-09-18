@@ -1093,19 +1093,17 @@ function PageVisualEditor({
   setSidebarRef.current = workspace.setSidebar;
 
   const toggleFocusMode = useCallback(() => {
-    setFocusMode((current) => {
-      const next = !current;
-      focusModeRef.current = next;
-      if (next) {
-        previousSidebarRef.current = workspace.sidebar;
-        workspace.setSidebar("hidden");
-        setStructureCollapsed(true);
-      } else {
-        workspace.setSidebar(previousSidebarRef.current);
-      }
-      return next;
-    });
-  }, [workspace]);
+    const next = !focusMode;
+    focusModeRef.current = next;
+    if (next) {
+      previousSidebarRef.current = workspace.sidebar;
+      workspace.setSidebar("hidden");
+      setStructureCollapsed(true);
+    } else {
+      workspace.setSidebar(previousSidebarRef.current);
+    }
+    setFocusMode(next);
+  }, [focusMode, workspace]);
 
   useEffect(() => {
     return () => {
