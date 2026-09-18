@@ -260,6 +260,15 @@ export interface ListingFeedInput {
   readonly events?: readonly PublicEventCard[];
   readonly places?: readonly PublicPlaceCard[];
   readonly destinations?: readonly Destination[];
+  readonly zones?: readonly PublicDestinationZone[];
+}
+
+export interface PublicDestinationZone {
+  readonly id: string;
+  readonly slug: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly destinationSlug: string;
 }
 
 export interface BuildPublicListingInput extends ListingFeedInput {
@@ -340,7 +349,35 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
               ? `Explora los distintos rincones de ${destinationLabel}.`
               : "Elige un punto de partida para recorrer el Oriente Maya.",
             seeAllHref: destino ? `/oriente-maya/${destino}` : "/oriente-maya",
-            items: destino ? [] : (input.destinations ?? []).map(destinationToTourismCard),
+            items: destino
+              ? (input.zones ?? [])
+                  .filter((zone) => zone.destinationSlug === destino)
+                  .map((zone) => ({
+                    id: zone.id,
+                    entityKind: "region" as const,
+                    eyebrow: "Zona",
+                    name: zone.name,
+                    href: `/oriente-maya/${destino}?zona=${encodeURIComponent(zone.slug)}`,
+                    tagline: zone.description,
+                    businessName: null,
+                    mediaUrl: null,
+                    mediaAlt: null,
+                    rating: null,
+                    location: { label: destinationLabel ?? labelOf(destino), distanceKm: null },
+                    territorialContext: destinationLabel ?? labelOf(destino),
+                    highlights: [],
+                    badges: [],
+                    institutionalBadges: [],
+                    dateLabel: null,
+                    availabilityLabel: null,
+                    priceAmount: null,
+                    priceCurrency: null,
+                    priceHint: null,
+                    primaryAction: null,
+                    secondaryAction: null,
+                    filterAttributes: { zone: [zone.slug] },
+                  }))
+              : (input.destinations ?? []).map(destinationToTourismCard),
           },
           {
             id: "events",

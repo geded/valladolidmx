@@ -29,6 +29,10 @@ import {
 } from "@/lib/alux/travel-preferences";
 import { useTravelPreferences } from "@/lib/alux/use-travel-preferences";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import type { FavoriteEntityKind } from "@/lib/traveler/traveler-favorites.functions";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 
@@ -666,7 +670,6 @@ function QueHacerDiscoveryBody({
 
       <div className="mt-7 space-y-10">
         {filteredRails.map((rail) => {
-          if (rail.id === "destinations" && isDestinationScope) return null;
           if (!rail.items.length) return null;
           return (
             <section key={rail.id} aria-labelledby={`que-hacer-${rail.id}`}>
@@ -1386,40 +1389,67 @@ function QueHacerDiscoveryCard({
   if (!vm) return null;
   const favoriteKind: FavoriteEntityKind | null =
     vm.entityKind === "event" ? "event" : vm.entityKind === "place" ? "place" : null;
-  const card = (
-    <TourismCard
-      vm={vm}
-      contractVariant="compact"
-      capabilities={{
-        compact: true,
-        showBusiness: false,
-        showRating: false,
-        showHighlights: false,
-        showBadges: false,
-        showInstitutionalBadges: false,
-        showAvailability: false,
-        showPrice: false,
-        showPrimaryAction: false,
-        showSecondaryAction: false,
-        showFavorite: false,
-      }}
-      renderMediaActions={
-        favoriteKind
-          ? () => (
-              <FavoriteButton
-                entityKind={favoriteKind}
-                entityId={vm.id}
-                entityTitle={vm.name}
-                entitySlug={vm.href ?? undefined}
-                entityImageUrl={vm.mediaUrl ?? undefined}
-                variant="media-overlay"
-              />
-            )
-          : undefined
-      }
-    />
+  const commercialBadge = vm.badges.find((badge) =>
+    /destacad|premium|élite|elite|spotlight/i.test(badge.label),
   );
-  return card;
+  const displayVm = commercialBadge
+    ? { ...vm, badges: vm.badges.filter((badge) => badge !== commercialBadge) }
+    : vm;
+  const card = (
+    <div>
+      <TourismCard
+        vm={displayVm}
+        contractVariant="compact"
+        capabilities={{
+          compact: true,
+          showBusiness: false,
+          showRating: false,
+          showHighlights: false,
+          showBadges: false,
+          showInstitutionalBadges: false,
+          showAvailability: false,
+          showPrice: false,
+          showPrimaryAction: false,
+          showSecondaryAction: false,
+          showFavorite: false,
+        }}
+        renderMediaActions={
+          favoriteKind
+            ? () => (
+                <FavoriteButton
+                  entityKind={favoriteKind}
+                  entityId={vm.id}
+                  entityTitle={vm.name}
+                  entitySlug={vm.href ?? undefined}
+                  entityImageUrl={vm.mediaUrl ?? undefined}
+                  variant="media-overlay"
+                />
+              )
+            : undefined
+        }
+      />
+      {commercialBadge ? (
+        <p className="mt-1 text-xs font-medium text-[var(--muted-foreground)]">Recomendado</p>
+      ) : null}
+    </div>
+  );
+  if (!vm.operatorId || !trackingSurface) return card;
+  const trackingProps = {
+    businessId: vm.operatorId,
+    surface: trackingSurface,
+    rail: trackingRail ?? null,
+    placement: commercialBadge ? ("contratado" as const) : ("organico" as const),
+    entityKind: vm.entityKind,
+    entityId: vm.id,
+  };
+  return (
+    <>
+      <BusinessImpressionTracker {...trackingProps} />
+      <TrackClick {...trackingProps} eventType="click_card">
+        {card}
+      </TrackClick>
+    </>
+  );
 }
 
 function NearbySection({ profile }: { profile: ListingProfile }) {
