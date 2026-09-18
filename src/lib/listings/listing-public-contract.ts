@@ -238,9 +238,21 @@ export interface PublicListingDTO {
     readonly metaLabel: string | null;
   };
   readonly items: readonly TourismCardVM[];
+  /** Carriles editoriales de descubrimiento. Sólo `que-hacer` los publica. */
+  readonly discoveryRails?: readonly PublicListingDiscoveryRail[];
   readonly destinationSlug: string | null;
   readonly destinationLabel: string | null;
   readonly emptyMessage: string;
+}
+
+export type PublicListingDiscoveryRailId = "destinations" | "events" | "experiences" | "places";
+
+export interface PublicListingDiscoveryRail {
+  readonly id: PublicListingDiscoveryRailId;
+  readonly title: string;
+  readonly subtitle: string;
+  readonly seeAllHref: string;
+  readonly items: readonly TourismCardVM[];
 }
 
 export interface ListingFeedInput {
@@ -304,8 +316,68 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
     items = [
       ...(input.destinations ?? []).map(destinationToTourismCard),
       ...(input.events ?? []).map(eventToTourismCard),
+      ...(input.businesses ?? [])
+        .filter((business) => !destino || business.destination_slug === destino)
+        .map((business) =>
+          businessToTourismCard(business, {
+            destinationLabel: labelOf(business.destination_slug),
+            regionLabel: ORIENTE_MAYA.name,
+          }),
+        ),
+      ...(input.places ?? [])
+        .filter((place) => !destino || place.destination_slug === destino)
+        .map(placeToTourismCard),
     ];
   }
+
+  const discoveryRails: PublicListingDiscoveryRail[] | undefined =
+    contract.id === "que-hacer"
+      ? [
+          {
+            id: "destinations",
+            title: destino ? "Zonas por descubrir" : "Destinos a descubrir",
+            subtitle: destino
+              ? `Explora los distintos rincones de ${destinationLabel}.`
+              : "Elige un punto de partida para recorrer el Oriente Maya.",
+            seeAllHref: destino ? `/oriente-maya/${destino}` : "/oriente-maya",
+            items: destino
+              ? []
+              : (input.destinations ?? []).map(destinationToTourismCard),
+          },
+          {
+            id: "events",
+            title: "Eventos que no te puedes perder",
+            subtitle: "Fechas, celebraciones y encuentros para sumar a tu viaje.",
+            seeAllHref: destino ? `/oriente-maya/${destino}/eventos` : "/eventos",
+            items: (input.events ?? [])
+              .filter((event) => !destino || event.destination_slug === destino)
+              .map(eventToTourismCard),
+          },
+          {
+            id: "experiences",
+            title: "Experiencias para vivir el territorio",
+            subtitle: "Actividades auténticas operadas por anfitriones locales.",
+            seeAllHref: destino ? `/oriente-maya/${destino}/experiencias` : "/experiencias",
+            items: (input.businesses ?? [])
+              .filter((business) => !destino || business.destination_slug === destino)
+              .map((business) =>
+                businessToTourismCard(business, {
+                  destinationLabel: labelOf(business.destination_slug),
+                  regionLabel: ORIENTE_MAYA.name,
+                }),
+              ),
+          },
+          {
+            id: "places",
+            title: "Lugares y sitios de interés preferidos",
+            subtitle: "Cenotes, patrimonio y rincones que cuentan la historia de la región.",
+            seeAllHref: destino ? `/oriente-maya/${destino}/lugares` : "/lugares",
+            items: (input.places ?? [])
+              .filter((place) => !destino || place.destination_slug === destino)
+              .map(placeToTourismCard),
+          },
+        ]
+      : undefined;
 
   // Alcance territorial del título: entrada global ⇒ toda la región;
   // entrada desde micrositio ⇒ destino activo. Nunca un destino por defecto.
@@ -337,6 +409,7 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
       metaLabel: destinationLabel ?? ORIENTE_MAYA.name,
     },
     items,
+    ...(discoveryRails ? { discoveryRails } : {}),
     destinationSlug: destino,
     destinationLabel,
     emptyMessage,

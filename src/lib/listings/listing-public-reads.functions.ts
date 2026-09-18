@@ -84,15 +84,29 @@ export const getPublicListing = createServerFn({ method: "GET" })
       return buildPublicListing({ family: contract.id, destino: data.destino, places });
     }
 
-    const [destinations, events] = await Promise.all([
+    const [destinations, events, businesses, places, taxonomy] = await Promise.all([
       listPublishedDestinations().catch(() => []),
       listPublishedEvents({ data: { upcomingOnly: true, limit: 24 } }).catch(() => []),
+      listMarketplaceBusinesses().catch(() => []),
+      listPublishedPlaces({ data: { destinationSlug: data.destino, previewMedia: false } }).catch(
+        () => [],
+      ),
+      getListingFamilyTaxonomy().catch(
+        (): ListingFamilyTaxonomyResult => ({ available: false, taxonomy: {} }),
+      ),
     ]);
+    const experienceSlugs = new Set(
+      taxonomy.available
+        ? (taxonomy.taxonomy.experiencias ?? [])
+        : listingFamilyContract("experiencias").categorySlugs,
+    );
     return buildPublicListing({
       family: contract.id,
       destino: data.destino,
       destinations,
       events,
+      businesses: businesses.filter((business) => experienceSlugs.has(business.category_slug)),
+      places,
     });
   });
 
