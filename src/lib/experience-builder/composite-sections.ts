@@ -157,6 +157,32 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
       },
     ],
   },
+  "vmx.place.premium-q2d": {
+    orderKey: "place_section_order",
+    sections: [
+      {
+        key: "hero",
+        label: "Portada del lugar",
+        prefixes: ["hero_", "identity_", "presentation_mode"],
+      },
+      { key: "alux", label: "Alux", prefixes: ["alux_"], reorderable: true },
+      { key: "gallery", label: "Galería", prefixes: ["gallery"], reorderable: true },
+      { key: "intro", label: "Relato del lugar", prefixes: ["intro"], reorderable: true },
+      { key: "essentials", label: "Lo esencial", prefixes: ["essentials"], reorderable: true },
+      { key: "map", label: "Ubicación y mapa", prefixes: ["map"], reorderable: true },
+      { key: "services", label: "Servicios", prefixes: ["services"], reorderable: true },
+      { key: "experiences", label: "Experiencias", prefixes: ["experiences"], reorderable: true },
+      { key: "events", label: "Eventos", prefixes: ["events"], reorderable: true },
+      {
+        key: "nearbyBusinesses",
+        label: "Qué hay cerca",
+        prefixes: ["nearbyBusinesses"],
+        reorderable: true,
+      },
+      { key: "nearby", label: "Lugares cercanos", prefixes: ["nearbyPlaces"], reorderable: true },
+      { key: "trip", label: "Mi Viaje", prefixes: ["trip"], reorderable: true },
+    ],
+  },
   "vmx.listing.premium-g5": {
     sections: [
       { key: "hero", label: "Portada del listado", prefixes: ["hero_"] },
