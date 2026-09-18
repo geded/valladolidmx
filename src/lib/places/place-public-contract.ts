@@ -515,7 +515,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     // Q2D-B no infiere cercanías: sin fuente gobernada, la sección se oculta.
     nearby: [],
     /* Cercanía real por coordenadas CMS (nunca inferida por texto). */
-    nearbyBusinesses: dto.nearbyBusinesses.map((b) => ({
+    nearbyBusinesses: (dto.nearbyBusinesses ?? []).map((b) => ({
       id: b.id,
       slug: b.slug,
       title: b.name,
