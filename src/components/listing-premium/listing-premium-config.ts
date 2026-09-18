@@ -52,6 +52,15 @@ export const QUE_HACER_DISCOVERY_RAILS = [
   },
 ] as const;
 
+export interface QueHacerDiscoveryRailConfig {
+  id: (typeof QUE_HACER_DISCOVERY_RAILS)[number]["id"];
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  max_items: number;
+  sort_by: "manual" | "recent" | "popular";
+}
+
 type Cfg = Record<string, unknown>;
 
 const str = (value: unknown, fallback: string): string =>
@@ -86,7 +95,7 @@ export interface ListingPremiumG5Resolved {
   emptyMessage: string;
   showAddToTrip: boolean;
   showFavorite: boolean;
-  discoveryRails: typeof QUE_HACER_DISCOVERY_RAILS;
+  discoveryRails: readonly QueHacerDiscoveryRailConfig[];
 }
 
 export function resolveListingPremiumG5(config: Cfg = {}): ListingPremiumG5Resolved {
