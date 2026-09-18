@@ -399,6 +399,63 @@ export function SeoLandingContentEditor({
         </div>
       </header>
 
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <header className="mb-3">
+          <h3 className="font-serif text-lg leading-tight">Orden de secciones</h3>
+          <p className="text-xs text-muted-foreground">
+            Arrastra para cambiar el orden de las secciones reordenables de la landing. La portada
+            y el cierre conservan su posición aprobada.
+          </p>
+        </header>
+        <ul className="space-y-2">
+          {orderedReorderables.map((slot, index) => (
+            <li
+              key={slot}
+              draggable={editable}
+              onDragStart={() => setDragSlot(slot)}
+              onDragEnd={() => setDragSlot(null)}
+              onDragOver={(e) => {
+                if (dragSlot && dragSlot !== slot) e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragSlot) moveSlotTo(dragSlot, index);
+                setDragSlot(null);
+              }}
+              className="flex items-center gap-2 rounded-xl border border-border bg-background p-2"
+              style={{ touchAction: "none" }}
+            >
+              <GripVertical
+                className="size-4 shrink-0 cursor-grab text-muted-foreground"
+                aria-hidden
+              />
+              <span className="min-w-0 flex-1 truncate text-sm">
+                {index + 1}. {REORDERABLE_LABELS[slot]}
+              </span>
+              <button
+                type="button"
+                className={chip}
+                disabled={!editable || index === 0}
+                aria-label={`Subir ${REORDERABLE_LABELS[slot]}`}
+                onClick={() => moveSlotTo(slot, index - 1)}
+              >
+                <ArrowUp className="size-3.5" aria-hidden />
+              </button>
+              <button
+                type="button"
+                className={chip}
+                disabled={!editable || index === orderedReorderables.length - 1}
+                aria-label={`Bajar ${REORDERABLE_LABELS[slot]}`}
+                onClick={() => moveSlotTo(slot, index + 1)}
+              >
+                <ArrowDown className="size-3.5" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+
       <Group
         title="Portada"
         hint="Territorio, identidad y fotografía protagonista."
