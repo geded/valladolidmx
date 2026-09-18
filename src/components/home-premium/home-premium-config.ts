@@ -43,6 +43,24 @@ const rows = (value: unknown): Cfg[] =>
 const EMPTY_MEDIA: HomePremiumMedia = { url: "", alt: "" };
 
 /**
+ * Orden editable de secciones (clave `home_section_order`). Fail-closed: sólo
+ * se aceptan claves conocidas, sin duplicados; las faltantes se completan con
+ * el orden aprobado del preset.
+ */
+const sectionOrder = (value: unknown): HomePremiumSectionKey[] => {
+  if (!Array.isArray(value)) return HOME_PREMIUM_DEFAULT_ORDER;
+  const known = new Set<string>(HOME_PREMIUM_DEFAULT_ORDER);
+  const picked: HomePremiumSectionKey[] = [];
+  for (const item of value) {
+    if (typeof item !== "string" || !known.has(item)) continue;
+    const key = item as HomePremiumSectionKey;
+    if (!picked.includes(key)) picked.push(key);
+  }
+  if (picked.length === 0) return HOME_PREMIUM_DEFAULT_ORDER;
+  return [...picked, ...HOME_PREMIUM_DEFAULT_ORDER.filter((key) => !picked.includes(key))];
+};
+
+/**
  * G8-R1-F1L-R2 · Sólo se acepta una ruta interna canónica ("/..."). Cualquier
  * otro valor —incluido "#"— se resuelve como `null` y la tarjeta se descarta.
  */
@@ -359,7 +377,7 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       queHacer: bool(config.show_que_hacer, true),
       mapa: bool(config.show_mapa, true),
     },
-    order: HOME_PREMIUM_DEFAULT_ORDER,
+    order: sectionOrder(config.home_section_order),
   };
 }
 
@@ -495,6 +513,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
     show_eventos: true,
     show_que_hacer: true,
     show_mapa: true,
+    home_section_order: [...HOME_PREMIUM_DEFAULT_ORDER],
   };
 }
 

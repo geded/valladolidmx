@@ -66,6 +66,14 @@ export interface AutoInspectorProps {
    * para que "lo que ves en el canvas" sea lo que editas.
    */
   activeBreakpoint?: TypographyBreakpoint;
+  /**
+   * Filtro opcional de campos. Cuando se pasa, el inspector sólo muestra los
+   * campos aceptados: permite trabajar sección por sección dentro de una
+   * plantilla compuesta sin duplicar el inspector.
+   */
+  fieldFilter?: (field: string) => boolean;
+  /** Oculta el encabezado del bloque cuando el panel ya lo muestra. */
+  hideHeader?: boolean;
 }
 
 export function AutoInspector({
@@ -74,6 +82,8 @@ export function AutoInspector({
   onChange,
   simple = false,
   activeBreakpoint,
+  fieldFilter,
+  hideHeader = false,
 }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
   const formRef = useRef<HTMLDivElement | null>(null);
@@ -116,33 +126,40 @@ export function AutoInspector({
     onChange({ ...config, __typography: nextMap });
   };
   const typoDefaults = getTypographyDefaults(contract.type) ?? {};
+  const visibleFields = Object.entries(contract.schema).filter(([key]) =>
+    fieldFilter ? fieldFilter(key) : true,
+  );
   return (
     <div ref={formRef} className="space-y-3">
-      <header className="space-y-1">
-        <h3 className="text-sm font-semibold">{contract.display_name}</h3>
-        {simple ? null : (
-          <p className="text-[11px] text-muted-foreground">
-            {contract.type} · v{contract.version}
-          </p>
-        )}
-        {contract.description ? (
-          <p className="text-xs text-muted-foreground">{contract.description}</p>
-        ) : null}
-        {simple ? null : <CapabilityChips contract={contract} />}
-      </header>
-      <DeviceVisibilityRow
-        value={
-          Array.isArray(config.__hidden_on)
-            ? (config.__hidden_on as unknown[]).filter(
-                (v): v is "mobile" | "tablet" | "desktop" =>
-                  v === "mobile" || v === "tablet" || v === "desktop",
-              )
-            : []
-        }
-        onChange={(next) => onChange({ ...config, __hidden_on: next })}
-      />
+      {hideHeader ? null : (
+        <header className="space-y-1">
+          <h3 className="text-sm font-semibold">{contract.display_name}</h3>
+          {simple ? null : (
+            <p className="text-[11px] text-muted-foreground">
+              {contract.type} · v{contract.version}
+            </p>
+          )}
+          {contract.description ? (
+            <p className="text-xs text-muted-foreground">{contract.description}</p>
+          ) : null}
+          {simple ? null : <CapabilityChips contract={contract} />}
+        </header>
+      )}
+      {hideHeader ? null : (
+        <DeviceVisibilityRow
+          value={
+            Array.isArray(config.__hidden_on)
+              ? (config.__hidden_on as unknown[]).filter(
+                  (v): v is "mobile" | "tablet" | "desktop" =>
+                    v === "mobile" || v === "tablet" || v === "desktop",
+                )
+              : []
+          }
+          onChange={(next) => onChange({ ...config, __hidden_on: next })}
+        />
+      )}
       <div className="space-y-3">
-        {Object.entries(contract.schema).map(([key, def]) => (
+        {visibleFields.map(([key, def]) => (
           <FieldRow
             key={key}
             name={key}
@@ -158,7 +175,7 @@ export function AutoInspector({
             activeBreakpoint={activeBreakpoint}
           />
         ))}
-        {Object.keys(contract.schema).length === 0 ? (
+        {visibleFields.length === 0 ? (
           <p className="text-xs text-muted-foreground">Este bloque no tiene campos editables.</p>
         ) : null}
       </div>

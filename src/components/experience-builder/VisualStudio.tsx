@@ -112,6 +112,13 @@ import {
 import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
+import {
+  fieldBelongsToSection,
+  getCompositeSections,
+  nextCompositeOrder,
+  orderedCompositeSections,
+  type CompositeSectionDef,
+} from "@/lib/experience-builder/composite-sections";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
@@ -1094,6 +1101,8 @@ function PageVisualEditor({
   // El panel de estructura ya no ocupa una columna fija: se abre como capa
   // superpuesta bajo demanda para que el lienzo use todo el ancho disponible.
   const [structureCollapsed, setStructureCollapsed] = useState(true);
+  // Sección interna activa dentro de una plantilla compuesta.
+  const [subSectionKey, setSubSectionKey] = useState<string | null>(null);
   const [focusMode, setFocusMode] = useState(false);
   const focusModeRef = useRef(false);
   const previousSidebarRef = useRef(workspace.sidebar);
@@ -1363,17 +1372,111 @@ function PageVisualEditor({
   }, [selectedChrome, selectedNode, tree]);
 
   /**
-   * Navegación sección por sección: lista ordenada de secciones editables
-   * (sólo raíz) para saltar entre ellas sin depender del scroll del lienzo.
+   * Plantillas compuestas: sus secciones internas se tratan como secciones de
+   * trabajo reales (registro `composite-sections`). Las plantillas con varias
+   * secciones siguen funcionando exactamente igual.
+   */
+  const compositeEntry = useMemo(
+    () => (selectedNode ? getCompositeSections(selectedNode.type) : null),
+    [selectedNode],
+  );
+  const compositeSections = useMemo(
+    () => (compositeEntry ? orderedCompositeSections(compositeEntry, selectedConfig) : []),
+    [compositeEntry, selectedConfig],
+  );
+  const activeSection: CompositeSectionDef | null =
+    compositeSections.find((s) => s.key === subSectionKey) ?? compositeSections[0] ?? null;
+
+  const selectUnit = (id: string, sub: string | null) => {
+    setSelectedId(id);
+    setSubSectionKey(sub);
+  };
+
+  /**
+   * Navegación sección por sección: lista ordenada de secciones editables,
+   * incluidas las secciones internas de las plantillas compuestas.
    */
   const sectionNav = useMemo(() => {
-    const items = (tree?.root.children ?? []).map((n) => ({
-      id: n.id,
-      label: getBlock(n.type)?.display_name ?? n.type,
-    }));
-    const index = selectedNode ? items.findIndex((i) => i.id === selectedNode.id) : -1;
-    return { items, index };
-  }, [tree, selectedNode]);
+    const items: Array<{ id: string; sub: string | null; value: string; label: string }> = [];
+    for (const n of tree?.root.children ?? []) {
+      const entry = getCompositeSections(n.type);
+      if (entry) {
+        for (const section of orderedCompositeSections(
+          entry,
+          n.config as Record<string, unknown> | null,
+        )) {
+          items.push({
+            id: n.id,
+            sub: section.key,
+            value: `${n.id}::${section.key}`,
+            label: section.label,
+          });
+        }
+      } else {
+        items.push({
+          id: n.id,
+          sub: null,
+          value: n.id,
+          label: getBlock(n.type)?.display_name ?? n.type,
+        });
+      }
+    }
+    const current = selectedNode
+      ? activeSection
+        ? `${selectedNode.id}::${activeSection.key}`
+        : selectedNode.id
+      : "";
+    const index = current ? items.findIndex((i) => i.value === current) : -1;
+    return { items, index, current };
+  }, [tree, selectedNode, activeSection]);
+
+  const moveCompositeSection = (dir: -1 | 1) => {
+    if (!compositeEntry?.orderKey || !activeSection || !selectedConfig) return;
+    const keys = orderedCompositeSections(compositeEntry, selectedConfig)
+      .filter((s) => s.reorderable)
+      .map((s) => s.key);
+    const i = keys.indexOf(activeSection.key);
+    const target = keys[i + dir];
+    if (i < 0 || !target) return;
+    const order = nextCompositeOrder(compositeEntry, selectedConfig, activeSection.key, target);
+    if (!order) return;
+    updateSelectedConfig({ ...selectedConfig, [compositeEntry.orderKey]: order });
+  };
+
+  const toggleCompositeSection = () => {
+    const key = activeSection?.visibilityKey;
+    if (!key || !selectedConfig) return;
+    updateSelectedConfig({ ...selectedConfig, [key]: selectedConfig[key] === false });
+  };
+
+  /**
+   * Estructura de una plantilla publicada como un único bloque compuesto:
+   * se listan sus secciones internas en lugar de "una sola sección".
+   */
+  const compositeStructure = useMemo(() => {
+    const children = tree?.root.children ?? [];
+    if (children.length !== 1) return null;
+    const node = children[0]!;
+    const entry = getCompositeSections(node.type);
+    if (!entry) return null;
+    const config = (node.config ?? {}) as Record<string, unknown>;
+    return {
+      nodeId: node.id,
+      orderKey: entry.orderKey,
+      entry,
+      config,
+      sections: orderedCompositeSections(entry, config),
+    };
+  }, [tree]);
+
+  const onCompositeDragEnd = (e: DragEndEvent) => {
+    if (!tree || !compositeStructure || !e.over || e.active.id === e.over.id) return;
+    const { entry, config, nodeId, orderKey } = compositeStructure;
+    if (!orderKey) return;
+    const order = nextCompositeOrder(entry, config, String(e.active.id), String(e.over.id));
+    if (!order) return;
+    commitTree(updateNodeConfig(tree, nodeId, { ...config, [orderKey]: order }));
+  };
 
   // Escape cierra el panel de edición desde cualquier punto del scroll.
   useEffect(() => {
@@ -2265,26 +2368,68 @@ function PageVisualEditor({
                   selected={selectedId === HEADER_CHROME_ID}
                   onSelect={() => setSelectedId(HEADER_CHROME_ID)}
                 />
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={onDragEnd}
-                >
-                  <SortableContext
-                    items={tree.root.children.map((n) => n.id)}
-                    strategy={verticalListSortingStrategy}
+                {compositeStructure ? (
+                  // Plantilla compuesta: la estructura muestra sus secciones
+                  // internas reales, con arrastre entre las reordenables.
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={onCompositeDragEnd}
                   >
-                    {tree.root.children.map((n) => (
-                      <SortableSectionItem
-                        key={n.id}
-                        node={n}
-                        selected={selectedId === n.id}
-                        onSelect={() => setSelectedId(n.id)}
-                        onToggleHidden={() => toggleHiddenNode(n.id)}
-                      />
-                    ))}
-                  </SortableContext>
-                </DndContext>
+                    <SortableContext
+                      items={compositeStructure.sections.map((s) => s.key)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {compositeStructure.sections.map((section) => (
+                        <SortableCompositeItem
+                          key={section.key}
+                          section={section}
+                          draggable={Boolean(compositeStructure.orderKey && section.reorderable)}
+                          hidden={
+                            section.visibilityKey
+                              ? compositeStructure.config[section.visibilityKey] === false
+                              : false
+                          }
+                          selected={
+                            selectedId === compositeStructure.nodeId &&
+                            activeSection?.key === section.key
+                          }
+                          onSelect={() => selectUnit(compositeStructure.nodeId, section.key)}
+                          onToggleHidden={() => {
+                            const key = section.visibilityKey;
+                            if (!key) return;
+                            selectUnit(compositeStructure.nodeId, section.key);
+                            updateSelectedConfig({
+                              ...compositeStructure.config,
+                              [key]: compositeStructure.config[key] === false,
+                            });
+                          }}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={onDragEnd}
+                  >
+                    <SortableContext
+                      items={tree.root.children.map((n) => n.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {tree.root.children.map((n) => (
+                        <SortableSectionItem
+                          key={n.id}
+                          node={n}
+                          selected={selectedId === n.id}
+                          onSelect={() => setSelectedId(n.id)}
+                          onToggleHidden={() => toggleHiddenNode(n.id)}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                )}
                 <ChromeItem
                   label="Pie de página"
                   note="Columnas, enlaces y textos legales"
@@ -2381,8 +2526,13 @@ function PageVisualEditor({
                       : ""}
                   </p>
                   <h2 className="truncate text-base font-semibold">
-                    {selectedContract.display_name}
+                    {activeSection?.label ?? selectedContract.display_name}
                   </h2>
+                  {activeSection ? (
+                    <p className="truncate text-[11px] text-muted-foreground">
+                      {selectedContract.display_name}
+                    </p>
+                  ) : null}
                 </div>
                 <button
                   type="button"
@@ -2402,7 +2552,7 @@ function PageVisualEditor({
                     disabled={sectionNav.index <= 0}
                     onClick={() => {
                       const prev = sectionNav.items[sectionNav.index - 1];
-                      if (prev) setSelectedId(prev.id);
+                      if (prev) selectUnit(prev.id, prev.sub);
                     }}
                     className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
                     aria-label="Sección anterior"
@@ -2417,7 +2567,7 @@ function PageVisualEditor({
                     }
                     onClick={() => {
                       const next = sectionNav.items[sectionNav.index + 1];
-                      if (next) setSelectedId(next.id);
+                      if (next) selectUnit(next.id, next.sub);
                     }}
                     className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
                     aria-label="Sección siguiente"
@@ -2426,16 +2576,17 @@ function PageVisualEditor({
                     <ChevronDown className="size-3.5" aria-hidden />
                   </button>
                   <select
-                    value={sectionNav.index >= 0 ? (selectedId ?? "") : ""}
+                    value={sectionNav.index >= 0 ? sectionNav.current : ""}
                     onChange={(e) => {
-                      if (e.target.value) setSelectedId(e.target.value);
+                      const item = sectionNav.items.find((i) => i.value === e.target.value);
+                      if (item) selectUnit(item.id, item.sub);
                     }}
                     className="h-8 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs"
                     aria-label="Ir a otra sección de la página"
                   >
                     {sectionNav.index < 0 ? <option value="">Ir a una sección…</option> : null}
                     {sectionNav.items.map((item, i) => (
-                      <option key={item.id} value={item.id}>
+                      <option key={item.value} value={item.value}>
                         {i + 1}. {item.label}
                       </option>
                     ))}
@@ -2445,7 +2596,41 @@ function PageVisualEditor({
             </header>
 
             <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
-              {selectedNode ? (
+              {selectedNode && activeSection ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {compositeEntry?.orderKey && activeSection.reorderable ? (
+                    <>
+                      <ToolBtn
+                        onClick={() => moveCompositeSection(-1)}
+                        icon={<ChevronUp className="size-3" />}
+                        label="Subir"
+                      />
+                      <ToolBtn
+                        onClick={() => moveCompositeSection(1)}
+                        icon={<ChevronDown className="size-3" />}
+                        label="Bajar"
+                      />
+                    </>
+                  ) : null}
+                  {activeSection.visibilityKey ? (
+                    <ToolBtn
+                      onClick={toggleCompositeSection}
+                      icon={
+                        selectedConfig[activeSection.visibilityKey] === false ? (
+                          <Eye className="size-3" />
+                        ) : (
+                          <EyeOff className="size-3" />
+                        )
+                      }
+                      label={
+                        selectedConfig[activeSection.visibilityKey] === false
+                          ? "Mostrar"
+                          : "Ocultar"
+                      }
+                    />
+                  ) : null}
+                </div>
+              ) : selectedNode ? (
                 <div className="flex flex-wrap gap-1.5">
                   <ToolBtn
                     onClick={() => moveNode(selectedNode.id, -1)}
@@ -2504,6 +2689,10 @@ function PageVisualEditor({
                 config={selectedConfig}
                 onChange={(next) => updateSelectedConfig(next)}
                 simple={!advanced}
+                hideHeader={Boolean(activeSection)}
+                fieldFilter={
+                  activeSection ? (field) => fieldBelongsToSection(field, activeSection) : undefined
+                }
                 activeBreakpoint={
                   deviceViewport === "tablet"
                     ? "md"
@@ -3352,6 +3541,79 @@ function ChromeItem({
       <p className="text-[11px] font-semibold text-foreground">{label}</p>
       <p className="text-[10px] text-muted-foreground">{note}</p>
     </button>
+  );
+}
+
+/** Sección interna de una plantilla compuesta dentro del panel de estructura. */
+function SortableCompositeItem({
+  section,
+  draggable,
+  hidden,
+  selected,
+  onSelect,
+  onToggleHidden,
+}: {
+  section: CompositeSectionDef;
+  draggable: boolean;
+  hidden: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  onToggleHidden: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: section.key,
+    disabled: !draggable,
+  });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`mb-1 flex items-center gap-1 rounded-md border px-2 py-1.5 text-left text-xs ${
+        selected ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-accent"
+      } ${hidden ? "opacity-60" : ""}`}
+    >
+      {draggable ? (
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Arrastrar para reordenar"
+          title="Arrastra para mover la sección"
+          style={{ touchAction: "none" }}
+          className="inline-flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+        >
+          <GripVertical className="size-3.5" aria-hidden />
+        </button>
+      ) : (
+        <span className="inline-flex size-7 shrink-0" aria-hidden />
+      )}
+      <button
+        type="button"
+        onClick={onSelect}
+        className={`min-w-0 flex-1 truncate text-left font-medium ${hidden ? "line-through" : ""}`}
+      >
+        {section.label}
+      </button>
+      {section.visibilityKey ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleHidden();
+          }}
+          aria-label={hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+          title={hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+          className="inline-flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          {hidden ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
