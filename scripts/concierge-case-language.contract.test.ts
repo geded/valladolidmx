@@ -2,7 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync("src/components/concierge/CaseFileView.tsx", "utf8");
-const route = readFileSync("src/routes/_authenticated/concierge/expedientes.$caseId.tsx", "utf8");
+// El detalle vive en la ruta `index`; `$caseId.tsx` sólo compone el Outlet.
+const route = readFileSync(
+  "src/routes/_authenticated/concierge/expedientes.$caseId.index.tsx",
+  "utf8",
+);
+// El armado de la propuesta vive en el Estudio de Propuesta.
+const studio = readFileSync("src/components/concierge/proposal/ProposalStudio.tsx", "utf8");
 
 describe("Expediente Concierge en lenguaje claro", () => {
   test("traduce los estados operativos sin alterar sus valores internos", () => {
@@ -47,7 +53,7 @@ describe("Expediente Concierge en lenguaje claro", () => {
   test("mantiene separadas las cotizaciones empresariales y la propuesta final", () => {
     expect(source).toContain('"Propuesta económica del Concierge"');
     expect(source).toContain("Las empresas sólo cotizan sus servicios.");
-    expect(source).toContain("Preparar propuesta final para el viajero");
-    expect(source).toContain("Total seleccionado:");
+    expect(source).toContain("propuesta final y la envías al viajero.");
+    expect(studio).toContain("Total: {formatMoneyCents(totalCents)}");
   });
 });
