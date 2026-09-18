@@ -3251,6 +3251,19 @@ function HomeCanvas({
     pageType === "home"
       ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
       : tree;
+  const renderedCompositeNode =
+    renderedTree.root.children.length === 1 ? renderedTree.root.children[0] : undefined;
+  const renderedCompositeEntry = renderedCompositeNode
+    ? getCompositeSections(renderedCompositeNode.type)
+    : null;
+  const reorderableSectionKeys = renderedCompositeEntry
+    ? orderedCompositeSections(
+        renderedCompositeEntry,
+        renderedCompositeNode?.config as Record<string, unknown> | null,
+      )
+        .filter((section) => section.reorderable)
+        .map((section) => section.key)
+    : [];
 
   return (
     <div
@@ -3264,7 +3277,8 @@ function HomeCanvas({
         minimumHeight={preset.height}
         scale={scale}
         presetLabel={preset.label}
-        compositeNodeId={renderedTree.root.children.length === 1 ? renderedTree.root.children[0]?.id ?? null : null}
+        compositeNodeId={renderedCompositeNode?.id ?? null}
+        reorderableSectionKeys={reorderableSectionKeys}
         onSelectSection={onSelectCompositeSection}
         onReorderSection={onReorderCompositeSection}
       >
@@ -3342,6 +3356,7 @@ function CanvasViewport({
   scale,
   presetLabel: _presetLabel,
   compositeNodeId,
+  reorderableSectionKeys,
   onSelectSection,
   onReorderSection,
   children,
@@ -3352,6 +3367,7 @@ function CanvasViewport({
   scale: number;
   presetLabel: string;
   compositeNodeId: string | null;
+  reorderableSectionKeys: string[];
   onSelectSection: (nodeId: string, sectionKey: string) => void;
   onReorderSection: (activeKey: string, overKey: string) => void;
   children: React.ReactNode;
@@ -3427,6 +3443,10 @@ function CanvasViewport({
     };
     let lastTouchY: number | null = null;
     const onTouchStart = (event: TouchEvent) => {
+      if ((event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) {
+        lastTouchY = null;
+        return;
+      }
       lastTouchY = event.touches[0]?.clientY ?? null;
     };
     const onTouchMove = (event: TouchEvent) => {
@@ -3474,6 +3494,8 @@ function CanvasViewport({
       Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
     const decorate = () => {
       sections().forEach((section) => {
+        const key = section.dataset.ebSection;
+        if (!key || !reorderableSectionKeys.includes(key)) return;
         if (section.querySelector(":scope > [data-eb-section-handle]")) return;
         section.style.position = section.style.position || "relative";
         const handle = doc.createElement("button");
@@ -3567,7 +3589,7 @@ function CanvasViewport({
       doc.removeEventListener("touchmove", onTouchMove);
       doc.removeEventListener("touchend", onTouchEnd);
     };
-  }, [compositeNodeId, mount, onReorderSection, onSelectSection]);
+  }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys]);
 
   useEffect(() => {
     if (!mount) return;
