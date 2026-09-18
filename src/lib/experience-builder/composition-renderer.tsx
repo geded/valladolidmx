@@ -470,6 +470,7 @@ function DestinationPremiumG4Render({ node }: BlockPreviewProps): ReactNode {
       heroVariant={resolved.heroVariant}
       galleryLayout={resolved.galleryLayout}
       sections={resolved.sections}
+      order={resolved.order}
     />
   );
 }
@@ -508,6 +509,7 @@ function PlacePremiumQ2dRender({ node }: BlockPreviewProps): ReactNode {
       variant={resolved.variant}
       builderNotice={resolved.builderNotice}
       copy={resolved.copy}
+      order={resolved.order}
     />
   );
 }

@@ -234,3 +234,9 @@
 
 - [x] Verificado visualmente (1440/834/430/390) el editor por secciones en Inicio (12 secciones, subir/bajar/ocultar, arrastre).
 - [x] Contratos en verde: 655 pruebas OMXDS sin fallos.
+
+## Constructor · biblioteca de elementos para arrastrar (2026-09-18)
+
+- [ ] Declarar y documentar el origen de los elementos insertables: mapa oficial con marca, familias de botón, texto con enlace (p. ej. "Agregar a Mi Viaje") y sección de hoteles.
+- [ ] Permitir arrastrar esos elementos desde la biblioteca oficial hacia las plantillas, sin crear bloques paralelos ni duplicados.
+- [ ] Arrastrar y soltar de secciones en todas las plantillas Premium (Inicio, Destino, Lugar, Listados), con orden por defecto = orden aprobado.

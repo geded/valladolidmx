@@ -14,7 +14,7 @@
  *  - `editorial`: lectura tipo revista territorial (historia primero).
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
-import { useMemo, useState, type ReactNode } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import {
   Accessibility,
   CalendarDays,
@@ -42,8 +42,10 @@ import { cn } from "@/lib/utils";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import {
   PLACE_PREMIUM_DEMO_CONTENT,
+  PLACE_PREMIUM_RENDER_ORDER,
   type PlacePremiumContent,
   type PlacePremiumMedia,
+  type PlacePremiumRenderSectionKey,
 } from "./place-premium-content";
 import {
   PLACE_PREMIUM_COPY_DEFAULTS,
@@ -79,6 +81,8 @@ export interface PlacePremiumSurfaceProps {
    * Ausente o parcial ⇒ se conservan los textos aprobados.
    */
   copy?: PlacePremiumCopy;
+  /** Orden editable de secciones. Ausente ⇒ orden aprobado. */
+  order?: readonly PlacePremiumRenderSectionKey[];
   className?: string;
 }
 
@@ -93,6 +97,7 @@ export function PlacePremiumSurface({
   saveSlot = null,
   showBreadcrumbs = true,
   copy = PLACE_PREMIUM_COPY_DEFAULTS,
+  order = PLACE_PREMIUM_RENDER_ORDER,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
@@ -179,8 +184,7 @@ export function PlacePremiumSurface({
 
   /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
   const primaryPoint = content.map.points[0] ?? null;
-  const placeAddressLine =
-    content.essentials.facts.find((f) => f.key === "address")?.value ?? null;
+  const placeAddressLine = content.essentials.facts.find((f) => f.key === "address")?.value ?? null;
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
@@ -214,6 +218,266 @@ export function PlacePremiumSurface({
     }),
     [content.map],
   );
+
+  /* Secciones de la ficha: mismo contenido aprobado, ahora emitido a través
+     del orden editable del Experience Builder. El orden por defecto es
+     exactamente el aprobado, de modo que sin configuración nada cambia. */
+  const placeSections: Partial<Record<PlacePremiumRenderSectionKey, ReactNode>> = {
+    hero: (
+      <>
+        {/* Hero: misma familia y proporción aprobadas en las fichas Premium
+            de hotel y restaurante (`PremiumHero`, presentación editorial).
+            No existe hero propio de Lugares ni selector visible de
+            dirección visual. */}
+        <PlaceContainer className={showBreadcrumbs ? "mt-2 sm:mt-3" : undefined}>
+          <PremiumHero
+            layout="entity"
+            vm={{
+              presentation: DEFAULT_PREMIUM_PRESENTATION,
+              eyebrow: heroEyebrow,
+              title: content.identity.title,
+              description: content.identity.subtitle,
+              media: content.hero.cover.url
+                ? {
+                    url: content.hero.cover.url,
+                    alt: content.hero.cover.alt,
+                    credit: content.hero.cover.credit,
+                  }
+                : null,
+              badges: content.identity.badges.map((label) => ({ label })),
+            }}
+          />
+        </PlaceContainer>
+        {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
+            emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
+            bloque oficial de ubicación. */}
+        <PlaceContainer className="mt-4 flex flex-wrap justify-end gap-2">
+          <PlaceShareButton title={content.identity.title} />
+          {saveSlot}
+          {tripSlot ?? (
+            <Button
+              type="button"
+              onClick={() => {
+                document
+                  .getElementById("place-trip-action")
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }}
+            >
+              {content.hero.primaryCta.label}
+            </Button>
+          )}
+        </PlaceContainer>
+        {content.hero.cover.url ? null : (
+          <PlaceContainer className="mt-3">
+            <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
+          </PlaceContainer>
+        )}
+      </>
+    ),
+    alux: aluxSlot ? <PlaceContainer className="mt-5 sm:mt-6">{aluxSlot}</PlaceContainer> : null,
+    /* Paridad con hotel, restaurante y casa: la fotografía encabeza la
+       lectura, justo después del encabezado y antes del relato. */
+    gallery: galleryDto ? (
+      <PlaceContainer id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
+        <ExperienceGallery dto={galleryDto} />
+      </PlaceContainer>
+    ) : null,
+    intro: hasIntro ? (
+      <PlaceContainer className="mt-8 sm:mt-12">
+        {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
+      </PlaceContainer>
+    ) : null,
+    essentials: hasEssentials ? (
+      <PlaceContainer className="mt-8 sm:mt-12">
+        {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
+      </PlaceContainer>
+    ) : null,
+    map: hasMap ? (
+      <PlaceContainer className="mt-10 sm:mt-16" id="mapa-lugar">
+        {/* Paridad exacta con hotel, restaurante y casa: se reutiliza el
+            bloque oficial de ubicación (mapa a todo lo ancho, distancia y
+            "Cómo llegar" debajo). Sin superficie de mapa paralela. */}
+        <div className="space-y-5">
+          {primaryPoint ? (
+            <BusinessLocationBlock
+              lat={primaryPoint.lat}
+              lng={primaryPoint.lng}
+              name={content.identity.title}
+              addressLine1={placeAddressLine}
+              heading={content.map.heading}
+              presentation="premium"
+              layout="stacked"
+            />
+          ) : content.map.points.length ? (
+            <ExperienceMapBlock dto={mapDto} />
+          ) : null}
+          {content.map.directions.length ? (
+            <ul className="grid gap-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
+              {content.map.directions.map((line, index) => (
+                <li key={`dir-${index}`} className="flex gap-2">
+                  <Compass className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      </PlaceContainer>
+    ) : null,
+    services: content.services.length ? (
+      <PlaceContainer className="mt-10 sm:mt-16">
+        <SectionHeading
+          id="servicios-lugar"
+          kicker={copy.servicesKicker}
+          title={copy.servicesTitle}
+        />
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {content.services.map((service) => (
+            <li
+              key={service.key}
+              className="rounded-3xl border border-border bg-card p-5 shadow-soft"
+            >
+              <p className="font-medium">{service.label}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{service.hint}</p>
+            </li>
+          ))}
+        </ul>
+      </PlaceContainer>
+    ) : null,
+    experiences: content.experiences.length ? (
+      <PlaceContainer className="mt-10 sm:mt-16">
+        <SectionHeading
+          id="experiencias-lugar"
+          kicker={copy.experiencesKicker}
+          title={copy.experiencesTitle}
+        />
+        <ul
+          className={cn(
+            "mt-6 grid gap-5",
+            cinematic ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2",
+          )}
+        >
+          {content.experiences.map((item) => (
+            <li key={item.id}>
+              <article className="h-full overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+                <DemoImage media={item.media} className="aspect-[4/3]" />
+                <div className="p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                    {item.eyebrow}
+                  </p>
+                  <h3 className="mt-2 text-base font-semibold leading-snug">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </PlaceContainer>
+    ) : null,
+    /* Eventos: sin contenido → el módulo se oculta por completo. */
+    events: content.events.length ? (
+      <PlaceContainer className="mt-10 sm:mt-16">
+        <SectionHeading id="eventos-lugar" kicker={copy.eventsKicker} title={copy.eventsTitle} />
+        <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {content.events.map((item) => (
+            <li key={item.id} className="rounded-3xl border border-border bg-card p-5">
+              <CalendarDays className="size-4 text-primary" aria-hidden />
+              <h3 className="mt-2 text-base font-semibold">{item.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+            </li>
+          ))}
+        </ul>
+      </PlaceContainer>
+    ) : null,
+    nearbyBusinesses: nearbyGroups.length ? (
+      <PlaceContainer className="mt-10 sm:mt-16">
+        <ExperienceRelatedCollectionBlock
+          config={{
+            source: "manual",
+            entityKind: "business",
+            variant: "carousel",
+            columns: 4,
+            density: "compact",
+            heading: fillPlaceCopy(copy.nearbyBusinessesHeading, content.identity.title),
+            subheading: copy.nearbyBusinessesSubheading,
+            ariaLabel: `Qué hay cerca de ${content.identity.title}`,
+            groups: nearbyGroups,
+            capabilities: {
+              showPrice: false,
+              showDate: false,
+              showKindBadge: false,
+              showFavorite: false,
+              showSecondaryAction: false,
+              showDistance: true,
+            },
+          }}
+        />
+      </PlaceContainer>
+    ) : null,
+    nearby: content.nearby.length ? (
+      <PlaceContainer className="mt-10 sm:mt-16">
+        <SectionHeading
+          id="cerca-lugar"
+          kicker={copy.nearbyPlacesKicker}
+          title={copy.nearbyPlacesTitle}
+        />
+        <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+          {content.nearby.map((item) => (
+            <li key={item.id}>
+              <article className="flex h-full gap-4 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-soft">
+                <DemoImage
+                  media={item.media}
+                  className="size-24 shrink-0 rounded-2xl sm:size-28"
+                  captionHidden
+                />
+                <div className="min-w-0 py-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                    {item.distance}
+                  </p>
+                  <h3 className="mt-1 truncate text-base font-semibold">{item.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.tagline}</p>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </PlaceContainer>
+    ) : null,
+    trip: (
+      <PlaceContainer className="mt-10 sm:mt-16">
+        <div
+          className={cn(
+            "grid gap-5",
+            /* Alux vive en el módulo compartido (`aluxSlot`) y en el
+               botón flotante global: la ficha no lo duplica. */
+            "lg:grid-cols-1",
+          )}
+        >
+          <section
+            aria-labelledby="mi-viaje-title"
+            className="rounded-3xl border border-primary/30 bg-primary/5 p-6"
+          >
+            <Heart className="size-5 text-primary" aria-hidden />
+            <h2 id="mi-viaje-title" className="mt-3 text-xl font-semibold tracking-tight">
+              {content.trip.title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {content.trip.description}
+            </p>
+            {tripSlot ? (
+              <div id="place-trip-action" className="mt-5">
+                {tripSlot}
+              </div>
+            ) : (
+              <Button type="button" className="mt-5 min-h-11 rounded-pill">
+                {content.trip.actionLabel}
+              </Button>
+            )}
+          </section>
+        </div>
+      </PlaceContainer>
+    ),
+  };
 
   return (
     <div
@@ -252,272 +516,9 @@ export function PlacePremiumSurface({
         </PlaceContainer>
       ) : null}
 
-      {/* Hero: misma familia y proporción aprobadas en las fichas Premium
-          de hotel y restaurante (`PremiumHero`, presentación editorial).
-          No existe hero propio de Lugares ni selector visible de
-          dirección visual. */}
-      <PlaceContainer className={showBreadcrumbs ? "mt-2 sm:mt-3" : undefined}>
-        <PremiumHero
-          layout="entity"
-          vm={{
-
-            presentation: DEFAULT_PREMIUM_PRESENTATION,
-            eyebrow: heroEyebrow,
-            title: content.identity.title,
-            description: content.identity.subtitle,
-            media: content.hero.cover.url
-              ? {
-                  url: content.hero.cover.url,
-                  alt: content.hero.cover.alt,
-                  credit: content.hero.cover.credit,
-                }
-              : null,
-            badges: content.identity.badges.map((label) => ({ label })),
-          }}
-        />
-      </PlaceContainer>
-      {/* Paridad exacta con hotel, restaurante y casa: bajo el encabezado se
-          emiten compartir y la acción de Mi Viaje. "Cómo llegar" pertenece al
-          bloque oficial de ubicación. */}
-      <PlaceContainer className="mt-4 flex flex-wrap justify-end gap-2">
-        <PlaceShareButton title={content.identity.title} />
-        {saveSlot}
-        {tripSlot ?? (
-          <Button
-            type="button"
-            onClick={() => {
-              document
-                .getElementById("place-trip-action")
-                ?.scrollIntoView({ behavior: "smooth", block: "center" });
-            }}
-          >
-            {content.hero.primaryCta.label}
-          </Button>
-        )}
-      </PlaceContainer>
-      {content.hero.cover.url ? null : (
-        <PlaceContainer className="mt-3">
-          <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
-        </PlaceContainer>
-      )}
-
-
-      {aluxSlot ? <PlaceContainer className="mt-5 sm:mt-6">{aluxSlot}</PlaceContainer> : null}
-      {/* Paridad con hotel, restaurante y casa: la fotografía encabeza la
-          lectura, justo después del encabezado y antes del relato. */}
-      {galleryDto ? (
-        <PlaceContainer id="galeria" data-eb-anchor className="mt-6 scroll-mt-24 sm:mt-8">
-          <ExperienceGallery dto={galleryDto} />
-        </PlaceContainer>
-      ) : null}
-
-      {hasIntro ? (
-        <PlaceContainer className="mt-8 sm:mt-12">
-          {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
-        </PlaceContainer>
-      ) : null}
-      {hasEssentials ? (
-        <PlaceContainer className="mt-8 sm:mt-12">
-          {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
-        </PlaceContainer>
-      ) : null}
-
-      {hasMap ? (
-        <PlaceContainer className="mt-10 sm:mt-16" id="mapa-lugar">
-          {/* Paridad exacta con hotel, restaurante y casa: se reutiliza el
-              bloque oficial de ubicación (mapa a todo lo ancho, distancia y
-              "Cómo llegar" debajo). Sin superficie de mapa paralela. */}
-          <div className="space-y-5">
-            {primaryPoint ? (
-              <BusinessLocationBlock
-                lat={primaryPoint.lat}
-                lng={primaryPoint.lng}
-                name={content.identity.title}
-                addressLine1={placeAddressLine}
-                heading={content.map.heading}
-                presentation="premium"
-                layout="stacked"
-              />
-            ) : content.map.points.length ? (
-              <ExperienceMapBlock dto={mapDto} />
-            ) : null}
-            {content.map.directions.length ? (
-              <ul className="grid gap-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
-                {content.map.directions.map((line, index) => (
-                  <li key={`dir-${index}`} className="flex gap-2">
-                    <Compass className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-
-        </PlaceContainer>
-      ) : null}
-
-      {content.services.length ? (
-        <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading
-            id="servicios-lugar"
-            kicker={copy.servicesKicker}
-            title={copy.servicesTitle}
-          />
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {content.services.map((service) => (
-              <li
-                key={service.key}
-                className="rounded-3xl border border-border bg-card p-5 shadow-soft"
-              >
-                <p className="font-medium">{service.label}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{service.hint}</p>
-              </li>
-            ))}
-          </ul>
-        </PlaceContainer>
-      ) : null}
-
-      {content.experiences.length ? (
-        <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading
-            id="experiencias-lugar"
-            kicker={copy.experiencesKicker}
-            title={copy.experiencesTitle}
-          />
-          <ul
-            className={cn(
-              "mt-6 grid gap-5",
-              cinematic ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2",
-            )}
-          >
-            {content.experiences.map((item) => (
-              <li key={item.id}>
-                <article className="h-full overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-                  <DemoImage media={item.media} className="aspect-[4/3]" />
-                  <div className="p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                      {item.eyebrow}
-                    </p>
-                    <h3 className="mt-2 text-base font-semibold leading-snug">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ul>
-        </PlaceContainer>
-      ) : null}
-
-      {/* Eventos: sin contenido → el módulo se oculta por completo. */}
-      {content.events.length ? (
-        <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading
-            id="eventos-lugar"
-            kicker={copy.eventsKicker}
-            title={copy.eventsTitle}
-          />
-          <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {content.events.map((item) => (
-              <li key={item.id} className="rounded-3xl border border-border bg-card p-5">
-                <CalendarDays className="size-4 text-primary" aria-hidden />
-                <h3 className="mt-2 text-base font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
-              </li>
-            ))}
-          </ul>
-        </PlaceContainer>
-      ) : null}
-
-      {nearbyGroups.length ? (
-        <PlaceContainer className="mt-10 sm:mt-16">
-          <ExperienceRelatedCollectionBlock
-            config={{
-              source: "manual",
-              entityKind: "business",
-              variant: "carousel",
-              columns: 4,
-              density: "compact",
-              heading: fillPlaceCopy(copy.nearbyBusinessesHeading, content.identity.title),
-              subheading: copy.nearbyBusinessesSubheading,
-              ariaLabel: `Qué hay cerca de ${content.identity.title}`,
-              groups: nearbyGroups,
-              capabilities: {
-                showPrice: false,
-                showDate: false,
-                showKindBadge: false,
-                showFavorite: false,
-                showSecondaryAction: false,
-                showDistance: true,
-              },
-            }}
-          />
-        </PlaceContainer>
-      ) : null}
-
-      {content.nearby.length ? (
-        <PlaceContainer className="mt-10 sm:mt-16">
-          <SectionHeading
-            id="cerca-lugar"
-            kicker={copy.nearbyPlacesKicker}
-            title={copy.nearbyPlacesTitle}
-          />
-          <ul className="mt-6 grid gap-5 sm:grid-cols-2">
-            {content.nearby.map((item) => (
-              <li key={item.id}>
-                <article className="flex h-full gap-4 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-soft">
-                  <DemoImage
-                    media={item.media}
-                    className="size-24 shrink-0 rounded-2xl sm:size-28"
-                    captionHidden
-                  />
-                  <div className="min-w-0 py-1">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                      {item.distance}
-                    </p>
-                    <h3 className="mt-1 truncate text-base font-semibold">{item.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{item.tagline}</p>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ul>
-        </PlaceContainer>
-      ) : null}
-
-      <PlaceContainer className="mt-10 sm:mt-16">
-        <div
-          className={cn(
-            "grid gap-5",
-            /* Alux vive en el módulo compartido (`aluxSlot`) y en el
-               botón flotante global: la ficha no lo duplica. */
-            "lg:grid-cols-1",
-          )}
-        >
-          <section
-            aria-labelledby="mi-viaje-title"
-            className="rounded-3xl border border-primary/30 bg-primary/5 p-6"
-          >
-            <Heart className="size-5 text-primary" aria-hidden />
-            <h2 id="mi-viaje-title" className="mt-3 text-xl font-semibold tracking-tight">
-              {content.trip.title}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {content.trip.description}
-            </p>
-            {tripSlot ? (
-              <div id="place-trip-action" className="mt-5">
-                {tripSlot}
-              </div>
-            ) : (
-              <Button type="button" className="mt-5 min-h-11 rounded-pill">
-                {content.trip.actionLabel}
-              </Button>
-            )}
-          </section>
-        </div>
-      </PlaceContainer>
+      {order.map((key) => (
+        <Fragment key={key}>{placeSections[key] ?? null}</Fragment>
+      ))}
 
       {/* Zona segura: reserva vertical para el dock flotante de Alux
           (incluye el área segura del dispositivo). Ningún contenido de la
@@ -538,10 +539,7 @@ export function PlacePremiumSurface({
  * (`max-w-7xl px-5 sm:px-8 lg:px-12`). Un solo margen para toda la
  * plataforma: no hay contenedor propio de Lugares.
  */
-function PlaceContainer({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function PlaceContainer({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <Container className={cn("px-5 sm:px-8 lg:px-12", className)} {...props} />;
 }
 
@@ -656,7 +654,10 @@ function IntroEditorial({ content }: { content: PlacePremiumContent }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             {content.intro.kicker}
           </p>
-          <h2 id="intro-lugar-title" className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+          <h2
+            id="intro-lugar-title"
+            className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl"
+          >
             {content.intro.title}
           </h2>
           <blockquote className="mt-6 border-l-2 border-primary/50 pl-4 font-serif text-lg italic leading-7 text-muted-foreground">
@@ -687,7 +688,10 @@ function IntroCentered({ content }: { content: PlacePremiumContent }) {
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {content.intro.kicker}
       </p>
-      <h2 id="intro-lugar-title" className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+      <h2
+        id="intro-lugar-title"
+        className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl"
+      >
         {content.intro.title}
       </h2>
       <div className="mt-6 space-y-5 text-left">
@@ -710,7 +714,10 @@ function EssentialsPanel({ content }: { content: PlacePremiumContent }) {
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {content.essentials.kicker}
       </p>
-      <h2 id="esencial-lugar-title" className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+      <h2
+        id="esencial-lugar-title"
+        className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl"
+      >
         {content.essentials.title}
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -813,5 +820,3 @@ function EssentialList({
     </div>
   );
 }
-
-

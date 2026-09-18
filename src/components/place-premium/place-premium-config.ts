@@ -18,7 +18,12 @@
  *    se activa sin reconstruir la ficha (sólo cambia la resolución).
  */
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
-import { PLACE_PREMIUM_DEMO_CONTENT, type PlacePremiumContent } from "./place-premium-content";
+import {
+  PLACE_PREMIUM_DEMO_CONTENT,
+  PLACE_PREMIUM_RENDER_ORDER,
+  type PlacePremiumContent,
+  type PlacePremiumRenderSectionKey,
+} from "./place-premium-content";
 import {
   placePremiumCopyDefaultConfig,
   resolvePlacePremiumCopy,
@@ -168,7 +173,23 @@ export interface PlacePremiumResolved {
   readonly builderNotice: string | null;
   /** G8-Q2D-C · textos de sección resueltos (editables en el constructor). */
   readonly copy: PlacePremiumCopy;
+  /** Orden editable de secciones; por defecto, el orden aprobado. */
+  readonly order: PlacePremiumRenderSectionKey[];
 }
+
+/**
+ * Orden editable de secciones (clave `place_section_order`). Fail-closed:
+ * claves desconocidas se ignoran y las ausentes se añaden en orden aprobado.
+ */
+const sectionOrder = (value: unknown): PlacePremiumRenderSectionKey[] => {
+  const approved = PLACE_PREMIUM_RENDER_ORDER;
+  if (!Array.isArray(value)) return [...approved];
+  const valid = value.filter((key): key is PlacePremiumRenderSectionKey =>
+    approved.some((k) => k === key),
+  );
+  const unique = Array.from(new Set(valid));
+  return [...unique, ...approved.filter((k) => !unique.includes(k))];
+};
 
 /** Configuración inicial del bloque al crear la composición. */
 export function placePremiumDefaultConfig(variant: string = "zona-arqueologica"): Cfg {
@@ -181,6 +202,7 @@ export function placePremiumDefaultConfig(variant: string = "zona-arqueologica")
     hero_media_alt: "",
     hero_media_credit: "",
     hero_media_approved: false,
+    place_section_order: [...PLACE_PREMIUM_RENDER_ORDER],
     ...placePremiumCopyDefaultConfig(),
   };
 }
@@ -231,5 +253,6 @@ export function resolvePlacePremiumQ2d(config: Cfg = {}): PlacePremiumResolved {
     fallbackApplied: resolution.fallbackApplied,
     builderNotice: resolution.builderNotice,
     copy: resolvePlacePremiumCopy(config),
+    order: sectionOrder(config.place_section_order),
   };
 }

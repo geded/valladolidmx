@@ -74,6 +74,11 @@ export interface DestinationPremiumSurfaceProps {
   heroVariant?: DestinationHeroVariant;
   galleryLayout?: DestinationGalleryLayout;
   sections?: Partial<Record<DestinationPremiumSectionKey, boolean>>;
+  /**
+   * Orden editable de secciones (Experience Builder). Ausente ⇒ orden
+   * aprobado `DESTINATION_PREMIUM_SECTION_ORDER`. No cambia el diseño.
+   */
+  order?: readonly DestinationPremiumSectionKey[];
   /** Servicio activo inicial (clave de categoría). */
   initialService?: string;
   className?: string;
@@ -109,6 +114,7 @@ export function DestinationPremiumSurface({
   heroVariant = "editorial",
   galleryLayout = "mosaico",
   sections,
+  order = DESTINATION_PREMIUM_SECTION_ORDER,
   initialService,
   className,
   renderServicePreview,
@@ -165,7 +171,7 @@ export function DestinationPremiumSurface({
         </Container>
       ) : null}
 
-      {DESTINATION_PREMIUM_SECTION_ORDER.map((key) => {
+      {order.map((key) => {
         if (!visible(key)) return null;
         switch (key) {
           case "hero":
