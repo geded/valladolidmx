@@ -579,7 +579,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(wrapper).toContain("titleOverride={titleOverride}");
     expect(wrapper).toContain("subtitleOverride={subtitleOverride}");
     expect(wrapper).toContain("facets={facets}");
-    expect(territorial).toContain("titleOverride?.trim() || baseProfile.title");
+    // El título territorializa el perfil base cuando no hay override editorial.
+    expect(territorial).toContain("titleOverride?.trim() || territorialize(baseProfile.title");
     expect(territorial).toContain("subtitleOverride?.trim() || baseProfile.description");
     expect(territorial).toContain("facet.extract(item.source) !== selected");
     expect(route).toContain("facets={tipoFacet ? [tipoFacet] : []}");
