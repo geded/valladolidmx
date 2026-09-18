@@ -54,6 +54,10 @@ import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
