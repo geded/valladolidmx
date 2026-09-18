@@ -1,0 +1,144 @@
+-- 1) Nuevo tipo de evento: agregado a Mi Viaje
+ALTER TABLE public.business_view_events DROP CONSTRAINT IF EXISTS business_view_events_event_type_check;
+ALTER TABLE public.business_view_events
+  ADD CONSTRAINT business_view_events_event_type_check
+  CHECK (event_type = ANY (ARRAY[
+    'impression','click_card','click_whatsapp','click_map','click_web',
+    'click_phone','alux_mention','share','add_to_trip','reserve_intent'
+  ]));
+
+CREATE OR REPLACE FUNCTION public.record_business_view_event(
+  _business_id uuid,
+  _event_type text,
+  _source text DEFAULT NULL,
+  _country_code text DEFAULT NULL,
+  _session_hash text DEFAULT NULL,
+  _referer text DEFAULT NULL,
+  _surface text DEFAULT NULL,
+  _rail text DEFAULT NULL,
+  _placement text DEFAULT NULL,
+  _grant_id uuid DEFAULT NULL,
+  _entity_kind text DEFAULT NULL,
+  _entity_id uuid DEFAULT NULL
+)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  _id UUID;
+BEGIN
+  IF _event_type NOT IN ('impression','click_card','click_whatsapp','click_map','click_web','click_phone','alux_mention','share','add_to_trip','reserve_intent') THEN
+    RAISE EXCEPTION 'invalid event type: %', _event_type;
+  END IF;
+  IF _placement IS NOT NULL AND _placement NOT IN ('contratado','fijado','editorial','organico') THEN
+    RAISE EXCEPTION 'invalid placement: %', _placement;
+  END IF;
+  INSERT INTO public.business_view_events(
+    business_id, event_type, source, country_code, session_hash, referer,
+    surface, rail, placement, grant_id, entity_kind, entity_id
+  ) VALUES (
+    _business_id, _event_type, _source, _country_code, _session_hash, _referer,
+    left(_surface, 80), left(_rail, 80), _placement, _grant_id, left(_entity_kind, 40), _entity_id
+  ) RETURNING id INTO _id;
+  RETURN _id;
+END;
+$function$;
+
+-- 2) Atribución: los eventos se asocian al contrato vigente de la empresa
+--    cuando el evento no trae grant_id explícito.
+CREATE OR REPLACE FUNCTION public.admin_visibility_performance(_window_days integer DEFAULT 30)
+RETURNS TABLE (
+  grant_id uuid,
+  business_id uuid,
+  business_name text,
+  business_slug text,
+  plan_slug text,
+  plan_name text,
+  status text,
+  starts_at timestamptz,
+  expires_at timestamptz,
+  impressions bigint,
+  clicks bigint,
+  last_seen timestamptz,
+  surfaces jsonb
+)
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  _from timestamptz := now() - make_interval(days => greatest(coalesce(_window_days, 30), 1));
+BEGIN
+  IF NOT (has_role(auth.uid(), 'admin'::app_role) OR has_role(auth.uid(), 'super_admin'::app_role)) THEN
+    RAISE EXCEPTION 'forbidden';
+  END IF;
+
+  RETURN QUERY
+  WITH ev AS (
+    SELECT
+      coalesce(e.grant_id, gmatch.id) AS g,
+      coalesce(e.surface, 'sin-superficie') AS surface,
+      e.event_type AS event_type,
+      e.occurred_at AS occurred_at
+    FROM public.business_view_events e
+    LEFT JOIN LATERAL (
+      SELECT gr2.id
+      FROM public.business_visibility_grants gr2
+      WHERE gr2.business_id = e.business_id
+        AND gr2.starts_at <= e.occurred_at
+        AND (gr2.expires_at IS NULL OR gr2.expires_at >= e.occurred_at)
+      ORDER BY gr2.starts_at DESC
+      LIMIT 1
+    ) AS gmatch ON e.grant_id IS NULL
+    WHERE e.occurred_at >= _from
+  ),
+  agg AS (
+    SELECT ev.g AS g,
+           count(*) FILTER (WHERE ev.event_type = 'impression') AS imp,
+           count(*) FILTER (WHERE ev.event_type <> 'impression') AS clk,
+           max(ev.occurred_at) AS seen
+    FROM ev WHERE ev.g IS NOT NULL GROUP BY ev.g
+  ),
+  persurface AS (
+    SELECT ev.g AS g,
+           ev.surface AS surface,
+           count(*) FILTER (WHERE ev.event_type = 'impression') AS imp,
+           count(*) FILTER (WHERE ev.event_type <> 'impression') AS clk
+    FROM ev WHERE ev.g IS NOT NULL GROUP BY ev.g, ev.surface
+  ),
+  bysurface AS (
+    SELECT persurface.g AS g,
+           jsonb_agg(jsonb_build_object(
+             'surface', persurface.surface,
+             'impressions', persurface.imp,
+             'clicks', persurface.clk
+           ) ORDER BY persurface.imp DESC) AS surfaces
+    FROM persurface GROUP BY persurface.g
+  )
+  SELECT gr.id,
+         gr.business_id,
+         b.display_name,
+         b.slug,
+         p.slug,
+         p.name,
+         gr.status,
+         gr.starts_at,
+         gr.expires_at,
+         coalesce(a.imp, 0),
+         coalesce(a.clk, 0),
+         a.seen,
+         coalesce(bs.surfaces, '[]'::jsonb)
+  FROM public.business_visibility_grants gr
+  LEFT JOIN public.businesses b ON b.id = gr.business_id
+  LEFT JOIN public.visibility_plans p ON p.id = gr.plan_id
+  LEFT JOIN agg a ON a.g = gr.id
+  LEFT JOIN bysurface bs ON bs.g = gr.id
+  ORDER BY coalesce(a.imp, 0) DESC, gr.created_at DESC;
+END;
+$function$;
+
+GRANT EXECUTE ON FUNCTION public.admin_visibility_performance(integer) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.record_business_view_event(uuid, text, text, text, text, text, text, text, text, uuid, text, uuid) TO anon, authenticated, service_role;
