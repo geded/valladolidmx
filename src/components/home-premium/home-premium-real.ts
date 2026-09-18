@@ -191,6 +191,7 @@ export function mergeHomeRealContent(
     experiencias: {
       ...safeContent.experiencias,
       items: real.experiencias.map((card, index) => ({
+        businessId: card.businessId,
         title: card.title,
         category: card.category,
         summary: card.subtitle,
@@ -201,6 +202,7 @@ export function mergeHomeRealContent(
     servicios: {
       ...safeContent.servicios,
       stays: real.stays.map((card, index) => ({
+        businessId: card.businessId,
         title: card.title,
         destination: card.category,
         category: "Hospedaje",
@@ -209,6 +211,7 @@ export function mergeHomeRealContent(
         href: card.href,
       })),
       food: real.food.map((card, index) => ({
+        businessId: card.businessId,
         title: card.title,
         destination: card.category,
         category: "Gastronomía",

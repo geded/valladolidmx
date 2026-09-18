@@ -100,6 +100,8 @@ export type HomePremiumDestination = {
 };
 
 export type HomePremiumExperience = {
+  /** Empresa operadora acreditada (medición de visibilidad). */
+  businessId?: string | null;
   title: string;
   category: string;
   summary: string;
@@ -108,6 +110,8 @@ export type HomePremiumExperience = {
 };
 
 export type HomePremiumService = {
+  /** Empresa operadora acreditada (medición de visibilidad). */
+  businessId?: string | null;
   title: string;
   destination: string;
   category: string;
