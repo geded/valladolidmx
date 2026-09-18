@@ -2216,51 +2216,51 @@ function PageVisualEditor({
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-2">
-              <ChromeItem
-                label="Encabezado"
-                note="Menú, enlaces y botón destacado"
-                selected={selectedId === HEADER_CHROME_ID}
-                onSelect={() => setSelectedId(HEADER_CHROME_ID)}
-              />
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={onDragEnd}
-              >
-                <SortableContext
-                  items={tree.root.children.map((n) => n.id)}
-                  strategy={verticalListSortingStrategy}
+                <ChromeItem
+                  label="Encabezado"
+                  note="Menú, enlaces y botón destacado"
+                  selected={selectedId === HEADER_CHROME_ID}
+                  onSelect={() => setSelectedId(HEADER_CHROME_ID)}
+                />
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={onDragEnd}
                 >
-                  {tree.root.children.map((n) => (
-                    <SortableSectionItem
-                      key={n.id}
-                      node={n}
-                      selected={selectedId === n.id}
-                      onSelect={() => setSelectedId(n.id)}
-                      onToggleHidden={() => toggleHiddenNode(n.id)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-              <ChromeItem
-                label="Pie de página"
-                note="Columnas, enlaces y textos legales"
-                selected={selectedId === FOOTER_CHROME_ID}
-                onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
-              />
-              <ChromeItem
-                label="SEO y compartir"
-                note="Título, descripción, imagen social, canonical"
-                selected={selectedId === SEO_CHROME_ID}
-                onSelect={() => setSelectedId(SEO_CHROME_ID)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowLibrary(true)}
-                className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                <Plus className="size-3.5" aria-hidden /> Añadir sección
-              </button>
+                  <SortableContext
+                    items={tree.root.children.map((n) => n.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {tree.root.children.map((n) => (
+                      <SortableSectionItem
+                        key={n.id}
+                        node={n}
+                        selected={selectedId === n.id}
+                        onSelect={() => setSelectedId(n.id)}
+                        onToggleHidden={() => toggleHiddenNode(n.id)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+                <ChromeItem
+                  label="Pie de página"
+                  note="Columnas, enlaces y textos legales"
+                  selected={selectedId === FOOTER_CHROME_ID}
+                  onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
+                />
+                <ChromeItem
+                  label="SEO y compartir"
+                  note="Título, descripción, imagen social, canonical"
+                  selected={selectedId === SEO_CHROME_ID}
+                  onSelect={() => setSelectedId(SEO_CHROME_ID)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLibrary(true)}
+                  className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <Plus className="size-3.5" aria-hidden /> Añadir sección
+                </button>
               </div>
             </aside>
           </>
