@@ -215,8 +215,7 @@ export function PlacePremiumSurface({
 
   /* Ubicación: mismo bloque oficial que hotel, restaurante y casa. */
   const primaryPoint = content.map.points[0] ?? null;
-  const placeAddressLine =
-    content.essentials.facts.find((f) => f.key === "address")?.value ?? null;
+  const placeAddressLine = content.essentials.facts.find((f) => f.key === "address")?.value ?? null;
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
@@ -306,9 +305,7 @@ export function PlacePremiumSurface({
         )}
       </>
     ),
-    alux: aluxSlot ? (
-      <PlaceContainer className="mt-5 sm:mt-6">{aluxSlot}</PlaceContainer>
-    ) : null,
+    alux: aluxSlot ? <PlaceContainer className="mt-5 sm:mt-6">{aluxSlot}</PlaceContainer> : null,
     /* Paridad con hotel, restaurante y casa: la fotografía encabeza la
        lectura, justo después del encabezado y antes del relato. */
     gallery: galleryDto ? (
@@ -360,10 +357,17 @@ export function PlacePremiumSurface({
     ) : null,
     services: content.services.length ? (
       <PlaceContainer className="mt-10 sm:mt-16">
-        <SectionHeading id="servicios-lugar" kicker={copy.servicesKicker} title={copy.servicesTitle} />
+        <SectionHeading
+          id="servicios-lugar"
+          kicker={copy.servicesKicker}
+          title={copy.servicesTitle}
+        />
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {content.services.map((service) => (
-            <li key={service.key} className="rounded-3xl border border-border bg-card p-5 shadow-soft">
+            <li
+              key={service.key}
+              className="rounded-3xl border border-border bg-card p-5 shadow-soft"
+            >
               <p className="font-medium">{service.label}</p>
               <p className="mt-1 text-sm text-muted-foreground">{service.hint}</p>
             </li>
@@ -566,10 +570,7 @@ export function PlacePremiumSurface({
  * (`max-w-7xl px-5 sm:px-8 lg:px-12`). Un solo margen para toda la
  * plataforma: no hay contenedor propio de Lugares.
  */
-function PlaceContainer({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function PlaceContainer({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <Container className={cn("px-5 sm:px-8 lg:px-12", className)} {...props} />;
 }
 
@@ -684,7 +685,10 @@ function IntroEditorial({ content }: { content: PlacePremiumContent }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             {content.intro.kicker}
           </p>
-          <h2 id="intro-lugar-title" className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+          <h2
+            id="intro-lugar-title"
+            className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl"
+          >
             {content.intro.title}
           </h2>
           <blockquote className="mt-6 border-l-2 border-primary/50 pl-4 font-serif text-lg italic leading-7 text-muted-foreground">
@@ -715,7 +719,10 @@ function IntroCentered({ content }: { content: PlacePremiumContent }) {
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {content.intro.kicker}
       </p>
-      <h2 id="intro-lugar-title" className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+      <h2
+        id="intro-lugar-title"
+        className="mt-2 text-balance text-xl font-semibold tracking-tight sm:text-2xl"
+      >
         {content.intro.title}
       </h2>
       <div className="mt-6 space-y-5 text-left">
@@ -738,7 +745,10 @@ function EssentialsPanel({ content }: { content: PlacePremiumContent }) {
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {content.essentials.kicker}
       </p>
-      <h2 id="esencial-lugar-title" className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+      <h2
+        id="esencial-lugar-title"
+        className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl"
+      >
         {content.essentials.title}
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -841,5 +851,3 @@ function EssentialList({
     </div>
   );
 }
-
-
