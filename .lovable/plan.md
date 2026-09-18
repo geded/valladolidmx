@@ -33,10 +33,13 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 
 - El editor puede fijar y ordenar contenidos editoriales desde el Experience Builder.
 - Los espacios orgánicos restantes rotan una vez al día, de forma determinista y estable durante el día.
+- **Prioridad de posición (modelo buscador):** dentro de cada bloque de 4 tarjetas, el espacio comercial es el primero. El contenido con contrato vigente y elegible ocupa esa posición delante de los orgánicos; si no hay contratado elegible, la posición la toma el siguiente orgánico y el bloque queda completo sin huecos.
 - Máximo **1 contenido contratado por cada 4 tarjetas visibles**; nunca se ocultan empresas sin plan.
+- Máximo **2 apariciones por empresa en toda la página y 1 por carril**, aplicable también al contenido contratado.
+- Este mismo cupo, la prioridad de posición y la indicación discreta se aplican además a los listados de Hoteles, Restaurantes, Casas de vacaciones, Eventos, Lugares y listados territoriales, para acotar el impulso comercial que hoy actúa sin límite.
 - La fotografía permanece limpia: sin badges, cintillos ni etiquetas comerciales superpuestas. La indicación breve `Promovido` aparece como texto secundario junto a los datos de la ficha y no ocupa un espacio editorial adicional.
 - Los filtros y la intención explícita del viajero siempre prevalecen sobre cualquier impulso comercial.
-- Un pago nunca hace elegible una ficha incompleta ni desplaza un resultado claramente más relevante.
+- Un pago nunca hace elegible una ficha incompleta ni desplaza un resultado claramente más relevante fuera de su espacio comercial asignado.
 - Desempate orgánico: calidad de ficha, actualidad, cercanía temática y variedad entre destinos.
 - Si faltan candidatos válidos, se muestran menos tarjetas o se oculta el carril; nunca se rellenan con fixtures.
 
