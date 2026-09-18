@@ -1388,7 +1388,6 @@ function PageVisualEditor({
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedId]);
 
-
   /**
    * 18.51 · Publicar/programar NUNCA guarda de forma implícita. Sólo se
    * invocan las RPC existentes cuando no hay cambios locales pendientes,
@@ -2410,7 +2409,9 @@ function PageVisualEditor({
                   </button>
                   <button
                     type="button"
-                    disabled={sectionNav.index < 0 || sectionNav.index >= sectionNav.items.length - 1}
+                    disabled={
+                      sectionNav.index < 0 || sectionNav.index >= sectionNav.items.length - 1
+                    }
                     onClick={() => {
                       const next = sectionNav.items[sectionNav.index + 1];
                       if (next) setSelectedId(next.id);
@@ -2422,7 +2423,7 @@ function PageVisualEditor({
                     <ChevronDown className="size-3.5" aria-hidden />
                   </button>
                   <select
-                    value={sectionNav.index >= 0 ? selectedId ?? "" : ""}
+                    value={sectionNav.index >= 0 ? (selectedId ?? "") : ""}
                     onChange={(e) => {
                       if (e.target.value) setSelectedId(e.target.value);
                     }}
@@ -2441,71 +2442,73 @@ function PageVisualEditor({
             </header>
 
             <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
-
-
-            {selectedNode ? (
-              <div className="flex flex-wrap gap-1.5">
-                <ToolBtn
-                  onClick={() => moveNode(selectedNode.id, -1)}
-                  icon={<ChevronUp className="size-3" />}
-                  label="Subir"
-                />
-                <ToolBtn
-                  onClick={() => moveNode(selectedNode.id, 1)}
-                  icon={<ChevronDown className="size-3" />}
-                  label="Bajar"
-                />
-                <ToolBtn
-                  onClick={() => duplicateNode(selectedNode.id)}
-                  icon={<Copy className="size-3" />}
-                  label="Duplicar"
-                />
-                <ToolBtn
-                  onClick={() => toggleHiddenNode(selectedNode.id)}
-                  icon={
-                    selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />
-                  }
-                  label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
-                />
-                <ToolBtn
-                  onClick={() => {
-                    const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
-                    if (
-                      typeof window !== "undefined" &&
-                      !window.confirm(
-                        `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+              {selectedNode ? (
+                <div className="flex flex-wrap gap-1.5">
+                  <ToolBtn
+                    onClick={() => moveNode(selectedNode.id, -1)}
+                    icon={<ChevronUp className="size-3" />}
+                    label="Subir"
+                  />
+                  <ToolBtn
+                    onClick={() => moveNode(selectedNode.id, 1)}
+                    icon={<ChevronDown className="size-3" />}
+                    label="Bajar"
+                  />
+                  <ToolBtn
+                    onClick={() => duplicateNode(selectedNode.id)}
+                    icon={<Copy className="size-3" />}
+                    label="Duplicar"
+                  />
+                  <ToolBtn
+                    onClick={() => toggleHiddenNode(selectedNode.id)}
+                    icon={
+                      selectedNode.hidden ? (
+                        <Eye className="size-3" />
+                      ) : (
+                        <EyeOff className="size-3" />
                       )
-                    )
-                      return;
-                    removeNodeById(selectedNode.id);
-                  }}
-                  icon={<Trash2 className="size-3" />}
-                  label="Eliminar"
-                  tone="danger"
+                    }
+                    label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
+                  />
+                  <ToolBtn
+                    onClick={() => {
+                      const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
+                      if (
+                        typeof window !== "undefined" &&
+                        !window.confirm(
+                          `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+                        )
+                      )
+                        return;
+                      removeNodeById(selectedNode.id);
+                    }}
+                    icon={<Trash2 className="size-3" />}
+                    label="Eliminar"
+                    tone="danger"
+                  />
+                </div>
+              ) : null}
+
+              {selectedChrome === "seo" ? (
+                <SeoPreview
+                  config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
+                  slug={pageDef.slug}
                 />
-              </div>
-            ) : null}
+              ) : null}
 
-            {selectedChrome === "seo" ? (
-              <SeoPreview
-                config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
-                slug={pageDef.slug}
+              <AutoInspector
+                contract={selectedContract}
+                config={selectedConfig}
+                onChange={(next) => updateSelectedConfig(next)}
+                simple={!advanced}
+                activeBreakpoint={
+                  deviceViewport === "tablet"
+                    ? "md"
+                    : deviceViewport === "mobile" || deviceViewport === "mobile430"
+                      ? "base"
+                      : "lg"
+                }
               />
-            ) : null}
-
-            <AutoInspector
-              contract={selectedContract}
-              config={selectedConfig}
-              onChange={(next) => updateSelectedConfig(next)}
-              simple={!advanced}
-              activeBreakpoint={
-                deviceViewport === "tablet"
-                  ? "md"
-                  : deviceViewport === "mobile" || deviceViewport === "mobile430"
-                    ? "base"
-                    : "lg"
-              }
-            />
 
               {selectedNode ? (
                 <details className="rounded-md border border-border">
@@ -2555,7 +2558,6 @@ function PageVisualEditor({
               ) : null}
             </div>
           </aside>
-
         ) : null}
 
         {showLibrary ? (
