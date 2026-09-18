@@ -56,7 +56,6 @@ import {
   KeyboardSensor,
   PointerSensor,
   TouchSensor,
-
   closestCenter,
   useSensor,
   useSensors,
@@ -3529,7 +3528,6 @@ function BlockOverlay({
               title="Arrastrar para reordenar"
               style={{ touchAction: "none" }}
               className="inline-flex size-7 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
-
             >
               <GripVertical className="size-3" />
             </button>
