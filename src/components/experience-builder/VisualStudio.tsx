@@ -2019,12 +2019,13 @@ function PageVisualEditor({
       );
     };
     measure();
-    const observer = new ResizeObserver(measure);
-    if (shellRef.current) observer.observe(shellRef.current);
+    // No se observa el propio shell: su altura es la que este efecto escribe y
+    // observarla provoca un bucle de medición (parpadeo/vibración del editor).
     window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
     return () => {
-      observer.disconnect();
       window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
     };
   }, [page, tree]);
 
@@ -3374,7 +3375,9 @@ function CanvasViewport({
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
-  const [documentHeight, setDocumentHeight] = useState(minimumHeight);
+  // El alto del iframe es SIEMPRE el del dispositivo: así las alturas relativas
+  // a la ventana (100vh, min-h-screen) no realimentan la medición del lienzo.
+  const documentHeight = minimumHeight;
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3432,39 +3435,14 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    // El documento del canvas tiene el alto completo, por lo que Safari no
-    // encuentra un scroll interno. Reenviamos rueda y gesto táctil al área de
-    // trabajo exterior para poder recorrer toda la plantilla en iPad.
-    const parentScroller = iframe?.parentElement?.closest(
-      "[data-eb-canvas-scrollport]",
-    ) as HTMLElement | null;
-    const onWheel = (event: WheelEvent) => {
-      if (!parentScroller) return;
-      parentScroller.scrollTop += event.deltaY;
-      event.preventDefault();
-    };
-    let lastTouchY: number | null = null;
-    const onTouchStart = (event: TouchEvent) => {
-      if ((event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) {
-        lastTouchY = null;
-        return;
-      }
-      lastTouchY = event.touches[0]?.clientY ?? null;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      const nextY = event.touches[0]?.clientY;
-      if (!parentScroller || lastTouchY == null || nextY == null) return;
-      parentScroller.scrollTop += lastTouchY - nextY;
-      lastTouchY = nextY;
-      event.preventDefault();
-    };
-    const onTouchEnd = () => {
-      lastTouchY = null;
-    };
-    doc.addEventListener("wheel", onWheel, { passive: false });
-    doc.addEventListener("touchstart", onTouchStart, { passive: true });
-    doc.addEventListener("touchmove", onTouchMove, { passive: false });
-    doc.addEventListener("touchend", onTouchEnd, { passive: true });
+    // El documento del canvas conserva el alto del dispositivo y se recorre con
+    // su propio scroll interno (rueda y gesto táctil nativos en iPad).
+    const scrollStyle = doc.createElement("style");
+    scrollStyle.setAttribute("data-eb-canvas-scroll-style", "");
+    scrollStyle.textContent = `
+      html, body { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    `;
+    doc.head.appendChild(scrollStyle);
 
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
@@ -3476,10 +3454,7 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
-      doc.removeEventListener("wheel", onWheel);
-      doc.removeEventListener("touchstart", onTouchStart);
-      doc.removeEventListener("touchmove", onTouchMove);
-      doc.removeEventListener("touchend", onTouchEnd);
+      scrollStyle.remove();
       viewportStyle.remove();
       canvasRoot.remove();
     };
@@ -3563,15 +3538,12 @@ function CanvasViewport({
       const touch = event.touches[0];
       if (!touch) return;
       touchMoved = true;
-      const parentScroller = iframeRef.current?.parentElement?.closest(
-        "[data-eb-canvas-scrollport]",
-      ) as HTMLElement | null;
-      if (parentScroller) {
-        const visibleTop = parentScroller.scrollTop / Math.max(scale, 0.01);
-        const visibleBottom = visibleTop + parentScroller.clientHeight / Math.max(scale, 0.01);
+      // El lienzo se desplaza con su propio scroll interno mientras se arrastra.
+      const win = doc.defaultView;
+      if (win) {
         const edge = 96;
-        if (touch.clientY < visibleTop + edge) parentScroller.scrollTop -= 22;
-        if (touch.clientY > visibleBottom - edge) parentScroller.scrollTop += 22;
+        if (touch.clientY < edge) win.scrollBy(0, -22);
+        if (touch.clientY > win.innerHeight - edge) win.scrollBy(0, 22);
       }
       const over = doc
         .elementFromPoint(touch.clientX, touch.clientY)
@@ -3610,22 +3582,8 @@ function CanvasViewport({
     };
   }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys, scale]);
 
-  useEffect(() => {
-    if (!mount) return;
-    const readHeight = () => {
-      const next = Math.max(minimumHeight, Math.ceil(mount.getBoundingClientRect().height));
-      setDocumentHeight((current) => (Math.abs(current - next) > 1 ? next : current));
-    };
-    readHeight();
-    const observer = new ResizeObserver(readHeight);
-    observer.observe(mount);
-    const win = mount.ownerDocument.defaultView;
-    win?.addEventListener("load", readHeight);
-    return () => {
-      observer.disconnect();
-      win?.removeEventListener("load", readHeight);
-    };
-  }, [minimumHeight, mount]);
+  // El documento del canvas se recorre con su propio scroll interno; no se
+  // vuelve a medir su altura para evitar realimentación.
 
   // HUD de medición (sólo entornos no productivos): innerWidth real del
   // iframe, overflow horizontal y posición efectiva del encabezado.
@@ -3677,7 +3635,7 @@ function CanvasViewport({
         data-eb-canvas-indicator=""
         className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
       >
-        <span>{`${width} px · página completa · ${Math.round(scaled * 100)}%`}</span>
+        <span>{`${width} px · ${Math.round(scaled * 100)}%`}</span>
         {hud && metrics ? (
           <span data-eb-canvas-hud="">
             innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
