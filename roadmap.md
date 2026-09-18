@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Reservación de productos · Sustituir el listado de fechas por el calendario oficial: días disponibles en verde con cupo visible, selección progresiva día → horario → personas, horario único preseleccionado y QA 1440/834/430/390. Preservar inventario, apartados, checkout ERL, ficha Premium y datos CMS.
+- [x] Reservación de productos · Calendario oficial con días disponibles en verde y cupo visible, selección progresiva día → horario → personas y horario único preseleccionado. Inventario, apartados, checkout ERL, ficha Premium y datos CMS preservados; contratos, typecheck, `git diff --check` y QA 1440/834/430/390 en PASS, sin overflow. El aviso de Google Maps en localhost es externo al flujo.
 
 - [x] Incidencia recurrente móvil/PWA: impedir que una versión anterior deje la portada sin estilos; fallback autónomo, recuperación en línea, actualización segura y caché de archivos versionados para reabrir páginas públicas visitadas sin conexión. QA 1440/834/430/390 y typecheck en PASS; pendiente publicar y confirmar reemplazo del worker anterior en el celular afectado.
 
