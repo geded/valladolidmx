@@ -2514,6 +2514,23 @@ function PageVisualEditor({
                 const next = arrayMove(tree.root.children, oldIdx, newIdx);
                 commitTree({ ...tree, root: { children: next } });
               }}
+              onSelectCompositeSection={(nodeId, sectionKey) => selectUnit(nodeId, sectionKey)}
+              onReorderCompositeSection={(activeKey, overKey) => {
+                if (!tree || !compositeStructure?.orderKey) return;
+                const order = nextCompositeOrder(
+                  compositeStructure.entry,
+                  compositeStructure.config,
+                  activeKey,
+                  overKey,
+                );
+                if (!order) return;
+                commitTree(
+                  updateNodeConfig(tree, compositeStructure.nodeId, {
+                    ...compositeStructure.config,
+                    [compositeStructure.orderKey]: order,
+                  }),
+                );
+              }}
               commentCounts={commentCounts}
             />
           );
@@ -3163,6 +3180,8 @@ function HomeCanvas({
   onToggleHidden,
   onMove,
   onReorderRoot,
+  onSelectCompositeSection,
+  onReorderCompositeSection,
   commentCounts,
 }: {
   tree: CompositionTree;
@@ -3177,6 +3196,8 @@ function HomeCanvas({
   onToggleHidden: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   onReorderRoot: (activeId: string, overId: string) => void;
+  onSelectCompositeSection: (nodeId: string, sectionKey: string) => void;
+  onReorderCompositeSection: (activeKey: string, overKey: string) => void;
   commentCounts?: Record<string, number>;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
@@ -3230,6 +3251,19 @@ function HomeCanvas({
     pageType === "home"
       ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
       : tree;
+  const renderedCompositeNode =
+    renderedTree.root.children.length === 1 ? renderedTree.root.children[0] : undefined;
+  const renderedCompositeEntry = renderedCompositeNode
+    ? getCompositeSections(renderedCompositeNode.type)
+    : null;
+  const reorderableSectionKeys = renderedCompositeEntry
+    ? orderedCompositeSections(
+        renderedCompositeEntry,
+        renderedCompositeNode?.config as Record<string, unknown> | null,
+      )
+        .filter((section) => section.reorderable)
+        .map((section) => section.key)
+    : [];
 
   return (
     <div
@@ -3243,6 +3277,10 @@ function HomeCanvas({
         minimumHeight={preset.height}
         scale={scale}
         presetLabel={preset.label}
+        compositeNodeId={renderedCompositeNode?.id ?? null}
+        reorderableSectionKeys={reorderableSectionKeys}
+        onSelectSection={onSelectCompositeSection}
+        onReorderSection={onReorderCompositeSection}
       >
         <InertChrome
           label="Encabezado"
@@ -3317,6 +3355,10 @@ function CanvasViewport({
   minimumHeight,
   scale,
   presetLabel: _presetLabel,
+  compositeNodeId,
+  reorderableSectionKeys,
+  onSelectSection,
+  onReorderSection,
   children,
 }: {
   device: DeviceViewport;
@@ -3324,6 +3366,10 @@ function CanvasViewport({
   minimumHeight: number;
   scale: number;
   presetLabel: string;
+  compositeNodeId: string | null;
+  reorderableSectionKeys: string[];
+  onSelectSection: (nodeId: string, sectionKey: string) => void;
+  onReorderSection: (activeKey: string, overKey: string) => void;
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -3386,6 +3432,40 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
+    // El documento del canvas tiene el alto completo, por lo que Safari no
+    // encuentra un scroll interno. Reenviamos rueda y gesto táctil al área de
+    // trabajo exterior para poder recorrer toda la plantilla en iPad.
+    const parentScroller = iframe?.parentElement?.closest(
+      "[data-eb-canvas-scrollport]",
+    ) as HTMLElement | null;
+    const onWheel = (event: WheelEvent) => {
+      if (!parentScroller) return;
+      parentScroller.scrollTop += event.deltaY;
+      event.preventDefault();
+    };
+    let lastTouchY: number | null = null;
+    const onTouchStart = (event: TouchEvent) => {
+      if ((event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) {
+        lastTouchY = null;
+        return;
+      }
+      lastTouchY = event.touches[0]?.clientY ?? null;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      const nextY = event.touches[0]?.clientY;
+      if (!parentScroller || lastTouchY == null || nextY == null) return;
+      parentScroller.scrollTop += lastTouchY - nextY;
+      lastTouchY = nextY;
+      event.preventDefault();
+    };
+    const onTouchEnd = () => {
+      lastTouchY = null;
+    };
+    doc.addEventListener("wheel", onWheel, { passive: false });
+    doc.addEventListener("touchstart", onTouchStart, { passive: true });
+    doc.addEventListener("touchmove", onTouchMove, { passive: false });
+    doc.addEventListener("touchend", onTouchEnd, { passive: true });
+
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
     doc.body.appendChild(canvasRoot);
@@ -3396,10 +3476,127 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
+      doc.removeEventListener("wheel", onWheel);
+      doc.removeEventListener("touchstart", onTouchStart);
+      doc.removeEventListener("touchmove", onTouchMove);
+      doc.removeEventListener("touchend", onTouchEnd);
       viewportStyle.remove();
       canvasRoot.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!mount || !compositeNodeId) return;
+    const doc = mount.ownerDocument;
+    let draggedKey: string | null = null;
+    let touchKey: string | null = null;
+    let touchMoved = false;
+
+    const sections = () => Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
+    const decorate = () => {
+      sections().forEach((section) => {
+        const key = section.dataset.ebSection;
+        if (!key || !reorderableSectionKeys.includes(key)) return;
+        if (section.querySelector(":scope > [data-eb-section-handle]")) return;
+        section.style.position = section.style.position || "relative";
+        const handle = doc.createElement("button");
+        handle.type = "button";
+        handle.draggable = true;
+        handle.setAttribute("data-eb-section-handle", "");
+        handle.setAttribute("aria-label", "Mover o editar sección");
+        handle.textContent = "⋮⋮";
+        section.prepend(handle);
+      });
+    };
+    const style = doc.createElement("style");
+    style.setAttribute("data-eb-section-style", "");
+    style.textContent = `
+      [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
+        width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
+        background:hsl(var(--background)); color:hsl(var(--foreground)); box-shadow:0 4px 16px rgb(0 0 0 / .16);
+        cursor:grab; touch-action:none; font-weight:800; letter-spacing:2px; }
+      [data-eb-section]:has(> [data-eb-section-handle]:focus) { outline:3px solid hsl(var(--ring)); outline-offset:3px; }
+      [data-eb-section][data-eb-drop-target] { outline:3px dashed hsl(var(--primary)); outline-offset:4px; }
+    `;
+    doc.head.appendChild(style);
+    decorate();
+    const observer = new MutationObserver(decorate);
+    observer.observe(mount, { childList: true, subtree: true });
+
+    const sectionFrom = (target: EventTarget | null) =>
+      (target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-section]") ?? null;
+    const sectionKey = (target: EventTarget | null) =>
+      sectionFrom(target)?.dataset.ebSection ?? null;
+    const onClick = (event: MouseEvent) => {
+      const key = sectionKey(event.target);
+      if (!key) return;
+      onSelectSection(compositeNodeId, key);
+    };
+    const onDragStart = (event: DragEvent) => {
+      if (!(event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) return;
+      draggedKey = sectionKey(event.target);
+      if (draggedKey) event.dataTransfer?.setData("text/plain", draggedKey);
+    };
+    const onDragOver = (event: DragEvent) => {
+      if (!draggedKey) return;
+      const section = sectionFrom(event.target);
+      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
+      section?.setAttribute("data-eb-drop-target", "");
+      event.preventDefault();
+    };
+    const onDrop = (event: DragEvent) => {
+      const overKey = sectionKey(event.target);
+      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
+      if (draggedKey && overKey && draggedKey !== overKey) onReorderSection(draggedKey, overKey);
+      draggedKey = null;
+      event.preventDefault();
+    };
+    const onTouchStart = (event: TouchEvent) => {
+      if (!(event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) return;
+      touchKey = sectionKey(event.target);
+      touchMoved = false;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (!touchKey) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      touchMoved = true;
+      const over = doc
+        .elementFromPoint(touch.clientX, touch.clientY)
+        ?.closest<HTMLElement>("[data-eb-section]");
+      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
+      over?.setAttribute("data-eb-drop-target", "");
+      event.preventDefault();
+    };
+    const onTouchEnd = () => {
+      const overKey =
+        doc.querySelector<HTMLElement>("[data-eb-section][data-eb-drop-target]")?.dataset
+          .ebSection ?? null;
+      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
+      if (touchMoved && touchKey && overKey && touchKey !== overKey)
+        onReorderSection(touchKey, overKey);
+      touchKey = null;
+      touchMoved = false;
+    };
+    doc.addEventListener("click", onClick, true);
+    doc.addEventListener("dragstart", onDragStart);
+    doc.addEventListener("dragover", onDragOver);
+    doc.addEventListener("drop", onDrop);
+    doc.addEventListener("touchstart", onTouchStart, { passive: true });
+    doc.addEventListener("touchmove", onTouchMove, { passive: false });
+    doc.addEventListener("touchend", onTouchEnd);
+    return () => {
+      observer.disconnect();
+      style.remove();
+      doc.removeEventListener("click", onClick, true);
+      doc.removeEventListener("dragstart", onDragStart);
+      doc.removeEventListener("dragover", onDragOver);
+      doc.removeEventListener("drop", onDrop);
+      doc.removeEventListener("touchstart", onTouchStart);
+      doc.removeEventListener("touchmove", onTouchMove);
+      doc.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys]);
 
   useEffect(() => {
     if (!mount) return;

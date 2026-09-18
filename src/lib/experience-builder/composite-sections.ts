@@ -44,8 +44,13 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
     orderKey: "home_section_order",
     sections: [
       { key: "hero", label: "Portada (hero)", prefixes: ["hero_"] },
-      { key: "categorias", label: "Explora por categoría", prefixes: ["categorias_"] },
-      { key: "alux", label: "Alux", prefixes: ["alux_"] },
+      { key: "alux", label: "Alux", prefixes: ["alux_"], reorderable: true },
+      {
+        key: "categorias",
+        label: "Explora por categoría",
+        prefixes: ["categorias_"],
+        reorderable: true,
+      },
       {
         key: "destinos",
         label: "Destinos del Oriente Maya",

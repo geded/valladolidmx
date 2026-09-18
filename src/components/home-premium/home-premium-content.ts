@@ -58,14 +58,18 @@ export const HOME_PREMIUM_MEDIA = {
 } as const satisfies Record<string, HomePremiumMedia>;
 
 export type HomePremiumSectionKey =
+  | "hero"
+  | "alux"
   | "destinos"
+  | "categorias"
   | "pueblosMagicos"
   | "rutas"
   | "experiencias"
   | "servicios"
   | "eventos"
   | "queHacer"
-  | "mapa";
+  | "mapa"
+  | "travelPlan";
 
 export type HomePremiumRoute = {
   id: string;
@@ -234,7 +238,10 @@ export type HomePremiumContent = {
 };
 
 export const HOME_PREMIUM_SECTION_LABELS: Record<HomePremiumSectionKey, string> = {
+  hero: "Portada",
+  alux: "Alux",
   destinos: "Destinos del Oriente Maya de Yucatán",
+  categorias: "Explora por categoría",
   pueblosMagicos: "Pueblos Mágicos",
   rutas: "Rutas recomendadas por Alux",
   experiencias: "Experiencias",
@@ -242,17 +249,22 @@ export const HOME_PREMIUM_SECTION_LABELS: Record<HomePremiumSectionKey, string> 
   eventos: "Eventos",
   queHacer: "Qué hacer",
   mapa: "Mapa",
+  travelPlan: "Mi Viaje",
 };
 
 export const HOME_PREMIUM_DEFAULT_ORDER: HomePremiumSectionKey[] = [
+  "hero",
+  "alux",
   "destinos",
-  "rutas",
-  "pueblosMagicos",
-  "experiencias",
-  "servicios",
+  "categorias",
   "eventos",
-  "queHacer",
+  "experiencias",
+  "rutas",
   "mapa",
+  "travelPlan",
+  "pueblosMagicos",
+  "servicios",
+  "queHacer",
 ];
 
 /**

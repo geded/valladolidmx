@@ -6,7 +6,7 @@
  * consumen la preview G4, el fixture de validación, el canvas de Studio y el
  * renderer público. Prohibido mantener una copia aproximada por superficie.
  */
-import { useEffect, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { es } from "date-fns/locale";
 import {
@@ -201,68 +201,20 @@ export function HomePremiumSurface({
   // Editorial y cinematográfica son variantes visuales del mismo sistema.
   // Nunca cambian jerarquía, orden ni geometría entre sí.
   const presentationOrder: HomePremiumSectionKey[] = order;
-  const remainingDiscoveryOrder = presentationOrder.filter(
-    (key) =>
-      key !== "destinos" &&
-      key !== "rutas" &&
-      key !== "eventos" &&
-      key !== "experiencias" &&
-      key !== "mapa",
-  );
-
   const renderSection = (key: HomePremiumSectionKey) => {
-    if (key === "destinos")
+    if (key === "hero")
       return (
-        <DestinationsSection
-          content={content}
-          layout={layout}
-          cinematic={cinematic}
-          opened={openedMicrosite}
-          onOpen={setOpenedMicrosite}
-        />
-      );
-    if (key === "pueblosMagicos")
-      return (
-        <PueblosMagicosSection
-          content={content}
-          onCreateRoute={() => setSelectedRoute("pueblos")}
-        />
-      );
-    if (key === "rutas")
-      return (
-        <RoutesSection
-          content={content}
-          selectedRoute={selectedRoute}
-          onSelectRoute={setSelectedRoute}
-          onAdd={() => setAdded(true)}
-        />
-      );
-    if (key === "experiencias")
-      return <ExperiencesSection content={content} layout={layout} cinematic={cinematic} />;
-    if (key === "servicios") return <ServicesSection content={content} />;
-    if (key === "eventos") return <EventsSection content={content} />;
-    if (key === "queHacer") return <EditorialSection content={content} cinematic={cinematic} />;
-    return (
-      <MapSection
-        content={content}
-        selectedRoute={selectedRoute}
-        proposalSequence={proposalSequence}
-      />
-    );
-  };
-
-  return (
-    <>
-      <main data-home-presentation={heroVariant}>
-        <Container className="pt-4 sm:pt-6">
+        <Container className="pt-4 sm:pt-6" data-eb-section="hero">
           {heroVariant === "editorial" ? (
             <HeroEditorial content={content} />
           ) : (
             <HeroCinematic content={content} />
           )}
         </Container>
-
-        <Container className="mt-6 sm:mt-8" data-home-journey="alux">
+      );
+    if (key === "alux")
+      return (
+        <Container className="mt-6 sm:mt-8" data-home-journey="alux" data-eb-section="alux">
           <AluxPlanner
             content={content}
             selectedPrompt={selectedPrompt}
@@ -275,82 +227,58 @@ export function HomePremiumSurface({
             onAdd={() => setAdded(true)}
           />
         </Container>
-
-        {enabled("destinos") ? (
-          <Container className="mt-8 lg:mt-12" data-home-journey="territory">
-            <div data-cinematic-section={cinematic || undefined}>{renderSection("destinos")}</div>
-          </Container>
-        ) : null}
-
-        <Container className="mt-6 sm:mt-8" data-home-journey="experiencias-access">
-          <a
-            href="/experiencias"
-            className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
-          >
-            <span className="flex min-w-0 items-center gap-3">
-              <TourismCategoryIcon slug="experiencias" variant="standard" />
-              <span className="min-w-0">
-                <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
-                  {content.experiencias.kicker}
-                </span>
-                <span className="block text-base font-semibold sm:truncate sm:text-lg">
-                  {content.experiencias.title}
-                </span>
-                <span className="block text-sm text-muted-foreground">
-                  {content.experiencias.description}
+      );
+    if (key === "categorias")
+      return (
+        <div data-eb-section="categorias">
+          <Container className="mt-6 sm:mt-8" data-home-journey="experiencias-access">
+            <a
+              href="/experiencias"
+              className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
+            >
+              <span className="flex min-w-0 items-center gap-3">
+                <TourismCategoryIcon slug="experiencias" variant="standard" />
+                <span className="min-w-0">
+                  <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
+                    {content.experiencias.kicker}
+                  </span>
+                  <span className="block text-base font-semibold sm:truncate sm:text-lg">
+                    {content.experiencias.title}
+                  </span>
+                  <span className="block text-sm text-muted-foreground">
+                    {content.experiencias.description}
+                  </span>
                 </span>
               </span>
-            </span>
-            <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
-              {content.experiencias.action}
-            </span>
-          </a>
-        </Container>
-
-        <Container className="mt-6 sm:mt-8" data-home-journey="categories">
-          {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
-          <section
-            aria-label={content.categorias.heading}
-            className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
-          >
-            <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
-            <CategoryNavGrid
-              items={content.categorias.items}
-              variant="standard"
-              mode="navigate"
-              showCounts={false}
-              desktopColumnsClassName="lg:grid-cols-6"
-            />
-          </section>
-        </Container>
-
-        {enabled("eventos") ? (
-          <Container className="mt-8 lg:mt-12" data-home-journey="eventos">
-            <div data-cinematic-section={cinematic || undefined}>{renderSection("eventos")}</div>
+              <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
+                {content.experiencias.action}
+              </span>
+            </a>
           </Container>
-        ) : null}
-
-        {enabled("experiencias") ? (
-          <Container className="mt-8 lg:mt-12" data-home-journey="experiencias">
-            <div data-cinematic-section={cinematic || undefined}>
-              {renderSection("experiencias")}
-            </div>
+          <Container className="mt-6 sm:mt-8" data-home-journey="categories">
+            <section
+              aria-label={content.categorias.heading}
+              className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
+            >
+              <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
+              <CategoryNavGrid
+                items={content.categorias.items}
+                variant="standard"
+                mode="navigate"
+                showCounts={false}
+                desktopColumnsClassName="lg:grid-cols-6"
+              />
+            </section>
           </Container>
-        ) : null}
-
-        {enabled("rutas") ? (
-          <Container className="mt-8 lg:mt-12" data-home-journey="routes">
-            <div data-cinematic-section={cinematic || undefined}>{renderSection("rutas")}</div>
-          </Container>
-        ) : null}
-
-        {enabled("mapa") ? (
-          <Container className="mt-8 lg:mt-12" data-home-journey="mapa">
-            <div data-cinematic-section={cinematic || undefined}>{renderSection("mapa")}</div>
-          </Container>
-        ) : null}
-
-        <Container className="mt-8 lg:mt-12" data-home-journey="travel-plan">
+        </div>
+      );
+    if (key === "travelPlan")
+      return (
+        <Container
+          className="mt-8 lg:mt-12"
+          data-home-journey="travel-plan"
+          data-eb-section="travelPlan"
+        >
           <TravelPlanClose
             content={content}
             selectedRoute={selectedRoute}
@@ -358,13 +286,103 @@ export function HomePremiumSurface({
             onAdd={() => setAdded(true)}
           />
         </Container>
+      );
+    if (key === "destinos")
+      return (
+        <Container
+          className="mt-8 lg:mt-12"
+          data-home-journey="territory"
+          data-eb-section="destinos"
+        >
+          <div data-cinematic-section={cinematic || undefined}>
+            <DestinationsSection
+              content={content}
+              layout={layout}
+              cinematic={cinematic}
+              opened={openedMicrosite}
+              onOpen={setOpenedMicrosite}
+            />
+          </div>
+        </Container>
+      );
+    if (key === "pueblosMagicos")
+      return (
+        <Container className="mt-8 lg:mt-12" data-eb-section="pueblosMagicos">
+          <div data-cinematic-section={cinematic || undefined}>
+            <PueblosMagicosSection
+              content={content}
+              onCreateRoute={() => setSelectedRoute("pueblos")}
+            />
+          </div>
+        </Container>
+      );
+    if (key === "rutas")
+      return (
+        <Container className="mt-8 lg:mt-12" data-home-journey="routes" data-eb-section="rutas">
+          <div data-cinematic-section={cinematic || undefined}>
+            <RoutesSection
+              content={content}
+              selectedRoute={selectedRoute}
+              onSelectRoute={setSelectedRoute}
+              onAdd={() => setAdded(true)}
+            />
+          </div>
+        </Container>
+      );
+    if (key === "experiencias")
+      return (
+        <Container
+          className="mt-8 lg:mt-12"
+          data-home-journey="experiencias"
+          data-eb-section="experiencias"
+        >
+          <div data-cinematic-section={cinematic || undefined}>
+            <ExperiencesSection content={content} layout={layout} cinematic={cinematic} />
+          </div>
+        </Container>
+      );
+    if (key === "servicios")
+      return (
+        <Container className="mt-8 lg:mt-12" data-eb-section="servicios">
+          <div data-cinematic-section={cinematic || undefined}>
+            <ServicesSection content={content} />
+          </div>
+        </Container>
+      );
+    if (key === "eventos")
+      return (
+        <Container className="mt-8 lg:mt-12" data-home-journey="eventos" data-eb-section="eventos">
+          <div data-cinematic-section={cinematic || undefined}>
+            <EventsSection content={content} />
+          </div>
+        </Container>
+      );
+    if (key === "queHacer")
+      return (
+        <Container className="mt-8 lg:mt-12" data-eb-section="queHacer">
+          <div data-cinematic-section={cinematic || undefined}>
+            <EditorialSection content={content} cinematic={cinematic} />
+          </div>
+        </Container>
+      );
+    return (
+      <Container className="mt-8 lg:mt-12" data-home-journey="mapa" data-eb-section="mapa">
+        <div data-cinematic-section={cinematic || undefined}>
+          <MapSection
+            content={content}
+            selectedRoute={selectedRoute}
+            proposalSequence={proposalSequence}
+          />
+        </div>
+      </Container>
+    );
+  };
 
-        {remainingDiscoveryOrder.map((key) =>
-          enabled(key) ? (
-            <Container key={key} className="mt-8 lg:mt-12">
-              <div data-cinematic-section={cinematic || undefined}>{renderSection(key)}</div>
-            </Container>
-          ) : null,
+  return (
+    <>
+      <main data-home-presentation={heroVariant}>
+        {presentationOrder.map((key) =>
+          enabled(key) ? <Fragment key={key}>{renderSection(key)}</Fragment> : null,
         )}
       </main>
     </>
