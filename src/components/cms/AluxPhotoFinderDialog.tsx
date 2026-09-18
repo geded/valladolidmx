@@ -89,7 +89,6 @@ export function AluxPhotoFinderDialog({
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-
   if (!open) return null;
 
   const search = async () => {
@@ -228,7 +227,6 @@ export function AluxPhotoFinderDialog({
             Buscando en {workingPlace}. No hace falta escribir el destino.
           </p>
         )}
-
 
         <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
           <input

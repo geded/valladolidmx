@@ -725,7 +725,6 @@ function UploadForm({
         </div>
       ) : null}
 
-
       {preview ? (
         <FocalPicker
           preview={preview}
