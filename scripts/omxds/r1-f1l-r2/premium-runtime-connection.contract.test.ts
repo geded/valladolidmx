@@ -725,7 +725,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(root).not.toContain('from "@/pwa/register-sw"');
     expect(root).not.toContain('from "@/pwa/sync-runner"');
     expect(vite).toContain('outDir: "dist/client"');
-    expect(vite).toContain('additionalManifestEntries: [{ url: "/offline"');
+    expect(vite).toContain('{ url: "/offline.html"');
     expect(vite).toContain('"assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*"');
     expect(vite).not.toContain('globPatterns: ["**/*.{js,css');
     expect(vite).not.toContain('cacheName: "static-assets"');
