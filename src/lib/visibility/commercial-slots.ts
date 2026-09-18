@@ -106,10 +106,7 @@ export function rankSponsored(
         tiebreak: stableHash(`${seed}:${candidate.id}`),
       };
     })
-    .sort(
-      (a, b) =>
-        a.pinned - b.pinned || a.debtRatio - b.debtRatio || a.tiebreak - b.tiebreak,
-    )
+    .sort((a, b) => a.pinned - b.pinned || a.debtRatio - b.debtRatio || a.tiebreak - b.tiebreak)
     .map((entry) => entry.candidate);
 }
 

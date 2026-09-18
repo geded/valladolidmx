@@ -14,10 +14,7 @@ const organic = (n: number): SlotCandidate[] =>
     eligible: true,
   }));
 
-const sponsored = (
-  id: string,
-  extra: Partial<SponsoredCandidate> = {},
-): SponsoredCandidate => ({
+const sponsored = (id: string, extra: Partial<SponsoredCandidate> = {}): SponsoredCandidate => ({
   id,
   businessId: extra.businessId ?? `biz-${id}`,
   eligible: extra.eligible ?? true,
