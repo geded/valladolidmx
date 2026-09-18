@@ -80,9 +80,10 @@
 
 ## Menú móvil · Refinamiento Airbnb (2026-09-13)
 
-- [ ] Texto del buscador: "¿Donde empezamos?" con subtítulo "Explora el Oriente Maya de Yucatán" visible en móvil.
-- [ ] Botones CTA del drawer móvil ("Arma tu Viaje", "Iniciar sesión"): estilo Airbnb — sin relleno ocre sólido; usar foreground/outline refinado.
-- [ ] Validar en 393x852 (móvil) y typecheck limpio.
+- [x] Texto del buscador: "¿Donde empezamos?" con subtítulo "Explora el Oriente Maya de Yucatán" visible en móvil.
+- [x] Botones CTA del drawer móvil ("Arma tu Viaje", "Iniciar sesión"): estilo Airbnb — sin relleno ocre sólido; usar foreground/outline refinado.
+- [x] Retirar “Destinos populares” sólo del menú hamburguesa y conservar el acceso territorial desde el buscador superior.
+- [x] Mantener “Arma tu Viaje” e “Iniciar sesión” visibles en móvil y tableta; `/auth` abre correctamente en 430/390, sin desbordamiento en 834/430/390.
 
 - [x] Compactar `/auth` y armonizar tipografía al estilo Airbnb solicitado.
 - [x] Afinar exclusivamente `/auth` en móvil sin cambiar su composición: escala tipográfica, ritmo vertical y proporciones compactas; Preservation Gate 1440/834/430/390 en PASS, sin desbordes ni errores.
