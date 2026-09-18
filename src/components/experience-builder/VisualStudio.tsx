@@ -3949,9 +3949,12 @@ function BlockLibraryModal({
   onPickReusable,
   surface,
   actor,
+  insertAt = null,
 }: {
   onClose: () => void;
   onPick: (type: string) => void;
+  /** Posición donde se colocará el elemento; `null` ⇒ al final. */
+  insertAt?: number | null;
   advanced?: boolean;
   onPickReusable?: (entry: ReusableBlock) => void;
   surface: EditorialSurface | null;
@@ -4015,9 +4018,11 @@ function BlockLibraryModal({
       <div className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-card p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold">Añadir una sección</h3>
+            <h3 className="text-sm font-semibold">Elementos que puedes añadir</h3>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Elige un tipo de sección para insertarlo al final de la página.
+              {insertAt === null
+                ? "Elige un elemento para colocarlo al final de la página."
+                : `Elige un elemento para colocarlo en la posición ${insertAt + 1}.`}
             </p>
           </div>
           <button
