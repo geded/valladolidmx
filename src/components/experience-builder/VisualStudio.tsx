@@ -3455,10 +3455,7 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
-      doc.removeEventListener("wheel", onWheel);
-      doc.removeEventListener("touchstart", onTouchStart);
-      doc.removeEventListener("touchmove", onTouchMove);
-      doc.removeEventListener("touchend", onTouchEnd);
+      scrollStyle.remove();
       viewportStyle.remove();
       canvasRoot.remove();
     };
