@@ -51,7 +51,7 @@ export function EditorialMediaFrame({
       priority: fetchPriority,
     });
     return (
-      <picture className={cn("contents", className?.includes("absolute") && "absolute inset-0")}>
+      <picture className={className?.includes("absolute") ? "absolute inset-0" : undefined}>
         {resolved.sources.map((source) => (
           <source
             key={source.type}
