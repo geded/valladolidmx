@@ -42,7 +42,9 @@ type TerritorialListingFamily =
   | "casas-de-vacaciones"
   | "eventos"
   | "lugares"
-  | "que-hacer";
+  | "que-hacer"
+  /** Familia genérica de empresas por categoría del CMS (cenotes, artesanías…). */
+  | "empresas";
 
 interface ListingItem {
   name: string;
@@ -400,7 +402,33 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: [],
     nearby: [],
   },
+  /* Perfil genérico de empresas por categoría del CMS. Usa exactamente la
+     misma plantilla Premium aprobada; la ruta ajusta el copy con el nombre
+     real de la categoría activa. No existe render alternativo. */
+  empresas: {
+    family: "empresas",
+    breadcrumb: "Empresas",
+    eyebrow: "Descubre el territorio",
+    title: "Empresas en Valladolid",
+    description:
+      "Selección editorial de empresas verificadas del Oriente Maya de Yucatán, con ubicación, contacto y contexto territorial.",
+    resultsTitle: "Empresas en Valladolid",
+    itemLabel: "empresa",
+    searchLabel: "Buscar",
+    searchPlaceholder: "Buscar por nombre, zona o servicio",
+    aluxQuestion: "¿Qué necesitas para tu viaje?",
+    aluxOptions: ["Cerca del centro", "En familia", "En pareja", "Medio día", "Con guía"],
+    filters: ["Zona", "Tipo", "Etiquetas"],
+    nearbyTitle: "Más opciones del territorio",
+    mapTitle: "Empresas en Valladolid",
+    aluxMapTitle: "Guarda tus favoritos y arma tu viaje.",
+    aluxMapDescription:
+      "Alux combina lo que guardas con distancias, horarios y tiempo disponible del destino.",
+    items: [],
+    nearby: [],
+  },
 };
+
 
 /**
  * Resuelve el alcance territorial del copy aprobado. El copy base está
@@ -416,6 +444,24 @@ function territorialize(text: string, destinationLabel: string | null): string {
     .replace(/Valladolid/g, "el Oriente Maya");
 }
 
+/**
+ * Ajuste de copy para la familia genérica de empresas: permite usar el
+ * nombre real de la categoría del CMS sin crear otra plantilla.
+ */
+export type TerritorialListingProfileOverride = Partial<
+  Pick<
+    ListingProfile,
+    | "breadcrumb"
+    | "eyebrow"
+    | "resultsTitle"
+    | "itemLabel"
+    | "searchPlaceholder"
+    | "nearbyTitle"
+    | "mapTitle"
+    | "filters"
+  >
+>;
+
 export function TerritorialListingReviewSurface({
   family = "hoteles",
   dto,
@@ -424,6 +470,7 @@ export function TerritorialListingReviewSurface({
   facets = [],
   nearbyItems,
   lockedDestinationLabel,
+  profileOverride,
 }: {
   family?: TerritorialListingFamily;
   dto?: PublicListingDTO;
@@ -434,11 +481,13 @@ export function TerritorialListingReviewSurface({
   nearbyItems?: readonly TourismCardVM[];
   /** Contexto territorial bloqueado (listado dentro de un destino). */
   lockedDestinationLabel?: string | null;
+  profileOverride?: TerritorialListingProfileOverride;
 }) {
   const baseProfile = PROFILES[family];
   // Alcance territorial real: destino activo cuando la entrada lo declara,
   // región completa cuando la entrada es global. Nunca un destino por defecto.
   const scopeLabel = lockedDestinationLabel ?? dto?.destinationLabel ?? null;
+  const overrideKey = JSON.stringify(profileOverride ?? null);
   const profile = useMemo(
     () => ({
       ...baseProfile,
@@ -447,8 +496,9 @@ export function TerritorialListingReviewSurface({
       resultsTitle: territorialize(baseProfile.resultsTitle, scopeLabel),
       nearbyTitle: territorialize(baseProfile.nearbyTitle, scopeLabel),
       mapTitle: territorialize(baseProfile.mapTitle, scopeLabel),
+      ...(JSON.parse(overrideKey) as Partial<ListingProfile> | null),
     }),
-    [baseProfile, scopeLabel, subtitleOverride, titleOverride],
+    [baseProfile, overrideKey, scopeLabel, subtitleOverride, titleOverride],
   );
   const [query, setQuery] = useState("");
   const [zone, setZone] = useState("");

@@ -10,9 +10,7 @@
  *  - No se activan redirects 301 (Fase 2 de N2.3, previa validación).
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
 import { PublicShell } from "@/components/discovery";
-import { BusinessQuickViewDialog } from "@/components/discovery/BusinessQuickViewDialog";
 import { buildPublicHead, collectionPageJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
@@ -31,11 +29,6 @@ import {
   type CategorySurfaceRelatedValue,
 } from "@/components/surfaces/CategorySurface";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
-import { TourismListingSurface } from "@/components/surfaces/TourismListingSurface";
-import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
-import { businessToMapPoint } from "@/lib/experience-builder/adapters/entity-to-map-point";
-import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
-import { ListingMapHeader } from "@/components/discovery/ListingMapHeader";
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import {
   buildPublicListing,
@@ -88,13 +81,18 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
       ([candidate, slugs]) =>
         isListingFamilyId(candidate) && slugs?.includes(params.categoria.toLowerCase()),
     )?.[0];
-    const family = familyTaxonomy.available
+    const resolvedFamily: ListingFamilyId | null = familyTaxonomy.available
       ? isListingFamilyId(cmsFamily)
         ? cmsFamily
         : null
       : (CANONICAL_LISTING_FAMILIES[params.categoria] ?? null);
-    const premiumListingPromise = family
-      ? listingFamilyContract(family).source === "businesses"
+    // Autoridad única: toda categoría empresarial publicada usa la plantilla
+    // Premium aprobada. Sin familia declarada en CMS, se resuelve con la
+    // familia genérica de empresas; nunca se degrada a un render anterior.
+    const family: ListingFamilyId = resolvedFamily ?? "empresas";
+    const isGenericBusinessFamily = family === "empresas";
+    const premiumListingPromise =
+      listingFamilyContract(family).source === "businesses"
         ? Promise.resolve(
             buildPublicListing({
               family,
@@ -103,8 +101,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
               categorySlugs: [params.categoria],
             }),
           )
-        : getPublicListing({ data: { family, destino: params.destino } }).catch(() => null)
-      : Promise.resolve(null);
+        : getPublicListing({ data: { family, destino: params.destino } }).catch(() => null);
     const [related, premiumListing] = await Promise.all([
       getCategoryRelated({
         data: {
@@ -114,7 +111,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
       }).catch(() => null),
       premiumListingPromise,
     ]);
-    return { resolution, items, related, premiumListing };
+    return { resolution, items, related, premiumListing, isGenericBusinessFamily };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -162,9 +159,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
 });
 
 function CategoriaEnDestinoPage() {
-  const { resolution, items, related, premiumListing } = Route.useLoaderData();
+  const { resolution, related, premiumListing, isGenericBusinessFamily } = Route.useLoaderData();
   const { destino, categoria } = Route.useParams();
-  const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
   const ctx = resolutionToNavigationContext(resolution, destino);
   // `BreadcrumbTerritorial` renderiza el ícono/Home por sí mismo, así
   // que evitamos duplicarlo pidiéndole a `buildBreadcrumbs` que lo omita.
@@ -175,15 +171,6 @@ function CategoriaEnDestinoPage() {
   const destLabel = resolution.destination?.label ?? destino;
   const catLabel = resolution.category?.label ?? categoria;
 
-  // Etiqueta contextual del CTA primario en cada tarjeta.
-  const primaryCtaLabel = (() => {
-    const c = catLabel.toLowerCase();
-    if (c.includes("hotel") || c.includes("hosped")) return "Ver hotel";
-    if (c.includes("restaur")) return "Ver restaurante";
-    if (c.includes("experi")) return "Ver experiencia";
-    if (c.includes("casa")) return "Ver alojamiento";
-    return `Ver ${c || "empresa"}`;
-  })();
   const declaration = navigationContextToDeclaration(ctx);
   const categoryValue: CategorySurfaceRelatedValue = {
     destinationSlug: destino,
@@ -194,44 +181,9 @@ function CategoriaEnDestinoPage() {
   };
   const hasRelated = Boolean(
     related &&
-    (related.otherCategoriesInDestination.length > 0 ||
-      related.sameCategoryOtherDestinations.length > 0),
+      (related.otherCategoriesInDestination.length > 0 ||
+        related.sameCategoryOtherDestinations.length > 0),
   );
-
-  // Puntos del mapa (Founder Discovery: mapa arriba + tarjetas abajo).
-  const mapPoints = useMemo<ExperienceMapPoint[]>(() => {
-    const arr: (ExperienceMapPoint | null)[] = items.map((b: MarketplaceBusinessCard) => {
-      const point = businessToMapPoint({
-        id: b.id,
-        name: b.display_name,
-        slug: b.slug,
-        latitude: b.latitude ?? null,
-        longitude: b.longitude ?? null,
-        address_line1: b.address_line1 ?? null,
-        cover_url: b.cover_url ?? null,
-        category_label: catLabel,
-      });
-      // Interceptamos href para abrir el modal (no navegar).
-      return point ? { ...point, href: null } : null;
-    });
-    return arr.filter((p): p is ExperienceMapPoint => p !== null);
-  }, [items, catLabel]);
-
-  // Intercepta clicks a la ficha completa y abre el modal en su lugar.
-  const handleListingClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    const anchor = target.closest("a");
-    if (!anchor) return;
-    const href = anchor.getAttribute("href");
-    if (!href) return;
-    const prefix = `/oriente-maya/${destino}/${categoria}/`;
-    if (!href.startsWith(prefix)) return;
-    // Extrae el slug de empresa (segmento tras el prefijo).
-    const rest = href.slice(prefix.length).split("/")[0];
-    if (!rest) return;
-    e.preventDefault();
-    setQuickViewSlug(rest);
-  };
 
   return (
     <ContextEngineProvider declaration={declaration}>
@@ -245,45 +197,21 @@ function CategoriaEnDestinoPage() {
               lockedDestinationLabel={destLabel}
               showAddToTrip
               showFavorite
+              profileOverride={
+                isGenericBusinessFamily
+                  ? {
+                      breadcrumb: catLabel,
+                      resultsTitle: `${catLabel} en ${destLabel}`,
+                      itemLabel: catLabel.toLowerCase(),
+                      searchPlaceholder: `Buscar ${catLabel.toLowerCase()} por nombre o zona`,
+                      nearbyTitle: `Más opciones en ${destLabel}`,
+                      mapTitle: `${catLabel} en el mapa de ${destLabel}`,
+                      filters: ["Zona", "Tipo", "Etiquetas"],
+                    }
+                  : undefined
+              }
             />
-          ) : (
-            <div onClick={handleListingClick}>
-              <TourismListingSurface
-                hero={{
-                  eyebrow: destLabel,
-                  title: `${catLabel} en ${destLabel}`,
-                  subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
-                  metaLabel: destLabel,
-                }}
-                items={items.map((b: MarketplaceBusinessCard) => {
-                  const vm = businessToTourismCard(b, {
-                    destinationLabel: destLabel,
-                    regionLabel: "Oriente Maya",
-                    forcedCategorySlug: categoria,
-                  });
-                  const pointIndex = mapPoints.findIndex((p) => p.id === b.id);
-                  // Inyectamos CTA primario: abre el modal (interceptado por
-                  // handleListingClick porque el href apunta a la ficha completa).
-                  return {
-                    ...vm,
-                    mapLabel: pointIndex >= 0 ? String.fromCharCode(65 + (pointIndex % 26)) : null,
-                    primaryAction: vm.href ? { label: primaryCtaLabel, href: vm.href } : null,
-                  };
-                })}
-                destinationSlug={destino}
-                destinationLabel={destLabel}
-                mapSlot={
-                  mapPoints.length > 0 ? (
-                    <ListingMapHeader
-                      heading={`${catLabel} en el mapa de ${destLabel}`}
-                      points={mapPoints}
-                    />
-                  ) : null
-                }
-                emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
-              />
-            </div>
-          )}
+          ) : null}
           {hasRelated ? (
             <section id="descubre" className="mt-12">
               <ExperienceRelatedCollectionBlock
@@ -316,12 +244,8 @@ function CategoriaEnDestinoPage() {
               />
             </section>
           ) : null}
-          <BusinessQuickViewDialog
-            slug={quickViewSlug}
-            destinoSlug={destino}
-            categoriaSlug={categoria}
-            onClose={() => setQuickViewSlug(null)}
-          />
+          {/* Las tarjetas navegan al perfil de empresa, igual que en Hoteles:
+              no existe vista rápida que intercepte la navegación canónica. */}
         </PublicShell>
       </CategorySurfaceRelatedProvider>
     </ContextEngineProvider>

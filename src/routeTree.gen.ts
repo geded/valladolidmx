@@ -120,6 +120,7 @@ import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ResenarNegocioSlugRouteImport } from './routes/resenar.negocio.$slug'
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
+import { Route as OrienteMayaCategoriaCategoriaRouteImport } from './routes/oriente-maya/categoria.$categoria'
 import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiDevMediaShadowEvalRouteImport } from './routes/api/dev/media-shadow-eval'
@@ -877,6 +878,12 @@ const PreviewCompositionTokenRoute = PreviewCompositionTokenRouteImport.update({
   path: '/preview/composition/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaCategoriaCategoriaRoute =
+  OrienteMayaCategoriaCategoriaRouteImport.update({
+    id: '/oriente-maya/categoria/$categoria',
+    path: '/oriente-maya/categoria/$categoria',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OrienteMayaDestinoCategoriaRoute =
   OrienteMayaDestinoCategoriaRouteImport.update({
     id: '/$categoria',
@@ -1929,6 +1936,7 @@ export interface FileRoutesByFullPath {
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
+  '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -2181,6 +2189,7 @@ export interface FileRoutesByTo {
   '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -2443,6 +2452,7 @@ export interface FileRoutesById {
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
+  '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -2707,6 +2717,7 @@ export interface FileRouteTypes {
     | '/api/dev/media-shadow-eval'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
+    | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
     | '/admin/'
@@ -2959,6 +2970,7 @@ export interface FileRouteTypes {
     | '/api/dev/media-pipeline-derive'
     | '/api/dev/media-shadow-eval'
     | '/lovable/email/suppression'
+    | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
     | '/admin'
@@ -3220,6 +3232,7 @@ export interface FileRouteTypes {
     | '/api/dev/media-shadow-eval'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
+    | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
     | '/_authenticated/admin/'
@@ -3414,6 +3427,7 @@ export interface RootRouteChildren {
   ApiDevMediaPipelineDeriveRoute: typeof ApiDevMediaPipelineDeriveRoute
   ApiDevMediaShadowEvalRoute: typeof ApiDevMediaShadowEvalRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  OrienteMayaCategoriaCategoriaRoute: typeof OrienteMayaCategoriaCategoriaRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
   ApiCmsStudioMediaPreviewMediaIdRoute: typeof ApiCmsStudioMediaPreviewMediaIdRoute
@@ -4214,6 +4228,13 @@ declare module '@tanstack/react-router' {
       path: '/preview/composition/$token'
       fullPath: '/preview/composition/$token'
       preLoaderRoute: typeof PreviewCompositionTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oriente-maya/categoria/$categoria': {
+      id: '/oriente-maya/categoria/$categoria'
+      path: '/oriente-maya/categoria/$categoria'
+      fullPath: '/oriente-maya/categoria/$categoria'
+      preLoaderRoute: typeof OrienteMayaCategoriaCategoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino/$categoria': {
@@ -5966,6 +5987,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDevMediaPipelineDeriveRoute: ApiDevMediaPipelineDeriveRoute,
   ApiDevMediaShadowEvalRoute: ApiDevMediaShadowEvalRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  OrienteMayaCategoriaCategoriaRoute: OrienteMayaCategoriaCategoriaRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
   ApiCmsStudioMediaPreviewMediaIdRoute: ApiCmsStudioMediaPreviewMediaIdRoute,
