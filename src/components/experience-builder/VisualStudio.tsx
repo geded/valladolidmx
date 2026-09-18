@@ -3527,7 +3527,9 @@ function BlockOverlay({
               onClick={(e) => e.stopPropagation()}
               aria-label="Arrastrar para reordenar"
               title="Arrastrar para reordenar"
-              className="inline-flex h-6 w-6 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
+              style={{ touchAction: "none" }}
+              className="inline-flex size-7 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
+
             >
               <GripVertical className="size-3" />
             </button>
