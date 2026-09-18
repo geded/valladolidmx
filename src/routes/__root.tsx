@@ -105,6 +105,8 @@ import { GlobalNavigationSessionBridge } from "@/components/navigation/Navigatio
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { getOmxdsVisualFoundationsFlag } from "@/lib/omxds/visual-foundations-flag.server";
+import { SITE_DOMAIN_DEFAULTS, getSiteDomainSettings } from "@/lib/settings/site-domains.functions";
+import { setCanonicalDomain } from "@/config/site";
 
 const OMXDS_THEME_BOOTSTRAP = `(()=>{try{const r=document.documentElement;if(r.dataset.omxdsVisualFoundations!=="enabled")return;const k="valladolidmx:theme";const s=localStorage.getItem(k);const t=s==="sol"||s==="luna"?s:matchMedia("(prefers-color-scheme: dark)").matches?"luna":"sol";r.classList.toggle("dark",t==="luna");r.dataset.theme=t;r.style.colorScheme=t==="luna"?"dark":"light"}catch{}})();`;
 
@@ -182,22 +184,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
     // para que header, pie y superficies públicas la pinten sin parpadeo.
     // Fail-safe: ante cualquier error se conserva el fallback de código.
-    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome] = await Promise.all([
-      getOmxdsVisualFoundationsFlag(),
-      context.queryClient
-        .ensureQueryData(brandSettingsQueryOptions)
-        .catch(() => BRAND_SETTINGS_DEFAULTS),
-      // Lote 3B · C — Autoridad institucional vigente (distintivos).
-      context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
-      // El chrome público debe llegar en la primera respuesta para evitar que
-      // header y footer cambien de geometría después de hidratar React.
-      context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
-    ]);
+    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome, siteDomains] =
+      await Promise.all([
+        getOmxdsVisualFoundationsFlag(),
+        context.queryClient
+          .ensureQueryData(brandSettingsQueryOptions)
+          .catch(() => BRAND_SETTINGS_DEFAULTS),
+        // Lote 3B · C — Autoridad institucional vigente (distintivos).
+        context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+        // El chrome público debe llegar en la primera respuesta para evitar que
+        // header y footer cambien de geometría después de hidratar React.
+        context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
+        // Configuración → Dominios: dominio canónico administrable.
+        getSiteDomainSettings().catch(() => SITE_DOMAIN_DEFAULTS),
+      ]);
+
+    // Aplica el dominio canónico vigente en SSR (antes de generar head/canonical).
+    setCanonicalDomain(siteDomains.primaryDomain);
 
     return {
       omxdsVisualFoundationsEnabled,
       brandSettings: normalizeBrandSettings(brandSettings),
       publishedHome,
+      siteDomains,
     };
   },
 
@@ -263,7 +272,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
+  const { omxdsVisualFoundationsEnabled, brandSettings, siteDomains } = Route.useLoaderData();
+  // Mantiene el origen canónico sincronizado también tras hidratar.
+  setCanonicalDomain(siteDomains.primaryDomain);
   return (
     <html
       lang="es"

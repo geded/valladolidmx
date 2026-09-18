@@ -54,9 +54,12 @@ function formatTime(iso?: string | null): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit", timeZone: EVENT_TIME_ZONE }).format(date);
+  return new Intl.DateTimeFormat("es-MX", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: EVENT_TIME_ZONE,
+  }).format(date);
 }
-
 
 function eventCardToVM(card: PublicEventCard): TourismCardVM {
   const startDay = formatDay(card.starts_at);
@@ -192,8 +195,7 @@ export function EventPremiumSurface({
       }
     : null;
 
-  const hasLocation =
-    typeof event.latitude === "number" && typeof event.longitude === "number";
+  const hasLocation = typeof event.latitude === "number" && typeof event.longitude === "number";
 
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" as const },
@@ -214,11 +216,14 @@ export function EventPremiumSurface({
           eyebrow: eventType ? humanizeAttributeValue(eventType) : "Evento",
           title: event.title,
           description: event.summary ?? undefined,
-          media: event.cover_url
-            ? { url: event.cover_url, alt: event.title }
-            : null,
+          media: event.cover_url ? { url: event.cover_url, alt: event.title } : null,
           badges: event.destination_name
-            ? [{ label: `${event.destination_name} · Oriente Maya`, tone: "neutral" as const }]
+            ? [
+                {
+                  label: `${event.destination_name} · Oriente Maya de Yucatán`,
+                  tone: "neutral" as const,
+                },
+              ]
             : [],
         }}
       />
@@ -240,7 +245,7 @@ export function EventPremiumSurface({
           onOpenChange={setShareOpen}
           title={event.title}
           url={typeof window !== "undefined" ? window.location.href : ""}
-          text="Descubre este evento en el Oriente Maya."
+          text="Descubre este evento en el Oriente Maya de Yucatán."
           heading="Compartir evento"
         />
         {!readOnlyPreview ? (
@@ -270,7 +275,7 @@ export function EventPremiumSurface({
         className="mx-auto mt-4 w-full max-w-7xl"
         title={fillEventCopy(copy.aluxTitle, event.title)}
         description={copy.aluxDescription}
-        task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya.`}
+        task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya de Yucatán.`}
         selection={{
           entityRef: `event:${event.id}`,
           title: event.title,
@@ -308,7 +313,11 @@ export function EventPremiumSurface({
 
       {/* ---- Eventos cercanos ---- */}
       {related.length > 0 ? (
-        <section id="descubre" data-eb-anchor className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24">
+        <section
+          id="descubre"
+          data-eb-anchor
+          className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24"
+        >
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             {fillEventCopy(copy.relatedHeading, event.title)}
           </h2>

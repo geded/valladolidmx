@@ -684,7 +684,7 @@ export function ExperiencePremiumSurface({
         onOpenChange={setShareOpen}
         title={vm.name}
         url={typeof window !== "undefined" ? window.location.href : `/producto/${vm.slug}`}
-        text="Descubre esta experiencia en el Oriente Maya."
+        text="Descubre esta experiencia en el Oriente Maya de Yucatán."
         heading="Compartir experiencia"
       />
     </div>

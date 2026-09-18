@@ -8,19 +8,51 @@
  * Experience Builder, emails transaccionales, media, sitemap, etc.)
  * DEBE derivar su origen de `SITE.url` o del helper `absoluteUrl()`.
  *
- * Migración futura a `https://valladolid.mx`: cambiar únicamente
- * `PUBLIC_DOMAIN` y `PUBLIC_URL` a continuación. Ninguna otra edición
- * es necesaria en el código de aplicación (los ficheros estáticos
- * `robots.txt`, `sitemap.xml`, `llms.txt` y la allow-list HMAC se
- * migran en PRs posteriores).
+ * Administrable (Configuración → Dominios): el dominio canónico ya no
+ * está fijo en código. `DEFAULT_PUBLIC_DOMAIN` es únicamente el valor
+ * predeterminado y el fallback seguro; la autoridad vigente es el ajuste
+ * `site.primary_domain` en `platform_settings`, aplicado en tiempo de
+ * ejecución con `setCanonicalDomain()`. Los ficheros estáticos
+ * (`robots.txt`, `sitemap.xml`, `llms.txt`) derivan del mismo helper.
  */
 
 import { ACTIVE_BRAND } from "@/config/brand";
 
-/** Dominio público canónico (host, sin protocolo). */
-const PUBLIC_DOMAIN = "quehacerenvalladolid.com";
-/** URL pública canónica (con protocolo, sin trailing slash). */
-const PUBLIC_URL = `https://${PUBLIC_DOMAIN}` as const;
+/** Dominio público canónico predeterminado (host, sin protocolo). */
+export const DEFAULT_PUBLIC_DOMAIN = "quehacerenvalladolid.com";
+
+const DOMAIN_RE = /^(?!-)[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+
+/** Normaliza un host administrado. Devuelve null si no es válido. */
+export function normalizeDomain(input: unknown): string | null {
+  if (typeof input !== "string") return null;
+  const host = input
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "")
+    .replace(/\.$/, "");
+  if (!host || host.length > 253) return null;
+  return DOMAIN_RE.test(host) ? host : null;
+}
+
+let runtimeDomain: string | null = null;
+
+/** Aplica el dominio canónico administrado. Ignora valores inválidos. */
+export function setCanonicalDomain(domain: unknown): void {
+  const normalized = normalizeDomain(domain);
+  if (normalized) runtimeDomain = normalized;
+}
+
+/** Dominio canónico vigente (administrado o predeterminado). */
+export function getCanonicalDomain(): string {
+  return runtimeDomain ?? DEFAULT_PUBLIC_DOMAIN;
+}
+
+/** Origen canónico vigente (con protocolo, sin trailing slash). */
+export function getCanonicalOrigin(): string {
+  return `https://${getCanonicalDomain()}`;
+}
 
 /**
  * Absolutiza un path público contra el dominio canónico.
@@ -31,18 +63,34 @@ const PUBLIC_URL = `https://${PUBLIC_DOMAIN}` as const;
 export function absoluteUrl(path: string = "/"): string {
   if (/^https?:\/\//i.test(path)) return path;
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `${PUBLIC_URL}${normalized}`;
+  return `${getCanonicalOrigin()}${normalized}`;
 }
 
-export const SITE = {
+export interface SiteConfig {
+  readonly name: string;
+  readonly tagline: string;
+  readonly domain: string;
+  readonly url: string;
+  readonly default_description: string;
+  readonly theme_color: string;
+  readonly og_image: string;
+}
+
+export const SITE: SiteConfig = {
   name: ACTIVE_BRAND.name,
   tagline: ACTIVE_BRAND.tagline,
-  domain: PUBLIC_DOMAIN,
-  url: PUBLIC_URL,
+  get domain() {
+    return getCanonicalDomain();
+  },
+  get url() {
+    return getCanonicalOrigin();
+  },
   default_description:
     "Despierta en Valladolid y descubre el Oriente Maya: cenotes, cultura, gastronomía y experiencias auténticas de Yucatán.",
   theme_color: "#EAA840",
   // SEO.A1.2 · D1 — Imagen social oficial estable (1200×630).
-  // Derivada de `SITE.url` para preservar la fuente única de verdad.
-  og_image: absoluteUrl("/og/default-1200x630.jpg"),
-} as const;
+  // Derivada del origen canónico vigente para preservar la fuente única.
+  get og_image() {
+    return absoluteUrl("/og/default-1200x630.jpg");
+  },
+};

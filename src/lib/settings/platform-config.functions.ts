@@ -12,12 +12,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { normalizeDomain } from "@/config/site";
+import { normalizeDomainList } from "@/lib/settings/site-domains.functions";
 
 export type SettingKind = "boolean" | "number" | "text";
 
 export interface SettingDefinition {
   key: string;
-  group: "pagos" | "reservas" | "avisos";
+  group: "dominios" | "pagos" | "reservas" | "avisos";
   label: string;
   help: string;
   kind: SettingKind;
@@ -31,6 +33,7 @@ export interface SettingDefinition {
 }
 
 export const SETTING_GROUP_LABEL: Record<SettingDefinition["group"], string> = {
+  dominios: "Dominios del sitio",
   pagos: "Formas de pago y pasarela",
   reservas: "Reservas y apartados",
   avisos: "Avisos y notificaciones",
@@ -41,6 +44,24 @@ export const SETTING_GROUP_LABEL: Record<SettingDefinition["group"], string> = {
  * entrada aquí; la pantalla se arma sola.
  */
 export const PLATFORM_SETTINGS: SettingDefinition[] = [
+  {
+    key: "site.primary_domain",
+    group: "dominios",
+    label: "Dominio principal del sitio",
+    help: "Dirección oficial que se usa en buscadores, enlaces compartidos y correos. Cámbialo sólo cuando el dominio ya esté conectado y funcionando.",
+    kind: "text",
+    defaultValue: "quehacerenvalladolid.com",
+    isPublic: true,
+  },
+  {
+    key: "site.alternate_domains",
+    group: "dominios",
+    label: "Otros dominios conectados",
+    help: "Direcciones adicionales que también llevan al sitio, separadas por coma. Ejemplo: orientemaya.com, valladolid.mx",
+    kind: "text",
+    defaultValue: "",
+    isPublic: true,
+  },
   {
     key: "payments.cash_enabled",
     group: "pagos",
@@ -267,7 +288,18 @@ export const setPlatformConfigValue = createServerFn({ method: "POST" })
       if (def.max != null && n > def.max) throw new Error("value_above_max");
       value = Math.round(n);
     } else {
-      value = String(data.value);
+      const text = String(data.value);
+      if (def.key === "site.primary_domain") {
+        const host = normalizeDomain(text);
+        if (!host) throw new Error("invalid_domain");
+        value = host;
+      } else if (def.key === "site.alternate_domains") {
+        const list = normalizeDomainList(text);
+        if (text.trim().length > 0 && list.length === 0) throw new Error("invalid_domain");
+        value = list.join(", ");
+      } else {
+        value = text;
+      }
     }
 
     const { error } = await client(context)
