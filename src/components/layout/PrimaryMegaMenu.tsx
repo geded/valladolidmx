@@ -263,12 +263,7 @@ export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
       />
     );
   }
-  return (
-    <MobileMenu
-      activeDestination={activeDestination}
-      onNavigate={props.onNavigate}
-    />
-  );
+  return <MobileMenu activeDestination={activeDestination} onNavigate={props.onNavigate} />;
 }
 
 /* ─────────────────────────── Desktop ─────────────────────────── */
@@ -420,7 +415,12 @@ interface MobileItem extends MenuLink {
 const MOBILE_PRIMARY: MobileItem[] = [
   { label: "Hoteles", href: "/hoteles", hint: "Dónde dormir", icon: BedDouble },
   { label: "Restaurantes", href: "/restaurantes", hint: "Dónde comer", icon: UtensilsCrossed },
-  { label: "Casas de vacaciones", href: "/casas-de-vacaciones", hint: "Estancias completas", icon: Home },
+  {
+    label: "Casas de vacaciones",
+    href: "/casas-de-vacaciones",
+    hint: "Estancias completas",
+    icon: Home,
+  },
   { label: "Experiencias", href: "/experiencias", hint: "Tours y actividades", icon: Sparkles },
   { label: "¿Qué hacer?", href: "/que-hacer", hint: "Lugares y sitios de interés", icon: MapPin },
   { label: "Eventos", href: "/eventos", hint: "Agenda del destino", icon: CalendarDays },
@@ -462,9 +462,7 @@ function MobileMenu({
       </a>
 
       <div>
-        <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">
-          Descubre
-        </p>
+        <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">Descubre</p>
         <ul className="flex flex-col">
           {MOBILE_PRIMARY.map((link) => {
             const Icon = link.icon;
