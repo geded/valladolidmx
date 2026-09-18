@@ -12,9 +12,9 @@ La selección combinará tres carriles claramente separados:
 
 ## Autoridad revisada
 
-- La estrategia 14.40.B define separación entre catálogo editorial y monetización, etiquetado obligatorio, auditoría y máximo orientativo de 25 % de espacios patrocinados.
+- La estrategia 14.40.B propone separación entre catálogo editorial y monetización, etiquetado obligatorio, auditoría y máximo orientativo de 25 % de espacios patrocinados. El índice maestro la clasifica como `Draft`; por tanto sirve como base para esta aprobación, no como autorización previa de implementación.
 - Los paquetes, solicitudes, activación y vigencia ya existen en Portal Empresa y Administración mediante `visibility_plans` y `business_visibility_grants`.
-- El ranking público actual ya consume `business_effective_visibility` y `active_founder_spotlights` para empresas.
+- El ranking público actual ya consume `business_effective_visibility` y `active_founder_spotlights` para empresas, pero hoy suma sus impulsos y ordena por ellos antes del criterio orgánico. Esa conducta no se extenderá a `/que-hacer` sin acotarla mediante espacios explícitos.
 - `Founder Spotlight` es una sobreexposición administrativa temporal y distinta de un paquete contratado.
 - La propuesta 14.40.B no autoriza por sí sola nuevas tablas o un motor nuevo; este plan reutiliza exclusivamente la infraestructura vigente y requiere autorización específica antes de implementar el enlace con `/que-hacer`.
 
@@ -27,7 +27,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 - **Experiencias:** deben tener ficha completa; la visibilidad contratada no activa venta, precio, cupo ni reservación.
 - **Lugares de interés:** `/lugares` conserva la autoridad de entidad; sólo se presentan accesos a sus fichas existentes.
 - **Contenido contratado:** requiere grant activo de la empresa y aprobación editorial del elemento mostrado.
-- **Founder Spotlight:** puede ocupar un espacio editorial temporal con motivo y vigencia auditables; no se confunde con contratación.
+- **Founder Spotlight:** puede ocupar un espacio destacado temporal, separado del editorial y del contratado, con motivo y vigencia auditables.
 
 ## Reglas de orden y rotación
 
@@ -58,15 +58,15 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 ### Administración · Visibilidad
 
 - Conserva el catálogo de paquetes, solicitudes, vigencia y cancelación actuales.
-- Añade `/que-hacer` como superficie disponible sólo mediante palanca configurable del paquete vigente.
-- Muestra inventario ocupado, vigencia, empresa, contenido, etiqueta e impresiones/clics por espacio.
+- Añade `/que-hacer` como superficie disponible sólo mediante una palanca configurable del paquete vigente.
+- Muestra cupo disponible, vigencia, empresa, etiqueta e impresiones/clics agregados de la superficie.
 - `Founder Spotlight` permanece separado, temporal y auditado.
 
 ### Portal Empresa
 
 - La empresa solicita o consulta su paquete como hoy.
-- Si su paquete lo permite, propone cuál de sus contenidos publicados desea destacar.
-- La solicitud no publica ni posiciona automáticamente: pasa por aprobación editorial fail-closed.
+- El grant vigente hace elegibles sus fichas publicadas y completas; no permite elegir ni autoimpulsar contenido incompleto.
+- La contratación no publica ni posiciona automáticamente: la elegibilidad final pasa por las reglas editoriales fail-closed.
 - El Portal explica alcance, vigencia y resultados sin prometer una posición fija permanente.
 
 ## Preservation Gate
@@ -82,8 +82,8 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 
 1. **Contrato y maqueta:** definir composición, proporción 3 orgánicos + 1 contratado y estados visuales; aprobación Founder antes de código público.
 2. **Curaduría editorial:** conectar selección, orden, límites y rotación diaria usando el contrato oficial de colecciones.
-3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; aplicar elegibilidad editorial y etiqueta visible.
-4. **Flujo empresa–administración:** permitir propuesta de contenido, revisión, activación, vencimiento y cancelación sin auto-publicación.
+3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; asignar únicamente los espacios comerciales declarados, con elegibilidad editorial y etiqueta visible.
+4. **Flujo empresa–administración:** reutilizar solicitud, revisión, activación, vencimiento y cancelación del paquete; la curaduría del contenido permanece en el Experience Builder.
 5. **Medición:** registrar impresión, clic y entrada a ficha diferenciando editorial, orgánico, contratado y Spotlight.
 
 ## Validación
