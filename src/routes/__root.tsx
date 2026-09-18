@@ -275,7 +275,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
+  const { omxdsVisualFoundationsEnabled, brandSettings, siteDomains } = Route.useLoaderData();
+  // Mantiene el origen canónico sincronizado también tras hidratar.
+  setCanonicalDomain(siteDomains.primaryDomain);
   return (
     <html
       lang="es"
