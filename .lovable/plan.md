@@ -3,7 +3,7 @@
 ## Qué está pasando hoy
 
 1. **No puedes recorrer la página en el iPad.** El lienzo del constructor se dibuja dentro de un marco aislado; en Safari el gesto de deslizar se queda atrapado en ese marco y la página no avanza, por eso sólo ves la portada y lo que está debajo del hero queda inalcanzable.
-2. **Las 12 secciones de Inicio sí existen, pero sólo dentro del panel “Estructura”.** Ahí puedes seleccionarlas, ocultarlas y arrastrarlas. Sobre el lienzo, en cambio, Inicio sigue tratándose como una sola pieza: por eso al intentar arrastrar directamente sobre la página no ocurre nada y el encabezado dice “sección 1 de 1”.
+2. **Las 12 secciones de Inicio sí existen, pero la conexión quedó incompleta.** El registro y el panel “Estructura” las reconocen; el lienzo sigue envolviendo toda la plantilla como un solo bloque. Por eso el resultado no cumple lo acordado: no puedes trabajar visualmente sección por sección ni arrastrarlas donde realmente se necesitaba.
 3. **Alux no se puede mover.** En Inicio, portada, categorías, Alux y Mi Viaje quedaron fijas; sólo destinos, rutas, pueblos mágicos, experiencias, hospedaje, eventos, qué hacer y mapa admiten reordenamiento.
 
 
@@ -14,6 +14,9 @@ Hacer que el deslizamiento, la rueda del ratón y el trackpad muevan el lienzo d
 
 ### 2. Arrastrar y soltar sobre el propio lienzo
 Cada sección de la plantilla mostrará, al seleccionarla, su nombre, su número y un tirador para arrastrarla, más los botones Subir/Bajar para uso táctil. Funcionará igual en Inicio, Destino, Lugar y los listados, usando el mismo registro de secciones que ya existe (sin plantillas paralelas ni componentes nuevos).
+
+### 2.1 Editar y mover los elementos dentro de cada sección
+Al abrir una sección, sus textos, imágenes, botones, enlaces y elementos autorizados aparecerán como piezas de esa sección, no como un formulario único de toda la plantilla. Los elementos declarados como movibles podrán arrastrarse dentro de la sección; los componentes protegidos conservarán sus límites para no romper la plantilla Premium.
 
 ### 3. Liberar Alux y las secciones que hoy están fijas en Inicio
 Alux pasa a ser una sección movible dentro del orden de Inicio, conservando su diseño, su contenido y su comportamiento actual. La portada sigue siendo la primera sección y Mi Viaje el cierre, salvo que autorices lo contrario.
