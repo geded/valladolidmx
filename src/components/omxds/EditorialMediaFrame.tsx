@@ -53,10 +53,7 @@ export function EditorialMediaFrame({
     const isAbsolute = className?.includes("absolute") ?? false;
     return (
       <picture
-        className={cn(
-          "block min-w-0 max-w-full overflow-hidden",
-          isAbsolute && "absolute inset-0",
-        )}
+        className={cn("block min-w-0 max-w-full overflow-hidden", isAbsolute && "absolute inset-0")}
       >
         {resolved.sources.map((source) => (
           <source
