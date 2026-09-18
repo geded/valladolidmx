@@ -12,6 +12,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { normalizeDomain } from "@/config/site";
+import { normalizeDomainList } from "@/lib/settings/site-domains.functions";
 
 export type SettingKind = "boolean" | "number" | "text";
 
