@@ -52,7 +52,9 @@ function RendimientoPage() {
     data = [],
     isLoading,
     isError,
+    error,
   } = useQuery<AdminVisibilityPerformanceRow[]>({
+    retry: false,
     queryKey: ["cms", "visibility-performance", windowDays],
     queryFn: () => call({ data: { windowDays } }),
   });
