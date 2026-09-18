@@ -139,6 +139,7 @@ export function businessToTourismCard(
       : [];
   return {
     id: b.id,
+    operatorId: b.id,
     entityKind: categoryToEntityKind(categorySlug),
     eyebrow: categoryToEyebrowLabel(categorySlug),
     name: b.display_name,
