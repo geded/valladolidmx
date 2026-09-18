@@ -212,3 +212,4 @@
 - [ ] Prioridad tipo buscador: la ficha con contrato vigente y elegible ocupa la primera posición de cada bloque de 4; sin contratado elegible, la toma un orgánico.
 - [ ] Cupo 1 de cada 4, máximo 2 apariciones por empresa (1 por carril), aplicable también a Hoteles, Restaurantes, Casas de vacaciones, Eventos, Lugares y listados territoriales.
 - [ ] Etiqueta discreta "Recomendado" fuera de la fotografía para contenido contratado; carril editorial mantiene "Recomendados por Valladolid.mx".
+- [ ] Reparto justo con muchos contratos: turnos por nivel de paquete, rotación determinista diaria, deuda de exposición, techo por empresa y cupo por superficie; sin posición fija garantizada.
