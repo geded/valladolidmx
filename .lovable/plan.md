@@ -97,6 +97,18 @@ Sí: las mismas reglas rigen Home y todos los listados, porque hoy el impulso co
 - Muestra cupo disponible, vigencia, empresa, modalidad de promoción e impresiones/clics agregados de la superficie.
 - `Founder Spotlight` permanece separado, temporal y auditado.
 
+### Administración · Destacados programados (fijados con fecha)
+
+Además de la rotación por paquetes, el administrador puede **fijar** un contenido en una superficie durante un periodo concreto: lanzamiento, promoción, evento de temporada o el mes que le toca a una empresa.
+
+- Se administra en **Administración → Visibilidad → Destacados**, ampliando el mecanismo existente de `founder_spotlights` (empresa, motivo, impulso, `starts_at`, `ends_at`, activo) para admitir también producto, experiencia, evento y promoción.
+- Cada fijado declara: contenido, superficie (Home, `/que-hacer`, un listado o un destino), posición del carril, fecha de inicio y fin, motivo interno y si es cortesía editorial o parte de un paquete contratado.
+- Al vencer la fecha, el fijado se retira solo y el espacio vuelve a la rotación; nadie queda fijado indefinidamente.
+- El fijado respeta las mismas reglas de honestidad: contenido publicado, completo, vigente y territorialmente coherente; si deja de cumplirlas se oculta aunque la fecha siga vigente.
+- El fijado de cortesía editorial no lleva `Recomendado`; el fijado que forma parte de un paquete contratado sí lo lleva y cuenta dentro del cupo de 1 de cada 4.
+- El panel muestra el calendario de fijados por superficie para evitar choques y sobreexposición de una misma empresa.
+- Home se alimenta así de tres fuentes: fijados vigentes, turnos de paquetes contratados y contenido orgánico; sin fijados ni contratos, Home se ve completa sólo con orgánico.
+
 ### Portal Empresa
 
 - La empresa solicita o consulta su paquete como hoy.
