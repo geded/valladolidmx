@@ -245,6 +245,7 @@ export function buildExperienceVMFromProduct(
     eyebrow: typeLabel,
     tagline: product.tagline || null,
     description: product.description || "",
+    operatorId: product.business.id ?? null,
     operatorName: product.business.display_name,
     operatorHref,
     operatorLogoUrl: product.business.logo_url ?? null,
