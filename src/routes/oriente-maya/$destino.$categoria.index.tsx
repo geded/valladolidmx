@@ -238,7 +238,7 @@ function CategoriaEnDestinoPage() {
                   heading: "Sigue descubriendo",
                   subheading: `Más ideas para tu viaje por ${destLabel} y el Oriente Maya.`,
                   capabilities: {
-                    showRationale: true,
+                    showRationale: false,
                     showKindBadge: false,
                   },
                   groups: [
