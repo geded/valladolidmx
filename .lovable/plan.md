@@ -27,7 +27,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 - **Experiencias:** deben tener ficha completa; la visibilidad contratada no activa venta, precio, cupo ni reservación.
 - **Lugares de interés:** `/lugares` conserva la autoridad de entidad; sólo se presentan accesos a sus fichas existentes.
 - **Contenido contratado:** requiere grant activo de la empresa y aprobación editorial del elemento mostrado.
-- **Founder Spotlight:** puede ocupar un espacio destacado temporal, separado del editorial y del contratado, con motivo y vigencia auditables.
+- **Founder Spotlight:** puede ocupar un espacio destacado temporal, separado del editorial y del contratado, con motivo y vigencia auditables. Se administra en **Administración → Visibilidad → Destacados** (`/cms/visibilidad/spotlight`).
 
 ## Reglas de orden y rotación
 
@@ -95,13 +95,13 @@ Sí: las mismas reglas rigen Home y todos los listados, porque hoy el impulso co
 - Conserva el catálogo de paquetes, solicitudes, vigencia y cancelación actuales.
 - Añade `/que-hacer` como superficie disponible sólo mediante una palanca configurable del paquete vigente.
 - Muestra cupo disponible, vigencia, empresa, modalidad de promoción e impresiones/clics agregados de la superficie.
-- `Founder Spotlight` permanece separado, temporal y auditado.
+- `Founder Spotlight` permanece separado, temporal y auditado; se configura en **Administración → Visibilidad → Destacados** (`/cms/visibilidad/spotlight`), donde se elige la empresa, el motivo, el impulso y los días de vigencia.
 
 ### Administración · Destacados programados (fijados con fecha)
 
 Además de la rotación por paquetes, el administrador puede **fijar** un contenido en una superficie durante un periodo concreto: lanzamiento, promoción, evento de temporada o el mes que le toca a una empresa.
 
-- Se administra en **Administración → Visibilidad → Destacados**, ampliando el mecanismo existente de `founder_spotlights` (empresa, motivo, impulso, `starts_at`, `ends_at`, activo) para admitir también producto, experiencia, evento y promoción.
+- Se administra en la misma pantalla **Administración → Visibilidad → Destacados** (`/cms/visibilidad/spotlight`), ampliando el mecanismo existente de `founder_spotlights` (empresa, motivo, impulso, `starts_at`, `ends_at`, activo) para admitir también producto, experiencia, evento y promoción.
 - Cada fijado declara: contenido, superficie (Home, `/que-hacer`, un listado o un destino), posición del carril, fecha de inicio y fin, motivo interno y si es cortesía editorial o parte de un paquete contratado.
 - Al vencer la fecha, el fijado se retira solo y el espacio vuelve a la rotación; nadie queda fijado indefinidamente.
 - El fijado respeta las mismas reglas de honestidad: contenido publicado, completo, vigente y territorialmente coherente; si deja de cumplirlas se oculta aunque la fecha siga vigente.
