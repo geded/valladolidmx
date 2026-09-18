@@ -193,5 +193,5 @@
 - [x] Retirar de la ficha empresarial las tarjetas redundantes Destino/Categoría/Estado; conservar breadcrumb y contexto territorial canónico.
 - [x] Unificar tarjetas de experiencias/servicios como acceso de descubrimiento: corazón sobre la foto y un único CTA “Ver experiencia”; reservar y agregar a Mi Viaje viven exclusivamente dentro de la ficha completa.
 - [x] Añadir en la ficha de experiencia un regreso visible al perfil territorial de la empresa para explorar sus demás experiencias.
-- [ ] Armonizar todos los listados territoriales de empresas —hoteles, cenotes, artesanías, transportes y futuras categorías— con la única plantilla Premium ya aprobada para empresas de hoteles; retirar el fallback visual antiguo sin cambiar perfiles, CMS ni datos.
-- [ ] Crear el listado regional de empresas por categoría en todo el Oriente Maya, con filtro por destino, y hacer que el listado de cada destino filtre por zonas del propio destino.
+- [x] Armonizar todos los listados territoriales de empresas —hoteles, cenotes, artesanías, transportes y futuras categorías— con la única plantilla Premium ya aprobada para empresas de hoteles; retirar el fallback visual antiguo sin cambiar perfiles, CMS ni datos.
+- [x] Crear el listado regional de empresas por categoría en todo el Oriente Maya, con filtro por destino, y hacer que el listado de cada destino filtre por zonas del propio destino.
