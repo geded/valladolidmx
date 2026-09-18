@@ -814,7 +814,6 @@ function DestinationsSection({
           ))}
         </div>
       </div>
-
     </section>
   );
 }
