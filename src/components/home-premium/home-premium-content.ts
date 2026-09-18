@@ -100,6 +100,8 @@ export type HomePremiumDestination = {
 };
 
 export type HomePremiumExperience = {
+  /** Empresa operadora acreditada (medición de visibilidad). */
+  businessId?: string | null;
   title: string;
   category: string;
   summary: string;
@@ -108,6 +110,8 @@ export type HomePremiumExperience = {
 };
 
 export type HomePremiumService = {
+  /** Empresa operadora acreditada (medición de visibilidad). */
+  businessId?: string | null;
   title: string;
   destination: string;
   category: string;
@@ -396,8 +400,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   mapa: {
     kicker: "Del relato al territorio",
     title: "Mira en el mapa la ruta seleccionada",
-    description:
-      "Visualiza en el territorio tu próximo recorrido por el Oriente Maya de Yucatán.",
+    description: "Visualiza en el territorio tu próximo recorrido por el Oriente Maya de Yucatán.",
     dto: MAP_DTO,
   },
   travelPlan: {

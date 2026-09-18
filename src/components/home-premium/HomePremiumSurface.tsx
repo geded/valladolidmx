@@ -31,6 +31,10 @@ import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { useHeroAutoplay } from "@/components/premium/use-hero-autoplay";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -328,7 +332,9 @@ export function HomePremiumSurface({
 
         {enabled("experiencias") ? (
           <Container className="mt-8 lg:mt-12" data-home-journey="experiencias">
-            <div data-cinematic-section={cinematic || undefined}>{renderSection("experiencias")}</div>
+            <div data-cinematic-section={cinematic || undefined}>
+              {renderSection("experiencias")}
+            </div>
           </Container>
         ) : null}
 
@@ -402,7 +408,6 @@ function HeroSearch() {
     />
   );
 }
-
 
 function HeroEditorial({ content }: { content: HomePremiumContent }) {
   const [index, setIndex] = useState(0);
@@ -660,9 +665,7 @@ function RoutesSection({
                   {route.duration} · {route.stops} paradas · {route.vibe}
                 </p>
                 {route.description ? (
-                  <p className="text-xs leading-snug text-muted-foreground">
-                    {route.description}
-                  </p>
+                  <p className="text-xs leading-snug text-muted-foreground">{route.description}</p>
                 ) : null}
 
                 <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
@@ -687,7 +690,6 @@ function RoutesSection({
                       </Link>
                     </Button>
                   ) : null}
-
                 </div>
               </div>
             </article>
@@ -867,6 +869,16 @@ function ExperiencesSection({
   if (!featured) return null;
   return (
     <section id="experiencias" aria-labelledby="experiences-title">
+      {items.map((item) => (
+        <BusinessImpressionTracker
+          key={`impression-${item.title}`}
+          businessId={item.businessId ?? null}
+          surface="home"
+          rail="experiencias"
+          entityKind="experience"
+          entityId={item.businessId ?? null}
+        />
+      ))}
       <SectionHead
         kicker={content.experiencias.kicker}
         title={content.experiencias.title}
@@ -881,23 +893,34 @@ function ExperiencesSection({
       >
         {items.map((item) =>
           item.href ? (
-            <Link
+            <TrackClick
               key={item.title}
-              to={item.href}
-              className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
+              businessId={item.businessId ?? null}
+              surface="home"
+              rail="experiencias"
+              eventType="click_card"
+              entityKind="experience"
+              entityId={item.businessId ?? null}
             >
-              <EditorialMediaFrame
-                media={item.media}
-                label={item.title}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 z-10 p-4">
-                <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
-                <h3 className="mt-1 font-display text-2xl">{item.title}</h3>
-                <p className="mt-1 line-clamp-1 text-xs text-white/75">{item.summary}</p>
-              </div>
-            </Link>
+              <Link
+                to={item.href}
+                className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
+              >
+                <EditorialMediaFrame
+                  media={item.media}
+                  label={item.title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+                  <p className="text-[10px] font-semibold uppercase text-primary">
+                    {item.category}
+                  </p>
+                  <h3 className="mt-1 font-display text-2xl">{item.title}</h3>
+                  <p className="mt-1 line-clamp-1 text-xs text-white/75">{item.summary}</p>
+                </div>
+              </Link>
+            </TrackClick>
           ) : null,
         )}
       </div>
@@ -946,17 +969,26 @@ function ExperiencesSection({
               {featured.summary}
             </p>
             {featured.href ? (
-              <Button
-                asChild
-                variant="outline"
-                className={cn(
-                  "mt-4 min-h-11 rounded-pill",
-                  cinematic &&
-                    "border-white/45 bg-black/25 text-white hover:bg-card hover:text-[var(--brand-territory-deep)]",
-                )}
+              <TrackClick
+                businessId={featured.businessId ?? null}
+                surface="home"
+                rail="experiencias"
+                eventType="click_card"
+                entityKind="experience"
+                entityId={featured.businessId ?? null}
               >
-                <Link to={featured.href}>Explorar experiencia</Link>
-              </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className={cn(
+                    "mt-4 min-h-11 rounded-pill",
+                    cinematic &&
+                      "border-white/45 bg-black/25 text-white hover:bg-card hover:text-[var(--brand-territory-deep)]",
+                  )}
+                >
+                  <Link to={featured.href}>Explorar experiencia</Link>
+                </Button>
+              </TrackClick>
             ) : null}
           </div>
         </article>
@@ -974,6 +1006,7 @@ function CompactMediaRow({
   item,
 }: {
   item: {
+    businessId?: string | null;
     title: string;
     category: string;
     summary: string;
@@ -983,26 +1016,42 @@ function CompactMediaRow({
 }) {
   if (!item.href) return null;
   return (
-    <Link
-      to={item.href}
-      className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
+    <TrackClick
+      businessId={item.businessId ?? null}
+      surface="home"
+      rail="experiencias"
+      eventType="click_card"
+      entityKind="experience"
+      entityId={item.businessId ?? null}
     >
-      <EditorialMediaFrame
-        media={item.media}
-        label={item.title}
-        className="h-full w-full object-cover"
+      <BusinessImpressionTracker
+        businessId={item.businessId ?? null}
+        surface="home"
+        rail="experiencias"
+        entityKind="experience"
+        entityId={item.businessId ?? null}
       />
-      <div className="flex min-w-0 flex-col justify-center p-4">
-        <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
-        <h3 className="mt-1 font-display text-xl">{item.title}</h3>
-        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-          {item.summary}
-        </p>
-        <span className="mt-2 inline-flex items-center text-xs font-semibold">
-          Ver detalle <ChevronRight className="size-3" aria-hidden />
-        </span>
-      </div>
-    </Link>
+      <Link
+        to={item.href}
+        className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
+      >
+        <EditorialMediaFrame
+          media={item.media}
+          label={item.title}
+          className="h-full w-full object-cover"
+        />
+        <div className="flex min-w-0 flex-col justify-center p-4">
+          <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
+          <h3 className="mt-1 font-display text-xl">{item.title}</h3>
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+            {item.summary}
+          </p>
+          <span className="mt-2 inline-flex items-center text-xs font-semibold">
+            Ver detalle <ChevronRight className="size-3" aria-hidden />
+          </span>
+        </div>
+      </Link>
+    </TrackClick>
   );
 }
 
@@ -1051,6 +1100,13 @@ function ServiceColumn({
             key={item.title}
             className="grid grid-cols-[6rem_1fr] overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-[11rem_1fr]"
           >
+            <BusinessImpressionTracker
+              businessId={item.businessId ?? null}
+              surface="home"
+              rail="servicios"
+              entityKind="business"
+              entityId={item.businessId ?? null}
+            />
             <EditorialMediaFrame
               media={item.media}
               label={item.title}
@@ -1065,11 +1121,20 @@ function ServiceColumn({
                 {item.summary}
               </p>
               {item.href ? (
-                <Button asChild variant="link" className="mt-2 h-auto min-h-11 p-0">
-                  <Link to={item.href}>
-                    Ver ficha <ArrowRight className="ml-1 size-3" aria-hidden />
-                  </Link>
-                </Button>
+                <TrackClick
+                  businessId={item.businessId ?? null}
+                  surface="home"
+                  rail="servicios"
+                  eventType="click_card"
+                  entityKind="business"
+                  entityId={item.businessId ?? null}
+                >
+                  <Button asChild variant="link" className="mt-2 h-auto min-h-11 p-0">
+                    <Link to={item.href}>
+                      Ver ficha <ArrowRight className="ml-1 size-3" aria-hidden />
+                    </Link>
+                  </Button>
+                </TrackClick>
               ) : null}
             </div>
           </article>
@@ -1184,9 +1249,9 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             <Button
               type="button"
               variant={mode === "today" ? "default" : "outline"}
-                  className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
-                  onClick={() => {
-                    setMode("today");
+              className="h-10 w-full justify-center rounded-pill px-2 text-xs font-semibold sm:px-5 lg:w-auto"
+              onClick={() => {
+                setMode("today");
                 setPage(0);
               }}
             >
@@ -1275,9 +1340,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 )}
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">
-                    {[labelDateFor(event) ?? event.day, event.type]
-                      .filter(Boolean)
-                      .join(" · ")}
+                    {[labelDateFor(event) ?? event.day, event.type].filter(Boolean).join(" · ")}
                   </p>
                   <h3 className="mt-0.5 truncate text-[15px] font-semibold leading-snug">
                     {event.title}

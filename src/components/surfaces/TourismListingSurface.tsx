@@ -43,6 +43,10 @@ import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/exp
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 
 /* ------------------------------------------------------------------ *
  * Hero — spec ligera; la superficie construye el DTO oficial.
@@ -96,6 +100,14 @@ export interface TourismListingSurfaceProps {
   capabilities?: Partial<TourismCardCapabilities>;
   /** Slot reservado para V4 · Maps Everywhere. */
   mapSlot?: React.ReactNode;
+  /**
+   * Medición de visibilidad (aditiva, invisible). Cuando se declara la
+   * superficie, cada tarjeta con empresa operadora acreditada registra
+   * su exposición y su clic en `business_view_events`. Sin superficie
+   * declarada no se registra nada (constructor, preview, demos).
+   */
+  trackingSurface?: string | null;
+  trackingRail?: string | null;
   /** Entidad favoritable por card (fallback: se deduce por entityKind). */
   favoriteKindFor?: (vm: TourismCardVM) => "business" | "product" | "promotion" | null;
   /**
@@ -130,6 +142,8 @@ export function TourismListingSurface({
   emptyHint,
   capabilities,
   mapSlot,
+  trackingSurface = null,
+  trackingRail = null,
   favoriteKindFor,
   showAddToTrip = true,
   presentation,
@@ -403,9 +417,17 @@ export function TourismListingSurface({
           )}
         >
           <ul role="list" className={cn("grid gap-5", colClass)}>
-            {displayItems.map((vm) => (
-              <li key={vm.id}>
-                {columns === 1 ? (
+            {displayItems.map((vm) => {
+              const operatorId = trackingSurface ? (vm.operatorId ?? null) : null;
+              const trackingProps = {
+                businessId: operatorId,
+                surface: trackingSurface,
+                rail: trackingRail,
+                entityKind: vm.entityKind,
+                entityId: vm.id,
+              };
+              const card =
+                columns === 1 ? (
                   <TourismCardRow
                     vm={vm}
                     capabilities={capabilities}
@@ -417,9 +439,22 @@ export function TourismListingSurface({
                     capabilities={capabilities}
                     renderActions={(v) => renderCardActions(v, favoriteKindFor, showAddToTrip)}
                   />
-                )}
-              </li>
-            ))}
+                );
+              return (
+                <li key={vm.id}>
+                  {operatorId ? (
+                    <>
+                      <BusinessImpressionTracker {...trackingProps} />
+                      <TrackClick {...trackingProps} eventType="click_card">
+                        {card}
+                      </TrackClick>
+                    </>
+                  ) : (
+                    card
+                  )}
+                </li>
+              );
+            })}
           </ul>
           {mapSlot ? (
             <aside

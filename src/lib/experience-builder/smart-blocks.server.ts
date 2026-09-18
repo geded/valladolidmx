@@ -154,7 +154,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
   },
   products: {
     select:
-      "id, slug, name, tagline, cover_media_id, price_amount, price_currency, metadata, businesses:business_id ( slug, status, deleted_at, source_review_state, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
+      "id, slug, name, tagline, cover_media_id, price_amount, price_currency, metadata, businesses:business_id ( id, slug, status, deleted_at, source_review_state, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
     filterable: ["status", "deleted_at", "slug", "name"],
     defaultOrder: { column: "name", ascending: true },
     adapt: (row) => {
@@ -174,6 +174,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
       const priceRaw = row.price_amount;
       return {
         id: str(row.id),
+        business_id: str(biz.id),
         slug,
         name,
         short_description: str(row.tagline),
@@ -193,7 +194,8 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
     },
   },
   events: {
-    select: "id, slug, title, summary, cover_media_id, starts_at, ends_at, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
+    select:
+      "id, slug, title, summary, cover_media_id, starts_at, ends_at, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
     filterable: ["status", "deleted_at", "slug", "starts_at", "ends_at"],
     defaultOrder: { column: "starts_at", ascending: true },
     adapt: (row) => {
@@ -204,12 +206,17 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
         starts_at: str(row.starts_at) ?? "",
         ends_at: str(row.ends_at),
         recurrence_frequency:
-          row.recurrence_frequency === "daily" || row.recurrence_frequency === "weekly" ||
-          row.recurrence_frequency === "monthly" || row.recurrence_frequency === "yearly"
+          row.recurrence_frequency === "daily" ||
+          row.recurrence_frequency === "weekly" ||
+          row.recurrence_frequency === "monthly" ||
+          row.recurrence_frequency === "yearly"
             ? row.recurrence_frequency
             : null,
-        recurrence_interval: typeof row.recurrence_interval === "number" ? row.recurrence_interval : 1,
-        recurrence_weekdays: Array.isArray(row.recurrence_weekdays) ? row.recurrence_weekdays.filter((day): day is number => typeof day === "number") : [],
+        recurrence_interval:
+          typeof row.recurrence_interval === "number" ? row.recurrence_interval : 1,
+        recurrence_weekdays: Array.isArray(row.recurrence_weekdays)
+          ? row.recurrence_weekdays.filter((day): day is number => typeof day === "number")
+          : [],
         recurrence_until: str(row.recurrence_until),
         schedule_times: normalizeScheduleTimes(row.schedule_times),
         exception_dates: normalizeExceptionDates(row.exception_dates),
@@ -316,7 +323,6 @@ export async function resolveStableMediaAssets(
     ]);
     const assets = [...(listed.data ?? []), ...(governed.data ?? [])];
     if (assets.length === 0) return out;
-
 
     const ready = assets.filter((a) => a.pipeline_status === "ready");
     if (ready.length === 0) return out;
@@ -761,6 +767,8 @@ async function resolveRouteStopPoints(
  * ------------------------------------------------------------------ */
 
 export interface HomeRealCard {
+  /** Empresa operadora acreditada, cuando la fuente la declara. */
+  businessId: string | null;
   title: string;
   subtitle: string;
   category: string;
@@ -788,7 +796,13 @@ export interface HomeRealContent {
   experiencias: HomeRealCard[];
   stays: HomeRealCard[];
   food: HomeRealCard[];
-  eventos: Array<HomeRealCard & { day: string; startsAt: string | null; recurrence: EventRecurrencePayload | null }>;
+  eventos: Array<
+    HomeRealCard & {
+      day: string;
+      startsAt: string | null;
+      recurrence: EventRecurrencePayload | null;
+    }
+  >;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
   /**
@@ -818,6 +832,7 @@ const EMPTY_HOME: HomeRealContent = {
 function cardsFrom(
   result: SmartBlockResolveResult,
   category: (item: Record<string, SmartBlockJsonValue>) => string,
+  businessIdOf?: (item: Record<string, SmartBlockJsonValue>) => string | null,
 ): HomeRealCard[] {
   const out: HomeRealCard[] = [];
   for (const item of result.items) {
@@ -829,6 +844,7 @@ function cardsFrom(
       (typeof item.cover_image_url === "string" ? item.cover_image_url : null) ??
       "";
     out.push({
+      businessId: businessIdOf?.(item) ?? null,
       title,
       subtitle: typeof item.short_description === "string" ? item.short_description : "",
       category: category(item),
@@ -904,8 +920,10 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       ? [valladolidItem, ...destRes.items.filter((item) => item.slug !== "valladolid")].slice(0, 8)
       : destRes.items;
     const destinos = cardsFrom({ ...destRes, items: destinationItems }, () => "Destino");
-    const businesses = cardsFrom(bizRes, (item) =>
-      typeof item.category_slug === "string" ? item.category_slug : "",
+    const businesses = cardsFrom(
+      bizRes,
+      (item) => (typeof item.category_slug === "string" ? item.category_slug : ""),
+      (item) => (typeof item.id === "string" ? item.id : null),
     );
     const byCategory = (slug: string) => businesses.filter((b) => b.category === slug);
     const stays = byCategory("hoteles")
@@ -915,7 +933,11 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       .slice(0, 4)
       .map((b) => ({ ...b, category: "Gastronomía" }));
     const experiencias = [
-      ...cardsFrom(prodRes, () => "Experiencia"),
+      ...cardsFrom(
+        prodRes,
+        () => "Experiencia",
+        (item) => (typeof item.business_id === "string" ? item.business_id : null),
+      ),
       ...byCategory("experiencias").map((b) => ({ ...b, category: "Experiencias" })),
       ...byCategory("cenotes").map((b) => ({ ...b, category: "Cenotes" })),
     ].slice(0, 6);

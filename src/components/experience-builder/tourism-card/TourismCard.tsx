@@ -74,6 +74,12 @@ export interface TourismCardAction {
 
 export interface TourismCardVM {
   id: string;
+  /**
+   * Empresa operadora acreditada de la ficha (cuando existe). Permite
+   * atribuir exposición y clics en `business_view_events` sin alterar
+   * la presentación aprobada. Nunca se infiere.
+   */
+  operatorId?: string | null;
   entityKind: TourismEntityKind | null;
   /** Override manual del eyebrow (ej. tipo de producto o categoría). */
   eyebrow?: string | null;

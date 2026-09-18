@@ -139,6 +139,7 @@ export function businessToTourismCard(
       : [];
   return {
     id: b.id,
+    operatorId: b.id,
     entityKind: categoryToEntityKind(categorySlug),
     eyebrow: categoryToEyebrowLabel(categorySlug),
     name: b.display_name,
@@ -249,8 +250,7 @@ export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
       p.latitude != null && p.longitude != null ? { lat: p.latitude, lng: p.longitude } : null,
     territorialContext: "Oriente Maya",
     highlights: [],
-    badges:
-      p.admission_kind === "gratuito" ? [{ label: "Entrada libre", tone: "success" }] : [],
+    badges: p.admission_kind === "gratuito" ? [{ label: "Entrada libre", tone: "success" }] : [],
     institutionalBadges: institutionalBadgesForDestination(p.destination_slug),
     dateLabel: null,
     availabilityLabel: null,
