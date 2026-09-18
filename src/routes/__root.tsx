@@ -187,8 +187,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
     // para que header, pie y superficies públicas la pinten sin parpadeo.
     // Fail-safe: ante cualquier error se conserva el fallback de código.
-    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome] = await Promise.all([
-      getOmxdsVisualFoundationsFlag(),
+    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome, siteDomains] =
+      await Promise.all([
+        getOmxdsVisualFoundationsFlag(),
       context.queryClient
         .ensureQueryData(brandSettingsQueryOptions)
         .catch(() => BRAND_SETTINGS_DEFAULTS),
