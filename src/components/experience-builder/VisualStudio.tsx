@@ -2865,10 +2865,12 @@ function HomeCanvas({
     };
   }, [deviceViewport]);
 
-  // G7-C · Escala proporcional sólo cuando el espacio visible es menor que el
-  // preset. El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
+  // G7-C · Escala proporcional sólo cuando el ANCHO visible es menor que el
+  // preset. La altura ya no reduce la escala: el área de trabajo se desplaza
+  // verticalmente, evitando lienzos ilegibles (27%) en pantallas bajas.
+  // El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
   // por lo que container queries y breakpoints no se ven alterados.
-  const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
+  const scale = Math.min(1, available.width / preset.width);
   const headerVariant = resolveCanvasHeaderVariant(tree);
   const renderedTree =
     pageType === "home"
@@ -2879,7 +2881,7 @@ function HomeCanvas({
     <div
       ref={outerRef}
       data-eb-canvas-scrollport="editor"
-      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-hidden bg-muted/20 p-3"
+      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-y-auto overflow-x-hidden bg-muted/20 p-3"
     >
       <CanvasViewport
         device={deviceViewport}
