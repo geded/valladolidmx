@@ -470,6 +470,7 @@ function DestinationPremiumG4Render({ node }: BlockPreviewProps): ReactNode {
       heroVariant={resolved.heroVariant}
       galleryLayout={resolved.galleryLayout}
       sections={resolved.sections}
+      order={resolved.order}
     />
   );
 }
