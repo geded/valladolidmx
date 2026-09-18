@@ -216,3 +216,4 @@
 - [ ] Alcance: aplicar cupo, prioridad y etiqueta en Home y todos los listados (incluidos territoriales y por categoría); excluir destinos, mapa, fichas, Alux, Mi Viaje y Concierge. Despliegue por etapas: /que-hacer → listados → Home.
 - [ ] Destacados programados: ampliar founder_spotlights a producto/experiencia/evento/promoción con superficie, posición, fecha inicio/fin, motivo y tipo (cortesía o contratado); calendario por superficie en Administración → Visibilidad → Destacados.
 - [ ] Documentar y ampliar /cms/visibilidad/spotlight como pantalla única de destacados (Founder Spotlight + fijados con fecha por superficie).
+- [x] 2026-09-18 Base gobernada del reparto comercial (`src/lib/visibility/commercial-slots.ts` + pruebas): cupo 1 de cada 4, prioridad comercial por bloque, techos por empresa, fijados vigentes, deuda de exposición y rotación diaria determinista. Sin cambios en superficies públicas.
