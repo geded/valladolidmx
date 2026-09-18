@@ -1003,6 +1003,15 @@ function StructuredListControl({
     next.splice(target, 0, item);
     onChange(next);
   };
+  // Arrastrar y soltar (aditivo): no sustituye Subir/Bajar, que siguen siendo
+  // la vía accesible y la única disponible en iPad/táctil.
+  const moveTo = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || to >= rows.length) return;
+    const next = [...rows];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    onChange(next);
+  };
   return (
     <div className="space-y-2">
       {rows.length === 0 && defaultRows.length > 0 ? (
