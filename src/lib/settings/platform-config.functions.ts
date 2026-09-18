@@ -31,6 +31,7 @@ export interface SettingDefinition {
 }
 
 export const SETTING_GROUP_LABEL: Record<SettingDefinition["group"], string> = {
+  dominios: "Dominios del sitio",
   pagos: "Formas de pago y pasarela",
   reservas: "Reservas y apartados",
   avisos: "Avisos y notificaciones",
