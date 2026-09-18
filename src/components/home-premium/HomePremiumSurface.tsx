@@ -815,9 +815,6 @@ function DestinationsSection({
         </div>
       </div>
 
-      <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
-        {content.destinos.disclaimer}
-      </p>
     </section>
   );
 }
