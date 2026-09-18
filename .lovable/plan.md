@@ -37,7 +37,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 - Máximo **1 contenido contratado por cada 4 tarjetas visibles**; nunca se ocultan empresas sin plan.
 - Máximo **2 apariciones por empresa en toda la página y 1 por carril**, aplicable también al contenido contratado.
 - Este mismo cupo, la prioridad de posición y la indicación discreta se aplican además a los listados de Hoteles, Restaurantes, Casas de vacaciones, Eventos, Lugares y listados territoriales, para acotar el impulso comercial que hoy actúa sin límite.
-- La fotografía permanece limpia: sin badges, cintillos ni etiquetas comerciales superpuestas. La indicación breve `Promovido` aparece como texto secundario junto a los datos de la ficha y no ocupa un espacio editorial adicional.
+- La fotografía permanece limpia: sin badges, cintillos ni etiquetas comerciales superpuestas. La indicación breve `Recomendado` aparece como texto secundario junto a los datos de la ficha y no ocupa un espacio editorial adicional.
 - Los filtros y la intención explícita del viajero siempre prevalecen sobre cualquier impulso comercial.
 - Un pago nunca hace elegible una ficha incompleta ni desplaza un resultado claramente más relevante fuera de su espacio comercial asignado.
 - Desempate orgánico: calidad de ficha, actualidad, cercanía temática y variedad entre destinos.
@@ -86,7 +86,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 
 1. **Contrato y maqueta:** definir composición, proporción 3 orgánicos + 1 contratado y estados visuales; aprobación Founder antes de código público.
 2. **Curaduría editorial:** conectar selección, orden, límites y rotación diaria usando el contrato oficial de colecciones.
-3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; asignar únicamente los espacios comerciales declarados, con elegibilidad editorial y una indicación `Promovido` discreta fuera de la fotografía.
+3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; asignar únicamente los espacios comerciales declarados, con elegibilidad editorial y una indicación `Recomendado` discreta fuera de la fotografía.
 4. **Flujo empresa–administración:** reutilizar solicitud, revisión, activación, vencimiento y cancelación del paquete; la curaduría del contenido permanece en el Experience Builder.
 5. **Medición:** registrar impresión, clic y entrada a ficha diferenciando editorial, orgánico, contratado y Spotlight.
 
