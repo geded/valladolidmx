@@ -10,8 +10,10 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
+import { es } from "date-fns/locale";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
+import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -22,28 +24,15 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { listAvailableDepartures, startBooking } from "@/lib/commerce/booking.functions";
+import {
+  calendarDayKey,
+  defaultDepartureId,
+  groupDeparturesByDay,
+} from "@/lib/commerce/booking-calendar";
 
 function genId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-function dayKey(iso: string, timeZone: string) {
-  return new Intl.DateTimeFormat("es-MX", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(iso));
-}
-
-function dayLabel(iso: string, timeZone: string) {
-  return new Intl.DateTimeFormat("es-MX", {
-    timeZone,
-    weekday: "short",
-    day: "numeric",
-    month: "long",
-  }).format(new Date(iso));
 }
 
 function timeLabel(iso: string, timeZone: string) {
@@ -52,6 +41,10 @@ function timeLabel(iso: string, timeZone: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(iso));
+}
+
+function availabilityLabel(available: number): string {
+  return available === 1 ? "1 lugar" : `${available} lugares`;
 }
 
 export function ReserveOnlineButton({
@@ -83,24 +76,49 @@ export function ReserveOnlineButton({
 
   const departures = departuresQ.data ?? [];
 
-  const days = useMemo(() => {
-    const map = new Map<string, { key: string; label: string; iso: string }>();
-    for (const d of departures) {
-      const key = dayKey(d.starts_at, d.timezone);
-      if (!map.has(key)) {
-        map.set(key, { key, label: dayLabel(d.starts_at, d.timezone), iso: d.starts_at });
-      }
-    }
-    return Array.from(map.values());
-  }, [departures]);
+  const days = useMemo(() => groupDeparturesByDay(departures), [departures]);
+  const daysByKey = useMemo(() => new Map(days.map((item) => [item.key, item])), [days]);
 
   const times = useMemo(
-    () => departures.filter((d) => dayKey(d.starts_at, d.timezone) === day),
-    [departures, day],
+    () => (day ? (daysByKey.get(day)?.departures ?? []) : []),
+    [day, daysByKey],
   );
 
   const selected = departures.find((d) => d.id === departureId) ?? null;
   const maxPeople = selected?.available ?? 10;
+
+  function selectDay(date: Date | undefined) {
+    if (!date) return;
+    const nextDay = daysByKey.get(calendarDayKey(date));
+    if (!nextDay) return;
+
+    setDay(nextDay.key);
+    setDepartureId(defaultDepartureId(nextDay.departures));
+    if (nextDay.departures.length === 1) {
+      const onlyDeparture = nextDay.departures[0];
+      if (onlyDeparture) setPeople((current) => Math.min(current, onlyDeparture.available));
+    }
+  }
+
+  function AvailabilityDayButton(props: React.ComponentProps<typeof CalendarDayButton>) {
+    const availability = daysByKey.get(calendarDayKey(props.day.date))?.available;
+    const label = availability ? availabilityLabel(availability) : null;
+
+    return (
+      <CalendarDayButton
+        {...props}
+        aria-label={label ? `${props.day.date.getDate()}, ${label} disponibles` : undefined}
+        className={
+          availability
+            ? "min-h-11 rounded-md bg-success/15 text-success hover:bg-success/25 data-[selected-single=true]:bg-success data-[selected-single=true]:text-success-foreground"
+            : undefined
+        }
+      >
+        <span className="text-sm font-semibold">{props.day.date.getDate()}</span>
+        {availability ? <span className="text-[0.6rem] font-medium">{availability}</span> : null}
+      </CalendarDayButton>
+    );
+  }
 
   async function handleReserve() {
     if (!user) {
@@ -133,7 +151,7 @@ export function ReserveOnlineButton({
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-h-[92dvh] w-[calc(100%-1rem)] overflow-y-auto p-4 sm:max-w-md sm:p-6">
           <DialogHeader>
             <DialogTitle>Elige tu fecha</DialogTitle>
             <DialogDescription>
@@ -151,56 +169,50 @@ export function ReserveOnlineButton({
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  Fecha
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {days.map((d) => (
-                    <button
-                      key={d.key}
-                      type="button"
-                      onClick={() => {
-                        setDay(d.key);
-                        setDepartureId(null);
-                      }}
-                      className={[
-                        "rounded-pill border px-3 py-1.5 text-xs font-medium transition",
-                        day === d.key
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-card hover:bg-accent",
-                      ].join(" ")}
-                    >
-                      {d.label}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">Fecha</p>
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="size-2.5 rounded-sm bg-success/20 ring-1 ring-success/40" />
+                    Días disponibles · número de lugares
+                  </span>
                 </div>
+                <Calendar
+                  mode="single"
+                  locale={es}
+                  selected={day ? daysByKey.get(day)?.date : undefined}
+                  onSelect={selectDay}
+                  defaultMonth={days[0]?.date}
+                  startMonth={days[0]?.date}
+                  endMonth={days[days.length - 1]?.date}
+                  disabled={(date) => !daysByKey.has(calendarDayKey(date))}
+                  components={{ DayButton: AvailabilityDayButton }}
+                  className="pointer-events-auto mx-auto mt-2 w-full p-0 [--cell-size:clamp(2.5rem,11vw,3rem)]"
+                  classNames={{ root: "w-full", month: "w-full", month_grid: "w-full" }}
+                />
               </div>
 
               {day ? (
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                    Hora
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">Horario</p>
+                  <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {times.map((t) => (
-                      <button
+                      <Button
                         key={t.id}
                         type="button"
+                        variant={departureId === t.id ? "default" : "outline"}
                         onClick={() => {
                           setDepartureId(t.id);
                           setPeople((p) => Math.min(p, t.available));
                         }}
-                        className={[
-                          "rounded-pill border px-3 py-1.5 text-xs font-medium transition",
-                          departureId === t.id
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-card hover:bg-accent",
-                        ].join(" ")}
+                        className="h-auto min-h-11 justify-between px-3 py-2"
                       >
-                        {timeLabel(t.starts_at, t.timezone)} · {t.available} lugares
-                      </button>
+                        <span>{timeLabel(t.starts_at, t.timezone)}</span>
+                        <span className={departureId === t.id ? "text-primary-foreground/80" : "text-muted-foreground"}>
+                          {availabilityLabel(t.available)}
+                        </span>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -208,9 +220,7 @@ export function ReserveOnlineButton({
 
               {departureId ? (
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                    Personas
-                  </p>
+                  <p className="text-xs font-medium uppercase text-muted-foreground">Personas</p>
                   <div className="mt-2 flex items-center gap-3">
                     <Button
                       type="button"
@@ -238,7 +248,7 @@ export function ReserveOnlineButton({
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
