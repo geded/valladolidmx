@@ -7,6 +7,7 @@
  * derechos declarados). Sólo editores y administradores.
  */
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, MapPin, Search, Sparkles, X } from "lucide-react";
 import {
@@ -88,7 +89,6 @@ export function AluxPhotoFinderDialog({
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-
   if (!open) return null;
 
   const search = async () => {
@@ -156,16 +156,18 @@ export function AluxPhotoFinderDialog({
     }
   };
 
-  return (
+  if (!open || typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Buscar fotos con Alux"
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="flex h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-border bg-background shadow-2xl"
+        className="flex h-[calc(100dvh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-border bg-background shadow-2xl sm:h-[85dvh]"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-start justify-between gap-2 border-b border-border px-4 py-3">
@@ -225,7 +227,6 @@ export function AluxPhotoFinderDialog({
             Buscando en {workingPlace}. No hace falta escribir el destino.
           </p>
         )}
-
 
         <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
           <input
@@ -374,6 +375,7 @@ export function AluxPhotoFinderDialog({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
