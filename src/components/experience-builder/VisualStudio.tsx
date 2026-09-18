@@ -43,6 +43,7 @@ import {
   Redo2,
   Search,
   Share2,
+  RefreshCw,
   Trash2,
   Undo2,
   Clock,
@@ -78,6 +79,7 @@ import {
   schedulePublishComposition,
   cancelScheduledPublish,
   listCompositionRevisions,
+  createCompositionRevision,
   restoreCompositionRevision,
   issueCompositionPreviewLink,
   getPublishedTree,
@@ -1018,6 +1020,7 @@ function PageVisualEditor({
   const cancelSchedule = useServerFn(cancelScheduledPublish);
   const fetchPublishedTree = useServerFn(getPublishedTree);
   const listRevs = useServerFn(listCompositionRevisions);
+  const createRevision = useServerFn(createCompositionRevision);
   const restore = useServerFn(restoreCompositionRevision);
   const issuePreview = useServerFn(issueCompositionPreviewLink);
   const setWorkflow = useServerFn(setCompositionWorkflowState);
@@ -1080,6 +1083,7 @@ function PageVisualEditor({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
   const [showVersions, setShowVersions] = useState(false);
+  const [restoringPublished, setRestoringPublished] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [sharing, setSharing] = useState(false);
@@ -1748,6 +1752,49 @@ function PageVisualEditor({
     }
   };
 
+  const restorePublishedAsDraft = async () => {
+    if (!page || pageDef.page_type !== "home" || !page.active_revision_id) return;
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        "¿Usar la Home publicada como nuevo borrador editable?\n\n" +
+          "Guardaremos primero el borrador actual en Versiones. El sitio público no cambiará hasta que vuelvas a publicar.",
+      )
+    )
+      return;
+    setRestoringPublished(true);
+    setMessage(null);
+    try {
+      await createRevision({
+        data: { id: page.id, notes: "Respaldo automático antes de recuperar la Home publicada" },
+      });
+      await restore({
+        data: {
+          id: page.id,
+          revision_id: page.active_revision_id,
+          expected_hash: page.draft_hash ?? draftHash ?? "",
+        },
+      });
+      const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+      if (detail) {
+        skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(detail.current_draft);
+        setPage(detail);
+        setTree(detail.current_draft);
+        resetHistory();
+        setSelectedId(null);
+        setMessage(
+          "La Home publicada ya es el borrador editable. El borrador anterior quedó respaldado en Versiones.",
+        );
+        void refreshVersions();
+      }
+    } catch (e) {
+      setMessage(`No se pudo recuperar la Home publicada: ${(e as Error).message}`);
+    } finally {
+      setRestoringPublished(false);
+    }
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -1978,6 +2025,22 @@ function PageVisualEditor({
             <History className="size-3.5" aria-hidden />
             Versiones
           </button>
+          {pageDef.page_type === "home" && publishState === "dirty" ? (
+            <button
+              type="button"
+              onClick={() => void restorePublishedAsDraft()}
+              disabled={restoringPublished || saveStatus === "saving"}
+              title="Respalda el borrador actual y recupera como borrador la Home que hoy ve el público"
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+            >
+              {restoringPublished ? (
+                <Loader2 className="size-3.5 animate-spin" aria-hidden />
+              ) : (
+                <RefreshCw className="size-3.5" aria-hidden />
+              )}
+              Usar versión publicada
+            </button>
+          ) : null}
           <PublishStateBadge state={publishState} publishedAt={page?.published_at ?? null} />
           {page ? (
             <WorkflowChip
@@ -2808,7 +2871,7 @@ function HomeCanvas({
   const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
   const headerVariant = resolveCanvasHeaderVariant(tree);
   const renderedTree =
-    previewMode && pageType === "home"
+    pageType === "home"
       ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
       : tree;
 
