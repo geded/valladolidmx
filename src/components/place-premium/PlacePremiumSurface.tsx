@@ -112,6 +112,8 @@ export interface PlacePremiumSurfaceProps {
    * Ausente o parcial ⇒ se conservan los textos aprobados.
    */
   copy?: PlacePremiumCopy;
+  /** Orden editable de secciones. Ausente ⇒ orden aprobado. */
+  order?: readonly PlacePremiumRenderSectionKey[];
   className?: string;
 }
 
@@ -126,6 +128,7 @@ export function PlacePremiumSurface({
   saveSlot = null,
   showBreadcrumbs = true,
   copy = PLACE_PREMIUM_COPY_DEFAULTS,
+  order = PLACE_PREMIUM_RENDER_ORDER,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
