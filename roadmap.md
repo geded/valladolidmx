@@ -198,3 +198,9 @@
 - [x] Añadir en la ficha de experiencia un regreso visible al perfil territorial de la empresa para explorar sus demás experiencias.
 - [x] Armonizar todos los listados territoriales de empresas —hoteles, cenotes, artesanías, transportes y futuras categorías— con la única plantilla Premium ya aprobada para empresas de hoteles; retirar el fallback visual antiguo sin cambiar perfiles, CMS ni datos.
 - [x] Crear el listado regional de empresas por categoría en todo el Oriente Maya, con filtro por destino, y hacer que el listado de cada destino filtre por zonas del propio destino.
+
+## Menú de escritorio compacto (2026-09-18)
+
+- [x] Barra principal de escritorio reducida a Oriente Maya, Hoteles, Restaurantes y Experiencias; se retira la opción “Más”.
+- [x] Panel de menú (hamburguesa) disponible también en escritorio con Casas de vacaciones, ¿Qué hacer?, Eventos, Promociones, Mapa, Blog, Contacto, “Arma tu Viaje”, inicio de sesión e idioma.
+- [x] Validado en 1440/834/430/390 sin desbordamiento; logotipo, buscador, Mi Viaje, cuenta y rutas preservados. Sin publicar.

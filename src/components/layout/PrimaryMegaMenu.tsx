@@ -160,58 +160,9 @@ function buildSections(destinos: DestinoLite[]): MenuSection[] {
         { title: "Por destino", links: destFilterLinks("/experiencias") },
       ],
     },
-    {
-      id: "casas",
-      label: "Casas de vacaciones",
-      href: "/casas-de-vacaciones",
-      columns: [
-        {
-          title: "Hospedaje independiente",
-          links: [{ label: "Todas las casas", href: "/casas-de-vacaciones" }],
-        },
-        { title: "Por destino", links: destFilterLinks("/casas-de-vacaciones") },
-      ],
-    },
-    {
-      id: "que-hacer",
-      label: "¿Qué hacer?",
-      href: "/que-hacer",
-      columns: [
-        {
-          title: "Editorial",
-          links: [
-            { label: "Ver todas las actividades", href: "/que-hacer" },
-            { label: "Cultura", href: "/que-hacer?tema=cultura" },
-            { label: "Naturaleza", href: "/que-hacer?tema=naturaleza" },
-            { label: "Aventura", href: "/que-hacer?tema=aventura" },
-            { label: "Gastronomía", href: "/que-hacer?tema=gastronomia" },
-          ],
-        },
-        {
-          title: "Vida local",
-          links: [
-            { label: "Eventos", href: "/eventos" },
-            { label: "Mercados", href: "/que-hacer?tema=mercados" },
-          ],
-        },
-      ],
-    },
-    {
-      id: "mas",
-      label: "Más",
-      href: "/promociones",
-      expandOnly: true,
-      columns: [
-        {
-          links: [
-            { label: "Promociones", href: "/promociones" },
-            { label: "Mapa", href: "/mapa" },
-            { label: "Blog", href: "/blog" },
-            { label: "Contacto", href: "/contacto" },
-          ],
-        },
-      ],
-    },
+    // Casas de vacaciones, ¿Qué hacer?, Eventos y los enlaces institucionales
+    // viven ahora exclusivamente en el panel de menú (hamburguesa), también en
+    // escritorio. La barra principal conserva sólo las secciones que venden.
   ];
 }
 

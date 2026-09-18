@@ -267,7 +267,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
           <>
             <div
               aria-hidden
-              className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm xl:hidden"
+              className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
             <aside
@@ -278,7 +278,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               aria-label="Navegación principal"
               tabIndex={-1}
               style={{ backgroundColor: "var(--background)" }}
-              className="fixed inset-x-2 bottom-2 top-2 z-[999] flex flex-col overflow-hidden rounded-[1.75rem] border border-border/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)] outline-none sm:inset-x-auto sm:right-3 sm:w-[min(86vw,24rem)] xl:hidden"
+              className="fixed inset-x-2 bottom-2 top-2 z-[999] flex flex-col overflow-hidden rounded-[1.75rem] border border-border/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)] outline-none sm:inset-x-auto sm:right-3 sm:w-[min(86vw,24rem)]"
             >
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-5">
                 <BrandLogo tone="dark" size="sm" />
@@ -309,6 +309,11 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                 {showUserMenu ? (
                   <div className="[&_a]:w-full [&_a]:justify-center [&_a]:rounded-full [&_a]:border [&_a]:border-border [&_a]:bg-transparent [&_a]:text-foreground [&_a]:hover:bg-accent/10 [&_button]:w-full [&_button]:justify-center [&_button]:rounded-full [&_button]:border [&_button]:border-border [&_button]:bg-transparent [&_button]:text-foreground [&_button]:hover:bg-accent/10">
                     <UserMenu />
+                  </div>
+                ) : null}
+                {showLanguage ? (
+                  <div className="flex items-center justify-center pt-0.5">
+                    <LanguageSwitcher align="start" />
                   </div>
                 ) : null}
               </div>
@@ -413,7 +418,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-[0.98] xl:hidden",
+          "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-[0.98]",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
