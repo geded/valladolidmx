@@ -214,3 +214,4 @@
 - [ ] Etiqueta discreta "Recomendado" fuera de la fotografía para contenido contratado; carril editorial mantiene "Recomendados por Valladolid.mx".
 - [ ] Reparto justo con muchos contratos: turnos por nivel de paquete, rotación determinista diaria, deuda de exposición, techo por empresa y cupo por superficie; sin posición fija garantizada.
 - [ ] Alcance: aplicar cupo, prioridad y etiqueta en Home y todos los listados (incluidos territoriales y por categoría); excluir destinos, mapa, fichas, Alux, Mi Viaje y Concierge. Despliegue por etapas: /que-hacer → listados → Home.
+- [ ] Destacados programados: ampliar founder_spotlights a producto/experiencia/evento/promoción con superficie, posición, fecha inicio/fin, motivo y tipo (cortesía o contratado); calendario por superficie en Administración → Visibilidad → Destacados.
