@@ -521,6 +521,15 @@ export function TerritorialListingReviewSurface({
       />
     );
   }
+  if (family === "que-hacer") {
+    return (
+      <QueHacerDiscoveryBody
+        profile={profile}
+        dto={dto}
+        lockedDestinationLabel={lockedDestinationLabel ?? dto?.destinationLabel ?? null}
+      />
+    );
+  }
   if (family === "lugares") {
     return (
       <PlaceListingBody
@@ -547,6 +556,185 @@ export function TerritorialListingReviewSurface({
       setSecondary={setSecondary}
       facets={facets}
     />
+  );
+}
+
+function tourismItemZone(item: TourismCardVM): string | null {
+  const structured = attributeValues(item.filterAttributes?.zone)[0];
+  return structured ? humanizeAttributeValue(structured) : null;
+}
+
+function QueHacerDiscoveryBody({
+  profile,
+  dto,
+  lockedDestinationLabel,
+}: {
+  profile: ListingProfile;
+  dto?: PublicListingDTO;
+  lockedDestinationLabel: string | null;
+}) {
+  const [territory, setTerritory] = useState("");
+  const [showMapMobile, setShowMapMobile] = useState(false);
+  const rails = dto?.discoveryRails ?? [];
+  const isDestinationScope = Boolean(lockedDestinationLabel || dto?.destinationSlug);
+  const allItems = useMemo(() => rails.flatMap((rail) => [...rail.items]), [rails]);
+  const territories = useMemo(
+    () =>
+      unique(
+        allItems.flatMap((item) => {
+          if (isDestinationScope) {
+            const itemTerritory = tourismItemZone(item);
+            return itemTerritory ? [itemTerritory] : [];
+          }
+          const itemTerritory =
+            item.entityKind === "destination" ? item.name : (item.location?.label ?? null);
+          return itemTerritory ? [itemTerritory] : [];
+        }),
+      ),
+    [allItems, isDestinationScope],
+  );
+  const filteredRails = useMemo(
+    () =>
+      rails.map((rail) => ({
+        ...rail,
+        items: territory
+          ? rail.items.filter((item) =>
+              isDestinationScope
+                ? tourismItemZone(item) === territory
+                : item.entityKind === "destination"
+                  ? item.name === territory
+                  : item.location?.label === territory,
+            )
+          : rail.items,
+      })),
+    [isDestinationScope, rails, territory],
+  );
+  const visibleItems = filteredRails.flatMap((rail) => [...rail.items]);
+  const mappedItems = visibleItems.filter(
+    (item) => item.coordinates?.lat != null && item.coordinates?.lng != null,
+  );
+
+  return (
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
+      <ListingIntro profile={profile} compact />
+      <AluxBar profile={profile} />
+
+      {territories.length ? (
+        <section className="mt-5 border-y border-[var(--border)] py-4" aria-label="Filtro territorial">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
+                Explora el territorio
+              </p>
+              <h2 className="mt-1 font-display text-xl sm:text-2xl">
+                {isDestinationScope ? "Zonas de este destino" : "Filtrar por destino"}
+              </h2>
+            </div>
+            {territory ? (
+              <button
+                type="button"
+                onClick={() => setTerritory("")}
+                className="shrink-0 text-sm font-semibold text-[var(--selva)] hover:underline"
+              >
+                Ver todo
+              </button>
+            ) : null}
+          </div>
+          <div className="mt-3 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {territories.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setTerritory((current) => (current === option ? "" : option))}
+                aria-pressed={territory === option}
+                className={cn(
+                  "min-h-10 shrink-0 snap-start rounded-full border px-4 text-sm font-semibold transition",
+                  territory === option
+                    ? "border-[var(--selva)] bg-[var(--selva)] text-[var(--selva-foreground)]"
+                    : "border-[var(--border)] bg-card text-foreground hover:border-[var(--selva)]/50",
+                )}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <div className="mt-7 space-y-10">
+        {filteredRails.map((rail) => {
+          if (rail.id === "destinations" && isDestinationScope) return null;
+          if (!rail.items.length) return null;
+          return (
+            <section key={rail.id} aria-labelledby={`que-hacer-${rail.id}`}>
+              <header className="mb-3 flex items-end justify-between gap-4">
+                <div className="min-w-0">
+                  <h2 id={`que-hacer-${rail.id}`} className="font-display text-2xl sm:text-3xl">
+                    {rail.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-[var(--muted-foreground)]">{rail.subtitle}</p>
+                </div>
+                <a
+                  href={rail.seeAllHref}
+                  className="hidden shrink-0 text-sm font-semibold text-[var(--selva)] hover:underline sm:block"
+                >
+                  Ver todos
+                </a>
+              </header>
+              <ul className="flex snap-x snap-mandatory scroll-px-1 gap-4 overflow-x-auto pb-3 pr-4 [scrollbar-width:thin]">
+                {rail.items.map((item) => (
+                  <li
+                    key={`${rail.id}-${item.id}`}
+                    className="w-[76%] max-w-[17rem] shrink-0 snap-start sm:w-[15rem]"
+                  >
+                    <QueHacerDiscoveryCard
+                      item={listingItemFromDTO(item, profile)}
+                      trackingSurface="que-hacer"
+                      trackingRail={rail.id}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+
+      {!visibleItems.length ? (
+        <div className="mt-7 rounded-2xl border border-dashed border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
+          No encontramos opciones publicadas con ese filtro. Prueba otro destino o zona.
+        </div>
+      ) : null}
+
+      {mappedItems.length ? (
+        <div className="mt-10">
+          <button
+            type="button"
+            onClick={() => setShowMapMobile((current) => !current)}
+            className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-card px-4 text-sm font-semibold lg:hidden"
+          >
+            <Map className="size-4" aria-hidden />
+            {showMapMobile ? "Ocultar mapa" : "Ver mapa de los resultados"}
+          </button>
+          <div className={cn("overflow-hidden rounded-2xl border border-[var(--border)]", showMapMobile ? "block" : "hidden lg:block")}>
+            <Suspense fallback={<div className="h-72 animate-pulse bg-[var(--brand-surface-soft)]" />}>
+              <InteractiveMap
+                lat={mappedItems[0].coordinates?.lat ?? 20.69}
+                lng={mappedItems[0].coordinates?.lng ?? -88.2}
+                zoom={isDestinationScope ? 12 : 9}
+                markerTitle={mappedItems[0].name}
+                markers={mappedItems.flatMap((item) =>
+                  item.coordinates
+                    ? [{ lat: item.coordinates.lat, lng: item.coordinates.lng, title: item.name, href: item.href }]
+                    : [],
+                )}
+                className="h-72 sm:h-96"
+              />
+            </Suspense>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -1168,12 +1356,20 @@ function ListingCard({
  * oficial TourismCard. La tarjeta sólo invita a abrir la ficha; reservar y
  * agregar a Mi Viaje permanecen dentro de la experiencia completa.
  */
-function QueHacerDiscoveryCard({ item }: { item: ListingItem }) {
+function QueHacerDiscoveryCard({
+  item,
+  trackingSurface,
+  trackingRail,
+}: {
+  item: ListingItem;
+  trackingSurface?: string;
+  trackingRail?: string;
+}) {
   const vm = item.source;
   if (!vm) return null;
   const favoriteKind: FavoriteEntityKind | null =
     vm.entityKind === "event" ? "event" : vm.entityKind === "place" ? "place" : null;
-  return (
+  const card = (
     <TourismCard
       vm={vm}
       contractVariant="compact"
@@ -1206,6 +1402,7 @@ function QueHacerDiscoveryCard({ item }: { item: ListingItem }) {
       }
     />
   );
+  return card;
 }
 
 function NearbySection({ profile }: { profile: ListingProfile }) {
