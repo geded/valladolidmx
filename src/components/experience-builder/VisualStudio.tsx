@@ -1362,6 +1362,34 @@ function PageVisualEditor({
   }, [selectedChrome, selectedNode, tree]);
 
   /**
+   * Navegación sección por sección: lista ordenada de secciones editables
+   * (sólo raíz) para saltar entre ellas sin depender del scroll del lienzo.
+   */
+  const sectionNav = useMemo(() => {
+    const items = (tree?.root.children ?? []).map((n) => ({
+      id: n.id,
+      label: getBlock(n.type)?.display_name ?? n.type,
+    }));
+    const index = selectedNode ? items.findIndex((i) => i.id === selectedNode.id) : -1;
+    return { items, index };
+  }, [tree, selectedNode]);
+
+  // Escape cierra el panel de edición desde cualquier punto del scroll.
+  useEffect(() => {
+    if (!selectedId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      setSelectedId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedId]);
+
+
+  /**
    * 18.51 · Publicar/programar NUNCA guarda de forma implícita. Sólo se
    * invocan las RPC existentes cuando no hay cambios locales pendientes,
    * `workflow_state` es `approved` y `draft_hash` coincide exactamente
