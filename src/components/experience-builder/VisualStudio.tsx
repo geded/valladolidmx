@@ -55,6 +55,8 @@ import {
   DndContext,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
+
   closestCenter,
   useSensor,
   useSensors,
