@@ -54,6 +54,10 @@ import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
@@ -761,17 +765,33 @@ export function BusinessSurface({
           badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
         }}
       />
+      <BusinessImpressionTracker
+        businessId={b.id}
+        surface="perfil-empresa"
+        entityKind="business"
+        entityId={b.id}
+      />
       <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center justify-end gap-2 px-5 sm:px-8 lg:px-12">
         <span className="flex flex-wrap items-center justify-end gap-2">
-          <ShareButton title={b.display_name} />
+          <TrackClick businessId={b.id} surface="perfil-empresa" eventType="share">
+            <ShareButton title={b.display_name} />
+          </TrackClick>
           <FavoriteButton entityKind="business" entityId={b.id} />
-          <AddToTravelPlanButton
-            kind="business"
-            targetId={b.id}
-            title={b.display_name}
-            slug={b.slug}
-            {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
-          />
+          <TrackClick
+            businessId={b.id}
+            surface="perfil-empresa"
+            eventType="add_to_trip"
+            entityKind="business"
+            entityId={b.id}
+          >
+            <AddToTravelPlanButton
+              kind="business"
+              targetId={b.id}
+              title={b.display_name}
+              slug={b.slug}
+              {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+            />
+          </TrackClick>
         </span>
       </div>
 

@@ -58,6 +58,8 @@ export interface ExperiencePremiumVM {
   readonly eyebrow: string;
   readonly tagline: string | null;
   readonly description: string;
+  /** Identificador de la empresa operadora (medición de visibilidad). */
+  readonly operatorId: string | null;
   readonly operatorName: string;
   readonly operatorHref: string | null;
   /** Logotipo firmado de la empresa operadora; `null` si no está cargado. */
@@ -243,6 +245,7 @@ export function buildExperienceVMFromProduct(
     eyebrow: typeLabel,
     tagline: product.tagline || null,
     description: product.description || "",
+    operatorId: product.business.id ?? null,
     operatorName: product.business.display_name,
     operatorHref,
     operatorLogoUrl: product.business.logo_url ?? null,

@@ -217,3 +217,10 @@
 - [ ] Destacados programados: ampliar founder_spotlights a producto/experiencia/evento/promoción con superficie, posición, fecha inicio/fin, motivo y tipo (cortesía o contratado); calendario por superficie en Administración → Visibilidad → Destacados.
 - [ ] Documentar y ampliar /cms/visibilidad/spotlight como pantalla única de destacados (Founder Spotlight + fijados con fecha por superficie).
 - [x] 2026-09-18 Base gobernada del reparto comercial (`src/lib/visibility/commercial-slots.ts` + pruebas): cupo 1 de cada 4, prioridad comercial por bloque, techos por empresa, fijados vigentes, deuda de exposición y rotación diaria determinista. Sin cambios en superficies públicas.
+
+## Medición real de visibilidad (2026-09-18)
+
+- [x] Registro real de impresiones y acciones en perfiles de empresa y fichas de experiencia (`src/lib/visibility/track.ts`, `BusinessEventTrackers.tsx`), fuente única `business_view_events`.
+- [x] Nuevos eventos `add_to_trip` y `reserve_intent`; atribución automática al contrato de visibilidad vigente en `admin_visibility_performance`.
+- [ ] Conectar impresiones/clics de tarjetas en listados públicos (`/que-hacer`, listados territoriales, Home) junto con el motor de cupo comercial.
+- [ ] Pruebas reales del Founder: compra de visibilidad para Zazil Tunich, un hotel y un restaurante; verificar acumulación en Administración → Visibilidad → Rendimiento.
