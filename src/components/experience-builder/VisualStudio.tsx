@@ -2261,8 +2261,9 @@ function PageVisualEditor({
               >
                 <Plus className="size-3.5" aria-hidden /> Añadir sección
               </button>
-            </div>
-          </aside>
+              </div>
+            </aside>
+          </>
         ) : null}
 
         {(() => {
