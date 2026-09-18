@@ -3444,7 +3444,6 @@ function CanvasViewport({
     `;
     doc.head.appendChild(scrollStyle);
 
-
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
     doc.body.appendChild(canvasRoot);
@@ -3585,7 +3584,6 @@ function CanvasViewport({
 
   // El documento del canvas se recorre con su propio scroll interno; no se
   // vuelve a medir su altura para evitar realimentación.
-
 
   // HUD de medición (sólo entornos no productivos): innerWidth real del
   // iframe, overflow horizontal y posición efectiva del encabezado.
