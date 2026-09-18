@@ -17,7 +17,7 @@ import {
 } from "../../../src/lib/omxds/category-icon-registry";
 
 // 1 · Cardinalidad e identidad canónica
-assert.equal(CATEGORY_ICON_SLUGS.length, 22, "el registry debe declarar 22 categorías");
+assert.equal(CATEGORY_ICON_SLUGS.length, 23, "el registry debe declarar 23 categorías");
 assert.equal(new Set(CATEGORY_ICON_SLUGS).size, 22, "slugs duplicados en el registry");
 
 for (const slug of CATEGORY_ICON_SLUGS) {
