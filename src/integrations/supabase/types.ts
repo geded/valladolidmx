@@ -1390,32 +1390,50 @@ export type Database = {
         Row: {
           business_id: string
           country_code: string | null
+          entity_id: string | null
+          entity_kind: string | null
           event_type: string
+          grant_id: string | null
           id: string
           occurred_at: string
+          placement: string | null
+          rail: string | null
           referer: string | null
           session_hash: string | null
           source: string | null
+          surface: string | null
         }
         Insert: {
           business_id: string
           country_code?: string | null
+          entity_id?: string | null
+          entity_kind?: string | null
           event_type: string
+          grant_id?: string | null
           id?: string
           occurred_at?: string
+          placement?: string | null
+          rail?: string | null
           referer?: string | null
           session_hash?: string | null
           source?: string | null
+          surface?: string | null
         }
         Update: {
           business_id?: string
           country_code?: string | null
+          entity_id?: string | null
+          entity_kind?: string | null
           event_type?: string
+          grant_id?: string | null
           id?: string
           occurred_at?: string
+          placement?: string | null
+          rail?: string | null
           referer?: string | null
           session_hash?: string | null
           source?: string | null
+          surface?: string | null
         }
         Relationships: [
           {
@@ -1430,6 +1448,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_view_events_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "business_visibility_grants"
             referencedColumns: ["id"]
           },
         ]
@@ -8078,6 +8103,24 @@ export type Database = {
         Args: { _patch: Json; _place_id: string }
         Returns: undefined
       }
+      admin_visibility_performance: {
+        Args: { _window_days?: number }
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          clicks: number
+          expires_at: string
+          grant_id: string
+          impressions: number
+          last_seen: string
+          plan_name: string
+          plan_slug: string
+          starts_at: string
+          status: string
+          surfaces: Json
+        }[]
+      }
       alux_get_concierge_context_for_user: {
         Args: { _user_id: string }
         Returns: Json
@@ -8125,6 +8168,15 @@ export type Database = {
       business_public_source_summary: {
         Args: { _business_id: string }
         Returns: Json
+      }
+      business_visibility_performance: {
+        Args: { _business_id: string; _window_days?: number }
+        Returns: {
+          clicks: number
+          impressions: number
+          placement: string
+          surface: string
+        }[]
       }
       cancel_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -9499,10 +9551,16 @@ export type Database = {
         Args: {
           _business_id: string
           _country_code?: string
+          _entity_id?: string
+          _entity_kind?: string
           _event_type: string
+          _grant_id?: string
+          _placement?: string
+          _rail?: string
           _referer?: string
           _session_hash?: string
           _source?: string
+          _surface?: string
         }
         Returns: string
       }

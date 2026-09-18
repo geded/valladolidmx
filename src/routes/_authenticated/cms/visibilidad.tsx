@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -52,31 +52,36 @@ function VisibilidadPage() {
             hardcodeada por nivel.
           </p>
         </div>
-        <Button
-          onClick={() =>
-            setEditing({
-              slug: "",
-              name: "",
-              base_price_mxn: 0,
-              badge_variant: "standard",
-              color_token: "muted",
-              display_order: (plans.length || 0) + 1,
-              is_active: true,
-              is_public: true,
-              cycles: [{ cycle: "monthly", discount_pct: 0, label: "Mensual" }],
-              limits: {},
-              visibility_levers: {},
-              commercial_rules: {
-                auto_renew_default: true,
-                grace_days: 3,
-                requires_admin_approval: false,
-              },
-              reporting: { bi_enabled: false, csv_export: false, monthly_email_report: false },
-            })
-          }
-        >
-          + Nuevo paquete
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/cms/visibilidad/rendimiento">Rendimiento</Link>
+          </Button>
+          <Button
+            onClick={() =>
+              setEditing({
+                slug: "",
+                name: "",
+                base_price_mxn: 0,
+                badge_variant: "standard",
+                color_token: "muted",
+                display_order: (plans.length || 0) + 1,
+                is_active: true,
+                is_public: true,
+                cycles: [{ cycle: "monthly", discount_pct: 0, label: "Mensual" }],
+                limits: {},
+                visibility_levers: {},
+                commercial_rules: {
+                  auto_renew_default: true,
+                  grace_days: 3,
+                  requires_admin_approval: false,
+                },
+                reporting: { bi_enabled: false, csv_export: false, monthly_email_report: false },
+              })
+            }
+          >
+            + Nuevo paquete
+          </Button>
+        </div>
       </header>
 
       {isLoading ? (

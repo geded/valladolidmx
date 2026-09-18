@@ -37,6 +37,7 @@ import {
   type BusinessVisibilityGrant,
 } from "@/lib/visibility/business-visibility-grants.functions";
 import type { VisibilityPlan } from "@/lib/visibility/visibility-plans.functions";
+import { BusinessVisibilityPerformancePanel } from "@/components/portal/BusinessVisibilityPerformancePanel";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -163,6 +164,8 @@ function VisibilityPage() {
       ) : (
         <>
           <ActiveGrantCard grant={activeGrant ?? null} loading={grantQ.isLoading} />
+
+          <BusinessVisibilityPerformancePanel businessId={businessId} />
 
           {plansQ.isLoading ? (
             <div className="flex items-center justify-center py-16 text-muted-foreground">
