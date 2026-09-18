@@ -3058,34 +3058,32 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    setMount(doc.body);
+    const canvasRoot = doc.createElement("div");
+    canvasRoot.setAttribute("data-eb-canvas-root", "");
+    canvasRoot.style.minHeight = "100%";
+    doc.body.appendChild(canvasRoot);
+    setMount(canvasRoot);
     return () => {
+      setMount(null);
       cancelAnimationFrame(frame);
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
       viewportStyle.remove();
+      canvasRoot.remove();
     };
   }, []);
 
   useEffect(() => {
     if (!mount) return;
-    const doc = mount.ownerDocument;
     const readHeight = () => {
-      const next = Math.max(
-        minimumHeight,
-        doc.body.scrollHeight,
-        doc.body.offsetHeight,
-        doc.documentElement.scrollHeight,
-        doc.documentElement.offsetHeight,
-      );
+      const next = Math.max(minimumHeight, Math.ceil(mount.getBoundingClientRect().height));
       setDocumentHeight((current) => (Math.abs(current - next) > 1 ? next : current));
     };
     readHeight();
     const observer = new ResizeObserver(readHeight);
-    observer.observe(doc.body);
-    observer.observe(doc.documentElement);
-    const win = doc.defaultView;
+    observer.observe(mount);
+    const win = mount.ownerDocument.defaultView;
     win?.addEventListener("load", readHeight);
     return () => {
       observer.disconnect();
