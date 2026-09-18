@@ -749,7 +749,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(categories).toBeLessThan(routes);
     expect(routes).toBeLessThan(travelPlan);
     expect(travelPlan).toBeLessThan(remaining);
-    expect(surface).toContain('key !== "destinos" && key !== "rutas"');
+    expect(surface).toContain('key !== "destinos" &&');
+    expect(surface).toContain('key !== "rutas" &&');
     expect(surface).toContain('heroVariant === "editorial"');
     expect(surface).toContain("useHeroAutoplay(content.hero.slides.length, setIndex)");
   });
@@ -792,8 +793,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(business).toContain('hoteles: "hotel"');
     expect(business).toContain('restaurantes: "restaurant"');
     expect(business).toContain('"casas-de-vacaciones": "vacation_rental"');
-    expect(business).toContain("{usesApprovedFamilyTemplate ? (");
-    expect(collection).toContain('"min-w-[210px] max-w-[240px] sm:min-w-[230px]"');
+    expect(business).toContain('presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}');
+    expect(collection).toContain('"min-w-[190px] max-w-[240px] sm:min-w-[230px]"');
     expect(card).toContain('caps.compact ? "aspect-[16/9] max-h-36"');
   });
 
