@@ -291,6 +291,7 @@ export function SeoLandingContentEditor({
   const saveFn = useServerFn(saveSeoLandingEditorModel);
   const [slots, setSlots] = useState<Record<string, SeoLandingSlotJson> | null>(null);
   const [seo, setSeo] = useState<SeoLandingSeoModel | null>(null);
+  const [dragSlot, setDragSlot] = useState<string | null>(null);
 
   const model = useQuery({
     queryKey: ["cms", "seo-landing", "editor", compositionId],
@@ -370,6 +371,29 @@ export function SeoLandingContentEditor({
   const orderOf = (slot: string) => {
     const raw = get(slot)["order"];
     return typeof raw === "number" && Number.isFinite(raw) ? raw : (DEFAULT_ORDER[slot] ?? 1);
+  };
+  const orderedReorderables: string[] = [...REORDERABLE_SLOTS].sort((a, b) => {
+    const diff = orderOf(a) - orderOf(b);
+    return diff !== 0
+      ? diff
+      : REORDERABLE_SLOTS.indexOf(a as (typeof REORDERABLE_SLOTS)[number]) -
+          REORDERABLE_SLOTS.indexOf(b as (typeof REORDERABLE_SLOTS)[number]);
+  });
+  const moveSlotTo = (slot: string, index: number) => {
+    const current = orderedReorderables;
+    const from = current.indexOf(slot);
+    const to = Math.max(0, Math.min(current.length - 1, index));
+    if (from < 0 || from === to) return;
+    const next = [...current];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved as string);
+    setSlots((prev) => {
+      const base = { ...(prev ?? {}) };
+      next.forEach((key, i) => {
+        base[key] = { ...(base[key] ?? {}), order: i + 1 };
+      });
+      return base;
+    });
   };
   const setCta = (action: string, patch: Row) => {
     const exists = ctaRows.some((r) => r["action"] === action);
