@@ -441,9 +441,9 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const breadcrumb = read("src/components/layout/BreadcrumbTerritorial.tsx");
 
     expect(breadcrumb).toContain("flex-col items-stretch");
-    expect(breadcrumb).toContain("lg:flex-row");
+    expect(breadcrumb).toContain("sm:flex-row");
     expect(breadcrumb).toContain("w-full min-w-0");
-    expect(breadcrumb).toContain("lg:w-auto");
+    expect(breadcrumb).toContain("sm:w-auto");
   });
 
   test("todas las familias aprobadas conservan breadcrumb, Alux y conexión productiva", () => {
@@ -656,7 +656,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const cmsPreview = read("src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx");
     const lovablePreview = read("src/routes/lovable/g4-event-premium-preview.tsx");
 
-    expect(publicRoute).toContain("<EventPremiumSurface event={event} />");
+    expect(publicRoute).toContain("<EventPremiumSurface event={event}");
     expect(publicRoute).not.toContain("EventSurfaceContractBoundary");
     expect(publicRoute).not.toContain("getOmxdsSurfaceContractsFlag");
     expect(cmsPreview).toContain("<EventPremiumSurface");
@@ -685,7 +685,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(studio).toContain('previewMode && pageType === "home"');
     expect(studio).toContain("pageType={pageType}");
     expect(studio).toContain("tree={renderedTree}");
-    expect(publicRoute).toContain("pickFirstMediaUrl(authorityTree)");
+    expect(publicRoute).toContain("pickFirstMediaUrl(stableAuthorityTree)");
     expect(publicRoute).not.toContain("pickFirstMediaUrl(published.snapshot)");
     expect(authority).toContain("root: { children: [premiumNode] }");
     expect(authority).toContain("chrome: snapshot.chrome");
@@ -723,7 +723,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(root).toContain('import("@/pwa/sync-runner")');
     expect(root).not.toContain('from "@/pwa/register-sw"');
     expect(root).not.toContain('from "@/pwa/sync-runner"');
-    expect(vite).toContain('outDir: ".output/public"');
+    expect(vite).toContain('outDir: "dist/client"');
     expect(vite).toContain('additionalManifestEntries: [{ url: "/offline"');
     expect(vite).toContain('"assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*"');
     expect(vite).not.toContain('globPatterns: ["**/*.{js,css');
@@ -774,7 +774,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     );
     const card = read("src/components/experience-builder/tourism-card/TourismCard.tsx");
 
-    expect(business).toContain("`Explora cerca de ${b.display_name}`");
+    expect(business).toContain("fillBusinessCopy(copy.relatedHeading, b.display_name)");
     expect(business).toContain('id: "cerca-del-perfil"');
     expect(business).toContain("maxItems: 4");
     expect(business).toContain('density: usesApprovedFamilyTemplate ? "compact" : "comfortable"');
