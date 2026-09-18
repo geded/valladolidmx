@@ -15,7 +15,8 @@ Un mecanismo **general** para toda la plataforma: cualquier plantilla compuesta 
 3. **Edición por secciones.** Al elegir una sección, el panel lateral muestra sólo sus campos, con "Editando sección N de M", flechas anterior/siguiente, selector de salto y Cerrar.
 4. **Arrastrar y pegar.** El nuevo orden se guarda en la clave de orden del bloque, validada fail-closed contra el orden aprobado.
 5. **Selección desde el lienzo.** Tocar una sección del lienzo abre esa sección en el panel.
-6. **Cobertura.** Se aplica primero a las plantillas compuestas vigentes: Inicio (`vmx.home.premium-g4`), micrositio de destino (`vmx.destination.premium-g4`) y los 6 listados turísticos (`vmx.listing.premium-g5`). Las plantillas que ya tienen varias secciones siguen funcionando igual. Toda plantilla compuesta futura sólo necesita declararse en el registro.
+6. **Regla para plantillas nuevas.** Declarar las secciones internas en el registro pasa a ser requisito obligatorio de toda plantilla compuesta nueva (parte de su cierre): sin esa declaración no se considera terminada. Se documenta en las reglas de bloques.
+7. **Cobertura.** Se aplica primero a las plantillas compuestas vigentes: Inicio (`vmx.home.premium-g4`), micrositio de destino (`vmx.destination.premium-g4`) y los 6 listados turísticos (`vmx.listing.premium-g5`). Las plantillas que ya tienen varias secciones siguen funcionando igual. Toda plantilla compuesta futura sólo necesita declararse en el registro.
 
 ## Decisión que requiere tu visto bueno
 
