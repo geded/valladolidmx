@@ -72,10 +72,12 @@ const place = (over: Record<string, unknown> = {}) =>
   }) as never;
 
 describe("G8-R1 · R1-A · contrato de listados (casos 1-7)", () => {
-  test("1 · las siete familias autorizadas están declaradas", () => {
+  test("1 · las ocho familias autorizadas están declaradas", () => {
     expect([...LISTING_FAMILY_IDS].sort()).toEqual(
       [
         "casas-de-vacaciones",
+        // Familia genérica de empresas por categoría del CMS (cenotes, artesanías…).
+        "empresas",
         "eventos",
         "experiencias",
         "hoteles",
@@ -137,7 +139,7 @@ describe("G8-R1 · R1-A · contrato de listados (casos 1-7)", () => {
     const queHacer = buildPublicListing({ family: "que-hacer", events: [event()] });
     expect(queHacer.source).toBe("editorial");
     expect(queHacer.items).toHaveLength(1);
-    expect(queHacer.hero.title).toBe("¿Qué hacer en el Oriente Maya?");
+    expect(queHacer.hero.title).toBe("¿Qué hacer en el Oriente Maya de Yucatán?");
   });
 
   test("7 · lugares proyecta el feed real de points_of_interest", () => {
