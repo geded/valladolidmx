@@ -3435,39 +3435,15 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    // El documento del canvas tiene el alto completo, por lo que Safari no
-    // encuentra un scroll interno. Reenviamos rueda y gesto táctil al área de
-    // trabajo exterior para poder recorrer toda la plantilla en iPad.
-    const parentScroller = iframe?.parentElement?.closest(
-      "[data-eb-canvas-scrollport]",
-    ) as HTMLElement | null;
-    const onWheel = (event: WheelEvent) => {
-      if (!parentScroller) return;
-      parentScroller.scrollTop += event.deltaY;
-      event.preventDefault();
-    };
-    let lastTouchY: number | null = null;
-    const onTouchStart = (event: TouchEvent) => {
-      if ((event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) {
-        lastTouchY = null;
-        return;
-      }
-      lastTouchY = event.touches[0]?.clientY ?? null;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      const nextY = event.touches[0]?.clientY;
-      if (!parentScroller || lastTouchY == null || nextY == null) return;
-      parentScroller.scrollTop += lastTouchY - nextY;
-      lastTouchY = nextY;
-      event.preventDefault();
-    };
-    const onTouchEnd = () => {
-      lastTouchY = null;
-    };
-    doc.addEventListener("wheel", onWheel, { passive: false });
-    doc.addEventListener("touchstart", onTouchStart, { passive: true });
-    doc.addEventListener("touchmove", onTouchMove, { passive: false });
-    doc.addEventListener("touchend", onTouchEnd, { passive: true });
+    // El documento del canvas conserva el alto del dispositivo y se recorre con
+    // su propio scroll interno (rueda y gesto táctil nativos en iPad).
+    const scrollStyle = doc.createElement("style");
+    scrollStyle.setAttribute("data-eb-canvas-scroll-style", "");
+    scrollStyle.textContent = `
+      html, body { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    `;
+    doc.head.appendChild(scrollStyle);
+
 
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
@@ -3613,22 +3589,9 @@ function CanvasViewport({
     };
   }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys, scale]);
 
-  useEffect(() => {
-    if (!mount) return;
-    const readHeight = () => {
-      const next = Math.max(minimumHeight, Math.ceil(mount.getBoundingClientRect().height));
-      setDocumentHeight((current) => (Math.abs(current - next) > 1 ? next : current));
-    };
-    readHeight();
-    const observer = new ResizeObserver(readHeight);
-    observer.observe(mount);
-    const win = mount.ownerDocument.defaultView;
-    win?.addEventListener("load", readHeight);
-    return () => {
-      observer.disconnect();
-      win?.removeEventListener("load", readHeight);
-    };
-  }, [minimumHeight, mount]);
+  // El documento del canvas se recorre con su propio scroll interno; no se
+  // vuelve a medir su altura para evitar realimentación.
+
 
   // HUD de medición (sólo entornos no productivos): innerWidth real del
   // iframe, overflow horizontal y posición efectiva del encabezado.
