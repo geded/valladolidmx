@@ -17,6 +17,10 @@ import { Heart, Share2, Star } from "lucide-react";
 
 import { PremiumSectionHead } from "@/components/home-premium/shared/PremiumShowcase";
 import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { BusinessLogo } from "@/components/common/BusinessLogo";
 import { PremiumHero } from "@/components/premium";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
@@ -154,6 +158,12 @@ export function ExperiencePremiumSurface({
 
   return (
     <div className={cn("space-y-10", className)}>
+      <BusinessImpressionTracker
+        businessId={vm.operatorId}
+        surface="ficha-experiencia"
+        entityKind="product"
+        entityId={vm.id}
+      />
       {vm.demoNotice ? (
         <p className="rounded-pill border border-dashed border-border bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
           {vm.demoNotice}
@@ -190,14 +200,22 @@ export function ExperiencePremiumSurface({
             className="min-h-11 rounded-pill px-4 text-sm"
           />
           {tripEligibility.eligible ? (
-            <AddToTravelPlanButton
-              kind="product"
-              targetId={vm.id}
-              title={vm.name}
-              slug={vm.slug}
-              subtitle={vm.operatorName}
-              imageUrl={vm.cover?.url ?? null}
-            />
+            <TrackClick
+              businessId={vm.operatorId}
+              surface="ficha-experiencia"
+              eventType="add_to_trip"
+              entityKind="product"
+              entityId={vm.id}
+            >
+              <AddToTravelPlanButton
+                kind="product"
+                targetId={vm.id}
+                title={vm.name}
+                slug={vm.slug}
+                subtitle={vm.operatorName}
+                imageUrl={vm.cover?.url ?? null}
+              />
+            </TrackClick>
           ) : null}
         </div>
         {galleryItems.length ? (
@@ -265,22 +283,38 @@ export function ExperiencePremiumSurface({
             )}
             <div className="mt-4 flex flex-col gap-2">
               {commerce.canBookOnline ? (
-                <ReserveOnlineButton
-                  productId={vm.id}
-                  label={commerce.bookLabel ?? "Reservar en línea"}
-                  className="min-h-11 w-full rounded-pill px-5 text-sm font-semibold"
-                />
+                <TrackClick
+                  businessId={vm.operatorId}
+                  surface="ficha-experiencia"
+                  eventType="reserve_intent"
+                  entityKind="product"
+                  entityId={vm.id}
+                >
+                  <ReserveOnlineButton
+                    productId={vm.id}
+                    label={commerce.bookLabel ?? "Reservar en línea"}
+                    className="min-h-11 w-full rounded-pill px-5 text-sm font-semibold"
+                  />
+                </TrackClick>
               ) : null}
               {tripEligibility.eligible ? (
-                <AddToTravelPlanButton
-                  kind="product"
-                  targetId={vm.id}
-                  title={vm.name}
-                  slug={vm.slug}
-                  subtitle={vm.operatorName}
-                  imageUrl={vm.cover?.url ?? null}
-                  variant="full"
-                />
+                <TrackClick
+                  businessId={vm.operatorId}
+                  surface="ficha-experiencia"
+                  eventType="add_to_trip"
+                  entityKind="product"
+                  entityId={vm.id}
+                >
+                  <AddToTravelPlanButton
+                    kind="product"
+                    targetId={vm.id}
+                    title={vm.name}
+                    slug={vm.slug}
+                    subtitle={vm.operatorName}
+                    imageUrl={vm.cover?.url ?? null}
+                    variant="full"
+                  />
+                </TrackClick>
               ) : null}
               {!commerce.canBookOnline &&
               commerce.contactLabel &&
@@ -610,21 +644,37 @@ export function ExperiencePremiumSurface({
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {tripEligibility.eligible ? (
-              <AddToTravelPlanButton
-                kind="product"
-                targetId={vm.id}
-                title={vm.name}
-                slug={vm.slug}
-                subtitle={vm.operatorName}
-                imageUrl={vm.cover?.url ?? null}
-              />
+              <TrackClick
+                businessId={vm.operatorId}
+                surface="ficha-experiencia"
+                eventType="add_to_trip"
+                entityKind="product"
+                entityId={vm.id}
+              >
+                <AddToTravelPlanButton
+                  kind="product"
+                  targetId={vm.id}
+                  title={vm.name}
+                  slug={vm.slug}
+                  subtitle={vm.operatorName}
+                  imageUrl={vm.cover?.url ?? null}
+                />
+              </TrackClick>
             ) : null}
             {commerce.canBookOnline ? (
-              <ReserveOnlineButton
-                productId={vm.id}
-                label={commerce.bookLabel ?? "Reservar"}
-                className="rounded-pill"
-              />
+              <TrackClick
+                businessId={vm.operatorId}
+                surface="ficha-experiencia"
+                eventType="reserve_intent"
+                entityKind="product"
+                entityId={vm.id}
+              >
+                <ReserveOnlineButton
+                  productId={vm.id}
+                  label={commerce.bookLabel ?? "Reservar"}
+                  className="rounded-pill"
+                />
+              </TrackClick>
             ) : null}
           </div>
         </div>

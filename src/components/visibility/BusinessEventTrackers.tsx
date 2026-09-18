@@ -32,10 +32,7 @@ export function TrackClick({
   children: ReactNode;
 }) {
   return (
-    <span
-      className="contents"
-      onClickCapture={() => trackBusinessEvent({ ...rest, eventType })}
-    >
+    <span className="contents" onClickCapture={() => trackBusinessEvent({ ...rest, eventType })}>
       {children}
     </span>
   );
