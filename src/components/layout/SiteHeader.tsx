@@ -313,7 +313,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                 ) : null}
                 {showLanguage ? (
                   <div className="flex items-center justify-center pt-0.5">
-                    <LanguageSwitcher align="center" />
+                    <LanguageSwitcher align="start" />
                   </div>
                 ) : null}
               </div>
