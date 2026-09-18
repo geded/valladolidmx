@@ -17,7 +17,7 @@ export type SettingKind = "boolean" | "number" | "text";
 
 export interface SettingDefinition {
   key: string;
-  group: "pagos" | "reservas" | "avisos";
+  group: "dominios" | "pagos" | "reservas" | "avisos";
   label: string;
   help: string;
   kind: SettingKind;
