@@ -12,7 +12,7 @@ Corrección localizada de navegación; no es un rediseño.
 
 ## Preservation Gate
 - Conservar intactos logo, búsqueda, idioma, Mi Viaje, cuenta y CTA del header.
-- Conservar íntegro el menú móvil recién corregido y sus acciones fijas.
+- Conservar íntegro el menú móvil recién corregido y sus acciones fijas, sin duplicar ahí el selector de idioma del header.
 - No cambiar CMS, datos, rutas, plantillas Premium, autenticación ni publicación.
 - Mantener navegación por teclado, cierre con Escape y comportamiento hover/clic del dropdown.
 
