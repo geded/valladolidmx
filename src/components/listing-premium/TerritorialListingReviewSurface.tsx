@@ -620,7 +620,10 @@ function QueHacerDiscoveryBody({
       <AluxBar profile={profile} />
 
       {territories.length ? (
-        <section className="mt-5 border-y border-[var(--border)] py-4" aria-label="Filtro territorial">
+        <section
+          className="mt-5 border-y border-[var(--border)] py-4"
+          aria-label="Filtro territorial"
+        >
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
@@ -716,8 +719,15 @@ function QueHacerDiscoveryBody({
             <Map className="size-4" aria-hidden />
             {showMapMobile ? "Ocultar mapa" : "Ver mapa de los resultados"}
           </button>
-          <div className={cn("overflow-hidden rounded-2xl border border-[var(--border)]", showMapMobile ? "block" : "hidden lg:block")}>
-            <Suspense fallback={<div className="h-72 animate-pulse bg-[var(--brand-surface-soft)]" />}>
+          <div
+            className={cn(
+              "overflow-hidden rounded-2xl border border-[var(--border)]",
+              showMapMobile ? "block" : "hidden lg:block",
+            )}
+          >
+            <Suspense
+              fallback={<div className="h-72 animate-pulse bg-[var(--brand-surface-soft)]" />}
+            >
               <InteractiveMap
                 lat={mappedItems[0].coordinates?.lat ?? 20.69}
                 lng={mappedItems[0].coordinates?.lng ?? -88.2}
@@ -725,7 +735,14 @@ function QueHacerDiscoveryBody({
                 markerTitle={mappedItems[0].name}
                 markers={mappedItems.flatMap((item) =>
                   item.coordinates
-                    ? [{ lat: item.coordinates.lat, lng: item.coordinates.lng, title: item.name, href: item.href }]
+                    ? [
+                        {
+                          lat: item.coordinates.lat,
+                          lng: item.coordinates.lng,
+                          title: item.name,
+                          href: item.href,
+                        },
+                      ]
                     : [],
                 )}
                 className="h-72 sm:h-96"

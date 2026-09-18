@@ -39,11 +39,7 @@ function QueHacerRoute() {
         { label: "¿Qué hacer?", to: "/que-hacer" },
       ]}
     >
-      <ListingPremiumSurfaceFromDTO
-        dto={dto}
-        showAddToTrip
-        showFavorite
-      />
+      <ListingPremiumSurfaceFromDTO dto={dto} showAddToTrip showFavorite />
     </PublicShell>
   );
 }

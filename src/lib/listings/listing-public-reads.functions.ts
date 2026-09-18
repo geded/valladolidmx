@@ -120,11 +120,7 @@ export const getPublicListing = createServerFn({ method: "GET" })
  */
 export const getPublicBusinessCategoryListing = createServerFn({ method: "GET" })
   .inputValidator(
-    (
-      data:
-        | { categorySlug?: unknown; categoryLabel?: unknown; destino?: unknown }
-        | undefined,
-    ) => ({
+    (data: { categorySlug?: unknown; categoryLabel?: unknown; destino?: unknown } | undefined) => ({
       categorySlug:
         typeof data?.categorySlug === "string" && data.categorySlug.trim()
           ? data.categorySlug.trim().toLowerCase()

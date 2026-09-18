@@ -340,9 +340,7 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
               ? `Explora los distintos rincones de ${destinationLabel}.`
               : "Elige un punto de partida para recorrer el Oriente Maya.",
             seeAllHref: destino ? `/oriente-maya/${destino}` : "/oriente-maya",
-            items: destino
-              ? []
-              : (input.destinations ?? []).map(destinationToTourismCard),
+            items: destino ? [] : (input.destinations ?? []).map(destinationToTourismCard),
           },
           {
             id: "events",
