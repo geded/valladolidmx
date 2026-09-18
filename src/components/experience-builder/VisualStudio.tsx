@@ -1362,6 +1362,33 @@ function PageVisualEditor({
   }, [selectedChrome, selectedNode, tree]);
 
   /**
+   * Navegación sección por sección: lista ordenada de secciones editables
+   * (sólo raíz) para saltar entre ellas sin depender del scroll del lienzo.
+   */
+  const sectionNav = useMemo(() => {
+    const items = (tree?.root.children ?? []).map((n) => ({
+      id: n.id,
+      label: getBlock(n.type)?.display_name ?? n.type,
+    }));
+    const index = selectedNode ? items.findIndex((i) => i.id === selectedNode.id) : -1;
+    return { items, index };
+  }, [tree, selectedNode]);
+
+  // Escape cierra el panel de edición desde cualquier punto del scroll.
+  useEffect(() => {
+    if (!selectedId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      setSelectedId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedId]);
+
+  /**
    * 18.51 · Publicar/programar NUNCA guarda de forma implícita. Sólo se
    * invocan las RPC existentes cuando no hay cambios locales pendientes,
    * `workflow_state` es `approved` y `draft_hash` coincide exactamente
@@ -2338,117 +2365,198 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed right-0 z-[80] flex w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl ${focusMode ? "top-0 h-[100dvh]" : "top-[52px] h-[calc(100vh-52px)]"}`}
+            className={`fixed right-0 z-[80] flex w-[360px] max-w-[92vw] flex-col border-l border-border bg-card shadow-xl ${focusMode ? "top-0 h-[100dvh]" : "top-[52px] h-[calc(100vh-52px)]"}`}
             aria-label="Herramientas para editar el bloque seleccionado"
           >
-            <header className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
-                  Sección seleccionada
-                </p>
-                <h2 className="truncate text-base font-semibold">
-                  {selectedContract.display_name}
-                </h2>
+            <header className="shrink-0 border-b border-border bg-card p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+                    Editando sección
+                    {sectionNav.index >= 0
+                      ? ` ${sectionNav.index + 1} de ${sectionNav.items.length}`
+                      : ""}
+                  </p>
+                  <h2 className="truncate text-base font-semibold">
+                    {selectedContract.display_name}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(null)}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-pill border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                  aria-label="Cerrar edición de la sección"
+                  title="Cerrar (Esc)"
+                >
+                  <X className="size-3.5" aria-hidden /> Cerrar
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setSelectedId(null)}
-                className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-                aria-label="Cerrar"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
+
+              {sectionNav.items.length > 1 ? (
+                <div className="mt-3 flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={sectionNav.index <= 0}
+                    onClick={() => {
+                      const prev = sectionNav.items[sectionNav.index - 1];
+                      if (prev) setSelectedId(prev.id);
+                    }}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+                    aria-label="Sección anterior"
+                    title="Sección anterior"
+                  >
+                    <ChevronUp className="size-3.5" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={
+                      sectionNav.index < 0 || sectionNav.index >= sectionNav.items.length - 1
+                    }
+                    onClick={() => {
+                      const next = sectionNav.items[sectionNav.index + 1];
+                      if (next) setSelectedId(next.id);
+                    }}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+                    aria-label="Sección siguiente"
+                    title="Sección siguiente"
+                  >
+                    <ChevronDown className="size-3.5" aria-hidden />
+                  </button>
+                  <select
+                    value={sectionNav.index >= 0 ? (selectedId ?? "") : ""}
+                    onChange={(e) => {
+                      if (e.target.value) setSelectedId(e.target.value);
+                    }}
+                    className="h-8 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs"
+                    aria-label="Ir a otra sección de la página"
+                  >
+                    {sectionNav.index < 0 ? <option value="">Ir a una sección…</option> : null}
+                    {sectionNav.items.map((item, i) => (
+                      <option key={item.id} value={item.id}>
+                        {i + 1}. {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
             </header>
 
-            {selectedNode ? (
-              <div className="flex flex-wrap gap-1.5">
-                <ToolBtn
-                  onClick={() => moveNode(selectedNode.id, -1)}
-                  icon={<ChevronUp className="size-3" />}
-                  label="Subir"
-                />
-                <ToolBtn
-                  onClick={() => moveNode(selectedNode.id, 1)}
-                  icon={<ChevronDown className="size-3" />}
-                  label="Bajar"
-                />
-                <ToolBtn
-                  onClick={() => duplicateNode(selectedNode.id)}
-                  icon={<Copy className="size-3" />}
-                  label="Duplicar"
-                />
-                <ToolBtn
-                  onClick={() => toggleHiddenNode(selectedNode.id)}
-                  icon={
-                    selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />
-                  }
-                  label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
-                />
-                <ToolBtn
-                  onClick={() => {
-                    const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
-                    if (
-                      typeof window !== "undefined" &&
-                      !window.confirm(
-                        `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+              {selectedNode ? (
+                <div className="flex flex-wrap gap-1.5">
+                  <ToolBtn
+                    onClick={() => moveNode(selectedNode.id, -1)}
+                    icon={<ChevronUp className="size-3" />}
+                    label="Subir"
+                  />
+                  <ToolBtn
+                    onClick={() => moveNode(selectedNode.id, 1)}
+                    icon={<ChevronDown className="size-3" />}
+                    label="Bajar"
+                  />
+                  <ToolBtn
+                    onClick={() => duplicateNode(selectedNode.id)}
+                    icon={<Copy className="size-3" />}
+                    label="Duplicar"
+                  />
+                  <ToolBtn
+                    onClick={() => toggleHiddenNode(selectedNode.id)}
+                    icon={
+                      selectedNode.hidden ? (
+                        <Eye className="size-3" />
+                      ) : (
+                        <EyeOff className="size-3" />
                       )
-                    )
-                      return;
-                    removeNodeById(selectedNode.id);
-                  }}
-                  icon={<Trash2 className="size-3" />}
-                  label="Eliminar"
-                  tone="danger"
+                    }
+                    label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
+                  />
+                  <ToolBtn
+                    onClick={() => {
+                      const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
+                      if (
+                        typeof window !== "undefined" &&
+                        !window.confirm(
+                          `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+                        )
+                      )
+                        return;
+                      removeNodeById(selectedNode.id);
+                    }}
+                    icon={<Trash2 className="size-3" />}
+                    label="Eliminar"
+                    tone="danger"
+                  />
+                </div>
+              ) : null}
+
+              {selectedChrome === "seo" ? (
+                <SeoPreview
+                  config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
+                  slug={pageDef.slug}
                 />
-              </div>
-            ) : null}
+              ) : null}
 
-            {selectedChrome === "seo" ? (
-              <SeoPreview
-                config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
-                slug={pageDef.slug}
-              />
-            ) : null}
-
-            <AutoInspector
-              contract={selectedContract}
-              config={selectedConfig}
-              onChange={(next) => updateSelectedConfig(next)}
-              simple={!advanced}
-              activeBreakpoint={
-                deviceViewport === "tablet"
-                  ? "md"
-                  : deviceViewport === "mobile" || deviceViewport === "mobile430"
-                    ? "base"
-                    : "lg"
-              }
-            />
-
-            {selectedNode ? (
-              <AppearancePanel
-                config={selectedConfig}
-                onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
-              />
-            ) : null}
-
-            {advanced && selectedNode ? (
-              <AdvancedPanel
-                node={selectedNode}
+              <AutoInspector
+                contract={selectedContract}
                 config={selectedConfig}
                 onChange={(next) => updateSelectedConfig(next)}
+                simple={!advanced}
+                activeBreakpoint={
+                  deviceViewport === "tablet"
+                    ? "md"
+                    : deviceViewport === "mobile" || deviceViewport === "mobile430"
+                      ? "base"
+                      : "lg"
+                }
               />
-            ) : null}
 
-            {selectedNode && page ? (
-              <BlockCommentsPanel
-                compositionId={page.id}
-                blockId={selectedNode.id}
-                blockLabel={selectedContract?.display_name ?? selectedNode.type}
-                currentUserId={user?.id ?? null}
-                isAdmin={isAdmin}
-                onCountsChange={setCommentCounts}
-              />
-            ) : null}
+              {selectedNode ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Apariencia
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <AppearancePanel
+                      config={selectedConfig}
+                      onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
+                    />
+                  </div>
+                </details>
+              ) : null}
+
+              {advanced && selectedNode ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Avanzado
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <AdvancedPanel
+                      node={selectedNode}
+                      config={selectedConfig}
+                      onChange={(next) => updateSelectedConfig(next)}
+                    />
+                  </div>
+                </details>
+              ) : null}
+
+              {selectedNode && page ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Comentarios
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <BlockCommentsPanel
+                      compositionId={page.id}
+                      blockId={selectedNode.id}
+                      blockLabel={selectedContract?.display_name ?? selectedNode.type}
+                      currentUserId={user?.id ?? null}
+                      isAdmin={isAdmin}
+                      onCountsChange={setCommentCounts}
+                    />
+                  </div>
+                </details>
+              ) : null}
+            </div>
           </aside>
         ) : null}
 
