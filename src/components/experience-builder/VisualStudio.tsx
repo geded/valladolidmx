@@ -3389,10 +3389,13 @@ function SortableSectionItem({
         {...attributes}
         {...listeners}
         aria-label="Arrastrar para reordenar"
-        className="cursor-grab text-muted-foreground active:cursor-grabbing"
+        title="Arrastra para mover la sección"
+        style={{ touchAction: "none" }}
+        className="inline-flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
       >
-        ⋮⋮
+        <GripVertical className="size-3.5" aria-hidden />
       </button>
+
       <button
         type="button"
         onClick={onSelect}
