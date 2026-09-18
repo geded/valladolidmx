@@ -1089,7 +1089,9 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
-  const [structureCollapsed, setStructureCollapsed] = useState(false);
+  // El panel de estructura ya no ocupa una columna fija: se abre como capa
+  // superpuesta bajo demanda para que el lienzo use todo el ancho disponible.
+  const [structureCollapsed, setStructureCollapsed] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const focusModeRef = useRef(false);
   const previousSidebarRef = useRef(workspace.sidebar);
