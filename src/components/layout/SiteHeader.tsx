@@ -293,7 +293,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               </div>
               <nav
                 aria-label="Menú móvil"
-                className="flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-3"
               >
                 <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
               </nav>
@@ -307,7 +307,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                   {ctaLabel}
                 </a>
                 {showUserMenu ? (
-                  <div className="[&_a]:w-full [&_a]:justify-center [&_a]:rounded-full [&_a]:border [&_a]:border-border [&_a]:bg-transparent [&_a]:text-foreground [&_a]:hover:bg-accent/10 [&_button]:w-full [&_button]:justify-center [&_button]:rounded-full [&_button]:border [&_button]:border-border [&_button]:bg-transparent [&_button]:text-foreground [&_button]:hover:bg-accent/10 sm:hidden">
+                  <div className="[&_a]:w-full [&_a]:justify-center [&_a]:rounded-full [&_a]:border [&_a]:border-border [&_a]:bg-transparent [&_a]:text-foreground [&_a]:hover:bg-accent/10 [&_button]:w-full [&_button]:justify-center [&_button]:rounded-full [&_button]:border [&_button]:border-border [&_button]:bg-transparent [&_button]:text-foreground [&_button]:hover:bg-accent/10">
                     <UserMenu />
                   </div>
                 ) : null}

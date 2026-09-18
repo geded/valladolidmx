@@ -90,14 +90,6 @@ function mergeDestinos(published: DestinoLite[]): { featured: DestinoLite[]; res
   return { featured, rest };
 }
 
-/** Destinos reales publicados para el menú móvil (máx. 6). */
-function popularDestinos(destinos: DestinoLite[]): DestinoLite[] {
-  const published = new Set(destinos.map((d) => d.slug));
-  const ordered = FEATURED_DESTINOS.filter((d) => published.has(d.slug));
-  const rest = destinos.filter((d) => !ordered.some((o) => o.slug === d.slug));
-  return [...ordered, ...rest].slice(0, 6);
-}
-
 function buildSections(destinos: DestinoLite[]): MenuSection[] {
   const { featured, rest } = mergeDestinos(destinos);
   const destinosLinks: MenuLink[] = [
@@ -271,13 +263,7 @@ export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
       />
     );
   }
-  return (
-    <MobileMenu
-      destinos={destinos}
-      activeDestination={activeDestination}
-      onNavigate={props.onNavigate}
-    />
-  );
+  return <MobileMenu activeDestination={activeDestination} onNavigate={props.onNavigate} />;
 }
 
 /* ─────────────────────────── Desktop ─────────────────────────── */
@@ -429,7 +415,12 @@ interface MobileItem extends MenuLink {
 const MOBILE_PRIMARY: MobileItem[] = [
   { label: "Hoteles", href: "/hoteles", hint: "Dónde dormir", icon: BedDouble },
   { label: "Restaurantes", href: "/restaurantes", hint: "Dónde comer", icon: UtensilsCrossed },
-  { label: "Casas de vacaciones", href: "/casas-de-vacaciones", hint: "Estancias completas", icon: Home },
+  {
+    label: "Casas de vacaciones",
+    href: "/casas-de-vacaciones",
+    hint: "Estancias completas",
+    icon: Home,
+  },
   { label: "Experiencias", href: "/experiencias", hint: "Tours y actividades", icon: Sparkles },
   { label: "¿Qué hacer?", href: "/que-hacer", hint: "Lugares y sitios de interés", icon: MapPin },
   { label: "Eventos", href: "/eventos", hint: "Agenda del destino", icon: CalendarDays },
@@ -443,17 +434,14 @@ const MOBILE_SECONDARY: MenuLink[] = [
 ];
 
 function MobileMenu({
-  destinos,
   activeDestination,
   onNavigate,
 }: {
-  destinos: DestinoLite[];
   activeDestination: string | null;
   onNavigate?: () => void;
 }) {
-  const populares = popularDestinos(destinos);
   return (
-    <div className="flex flex-col gap-7 pb-2">
+    <div className="flex flex-col gap-4 pb-1">
       <a
         href="/oriente-maya"
         onClick={() => onNavigate?.()}
@@ -474,9 +462,7 @@ function MobileMenu({
       </a>
 
       <div>
-        <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">
-          Descubre
-        </p>
+        <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">Descubre</p>
         <ul className="flex flex-col">
           {MOBILE_PRIMARY.map((link) => {
             const Icon = link.icon;
@@ -510,26 +496,6 @@ function MobileMenu({
           })}
         </ul>
       </div>
-
-      {populares.length ? (
-        <div>
-          <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">
-            Destinos populares
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {populares.map((d) => (
-              <a
-                key={d.slug}
-                href={`/oriente-maya/${d.slug}`}
-                onClick={() => onNavigate?.()}
-                className="rounded-pill border border-border/70 px-3.5 py-2 text-[0.875rem] font-normal text-foreground transition-colors hover:bg-accent/60"
-              >
-                {d.name}
-              </a>
-            ))}
-          </div>
-        </div>
-      ) : null}
 
       <div className="border-t border-border/50 pt-3">
         <ul className="flex flex-wrap gap-x-5 gap-y-0.5 px-1">
