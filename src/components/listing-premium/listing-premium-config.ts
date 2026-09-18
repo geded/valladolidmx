@@ -17,6 +17,41 @@ export const LISTING_PREMIUM_G5_BLOCK_TYPE = "vmx.listing.premium-g5" as const;
 export const LISTING_PREMIUM_G5_CONTRACT_VERSION = "1.0.0" as const;
 export const LISTING_PREMIUM_G5_VARIANT = "listado-premium-g5-approved" as const;
 
+export const QUE_HACER_DISCOVERY_RAILS = [
+  {
+    id: "destinations",
+    enabled: true,
+    title: "Destinos a descubrir",
+    subtitle: "Elige un punto de partida para recorrer el Oriente Maya.",
+    max_items: 12,
+    sort_by: "manual",
+  },
+  {
+    id: "events",
+    enabled: true,
+    title: "Eventos que no te puedes perder",
+    subtitle: "Fechas, celebraciones y encuentros para sumar a tu viaje.",
+    max_items: 12,
+    sort_by: "recent",
+  },
+  {
+    id: "experiences",
+    enabled: true,
+    title: "Experiencias para vivir el territorio",
+    subtitle: "Actividades auténticas operadas por anfitriones locales.",
+    max_items: 12,
+    sort_by: "manual",
+  },
+  {
+    id: "places",
+    enabled: true,
+    title: "Lugares y sitios de interés preferidos",
+    subtitle: "Cenotes, patrimonio y rincones que cuentan la historia de la región.",
+    max_items: 12,
+    sort_by: "manual",
+  },
+] as const;
+
 type Cfg = Record<string, unknown>;
 
 const str = (value: unknown, fallback: string): string =>
@@ -115,6 +150,7 @@ export function listingPremiumG5DefaultConfig(familyId = "hoteles"): Cfg {
     empty_message: "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya.",
     show_add_to_trip: false,
     show_favorite: false,
+    discovery_rails: family.id === "que-hacer" ? QUE_HACER_DISCOVERY_RAILS : [],
     items: family.items.map((it) => ({
       id: it.id,
       name: it.name,
