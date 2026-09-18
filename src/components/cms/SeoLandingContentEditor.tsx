@@ -11,7 +11,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowDown, ArrowUp, Plus, Save, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, GripVertical, Plus, Save, Trash2, X } from "lucide-react";
 import { toast } from "@/lib/toast";
 import {
   getSeoLandingEditorModel,
@@ -270,6 +270,15 @@ const EMPTY_SEO: SeoLandingSeoModel = {
 
 const ORDER_OPTIONS = [1, 2, 3, 4].map((n) => ({ value: String(n), label: `Posición ${n}` }));
 
+/** Slots de la landing cuya posición es editable (el resto es estructura aprobada). */
+const REORDERABLE_SLOTS = ["intro", "offers", "infoGrid", "map"] as const;
+const REORDERABLE_LABELS: Record<string, string> = {
+  intro: "Por qué visitar",
+  offers: "Oferta publicada",
+  infoGrid: "Información práctica",
+  map: "Ubicación y mapa",
+};
+
 export function SeoLandingContentEditor({
   compositionId,
   onClose,
@@ -282,6 +291,7 @@ export function SeoLandingContentEditor({
   const saveFn = useServerFn(saveSeoLandingEditorModel);
   const [slots, setSlots] = useState<Record<string, SeoLandingSlotJson> | null>(null);
   const [seo, setSeo] = useState<SeoLandingSeoModel | null>(null);
+  const [dragSlot, setDragSlot] = useState<string | null>(null);
 
   const model = useQuery({
     queryKey: ["cms", "seo-landing", "editor", compositionId],
@@ -362,6 +372,29 @@ export function SeoLandingContentEditor({
     const raw = get(slot)["order"];
     return typeof raw === "number" && Number.isFinite(raw) ? raw : (DEFAULT_ORDER[slot] ?? 1);
   };
+  const orderedReorderables: string[] = [...REORDERABLE_SLOTS].sort((a, b) => {
+    const diff = orderOf(a) - orderOf(b);
+    return diff !== 0
+      ? diff
+      : REORDERABLE_SLOTS.indexOf(a as (typeof REORDERABLE_SLOTS)[number]) -
+          REORDERABLE_SLOTS.indexOf(b as (typeof REORDERABLE_SLOTS)[number]);
+  });
+  const moveSlotTo = (slot: string, index: number) => {
+    const current = orderedReorderables;
+    const from = current.indexOf(slot);
+    const to = Math.max(0, Math.min(current.length - 1, index));
+    if (from < 0 || from === to) return;
+    const next = [...current];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved as string);
+    setSlots((prev) => {
+      const base = { ...(prev ?? {}) };
+      next.forEach((key, i) => {
+        base[key] = { ...(base[key] ?? {}), order: i + 1 };
+      });
+      return base;
+    });
+  };
   const setCta = (action: string, patch: Row) => {
     const exists = ctaRows.some((r) => r["action"] === action);
     const next = exists
@@ -398,6 +431,62 @@ export function SeoLandingContentEditor({
           </button>
         </div>
       </header>
+
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <header className="mb-3">
+          <h3 className="font-serif text-lg leading-tight">Orden de secciones</h3>
+          <p className="text-xs text-muted-foreground">
+            Arrastra para cambiar el orden de las secciones reordenables de la landing. La portada y
+            el cierre conservan su posición aprobada.
+          </p>
+        </header>
+        <ul className="space-y-2">
+          {orderedReorderables.map((slot, index) => (
+            <li
+              key={slot}
+              draggable={editable}
+              onDragStart={() => setDragSlot(slot)}
+              onDragEnd={() => setDragSlot(null)}
+              onDragOver={(e) => {
+                if (dragSlot && dragSlot !== slot) e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragSlot) moveSlotTo(dragSlot, index);
+                setDragSlot(null);
+              }}
+              className="flex items-center gap-2 rounded-xl border border-border bg-background p-2"
+              style={{ touchAction: "none" }}
+            >
+              <GripVertical
+                className="size-4 shrink-0 cursor-grab text-muted-foreground"
+                aria-hidden
+              />
+              <span className="min-w-0 flex-1 truncate text-sm">
+                {index + 1}. {REORDERABLE_LABELS[slot]}
+              </span>
+              <button
+                type="button"
+                className={chip}
+                disabled={!editable || index === 0}
+                aria-label={`Subir ${REORDERABLE_LABELS[slot]}`}
+                onClick={() => moveSlotTo(slot, index - 1)}
+              >
+                <ArrowUp className="size-3.5" aria-hidden />
+              </button>
+              <button
+                type="button"
+                className={chip}
+                disabled={!editable || index === orderedReorderables.length - 1}
+                aria-label={`Bajar ${REORDERABLE_LABELS[slot]}`}
+                onClick={() => moveSlotTo(slot, index + 1)}
+              >
+                <ArrowDown className="size-3.5" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <Group
         title="Portada"
