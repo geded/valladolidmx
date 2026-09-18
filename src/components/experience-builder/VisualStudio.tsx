@@ -34,6 +34,10 @@ import {
   GripVertical,
   Loader2,
   Lock,
+  Maximize2,
+  Minimize2,
+  PanelLeftClose,
+  PanelLeftOpen,
   Pencil,
   Plus,
   Redo2,
@@ -116,6 +120,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
 import { useEditingLock, formatRelativeSince } from "./useEditingLock";
+import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type ChromeArea = "header" | "footer";
@@ -1018,6 +1023,7 @@ function PageVisualEditor({
   const setWorkflow = useServerFn(setCompositionWorkflowState);
   const queryClient = useQueryClient();
   const { roles, user } = useAuth();
+  const workspace = useWorkspace();
   const editorialSurface = resolveEditorialSurface(pageDef.page_type);
   const editorialActor = resolveEditorialActor(roles);
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
@@ -1079,6 +1085,33 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  const [structureCollapsed, setStructureCollapsed] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const focusModeRef = useRef(false);
+  const previousSidebarRef = useRef(workspace.sidebar);
+  const setSidebarRef = useRef(workspace.setSidebar);
+  setSidebarRef.current = workspace.setSidebar;
+
+  const toggleFocusMode = useCallback(() => {
+    setFocusMode((current) => {
+      const next = !current;
+      focusModeRef.current = next;
+      if (next) {
+        previousSidebarRef.current = workspace.sidebar;
+        workspace.setSidebar("hidden");
+        setStructureCollapsed(true);
+      } else {
+        workspace.setSidebar(previousSidebarRef.current);
+      }
+      return next;
+    });
+  }, [workspace]);
+
+  useEffect(() => {
+    return () => {
+      if (focusModeRef.current) setSidebarRef.current(previousSidebarRef.current);
+    };
+  }, []);
   // US-R3 · Sub-ola 2.2b — Preview data para plantillas dinámicas.
   // Se resuelve por `page_type`/`slug` desde el Preview Registry. Cuando
   // no aplica (Home, landings estáticos), `previewProvider` es null y ni
@@ -1827,7 +1860,7 @@ function PageVisualEditor({
       ref={shellRef}
       data-eb-studio-shell=""
       style={shellHeight ? { height: shellHeight } : undefined}
-      className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background"
+      className={`flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background ${focusMode ? "fixed inset-0 z-[70]" : ""}`}
     >
       <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <button
@@ -1847,6 +1880,36 @@ function PageVisualEditor({
           <p className="truncate text-[10px] text-muted-foreground">{pageDef.publicPath}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          {!previewMode ? (
+            <button
+              type="button"
+              onClick={() => setStructureCollapsed((current) => !current)}
+              title={structureCollapsed ? "Mostrar estructura" : "Ocultar estructura"}
+              aria-label={structureCollapsed ? "Mostrar estructura" : "Ocultar estructura"}
+              aria-pressed={structureCollapsed}
+              className="inline-flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground hover:bg-accent"
+            >
+              {structureCollapsed ? (
+                <PanelLeftOpen className="size-3.5" aria-hidden />
+              ) : (
+                <PanelLeftClose className="size-3.5" aria-hidden />
+              )}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={toggleFocusMode}
+            title={focusMode ? "Salir del área amplia" : "Ampliar área de trabajo"}
+            aria-label={focusMode ? "Salir del área amplia" : "Ampliar área de trabajo"}
+            aria-pressed={focusMode}
+            className="inline-flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground hover:bg-accent"
+          >
+            {focusMode ? (
+              <Minimize2 className="size-3.5" aria-hidden />
+            ) : (
+              <Maximize2 className="size-3.5" aria-hidden />
+            )}
+          </button>
           <SaveIndicator status={saveStatus} />
           <div
             className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5"
@@ -2059,7 +2122,7 @@ function PageVisualEditor({
       ) : null}
 
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
-        {!previewMode ? (
+        {!previewMode && !structureCollapsed ? (
           <aside
             className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col"
             aria-label="Estructura de la página"
@@ -2068,7 +2131,7 @@ function PageVisualEditor({
               <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 Estructura
               </p>
-              <h2 className="mt-1 text-sm font-semibold">Secciones de la Home</h2>
+              <h2 className="mt-1 text-sm font-semibold">Secciones de la página</h2>
               <p className="mt-1 text-[10px] text-muted-foreground">
                 Arrastra para reordenar. Clic para editar.
               </p>
@@ -2182,7 +2245,7 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className="fixed right-0 top-[52px] z-40 flex h-[calc(100vh-52px)] w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl"
+            className={`fixed right-0 z-[80] flex w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl ${focusMode ? "top-0 h-[100dvh]" : "top-[52px] h-[calc(100vh-52px)]"}`}
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="flex items-start justify-between gap-2">
@@ -2836,7 +2899,7 @@ function CanvasViewport({
   width,
   height,
   scale,
-  presetLabel,
+  presetLabel: _presetLabel,
   children,
 }: {
   device: DeviceViewport;
@@ -2965,8 +3028,7 @@ function CanvasViewport({
         data-eb-canvas-indicator=""
         className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
       >
-        <span>{presetLabel}</span>
-        <span>{scaled < 1 ? `escala ${Math.round(scaled * 100)}%` : "escala 100%"}</span>
+        <span>{`${width} × ${height} · ${Math.round(scaled * 100)}%`}</span>
         {hud && metrics ? (
           <span data-eb-canvas-hud="">
             innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
