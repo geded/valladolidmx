@@ -793,7 +793,9 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(business).toContain('hoteles: "hotel"');
     expect(business).toContain('restaurantes: "restaurant"');
     expect(business).toContain('"casas-de-vacaciones": "vacation_rental"');
-    expect(business).toContain('presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}');
+    expect(business).toContain(
+      'presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}',
+    );
     expect(collection).toContain('"min-w-[190px] max-w-[240px] sm:min-w-[230px]"');
     expect(card).toContain("caps.compact");
     expect(card).toContain('"aspect-[16/9] max-h-36"');
