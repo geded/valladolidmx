@@ -13,7 +13,10 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
@@ -429,7 +432,6 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
   },
 };
 
-
 /**
  * Resuelve el alcance territorial del copy aprobado. El copy base está
  * redactado con Valladolid como marcador territorial; aquí se sustituye
@@ -655,15 +657,18 @@ function TerritorialListingBody({
             </div>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {filteredItems.map((item, index) => (
-                <ListingCard
-                  key={item.name}
-                  item={item}
-                  featured={index === 0}
-                  profile={profile}
-                  compactFallback={compactDiscovery}
-                />
-              ))}
+              {filteredItems.map((item, index) =>
+                compactDiscovery ? (
+                  <QueHacerDiscoveryCard key={item.source?.id ?? item.name} item={item} />
+                ) : (
+                  <ListingCard
+                    key={item.name}
+                    item={item}
+                    featured={index === 0}
+                    profile={profile}
+                  />
+                ),
+              )}
               {!filteredItems.length ? (
                 <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
                   No encontramos opciones con esos filtros. Prueba quitando una selección.
@@ -1155,6 +1160,51 @@ function ListingCard({
         </div>
       </div>
     </article>
+  );
+}
+
+/**
+ * Variante compacta de descubrimiento para `/que-hacer` sobre la familia
+ * oficial TourismCard. La tarjeta sólo invita a abrir la ficha; reservar y
+ * agregar a Mi Viaje permanecen dentro de la experiencia completa.
+ */
+function QueHacerDiscoveryCard({ item }: { item: ListingItem }) {
+  const vm = item.source;
+  if (!vm) return null;
+  const favoriteKind: FavoriteEntityKind | null =
+    vm.entityKind === "event" ? "event" : vm.entityKind === "place" ? "place" : null;
+  return (
+    <TourismCard
+      vm={vm}
+      contractVariant="compact"
+      capabilities={{
+        compact: true,
+        showBusiness: false,
+        showRating: false,
+        showHighlights: false,
+        showBadges: false,
+        showInstitutionalBadges: false,
+        showAvailability: false,
+        showPrice: false,
+        showPrimaryAction: false,
+        showSecondaryAction: false,
+        showFavorite: false,
+      }}
+      renderMediaActions={
+        favoriteKind
+          ? () => (
+              <FavoriteButton
+                entityKind={favoriteKind}
+                entityId={vm.id}
+                entityTitle={vm.name}
+                entitySlug={vm.href ?? undefined}
+                entityImageUrl={vm.mediaUrl ?? undefined}
+                variant="media-overlay"
+              />
+            )
+          : undefined
+      }
+    />
   );
 }
 

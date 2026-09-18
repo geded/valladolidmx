@@ -365,8 +365,11 @@ export function destinationToTourismCard(d: Destination): TourismCardVM {
     href: `/oriente-maya/${d.slug}`,
     tagline: d.tagline || null,
     businessName: null,
-    mediaUrl: null,
-    mediaAlt: null,
+    // `listPublishedDestinations` sólo expone `image_url` cuando la portada
+    // superó la política pública de acreditación. Conservarla aquí evita que
+    // los listados editoriales pierdan el medio gobernado antes del render.
+    mediaUrl: d.image_url ?? null,
+    mediaAlt: d.image_url ? `${d.name} — ${d.tagline}` : null,
     rating: null,
     location: null,
     territorialContext: "Oriente Maya",
