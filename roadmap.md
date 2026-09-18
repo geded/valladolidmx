@@ -226,3 +226,8 @@
 - [x] Nuevos eventos `add_to_trip` y `reserve_intent`; atribución automática al contrato de visibilidad vigente en `admin_visibility_performance`.
 - [ ] Conectar impresiones/clics de tarjetas en listados públicos (`/que-hacer`, listados territoriales, Home) junto con el motor de cupo comercial.
 - [ ] Pruebas reales del Founder: compra de visibilidad para Zazil Tunich, un hotel y un restaurante; verificar acumulación en Administración → Visibilidad → Rendimiento.
+
+## Constructor · edición por secciones en plantillas compuestas (2026-09-18)
+
+- [ ] Registro general de secciones internas para bloques compuestos (Inicio, micrositio de destino, listados G5), con edición sección por sección, visibilidad y reordenamiento por arrastre.
+- [ ] Regla vinculante: toda plantilla compuesta nueva debe declarar sus secciones internas en el registro como parte de su Definition of Done.
