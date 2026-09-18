@@ -2,6 +2,8 @@
 
 ## En curso
 
+- [ ] Reservación de productos · Sustituir el listado de fechas por el calendario oficial: días disponibles en verde con cupo visible, selección progresiva día → horario → personas, horario único preseleccionado y QA 1440/834/430/390. Preservar inventario, apartados, checkout ERL, ficha Premium y datos CMS.
+
 - [x] Incidencia recurrente móvil/PWA: impedir que una versión anterior deje la portada sin estilos; fallback autónomo, recuperación en línea, actualización segura y caché de archivos versionados para reabrir páginas públicas visitadas sin conexión. QA 1440/834/430/390 y typecheck en PASS; pendiente publicar y confirmar reemplazo del worker anterior en el celular afectado.
 
 - [x] Reconciliación visual Premium de `/que-hacer`: header, filtros, cards/fallback, mapa y temas compactos; QA 1440/834/430/390 sin overflow, un H1 y un solo Alux. Data Readiness: 11 resultados actuales sin portada canónica. La URL territorial `/oriente-maya/valladolid/que-hacer` no existe y queda fuera de alcance para no crear una ruta nueva.
