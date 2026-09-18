@@ -2452,32 +2452,55 @@ function PageVisualEditor({
               }
             />
 
-            {selectedNode ? (
-              <AppearancePanel
-                config={selectedConfig}
-                onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
-              />
-            ) : null}
+              {selectedNode ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Apariencia
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <AppearancePanel
+                      config={selectedConfig}
+                      onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
+                    />
+                  </div>
+                </details>
+              ) : null}
 
-            {advanced && selectedNode ? (
-              <AdvancedPanel
-                node={selectedNode}
-                config={selectedConfig}
-                onChange={(next) => updateSelectedConfig(next)}
-              />
-            ) : null}
+              {advanced && selectedNode ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Avanzado
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <AdvancedPanel
+                      node={selectedNode}
+                      config={selectedConfig}
+                      onChange={(next) => updateSelectedConfig(next)}
+                    />
+                  </div>
+                </details>
+              ) : null}
 
-            {selectedNode && page ? (
-              <BlockCommentsPanel
-                compositionId={page.id}
-                blockId={selectedNode.id}
-                blockLabel={selectedContract?.display_name ?? selectedNode.type}
-                currentUserId={user?.id ?? null}
-                isAdmin={isAdmin}
-                onCountsChange={setCommentCounts}
-              />
-            ) : null}
+              {selectedNode && page ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Comentarios
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <BlockCommentsPanel
+                      compositionId={page.id}
+                      blockId={selectedNode.id}
+                      blockLabel={selectedContract?.display_name ?? selectedNode.type}
+                      currentUserId={user?.id ?? null}
+                      isAdmin={isAdmin}
+                      onCountsChange={setCommentCounts}
+                    />
+                  </div>
+                </details>
+              ) : null}
+            </div>
           </aside>
+
         ) : null}
 
         {showLibrary ? (
