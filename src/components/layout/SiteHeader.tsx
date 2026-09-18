@@ -293,7 +293,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               </div>
               <nav
                 aria-label="Menú móvil"
-                className="flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-3"
               >
                 <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
               </nav>
