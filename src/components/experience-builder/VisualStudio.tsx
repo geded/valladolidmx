@@ -1089,7 +1089,9 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
-  const [structureCollapsed, setStructureCollapsed] = useState(false);
+  // El panel de estructura ya no ocupa una columna fija: se abre como capa
+  // superpuesta bajo demanda para que el lienzo use todo el ancho disponible.
+  const [structureCollapsed, setStructureCollapsed] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const focusModeRef = useRef(false);
   const previousSidebarRef = useRef(workspace.sidebar);
@@ -2184,67 +2186,84 @@ function PageVisualEditor({
 
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {!previewMode && !structureCollapsed ? (
-          <aside
-            className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col"
-            aria-label="Estructura de la página"
-          >
-            <div className="border-b border-border p-3">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Estructura
-              </p>
-              <h2 className="mt-1 text-sm font-semibold">Secciones de la página</h2>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                Arrastra para reordenar. Clic para editar.
-              </p>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2">
-              <ChromeItem
-                label="Encabezado"
-                note="Menú, enlaces y botón destacado"
-                selected={selectedId === HEADER_CHROME_ID}
-                onSelect={() => setSelectedId(HEADER_CHROME_ID)}
-              />
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={onDragEnd}
-              >
-                <SortableContext
-                  items={tree.root.children.map((n) => n.id)}
-                  strategy={verticalListSortingStrategy}
+          <>
+            <button
+              type="button"
+              aria-label="Cerrar estructura"
+              onClick={() => setStructureCollapsed(true)}
+              className="absolute inset-0 z-[70] bg-foreground/20"
+            />
+            <aside
+              className="absolute inset-y-0 left-0 z-[75] flex w-[86vw] max-w-[18rem] flex-col border-r border-border bg-card shadow-xl"
+              aria-label="Estructura de la página"
+            >
+              <div className="flex items-start gap-2 border-b border-border p-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    Estructura
+                  </p>
+                  <h2 className="mt-1 text-sm font-semibold">Secciones de la página</h2>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    Arrastra para reordenar. Clic para editar.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStructureCollapsed(true)}
+                  className="shrink-0 rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground"
                 >
-                  {tree.root.children.map((n) => (
-                    <SortableSectionItem
-                      key={n.id}
-                      node={n}
-                      selected={selectedId === n.id}
-                      onSelect={() => setSelectedId(n.id)}
-                      onToggleHidden={() => toggleHiddenNode(n.id)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-              <ChromeItem
-                label="Pie de página"
-                note="Columnas, enlaces y textos legales"
-                selected={selectedId === FOOTER_CHROME_ID}
-                onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
-              />
-              <ChromeItem
-                label="SEO y compartir"
-                note="Título, descripción, imagen social, canonical"
-                selected={selectedId === SEO_CHROME_ID}
-                onSelect={() => setSelectedId(SEO_CHROME_ID)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowLibrary(true)}
-                className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                <Plus className="size-3.5" aria-hidden /> Añadir sección
-              </button>
-            </div>
-          </aside>
+                  Cerrar
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                <ChromeItem
+                  label="Encabezado"
+                  note="Menú, enlaces y botón destacado"
+                  selected={selectedId === HEADER_CHROME_ID}
+                  onSelect={() => setSelectedId(HEADER_CHROME_ID)}
+                />
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={onDragEnd}
+                >
+                  <SortableContext
+                    items={tree.root.children.map((n) => n.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {tree.root.children.map((n) => (
+                      <SortableSectionItem
+                        key={n.id}
+                        node={n}
+                        selected={selectedId === n.id}
+                        onSelect={() => setSelectedId(n.id)}
+                        onToggleHidden={() => toggleHiddenNode(n.id)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+                <ChromeItem
+                  label="Pie de página"
+                  note="Columnas, enlaces y textos legales"
+                  selected={selectedId === FOOTER_CHROME_ID}
+                  onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
+                />
+                <ChromeItem
+                  label="SEO y compartir"
+                  note="Título, descripción, imagen social, canonical"
+                  selected={selectedId === SEO_CHROME_ID}
+                  onSelect={() => setSelectedId(SEO_CHROME_ID)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLibrary(true)}
+                  className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <Plus className="size-3.5" aria-hidden /> Añadir sección
+                </button>
+              </div>
+            </aside>
+          </>
         ) : null}
 
         {(() => {
