@@ -234,9 +234,9 @@ import { Route as AuthenticatedConciergeReservacionesOrderIdRouteImport } from '
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
 import { Route as AuthenticatedCmsVisitorIntelDecisionsRouteImport } from './routes/_authenticated/cms/visitor-intel_.decisions'
+import { Route as AuthenticatedCmsVisibilidadRendimientoRouteImport } from './routes/_authenticated/cms/visibilidad_.rendimiento'
 import { Route as AuthenticatedCmsVisibilidadSpotlightRouteImport } from './routes/_authenticated/cms/visibilidad.spotlight'
 import { Route as AuthenticatedCmsVisibilidadSolicitudesRouteImport } from './routes/_authenticated/cms/visibilidad.solicitudes'
-import { Route as AuthenticatedCmsVisibilidadRendimientoRouteImport } from './routes/_authenticated/cms/visibilidad.rendimiento'
 import { Route as AuthenticatedCmsRutasNuevaRouteImport } from './routes/_authenticated/cms/rutas.nueva'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsProductosNuevaRouteImport } from './routes/_authenticated/cms/productos.nueva'
@@ -1548,6 +1548,12 @@ const AuthenticatedCmsVisitorIntelDecisionsRoute =
     path: '/visitor-intel/decisions',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsVisibilidadRendimientoRoute =
+  AuthenticatedCmsVisibilidadRendimientoRouteImport.update({
+    id: '/visibilidad_/rendimiento',
+    path: '/visibilidad/rendimiento',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsVisibilidadSpotlightRoute =
   AuthenticatedCmsVisibilidadSpotlightRouteImport.update({
     id: '/spotlight',
@@ -1558,12 +1564,6 @@ const AuthenticatedCmsVisibilidadSolicitudesRoute =
   AuthenticatedCmsVisibilidadSolicitudesRouteImport.update({
     id: '/solicitudes',
     path: '/solicitudes',
-    getParentRoute: () => AuthenticatedCmsVisibilidadRoute,
-  } as any)
-const AuthenticatedCmsVisibilidadRendimientoRoute =
-  AuthenticatedCmsVisibilidadRendimientoRouteImport.update({
-    id: '/rendimiento',
-    path: '/rendimiento',
     getParentRoute: () => AuthenticatedCmsVisibilidadRoute,
   } as any)
 const AuthenticatedCmsRutasNuevaRoute =
@@ -1967,9 +1967,9 @@ export interface FileRoutesByFullPath {
   '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/rutas/nueva': typeof AuthenticatedCmsRutasNuevaRoute
-  '/cms/visibilidad/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
+  '/cms/visibilidad/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
@@ -2221,9 +2221,9 @@ export interface FileRoutesByTo {
   '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/rutas/nueva': typeof AuthenticatedCmsRutasNuevaRoute
-  '/cms/visibilidad/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
+  '/cms/visibilidad/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
@@ -2485,9 +2485,9 @@ export interface FileRoutesById {
   '/_authenticated/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/cms/rutas/nueva': typeof AuthenticatedCmsRutasNuevaRoute
-  '/_authenticated/cms/visibilidad/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/_authenticated/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/_authenticated/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
+  '/_authenticated/cms/visibilidad_/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/_authenticated/cms/visitor-intel_/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
@@ -2751,9 +2751,9 @@ export interface FileRouteTypes {
     | '/cms/productos/nueva'
     | '/cms/regiones/nueva'
     | '/cms/rutas/nueva'
-    | '/cms/visibilidad/rendimiento'
     | '/cms/visibilidad/solicitudes'
     | '/cms/visibilidad/spotlight'
+    | '/cms/visibilidad/rendimiento'
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
@@ -3005,9 +3005,9 @@ export interface FileRouteTypes {
     | '/cms/productos/nueva'
     | '/cms/regiones/nueva'
     | '/cms/rutas/nueva'
-    | '/cms/visibilidad/rendimiento'
     | '/cms/visibilidad/solicitudes'
     | '/cms/visibilidad/spotlight'
+    | '/cms/visibilidad/rendimiento'
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/reservaciones/$orderId'
@@ -3268,9 +3268,9 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/productos/nueva'
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/cms/rutas/nueva'
-    | '/_authenticated/cms/visibilidad/rendimiento'
     | '/_authenticated/cms/visibilidad/solicitudes'
     | '/_authenticated/cms/visibilidad/spotlight'
+    | '/_authenticated/cms/visibilidad_/rendimiento'
     | '/_authenticated/cms/visitor-intel_/decisions'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
@@ -5041,6 +5041,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsVisitorIntelDecisionsRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/visibilidad_/rendimiento': {
+      id: '/_authenticated/cms/visibilidad_/rendimiento'
+      path: '/visibilidad/rendimiento'
+      fullPath: '/cms/visibilidad/rendimiento'
+      preLoaderRoute: typeof AuthenticatedCmsVisibilidadRendimientoRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/visibilidad/spotlight': {
       id: '/_authenticated/cms/visibilidad/spotlight'
       path: '/spotlight'
@@ -5053,13 +5060,6 @@ declare module '@tanstack/react-router' {
       path: '/solicitudes'
       fullPath: '/cms/visibilidad/solicitudes'
       preLoaderRoute: typeof AuthenticatedCmsVisibilidadSolicitudesRouteImport
-      parentRoute: typeof AuthenticatedCmsVisibilidadRoute
-    }
-    '/_authenticated/cms/visibilidad/rendimiento': {
-      id: '/_authenticated/cms/visibilidad/rendimiento'
-      path: '/rendimiento'
-      fullPath: '/cms/visibilidad/rendimiento'
-      preLoaderRoute: typeof AuthenticatedCmsVisibilidadRendimientoRouteImport
       parentRoute: typeof AuthenticatedCmsVisibilidadRoute
     }
     '/_authenticated/cms/rutas/nueva': {
@@ -5610,15 +5610,12 @@ const AuthenticatedCmsExperienceBuilderRouteWithChildren =
   )
 
 interface AuthenticatedCmsVisibilidadRouteChildren {
-  AuthenticatedCmsVisibilidadRendimientoRoute: typeof AuthenticatedCmsVisibilidadRendimientoRoute
   AuthenticatedCmsVisibilidadSolicitudesRoute: typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   AuthenticatedCmsVisibilidadSpotlightRoute: typeof AuthenticatedCmsVisibilidadSpotlightRoute
 }
 
 const AuthenticatedCmsVisibilidadRouteChildren: AuthenticatedCmsVisibilidadRouteChildren =
   {
-    AuthenticatedCmsVisibilidadRendimientoRoute:
-      AuthenticatedCmsVisibilidadRendimientoRoute,
     AuthenticatedCmsVisibilidadSolicitudesRoute:
       AuthenticatedCmsVisibilidadSolicitudesRoute,
     AuthenticatedCmsVisibilidadSpotlightRoute:
@@ -5660,6 +5657,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsProductosNuevaRoute: typeof AuthenticatedCmsProductosNuevaRoute
   AuthenticatedCmsRegionesNuevaRoute: typeof AuthenticatedCmsRegionesNuevaRoute
   AuthenticatedCmsRutasNuevaRoute: typeof AuthenticatedCmsRutasNuevaRoute
+  AuthenticatedCmsVisibilidadRendimientoRoute: typeof AuthenticatedCmsVisibilidadRendimientoRoute
   AuthenticatedCmsVisitorIntelDecisionsRoute: typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   AuthenticatedCmsZonasNuevaRoute: typeof AuthenticatedCmsZonasNuevaRoute
   AuthenticatedCmsCategoriasIndexRoute: typeof AuthenticatedCmsCategoriasIndexRoute
@@ -5722,6 +5720,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsProductosNuevaRoute: AuthenticatedCmsProductosNuevaRoute,
   AuthenticatedCmsRegionesNuevaRoute: AuthenticatedCmsRegionesNuevaRoute,
   AuthenticatedCmsRutasNuevaRoute: AuthenticatedCmsRutasNuevaRoute,
+  AuthenticatedCmsVisibilidadRendimientoRoute:
+    AuthenticatedCmsVisibilidadRendimientoRoute,
   AuthenticatedCmsVisitorIntelDecisionsRoute:
     AuthenticatedCmsVisitorIntelDecisionsRoute,
   AuthenticatedCmsZonasNuevaRoute: AuthenticatedCmsZonasNuevaRoute,
