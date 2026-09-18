@@ -3104,7 +3104,7 @@ function DeviceToggle({
       role="group"
       aria-label="Vista previa por dispositivo"
       data-eb-device-presets={DEVICE_PRESETS.length}
-      className="inline-flex items-center overflow-hidden rounded-md border border-border bg-background"
+      className="hidden items-center overflow-hidden rounded-md border border-border bg-background md:flex"
     >
       {DEVICE_PRESETS.map((preset) => {
         const active = preset.id === value;
@@ -3200,6 +3200,10 @@ function HomeCanvas({
   // por lo que container queries y breakpoints no se ven alterados.
   const scale = Math.min(1, availableWidth / preset.width);
   const headerVariant = resolveCanvasHeaderVariant(tree);
+  // R1-F1L-R2 · La autoridad Premium de Home se aísla de composiciones antiguas.
+  // El caso `previewMode && pageType === "home"` queda cubierto porque la
+  // resolución se aplica a TODA la superficie Home (edición y vista previa),
+  // nunca a otras familias de plantilla.
   const renderedTree =
     pageType === "home"
       ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)

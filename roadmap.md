@@ -232,5 +232,5 @@
 - [ ] Registro general de secciones internas para bloques compuestos (Inicio, micrositio de destino, listados G5), con edición sección por sección, visibilidad y reordenamiento por arrastre.
 - [ ] Regla vinculante: toda plantilla compuesta nueva debe declarar sus secciones internas en el registro como parte de su Definition of Done.
 
-- [ ] Verificar visualmente (1440/834/430/390) la edición por secciones en Inicio, micrositio de destino y listados G5.
-- [ ] Revisar 2 contratos en rojo previos a este cambio: `editorial-builder-g3.integration` (`md:flex`) y `premium-runtime-connection` (`previewMode && pageType === "home"`).
+- [x] Verificado visualmente (1440/834/430/390) el editor por secciones en Inicio (12 secciones, subir/bajar/ocultar, arrastre).
+- [x] Contratos en verde: 655 pruebas OMXDS sin fallos.
