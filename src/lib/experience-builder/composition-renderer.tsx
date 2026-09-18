@@ -490,6 +490,7 @@ function ListingPremiumG5Render({ node }: BlockPreviewProps): ReactNode {
       emptyMessage={resolved.emptyMessage}
       showAddToTrip={resolved.showAddToTrip}
       showFavorite={resolved.showFavorite}
+      discoveryRailConfig={resolved.discoveryRails}
     />
   );
 }

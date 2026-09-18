@@ -20,6 +20,7 @@ import {
 } from "@/components/surfaces/TourismListingSurface";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
+import type { QUE_HACER_DISCOVERY_RAILS } from "./listing-premium-config";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import {
   TerritorialListingReviewSurface,
@@ -96,6 +97,7 @@ export interface ListingPremiumSurfaceProps {
   mapSlot?: ReactNode;
   /** Superficie pública para medición de visibilidad (aditiva). */
   trackingSurface?: string | null;
+  discoveryRailConfig?: typeof QUE_HACER_DISCOVERY_RAILS;
   className?: string;
 }
 
@@ -114,6 +116,7 @@ export function ListingPremiumSurface({
   intentPrompts,
   mapSlot,
   trackingSurface = null,
+  discoveryRailConfig,
   className,
 }: ListingPremiumSurfaceProps) {
   return (
@@ -138,6 +141,7 @@ export function ListingPremiumSurface({
       intentPrompts={intentPrompts}
       mapSlot={mapSlot}
       trackingSurface={trackingSurface}
+      discoveryRailConfig={discoveryRailConfig}
       trackingRail="listado"
       emptyMessage={
         emptyMessage ?? "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya."
