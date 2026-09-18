@@ -32,6 +32,7 @@ import { ExperienceRelatedCollectionBlock } from "@/components/experience-builde
 import { ListingPremiumSurfaceFromDTO } from "@/components/listing-premium/ListingPremiumSurface";
 import {
   buildPublicListing,
+  configurePublicDiscoveryRails,
   listingFamilyContract,
   isListingFamilyId,
   type ListingFamilyId,
@@ -39,7 +40,6 @@ import {
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { getListingFamilyTaxonomy } from "@/lib/listings/listing-family-taxonomy.functions";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
-import { configurePublicDiscoveryRails } from "@/lib/listings/listing-public-contract";
 
 const CANONICAL_LISTING_FAMILIES: Partial<Record<string, ListingFamilyId>> = {
   hoteles: "hoteles",
