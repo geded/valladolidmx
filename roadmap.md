@@ -206,3 +206,9 @@
 - [x] Barra principal de escritorio reducida a Oriente Maya, Hoteles, Restaurantes y Experiencias; se retira la opción “Más”.
 - [x] Panel de menú (hamburguesa) disponible también en escritorio con Casas de vacaciones, ¿Qué hacer?, Eventos, Promociones, Mapa, Blog, Contacto, “Arma tu Viaje” e inicio de sesión; el idioma permanece exclusivamente en el header para evitar duplicación y fallos.
 - [x] Validado en 1440/834/430/390 sin desbordamiento; logotipo, buscador, Mi Viaje, cuenta y rutas preservados. Sin publicar.
+
+## Qué hacer · visibilidad contratada (2026-09-18)
+
+- [ ] Prioridad tipo buscador: la ficha con contrato vigente y elegible ocupa la primera posición de cada bloque de 4; sin contratado elegible, la toma un orgánico.
+- [ ] Cupo 1 de cada 4, máximo 2 apariciones por empresa (1 por carril), aplicable también a Hoteles, Restaurantes, Casas de vacaciones, Eventos, Lugares y listados territoriales.
+- [ ] Etiqueta discreta "Recomendado" fuera de la fotografía para contenido contratado; carril editorial mantiene "Recomendados por Valladolid.mx".
