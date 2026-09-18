@@ -74,6 +74,38 @@ type StatusFilter = "all" | "draft" | "published" | "scheduled" | "archived";
 type WorkflowFilter = "all" | "draft" | "in_review" | "approved";
 type OwnershipFilter = "all" | "mine";
 
+/**
+ * Familias con cadena vigente Studio → guardado → preview → superficie pública.
+ * Las familias históricas o todavía desconectadas no se ofrecen como editables:
+ * permanecen intactas en el historial y pueden recuperarse cuando completen su gate.
+ */
+const ACTIVE_STUDIO_KINDS = new Set<PageKind>([
+  "home",
+  "landing",
+  "campaign",
+  "microsite",
+  "institutional",
+  "promo",
+  "place",
+  "experience",
+  "hotel",
+  "restaurant",
+  "event",
+  "business",
+  "product",
+  "alux",
+  "trip_builder",
+  "wedding",
+]);
+
+const ACTIVE_PAGE_KIND_REGISTRY = PAGE_KIND_REGISTRY.filter((definition) =>
+  ACTIVE_STUDIO_KINDS.has(definition.kind),
+);
+
+function isCurrentStudioPage(row: StudioPageRow): boolean {
+  return ACTIVE_STUDIO_KINDS.has(row.kind);
+}
+
 function slugify(v: string): string {
   return v
     .toLowerCase()
@@ -214,7 +246,9 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const [rows, setRows] = useState<StudioPageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  // La vista operativa abre sólo lo que está publicado y en uso. Los borradores
+  // y archivados siguen disponibles mediante el filtro para revisión gobernada.
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("published");
   const [kindFilter, setKindFilter] = useState<PageKind | "all">("all");
   const [workflowFilter, setWorkflowFilter] = useState<WorkflowFilter>("all");
   const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("all");
@@ -256,6 +290,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     return rows.filter((r) => {
+      if (!isCurrentStudioPage(r)) return false;
       if (statusFilter !== "all" && derivedStatus(r) !== statusFilter) return false;
       if (kindFilter !== "all" && r.kind !== kindFilter) return false;
       if (workflowFilter !== "all" && r.workflow_state !== workflowFilter) return false;
@@ -277,7 +312,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
       list.push(r);
       byKind.set(r.kind, list);
     }
-    return PAGE_KIND_REGISTRY.map((def) => ({
+    return ACTIVE_PAGE_KIND_REGISTRY.map((def) => ({
       def,
       rows: byKind.get(def.kind) ?? [],
     }));
@@ -385,8 +420,8 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </p>
           <h2 className="mt-1 text-lg font-semibold sm:text-xl">Mis páginas</h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Todas las páginas del sitio, agrupadas por tipo. Selecciona una para editarla dentro del
-            Studio, sin salir del canvas.
+            Páginas y plantillas aprobadas que utiliza actualmente el sitio. Los borradores
+            históricos permanecen disponibles en el filtro de estados.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -455,7 +490,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           aria-label="Filtrar por tipo de página"
         >
           <option value="all">Todos los tipos</option>
-          {PAGE_KIND_REGISTRY.map((k) => (
+          {ACTIVE_PAGE_KIND_REGISTRY.map((k) => (
             <option key={k.kind} value={k.kind}>
               {k.label}
             </option>
@@ -964,7 +999,7 @@ function CreatePageDialog({
   }) => Promise<void>;
 }) {
   const { roles } = useAuth();
-  const allowedKinds = PAGE_KIND_REGISTRY.filter((k) =>
+  const allowedKinds = ACTIVE_PAGE_KIND_REGISTRY.filter((k) =>
     k.requiredRoles.some((r) => roles.includes(r)),
   );
   const [step, setStep] = useState<1 | 2>(1);

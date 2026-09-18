@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Depurar el catálogo para mostrar únicamente plantillas Premium aprobadas y superficies activas de la plataforma; ocultar pruebas históricas, demos y composiciones sin consumidor vigente, sin borrar contenido válido hasta completar trazabilidad y Preservation Gate.
+- [x] Experience Builder · Catálogo operativo limitado a familias conectadas; vista inicial sólo publicada, con borradores y archivadas accesibles por filtro. Pruebas históricas desconectadas quedan ocultas de forma reversible y sin borrar datos.
 
 - [ ] Qué hacer · Evolución editorial CMS-first: crear su administración dentro del Experience Builder para ordenar/activar Destinos recomendados, Eventos, Experiencias y Lugares de interés; integrar los contratos desde Administración → Visibilidad como elegibilidad comercial separada y limitada, con indicación `Promovido` discreta fuera de la fotografía, sin duplicar Lugares, planes, pagos ni superficies.
 
