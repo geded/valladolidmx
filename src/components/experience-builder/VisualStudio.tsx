@@ -2881,7 +2881,7 @@ function HomeCanvas({
     <div
       ref={outerRef}
       data-eb-canvas-scrollport="editor"
-      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-hidden bg-muted/20 p-3"
+      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-y-auto overflow-x-hidden bg-muted/20 p-3"
     >
       <CanvasViewport
         device={deviceViewport}
