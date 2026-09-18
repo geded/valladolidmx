@@ -3375,7 +3375,9 @@ function CanvasViewport({
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
-  const [documentHeight, setDocumentHeight] = useState(minimumHeight);
+  // El alto del iframe es SIEMPRE el del dispositivo: así las alturas relativas
+  // a la ventana (100vh, min-h-screen) no realimentan la medición del lienzo.
+  const documentHeight = minimumHeight;
 
   useEffect(() => {
     const iframe = iframeRef.current;
