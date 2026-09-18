@@ -239,56 +239,151 @@ export function HomePremiumSurface({
               <span className="flex min-w-0 items-center gap-3">
                 <TourismCategoryIcon slug="experiencias" variant="standard" />
                 <span className="min-w-0">
-                  <span className="block text-xs font-semibold uppercase tracking-wide text-primary">{content.experiencias.kicker}</span>
-                  <span className="block text-base font-semibold sm:truncate sm:text-lg">{content.experiencias.title}</span>
-                  <span className="block text-sm text-muted-foreground">{content.experiencias.description}</span>
+                  <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
+                    {content.experiencias.kicker}
+                  </span>
+                  <span className="block text-base font-semibold sm:truncate sm:text-lg">
+                    {content.experiencias.title}
+                  </span>
+                  <span className="block text-sm text-muted-foreground">
+                    {content.experiencias.description}
+                  </span>
                 </span>
               </span>
-              <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">{content.experiencias.action}</span>
+              <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
+                {content.experiencias.action}
+              </span>
             </a>
           </Container>
           <Container className="mt-6 sm:mt-8" data-home-journey="categories">
-            <section aria-label={content.categorias.heading} className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+            <section
+              aria-label={content.categorias.heading}
+              className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
+            >
               <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
-              <CategoryNavGrid items={content.categorias.items} variant="standard" mode="navigate" showCounts={false} desktopColumnsClassName="lg:grid-cols-6" />
+              <CategoryNavGrid
+                items={content.categorias.items}
+                variant="standard"
+                mode="navigate"
+                showCounts={false}
+                desktopColumnsClassName="lg:grid-cols-6"
+              />
             </section>
           </Container>
         </div>
       );
     if (key === "travelPlan")
       return (
-        <Container className="mt-8 lg:mt-12" data-home-journey="travel-plan" data-eb-section="travelPlan">
-          <TravelPlanClose content={content} selectedRoute={selectedRoute} added={added} onAdd={() => setAdded(true)} />
+        <Container
+          className="mt-8 lg:mt-12"
+          data-home-journey="travel-plan"
+          data-eb-section="travelPlan"
+        >
+          <TravelPlanClose
+            content={content}
+            selectedRoute={selectedRoute}
+            added={added}
+            onAdd={() => setAdded(true)}
+          />
         </Container>
       );
     if (key === "destinos")
       return (
-        <Container className="mt-8 lg:mt-12" data-home-journey="territory" data-eb-section="destinos">
-          <div data-cinematic-section={cinematic || undefined}><DestinationsSection content={content} layout={layout} cinematic={cinematic} opened={openedMicrosite} onOpen={setOpenedMicrosite} /></div>
+        <Container
+          className="mt-8 lg:mt-12"
+          data-home-journey="territory"
+          data-eb-section="destinos"
+        >
+          <div data-cinematic-section={cinematic || undefined}>
+            <DestinationsSection
+              content={content}
+              layout={layout}
+              cinematic={cinematic}
+              opened={openedMicrosite}
+              onOpen={setOpenedMicrosite}
+            />
+          </div>
         </Container>
       );
     if (key === "pueblosMagicos")
       return (
-        <Container className="mt-8 lg:mt-12" data-eb-section="pueblosMagicos"><div data-cinematic-section={cinematic || undefined}><PueblosMagicosSection content={content} onCreateRoute={() => setSelectedRoute("pueblos")} /></div></Container>
+        <Container className="mt-8 lg:mt-12" data-eb-section="pueblosMagicos">
+          <div data-cinematic-section={cinematic || undefined}>
+            <PueblosMagicosSection
+              content={content}
+              onCreateRoute={() => setSelectedRoute("pueblos")}
+            />
+          </div>
+        </Container>
       );
     if (key === "rutas")
       return (
-        <Container className="mt-8 lg:mt-12" data-home-journey="routes" data-eb-section="rutas"><div data-cinematic-section={cinematic || undefined}><RoutesSection content={content} selectedRoute={selectedRoute} onSelectRoute={setSelectedRoute} onAdd={() => setAdded(true)} /></div></Container>
+        <Container className="mt-8 lg:mt-12" data-home-journey="routes" data-eb-section="rutas">
+          <div data-cinematic-section={cinematic || undefined}>
+            <RoutesSection
+              content={content}
+              selectedRoute={selectedRoute}
+              onSelectRoute={setSelectedRoute}
+              onAdd={() => setAdded(true)}
+            />
+          </div>
+        </Container>
       );
     if (key === "experiencias")
-      return <Container className="mt-8 lg:mt-12" data-home-journey="experiencias" data-eb-section="experiencias"><div data-cinematic-section={cinematic || undefined}><ExperiencesSection content={content} layout={layout} cinematic={cinematic} /></div></Container>;
-    if (key === "servicios") return <Container className="mt-8 lg:mt-12" data-eb-section="servicios"><div data-cinematic-section={cinematic || undefined}><ServicesSection content={content} /></div></Container>;
-    if (key === "eventos") return <Container className="mt-8 lg:mt-12" data-home-journey="eventos" data-eb-section="eventos"><div data-cinematic-section={cinematic || undefined}><EventsSection content={content} /></div></Container>;
-    if (key === "queHacer") return <Container className="mt-8 lg:mt-12" data-eb-section="queHacer"><div data-cinematic-section={cinematic || undefined}><EditorialSection content={content} cinematic={cinematic} /></div></Container>;
+      return (
+        <Container
+          className="mt-8 lg:mt-12"
+          data-home-journey="experiencias"
+          data-eb-section="experiencias"
+        >
+          <div data-cinematic-section={cinematic || undefined}>
+            <ExperiencesSection content={content} layout={layout} cinematic={cinematic} />
+          </div>
+        </Container>
+      );
+    if (key === "servicios")
+      return (
+        <Container className="mt-8 lg:mt-12" data-eb-section="servicios">
+          <div data-cinematic-section={cinematic || undefined}>
+            <ServicesSection content={content} />
+          </div>
+        </Container>
+      );
+    if (key === "eventos")
+      return (
+        <Container className="mt-8 lg:mt-12" data-home-journey="eventos" data-eb-section="eventos">
+          <div data-cinematic-section={cinematic || undefined}>
+            <EventsSection content={content} />
+          </div>
+        </Container>
+      );
+    if (key === "queHacer")
+      return (
+        <Container className="mt-8 lg:mt-12" data-eb-section="queHacer">
+          <div data-cinematic-section={cinematic || undefined}>
+            <EditorialSection content={content} cinematic={cinematic} />
+          </div>
+        </Container>
+      );
     return (
-      <Container className="mt-8 lg:mt-12" data-home-journey="mapa" data-eb-section="mapa"><div data-cinematic-section={cinematic || undefined}><MapSection content={content} selectedRoute={selectedRoute} proposalSequence={proposalSequence} /></div></Container>
+      <Container className="mt-8 lg:mt-12" data-home-journey="mapa" data-eb-section="mapa">
+        <div data-cinematic-section={cinematic || undefined}>
+          <MapSection
+            content={content}
+            selectedRoute={selectedRoute}
+            proposalSequence={proposalSequence}
+          />
+        </div>
+      </Container>
     );
   };
 
   return (
     <>
       <main data-home-presentation={heroVariant}>
-        {presentationOrder.map((key) => enabled(key) ? <Fragment key={key}>{renderSection(key)}</Fragment> : null)}
+        {presentationOrder.map((key) =>
+          enabled(key) ? <Fragment key={key}>{renderSection(key)}</Fragment> : null,
+        )}
       </main>
     </>
   );

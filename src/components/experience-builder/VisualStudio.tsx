@@ -3435,7 +3435,9 @@ function CanvasViewport({
     // El documento del canvas tiene el alto completo, por lo que Safari no
     // encuentra un scroll interno. Reenviamos rueda y gesto táctil al área de
     // trabajo exterior para poder recorrer toda la plantilla en iPad.
-    const parentScroller = iframe?.parentElement?.closest("[data-eb-canvas-scrollport]") as HTMLElement | null;
+    const parentScroller = iframe?.parentElement?.closest(
+      "[data-eb-canvas-scrollport]",
+    ) as HTMLElement | null;
     const onWheel = (event: WheelEvent) => {
       if (!parentScroller) return;
       parentScroller.scrollTop += event.deltaY;
@@ -3490,8 +3492,7 @@ function CanvasViewport({
     let touchKey: string | null = null;
     let touchMoved = false;
 
-    const sections = () =>
-      Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
+    const sections = () => Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
     const decorate = () => {
       sections().forEach((section) => {
         const key = section.dataset.ebSection;
@@ -3524,7 +3525,8 @@ function CanvasViewport({
 
     const sectionFrom = (target: EventTarget | null) =>
       (target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-section]") ?? null;
-    const sectionKey = (target: EventTarget | null) => sectionFrom(target)?.dataset.ebSection ?? null;
+    const sectionKey = (target: EventTarget | null) =>
+      sectionFrom(target)?.dataset.ebSection ?? null;
     const onClick = (event: MouseEvent) => {
       const key = sectionKey(event.target);
       if (!key) return;
@@ -3559,15 +3561,20 @@ function CanvasViewport({
       const touch = event.touches[0];
       if (!touch) return;
       touchMoved = true;
-      const over = doc.elementFromPoint(touch.clientX, touch.clientY)?.closest<HTMLElement>("[data-eb-section]");
+      const over = doc
+        .elementFromPoint(touch.clientX, touch.clientY)
+        ?.closest<HTMLElement>("[data-eb-section]");
       sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
       over?.setAttribute("data-eb-drop-target", "");
       event.preventDefault();
     };
     const onTouchEnd = () => {
-      const overKey = doc.querySelector<HTMLElement>("[data-eb-section][data-eb-drop-target]")?.dataset.ebSection ?? null;
+      const overKey =
+        doc.querySelector<HTMLElement>("[data-eb-section][data-eb-drop-target]")?.dataset
+          .ebSection ?? null;
       sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
-      if (touchMoved && touchKey && overKey && touchKey !== overKey) onReorderSection(touchKey, overKey);
+      if (touchMoved && touchKey && overKey && touchKey !== overKey)
+        onReorderSection(touchKey, overKey);
       touchKey = null;
       touchMoved = false;
     };
