@@ -734,12 +734,14 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
 
   test("Home conserva la jerarquía de Marca e Inspiración alrededor de las rutas", () => {
     const surface = read("src/components/home-premium/HomePremiumSurface.tsx");
-    const territory = surface.indexOf('data-home-journey="territory"');
-    const categories = surface.indexOf('data-home-journey="categories"');
-    const routes = surface.indexOf('data-home-journey="routes"');
-    const alux = surface.indexOf('data-home-journey="alux"');
-    const travelPlan = surface.indexOf('data-home-journey="travel-plan"');
-    const remaining = surface.indexOf("remainingDiscoveryOrder.map");
+    const content = read("src/components/home-premium/home-premium-content.ts");
+    const orderStart = content.indexOf("export const HOME_PREMIUM_DEFAULT_ORDER");
+    const defaultOrder = content.slice(orderStart, content.indexOf("];", orderStart));
+    const territory = defaultOrder.indexOf('"destinos"');
+    const categories = defaultOrder.indexOf('"categorias"');
+    const routes = defaultOrder.indexOf('"rutas"');
+    const alux = defaultOrder.indexOf('"alux"');
+    const travelPlan = defaultOrder.indexOf('"travelPlan"');
 
     // Alux abre el recorrido; después Territorio → Categorías → Rutas →
     // Mi Viaje y al final el resto del descubrimiento.
@@ -749,9 +751,9 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(territory).toBeLessThan(categories);
     expect(categories).toBeLessThan(routes);
     expect(routes).toBeLessThan(travelPlan);
-    expect(travelPlan).toBeLessThan(remaining);
-    expect(surface).toContain('key !== "destinos" &&');
-    expect(surface).toContain('key !== "rutas" &&');
+    expect(surface).toContain("presentationOrder.map");
+    expect(surface).toContain('data-eb-section="alux"');
+    expect(surface).toContain('data-eb-section="travelPlan"');
     expect(surface).toContain('heroVariant === "editorial"');
     expect(surface).toContain("useHeroAutoplay(content.hero.slides.length, setIndex)");
   });

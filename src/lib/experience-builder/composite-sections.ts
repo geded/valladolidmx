@@ -260,14 +260,14 @@ export function nextCompositeOrder(
   toKey: string,
 ): string[] | null {
   if (!entry.orderKey) return null;
-  const current = orderedCompositeSections(entry, config)
-    .filter((s) => s.reorderable)
-    .map((s) => s.key);
+  const ordered = orderedCompositeSections(entry, config);
+  const current = ordered.filter((s) => s.reorderable).map((s) => s.key);
   const from = current.indexOf(fromKey);
   const to = current.indexOf(toKey);
   if (from < 0 || to < 0 || from === to) return null;
   const next = [...current];
   const [moved] = next.splice(from, 1);
   next.splice(to, 0, moved as string);
-  return next;
+  let cursor = 0;
+  return ordered.map((section) => (section.reorderable ? (next[cursor++] as string) : section.key));
 }

@@ -3511,10 +3511,12 @@ function CanvasViewport({
     const style = doc.createElement("style");
     style.setAttribute("data-eb-section-style", "");
     style.textContent = `
+      [data-eb-section] { pointer-events:auto; }
+      [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
         background:hsl(var(--background)); color:hsl(var(--foreground)); box-shadow:0 4px 16px rgb(0 0 0 / .16);
-        cursor:grab; touch-action:none; font-weight:800; letter-spacing:2px; }
+        cursor:grab; touch-action:none; pointer-events:auto; font-weight:800; letter-spacing:2px; }
       [data-eb-section]:has(> [data-eb-section-handle]:focus) { outline:3px solid hsl(var(--ring)); outline-offset:3px; }
       [data-eb-section][data-eb-drop-target] { outline:3px dashed hsl(var(--primary)); outline-offset:4px; }
     `;
@@ -3561,6 +3563,16 @@ function CanvasViewport({
       const touch = event.touches[0];
       if (!touch) return;
       touchMoved = true;
+      const parentScroller = iframeRef.current?.parentElement?.closest(
+        "[data-eb-canvas-scrollport]",
+      ) as HTMLElement | null;
+      if (parentScroller) {
+        const visibleTop = parentScroller.scrollTop / Math.max(scale, 0.01);
+        const visibleBottom = visibleTop + parentScroller.clientHeight / Math.max(scale, 0.01);
+        const edge = 96;
+        if (touch.clientY < visibleTop + edge) parentScroller.scrollTop -= 22;
+        if (touch.clientY > visibleBottom - edge) parentScroller.scrollTop += 22;
+      }
       const over = doc
         .elementFromPoint(touch.clientX, touch.clientY)
         ?.closest<HTMLElement>("[data-eb-section]");
@@ -3596,7 +3608,7 @@ function CanvasViewport({
       doc.removeEventListener("touchmove", onTouchMove);
       doc.removeEventListener("touchend", onTouchEnd);
     };
-  }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys]);
+  }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys, scale]);
 
   useEffect(() => {
     if (!mount) return;
