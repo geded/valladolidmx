@@ -3,8 +3,9 @@
 ## Qué está pasando hoy
 
 1. **No puedes recorrer la página en el iPad.** El lienzo del constructor se dibuja dentro de un marco aislado; en Safari el gesto de deslizar se queda atrapado en ese marco y la página no avanza, por eso sólo ves la portada y lo que está debajo del hero queda inalcanzable.
-2. **Arrastrar y soltar sí existe, pero no donde lo estás intentando.** En Inicio toda la plantilla es una sola pieza aprobada con 12 secciones internas. El arrastre está disponible en el panel “Estructura”, no sobre el lienzo, así que al intentar mover directamente sobre la página no ocurre nada.
-3. **Alux no se puede mover.** En Inicio, portada, Alux, categorías y Mi Viaje están fijados en la plantilla aprobada; sólo destinos, rutas, pueblos mágicos, experiencias, hospedaje, eventos, qué hacer y mapa admiten reordenamiento.
+2. **Las 12 secciones de Inicio sí existen, pero sólo dentro del panel “Estructura”.** Ahí puedes seleccionarlas, ocultarlas y arrastrarlas. Sobre el lienzo, en cambio, Inicio sigue tratándose como una sola pieza: por eso al intentar arrastrar directamente sobre la página no ocurre nada y el encabezado dice “sección 1 de 1”.
+3. **Alux no se puede mover.** En Inicio, portada, categorías, Alux y Mi Viaje quedaron fijas; sólo destinos, rutas, pueblos mágicos, experiencias, hospedaje, eventos, qué hacer y mapa admiten reordenamiento.
+
 
 ## Qué voy a hacer
 
