@@ -87,8 +87,9 @@ describe("G8-Q2D-0 · propuesta visual", () => {
     expect(surface).toContain("cinematic");
     expect(surface).toContain("PremiumHero");
     expect(surface).not.toContain("HeroEditorial");
-    expect(surface).toContain("GalleryFilmstrip");
-    expect(surface).toContain("GalleryMosaic");
+    // La galería se unificó en el bloque oficial `experience-gallery`:
+    // ya no existen variantes propias de la ficha de Lugar.
+    expect(surface).toContain("ExperienceGallery");
   });
 
   test("oculta los módulos sin contenido", () => {

@@ -15,12 +15,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const MANIFEST_PATH = join(
-  HERE,
-  "..",
-  "r1-f1l-r2",
-  "destination-gallery-open-media.manifest.json",
-);
+const MANIFEST_PATH = join(HERE, "..", "r1-f1l-r2", "destination-gallery-open-media.manifest.json");
 const OUT_DIR = join(HERE, "out");
 const BUCKET = "studio-media";
 const MAX_DOWNLOAD_BYTES = 24 * 1024 * 1024;

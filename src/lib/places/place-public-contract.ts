@@ -292,7 +292,8 @@ function hoursValue(h: PublicPlaceHoursDTO): string {
     const opens = hhmm(h.opensAt);
     const closes = hhmm(h.closesAt);
     /* Paseo público abierto 24 h: se dice en lenguaje del visitante. */
-    if (opens === "00:00" && (closes === "23:59" || closes === "24:00")) return "abierto todo el día";
+    if (opens === "00:00" && (closes === "23:59" || closes === "24:00"))
+      return "abierto todo el día";
     return `${opens} – ${closes}`;
   }
   return h.notes?.trim() || "horario por confirmar";
@@ -373,7 +374,6 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
   const galleryItems = dto.media
     .filter((m) => m.url && m.approved)
     .map((m) => toSurfaceMedia(m, placeholderLabel));
-
 
   const facts: PlacePremiumContent["essentials"]["facts"] = [];
   /* La familia es METADATA declarada, nunca un selector visual de estilo. */
@@ -515,7 +515,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     // Q2D-B no infiere cercanías: sin fuente gobernada, la sección se oculta.
     nearby: [],
     /* Cercanía real por coordenadas CMS (nunca inferida por texto). */
-    nearbyBusinesses: dto.nearbyBusinesses.map((b) => ({
+    nearbyBusinesses: (dto.nearbyBusinesses ?? []).map((b) => ({
       id: b.id,
       slug: b.slug,
       title: b.name,
