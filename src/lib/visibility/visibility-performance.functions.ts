@@ -47,7 +47,9 @@ export const getAdminVisibilityPerformance = createServerFn({ method: "POST" })
     const { data: rows, error } = await supa.rpc("admin_visibility_performance", {
       _window_days: windowDays,
     });
-    if (error) throw error;
+    if (error) {
+      throw new Error(/forbidden/i.test(error.message ?? "") ? "forbidden" : (error.message ?? "error"));
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return ((rows ?? []) as any[]).map((r) => ({
       grant_id: r.grant_id,
