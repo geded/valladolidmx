@@ -213,3 +213,4 @@
 - [ ] Cupo 1 de cada 4, máximo 2 apariciones por empresa (1 por carril), aplicable también a Hoteles, Restaurantes, Casas de vacaciones, Eventos, Lugares y listados territoriales.
 - [ ] Etiqueta discreta "Recomendado" fuera de la fotografía para contenido contratado; carril editorial mantiene "Recomendados por Valladolid.mx".
 - [ ] Reparto justo con muchos contratos: turnos por nivel de paquete, rotación determinista diaria, deuda de exposición, techo por empresa y cupo por superficie; sin posición fija garantizada.
+- [ ] Alcance: aplicar cupo, prioridad y etiqueta en Home y todos los listados (incluidos territoriales y por categoría); excluir destinos, mapa, fichas, Alux, Mi Viaje y Concierge. Despliegue por etapas: /que-hacer → listados → Home.

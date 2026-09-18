@@ -57,6 +57,23 @@ Con decenas o cientos de empresas contratadas, los espacios comerciales son esca
 - **Vigencia y pausa:** grant vencido, suspendido o ficha despublicada sale de la rotación de inmediato y su espacio lo toma el siguiente elegible o un orgánico.
 - **Medición:** impresiones, clics y turnos servidos se registran por empresa y periodo para acreditar el cumplimiento del paquete.
 
+## Superficies alcanzadas
+
+Sí: las mismas reglas rigen Home y todos los listados, porque hoy el impulso comercial ya actúa ahí sin cupo ni transparencia.
+
+| Superficie | Espacios comerciales | Etiqueta `Recomendado` | Cupo |
+| --- | --- | --- | --- |
+| Home (empresas destacadas, promociones) | Sí | Sí | 1 de cada 4 |
+| Hoteles, Restaurantes, Casas de vacaciones, Experiencias, Eventos, Lugares | Sí | Sí | 1 de cada 4 |
+| Listados territoriales `/oriente-maya/...` y por categoría | Sí | Sí | 1 de cada 4 |
+| `/que-hacer` | Sí | Sí | 1 de cada 4 |
+| Destinos, mapa territorial, breadcrumb y navegación | No | No aplica | Sin espacios comerciales |
+| Fichas de empresa, experiencia y producto | No | No aplica | Contenido propio, sin promoción de terceros |
+| Alux, Mi Viaje, Concierge y propuestas | No | No aplica | El impulso comercial nunca entra en su razonamiento |
+
+- Búsquedas y filtros con intención explícita del viajero se resuelven por relevancia; el espacio comercial sólo existe si el resultado es igualmente pertinente.
+- El despliegue será por etapas: primero `/que-hacer`, después listados y Home, con comparativa antes/después en cada paso.
+
 ## Scope Gate
 
 - Evolucionar únicamente la composición publicada de `/que-hacer` sobre su autoridad Premium actual.
