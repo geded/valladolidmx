@@ -2779,7 +2779,8 @@ function PageVisualEditor({
             surface={editorialSurface}
             actor={editorialActor}
             onClose={() => setShowLibrary(false)}
-            onPick={(type) => insertBlock(type)}
+            insertAt={insertAt}
+            onPick={(type) => insertBlock(type, insertAt ?? undefined)}
             onPickReusable={(entry) => insertReusable(entry)}
           />
         ) : null}
@@ -3916,6 +3917,27 @@ function ToolBtn({
     >
       {icon}
       {label}
+    </button>
+  );
+}
+
+/**
+ * Zona de inserción entre secciones: abre la biblioteca de elementos
+ * aprobados y coloca el elegido exactamente en esa posición.
+ */
+function InsertHere({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex h-5 w-full items-center gap-1 text-[10px] font-medium uppercase tracking-[0.12em] text-transparent transition hover:text-primary"
+      aria-label="Insertar un elemento aquí"
+      title="Insertar un elemento aquí"
+    >
+      <span className="h-px flex-1 bg-transparent transition group-hover:bg-primary/40" />
+      <Plus className="size-3" aria-hidden />
+      Insertar aquí
+      <span className="h-px flex-1 bg-transparent transition group-hover:bg-primary/40" />
     </button>
   );
 }
