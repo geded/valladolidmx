@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Qué hacer · Evolución editorial CMS-first: crear su administración dentro del Experience Builder para ordenar/activar Destinos recomendados, Eventos, Experiencias y Lugares de interés; integrar los contratos desde Administración → Visibilidad como elegibilidad comercial separada, etiquetada y limitada, sin duplicar Lugares, planes, pagos ni superficies.
+- [ ] Qué hacer · Evolución editorial CMS-first: crear su administración dentro del Experience Builder para ordenar/activar Destinos recomendados, Eventos, Experiencias y Lugares de interés; integrar los contratos desde Administración → Visibilidad como elegibilidad comercial separada y limitada, con indicación `Promovido` discreta fuera de la fotografía, sin duplicar Lugares, planes, pagos ni superficies.
 
 - [x] Reservación de productos · Calendario oficial con días disponibles en verde y cupo visible, selección progresiva día → horario → personas y horario único preseleccionado. Inventario, apartados, checkout ERL, ficha Premium y datos CMS preservados; contratos, typecheck, `git diff --check` y QA 1440/834/430/390 en PASS, sin overflow. El aviso de Google Maps en localhost es externo al flujo.
 

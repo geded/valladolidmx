@@ -8,7 +8,7 @@ La selección combinará tres carriles claramente separados:
 
 1. **Recomendados por Valladolid.mx**: selección editorial manual por calidad, interés turístico, vigencia y diversidad territorial.
 2. **Descubrimiento orgánico**: rotación diaria entre fichas publicadas y completas, respetando destino, categoría y preferencias explícitas del visitante.
-3. **Visibilidad contratada**: contenidos de empresas con paquete vigente, siempre identificados como **Destacado** o **Patrocinado**, relevantes para la sección y con cupo máximo.
+3. **Visibilidad contratada**: contenidos de empresas con paquete vigente, relevantes para la sección y con cupo máximo. La transparencia comercial se comunica de forma discreta en la información de la tarjeta, nunca sobre la fotografía.
 
 ## Autoridad revisada
 
@@ -34,6 +34,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 - El editor puede fijar y ordenar contenidos editoriales desde el Experience Builder.
 - Los espacios orgánicos restantes rotan una vez al día, de forma determinista y estable durante el día.
 - Máximo **1 contenido contratado por cada 4 tarjetas visibles**; nunca se ocultan empresas sin plan.
+- La fotografía permanece limpia: sin badges, cintillos ni etiquetas comerciales superpuestas. La indicación breve `Promovido` aparece como texto secundario junto a los datos de la ficha y no ocupa un espacio editorial adicional.
 - Los filtros y la intención explícita del viajero siempre prevalecen sobre cualquier impulso comercial.
 - Un pago nunca hace elegible una ficha incompleta ni desplaza un resultado claramente más relevante.
 - Desempate orgánico: calidad de ficha, actualidad, cercanía temática y variedad entre destinos.
@@ -59,7 +60,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 
 - Conserva el catálogo de paquetes, solicitudes, vigencia y cancelación actuales.
 - Añade `/que-hacer` como superficie disponible sólo mediante una palanca configurable del paquete vigente.
-- Muestra cupo disponible, vigencia, empresa, etiqueta e impresiones/clics agregados de la superficie.
+- Muestra cupo disponible, vigencia, empresa, modalidad de promoción e impresiones/clics agregados de la superficie.
 - `Founder Spotlight` permanece separado, temporal y auditado.
 
 ### Portal Empresa
@@ -82,7 +83,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 
 1. **Contrato y maqueta:** definir composición, proporción 3 orgánicos + 1 contratado y estados visuales; aprobación Founder antes de código público.
 2. **Curaduría editorial:** conectar selección, orden, límites y rotación diaria usando el contrato oficial de colecciones.
-3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; asignar únicamente los espacios comerciales declarados, con elegibilidad editorial y etiqueta visible.
+3. **Visibilidad contratada:** leer grants vigentes y palancas existentes; asignar únicamente los espacios comerciales declarados, con elegibilidad editorial y una indicación `Promovido` discreta fuera de la fotografía.
 4. **Flujo empresa–administración:** reutilizar solicitud, revisión, activación, vencimiento y cancelación del paquete; la curaduría del contenido permanece en el Experience Builder.
 5. **Medición:** registrar impresión, clic y entrada a ficha diferenciando editorial, orgánico, contratado y Spotlight.
 
@@ -90,7 +91,7 @@ Todo contenido, sea orgánico o contratado, debe estar publicado, visible, vigen
 
 - Comparativa antes/después en 1440, 834, 430 y 390 px.
 - Un H1, cero overflow, controles táctiles accesibles y navegación por teclado.
-- Verificar cupo comercial, etiquetas, vigencia, filtros, rotación estable y estados sin candidatos.
+- Verificar cupo comercial, indicación discreta fuera de la fotografía, vigencia, filtros, rotación estable y estados sin candidatos.
 - Confirmar que contenido sin plan sigue apareciendo orgánicamente y que un grant vencido pierde el impulso.
 - Confirmar paridad Experience Builder, preview y `/que-hacer` pública.
 - Ejecutar typecheck, pruebas focalizadas, Route Inventory y controles de gobernanza disponibles.
