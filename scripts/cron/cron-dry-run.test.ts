@@ -183,8 +183,8 @@ describe("3) y 4) RPC: `enqueue_email` bloqueada, selección permitida", () => {
   it("la lista blanca contiene sólo las funciones de selección", () => {
     expect([...CRON_DRY_RUN_READ_RPCS].sort()).toEqual([
       "get_coupons_needing_review_reminder",
-      "get_proposals_needing_payment_reminder",
       "get_orders_needing_trip_email",
+      "get_proposals_needing_payment_reminder",
       "list_visibility_grants_expiring",
       "list_visibility_grants_recently_expired",
     ]);
