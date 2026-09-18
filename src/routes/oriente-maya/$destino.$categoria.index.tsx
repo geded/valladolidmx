@@ -102,7 +102,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
             }),
           )
         : getPublicListing({ data: { family, destino: params.destino } }).catch(() => null);
-    const [related, premiumListing] = await Promise.all([
+    const [relatedRaw, premiumListing] = await Promise.all([
       getCategoryRelated({
         data: {
           destinationSlug: params.destino,
@@ -111,6 +111,21 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
       }).catch(() => null),
       premiumListingPromise,
     ]);
+    // Las tarjetas de "Sigue descubriendo" deben usar la MISMA portada
+    // acreditada del CMS que el listado Premium. La lectura relacionada
+    // no la trae, así que se reutiliza la portada ya resuelta por la
+    // lectura canónica de empresas. Sin portada acreditada, fail-closed.
+    const coverBySlug = new Map(
+      businesses.map((b: MarketplaceBusinessCard) => [b.slug, b.cover_url ?? null]),
+    );
+    const withCover = (list: MarketplaceBusinessCard[]) =>
+      list.map((b) => ({ ...b, cover_url: b.cover_url ?? coverBySlug.get(b.slug) ?? null }));
+    const related = relatedRaw
+      ? {
+          otherCategoriesInDestination: withCover(relatedRaw.otherCategoriesInDestination),
+          sameCategoryOtherDestinations: withCover(relatedRaw.sameCategoryOtherDestinations),
+        }
+      : null;
     return { resolution, items, related, premiumListing, isGenericBusinessFamily };
   },
   head: ({ loaderData, params }) => {
@@ -223,7 +238,7 @@ function CategoriaEnDestinoPage() {
                   heading: "Sigue descubriendo",
                   subheading: `Más ideas para tu viaje por ${destLabel} y el Oriente Maya.`,
                   capabilities: {
-                    showRationale: true,
+                    showRationale: false,
                     showKindBadge: false,
                   },
                   groups: [
