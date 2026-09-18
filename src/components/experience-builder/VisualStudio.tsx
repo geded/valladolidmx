@@ -3060,7 +3060,6 @@ function CanvasViewport({
 
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
-    canvasRoot.style.minHeight = "100%";
     doc.body.appendChild(canvasRoot);
     setMount(canvasRoot);
     return () => {
