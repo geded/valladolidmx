@@ -5,7 +5,8 @@
 - La captura muestra el lienzo de 1440 px reducido a 32% porque compiten simultáneamente la navegación del CMS, la estructura de secciones y la barra de acciones.
 - “Escritorio amplio” sólo nombra la vista de 1440 × 900; no causa el problema, pero ocupa espacio y no ayuda a editar.
 - El guardado de borradores sí existe y se ejecuta automáticamente después de cada cambio, con detección de conflictos y publicación separada.
-- No es correcto afirmar todavía que **todas** las plantillas están completamente conectadas: el catálogo declara más familias que las que hoy tienen vista previa con datos reales, plantilla Premium registrada y consumo público comprobado.
+- No es correcto afirmar todavía que **todas** las plantillas están completamente conectadas: el catálogo declara más familias que las que hoy tienen vista previa con datos reales, plantilla Premium aprobada y consumo público comprobado.
+- El panel mezcla plantillas activas con pruebas históricas y composiciones sin uso público vigente; esa mezcla debe retirarse de la experiencia normal del editor.
 
 ## Scope Gate
 
@@ -13,7 +14,8 @@ Autorizado para esta entrega:
 
 1. Mejorar únicamente el área de trabajo del Experience Builder existente.
 2. Auditar y cerrar la cadena de cada familia: edición → guardado → vista previa → publicación → página pública.
-3. No rediseñar plantillas ni cambiar su contenido, orden, marca o datos.
+3. Depurar el catálogo para dejar únicamente plantillas Premium aprobadas y superficies activas.
+4. No rediseñar plantillas ni cambiar su contenido, orden, marca o datos.
 
 ## Mejora del área de construcción
 
@@ -23,6 +25,14 @@ Autorizado para esta entrega:
 - Sustituir la frase larga por un indicador compacto: `1440 × 900 · 32%`.
 - Conservar los seis anchos de comprobación y recordar la vista elegida.
 - Mantener salir del modo amplio, volver a Páginas, guardar, versiones, vista previa y publicación siempre accesibles.
+
+## Depuración gobernada del catálogo
+
+- Construir un inventario de cada registro visible con: familia, aprobación, ruta pública, consumidor actual, última revisión y dependencia.
+- Mostrar en el editor normal sólo plantillas aprobadas con uso vigente en la plataforma.
+- Excluir del selector pruebas antiguas, demos, previews internas y composiciones huérfanas.
+- No eliminar físicamente un registro hasta comprobar que ninguna ruta, preview, publicación o historial lo referencia; primero se archiva u oculta de forma reversible.
+- Las plantillas internas `__tpl_*__` permanecen sólo cuando sean la autoridad activa de una familia y se presentan con nombre comprensible, no como páginas públicas.
 
 ## Cierre de plantillas y persistencia
 
