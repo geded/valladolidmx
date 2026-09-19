@@ -372,6 +372,30 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
       r.is_template ? "Marca de plantilla retirada." : "Guardada como plantilla oficial.",
     );
 
+  /**
+   * Flujo editorial desde el listado. Respeta la máquina oficial
+   * `draft → in_review → approved`: si se aprueba desde borrador se
+   * registra primero el paso por revisión, sin saltar estados.
+   */
+  const onWorkflow = (r: StudioPageRow, next: "draft" | "in_review" | "approved") => {
+    const labels: Record<string, string> = {
+      draft: "Página regresada a borrador.",
+      in_review: "Página enviada a revisión.",
+      approved: "Página aprobada.",
+    };
+    void doAction(
+      r.id,
+      async () => {
+        if (next === "approved" && r.workflow_state === "draft") {
+          await setWorkflow({ data: { id: r.id, next_state: "in_review" } });
+        }
+        return setWorkflow({ data: { id: r.id, next_state: next } });
+      },
+      labels[next] ?? "Estado actualizado.",
+    );
+  };
+
+
   const submitInlineEdit = async () => {
     if (!inlineEdit) return;
     const { row, mode, value } = inlineEdit;
