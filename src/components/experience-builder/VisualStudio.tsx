@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
 import { OnboardingTour, HelpButton, hasSeenOnboarding } from "./OnboardingTour";
 import {
@@ -101,6 +101,11 @@ import {
   HOME_PREMIUM_FALLBACK_TREE,
   resolveHomePremiumAuthorityTree,
 } from "@/components/home-premium/home-premium-config";
+import {
+  buildHomeDestinationEditorRows,
+  compactHomeDestinationEditorOverrides,
+} from "@/components/home-premium/home-premium-real";
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
   canListEditorialBlock,
@@ -1033,6 +1038,7 @@ function PageVisualEditor({
   const restore = useServerFn(restoreCompositionRevision);
   const issuePreview = useServerFn(issueCompositionPreviewLink);
   const setWorkflow = useServerFn(setCompositionWorkflowState);
+  const resolveHomeReal = useServerFn(resolveHomePremiumRealContent);
   const queryClient = useQueryClient();
   const { roles, user } = useAuth();
   const workspace = useWorkspace();
@@ -1044,6 +1050,12 @@ function PageVisualEditor({
   const [workflowBusy, setWorkflowBusy] = useState(false);
   // US-03 · Conteo de comentarios abiertos por bloque (para badge en overlay).
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const { data: homeRealContent } = useQuery({
+    queryKey: ["home-premium-real-content"],
+    queryFn: () => resolveHomeReal(),
+    staleTime: 60_000,
+    enabled: pageDef.page_type === "home",
+  });
 
   const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
     if (!page) return;
@@ -1399,6 +1411,36 @@ function PageVisualEditor({
   );
   const activeSection: CompositeSectionDef | null =
     compositeSections.find((s) => s.key === subSectionKey) ?? compositeSections[0] ?? null;
+  const inspectorConfig = useMemo(() => {
+    if (
+      !selectedConfig ||
+      selectedNode?.type !== "vmx.home.premium-g4" ||
+      activeSection?.key !== "destinos"
+    ) {
+      return selectedConfig;
+    }
+    return {
+      ...selectedConfig,
+      destinos_items: buildHomeDestinationEditorRows(
+        homeRealContent,
+        selectedConfig.destinos_items,
+      ),
+    };
+  }, [activeSection?.key, homeRealContent, selectedConfig, selectedNode?.type]);
+  const updateInspectorConfig = (next: Record<string, unknown>) => {
+    if (
+      selectedNode?.type !== "vmx.home.premium-g4" ||
+      activeSection?.key !== "destinos" ||
+      !selectedConfig
+    ) {
+      updateSelectedConfig(next);
+      return;
+    }
+    updateSelectedConfig({
+      ...next,
+      destinos_items: compactHomeDestinationEditorOverrides(homeRealContent, next.destinos_items),
+    });
+  };
 
   const selectUnit = (id: string, sub: string | null) => {
     setSelectedId(id);
@@ -2733,8 +2775,8 @@ function PageVisualEditor({
 
               <AutoInspector
                 contract={selectedContract}
-                config={selectedConfig}
-                onChange={(next) => updateSelectedConfig(next)}
+                config={inspectorConfig ?? selectedConfig}
+                onChange={updateInspectorConfig}
                 simple={!advanced}
                 hideHeader={Boolean(activeSection)}
                 fieldFilter={

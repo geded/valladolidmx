@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Corregir la paridad de la sección Destinos de Home: mostrar Valladolid como tarjeta principal con sus datos publicados y dos destinos secundarios completos, eliminar el recorte artificial del lienzo y cargar en el diálogo los mismos valores que se ven en la plantilla, sin modificar la Home pública.
+- [x] Experience Builder · Corregir la paridad de la sección Destinos de Home: Valladolid aparece como tarjeta principal y Ek Balam, Espita e Izamal como secundarias; el diálogo carga esos mismos valores reales y sólo guarda cambios editoriales explícitos, sin modificar la Home pública.
 
 - [x] Experience Builder · Catálogo operativo limitado a familias conectadas; vista inicial sólo publicada, con borradores y archivadas accesibles por filtro. Pruebas históricas desconectadas quedan ocultas de forma reversible y sin borrar datos.
 

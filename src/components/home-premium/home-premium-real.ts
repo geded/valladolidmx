@@ -38,6 +38,78 @@ function withValladolidFirst(cards: readonly Card[]): Card[] {
   ];
 }
 
+type DestinationEditorRow = {
+  name: string;
+  note: string;
+  pueblo_magico: boolean;
+  href: string;
+  demo: boolean;
+  media_url: string;
+  media_alt: string;
+};
+
+/**
+ * Proyección editable de los destinos reales del Home.
+ *
+ * El corpus publicado conserva la autoridad sobre elegibilidad y URL
+ * canónica. El Studio puede guardar ajustes editoriales de texto e imagen
+ * sobre esas mismas filas, sin crear destinos ni sustituir el catálogo CMS.
+ */
+export function buildHomeDestinationEditorRows(
+  real: HomeRealContent | undefined,
+  configured: unknown,
+): DestinationEditorRow[] {
+  const saved = Array.isArray(configured)
+    ? configured.filter(
+        (row): row is Record<string, unknown> => Boolean(row) && typeof row === "object",
+      )
+    : [];
+  const cards = withValladolidFirst(real?.destinos ?? []);
+
+  return cards.map((card, index) => {
+    const byHref = saved.find(
+      (row) => typeof row.href === "string" && row.href.replace(/\/$/, "") === card.href,
+    );
+    const row = byHref ?? saved[index] ?? {};
+    const fallbackMedia = mediaOf(card, "destination", index);
+    const text = (key: string, fallback: string) =>
+      typeof row[key] === "string" && row[key].trim() ? row[key].trim() : fallback;
+    return {
+      name: text("name", card.title),
+      note: text("note", card.subtitle),
+      pueblo_magico: typeof row.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
+      href: card.href,
+      demo: false,
+      media_url: text("media_url", fallbackMedia.url),
+      media_alt: text("media_alt", fallbackMedia.alt),
+    };
+  });
+}
+
+/** Conserva únicamente los cambios editoriales explícitos sobre el corpus. */
+export function compactHomeDestinationEditorOverrides(
+  real: HomeRealContent | undefined,
+  next: unknown,
+): Array<Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href">> {
+  const baseline = buildHomeDestinationEditorRows(real, undefined);
+  const rows = Array.isArray(next)
+    ? next.filter((row): row is Record<string, unknown> => Boolean(row) && typeof row === "object")
+    : [];
+  const editableKeys = ["name", "note", "pueblo_magico", "media_url", "media_alt"] as const;
+
+  return baseline.flatMap((base, index) => {
+    const row =
+      rows.find((candidate) => candidate.href === base.href) ?? rows[index] ?? ({} as const);
+    const override: Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href"> = {
+      href: base.href,
+    };
+    for (const key of editableKeys) {
+      if (row[key] !== undefined && row[key] !== base[key]) override[key] = row[key] as never;
+    }
+    return Object.keys(override).length > 1 ? [override] : [];
+  });
+}
+
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
 const GOVERNED_VERTICAL_MEDIA = {
@@ -142,6 +214,7 @@ function attachMediaAssets<T>(node: T, assets: Record<string, MediaAssetInput>):
 export function mergeHomeRealContent(
   content: HomePremiumContent,
   real: HomeRealContent | undefined,
+  destinationOverrides?: unknown,
 ): HomePremiumContent {
   const safeContent = withoutUnapprovedMedia(content);
   if (!real) return safeContent;
@@ -150,6 +223,7 @@ export function mergeHomeRealContent(
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
   const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
   const homeDestinations = withValladolidFirst(real.destinos);
+  const destinationRows = buildHomeDestinationEditorRows(real, destinationOverrides);
   const firstEventWithMedia = real.eventos.find((card) => card.mediaUrl.length > 0);
   const realHeroSlides = destinationsWithMedia.slice(0, 3).map((card) => ({
     media: mediaOf(card),
@@ -165,13 +239,18 @@ export function mergeHomeRealContent(
       },
       destinos: {
         ...safeContent.destinos,
-        items: homeDestinations.map((card, index) => ({
-          name: card.title,
-          note: card.subtitle,
-          media: mediaOf(card, "destination", index),
-          puebloMagico: card.puebloMagico,
-          href: card.href,
-        })),
+        items: homeDestinations.map((card, index) => {
+          const row = destinationRows[index];
+          return {
+            name: row?.name ?? card.title,
+            note: row?.note ?? card.subtitle,
+            media: row
+              ? { url: row.media_url, alt: row.media_alt }
+              : mediaOf(card, "destination", index),
+            puebloMagico: row?.pueblo_magico ?? card.puebloMagico,
+            href: card.href,
+          };
+        }),
       },
       rutas: {
         ...safeContent.rutas,

@@ -55,7 +55,11 @@ function HomePremiumNode({
     staleTime: 60_000,
   });
 
-  const content = mergeHomeRealContent(resolved.content, data);
+  const content = mergeHomeRealContent(
+    resolved.content,
+    data,
+    (localized.config as Record<string, unknown>).destinos_items,
+  );
   const sections = resolveHomeSectionVisibility(content, resolved.sections);
   const surface = (
     <HomePremiumSurface
