@@ -2553,7 +2553,7 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[58dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
+            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:h-auto lg:max-h-none lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="shrink-0 border-b border-border bg-card p-4">
