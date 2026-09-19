@@ -3728,7 +3728,7 @@ function CanvasViewport({
                     draggedSectionRef.current = null;
                   }}
                   className="pointer-events-auto absolute right-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
-                  style={{ top: section.top + 10 }}
+                  style={{ top: section.top * scaled + 10 }}
                 >
                   <GripVertical className="size-4" aria-hidden />
                 </button>
