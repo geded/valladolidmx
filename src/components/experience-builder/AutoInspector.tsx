@@ -985,6 +985,10 @@ function StructuredListControl({
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const fields = def.item?.fields ?? {};
   const defaultRows = Array.isArray(def.default) ? (def.default as Record<string, unknown>[]) : [];
+  const rowWithDefaults = (row: Record<string, unknown>, index: number) => ({
+    ...(defaultRows.length > 0 ? defaultRows[index % defaultRows.length] : {}),
+    ...row,
+  });
   const makeDefault = () =>
     Object.fromEntries(
       Object.entries(fields).map(([key, field]) => [
@@ -1026,8 +1030,10 @@ function StructuredListControl({
           <Plus className="size-3.5" aria-hidden /> Cargar valores por defecto
         </button>
       ) : null}
-      {rows.map((row, index) => (
-        <div
+      {rows.map((row, index) => {
+        const displayRow = rowWithDefaults(row, index);
+        return (
+          <div
           key={index}
           className="rounded-lg border border-border bg-background p-2"
           onDragOver={(e) => {
@@ -1076,20 +1082,21 @@ function StructuredListControl({
               />
             </div>
           </div>
-          <div className="space-y-2">
+            <div className="space-y-2">
             {Object.entries(fields).map(([key, field]) => (
               <FieldRow
                 key={key}
                 name={key}
                 def={field}
-                value={row?.[key]}
-                onChange={(nextValue) => setRow(index, { ...row, [key]: nextValue })}
+                value={displayRow[key]}
+                onChange={(nextValue) => setRow(index, { ...displayRow, [key]: nextValue })}
                 simple={simple}
               />
             ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         onClick={() => onChange([...rows, makeDefault()])}
