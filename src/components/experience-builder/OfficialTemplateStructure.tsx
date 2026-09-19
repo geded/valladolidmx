@@ -31,10 +31,7 @@ export function OfficialTemplateStructure({
   onCreateFromTemplate,
 }: OfficialTemplateStructureProps) {
   const families = useMemo(() => buildOfficialTemplateStructure(), []);
-  const total = useMemo(
-    () => families.reduce((acc, f) => acc + f.entries.length, 0),
-    [families],
-  );
+  const total = useMemo(() => families.reduce((acc, f) => acc + f.entries.length, 0), [families]);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const bySlug = useMemo(() => {
     const map = new Map<string, StudioPageRow>();
