@@ -516,9 +516,17 @@ export function PlacePremiumSurface({
         </PlaceContainer>
       ) : null}
 
-      {order.map((key) => (
-        <Fragment key={key}>{placeSections[key] ?? null}</Fragment>
-      ))}
+      {order.map((key) => {
+        const node = placeSections[key] ?? null;
+        // Marcador de sección para el Experience Builder (no altera el render).
+        return node ? (
+          <div key={key} data-eb-section={key}>
+            {node}
+          </div>
+        ) : (
+          <Fragment key={key} />
+        );
+      })}
 
       {/* Zona segura: reserva vertical para el dock flotante de Alux
           (incluye el área segura del dispositivo). Ningún contenido de la

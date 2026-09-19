@@ -2553,7 +2553,7 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[58dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
+            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:h-auto lg:max-h-none lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="shrink-0 border-b border-border bg-card p-4">
@@ -3145,7 +3145,7 @@ function DeviceToggle({
       role="group"
       aria-label="Vista previa por dispositivo"
       data-eb-device-presets={DEVICE_PRESETS.length}
-      className="hidden items-center overflow-hidden rounded-md border border-border bg-background md:flex"
+      className="flex max-w-full items-center overflow-x-auto rounded-md border border-border bg-background"
     >
       {DEVICE_PRESETS.map((preset) => {
         const active = preset.id === value;
