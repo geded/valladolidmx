@@ -2669,7 +2669,7 @@ function PageVisualEditor({
           );
         })()}
 
-        {!previewMode && selectedContract && selectedConfig ? (
+        {!previewMode && structureCollapsed && selectedContract && selectedConfig ? (
           <aside
             className="fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl xl:static xl:inset-auto xl:h-full xl:max-h-none xl:w-[360px] xl:max-w-[32vw] xl:shrink-0 xl:border-l xl:border-t-0 xl:shadow-none"
             aria-label="Herramientas para editar el bloque seleccionado"
@@ -3363,7 +3363,7 @@ function HomeCanvas({
   const changeZoom = (delta: number) => {
     setZoomOverride((current) => {
       const base = current ?? fitScale;
-      return Math.min(1, Math.max(0.5, Math.round((base + delta) * 10) / 10));
+      return Math.min(1, Math.max(minimumReadableScale, Math.round((base + delta) * 10) / 10));
     });
   };
   const headerVariant = resolveCanvasHeaderVariant(tree);
@@ -3401,6 +3401,7 @@ function HomeCanvas({
         minimumHeight={preset.height}
         scale={scale}
         fitScale={fitScale}
+        minimumScale={minimumReadableScale}
         isFit={zoomOverride === null}
         onZoomIn={() => changeZoom(0.1)}
         onZoomOut={() => changeZoom(-0.1)}
@@ -3485,6 +3486,7 @@ function CanvasViewport({
   minimumHeight,
   scale,
   fitScale,
+  minimumScale,
   isFit,
   onZoomIn,
   onZoomOut,
@@ -3502,6 +3504,7 @@ function CanvasViewport({
   minimumHeight: number;
   scale: number;
   fitScale: number;
+  minimumScale: number;
   isFit: boolean;
   onZoomIn: () => void;
   onZoomOut: () => void;
@@ -3762,7 +3765,7 @@ function CanvasViewport({
         <button
           type="button"
           onClick={onZoomOut}
-          disabled={scaled <= 0.5}
+          disabled={scaled <= minimumScale}
           className="inline-flex size-7 items-center justify-center rounded text-sm font-semibold hover:bg-background/15 disabled:opacity-40"
           aria-label="Alejar lienzo"
           title="Alejar"

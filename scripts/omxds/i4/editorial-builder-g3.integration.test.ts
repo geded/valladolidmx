@@ -98,6 +98,7 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain('data-eb-canvas-scrollport="editor"');
     expect(studio).toContain("usableWidth / preset.width");
     expect(studio).toContain("minimumReadableScale");
+    expect(studio).toContain("scaled <= minimumScale");
     expect(studio).toContain("Ajustar al espacio de trabajo");
     expect(studio).toContain("new ResizeObserver(read)");
     expect(studio).toContain("transform: `scale(${scaled})`");
