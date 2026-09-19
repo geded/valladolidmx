@@ -77,8 +77,7 @@ export function buildHomeDestinationEditorRows(
     return {
       name: text("name", card.title),
       note: text("note", card.subtitle),
-      pueblo_magico:
-        typeof row.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
+      pueblo_magico: typeof row.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
       href: card.href,
       demo: false,
       media_url: text("media_url", fallbackMedia.url),
