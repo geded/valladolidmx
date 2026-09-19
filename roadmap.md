@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): conservar el viewport lógico Premium y ajustar sólo su representación visual al área de trabajo, sin deformar Destinos/Experiencias ni afectar 390/430/768. Pendiente aceptación visual humana en iPad.
+- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): lienzo reconstruido a escala real, altura medida y controles fuera de la plantilla; comparación constructor/público de Destinos y Experiencias a 1024 en paridad. Pendiente aceptación visual humana en iPad y validación 1280/1440/834/430/390 antes de extender por familias.
 
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 
@@ -254,4 +254,4 @@
 
 - [x] Constructor: galeria unica de plantillas oficiales agrupada por seccion + asignacion automatica de plantilla al crear pagina nueva en una seccion.
 - [ ] Regla: toda correccion de plantilla (empezando por Micrositio de Destino v1 oficial) se entrega editable desde la estructura del constructor (textos, imagenes, enlaces, orden).
-- [ ] Reconstruir el lienzo del Experience Builder para paridad real con las plantillas públicas; validar primero Home con aceptación humana y después extender por familias.
+- [ ] Extender el lienzo reconstruido a las demás familias sólo después de aceptación humana de Home y validación completa 1440/1280/1024/834/430/390.
