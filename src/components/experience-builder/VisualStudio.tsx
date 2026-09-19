@@ -2484,6 +2484,7 @@ function PageVisualEditor({
               previewMode={previewMode}
               deviceViewport={deviceViewport}
               selectedId={selectedId}
+              selectedCompositeSectionKey={activeSection?.key ?? null}
               onSelect={(id) => setSelectedId(id)}
               onSelectChrome={(area) =>
                 setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)
@@ -3174,6 +3175,7 @@ function HomeCanvas({
   previewMode,
   deviceViewport,
   selectedId,
+  selectedCompositeSectionKey,
   onSelect,
   onSelectChrome,
   onDelete,
@@ -3190,6 +3192,7 @@ function HomeCanvas({
   previewMode: boolean;
   deviceViewport: DeviceViewport;
   selectedId: string | null;
+  selectedCompositeSectionKey: string | null;
   onSelect: (id: string) => void;
   onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
@@ -3279,6 +3282,7 @@ function HomeCanvas({
         scale={scale}
         presetLabel={preset.label}
         compositeNodeId={renderedCompositeNode?.id ?? null}
+        selectedSectionKey={selectedCompositeSectionKey}
         reorderableSectionKeys={reorderableSectionKeys}
         onSelectSection={onSelectCompositeSection}
         onReorderSection={onReorderCompositeSection}
@@ -3357,6 +3361,7 @@ function CanvasViewport({
   scale,
   presetLabel: _presetLabel,
   compositeNodeId,
+  selectedSectionKey,
   reorderableSectionKeys,
   onSelectSection,
   onReorderSection,
@@ -3368,6 +3373,7 @@ function CanvasViewport({
   scale: number;
   presetLabel: string;
   compositeNodeId: string | null;
+  selectedSectionKey: string | null;
   reorderableSectionKeys: string[];
   onSelectSection: (nodeId: string, sectionKey: string) => void;
   onReorderSection: (activeKey: string, overKey: string) => void;
@@ -3581,6 +3587,32 @@ function CanvasViewport({
       doc.removeEventListener("touchend", onTouchEnd);
     };
   }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys, scale]);
+
+  // Mantiene sincronizados el panel y el lienzo. Al elegir una sección desde
+  // la lista o desde el inspector, el canvas muestra esa sección completa en
+  // vez de permanecer en la portada u otra posición de la página.
+  useEffect(() => {
+    if (!mount || !selectedSectionKey) return;
+    const doc = mount.ownerDocument;
+    const frame = doc.defaultView;
+    const escapedKey = CSS.escape(selectedSectionKey);
+    let cancelled = false;
+    const reveal = () => {
+      if (cancelled) return;
+      const section = doc.querySelector<HTMLElement>(`[data-eb-section="${escapedKey}"]`);
+      if (!section) return;
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      const top = Math.max(0, section.offsetTop - 12);
+      if (Math.abs(scroller.scrollTop - top) > 8) frame?.scrollTo({ top, behavior: "smooth" });
+    };
+    const first = frame?.requestAnimationFrame(reveal);
+    const retry = frame?.setTimeout(reveal, 180);
+    return () => {
+      cancelled = true;
+      if (first !== undefined) frame?.cancelAnimationFrame(first);
+      if (retry !== undefined) frame?.clearTimeout(retry);
+    };
+  }, [mount, selectedSectionKey]);
 
   // El documento del canvas se recorre con su propio scroll interno; no se
   // vuelve a medir su altura para evitar realimentación.
