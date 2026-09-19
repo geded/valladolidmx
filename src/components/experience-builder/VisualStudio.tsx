@@ -1049,6 +1049,13 @@ function PageVisualEditor({
     if (!page) return;
     setWorkflowBusy(true);
     try {
+      // La máquina oficial no permite draft → approved directo
+      // (draft → in_review → approved). Cuando un administrador aprueba desde
+      // borrador, se ejecutan ambas transiciones válidas en orden, sin
+      // saltarse la máquina ni su auditoría.
+      if (next === "approved" && page.workflow_state === "draft") {
+        await setWorkflow({ data: { id: page.id, next_state: "in_review" } });
+      }
       const res = await setWorkflow({ data: { id: page.id, next_state: next } });
       setPage((p) =>
         p
