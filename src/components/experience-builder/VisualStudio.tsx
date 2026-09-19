@@ -3595,10 +3595,9 @@ function CanvasViewport({
       [data-eb-section] {
         position:relative;
         isolation:isolate;
-        contain:paint;
         pointer-events:auto;
       }
-      [data-eb-section] { overflow:clip; }
+      [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
       [data-eb-section="destinos"] { overflow:clip; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
