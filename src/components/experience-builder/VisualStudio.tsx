@@ -1108,6 +1108,10 @@ function PageVisualEditor({
   const [scheduling, setScheduling] = useState(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // Conflicto de borrador: el servidor tiene una versión más nueva. No se
+  // sobrescribe nada de forma silenciosa; el editor decide recargar.
+  const [draftConflict, setDraftConflict] = useState(false);
+  const [reloadingDraft, setReloadingDraft] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
   /** Posición donde se insertará el elemento elegido en la biblioteca. */
