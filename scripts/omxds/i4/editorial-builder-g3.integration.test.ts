@@ -92,9 +92,12 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("overflow-x-auto rounded-md border border-border bg-background");
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
-    // El iframe conserva el viewport lógico Premium al 100 %, adopta la altura
-    // real del documento y los controles viven fuera de la plantilla.
-    expect(studio).toContain("const scale = 1");
+    // El iframe conserva el viewport lógico Premium (ancho del preset) y adopta
+    // la altura real del documento; sólo la envolvente se reduce (fit-to-width)
+    // cuando el área disponible del CMS es menor. Los controles viven fuera.
+    expect(studio).toContain('data-eb-canvas-scrollport="editor"');
+    expect(studio).toContain("usableWidth / preset.width");
+    expect(studio).toContain("new ResizeObserver(read)");
     expect(studio).toContain("transform: `scale(${scaled})`");
     expect(studio).toContain('transformOrigin: "top left"');
     expect(studio).toContain("justify-start overflow-auto");
