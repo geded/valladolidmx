@@ -92,13 +92,13 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("overflow-x-auto rounded-md border border-border bg-background");
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
-    // Cada sección delimita su propia capa de pintura dentro del iframe
-    // escalado; evita que Safari/iPad prolongue medios absolutos detrás de
-    // secciones posteriores sin alterar el render público Premium.
-    expect(studio).toContain("contain:paint");
-    expect(studio).toContain("isolation:isolate");
-    expect(studio).toContain('[data-eb-section="destinos"] { overflow:clip; }');
-    expect(studio).toContain(':not([data-eb-section="destinos"]) { contain:paint; }');
+// El iframe conserva el viewport lógico Premium y sólo su representación se
+// ajusta al espacio del Studio; los controles absolutos no alteran el flujo.
+expect(studio).toContain("transform: `scale(${scaled})`");
+expect(studio).toContain('transformOrigin: "top left"');
+    expect(studio).toContain("justify-start overflow-auto");
+    expect(studio).not.toContain('[data-eb-section="destinos"] { overflow:clip; }');
+    expect(studio).not.toContain(':not([data-eb-section="destinos"]) { contain:paint; }');
 
     const inspector = read("src/components/experience-builder/AutoInspector.tsx");
     // Las filas parciales del borrador muestran los valores acreditados por
