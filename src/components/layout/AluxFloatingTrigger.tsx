@@ -90,7 +90,7 @@ import {
 import { getAluxTravelerLens } from "@/lib/alux/traveler-lens.functions";
 import { getAluxTerritorialMemory } from "@/lib/alux/territorial-memory.functions";
 import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
-import { useAuth } from "@/hooks/useAuth";
+import { useOptionalAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
 import { AluxConverseChat } from "@/components/alux/AluxConverseChat";
@@ -119,7 +119,7 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 export function AluxFloatingTrigger() {
   const { t, locale } = useTranslation();
   const alux = useAluxBrand();
-  const { user } = useAuth();
+  const user = useOptionalAuth()?.user ?? null;
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
