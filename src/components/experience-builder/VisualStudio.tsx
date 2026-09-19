@@ -2374,8 +2374,18 @@ function PageVisualEditor({
       ) : null}
 
       {message ? (
-        <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
-          {message}
+        <div className="flex flex-wrap items-center justify-center gap-2 border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
+          <span>{message}</span>
+          {draftConflict ? (
+            <button
+              type="button"
+              onClick={() => void reloadDraftFromServer()}
+              disabled={reloadingDraft}
+              className="rounded-pill border border-border bg-background px-3 py-1 font-semibold ring-focus disabled:opacity-60"
+            >
+              {reloadingDraft ? "Recargando…" : "Recargar borrador"}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
