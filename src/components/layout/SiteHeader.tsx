@@ -399,7 +399,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   }
   if (btn.kind === "user_menu") {
     return (
-      <div key={key} data-header-button-kind={btn.kind} className="hidden sm:block">
+      <div key={key} data-header-button-kind={btn.kind} className="hidden xl:block">
         <UserMenu />
       </div>
     );
