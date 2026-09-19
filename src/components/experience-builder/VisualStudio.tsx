@@ -1057,6 +1057,33 @@ function PageVisualEditor({
     enabled: pageDef.page_type === "home",
   });
 
+  /**
+   * Reconciliación explícita del conflicto de borrador: trae la versión
+   * vigente del servidor y la adopta como base de edición. No publica, no
+   * sobrescribe el servidor y no toca la página publicada.
+   */
+  const reloadDraftFromServer = async () => {
+    if (!page) return;
+    setReloadingDraft(true);
+    try {
+      const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+      if (refreshed) {
+        setPage(refreshed);
+        skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(refreshed.current_draft);
+        setTree(refreshed.current_draft);
+        resetHistory();
+        setDraftConflict(false);
+        setSaveStatus("idle");
+        setMessage("Borrador actualizado con la versión del servidor.");
+      }
+    } catch (e) {
+      setMessage(`No se pudo recargar el borrador: ${(e as Error).message}`);
+    } finally {
+      setReloadingDraft(false);
+    }
+  };
+
   const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
     if (!page) return;
     setWorkflowBusy(true);
@@ -1108,6 +1135,10 @@ function PageVisualEditor({
   const [scheduling, setScheduling] = useState(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // Conflicto de borrador: el servidor tiene una versión más nueva. No se
+  // sobrescribe nada de forma silenciosa; el editor decide recargar.
+  const [draftConflict, setDraftConflict] = useState(false);
+  const [reloadingDraft, setReloadingDraft] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
   /** Posición donde se insertará el elemento elegido en la biblioteca. */
@@ -1357,8 +1388,9 @@ function PageVisualEditor({
           setSaveStatus("error");
           const msg = e instanceof Error ? e.message : String(e);
           if (msg.includes("draft_conflict")) {
+            setDraftConflict(true);
             setMessage(
-              "Conflicto de edición: el borrador cambió en el servidor. Recarga antes de guardar.",
+              "Conflicto de edición: el borrador cambió en el servidor. Recarga el borrador para seguir trabajando.",
             );
           }
         });
@@ -2369,8 +2401,18 @@ function PageVisualEditor({
       ) : null}
 
       {message ? (
-        <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
-          {message}
+        <div className="flex flex-wrap items-center justify-center gap-2 border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
+          <span>{message}</span>
+          {draftConflict ? (
+            <button
+              type="button"
+              onClick={() => void reloadDraftFromServer()}
+              disabled={reloadingDraft}
+              className="rounded-pill border border-border bg-background px-3 py-1 font-semibold ring-focus disabled:opacity-60"
+            >
+              {reloadingDraft ? "Recargando…" : "Recargar borrador"}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
@@ -3561,7 +3603,13 @@ function CanvasViewport({
        * absolutos; overflow:clip preserva sus capas sin colapsar la tarjeta.
        */
       [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
-      [data-eb-section="destinos"] { overflow:clip; }
+      /*
+       * Destinos no admite límite de pintura ni recorte: su cuadrícula de
+       * 30rem y los medios absolutos de la tarjeta principal desbordan unos
+       * píxeles en 1440. El aislamiento declarado arriba basta para evitar el
+       * sangrado de capas en Safari sin cortar contenido legítimo.
+       */
+      [data-eb-section="destinos"] { overflow:visible; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
