@@ -3551,9 +3551,28 @@ function CanvasViewport({
         if (touch.clientY < edge) win.scrollBy(0, -22);
         if (touch.clientY > win.innerHeight - edge) win.scrollBy(0, 22);
       }
-      const over = doc
-        .elementFromPoint(touch.clientX, touch.clientY)
-        ?.closest<HTMLElement>("[data-eb-section]");
+      // Safari/iPad conserva el propio tirador como `event.target` durante
+      // todo el gesto. Resolvemos el destino por la posición vertical real
+      // del dedo para que soltar sobre otra sección sí cambie el orden.
+      const candidates = sections().filter((section) => {
+        const key = section.dataset.ebSection;
+        return Boolean(key && reorderableSectionKeys.includes(key) && key !== touchKey);
+      });
+      const containing = candidates.find((section) => {
+        const rect = section.getBoundingClientRect();
+        return touch.clientY >= rect.top && touch.clientY <= rect.bottom;
+      });
+      const over =
+        containing ??
+        candidates.reduce<HTMLElement | null>((nearest, section) => {
+          if (!nearest) return section;
+          const center = (section.getBoundingClientRect().top + section.getBoundingClientRect().bottom) / 2;
+          const nearestCenter =
+            (nearest.getBoundingClientRect().top + nearest.getBoundingClientRect().bottom) / 2;
+          return Math.abs(center - touch.clientY) < Math.abs(nearestCenter - touch.clientY)
+            ? section
+            : nearest;
+        }, null);
       sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
       over?.setAttribute("data-eb-drop-target", "");
       event.preventDefault();
