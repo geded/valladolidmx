@@ -53,3 +53,10 @@ Las familias se ordenan por el registro oficial, no alfabéticamente, para que e
 
 - Typecheck, Prettier y suite dirigida del Experience Builder.
 - Revisión visual autenticada del constructor en 1440, 834, 430 y 390.
+
+## 4. Estructura fácil de entender y plantilla por defecto
+
+- Cada familia se presenta con su nombre turístico (Inicio, Destinos, Listados turísticos, Lugares y sitios de interés, Fichas de empresa/producto/evento, Landing promocional), una línea que explica para qué sirve y la ruta pública de ejemplo. Nada de identificadores técnicos en la vista visual.
+- Dentro de cada familia se ve de un vistazo qué páginas existen, su estado y qué se puede modificar (contenido, orden de secciones, imágenes, enlaces).
+- **Plantilla por defecto por sección:** al crear una página nueva dentro de una sección, el sistema asigna automáticamente la plantilla aprobada de esa familia, sin pedir elegir preset. Si la familia tiene variantes (Lugares), se pregunta sólo la variante; el resto queda preasignado.
+- Si una sección todavía no tiene su plantilla aprobada declarada, la creación queda bloqueada con aviso claro (fail-closed), en vez de caer en una plantilla genérica.
