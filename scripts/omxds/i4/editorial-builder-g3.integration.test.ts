@@ -92,6 +92,11 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("overflow-x-auto rounded-md border border-border bg-background");
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
+    // Cada sección delimita su propia capa de pintura dentro del iframe
+    // escalado; evita que Safari/iPad prolongue medios absolutos detrás de
+    // secciones posteriores sin alterar el render público Premium.
+    expect(studio).toContain("contain:paint");
+    expect(studio).toContain("isolation:isolate");
   });
 
   test("acceptance report declares every mandatory human scenario and remains the authority for final G3 PASS", () => {

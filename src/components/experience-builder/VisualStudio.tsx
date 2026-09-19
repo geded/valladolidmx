@@ -3492,7 +3492,20 @@ function CanvasViewport({
     const style = doc.createElement("style");
     style.setAttribute("data-eb-section-style", "");
     style.textContent = `
-      [data-eb-section] { pointer-events:auto; }
+      /*
+       * Safari/iPad puede promocionar las imágenes absolutas de las tarjetas a
+       * una capa distinta cuando el iframe completo está escalado. Sin un
+       * límite de pintura por sección, esa capa puede seguir dibujándose por
+       * detrás de las secciones siguientes aunque el flujo tenga el alto
+       * correcto. Este aislamiento pertenece sólo al canvas editorial: no
+       * modifica la plantilla Premium ni su render público.
+       */
+      [data-eb-section] {
+        position:relative;
+        isolation:isolate;
+        contain:paint;
+        pointer-events:auto;
+      }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
