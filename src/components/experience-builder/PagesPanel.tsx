@@ -685,14 +685,24 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               // usando `getKitSeed(kind).build()`. Persistimos con el
               // flujo existente (`saveCompositionDraft`) — sin tocar
               // Business / Product ni renderers.
+              // Plantilla por defecto de la sección: si el tipo tiene un
+              // preset premium aprobado, la página nueva nace con él. Si no,
+              // se conserva la semilla oficial del Surface Kit.
+              const presetId = defaultPresetIdForPageKind(form.kind);
+              const presetTree = presetId ? buildPresetCompositionTree(presetId) : null;
               const seed = getKitSeed(form.kind);
-              if (seed && created?.id) {
+              const initialTree = presetTree ?? (seed ? seed.build() : null);
+              if (initialTree && created?.id) {
                 try {
-                  await saveDraft({ data: { id: created.id, tree: seed.build() } });
-                  toast.success("Página creada con semilla del Kit.");
+                  await saveDraft({ data: { id: created.id, tree: initialTree } });
+                  toast.success(
+                    presetTree
+                      ? "Página creada con la plantilla de la sección."
+                      : "Página creada con semilla del Kit.",
+                  );
                 } catch (seedErr) {
                   // No bloqueamos la creación por un fallo de semilla.
-                  console.warn("[PagesPanel] seed inicial falló:", seedErr);
+                  console.warn("[PagesPanel] semilla inicial falló:", seedErr);
                   toast.success("Página creada (semilla vacía).");
                 }
               } else {
