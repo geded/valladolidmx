@@ -3313,9 +3313,9 @@ function HomeCanvas({
   // (1024/1280/1440…), de modo que tipografía, rejillas y saltos son idénticos
   // a la web pública. Sólo la ENVOLVENTE se reduce visualmente (fit-to-width)
   // cuando el área disponible del CMS es menor que el preset.
-  const scrollportRef = React.useRef<HTMLDivElement | null>(null);
-  const [availableWidth, setAvailableWidth] = React.useState<number | null>(null);
-  React.useEffect(() => {
+  const scrollportRef = useRef<HTMLDivElement | null>(null);
+  const [availableWidth, setAvailableWidth] = useState<number | null>(null);
+  useEffect(() => {
     const el = scrollportRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
     const read = () => setAvailableWidth(el.clientWidth);
