@@ -177,83 +177,83 @@ export function DestinationPremiumSurface({
         const node = ((): React.ReactNode => {
           if (!visible(key)) return null;
           switch (key) {
-          case "hero":
-            return (
-              <Container key={key} className="mt-5">
-                {heroVariant === "cinematic" ? (
-                  <HeroCinematografico content={content} heroAction={heroAction} />
-                ) : (
-                  <HeroEditorial content={content} heroAction={heroAction} />
-                )}
-              </Container>
-            );
-          case "services":
-            return (
-              <div key={key}>
-                <Container className="mt-8">
-                  <AluxDestinationGuide content={content} />
+            case "hero":
+              return (
+                <Container key={key} className="mt-5">
+                  {heroVariant === "cinematic" ? (
+                    <HeroCinematografico content={content} heroAction={heroAction} />
+                  ) : (
+                    <HeroEditorial content={content} heroAction={heroAction} />
+                  )}
                 </Container>
-                <Container className="mt-8">
-                  <ServiciosStrip
-                    content={content}
-                    active={activeService}
-                    onSelect={setActiveService}
-                    navigation={serviceNavigation}
-                    hrefByKey={serviceHrefByKey}
-                  />
+              );
+            case "services":
+              return (
+                <div key={key}>
+                  <Container className="mt-8">
+                    <AluxDestinationGuide content={content} />
+                  </Container>
+                  <Container className="mt-8">
+                    <ServiciosStrip
+                      content={content}
+                      active={activeService}
+                      onSelect={setActiveService}
+                      navigation={serviceNavigation}
+                      hrefByKey={serviceHrefByKey}
+                    />
+                  </Container>
+                </div>
+              );
+            case "descubre": {
+              // Sin párrafos propios y sin medios la sección sólo aportaba
+              // espacio en blanco: no se renderiza.
+              const hasDescubreText = content.descubre.paragraphs.some((p) => p.trim().length > 0);
+              const hasDescubreMedia = content.descubre.media.some((m) => Boolean(m.url));
+              if (!hasDescubreText && !hasDescubreMedia) return null;
+              return (
+                <Container key={key} className="mt-14">
+                  <DescubreDestino content={content} />
                 </Container>
-              </div>
-            );
-          case "descubre": {
-            // Sin párrafos propios y sin medios la sección sólo aportaba
-            // espacio en blanco: no se renderiza.
-            const hasDescubreText = content.descubre.paragraphs.some((p) => p.trim().length > 0);
-            const hasDescubreMedia = content.descubre.media.some((m) => Boolean(m.url));
-            if (!hasDescubreText && !hasDescubreMedia) return null;
-            return (
-              <Container key={key} className="mt-14">
-                <DescubreDestino content={content} />
-              </Container>
-            );
-          }
-          case "gallery": {
-            // Sin fotografías propias la galería sólo aportaba espacio en blanco.
-            const hasGalleryMedia = content.gallery.items.some((m) => Boolean(m.url));
-            if (!hasGalleryMedia) return null;
-            return (
-              <Container key={key} className="mt-14">
-                <GaleriaEditorial content={content} layout={galleryLayout} />
-              </Container>
-            );
-          }
-          case "servicePreview":
-            return service ? (
-              <Container key={key} className="mt-14">
-                {renderServicePreview ? (
-                  renderServicePreview(service)
-                ) : (
-                  <ServicioPreview content={content} service={service} />
-                )}
-              </Container>
-            ) : null;
-          case "routes":
-            return routes.length > 0 ? (
-              <Container key={key} className="mt-14">
-                <DestinationRoutes content={content} routes={routes} />
-              </Container>
-            ) : null;
-          case "map":
-            return (
-              <Container key={key} className="mt-16">
-                <ExperienceMapBlock dto={mapDto} />
-              </Container>
-            );
-          case "nearby":
-            return (
-              <Container key={key} className="mt-16">
-                <CercaDelDestino content={content} />
-              </Container>
-            );
+              );
+            }
+            case "gallery": {
+              // Sin fotografías propias la galería sólo aportaba espacio en blanco.
+              const hasGalleryMedia = content.gallery.items.some((m) => Boolean(m.url));
+              if (!hasGalleryMedia) return null;
+              return (
+                <Container key={key} className="mt-14">
+                  <GaleriaEditorial content={content} layout={galleryLayout} />
+                </Container>
+              );
+            }
+            case "servicePreview":
+              return service ? (
+                <Container key={key} className="mt-14">
+                  {renderServicePreview ? (
+                    renderServicePreview(service)
+                  ) : (
+                    <ServicioPreview content={content} service={service} />
+                  )}
+                </Container>
+              ) : null;
+            case "routes":
+              return routes.length > 0 ? (
+                <Container key={key} className="mt-14">
+                  <DestinationRoutes content={content} routes={routes} />
+                </Container>
+              ) : null;
+            case "map":
+              return (
+                <Container key={key} className="mt-16">
+                  <ExperienceMapBlock dto={mapDto} />
+                </Container>
+              );
+            case "nearby":
+              return (
+                <Container key={key} className="mt-16">
+                  <CercaDelDestino content={content} />
+                </Container>
+              );
             default:
               return null;
           }
