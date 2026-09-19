@@ -66,6 +66,12 @@ import {
   type PageKindDefinition,
 } from "@/lib/experience-builder/page-kind-registry";
 import { getKitSeed } from "@/lib/experience-builder/kit-seeds";
+import {
+  buildPresetCompositionTree,
+  defaultPresetIdForPageKind,
+  type OfficialTemplateEntry,
+} from "@/lib/experience-builder/official-template-structure";
+import { OfficialTemplateStructure } from "./OfficialTemplateStructure";
 import { useAuth } from "@/hooks/useAuth";
 
 /* -------------------------------------------------------------------- */
@@ -338,6 +344,57 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
     });
   };
 
+  /** Abre por dirección web una página ya existente (Estructura oficial). */
+  const handleOpenSlug = (slug: string) => {
+    const row = rows.find((r) => r.slug === slug);
+    if (!row) {
+      toast.error("Esa página todavía no existe.");
+      return;
+    }
+    handleOpen(row);
+  };
+
+  /**
+   * Crea la página de trabajo de una sección usando su plantilla
+   * aprobada. Fail-closed: sin preset declarado no se crea nada.
+   */
+  const handleCreateFromTemplate = async (entry: OfficialTemplateEntry) => {
+    if (!entry.workingSlug) return;
+    const tree = buildPresetCompositionTree(entry.id);
+    if (!tree) {
+      toast.error("Esta sección todavía no tiene plantilla aprobada declarada.");
+      return;
+    }
+    setBusyId(entry.id);
+    try {
+      const created = await create({
+        data: {
+          slug: entry.workingSlug,
+          title: entry.name,
+          description: entry.description,
+          page_type: entry.pageKind,
+        },
+      });
+      await saveDraft({ data: { id: created.id, tree } });
+      toast.success("Página creada con la plantilla de la sección.");
+      await reload();
+      onOpenPage({
+        id: created.id,
+        key: entry.workingSlug,
+        slug: entry.workingSlug,
+        title: entry.name,
+        description: entry.description,
+        page_type: entry.pageKind,
+        publicPath: entry.publicRoute.includes("{") ? `/p/${entry.workingSlug}` : entry.publicRoute,
+        custom: true,
+      });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const doAction = async (id: string, fn: () => Promise<unknown>, ok: string) => {
     setBusyId(id);
     try {
@@ -470,6 +527,15 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </button>
         </div>
       </header>
+
+      {/* Estructura oficial de plantillas por sección */}
+      <OfficialTemplateStructure
+        rows={rows}
+        loading={loading}
+        busyId={busyId}
+        onOpenSlug={handleOpenSlug}
+        onCreateFromTemplate={handleCreateFromTemplate}
+      />
 
       {/* Filtros y búsqueda */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2">
@@ -619,14 +685,24 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               // usando `getKitSeed(kind).build()`. Persistimos con el
               // flujo existente (`saveCompositionDraft`) — sin tocar
               // Business / Product ni renderers.
+              // Plantilla por defecto de la sección: si el tipo tiene un
+              // preset premium aprobado, la página nueva nace con él. Si no,
+              // se conserva la semilla oficial del Surface Kit.
+              const presetId = defaultPresetIdForPageKind(form.kind);
+              const presetTree = presetId ? buildPresetCompositionTree(presetId) : null;
               const seed = getKitSeed(form.kind);
-              if (seed && created?.id) {
+              const initialTree = presetTree ?? (seed ? seed.build() : null);
+              if (initialTree && created?.id) {
                 try {
-                  await saveDraft({ data: { id: created.id, tree: seed.build() } });
-                  toast.success("Página creada con semilla del Kit.");
+                  await saveDraft({ data: { id: created.id, tree: initialTree } });
+                  toast.success(
+                    presetTree
+                      ? "Página creada con la plantilla de la sección."
+                      : "Página creada con semilla del Kit.",
+                  );
                 } catch (seedErr) {
                   // No bloqueamos la creación por un fallo de semilla.
-                  console.warn("[PagesPanel] seed inicial falló:", seedErr);
+                  console.warn("[PagesPanel] semilla inicial falló:", seedErr);
                   toast.success("Página creada (semilla vacía).");
                 }
               } else {
