@@ -1057,6 +1057,33 @@ function PageVisualEditor({
     enabled: pageDef.page_type === "home",
   });
 
+  /**
+   * Reconciliación explícita del conflicto de borrador: trae la versión
+   * vigente del servidor y la adopta como base de edición. No publica, no
+   * sobrescribe el servidor y no toca la página publicada.
+   */
+  const reloadDraftFromServer = async () => {
+    if (!page) return;
+    setReloadingDraft(true);
+    try {
+      const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+      if (refreshed) {
+        setPage(refreshed);
+        skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(refreshed.current_draft);
+        setTree(refreshed.current_draft);
+        resetHistory();
+        setDraftConflict(false);
+        setSaveStatus("idle");
+        setMessage("Borrador actualizado con la versión del servidor.");
+      }
+    } catch (e) {
+      setMessage(`No se pudo recargar el borrador: ${(e as Error).message}`);
+    } finally {
+      setReloadingDraft(false);
+    }
+  };
+
   const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
     if (!page) return;
     setWorkflowBusy(true);
