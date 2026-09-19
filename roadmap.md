@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): mantener el viewport Premium a escala real con desplazamiento del área de trabajo, sin deformar Destinos/Experiencias ni afectar 390/430/768. Pendiente aceptación visual humana en iPad.
+- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): conservar el viewport lógico Premium y ajustar sólo su representación visual al área de trabajo, sin deformar Destinos/Experiencias ni afectar 390/430/768. Pendiente aceptación visual humana en iPad.
 
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 

@@ -3780,12 +3780,7 @@ function CanvasViewport({
     };
   }, [hud, mount, width]);
 
-  const requestedScale = Math.min(1, Math.max(0.2, scale));
-  // Los presets amplios deben conservar el viewport Premium a escala real.
-  // Reducir el iframe con `zoom` o `transform` recompone de forma distinta
-  // imágenes absolutas y grids en Safari/iPad. El área de trabajo proporciona
-  // desplazamiento en ambos ejes, como un lienzo profesional.
-  const scaled = width >= 1024 ? 1 : requestedScale;
+  const scaled = Math.min(1, Math.max(0.2, scale));
   return (
     <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
       <div
@@ -3817,6 +3812,8 @@ function CanvasViewport({
           style={{
             width,
             height: documentHeight,
+             transform: `scale(${scaled})`,
+             transformOrigin: "top left",
           }}
         />
         {mount ? createPortal(children, mount) : null}
