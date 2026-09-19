@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): lienzo reconstruido a escala real, altura medida y controles fuera de la plantilla; comparación constructor/público de Destinos y Experiencias a 1024 en paridad. Pendiente aceptación visual humana en iPad y validación 1280/1440/834/430/390 antes de extender por familias.
+- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): reconstrucción del espacio de trabajo en curso. Documento interno a escala lógica real; ajuste con mínimo legible y desplazamiento horizontal; inspector inferior hasta 1279 px y acoplado desde 1280 px; altura medida, controles externos y navegación de secciones sobre el scroll del editor. Pendiente comparación constructor/preview/público en 1440/1280/1024/834/430/390 y aceptación visual humana antes de extender por familias.
 
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 
