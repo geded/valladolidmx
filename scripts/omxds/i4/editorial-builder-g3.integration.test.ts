@@ -87,7 +87,9 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toMatch(/role=["']dialog["']/);
     expect(studio).toMatch(/aria-modal=["']true["']/);
     expect(studio).toContain("flex-wrap");
-    expect(studio).toContain("md:flex");
+    // El selector de dispositivo permanece accesible en todos los anchos
+    // (antes oculto bajo 768 px con `md:flex`).
+    expect(studio).toContain("overflow-x-auto rounded-md border border-border bg-background");
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
   });
