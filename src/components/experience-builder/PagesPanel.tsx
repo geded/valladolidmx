@@ -41,6 +41,7 @@ import {
   Search,
   Star,
   Trash2,
+  Undo2,
   X,
 } from "lucide-react";
 
