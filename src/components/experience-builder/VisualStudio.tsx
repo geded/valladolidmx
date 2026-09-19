@@ -3295,9 +3295,7 @@ function HomeCanvas({
   onReorderCompositeSection: (activeKey: string, overKey: string) => void;
   commentCounts?: Record<string, number>;
 }) {
-  const outerRef = useRef<HTMLDivElement | null>(null);
   const preset = getDevicePreset(deviceViewport);
-  const [availableWidth, setAvailableWidth] = useState(preset.width);
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
@@ -3311,32 +3309,10 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
-  // El ancho disponible determina únicamente la escala. El alto del lienzo se
-  // adapta al documento real para poder recorrer y editar la página completa.
-  useEffect(() => {
-    const measure = () => {
-      const el = outerRef.current;
-      if (!el) return;
-      const width = Math.max(120, el.clientWidth - 24);
-      setAvailableWidth((current) => (Math.abs(current - width) > 1 ? width : current));
-    };
-    measure();
-    const outer = outerRef.current;
-    const observer = new ResizeObserver(measure);
-    if (outer) observer.observe(outer);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [deviceViewport]);
-
-  // G7-C · Escala proporcional sólo cuando el ANCHO visible es menor que el
-  // preset. La altura ya no reduce la escala: el área de trabajo se desplaza
-  // verticalmente, evitando lienzos ilegibles (27%) en pantallas bajas.
-  // El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
-  // por lo que container queries y breakpoints no se ven alterados.
-  const scale = Math.min(1, availableWidth / preset.width);
+  // El lienzo se presenta siempre al 100 %. Si el dispositivo seleccionado no
+  // cabe entre los paneles, el Workspace ofrece desplazamiento horizontal. Así
+  // tipografía, saltos y composición no dependen del espacio accidental del CMS.
+  const scale = 1;
   const headerVariant = resolveCanvasHeaderVariant(tree);
   // R1-F1L-R2 · La autoridad Premium de Home se aísla de composiciones antiguas.
   // El caso `previewMode && pageType === "home"` queda cubierto porque la
@@ -3362,7 +3338,6 @@ function HomeCanvas({
 
   return (
     <div
-      ref={outerRef}
       data-eb-canvas-scrollport="editor"
       className="flex min-h-0 min-w-0 flex-1 items-start justify-start overflow-auto bg-muted/20 p-3"
     >
@@ -3472,10 +3447,9 @@ function CanvasViewport({
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
-  // El iframe conserva el alto lógico del dispositivo. La página completa se
-  // recorre dentro del iframe, igual que en un navegador real; no vinculamos su
-  // scrollHeight al marco porque 100vh/min-h-screen crearían realimentación.
-  const documentHeight = minimumHeight;
+  const [documentHeight, setDocumentHeight] = useState(minimumHeight);
+  const [sectionRects, setSectionRects] = useState<Array<{ key: string; top: number }>>([]);
+  const draggedSectionRef = useRef<string | null>(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3533,12 +3507,12 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    // El documento del canvas conserva el alto del dispositivo y se recorre con
-    // su propio scroll interno (rueda y gesto táctil nativos en iPad).
+    // El documento no tiene scroll interno: el marco adopta la altura completa
+    // de la página y el Workspace es el único scrollport.
     const scrollStyle = doc.createElement("style");
     scrollStyle.setAttribute("data-eb-canvas-scroll-style", "");
     scrollStyle.textContent = `
-      html, body { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      html, body { min-height: 100%; height: auto; overflow-y: visible; }
     `;
     doc.head.appendChild(scrollStyle);
 
@@ -3559,56 +3533,54 @@ function CanvasViewport({
   }, []);
 
   useEffect(() => {
-    if (!mount || !compositeNodeId) return;
-    const doc = mount.ownerDocument;
-    let draggedKey: string | null = null;
-    let touchKey: string | null = null;
-    let touchMoved = false;
+    setDocumentHeight(minimumHeight);
+  }, [minimumHeight, width]);
 
-    const sections = () => Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
-    const decorate = () => {
-      sections().forEach((section) => {
-        const key = section.dataset.ebSection;
-        if (!key || !reorderableSectionKeys.includes(key)) return;
-        if (section.querySelector(":scope > [data-eb-section-handle]")) return;
-        section.style.position = section.style.position || "relative";
-        const handle = doc.createElement("button");
-        handle.type = "button";
-        handle.draggable = true;
-        handle.setAttribute("data-eb-section-handle", "");
-        handle.setAttribute("aria-label", "Mover o editar sección");
-        handle.textContent = "⋮⋮";
-        section.prepend(handle);
+  useEffect(() => {
+    if (!mount) return;
+    const doc = mount.ownerDocument;
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const nextHeight = Math.max(
+          minimumHeight,
+          Math.ceil(mount.getBoundingClientRect().height),
+          Math.ceil(mount.scrollHeight),
+        );
+        setDocumentHeight((current) => (Math.abs(current - nextHeight) > 1 ? nextHeight : current));
+        setSectionRects(
+          Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
+            .map((section) => ({
+              key: section.dataset.ebSection ?? "",
+              top: Math.max(0, Math.round(section.getBoundingClientRect().top)),
+            }))
+            .filter((section) => section.key.length > 0),
+        );
       });
     };
-    const style = doc.createElement("style");
-    style.setAttribute("data-eb-section-style", "");
-    style.textContent = `
-      /*
-       * Los controles editoriales son absolutos y no participan en el flujo.
-       * Cada sección conserva su altura natural, pero establece un límite de
-       * pintura propio: evita que Safari componga imágenes absolutas detrás de
-       * las secciones siguientes cuando el iframe está reducido.
-       */
-      [data-eb-section] {
-        position:relative;
-        isolation:isolate;
-        contain:paint;
-        pointer-events:auto;
-      }
-      [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
-      [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
-        width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
-        background:hsl(var(--background)); color:hsl(var(--foreground)); box-shadow:0 4px 16px rgb(0 0 0 / .16);
-        cursor:grab; touch-action:none; pointer-events:auto; font-weight:800; letter-spacing:2px; }
-      [data-eb-section]:has(> [data-eb-section-handle]:focus) { outline:3px solid hsl(var(--ring)); outline-offset:3px; }
-      [data-eb-section][data-eb-drop-target] { outline:3px dashed hsl(var(--primary)); outline-offset:4px; }
-    `;
-    doc.head.appendChild(style);
-    decorate();
-    const observer = new MutationObserver(decorate);
-    observer.observe(mount, { childList: true, subtree: true });
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(mount);
+    const mutationObserver = new MutationObserver(measure);
+    mutationObserver.observe(mount, { childList: true, subtree: true, attributes: true });
+    Array.from(mount.querySelectorAll("img")).forEach((image) =>
+      image.addEventListener("load", measure),
+    );
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      Array.from(mount.querySelectorAll("img")).forEach((image) =>
+        image.removeEventListener("load", measure),
+      );
+    };
+  }, [minimumHeight, mount, width]);
 
+  useEffect(() => {
+    if (!mount || !compositeNodeId) return;
+    const doc = mount.ownerDocument;
+    const sections = () => Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
     const sectionFrom = (target: EventTarget | null) =>
       (target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-section]") ?? null;
     const sectionKey = (target: EventTarget | null) =>
@@ -3618,98 +3590,11 @@ function CanvasViewport({
       if (!key) return;
       onSelectSection(compositeNodeId, key);
     };
-    const onDragStart = (event: DragEvent) => {
-      if (!(event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) return;
-      draggedKey = sectionKey(event.target);
-      if (draggedKey) event.dataTransfer?.setData("text/plain", draggedKey);
-    };
-    const onDragOver = (event: DragEvent) => {
-      if (!draggedKey) return;
-      const section = sectionFrom(event.target);
-      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
-      section?.setAttribute("data-eb-drop-target", "");
-      event.preventDefault();
-    };
-    const onDrop = (event: DragEvent) => {
-      const overKey = sectionKey(event.target);
-      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
-      if (draggedKey && overKey && draggedKey !== overKey) onReorderSection(draggedKey, overKey);
-      draggedKey = null;
-      event.preventDefault();
-    };
-    const onTouchStart = (event: TouchEvent) => {
-      if (!(event.target as HTMLElement | null)?.closest("[data-eb-section-handle]")) return;
-      touchKey = sectionKey(event.target);
-      touchMoved = false;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      if (!touchKey) return;
-      const touch = event.touches[0];
-      if (!touch) return;
-      touchMoved = true;
-      // El lienzo se desplaza con su propio scroll interno mientras se arrastra.
-      const win = doc.defaultView;
-      if (win) {
-        const edge = 96;
-        if (touch.clientY < edge) win.scrollBy(0, -22);
-        if (touch.clientY > win.innerHeight - edge) win.scrollBy(0, 22);
-      }
-      // Safari/iPad conserva el propio tirador como `event.target` durante
-      // todo el gesto. Resolvemos el destino por la posición vertical real
-      // del dedo para que soltar sobre otra sección sí cambie el orden.
-      const candidates = sections().filter((section) => {
-        const key = section.dataset.ebSection;
-        return Boolean(key && reorderableSectionKeys.includes(key) && key !== touchKey);
-      });
-      const containing = candidates.find((section) => {
-        const rect = section.getBoundingClientRect();
-        return touch.clientY >= rect.top && touch.clientY <= rect.bottom;
-      });
-      const over =
-        containing ??
-        candidates.reduce<HTMLElement | null>((nearest, section) => {
-          if (!nearest) return section;
-          const center =
-            (section.getBoundingClientRect().top + section.getBoundingClientRect().bottom) / 2;
-          const nearestCenter =
-            (nearest.getBoundingClientRect().top + nearest.getBoundingClientRect().bottom) / 2;
-          return Math.abs(center - touch.clientY) < Math.abs(nearestCenter - touch.clientY)
-            ? section
-            : nearest;
-        }, null);
-      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
-      over?.setAttribute("data-eb-drop-target", "");
-      event.preventDefault();
-    };
-    const onTouchEnd = () => {
-      const overKey =
-        doc.querySelector<HTMLElement>("[data-eb-section][data-eb-drop-target]")?.dataset
-          .ebSection ?? null;
-      sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
-      if (touchMoved && touchKey && overKey && touchKey !== overKey)
-        onReorderSection(touchKey, overKey);
-      touchKey = null;
-      touchMoved = false;
-    };
     doc.addEventListener("click", onClick, true);
-    doc.addEventListener("dragstart", onDragStart);
-    doc.addEventListener("dragover", onDragOver);
-    doc.addEventListener("drop", onDrop);
-    doc.addEventListener("touchstart", onTouchStart, { passive: true });
-    doc.addEventListener("touchmove", onTouchMove, { passive: false });
-    doc.addEventListener("touchend", onTouchEnd);
     return () => {
-      observer.disconnect();
-      style.remove();
       doc.removeEventListener("click", onClick, true);
-      doc.removeEventListener("dragstart", onDragStart);
-      doc.removeEventListener("dragover", onDragOver);
-      doc.removeEventListener("drop", onDrop);
-      doc.removeEventListener("touchstart", onTouchStart);
-      doc.removeEventListener("touchmove", onTouchMove);
-      doc.removeEventListener("touchend", onTouchEnd);
     };
-  }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys, scale]);
+  }, [compositeNodeId, mount, onSelectSection]);
 
   // Mantiene sincronizados el panel y el lienzo. Al elegir una sección desde
   // la lista o desde el inspector, el canvas muestra esa sección completa en
@@ -3737,9 +3622,6 @@ function CanvasViewport({
       if (retry !== undefined) frame?.clearTimeout(retry);
     };
   }, [mount, selectedSectionKey]);
-
-  // El documento del canvas se recorre con su propio scroll interno; no se
-  // vuelve a medir su altura para evitar realimentación.
 
   // HUD de medición (sólo entornos no productivos): innerWidth real del
   // iframe, overflow horizontal y posición efectiva del encabezado.
@@ -3802,7 +3684,7 @@ function CanvasViewport({
       </div>
       <div
         data-eb-canvas-frame=""
-        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        className="relative shrink-0 overflow-visible rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{ width: Math.round(width * scaled), height: Math.round(documentHeight * scaled) }}
       >
         <iframe
@@ -3821,6 +3703,38 @@ function CanvasViewport({
           }}
         />
         {mount ? createPortal(children, mount) : null}
+        {compositeNodeId ? (
+          <div className="pointer-events-none absolute inset-0 z-50" aria-label="Controles de secciones">
+            {sectionRects
+              .filter((section) => reorderableSectionKeys.includes(section.key))
+              .map((section) => (
+                <button
+                  key={section.key}
+                  type="button"
+                  draggable
+                  data-eb-external-section-handle={section.key}
+                  aria-label={`Mover o editar sección ${section.key}`}
+                  title="Arrastra para reordenar; pulsa para editar"
+                  onClick={() => onSelectSection(compositeNodeId, section.key)}
+                  onDragStart={(event) => {
+                    draggedSectionRef.current = section.key;
+                    event.dataTransfer.setData("text/plain", section.key);
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    const active = draggedSectionRef.current;
+                    if (active && active !== section.key) onReorderSection(active, section.key);
+                    draggedSectionRef.current = null;
+                  }}
+                  className="pointer-events-auto absolute right-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
+                  style={{ top: section.top + 10 }}
+                >
+                  <GripVertical className="size-4" aria-hidden />
+                </button>
+              ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );
