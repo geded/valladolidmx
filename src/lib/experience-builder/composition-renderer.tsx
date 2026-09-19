@@ -444,7 +444,11 @@ function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
     staleTime: 60_000,
   });
 
-  const content = mergeHomeRealContent(resolved.content, data);
+  const content = mergeHomeRealContent(
+    resolved.content,
+    data,
+    (node.config as Record<string, unknown>).destinos_items,
+  );
   const sections = resolveHomeSectionVisibility(content, resolved.sections);
 
   return (
