@@ -106,6 +106,8 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
     expect(studio).toContain("section.offsetTop * scale");
     expect(studio).toContain("xl:static");
+    expect(studio).toContain('window.matchMedia("(max-width: 1279px)")');
+    expect(studio).toContain('setSidebarRef.current("hidden")');
     expect(studio).toContain("data-eb-external-section-handle");
     expect(studio).not.toContain("data-eb-section-handle");
     expect(studio).not.toContain('[data-eb-section="destinos"] { overflow:clip; }');

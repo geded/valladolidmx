@@ -1162,8 +1162,35 @@ function PageVisualEditor({
   const [focusMode, setFocusMode] = useState(false);
   const focusModeRef = useRef(false);
   const previousSidebarRef = useRef(workspace.sidebar);
+  const currentSidebarRef = useRef(workspace.sidebar);
   const setSidebarRef = useRef(workspace.setSidebar);
+  currentSidebarRef.current = workspace.sidebar;
   setSidebarRef.current = workspace.setSidebar;
+
+  // En tablet el menú general del CMS deja menos de la mitad de la pantalla
+  // para el lienzo. El Studio toma temporalmente todo el ancho disponible y
+  // restaura exactamente el estado anterior al salir o volver a escritorio.
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1279px)");
+    let hiddenByStudio = false;
+    let sidebarBeforeStudio = currentSidebarRef.current;
+    const syncWorkspaceSidebar = () => {
+      if (media.matches) {
+        if (!hiddenByStudio) sidebarBeforeStudio = currentSidebarRef.current;
+        hiddenByStudio = true;
+        setSidebarRef.current("hidden");
+      } else if (hiddenByStudio && !focusModeRef.current) {
+        hiddenByStudio = false;
+        setSidebarRef.current(sidebarBeforeStudio);
+      }
+    };
+    syncWorkspaceSidebar();
+    media.addEventListener("change", syncWorkspaceSidebar);
+    return () => {
+      media.removeEventListener("change", syncWorkspaceSidebar);
+      if (hiddenByStudio && !focusModeRef.current) setSidebarRef.current(sidebarBeforeStudio);
+    };
+  }, []);
 
   const toggleFocusMode = useCallback(() => {
     const next = !focusMode;
@@ -2644,7 +2671,7 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl xl:static xl:inset-auto xl:h-full xl:max-h-none xl:w-[360px] xl:max-w-[32vw] xl:shrink-0 xl:border-l xl:border-t-0 xl:shadow-none`}
+            className="fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl xl:static xl:inset-auto xl:h-full xl:max-h-none xl:w-[360px] xl:max-w-[32vw] xl:shrink-0 xl:border-l xl:border-t-0 xl:shadow-none"
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="shrink-0 border-b border-border bg-card p-4">
