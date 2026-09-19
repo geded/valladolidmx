@@ -97,6 +97,15 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // secciones posteriores sin alterar el render público Premium.
     expect(studio).toContain("contain:paint");
     expect(studio).toContain("isolation:isolate");
+    expect(studio).toContain('[data-eb-section="destinos"] { overflow:clip; }');
+    expect(studio).toContain(':not([data-eb-section="destinos"]) { contain:paint; }');
+
+    const inspector = read("src/components/experience-builder/AutoInspector.tsx");
+    // Las filas parciales del borrador muestran los valores acreditados por
+    // índice, pero sólo se materializan cuando el editor cambia un campo.
+    expect(inspector).toContain("defaultRows[index] ?? {}");
+    expect(inspector).toContain("setRow(index, { ...displayRow, [key]: nextValue })");
+    expect(inspector).not.toContain("defaultRows[index % defaultRows.length]");
   });
 
   test("acceptance report declares every mandatory human scenario and remains the authority for final G3 PASS", () => {
