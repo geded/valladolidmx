@@ -985,6 +985,10 @@ function StructuredListControl({
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const fields = def.item?.fields ?? {};
   const defaultRows = Array.isArray(def.default) ? (def.default as Record<string, unknown>[]) : [];
+  const rowWithDefaults = (row: Record<string, unknown>, index: number) => ({
+    ...(defaultRows[index] ?? {}),
+    ...row,
+  });
   const makeDefault = () =>
     Object.fromEntries(
       Object.entries(fields).map(([key, field]) => [
@@ -1026,70 +1030,73 @@ function StructuredListControl({
           <Plus className="size-3.5" aria-hidden /> Cargar valores por defecto
         </button>
       ) : null}
-      {rows.map((row, index) => (
-        <div
-          key={index}
-          className="rounded-lg border border-border bg-background p-2"
-          onDragOver={(e) => {
-            if (dragIndex === null) return;
-            e.preventDefault();
-          }}
-          onDrop={(e) => {
-            if (dragIndex === null) return;
-            e.preventDefault();
-            moveTo(dragIndex, index);
-            setDragIndex(null);
-          }}
-        >
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="flex items-center gap-1.5 text-[11px] font-semibold">
-              <span
-                draggable
-                onDragStart={() => setDragIndex(index)}
-                onDragEnd={() => setDragIndex(null)}
-                aria-label="Arrastrar para reordenar"
-                title="Arrastrar para reordenar"
-                className="inline-flex size-6 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
-              >
-                <GripVertical className="size-3.5" aria-hidden />
-              </span>
-              {def.item?.label ?? "Elemento"} {index + 1}
-            </p>
-            <div className="flex items-center gap-1">
-              <MiniIconButton
-                label="Subir"
-                disabled={index === 0}
-                onClick={() => move(index, -1)}
-                icon={<ChevronUp className="size-3" />}
-              />
-              <MiniIconButton
-                label="Bajar"
-                disabled={index === rows.length - 1}
-                onClick={() => move(index, 1)}
-                icon={<ChevronDown className="size-3" />}
-              />
-              <MiniIconButton
-                label="Eliminar"
-                onClick={() => onChange(rows.filter((_, i) => i !== index))}
-                icon={<Trash2 className="size-3" />}
-                tone="danger"
-              />
+      {rows.map((row, index) => {
+        const displayRow = rowWithDefaults(row, index);
+        return (
+          <div
+            key={index}
+            className="rounded-lg border border-border bg-background p-2"
+            onDragOver={(e) => {
+              if (dragIndex === null) return;
+              e.preventDefault();
+            }}
+            onDrop={(e) => {
+              if (dragIndex === null) return;
+              e.preventDefault();
+              moveTo(dragIndex, index);
+              setDragIndex(null);
+            }}
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold">
+                <span
+                  draggable
+                  onDragStart={() => setDragIndex(index)}
+                  onDragEnd={() => setDragIndex(null)}
+                  aria-label="Arrastrar para reordenar"
+                  title="Arrastrar para reordenar"
+                  className="inline-flex size-6 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
+                >
+                  <GripVertical className="size-3.5" aria-hidden />
+                </span>
+                {def.item?.label ?? "Elemento"} {index + 1}
+              </p>
+              <div className="flex items-center gap-1">
+                <MiniIconButton
+                  label="Subir"
+                  disabled={index === 0}
+                  onClick={() => move(index, -1)}
+                  icon={<ChevronUp className="size-3" />}
+                />
+                <MiniIconButton
+                  label="Bajar"
+                  disabled={index === rows.length - 1}
+                  onClick={() => move(index, 1)}
+                  icon={<ChevronDown className="size-3" />}
+                />
+                <MiniIconButton
+                  label="Eliminar"
+                  onClick={() => onChange(rows.filter((_, i) => i !== index))}
+                  icon={<Trash2 className="size-3" />}
+                  tone="danger"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(fields).map(([key, field]) => (
+                <FieldRow
+                  key={key}
+                  name={key}
+                  def={field}
+                  value={displayRow[key]}
+                  onChange={(nextValue) => setRow(index, { ...displayRow, [key]: nextValue })}
+                  simple={simple}
+                />
+              ))}
             </div>
           </div>
-          <div className="space-y-2">
-            {Object.entries(fields).map(([key, field]) => (
-              <FieldRow
-                key={key}
-                name={key}
-                def={field}
-                value={row?.[key]}
-                onChange={(nextValue) => setRow(index, { ...row, [key]: nextValue })}
-                simple={simple}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         onClick={() => onChange([...rows, makeDefault()])}

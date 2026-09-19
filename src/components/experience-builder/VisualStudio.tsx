@@ -3381,8 +3381,9 @@ function CanvasViewport({
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
-  // El alto del iframe es SIEMPRE el del dispositivo: así las alturas relativas
-  // a la ventana (100vh, min-h-screen) no realimentan la medición del lienzo.
+  // El iframe conserva el alto lógico del dispositivo. La página completa se
+  // recorre dentro del iframe, igual que en un navegador real; no vinculamos su
+  // scrollHeight al marco porque 100vh/min-h-screen crearían realimentación.
   const documentHeight = minimumHeight;
 
   useEffect(() => {
@@ -3503,9 +3504,15 @@ function CanvasViewport({
       [data-eb-section] {
         position:relative;
         isolation:isolate;
-        contain:paint;
         pointer-events:auto;
       }
+      /*
+       * El aislamiento de pintura sólo es seguro cuando no recorta contenido
+       * legítimo de la sección. Destinos usa una cuadrícula alta y medios
+       * absolutos; overflow:clip preserva sus capas sin colapsar la tarjeta.
+       */
+      [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
+      [data-eb-section="destinos"] { overflow:clip; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
