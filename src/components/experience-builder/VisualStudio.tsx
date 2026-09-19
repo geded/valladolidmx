@@ -3819,8 +3819,13 @@ function CanvasViewport({
           style={{
             width,
             height: documentHeight,
-            transform: `scale(${scaled})`,
-            transformOrigin: "top left",
+            /*
+             * Safari/iPad compone por separado las imágenes absolutas cuando
+             * se transforma el iframe completo. Eso desliga las fotografías
+             * de las filas de Destinos/Experiencias. `zoom` mantiene el mismo
+             * viewport lógico y escala el documento como una sola superficie.
+             */
+            zoom: scaled,
           }}
         />
         {mount ? createPortal(children, mount) : null}
