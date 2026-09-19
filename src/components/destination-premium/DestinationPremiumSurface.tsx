@@ -254,9 +254,15 @@ export function DestinationPremiumSurface({
                 <CercaDelDestino content={content} />
               </Container>
             );
-          default:
-            return null;
-        }
+            default:
+              return null;
+          }
+        })();
+        return node ? (
+          <div key={key} data-eb-section={key}>
+            {node}
+          </div>
+        ) : null;
       })}
     </div>
   );
