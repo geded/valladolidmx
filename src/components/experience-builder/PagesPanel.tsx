@@ -24,6 +24,7 @@ import {
   Archive,
   ArchiveRestore,
   CalendarClock,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Copy,
@@ -926,6 +927,29 @@ function PageRow({
                 onClick={() => onAction("template", row)}
                 disabled={!canDelete}
               />
+              <div className="my-1 border-t border-border" />
+              {row.workflow_state !== "in_review" && row.workflow_state !== "approved" ? (
+                <MenuItem
+                  icon={GitBranch}
+                  label="Enviar a revisión"
+                  onClick={() => onAction("wf_review", row)}
+                />
+              ) : null}
+              {row.workflow_state !== "approved" ? (
+                <MenuItem
+                  icon={CheckCircle2}
+                  label="Aprobar"
+                  onClick={() => onAction("wf_approve", row)}
+                  disabled={!canDelete}
+                />
+              ) : null}
+              {row.workflow_state !== "draft" ? (
+                <MenuItem
+                  icon={Undo2}
+                  label="Regresar a borrador"
+                  onClick={() => onAction("wf_draft", row)}
+                />
+              ) : null}
               <div className="my-1 border-t border-border" />
               {archived ? (
                 <MenuItem
