@@ -2,6 +2,8 @@
 
 ## En curso
 
+- [ ] Experience Builder · Corregir la paridad de la sección Destinos de Home: mostrar Valladolid como tarjeta principal con sus datos publicados y dos destinos secundarios completos, eliminar el recorte artificial del lienzo y cargar en el diálogo los mismos valores que se ven en la plantilla, sin modificar la Home pública.
+
 - [x] Experience Builder · Catálogo operativo limitado a familias conectadas; vista inicial sólo publicada, con borradores y archivadas accesibles por filtro. Pruebas históricas desconectadas quedan ocultas de forma reversible y sin borrar datos.
 
 - [ ] Qué hacer · Evolución editorial CMS-first: crear su administración dentro del Experience Builder para ordenar/activar Destinos recomendados, Eventos, Experiencias y Lugares de interés; integrar los contratos desde Administración → Visibilidad como elegibilidad comercial separada y limitada, con indicación `Promovido` discreta fuera de la fotografía, sin duplicar Lugares, planes, pagos ni superficies.
