@@ -3309,10 +3309,26 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
-  // El lienzo se presenta siempre al 100 %. Si el dispositivo seleccionado no
-  // cabe entre los paneles, el Workspace ofrece desplazamiento horizontal. Así
-  // tipografía, saltos y composición no dependen del espacio accidental del CMS.
-  const scale = 1;
+  // El documento interno SIEMPRE se renderiza al ancho lógico del preset
+  // (1024/1280/1440…), de modo que tipografía, rejillas y saltos son idénticos
+  // a la web pública. Sólo la ENVOLVENTE se reduce visualmente (fit-to-width)
+  // cuando el área disponible del CMS es menor que el preset.
+  const scrollportRef = React.useRef<HTMLDivElement | null>(null);
+  const [availableWidth, setAvailableWidth] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    const el = scrollportRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const read = () => setAvailableWidth(el.clientWidth);
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
+  const scale =
+    usableWidth == null || usableWidth <= 0 || usableWidth >= preset.width
+      ? 1
+      : Math.max(0.25, usableWidth / preset.width);
   const headerVariant = resolveCanvasHeaderVariant(tree);
   // R1-F1L-R2 · La autoridad Premium de Home se aísla de composiciones antiguas.
   // El caso `previewMode && pageType === "home"` queda cubierto porque la
