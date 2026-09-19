@@ -251,3 +251,4 @@
 - [ ] Validar Home completa en 1440/834/430/390 sin modificar ni publicar la versión pública. Bloqueada en este turno: la sesión autenticada de prueba quedó en “Verificando sesión…”. Typecheck y contratos OMXDS sí están en PASS.
 
 - [ ] Constructor: galeria unica de plantillas oficiales agrupada por seccion + asignacion automatica de plantilla al crear pagina nueva en una seccion.
+- [ ] Regla: toda correccion de plantilla (empezando por Micrositio de Destino v1 oficial) se entrega editable desde la estructura del constructor (textos, imagenes, enlaces, orden).

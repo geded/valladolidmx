@@ -60,3 +60,9 @@ Las familias se ordenan por el registro oficial, no alfabéticamente, para que e
 - Dentro de cada familia se ve de un vistazo qué páginas existen, su estado y qué se puede modificar (contenido, orden de secciones, imágenes, enlaces).
 - **Plantilla por defecto por sección:** al crear una página nueva dentro de una sección, el sistema asigna automáticamente la plantilla aprobada de esa familia, sin pedir elegir preset. Si la familia tiene variantes (Lugares), se pregunta sólo la variante; el resto queda preasignado.
 - Si una sección todavía no tiene su plantilla aprobada declarada, la creación queda bloqueada con aviso claro (fail-closed), en vez de caer en una plantilla genérica.
+
+## 5. Regla de crecimiento y correcciones
+
+- Toda corrección o mejora de una plantilla se entrega **dentro de esta estructura**: los textos, imágenes, enlaces y el orden de secciones quedan editables desde el constructor, nunca fijos en el código.
+- Cuando una sección necesite crecer, se añade a su familia existente; no se crean plantillas paralelas.
+- Primer trabajo con esta regla, en un paso posterior y separado: dejar lista la primera versión oficial del **Micrositio de Destino**, con sus secciones declaradas y editables.
