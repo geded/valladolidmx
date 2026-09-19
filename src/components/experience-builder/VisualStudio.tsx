@@ -1438,10 +1438,7 @@ function PageVisualEditor({
     }
     updateSelectedConfig({
       ...next,
-      destinos_items: compactHomeDestinationEditorOverrides(
-        homeRealContent,
-        next.destinos_items,
-      ),
+      destinos_items: compactHomeDestinationEditorOverrides(homeRealContent, next.destinos_items),
     });
   };
 

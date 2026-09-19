@@ -93,9 +93,7 @@ export function compactHomeDestinationEditorOverrides(
 ): Array<Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href">> {
   const baseline = buildHomeDestinationEditorRows(real, undefined);
   const rows = Array.isArray(next)
-    ? next.filter(
-        (row): row is Record<string, unknown> => Boolean(row) && typeof row === "object",
-      )
+    ? next.filter((row): row is Record<string, unknown> => Boolean(row) && typeof row === "object")
     : [];
   const editableKeys = ["name", "note", "pueblo_magico", "media_url", "media_alt"] as const;
 
