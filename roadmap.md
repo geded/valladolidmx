@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Corregir sólo las vistas amplias de Home (1024/1280/1440): Destinos y Experiencias deben conservar composición, altura y edición Premium sin afectar 390/430/768.
+- [x] Experience Builder · Vistas amplias de Home (1024/1280/1440): corregida la escala del iframe para conservar Destinos y Experiencias en su composición Premium; 390/430/768 preservadas.
 
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 
