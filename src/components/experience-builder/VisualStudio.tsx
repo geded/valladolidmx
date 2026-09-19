@@ -3354,6 +3354,7 @@ function HomeCanvas({
 
   return (
     <div
+      ref={scrollportRef}
       data-eb-canvas-scrollport="editor"
       className="flex min-h-0 min-w-0 flex-1 items-start justify-start overflow-auto bg-muted/20 p-3"
     >
