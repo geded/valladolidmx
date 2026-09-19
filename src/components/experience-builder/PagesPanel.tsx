@@ -241,6 +241,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const unarchive = useServerFn(unarchiveComposition);
   const del = useServerFn(deleteComposition);
   const markTpl = useServerFn(markCompositionAsTemplate);
+  const setWorkflow = useServerFn(setCompositionWorkflowState);
 
   const [rows, setRows] = useState<StudioPageRow[]>([]);
   const [loading, setLoading] = useState(true);
