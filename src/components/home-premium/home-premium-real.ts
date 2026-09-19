@@ -86,6 +86,32 @@ export function buildHomeDestinationEditorRows(
   });
 }
 
+/** Conserva únicamente los cambios editoriales explícitos sobre el corpus. */
+export function compactHomeDestinationEditorOverrides(
+  real: HomeRealContent | undefined,
+  next: unknown,
+): Array<Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href">> {
+  const baseline = buildHomeDestinationEditorRows(real, undefined);
+  const rows = Array.isArray(next)
+    ? next.filter(
+        (row): row is Record<string, unknown> => Boolean(row) && typeof row === "object",
+      )
+    : [];
+  const editableKeys = ["name", "note", "pueblo_magico", "media_url", "media_alt"] as const;
+
+  return baseline.flatMap((base, index) => {
+    const row =
+      rows.find((candidate) => candidate.href === base.href) ?? rows[index] ?? ({} as const);
+    const override: Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href"> = {
+      href: base.href,
+    };
+    for (const key of editableKeys) {
+      if (row[key] !== undefined && row[key] !== base[key]) override[key] = row[key] as never;
+    }
+    return Object.keys(override).length > 1 ? [override] : [];
+  });
+}
+
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
 const GOVERNED_VERTICAL_MEDIA = {

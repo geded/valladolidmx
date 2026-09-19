@@ -101,7 +101,10 @@ import {
   HOME_PREMIUM_FALLBACK_TREE,
   resolveHomePremiumAuthorityTree,
 } from "@/components/home-premium/home-premium-config";
-import { buildHomeDestinationEditorRows } from "@/components/home-premium/home-premium-real";
+import {
+  buildHomeDestinationEditorRows,
+  compactHomeDestinationEditorOverrides,
+} from "@/components/home-premium/home-premium-real";
 import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
@@ -1424,6 +1427,23 @@ function PageVisualEditor({
       ),
     };
   }, [activeSection?.key, homeRealContent, selectedConfig, selectedNode?.type]);
+  const updateInspectorConfig = (next: Record<string, unknown>) => {
+    if (
+      selectedNode?.type !== "vmx.home.premium-g4" ||
+      activeSection?.key !== "destinos" ||
+      !selectedConfig
+    ) {
+      updateSelectedConfig(next);
+      return;
+    }
+    updateSelectedConfig({
+      ...next,
+      destinos_items: compactHomeDestinationEditorOverrides(
+        homeRealContent,
+        next.destinos_items,
+      ),
+    });
+  };
 
   const selectUnit = (id: string, sub: string | null) => {
     setSelectedId(id);
@@ -2759,7 +2779,7 @@ function PageVisualEditor({
               <AutoInspector
                 contract={selectedContract}
                 config={inspectorConfig ?? selectedConfig}
-                onChange={(next) => updateSelectedConfig(next)}
+                onChange={updateInspectorConfig}
                 simple={!advanced}
                 hideHeader={Boolean(activeSection)}
                 fieldFilter={
