@@ -54,6 +54,7 @@ import {
   unarchiveComposition,
   deleteComposition,
   markCompositionAsTemplate,
+  setCompositionWorkflowState,
   type StudioPageRow,
 } from "@/lib/experience-builder/studio.functions";
 import {
