@@ -573,6 +573,14 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
                       return canDelete
                         ? onMarkTemplate(row)
                         : toast.error("Sólo administradores pueden gestionar plantillas.");
+                    case "wf_review":
+                      return onWorkflow(row, "in_review");
+                    case "wf_approve":
+                      return canDelete
+                        ? onWorkflow(row, "approved")
+                        : toast.error("Sólo administradores pueden aprobar.");
+                    case "wf_draft":
+                      return onWorkflow(row, "draft");
                     default:
                       return;
                   }
