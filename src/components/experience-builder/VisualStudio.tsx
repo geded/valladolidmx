@@ -1357,8 +1357,9 @@ function PageVisualEditor({
           setSaveStatus("error");
           const msg = e instanceof Error ? e.message : String(e);
           if (msg.includes("draft_conflict")) {
+            setDraftConflict(true);
             setMessage(
-              "Conflicto de edición: el borrador cambió en el servidor. Recarga antes de guardar.",
+              "Conflicto de edición: el borrador cambió en el servidor. Recarga el borrador para seguir trabajando.",
             );
           }
         });
