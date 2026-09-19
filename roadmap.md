@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): lienzo reconstruido a escala real, altura medida y controles fuera de la plantilla; comparación constructor/público de Destinos y Experiencias a 1024 en paridad. Pendiente aceptación visual humana en iPad y validación 1280/1440/834/430/390 antes de extender por familias.
+- [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): reconstrucción del espacio de trabajo en curso. Documento interno a escala lógica real; ajuste con mínimo legible y desplazamiento horizontal; el Studio ocupa temporalmente todo el ancho en tablet; inspector inferior hasta 1279 px y acoplado desde 1280 px; altura medida, controles externos y navegación de secciones sobre el scroll del editor. Pendiente comparación constructor/preview/público en 1440/1280/1024/834/430/390 y aceptación visual humana antes de extender por familias.
 
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 
@@ -250,7 +250,7 @@
 
 - [x] Corregir selección de Destinos: enfocar la sección real del lienzo, mostrar tarjetas/valores/imágenes y evitar que el panel cubra la Home en tablet/móvil.
 - [x] Corregir arrastrar y soltar secciones: el gesto táctil resuelve el destino por la posición real del dedo en Safari/iPad; el mismo commit actualiza el lienzo y activa el autoguardado del borrador.
-- [ ] Validar Home completa en 1440/834/430/390 sin modificar ni publicar la versión pública. Bloqueada en este turno: la sesión autenticada de prueba quedó en “Verificando sesión…”. Typecheck y contratos OMXDS sí están en PASS.
+- [x] Validar técnicamente Home completa en 1440/1280/1024/834/430/390 sin modificar ni publicar la versión pública: 11 secciones consecutivas, cero solapamientos, cero overflow interno y anchos lógicos correctos. Contratos OMXDS 5/5 en PASS. La aceptación visual humana permanece pendiente.
 
 - [x] Constructor: galeria unica de plantillas oficiales agrupada por seccion + asignacion automatica de plantilla al crear pagina nueva en una seccion.
 - [ ] Regla: toda correccion de plantilla (empezando por Micrositio de Destino v1 oficial) se entrega editable desde la estructura del constructor (textos, imagenes, enlaces, orden).

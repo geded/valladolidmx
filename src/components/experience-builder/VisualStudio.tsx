@@ -1162,8 +1162,35 @@ function PageVisualEditor({
   const [focusMode, setFocusMode] = useState(false);
   const focusModeRef = useRef(false);
   const previousSidebarRef = useRef(workspace.sidebar);
+  const currentSidebarRef = useRef(workspace.sidebar);
   const setSidebarRef = useRef(workspace.setSidebar);
+  currentSidebarRef.current = workspace.sidebar;
   setSidebarRef.current = workspace.setSidebar;
+
+  // En tablet el menú general del CMS deja menos de la mitad de la pantalla
+  // para el lienzo. El Studio toma temporalmente todo el ancho disponible y
+  // restaura exactamente el estado anterior al salir o volver a escritorio.
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1279px)");
+    let hiddenByStudio = false;
+    let sidebarBeforeStudio = currentSidebarRef.current;
+    const syncWorkspaceSidebar = () => {
+      if (media.matches) {
+        if (!hiddenByStudio) sidebarBeforeStudio = currentSidebarRef.current;
+        hiddenByStudio = true;
+        setSidebarRef.current("hidden");
+      } else if (hiddenByStudio && !focusModeRef.current) {
+        hiddenByStudio = false;
+        setSidebarRef.current(sidebarBeforeStudio);
+      }
+    };
+    syncWorkspaceSidebar();
+    media.addEventListener("change", syncWorkspaceSidebar);
+    return () => {
+      media.removeEventListener("change", syncWorkspaceSidebar);
+      if (hiddenByStudio && !focusModeRef.current) setSidebarRef.current(sidebarBeforeStudio);
+    };
+  }, []);
 
   const toggleFocusMode = useCallback(() => {
     const next = !focusMode;
@@ -2642,9 +2669,9 @@ function PageVisualEditor({
           );
         })()}
 
-        {!previewMode && selectedContract && selectedConfig ? (
+        {!previewMode && structureCollapsed && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:h-auto lg:max-h-none lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
+            className="fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl xl:static xl:inset-auto xl:h-full xl:max-h-none xl:w-[360px] xl:max-w-[32vw] xl:shrink-0 xl:border-l xl:border-t-0 xl:shadow-none"
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="shrink-0 border-b border-border bg-card p-4">
@@ -3296,6 +3323,7 @@ function HomeCanvas({
   commentCounts?: Record<string, number>;
 }) {
   const preset = getDevicePreset(deviceViewport);
+  const [zoomOverride, setZoomOverride] = useState<number | null>(null);
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
@@ -3309,10 +3337,10 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
-  // El documento interno SIEMPRE se renderiza al ancho lógico del preset
-  // (1024/1280/1440…), de modo que tipografía, rejillas y saltos son idénticos
-  // a la web pública. Sólo la ENVOLVENTE se reduce visualmente (fit-to-width)
-  // cuando el área disponible del CMS es menor que el preset.
+  // El documento interno SIEMPRE se renderiza al ancho lógico del preset.
+  // "Ajustar" reduce sólo su envolvente, pero nunca por debajo de un nivel
+  // legible: cuando hace falta más espacio, el escenario desplaza el lienzo
+  // horizontalmente en lugar de comprimirlo hasta volverlo inutilizable.
   const scrollportRef = useRef<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
   useEffect(() => {
@@ -3325,10 +3353,19 @@ function HomeCanvas({
     return () => ro.disconnect();
   }, []);
   const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
-  const scale =
+  const minimumReadableScale = preset.width <= 430 ? 1 : preset.width <= 768 ? 0.85 : 0.7;
+  const fitScale =
     usableWidth == null || usableWidth <= 0 || usableWidth >= preset.width
       ? 1
-      : Math.max(0.25, usableWidth / preset.width);
+      : Math.max(minimumReadableScale, usableWidth / preset.width);
+  const scale = zoomOverride ?? fitScale;
+  useEffect(() => setZoomOverride(null), [deviceViewport]);
+  const changeZoom = (delta: number) => {
+    setZoomOverride((current) => {
+      const base = current ?? fitScale;
+      return Math.min(1, Math.max(minimumReadableScale, Math.round((base + delta) * 10) / 10));
+    });
+  };
   const headerVariant = resolveCanvasHeaderVariant(tree);
   // R1-F1L-R2 · La autoridad Premium de Home se aísla de composiciones antiguas.
   // El caso `previewMode && pageType === "home"` queda cubierto porque la
@@ -3356,13 +3393,19 @@ function HomeCanvas({
     <div
       ref={scrollportRef}
       data-eb-canvas-scrollport="editor"
-      className="flex min-h-0 min-w-0 flex-1 items-start justify-start overflow-auto bg-muted/20 p-3"
+      className="flex min-h-0 min-w-0 flex-1 items-start justify-start overflow-auto overscroll-contain bg-muted/20 p-3"
     >
       <CanvasViewport
         device={deviceViewport}
         width={preset.width}
         minimumHeight={preset.height}
         scale={scale}
+        fitScale={fitScale}
+        minimumScale={minimumReadableScale}
+        isFit={zoomOverride === null}
+        onZoomIn={() => changeZoom(0.1)}
+        onZoomOut={() => changeZoom(-0.1)}
+        onFit={() => setZoomOverride(null)}
         presetLabel={preset.label}
         compositeNodeId={renderedCompositeNode?.id ?? null}
         selectedSectionKey={selectedCompositeSectionKey}
@@ -3442,6 +3485,12 @@ function CanvasViewport({
   width,
   minimumHeight,
   scale,
+  fitScale,
+  minimumScale,
+  isFit,
+  onZoomIn,
+  onZoomOut,
+  onFit,
   presetLabel: _presetLabel,
   compositeNodeId,
   selectedSectionKey,
@@ -3454,6 +3503,12 @@ function CanvasViewport({
   width: number;
   minimumHeight: number;
   scale: number;
+  fitScale: number;
+  minimumScale: number;
+  isFit: boolean;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onFit: () => void;
   presetLabel: string;
   compositeNodeId: string | null;
   selectedSectionKey: string | null;
@@ -3613,13 +3668,15 @@ function CanvasViewport({
     };
   }, [compositeNodeId, mount, onSelectSection]);
 
-  // Mantiene sincronizados el panel y el lienzo. Al elegir una sección desde
-  // la lista o desde el inspector, el canvas muestra esa sección completa en
-  // vez de permanecer en la portada u otra posición de la página.
+  // Mantiene sincronizados el panel y el escenario exterior. El iframe adopta
+  // toda la altura del documento y no tiene scroll propio, por lo que revelar
+  // una sección debe mover el scrollport del editor, no `window` del iframe.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
     const doc = mount.ownerDocument;
-    const frame = doc.defaultView;
+    const frame = iframeRef.current;
+    const scrollport = frame?.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
+    if (!frame || !scrollport) return;
     let cancelled = false;
     const reveal = () => {
       if (cancelled) return;
@@ -3627,18 +3684,22 @@ function CanvasViewport({
         (candidate) => candidate.dataset.ebSection === selectedSectionKey,
       );
       if (!section) return;
-      const scroller = doc.scrollingElement ?? doc.documentElement;
-      const top = Math.max(0, section.offsetTop - 12);
-      if (Math.abs(scroller.scrollTop - top) > 8) frame?.scrollTo({ top, behavior: "smooth" });
+      const scrollportRect = scrollport.getBoundingClientRect();
+      const frameRect = frame.getBoundingClientRect();
+      const top = Math.max(
+        0,
+        scrollport.scrollTop + frameRect.top - scrollportRect.top + section.offsetTop * scale - 16,
+      );
+      if (Math.abs(scrollport.scrollTop - top) > 8) scrollport.scrollTo({ top, behavior: "smooth" });
     };
-    const first = frame?.requestAnimationFrame(reveal);
-    const retry = frame?.setTimeout(reveal, 180);
+    const first = window.requestAnimationFrame(reveal);
+    const retry = window.setTimeout(reveal, 180);
     return () => {
       cancelled = true;
-      if (first !== undefined) frame?.cancelAnimationFrame(first);
-      if (retry !== undefined) frame?.clearTimeout(retry);
+      window.cancelAnimationFrame(first);
+      window.clearTimeout(retry);
     };
-  }, [mount, selectedSectionKey]);
+  }, [mount, scale, selectedSectionKey]);
 
   // HUD de medición (sólo entornos no productivos): innerWidth real del
   // iframe, overflow horizontal y posición efectiva del encabezado.
@@ -3686,11 +3747,13 @@ function CanvasViewport({
   const scaled = Math.min(1, Math.max(0.2, scale));
   return (
     <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
-      <div
-        data-eb-canvas-indicator=""
-        className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
-      >
-        <span>{`${width} px · ${Math.round(scaled * 100)}%`}</span>
+      <div className="sticky left-0 z-20 flex max-w-full items-center gap-1 self-start rounded-md bg-foreground/90 p-1 text-background shadow-sm">
+        <div
+          data-eb-canvas-indicator=""
+          className="flex min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-1 font-mono text-[10px] leading-tight"
+        >
+          <span>{`${width} px · ${Math.round(scaled * 100)}%`}</span>
+          {isFit ? <span>Ajustado</span> : null}
         {hud && metrics ? (
           <span data-eb-canvas-hud="">
             innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
@@ -3698,6 +3761,37 @@ function CanvasViewport({
             {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
           </span>
         ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={onZoomOut}
+          disabled={scaled <= minimumScale}
+          className="inline-flex size-7 items-center justify-center rounded text-sm font-semibold hover:bg-background/15 disabled:opacity-40"
+          aria-label="Alejar lienzo"
+          title="Alejar"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          onClick={onFit}
+          disabled={isFit && Math.abs(scaled - fitScale) < 0.01}
+          className="inline-flex h-7 items-center justify-center rounded px-2 text-[10px] font-semibold hover:bg-background/15 disabled:opacity-60"
+          aria-label="Ajustar lienzo al espacio de trabajo"
+          title="Ajustar al espacio de trabajo"
+        >
+          Ajustar
+        </button>
+        <button
+          type="button"
+          onClick={onZoomIn}
+          disabled={scaled >= 1}
+          className="inline-flex size-7 items-center justify-center rounded text-sm font-semibold hover:bg-background/15 disabled:opacity-40"
+          aria-label="Acercar lienzo"
+          title="Acercar"
+        >
+          +
+        </button>
       </div>
       <div
         data-eb-canvas-frame=""
