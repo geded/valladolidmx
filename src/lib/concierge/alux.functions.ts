@@ -93,7 +93,9 @@ async function runAlux(
   supabase: unknown,
   caseId: string,
 ): Promise<AluxSuggestion> {
-  const settings = await resolveAluxSettingsServer(supabase);
+  // Configuración interna de Alux: lectura con cliente privilegiado.
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const settings = await resolveAluxSettingsServer(supabaseAdmin);
   const provider = createLovableAiGatewayProvider(requireApiKey());
   const model =
     settings.capability_overrides[capability]?.model ?? settings.default_model ?? DEFAULT_MODEL;
