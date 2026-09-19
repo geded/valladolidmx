@@ -254,7 +254,6 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("all");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [showCreate, setShowCreate] = useState(false);
-  const [showPremium, setShowPremium] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [inlineEdit, setInlineEdit] = useState<null | {
     mode: "rename" | "slug";
