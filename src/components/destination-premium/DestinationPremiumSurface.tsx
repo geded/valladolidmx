@@ -172,8 +172,11 @@ export function DestinationPremiumSurface({
       ) : null}
 
       {order.map((key) => {
-        if (!visible(key)) return null;
-        switch (key) {
+        // Marcador de sección para el Experience Builder. No altera el render
+        // público: sólo permite seleccionar y reordenar la sección aprobada.
+        const node = ((): React.ReactNode => {
+          if (!visible(key)) return null;
+          switch (key) {
           case "hero":
             return (
               <Container key={key} className="mt-5">
