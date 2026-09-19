@@ -3585,12 +3585,9 @@ function CanvasViewport({
     style.setAttribute("data-eb-section-style", "");
     style.textContent = `
       /*
-       * Safari/iPad puede promocionar las imágenes absolutas de las tarjetas a
-       * una capa distinta cuando el iframe completo está escalado. Sin un
-       * límite de pintura por sección, esa capa puede seguir dibujándose por
-       * detrás de las secciones siguientes aunque el flujo tenga el alto
-       * correcto. Este aislamiento pertenece sólo al canvas editorial: no
-       * modifica la plantilla Premium ni su render público.
+       * Cada sección conserva una capa propia para que selección y arrastre no
+       * alteren la plantilla. Destinos queda sin recorte adicional: su cuadrícula
+       * amplia debe conservar exactamente la altura y composición Premium.
        */
       [data-eb-section] {
         position:relative;
@@ -3598,7 +3595,6 @@ function CanvasViewport({
         pointer-events:auto;
       }
       [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
-      [data-eb-section="destinos"] { overflow:clip; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
