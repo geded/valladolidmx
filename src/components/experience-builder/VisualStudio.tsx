@@ -3145,7 +3145,7 @@ function DeviceToggle({
       role="group"
       aria-label="Vista previa por dispositivo"
       data-eb-device-presets={DEVICE_PRESETS.length}
-      className="hidden items-center overflow-hidden rounded-md border border-border bg-background md:flex"
+      className="flex max-w-full items-center overflow-x-auto rounded-md border border-border bg-background"
     >
       {DEVICE_PRESETS.map((preset) => {
         const active = preset.id === value;
