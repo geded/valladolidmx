@@ -397,7 +397,6 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
     );
   };
 
-
   const submitInlineEdit = async () => {
     if (!inlineEdit) return;
     const { row, mode, value } = inlineEdit;
