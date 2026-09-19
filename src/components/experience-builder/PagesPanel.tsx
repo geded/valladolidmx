@@ -444,7 +444,6 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
         </div>
       </header>
 
-
       {/* Filtros y búsqueda */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2">
         <label className="relative flex min-w-[220px] flex-1 items-center">
