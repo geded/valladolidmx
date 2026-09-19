@@ -432,14 +432,10 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           >
             Actualizar
           </button>
-          <button
-            type="button"
-            onClick={() => setShowPremium((v) => !v)}
-            aria-pressed={showPremium}
-            className="rounded-md border border-primary/40 bg-primary/5 px-3 py-1.5 text-[11px] font-semibold text-primary hover:bg-primary/10"
-          >
-            Plantillas premium
-          </button>
+          {/* R1 · Un solo lugar para trabajar plantillas: el Panel de Páginas.
+              El catálogo interno de presets premium permanece disponible en la
+              ruta interna /lovable/g8e-premium-template-catalog (no editorial). */}
+
           <button
             type="button"
             onClick={() => setShowCreate(true)}
