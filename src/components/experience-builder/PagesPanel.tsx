@@ -18,7 +18,6 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PremiumPresetGallery } from "@/components/experience-builder/PremiumPresetGallery";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
 import {
@@ -254,7 +253,6 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("all");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [showCreate, setShowCreate] = useState(false);
-  const [showPremium, setShowPremium] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [inlineEdit, setInlineEdit] = useState<null | {
     mode: "rename" | "slug";
@@ -432,14 +430,10 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           >
             Actualizar
           </button>
-          <button
-            type="button"
-            onClick={() => setShowPremium((v) => !v)}
-            aria-pressed={showPremium}
-            className="rounded-md border border-primary/40 bg-primary/5 px-3 py-1.5 text-[11px] font-semibold text-primary hover:bg-primary/10"
-          >
-            Plantillas premium
-          </button>
+          {/* R1 · Un solo lugar para trabajar plantillas: el Panel de Páginas.
+              El catálogo interno de presets premium permanece disponible en la
+              ruta interna /lovable/g8e-premium-template-catalog (no editorial). */}
+
           <button
             type="button"
             onClick={() => setShowCreate(true)}
@@ -449,13 +443,6 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </button>
         </div>
       </header>
-
-      {showPremium ? (
-        <PremiumPresetGallery
-          pageKind={kindFilter === "all" ? undefined : kindFilter}
-          onClose={() => setShowPremium(false)}
-        />
-      ) : null}
 
       {/* Filtros y búsqueda */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2">
