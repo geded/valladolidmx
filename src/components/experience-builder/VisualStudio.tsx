@@ -3561,7 +3561,13 @@ function CanvasViewport({
        * absolutos; overflow:clip preserva sus capas sin colapsar la tarjeta.
        */
       [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
-      [data-eb-section="destinos"] { overflow:clip; }
+      /*
+       * Destinos no admite límite de pintura ni recorte: su cuadrícula de
+       * 30rem y los medios absolutos de la tarjeta principal desbordan unos
+       * píxeles en 1440. `isolation:isolate` (arriba) basta para evitar el
+       * sangrado de capas en Safari sin cortar contenido legítimo.
+       */
+      [data-eb-section="destinos"] { overflow:visible; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
