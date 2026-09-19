@@ -3585,12 +3585,9 @@ function CanvasViewport({
     style.setAttribute("data-eb-section-style", "");
     style.textContent = `
       /*
-       * Safari/iPad puede promocionar las imágenes absolutas de las tarjetas a
-       * una capa distinta cuando el iframe completo está escalado. Sin un
-       * límite de pintura por sección, esa capa puede seguir dibujándose por
-       * detrás de las secciones siguientes aunque el flujo tenga el alto
-       * correcto. Este aislamiento pertenece sólo al canvas editorial: no
-       * modifica la plantilla Premium ni su render público.
+       * Cada sección conserva una capa propia para que selección y arrastre no
+       * alteren la plantilla. Destinos conserva un límite de pintura como
+       * protección adicional, pero el iframe ya no se transforma por capas.
        */
       [data-eb-section] {
         position:relative;
@@ -3819,8 +3816,13 @@ function CanvasViewport({
           style={{
             width,
             height: documentHeight,
-            transform: `scale(${scaled})`,
-            transformOrigin: "top left",
+            /*
+             * Safari/iPad compone por separado las imágenes absolutas cuando
+             * se transforma el iframe completo. Eso desliga las fotografías
+             * de las filas de Destinos/Experiencias. `zoom` mantiene el mismo
+             * viewport lógico y escala el documento como una sola superficie.
+             */
+            zoom: scaled,
           }}
         />
         {mount ? createPortal(children, mount) : null}

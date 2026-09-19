@@ -2,6 +2,8 @@
 
 ## En curso
 
+- [x] Experience Builder · Vistas amplias de Home (1024/1280/1440): corregida la escala del iframe para conservar Destinos y Experiencias en su composición Premium; 390/430/768 preservadas.
+
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 
 - [x] Experience Builder · Catálogo operativo limitado a familias conectadas; vista inicial sólo publicada, con borradores y archivadas accesibles por filtro. Pruebas históricas desconectadas quedan ocultas de forma reversible y sin borrar datos.
