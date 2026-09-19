@@ -450,12 +450,6 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
         </div>
       </header>
 
-      {showPremium ? (
-        <PremiumPresetGallery
-          pageKind={kindFilter === "all" ? undefined : kindFilter}
-          onClose={() => setShowPremium(false)}
-        />
-      ) : null}
 
       {/* Filtros y búsqueda */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2">
