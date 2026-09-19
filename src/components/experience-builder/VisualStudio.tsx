@@ -3364,7 +3364,7 @@ function HomeCanvas({
     <div
       ref={outerRef}
       data-eb-canvas-scrollport="editor"
-      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-y-auto overflow-x-hidden bg-muted/20 p-3"
+      className="flex min-h-0 min-w-0 flex-1 items-start justify-start overflow-auto bg-muted/20 p-3"
     >
       <CanvasViewport
         device={deviceViewport}
@@ -3585,17 +3585,13 @@ function CanvasViewport({
     style.setAttribute("data-eb-section-style", "");
     style.textContent = `
       /*
-       * Cada sección conserva una capa propia para que selección y arrastre no
-       * alteren la plantilla. Destinos conserva un límite de pintura como
-       * protección adicional, pero el iframe ya no se transforma por capas.
+       * Los controles editoriales son absolutos y no participan en el flujo ni
+       * alteran el recorte de la plantilla Premium.
        */
       [data-eb-section] {
         position:relative;
-        isolation:isolate;
         pointer-events:auto;
       }
-      [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
-      [data-eb-section="destinos"] { overflow:clip; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
@@ -3784,7 +3780,12 @@ function CanvasViewport({
     };
   }, [hud, mount, width]);
 
-  const scaled = Math.min(1, Math.max(0.2, scale));
+  const requestedScale = Math.min(1, Math.max(0.2, scale));
+  // Los presets amplios deben conservar el viewport Premium a escala real.
+  // Reducir el iframe con `zoom` o `transform` recompone de forma distinta
+  // imágenes absolutas y grids en Safari/iPad. El área de trabajo proporciona
+  // desplazamiento en ambos ejes, como un lienzo profesional.
+  const scaled = width >= 1024 ? 1 : requestedScale;
   return (
     <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
       <div
@@ -3816,13 +3817,6 @@ function CanvasViewport({
           style={{
             width,
             height: documentHeight,
-            /*
-             * Safari/iPad compone por separado las imágenes absolutas cuando
-             * se transforma el iframe completo. Eso desliga las fotografías
-             * de las filas de Destinos/Experiencias. `zoom` mantiene el mismo
-             * viewport lógico y escala el documento como una sola superficie.
-             */
-            zoom: scaled,
           }}
         />
         {mount ? createPortal(children, mount) : null}
