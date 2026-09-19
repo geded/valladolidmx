@@ -344,6 +344,57 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
     });
   };
 
+  /** Abre por dirección web una página ya existente (Estructura oficial). */
+  const handleOpenSlug = (slug: string) => {
+    const row = rows.find((r) => r.slug === slug);
+    if (!row) {
+      toast.error("Esa página todavía no existe.");
+      return;
+    }
+    handleOpen(row);
+  };
+
+  /**
+   * Crea la página de trabajo de una sección usando su plantilla
+   * aprobada. Fail-closed: sin preset declarado no se crea nada.
+   */
+  const handleCreateFromTemplate = async (entry: OfficialTemplateEntry) => {
+    if (!entry.workingSlug) return;
+    const tree = buildPresetCompositionTree(entry.id);
+    if (!tree) {
+      toast.error("Esta sección todavía no tiene plantilla aprobada declarada.");
+      return;
+    }
+    setBusyId(entry.id);
+    try {
+      const created = await create({
+        data: {
+          slug: entry.workingSlug,
+          title: entry.name,
+          description: entry.description,
+          page_type: entry.pageKind,
+        },
+      });
+      await saveDraft({ data: { id: created.id, tree } });
+      toast.success("Página creada con la plantilla de la sección.");
+      await reload();
+      onOpenPage({
+        id: created.id,
+        key: entry.workingSlug,
+        slug: entry.workingSlug,
+        title: entry.name,
+        description: entry.description,
+        page_type: entry.pageKind,
+        publicPath: entry.publicRoute.includes("{") ? `/p/${entry.workingSlug}` : entry.publicRoute,
+        custom: true,
+      });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const doAction = async (id: string, fn: () => Promise<unknown>, ok: string) => {
     setBusyId(id);
     try {
