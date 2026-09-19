@@ -3595,21 +3595,10 @@ function CanvasViewport({
       [data-eb-section] {
         position:relative;
         isolation:isolate;
+        contain:paint;
+        overflow:clip;
         pointer-events:auto;
       }
-      /*
-       * El aislamiento de pintura sólo es seguro cuando no recorta contenido
-       * legítimo de la sección. Destinos usa una cuadrícula alta y medios
-       * absolutos; overflow:clip preserva sus capas sin colapsar la tarjeta.
-       */
-      [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
-      /*
-       * Destinos no admite límite de pintura ni recorte: su cuadrícula de
-       * 30rem y los medios absolutos de la tarjeta principal desbordan unos
-       * píxeles en 1440. El aislamiento declarado arriba basta para evitar el
-       * sangrado de capas en Safari sin cortar contenido legítimo.
-       */
-      [data-eb-section="destinos"] { overflow:visible; }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
       [data-eb-section-handle] { position:absolute; top:10px; right:10px; z-index:80;
         width:44px; height:44px; border:1px solid hsl(var(--border)); border-radius:999px;
