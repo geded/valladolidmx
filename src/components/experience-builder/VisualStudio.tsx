@@ -2758,7 +2758,7 @@ function PageVisualEditor({
 
               <AutoInspector
                 contract={selectedContract}
-                config={inspectorConfig}
+                config={inspectorConfig ?? selectedConfig}
                 onChange={(next) => updateSelectedConfig(next)}
                 simple={!advanced}
                 hideHeader={Boolean(activeSection)}
