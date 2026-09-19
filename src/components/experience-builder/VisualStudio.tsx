@@ -3564,7 +3564,7 @@ function CanvasViewport({
       /*
        * Destinos no admite límite de pintura ni recorte: su cuadrícula de
        * 30rem y los medios absolutos de la tarjeta principal desbordan unos
-       * píxeles en 1440. `isolation:isolate` (arriba) basta para evitar el
+       * píxeles en 1440. El aislamiento declarado arriba basta para evitar el
        * sangrado de capas en Safari sin cortar contenido legítimo.
        */
       [data-eb-section="destinos"] { overflow:visible; }
