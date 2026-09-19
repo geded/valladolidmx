@@ -3509,7 +3509,7 @@ function CanvasViewport({
       /*
        * El aislamiento de pintura sólo es seguro cuando no recorta contenido
        * legítimo de la sección. Destinos usa una cuadrícula alta y medios
-       * absolutos; `overflow:clip` preserva sus capas sin colapsar la tarjeta.
+       * absolutos; overflow:clip preserva sus capas sin colapsar la tarjeta.
        */
       [data-eb-section]:not([data-eb-section="destinos"]) { contain:paint; }
       [data-eb-section="destinos"] { overflow:clip; }
