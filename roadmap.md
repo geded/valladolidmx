@@ -241,3 +241,9 @@
 - [ ] Permitir arrastrar esos elementos desde la biblioteca oficial hacia las plantillas, sin crear bloques paralelos ni duplicados.
 - [ ] Arrastrar y soltar de secciones en todas las plantillas Premium (Inicio, Destino, Lugar, Listados), con orden por defecto = orden aprobado.
 - [ ] Hacer utilizables en el lienzo del constructor los elementos editables internos declarados por cada sección; no limitar el trabajo al panel Estructura.
+
+## Experience Builder · Corrección operativa de secciones (2026-09-19)
+
+- [ ] Corregir selección de Destinos: enfocar la sección real del lienzo, mostrar tarjetas/valores/imágenes y evitar que el panel cubra la Home en tablet/móvil.
+- [ ] Corregir arrastrar y soltar secciones: reflejar el orden en el lienzo y persistirlo en el borrador.
+- [ ] Validar Home completa en 1440/834/430/390 sin modificar ni publicar la versión pública.
