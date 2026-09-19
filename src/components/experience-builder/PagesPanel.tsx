@@ -24,6 +24,7 @@ import {
   Archive,
   ArchiveRestore,
   CalendarClock,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Copy,
@@ -40,6 +41,7 @@ import {
   Search,
   Star,
   Trash2,
+  Undo2,
   X,
 } from "lucide-react";
 
@@ -54,6 +56,7 @@ import {
   unarchiveComposition,
   deleteComposition,
   markCompositionAsTemplate,
+  setCompositionWorkflowState,
   type StudioPageRow,
 } from "@/lib/experience-builder/studio.functions";
 import {
@@ -241,6 +244,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const unarchive = useServerFn(unarchiveComposition);
   const del = useServerFn(deleteComposition);
   const markTpl = useServerFn(markCompositionAsTemplate);
+  const setWorkflow = useServerFn(setCompositionWorkflowState);
 
   const [rows, setRows] = useState<StudioPageRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -369,6 +373,29 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
         }),
       r.is_template ? "Marca de plantilla retirada." : "Guardada como plantilla oficial.",
     );
+
+  /**
+   * Flujo editorial desde el listado. Respeta la máquina oficial
+   * `draft → in_review → approved`: si se aprueba desde borrador se
+   * registra primero el paso por revisión, sin saltar estados.
+   */
+  const onWorkflow = (r: StudioPageRow, next: "draft" | "in_review" | "approved") => {
+    const labels: Record<string, string> = {
+      draft: "Página regresada a borrador.",
+      in_review: "Página enviada a revisión.",
+      approved: "Página aprobada.",
+    };
+    void doAction(
+      r.id,
+      async () => {
+        if (next === "approved" && r.workflow_state === "draft") {
+          await setWorkflow({ data: { id: r.id, next_state: "in_review" } });
+        }
+        return setWorkflow({ data: { id: r.id, next_state: next } });
+      },
+      labels[next] ?? "Estado actualizado.",
+    );
+  };
 
   const submitInlineEdit = async () => {
     if (!inlineEdit) return;
@@ -547,6 +574,14 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
                       return canDelete
                         ? onMarkTemplate(row)
                         : toast.error("Sólo administradores pueden gestionar plantillas.");
+                    case "wf_review":
+                      return onWorkflow(row, "in_review");
+                    case "wf_approve":
+                      return canDelete
+                        ? onWorkflow(row, "approved")
+                        : toast.error("Sólo administradores pueden aprobar.");
+                    case "wf_draft":
+                      return onWorkflow(row, "draft");
                     default:
                       return;
                   }
@@ -663,7 +698,10 @@ type RowAction =
   | "archive"
   | "unarchive"
   | "delete"
-  | "template";
+  | "template"
+  | "wf_review"
+  | "wf_approve"
+  | "wf_draft";
 
 function GroupBlock({
   def,
@@ -889,6 +927,29 @@ function PageRow({
                 onClick={() => onAction("template", row)}
                 disabled={!canDelete}
               />
+              <div className="my-1 border-t border-border" />
+              {row.workflow_state !== "in_review" && row.workflow_state !== "approved" ? (
+                <MenuItem
+                  icon={GitBranch}
+                  label="Enviar a revisión"
+                  onClick={() => onAction("wf_review", row)}
+                />
+              ) : null}
+              {row.workflow_state !== "approved" ? (
+                <MenuItem
+                  icon={CheckCircle2}
+                  label="Aprobar"
+                  onClick={() => onAction("wf_approve", row)}
+                  disabled={!canDelete}
+                />
+              ) : null}
+              {row.workflow_state !== "draft" ? (
+                <MenuItem
+                  icon={Undo2}
+                  label="Regresar a borrador"
+                  onClick={() => onAction("wf_draft", row)}
+                />
+              ) : null}
               <div className="my-1 border-t border-border" />
               {archived ? (
                 <MenuItem
