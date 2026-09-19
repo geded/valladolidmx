@@ -66,6 +66,12 @@ import {
   type PageKindDefinition,
 } from "@/lib/experience-builder/page-kind-registry";
 import { getKitSeed } from "@/lib/experience-builder/kit-seeds";
+import {
+  buildPresetCompositionTree,
+  defaultPresetIdForPageKind,
+  type OfficialTemplateEntry,
+} from "@/lib/experience-builder/official-template-structure";
+import { OfficialTemplateStructure } from "./OfficialTemplateStructure";
 import { useAuth } from "@/hooks/useAuth";
 
 /* -------------------------------------------------------------------- */
