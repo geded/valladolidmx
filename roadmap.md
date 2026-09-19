@@ -254,3 +254,4 @@
 
 - [x] Constructor: galeria unica de plantillas oficiales agrupada por seccion + asignacion automatica de plantilla al crear pagina nueva en una seccion.
 - [ ] Regla: toda correccion de plantilla (empezando por Micrositio de Destino v1 oficial) se entrega editable desde la estructura del constructor (textos, imagenes, enlaces, orden).
+- [ ] Reconstruir el lienzo del Experience Builder para paridad real con las plantillas públicas; validar primero Home con aceptación humana y después extender por familias.
