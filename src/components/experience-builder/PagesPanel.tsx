@@ -663,7 +663,10 @@ type RowAction =
   | "archive"
   | "unarchive"
   | "delete"
-  | "template";
+  | "template"
+  | "wf_review"
+  | "wf_approve"
+  | "wf_draft";
 
 function GroupBlock({
   def,
