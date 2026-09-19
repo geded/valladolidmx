@@ -2484,6 +2484,7 @@ function PageVisualEditor({
               previewMode={previewMode}
               deviceViewport={deviceViewport}
               selectedId={selectedId}
+              selectedCompositeSectionKey={activeSection?.key ?? null}
               onSelect={(id) => setSelectedId(id)}
               onSelectChrome={(area) =>
                 setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)
@@ -2552,7 +2553,7 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed right-0 z-[80] flex w-[360px] max-w-[92vw] flex-col border-l border-border bg-card shadow-xl ${focusMode ? "top-0 h-[100dvh]" : "top-[52px] h-[calc(100vh-52px)]"}`}
+            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[58dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="shrink-0 border-b border-border bg-card p-4">
@@ -3174,6 +3175,7 @@ function HomeCanvas({
   previewMode,
   deviceViewport,
   selectedId,
+  selectedCompositeSectionKey,
   onSelect,
   onSelectChrome,
   onDelete,
@@ -3190,6 +3192,7 @@ function HomeCanvas({
   previewMode: boolean;
   deviceViewport: DeviceViewport;
   selectedId: string | null;
+  selectedCompositeSectionKey: string | null;
   onSelect: (id: string) => void;
   onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
@@ -3279,6 +3282,7 @@ function HomeCanvas({
         scale={scale}
         presetLabel={preset.label}
         compositeNodeId={renderedCompositeNode?.id ?? null}
+        selectedSectionKey={selectedCompositeSectionKey}
         reorderableSectionKeys={reorderableSectionKeys}
         onSelectSection={onSelectCompositeSection}
         onReorderSection={onReorderCompositeSection}
@@ -3357,6 +3361,7 @@ function CanvasViewport({
   scale,
   presetLabel: _presetLabel,
   compositeNodeId,
+  selectedSectionKey,
   reorderableSectionKeys,
   onSelectSection,
   onReorderSection,
@@ -3368,6 +3373,7 @@ function CanvasViewport({
   scale: number;
   presetLabel: string;
   compositeNodeId: string | null;
+  selectedSectionKey: string | null;
   reorderableSectionKeys: string[];
   onSelectSection: (nodeId: string, sectionKey: string) => void;
   onReorderSection: (activeKey: string, overKey: string) => void;
@@ -3545,9 +3551,29 @@ function CanvasViewport({
         if (touch.clientY < edge) win.scrollBy(0, -22);
         if (touch.clientY > win.innerHeight - edge) win.scrollBy(0, 22);
       }
-      const over = doc
-        .elementFromPoint(touch.clientX, touch.clientY)
-        ?.closest<HTMLElement>("[data-eb-section]");
+      // Safari/iPad conserva el propio tirador como `event.target` durante
+      // todo el gesto. Resolvemos el destino por la posición vertical real
+      // del dedo para que soltar sobre otra sección sí cambie el orden.
+      const candidates = sections().filter((section) => {
+        const key = section.dataset.ebSection;
+        return Boolean(key && reorderableSectionKeys.includes(key) && key !== touchKey);
+      });
+      const containing = candidates.find((section) => {
+        const rect = section.getBoundingClientRect();
+        return touch.clientY >= rect.top && touch.clientY <= rect.bottom;
+      });
+      const over =
+        containing ??
+        candidates.reduce<HTMLElement | null>((nearest, section) => {
+          if (!nearest) return section;
+          const center =
+            (section.getBoundingClientRect().top + section.getBoundingClientRect().bottom) / 2;
+          const nearestCenter =
+            (nearest.getBoundingClientRect().top + nearest.getBoundingClientRect().bottom) / 2;
+          return Math.abs(center - touch.clientY) < Math.abs(nearestCenter - touch.clientY)
+            ? section
+            : nearest;
+        }, null);
       sections().forEach((item) => item.removeAttribute("data-eb-drop-target"));
       over?.setAttribute("data-eb-drop-target", "");
       event.preventDefault();
@@ -3581,6 +3607,33 @@ function CanvasViewport({
       doc.removeEventListener("touchend", onTouchEnd);
     };
   }, [compositeNodeId, mount, onReorderSection, onSelectSection, reorderableSectionKeys, scale]);
+
+  // Mantiene sincronizados el panel y el lienzo. Al elegir una sección desde
+  // la lista o desde el inspector, el canvas muestra esa sección completa en
+  // vez de permanecer en la portada u otra posición de la página.
+  useEffect(() => {
+    if (!mount || !selectedSectionKey) return;
+    const doc = mount.ownerDocument;
+    const frame = doc.defaultView;
+    let cancelled = false;
+    const reveal = () => {
+      if (cancelled) return;
+      const section = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]")).find(
+        (candidate) => candidate.dataset.ebSection === selectedSectionKey,
+      );
+      if (!section) return;
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      const top = Math.max(0, section.offsetTop - 12);
+      if (Math.abs(scroller.scrollTop - top) > 8) frame?.scrollTo({ top, behavior: "smooth" });
+    };
+    const first = frame?.requestAnimationFrame(reveal);
+    const retry = frame?.setTimeout(reveal, 180);
+    return () => {
+      cancelled = true;
+      if (first !== undefined) frame?.cancelAnimationFrame(first);
+      if (retry !== undefined) frame?.clearTimeout(retry);
+    };
+  }, [mount, selectedSectionKey]);
 
   // El documento del canvas se recorre con su propio scroll interno; no se
   // vuelve a medir su altura para evitar realimentación.
