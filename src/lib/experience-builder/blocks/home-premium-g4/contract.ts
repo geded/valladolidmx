@@ -98,13 +98,8 @@ const schema: BlockSchema = {
   }),
 
   // 4 · Destinos curados
-  destinos_kicker: text("Destinos · kicker", "destinos_kicker"),
-  destinos_title: text("Destinos · título", "destinos_title"),
-  destinos_description: text("Destinos · descripción", "destinos_description"),
-  destinos_action: text("Destinos · acción", "destinos_action"),
-  destinos_action_href: link("Destinos · destino de la acción", "destinos_action_href"),
-  destinos_disclaimer: text("Destinos · nota al pie", "destinos_disclaimer"),
-  destinos_max_items: limit("Destinos · máximo", "destinos_max_items"),
+  // La colección va primero para que al abrir la sección se vean de inmediato
+  // las tarjetas, sus valores y sus imágenes; los textos generales quedan después.
   destinos_items: list("Destinos curados", "destinos_items", {
     name: { type: "text", label: "Destino", translatable: false },
     note: { type: "text", label: "Nota editorial", translatable: true },
@@ -113,6 +108,12 @@ const schema: BlockSchema = {
     demo: { type: "boolean", label: "Marcar como demo visual" },
     ...mediaFields,
   }),
+  destinos_kicker: text("Destinos · kicker", "destinos_kicker"),
+  destinos_title: text("Destinos · título", "destinos_title"),
+  destinos_description: text("Destinos · descripción", "destinos_description"),
+  destinos_action: text("Destinos · acción", "destinos_action"),
+  destinos_action_href: link("Destinos · destino de la acción", "destinos_action_href"),
+  destinos_max_items: limit("Destinos · máximo", "destinos_max_items"),
 
   // 5 · Pueblos Mágicos
   pueblos_kicker: text("Pueblos Mágicos · kicker", "pueblos_kicker"),

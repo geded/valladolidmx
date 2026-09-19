@@ -2553,7 +2553,7 @@ function PageVisualEditor({
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
-            className={`fixed right-0 z-[80] flex w-[360px] max-w-[92vw] flex-col border-l border-border bg-card shadow-xl ${focusMode ? "top-0 h-[100dvh]" : "top-[52px] h-[calc(100vh-52px)]"}`}
+            className={`fixed inset-x-0 bottom-0 z-[80] flex h-[58dvh] w-full flex-col border-t border-border bg-card shadow-xl lg:inset-x-auto lg:right-0 lg:w-[360px] lg:max-w-[92vw] lg:border-l lg:border-t-0 ${focusMode ? "lg:top-0 lg:h-[100dvh]" : "lg:top-[52px] lg:h-[calc(100vh-52px)]"}`}
             aria-label="Herramientas para editar el bloque seleccionado"
           >
             <header className="shrink-0 border-b border-border bg-card p-4">
@@ -3595,11 +3595,12 @@ function CanvasViewport({
     if (!mount || !selectedSectionKey) return;
     const doc = mount.ownerDocument;
     const frame = doc.defaultView;
-    const escapedKey = CSS.escape(selectedSectionKey);
     let cancelled = false;
     const reveal = () => {
       if (cancelled) return;
-      const section = doc.querySelector<HTMLElement>(`[data-eb-section="${escapedKey}"]`);
+      const section = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]")).find(
+        (candidate) => candidate.dataset.ebSection === selectedSectionKey,
+      );
       if (!section) return;
       const scroller = doc.scrollingElement ?? doc.documentElement;
       const top = Math.max(0, section.offsetTop - 12);
