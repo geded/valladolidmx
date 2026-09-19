@@ -3585,11 +3585,15 @@ function CanvasViewport({
     style.setAttribute("data-eb-section-style", "");
     style.textContent = `
       /*
-       * Los controles editoriales son absolutos y no participan en el flujo ni
-       * alteran el recorte de la plantilla Premium.
+       * Los controles editoriales son absolutos y no participan en el flujo.
+       * Cada sección conserva su altura natural, pero establece un límite de
+       * pintura propio: evita que Safari componga imágenes absolutas detrás de
+       * las secciones siguientes cuando el iframe está reducido.
        */
       [data-eb-section] {
         position:relative;
+        isolation:isolate;
+        contain:paint;
         pointer-events:auto;
       }
       [data-eb-section] > :not([data-eb-section-handle]) { pointer-events:none; }
