@@ -249,3 +249,5 @@
 - [x] Corregir selección de Destinos: enfocar la sección real del lienzo, mostrar tarjetas/valores/imágenes y evitar que el panel cubra la Home en tablet/móvil.
 - [x] Corregir arrastrar y soltar secciones: el gesto táctil resuelve el destino por la posición real del dedo en Safari/iPad; el mismo commit actualiza el lienzo y activa el autoguardado del borrador.
 - [ ] Validar Home completa en 1440/834/430/390 sin modificar ni publicar la versión pública. Bloqueada en este turno: la sesión autenticada de prueba quedó en “Verificando sesión…”. Typecheck y contratos OMXDS sí están en PASS.
+
+- [ ] Constructor: galeria unica de plantillas oficiales agrupada por seccion + asignacion automatica de plantilla al crear pagina nueva en una seccion.
