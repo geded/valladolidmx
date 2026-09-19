@@ -1,21 +1,55 @@
-# Corregir imágenes y valores de secciones en el constructor
+# Ordenar el constructor: una sola galería con las 21 plantillas oficiales
 
-## Alcance autorizado
-Corrección localizada del Experience Builder para que la plantilla aprobada se vea completa y el diálogo de cada sección muestre los mismos valores que ya renderiza la vista.
+## Por qué hoy solo ves Home
 
-## Cambios
-1. Ajustar el alto visible del lienzo con una medición estable del contenido real, manteniendo la altura del dispositivo como mínimo y evitando el ciclo de vibración anterior.
-2. Mantener intactos el encuadre, proporción y `object-cover` de la plantilla Premium pública; sólo retirar el recorte artificial causado por el marco del constructor.
-3. Completar en memoria las filas parciales del inspector con los valores aprobados del contrato antes de mostrarlas. Los valores guardados por el CMS siempre tendrán prioridad.
-4. Al editar un valor completado, guardar la fila resultante mediante el autoguardado existente; no modificar ni publicar datos automáticamente al abrir el diálogo.
-5. Añadir pruebas de regresión para altura del lienzo, filas parciales y selección de la sección Destinos.
+El panel "Mis páginas" no lista plantillas: lista las páginas que ya existen guardadas en el CMS. Hoy existen 19 páginas guardadas, y la mayoría son o fichas de autoridad interna (`Plantilla · Empresa`, `Plantilla · Producto`, `Plantilla · Evento`, `Plantilla · Lugar`, `Plantilla · Destino`, `Plantilla · Región`) o borradores vacíos (`Hoteles`, `Restaurantes`, `Experiencias`, `Oriente Maya`). Sólo Home tiene contenido real porque es la única con composición publicada y editada.
 
-## Preservación
-- Sin cambios en la ruta pública, diseño, orden, encabezado, pie, Alux, Mi Viaje, mapas ni navegación.
-- Sin nuevas plantillas, componentes paralelos, fixtures productivos, migraciones o publicación.
-- La configuración CMS existente continúa siendo la autoridad y prevalece sobre cualquier valor por defecto.
+Las otras plantillas aprobadas (los 6 listados G5, las 6 variantes de Lugar, las 6 fichas de entidad, la landing SEO) existen en el registro oficial del sistema, pero no tienen una página de trabajo creada, así que no aparecen en el listado.
 
-## Validación
-- Typecheck y pruebas específicas del constructor.
-- Comparación del constructor con la Home pública en 1440, 834, 430 y 390 px.
-- Verificar Destinos y una segunda plantilla compuesta para confirmar que no hay recortes, vibración ni valores vacíos.
+## Qué se va a hacer
+
+### 1. Sección "Plantillas oficiales" dentro del constructor
+
+En la página inicial del constructor, encima de "Mis páginas", una galería agrupada por familia con las 21 plantillas aprobadas:
+
+- Inicio (1)
+- Destinos (1)
+- Listados turísticos (6): Hoteles, Restaurantes, Experiencias, Eventos, Casas de vacaciones, Qué hacer
+- Lugares y sitios de interés (6 variantes)
+- Fichas de entidad (6): Hotel, Restaurante, Casa de vacaciones, Experiencia, Tour, Evento
+- Landing promocional SEO (1)
+
+Cada tarjeta muestra nombre, descripción, ruta pública, estado (Publicada / Borrador / Sin página creada) y un botón:
+
+- si la página de trabajo ya existe, **Abrir** la lleva al editor visual;
+- si no existe, **Crear página de trabajo** la genera con el preset aprobado y la abre.
+
+No se crea ningún editor nuevo: se reutiliza la galería de presets que ya existía (`PremiumPresetGallery`) y las funciones de creación existentes del Studio.
+
+### 2. Limpiar lo que no se usa
+
+Se ocultan del listado (de forma reversible, sin borrar datos):
+
+- `premium-g4-approved` (duplicado de Home, tipo "custom", borrador de agosto)
+- `marketplace` (terminología ya retirada del producto)
+
+Las fichas `Plantilla · …` dejan de mostrarse como páginas sueltas y pasan a representarse dentro de su familia en la galería, que es su función real.
+
+Nada se elimina de la base de datos en este paso.
+
+### 3. Orden estable
+
+Las familias se ordenan por el registro oficial, no alfabéticamente, para que el constructor tenga siempre la misma estructura: Inicio → Destinos → Listados → Lugares → Fichas → Landing.
+
+## Detalles técnicos
+
+- Fuente única: `premium-template-registry.ts` + `entity-premium-templates.ts` + `seo-landing-template.ts`. No se declara ninguna lista paralela.
+- Se cruza el registro con `page_compositions` por `slug`/`kind` para resolver el estado de cada plantilla.
+- Cambios en `src/components/experience-builder/PagesPanel.tsx` y reincorporación de `PremiumPresetGallery.tsx` en modo galería agrupada.
+- La ocultación usa el mismo mecanismo reversible ya aplicado a las demos históricas.
+- Sin cambios en rutas públicas, contratos de bloques ni render público. No se publica nada.
+
+## Verificación
+
+- Typecheck, Prettier y suite dirigida del Experience Builder.
+- Revisión visual autenticada del constructor en 1440, 834, 430 y 390.
