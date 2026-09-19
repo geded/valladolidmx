@@ -3566,7 +3566,8 @@ function CanvasViewport({
         containing ??
         candidates.reduce<HTMLElement | null>((nearest, section) => {
           if (!nearest) return section;
-          const center = (section.getBoundingClientRect().top + section.getBoundingClientRect().bottom) / 2;
+          const center =
+            (section.getBoundingClientRect().top + section.getBoundingClientRect().bottom) / 2;
           const nearestCenter =
             (nearest.getBoundingClientRect().top + nearest.getBoundingClientRect().bottom) / 2;
           return Math.abs(center - touch.clientY) < Math.abs(nearestCenter - touch.clientY)
