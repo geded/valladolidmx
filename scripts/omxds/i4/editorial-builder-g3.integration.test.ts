@@ -93,13 +93,13 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
     // El iframe conserva el viewport lógico Premium (ancho del preset) y adopta
-    // la altura real del documento; "Ajustar" muestra el ancho completo aun
-    // cuando el editor corre en tablet. Los controles viven fuera de la plantilla.
+    // la altura real del documento; el zoom sólo escala el conjunto y toda la
+    // capa de edición vive fuera del documento de la plantilla.
     expect(studio).toContain('data-eb-canvas-scrollport="editor"');
     expect(studio).toContain("usableWidth / preset.width");
-    expect(studio).toContain("minimumReadableScale");
-    expect(studio).toContain("preset.width <= 430 ? 1 : 0.25");
-    expect(studio).toContain('scrollport.scrollTo({ left: 0, top: 0 })');
+    expect(studio).toContain("CANVAS_MIN_SCALE = 0.2");
+    expect(studio).toContain("CANVAS_PRECISE_EDIT_SCALE = 0.45");
+    expect(studio).toContain("scrollport.scrollTo({ left: 0, top: 0 })");
     expect(studio).toContain("scaled <= minimumScale");
     expect(studio).toContain("Ajustar al espacio de trabajo");
     expect(studio).toContain("new ResizeObserver(read)");
@@ -107,12 +107,21 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain('transformOrigin: "top left"');
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
-    expect(studio).toContain("section.offsetTop * scale");
+    // Una sola geometría compartida por marco, iframe y capa de edición.
+    expect(studio).toContain("const frameWidth = Math.round(width * scaled)");
+    expect(studio).toContain("const frameHeight = Math.round(documentHeight * scaled)");
+    expect(studio).toContain("data-eb-canvas-edit-layer");
+    expect(studio).toContain("data-eb-canvas-precision-notice");
+    // Un solo arrastrar y soltar del lienzo, válido también en táctil.
+    expect(studio).toContain("startSectionDrag");
+    expect(studio).toContain('touchAction: "none"');
     expect(studio).toContain("xl:static");
     expect(studio).toContain('window.matchMedia("(max-width: 1279px)")');
     expect(studio).toContain('setSidebarRef.current("hidden")');
     expect(studio).toContain("data-eb-external-section-handle");
-    expect(studio).not.toContain("data-eb-section-handle");
+    // Ya no existe el arrastre nativo HTML5 en el lienzo (competía con dnd-kit).
+    expect(studio).not.toContain("onDragStart={(event) => {");
+    expect(studio).not.toContain("dataTransfer");
     expect(studio).not.toContain('[data-eb-section="destinos"] { overflow:clip; }');
     expect(studio).not.toContain("isolation:isolate");
     expect(studio).not.toContain("contain:paint");
