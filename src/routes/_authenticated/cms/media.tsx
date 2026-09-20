@@ -242,6 +242,13 @@ const SCOPE_OPTIONS = [
   { value: "mine", label: "Mis imágenes" },
 ] as const;
 
+const STATE_OPTIONS = [
+  { value: "all", label: "Todos los estados" },
+  { value: "draft", label: "Borradores" },
+  { value: "in_review", label: "Pendientes de aprobación" },
+  { value: "published", label: "Publicadas" },
+] as const;
+
 const USAGE_OPTIONS = [
   { value: "all", label: "Todos los usos" },
   { value: "cover", label: "Portadas" },
@@ -251,7 +258,9 @@ const USAGE_OPTIONS = [
 ] as const;
 
 type ScopeValue = (typeof SCOPE_OPTIONS)[number]["value"];
+type StateValue = (typeof STATE_OPTIONS)[number]["value"];
 type UsageValue = (typeof USAGE_OPTIONS)[number]["value"];
+
 
 const USAGE_LABELS: Record<string, string> = {
   cover: "Portada",
