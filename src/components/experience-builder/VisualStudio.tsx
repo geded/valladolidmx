@@ -3591,17 +3591,20 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
-        height: 100%;
         min-height: 100%;
       }
       html {
-        overflow: hidden;
-      }
-      body {
+        height: 100%;
         overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
+      }
+      body {
+        height: auto;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
@@ -3718,7 +3721,7 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-         const scrollTop = doc.body.scrollTop;
+        const scrollTop = doc.scrollingElement?.scrollTop ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
@@ -3783,14 +3786,14 @@ function CanvasViewport({
     const read = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        setCanvasScrollTop(doc.body.scrollTop);
+        setCanvasScrollTop(doc.scrollingElement?.scrollTop ?? 0);
       });
     };
     read();
-    doc.body.addEventListener("scroll", read, { passive: true });
+    doc.addEventListener("scroll", read, { passive: true, capture: true });
     return () => {
       cancelAnimationFrame(frame);
-      doc.body.removeEventListener("scroll", read);
+      doc.removeEventListener("scroll", read, true);
     };
   }, [mount]);
 
@@ -3813,7 +3816,8 @@ function CanvasViewport({
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const scroller = mount.ownerDocument.body;
+    const scroller = mount.ownerDocument.scrollingElement;
+    if (!(scroller instanceof HTMLElement)) return;
     const top = Math.max(0, Math.round(target.top - 16));
     if (Math.abs(scroller.scrollTop - top) > 8) {
       scroller.scrollTo({ top, behavior: "smooth" });
@@ -3841,7 +3845,8 @@ function CanvasViewport({
     const doc = mount.ownerDocument;
     if (!win) return;
     const read = () => {
-      const scroller = doc.body;
+      const scroller = doc.scrollingElement;
+      if (!(scroller instanceof HTMLElement)) return;
       const header = doc.querySelector("header");
       const rect = header?.getBoundingClientRect();
       setMetrics({
@@ -3855,11 +3860,11 @@ function CanvasViewport({
     };
     read();
     const id = win.setInterval(read, 250);
-    doc.body.addEventListener("scroll", read, true);
+    doc.addEventListener("scroll", read, true);
     win.addEventListener("resize", read);
     return () => {
       win.clearInterval(id);
-      doc.body.removeEventListener("scroll", read, true);
+      doc.removeEventListener("scroll", read, true);
       win.removeEventListener("resize", read);
     };
   }, [hud, mount, width]);
@@ -3901,7 +3906,7 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const canvasScroller = mount?.ownerDocument.body;
+    const canvasScroller = mount?.ownerDocument.scrollingElement;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
@@ -3910,6 +3915,7 @@ function CanvasViewport({
       const rect = frame.getBoundingClientRect();
       const edge = 56;
       const logicalStep = 18 / scaled;
+      if (!(canvasScroller instanceof HTMLElement)) return;
       if (moveEvent.clientY < rect.top + edge) canvasScroller.scrollBy({ top: -logicalStep });
       else if (moveEvent.clientY > rect.bottom - edge)
         canvasScroller.scrollBy({ top: logicalStep });

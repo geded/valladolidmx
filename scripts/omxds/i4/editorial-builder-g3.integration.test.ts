@@ -92,9 +92,9 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("overflow-x-auto rounded-md border border-border bg-background");
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
-    // El iframe conserva el viewport lógico Premium (ancho del preset) y adopta
-    // la altura real del documento; el zoom sólo escala el conjunto y toda la
-    // capa de edición vive fuera del documento de la plantilla.
+    // El iframe conserva el viewport lógico Premium y una ventana acotada. El
+    // documento es la única autoridad de scroll; el zoom sólo escala el conjunto
+    // y toda la capa de edición vive fuera de la plantilla.
     expect(studio).toContain('data-eb-canvas-scrollport="editor"');
     expect(studio).toContain("usableWidth / preset.width");
     expect(studio).toContain("CANVAS_MIN_SCALE = 0.2");
@@ -108,12 +108,12 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
     expect(studio).toContain('doc.addEventListener("touchmove", onTouchMove, { passive: false })');
     expect(studio).toContain('doc.addEventListener("wheel", onWheel, { passive: false })');
-    expect(studio).toContain("document.documentElement.clientHeight");
+    expect(studio).toContain("doc.scrollingElement");
     expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
     // Una sola geometría compartida por marco, iframe y capa de edición.
     expect(studio).toContain("const frameWidth = Math.round(width * scaled)");
-    expect(studio).toContain("const frameHeight = Math.round(documentHeight * scaled)");
+    expect(studio).toContain("const frameHeight = Math.round(minimumHeight * scaled)");
     expect(studio).toContain("data-eb-canvas-edit-layer");
     expect(studio).toContain("data-eb-canvas-precision-notice");
     // Un solo arrastrar y soltar del lienzo, válido también en táctil.
