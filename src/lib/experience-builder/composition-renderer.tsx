@@ -47,6 +47,7 @@ import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-con
 import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import {
   mergeHomeRealContent,
+  readHomeRailLimits,
   resolveHomeSectionVisibility,
 } from "@/components/home-premium/home-premium-real";
 
@@ -448,6 +449,7 @@ function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
     resolved.content,
     data,
     (node.config as Record<string, unknown>).destinos_items,
+    readHomeRailLimits(node.config),
   );
   const sections = resolveHomeSectionVisibility(content, resolved.sections);
 

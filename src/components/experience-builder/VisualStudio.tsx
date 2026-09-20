@@ -4001,6 +4001,47 @@ function CanvasViewport({
 
 /* --------------------------------------------------------------------- */
 
+/**
+ * G9 · Contenido vivo del lienzo (comportamiento tipo Wix).
+ *
+ * Antes el contenido se envolvía con `pointer-events-none`, lo que congelaba
+ * los carruseles horizontales de la plantilla (destinos, experiencias,
+ * hoteles, eventos) y hacía que el lienzo pareciera una imagen fija.
+ * Ahora el contenido conserva sus gestos reales y sólo se neutraliza la
+ * navegación/envío en fase de captura, de modo que el clic siga seleccionando
+ * la sección para editarla en vez de salir de la página.
+ */
+function CanvasLiveContent({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      data-eb-canvas-live-content=""
+      className={`select-none ${className ?? ""}`}
+      onClickCapture={(event) => {
+        const target = event.target as HTMLElement | null;
+        if (
+          target?.closest("a,button,input,select,textarea,label,summary,[role='button'],[role='link']")
+        ) {
+          event.preventDefault();
+        }
+      }}
+      onAuxClickCapture={(event) => event.preventDefault()}
+      onSubmitCapture={(event) => event.preventDefault()}
+      onDragStartCapture={(event) => event.preventDefault()}
+      onKeyDownCapture={(event) => {
+        if (event.key === "Enter" || event.key === " ") event.preventDefault();
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function InertChrome({
   label,
   selected,
@@ -4031,9 +4072,7 @@ function InertChrome({
       className={`group cursor-pointer outline-none ring-inset ${sticky ? "sticky top-0 z-30" : "relative"} ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
-      <div className="pointer-events-none select-none" aria-hidden>
-        {children}
-      </div>
+      <CanvasLiveContent>{children}</CanvasLiveContent>
       <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
       >
@@ -4359,13 +4398,12 @@ function BlockOverlay({
           />
         </div>
       ) : null}
-      {/* Bloqueamos interacciones internas: en modo edición los clics
-          siempre seleccionan el bloque en vez de navegar/enviar. */}
-      <div
-        className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}
-      >
+      {/* G9 · El contenido queda vivo (carruseles y desplazamiento lateral
+          funcionan como en el sitio real). Sólo se neutraliza la navegación
+          en fase de captura para que el clic seleccione el bloque. */}
+      <CanvasLiveContent className={node.hidden ? "opacity-40 grayscale" : ""}>
         {children}
-      </div>
+      </CanvasLiveContent>
     </div>
   );
 }
