@@ -10,6 +10,8 @@
 
 - [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): reconstrucción del espacio de trabajo en curso. Documento interno a escala lógica real; "Ajustar" usa todo el ancho real disponible sin forzar un mínimo que recorte la plantilla, y cada cambio de preset vuelve al borde inicial; el Studio ocupa temporalmente todo el ancho en tablet; inspector inferior hasta 1279 px y acoplado desde 1280 px; altura medida, controles externos y navegación de secciones sobre el scroll del editor. Pendiente comparación constructor/preview/público en 1440/1280/1024/834/430/390 y aceptación visual humana antes de extender por familias.
 
+- [ ] Experience Builder · Safari móvil: corregido el conflicto entre el documento interno y el desplazamiento exterior, el cálculo de altura que sumaba dos veces el desplazamiento y la barra superior multilínea. Pendiente comprobar físicamente en iPhone/iPad que el recorrido completo sea continuo y que ningún control cubra la plantilla antes de cerrar.
+
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
 
 - [x] Experience Builder · Catálogo operativo limitado a familias conectadas; vista inicial sólo publicada, con borradores y archivadas accesibles por filtro. Pruebas históricas desconectadas quedan ocultas de forma reversible y sin borrar datos.
