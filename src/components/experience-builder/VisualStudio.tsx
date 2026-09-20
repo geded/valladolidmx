@@ -3580,10 +3580,10 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // El documento conserva el ancho lógico exacto. El iframe representa un
-    // viewport real de dispositivo y es su única autoridad de desplazamiento.
-    // Esto evita que WebKit tenga que rasterizar un iframe de página completa
-    // (decenas de miles de píxeles), causa de mosaicos blancos y pintura vieja.
+    // El documento conserva el ancho lógico exacto. El elemento raíz mantiene
+    // el scroll nativo del viewport del iframe; `body` conserva el flujo normal
+    // de la página. Forzar `body { height:100%; overflow:auto }` crea en WebKit
+    // una segunda caja de composición y deja secciones parcialmente pintadas.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
@@ -3591,20 +3591,19 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
-        min-height: 100%;
       }
       html {
         height: 100%;
         overflow-x: hidden;
-        overflow-y: hidden;
-      }
-      body {
-        height: 100%;
-        min-height: 100%;
-        overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
+      }
+      body {
+        min-height: 100%;
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
@@ -3721,7 +3720,8 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-        const scrollTop = doc.body.scrollTop;
+        const scroller = doc.scrollingElement ?? doc.documentElement;
+        const scrollTop = scroller.scrollTop;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
@@ -3786,7 +3786,8 @@ function CanvasViewport({
     const read = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        setCanvasScrollTop(doc.body.scrollTop);
+        const scroller = doc.scrollingElement ?? doc.documentElement;
+        setCanvasScrollTop(scroller.scrollTop);
       });
     };
     read();
@@ -3816,7 +3817,8 @@ function CanvasViewport({
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const scroller = mount.ownerDocument.body;
+    const doc = mount.ownerDocument;
+    const scroller = doc.scrollingElement ?? doc.documentElement;
     const top = Math.max(0, Math.round(target.top - 16));
     if (Math.abs(scroller.scrollTop - top) > 8) {
       scroller.scrollTo({ top, behavior: "smooth" });
@@ -3844,7 +3846,7 @@ function CanvasViewport({
     const doc = mount.ownerDocument;
     if (!win) return;
     const read = () => {
-      const scroller = doc.body;
+      const scroller = doc.scrollingElement ?? doc.documentElement;
       const header = doc.querySelector("header");
       const rect = header?.getBoundingClientRect();
       setMetrics({
@@ -3904,7 +3906,8 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const canvasScroller = mount?.ownerDocument.body;
+    const canvasDocument = mount?.ownerDocument;
+    const canvasScroller = canvasDocument?.scrollingElement ?? canvasDocument?.documentElement;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
