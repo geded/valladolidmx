@@ -357,21 +357,26 @@ export const listMyBusinesses = createServerFn({ method: "GET" })
     if (ids.length === 0) return [];
     const { data, error } = await supabase
       .from("businesses")
-      .select(
-        "id, display_name, slug, status, review_notes, submitted_for_review_at, destinations(name)",
-      )
+      .select("id, display_name, slug, status, destinations(name)")
       .in("id", ids)
       .is("deleted_at", null)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
+    const { data: states, error: sErr } = await supabase.rpc("business_review_state", {
+      _business_ids: ids,
+    } as never);
+    if (sErr) throw new Error(sErr.message);
+    const stateById = new Map<string, any>(
+      ((states as any[]) ?? []).map((s) => [s.business_id, s]),
+    );
     return (data ?? []).map((b: any) => ({
       id: b.id,
       display_name: b.display_name,
       slug: b.slug,
       status: b.status,
       destination_name: b.destinations?.name ?? null,
-      review_notes: b.review_notes,
-      submitted_for_review_at: b.submitted_for_review_at,
+      review_notes: stateById.get(b.id)?.review_notes ?? null,
+      submitted_for_review_at: stateById.get(b.id)?.submitted_for_review_at ?? null,
     }));
   });
 
