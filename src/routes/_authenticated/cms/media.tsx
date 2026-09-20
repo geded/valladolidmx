@@ -402,6 +402,11 @@ function MediaPage() {
         },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
+          key: "review",
+          header: "Aprobación",
+          render: (r) => <ReviewActions row={r} />,
+        },
+        {
           key: "actions",
           header: "IA",
           render: (r) => (
@@ -412,6 +417,7 @@ function MediaPage() {
           ),
         },
       ]}
+
     />
   );
 }
