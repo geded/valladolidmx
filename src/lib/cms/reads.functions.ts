@@ -366,6 +366,10 @@ export const listMediaCms = createServerFn({ method: "POST" })
       q = q.in("usage_context", list);
     }
 
+    if (state !== "all") q = q.eq("status", state);
+
+
+
     const { data: rows, count, error } = await q;
     if (error) throw error;
 
