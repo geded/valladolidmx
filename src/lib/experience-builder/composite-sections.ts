@@ -42,15 +42,13 @@ export interface CompositeSectionRegistryEntry {
 export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistryEntry> = {
   "vmx.home.premium-g4": {
     orderKey: "home_section_order",
+    // El orden declarado aquí DEBE coincidir con `HOME_PREMIUM_DEFAULT_ORDER`
+    // (autoridad de la plantilla aprobada). Si difiere, el panel Estructura
+    // muestra una secuencia distinta a la del lienzo y arrastrar una sección
+    // reacomoda varias.
     sections: [
       { key: "hero", label: "Portada (hero)", prefixes: ["hero_"] },
       { key: "alux", label: "Alux", prefixes: ["alux_"], reorderable: true },
-      {
-        key: "categorias",
-        label: "Explora por categoría",
-        prefixes: ["categorias_"],
-        reorderable: true,
-      },
       {
         key: "destinos",
         label: "Destinos del Oriente Maya",
@@ -59,31 +57,9 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       {
-        key: "rutas",
-        label: "Rutas recomendadas",
-        prefixes: ["rutas_"],
-        visibilityKey: "show_rutas",
-        reorderable: true,
-      },
-      {
-        key: "pueblosMagicos",
-        label: "Pueblos Mágicos",
-        prefixes: ["pueblos_"],
-        visibilityKey: "show_pueblos_magicos",
-        reorderable: true,
-      },
-      {
-        key: "experiencias",
-        label: "Experiencias",
-        prefixes: ["experiencias_"],
-        visibilityKey: "show_experiencias",
-        reorderable: true,
-      },
-      {
-        key: "servicios",
-        label: "Hospedaje y gastronomía",
-        prefixes: ["servicios_"],
-        visibilityKey: "show_servicios",
+        key: "categorias",
+        label: "Explora por categoría",
+        prefixes: ["categorias_"],
         reorderable: true,
       },
       {
@@ -94,10 +70,17 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       {
-        key: "queHacer",
-        label: "Qué hacer",
-        prefixes: ["que_hacer_"],
-        visibilityKey: "show_que_hacer",
+        key: "experiencias",
+        label: "Experiencias",
+        prefixes: ["experiencias_"],
+        visibilityKey: "show_experiencias",
+        reorderable: true,
+      },
+      {
+        key: "rutas",
+        label: "Rutas recomendadas",
+        prefixes: ["rutas_"],
+        visibilityKey: "show_rutas",
         reorderable: true,
       },
       {
@@ -108,6 +91,27 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       { key: "travelPlan", label: "Mi Viaje", prefixes: ["travel_plan_"] },
+      {
+        key: "pueblosMagicos",
+        label: "Pueblos Mágicos",
+        prefixes: ["pueblos_"],
+        visibilityKey: "show_pueblos_magicos",
+        reorderable: true,
+      },
+      {
+        key: "servicios",
+        label: "Hospedaje y gastronomía",
+        prefixes: ["servicios_"],
+        visibilityKey: "show_servicios",
+        reorderable: true,
+      },
+      {
+        key: "queHacer",
+        label: "Qué hacer",
+        prefixes: ["que_hacer_"],
+        visibilityKey: "show_que_hacer",
+        reorderable: true,
+      },
     ],
   },
   "vmx.destination.premium-g4": {
@@ -223,8 +227,15 @@ export function fieldBelongsToSection(field: string, section: CompositeSectionDe
 
 /**
  * Ordena las secciones declaradas según el orden guardado en configuración.
- * Fail-closed: claves desconocidas se ignoran y las faltantes se añaden con
- * el orden aprobado del registro.
+ *
+ * Semántica ABSOLUTA, idéntica a la que aplican los renderers aprobados
+ * (`home-premium-config`, `destination-premium-config`, `place-premium-config`):
+ * el arreglo guardado describe la secuencia completa de secciones, incluidas
+ * las no reordenables. Antes esta función reinterpretaba el arreglo como
+ * "huecos" reordenables sobre el orden del registro, por lo que el panel
+ * Estructura mostraba una secuencia distinta a la del lienzo y arrastrar una
+ * sección reacomodaba varias. Fail-closed: claves desconocidas se ignoran y
+ * las faltantes se añaden con el orden aprobado del registro.
  */
 export function orderedCompositeSections(
   entry: CompositeSectionRegistryEntry,
@@ -234,25 +245,24 @@ export function orderedCompositeSections(
   if (!orderKey) return sections;
   const saved = config?.[orderKey];
   if (!Array.isArray(saved)) return sections;
-  const reorderable = sections.filter((s) => s.reorderable);
   const valid = saved.filter(
     (key): key is string =>
-      typeof key === "string" && reorderable.some((section) => section.key === key),
+      typeof key === "string" && sections.some((section) => section.key === key),
   );
   const unique = Array.from(new Set(valid));
-  const resolved = [
-    ...unique,
-    ...reorderable.filter((s) => !unique.includes(s.key)).map((s) => s.key),
-  ];
-  let cursor = 0;
-  return sections.map((section) => {
-    if (!section.reorderable) return section;
-    const key = resolved[cursor++];
-    return sections.find((s) => s.key === key) ?? section;
-  });
+  if (unique.length === 0) return sections;
+  const resolved = [...unique, ...sections.filter((s) => !unique.includes(s.key)).map((s) => s.key)];
+  return resolved
+    .map((key) => sections.find((s) => s.key === key))
+    .filter((section): section is CompositeSectionDef => Boolean(section));
 }
 
-/** Devuelve el nuevo arreglo de orden tras mover una sección reordenable. */
+/**
+ * Devuelve el nuevo arreglo de orden tras mover una sección reordenable.
+ * El arreglo resultante conserva la secuencia absoluta completa, de modo que
+ * el lienzo y la página publicada reproducen exactamente lo que el editor ve
+ * en el panel Estructura.
+ */
 export function nextCompositeOrder(
   entry: CompositeSectionRegistryEntry,
   config: Record<string, unknown> | null | undefined,
@@ -261,13 +271,12 @@ export function nextCompositeOrder(
 ): string[] | null {
   if (!entry.orderKey) return null;
   const ordered = orderedCompositeSections(entry, config);
-  const current = ordered.filter((s) => s.reorderable).map((s) => s.key);
-  const from = current.indexOf(fromKey);
-  const to = current.indexOf(toKey);
+  const from = ordered.findIndex((s) => s.key === fromKey);
+  const to = ordered.findIndex((s) => s.key === toKey);
   if (from < 0 || to < 0 || from === to) return null;
-  const next = [...current];
+  if (!ordered[from]?.reorderable || !ordered[to]?.reorderable) return null;
+  const next = ordered.map((s) => s.key);
   const [moved] = next.splice(from, 1);
   next.splice(to, 0, moved as string);
-  let cursor = 0;
-  return ordered.map((section) => (section.reorderable ? (next[cursor++] as string) : section.key));
+  return next;
 }
