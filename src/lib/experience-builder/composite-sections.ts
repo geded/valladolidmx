@@ -42,15 +42,13 @@ export interface CompositeSectionRegistryEntry {
 export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistryEntry> = {
   "vmx.home.premium-g4": {
     orderKey: "home_section_order",
+    // El orden declarado aquí DEBE coincidir con `HOME_PREMIUM_DEFAULT_ORDER`
+    // (autoridad de la plantilla aprobada). Si difiere, el panel Estructura
+    // muestra una secuencia distinta a la del lienzo y arrastrar una sección
+    // reacomoda varias.
     sections: [
       { key: "hero", label: "Portada (hero)", prefixes: ["hero_"] },
       { key: "alux", label: "Alux", prefixes: ["alux_"], reorderable: true },
-      {
-        key: "categorias",
-        label: "Explora por categoría",
-        prefixes: ["categorias_"],
-        reorderable: true,
-      },
       {
         key: "destinos",
         label: "Destinos del Oriente Maya",
@@ -59,31 +57,9 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       {
-        key: "rutas",
-        label: "Rutas recomendadas",
-        prefixes: ["rutas_"],
-        visibilityKey: "show_rutas",
-        reorderable: true,
-      },
-      {
-        key: "pueblosMagicos",
-        label: "Pueblos Mágicos",
-        prefixes: ["pueblos_"],
-        visibilityKey: "show_pueblos_magicos",
-        reorderable: true,
-      },
-      {
-        key: "experiencias",
-        label: "Experiencias",
-        prefixes: ["experiencias_"],
-        visibilityKey: "show_experiencias",
-        reorderable: true,
-      },
-      {
-        key: "servicios",
-        label: "Hospedaje y gastronomía",
-        prefixes: ["servicios_"],
-        visibilityKey: "show_servicios",
+        key: "categorias",
+        label: "Explora por categoría",
+        prefixes: ["categorias_"],
         reorderable: true,
       },
       {
@@ -94,10 +70,17 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       {
-        key: "queHacer",
-        label: "Qué hacer",
-        prefixes: ["que_hacer_"],
-        visibilityKey: "show_que_hacer",
+        key: "experiencias",
+        label: "Experiencias",
+        prefixes: ["experiencias_"],
+        visibilityKey: "show_experiencias",
+        reorderable: true,
+      },
+      {
+        key: "rutas",
+        label: "Rutas recomendadas",
+        prefixes: ["rutas_"],
+        visibilityKey: "show_rutas",
         reorderable: true,
       },
       {
@@ -108,6 +91,27 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       { key: "travelPlan", label: "Mi Viaje", prefixes: ["travel_plan_"] },
+      {
+        key: "pueblosMagicos",
+        label: "Pueblos Mágicos",
+        prefixes: ["pueblos_"],
+        visibilityKey: "show_pueblos_magicos",
+        reorderable: true,
+      },
+      {
+        key: "servicios",
+        label: "Hospedaje y gastronomía",
+        prefixes: ["servicios_"],
+        visibilityKey: "show_servicios",
+        reorderable: true,
+      },
+      {
+        key: "queHacer",
+        label: "Qué hacer",
+        prefixes: ["que_hacer_"],
+        visibilityKey: "show_que_hacer",
+        reorderable: true,
+      },
     ],
   },
   "vmx.destination.premium-g4": {
