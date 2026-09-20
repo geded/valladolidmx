@@ -2,6 +2,8 @@
 
 ## En curso
 
+- [ ] Experience Builder · Corregir la arquitectura del contenedor editorial: la plantilla sí comparte renderer con la web, pero su envolvente actual puede activar controles públicos, resincronizar estilos y proyectar medidas antiguas. Sustituir esos comportamientos antes de modificar otra sección o extender a más plantillas.
+
 - [ ] Experience Builder · Aclarar y corregir la deuda del objetivo tipo Wix: la implementación anterior sólo ajustó escala/iframe sobre el shell existente; no unificó desplazamiento, medición, selección ni arrastre. La reconstrucción debe sustituir esos mecanismos del shell sin tocar plantillas públicas, y no puede declararse terminada sin aceptación visual humana.
 
 - [ ] Experience Builder · Editable en cualquier zoom: el zoom sólo cambia el tamaño de presentación de la plantilla, nunca su contenido ni sus medidas; seleccionar, mover y editar deben funcionar en todos los niveles de zoom y vistas. Si una operación no puede realizarse en el equipo actual, el lienzo debe decirlo con un aviso claro y accionable, nunca comportarse de forma errática. Objetivo final: que un editor humano trabaje las plantillas sin pedir cambios al agente.
