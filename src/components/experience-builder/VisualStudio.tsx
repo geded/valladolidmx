@@ -3446,7 +3446,11 @@ function HomeCanvas({
           onSelect={() => onSelectChrome("header")}
           sticky
         >
-          <PublicHeader variant={headerVariant} config={getChromeConfig(tree, "header")} />
+          <PublicHeader
+            variant={headerVariant}
+            config={getChromeConfig(tree, "header")}
+            interactionMode="editor"
+          />
         </InertChrome>
         <DndContext
           sensors={canvasSensors}
