@@ -8169,6 +8169,15 @@ export type Database = {
         Args: { _business_id: string }
         Returns: Json
       }
+      business_review_state: {
+        Args: { _business_ids?: string[] }
+        Returns: {
+          business_id: string
+          has_verification_document: boolean
+          review_notes: string
+          submitted_for_review_at: string
+        }[]
+      }
       business_visibility_performance: {
         Args: { _business_id: string; _window_days?: number }
         Returns: {
