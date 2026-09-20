@@ -298,7 +298,7 @@ export function mergeHomeRealContent(
   }));
 
   return attachMediaAssets(
-    {
+    applyHomeRailLimits({
       ...safeContent,
       hero: {
         ...safeContent.hero,
