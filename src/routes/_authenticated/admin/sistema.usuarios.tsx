@@ -6,7 +6,8 @@
  * RPCs SECURITY DEFINER. No usa service_role. Toda escritura queda
  * auditada en `permissions_audit_log`.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -561,6 +562,16 @@ function UserRow({
 
 // ---------------- Edición de usuario ----------------
 
+/**
+ * Portal de diálogos: los monta en <body> para que `fixed inset-0` se resuelva
+ * contra el viewport real y no contra un contenedor del Workspace (que en
+ * Safari/iOS horizontal recortaba la ventana y la desplazaba fuera de pantalla).
+ */
+function DialogPortal({ children }: { children: ReactNode }) {
+  if (typeof document === "undefined") return null;
+  return createPortal(children, document.body);
+}
+
 function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => void }) {
   const qc = useQueryClient();
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
@@ -617,14 +628,15 @@ function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => vo
   });
 
   return (
+    <DialogPortal>
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg rounded-2xl border border-border bg-background p-6 shadow-lg"
+        className="my-auto max-h-[92dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-start justify-between gap-4">
@@ -745,6 +757,7 @@ function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => vo
         ) : null}
       </div>
     </div>
+    </DialogPortal>
   );
 }
 
@@ -945,14 +958,15 @@ function InviteDialog({
   });
 
   return (
+    <DialogPortal>
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-lg"
+        className="my-auto max-h-[92dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold">Invitar nuevo usuario</h2>
@@ -1026,6 +1040,7 @@ function InviteDialog({
         </form>
       </div>
     </div>
+    </DialogPortal>
   );
 }
 
@@ -1274,8 +1289,9 @@ function RoleEditor({
   const canDelete = !isNew && !isSystem;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl">
+    <DialogPortal>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4">
+      <div className="my-auto max-h-[92dvh] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 shadow-xl sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">
@@ -1454,5 +1470,6 @@ function RoleEditor({
         </div>
       </div>
     </div>
+    </DialogPortal>
   );
 }
