@@ -4003,6 +4003,7 @@ function CanvasViewport({
         <iframe
           ref={iframeRef}
           title="Vista previa del canvas"
+          srcDoc="<!doctype html><html><head></head><body></body></html>"
           data-eb-canvas-device={device}
           data-eb-canvas-width={width}
           data-eb-canvas-height={documentHeight}

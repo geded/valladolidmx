@@ -105,6 +105,7 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("new ResizeObserver(read)");
     expect(studio).toContain("transform: `scale(${scaled})`");
     expect(studio).toContain("origin-top-left");
+    expect(studio).toContain('srcDoc="<!doctype html><html><head></head><body></body></html>"');
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
     expect(studio).toContain('doc.addEventListener("scroll", read, { passive: true, capture: true })');
     expect(studio).toContain("setCanvasScrollTop(win.scrollY)");
