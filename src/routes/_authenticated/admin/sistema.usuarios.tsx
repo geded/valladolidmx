@@ -327,13 +327,13 @@ function UsersTable({
           onClose={() => setInviteOpen(false)}
         />
       ) : null}
-      <div className="overflow-hidden rounded-2xl border border-border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="w-full min-w-[720px] text-sm">
           <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-2">Usuario</th>
               <th className="px-4 py-2">Roles actuales</th>
-              <th className="px-4 py-2">Asignar</th>
+              <th className="px-4 py-2">Agregar rol</th>
             </tr>
           </thead>
           <tbody>
@@ -341,7 +341,7 @@ function UsersTable({
               <UserRow
                 key={row.user_id}
                 row={row}
-                assignable={assignableForTab}
+                assignable={assignableForRows}
                 customRoles={customRoles}
               />
             ))}
