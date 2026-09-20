@@ -4031,9 +4031,7 @@ function InertChrome({
       className={`group cursor-pointer outline-none ring-inset ${sticky ? "sticky top-0 z-30" : "relative"} ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
-      <div className="pointer-events-none select-none" aria-hidden>
-        {children}
-      </div>
+      <CanvasLiveContent>{children}</CanvasLiveContent>
       <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
       >
@@ -4359,13 +4357,12 @@ function BlockOverlay({
           />
         </div>
       ) : null}
-      {/* Bloqueamos interacciones internas: en modo edición los clics
-          siempre seleccionan el bloque en vez de navegar/enviar. */}
-      <div
-        className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}
-      >
+      {/* G9 · El contenido queda vivo (carruseles y desplazamiento lateral
+          funcionan como en el sitio real). Sólo se neutraliza la navegación
+          en fase de captura para que el clic seleccione el bloque. */}
+      <CanvasLiveContent className={node.hidden ? "opacity-40 grayscale" : ""}>
         {children}
-      </div>
+      </CanvasLiveContent>
     </div>
   );
 }
