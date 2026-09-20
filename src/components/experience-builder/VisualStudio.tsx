@@ -3287,6 +3287,19 @@ function DeviceToggle({
   );
 }
 
+/**
+ * Escala mínima del escenario. El documento conserva su ancho lógico; sólo
+ * cambia el tamaño con el que se presenta. Por debajo de
+ * `CANVAS_PRECISE_EDIT_SCALE` el lienzo avisa que conviene acercar o usar el
+ * panel Estructura en vez de comportarse de forma imprecisa.
+ */
+const CANVAS_MIN_SCALE = 0.2;
+const CANVAS_PRECISE_EDIT_SCALE = 0.45;
+
+function roundScale(value: number): number {
+  return Math.round(Math.min(1, Math.max(CANVAS_MIN_SCALE, value)) * 1000) / 1000;
+}
+
 function HomeCanvas({
   tree,
   pageType,
@@ -3337,10 +3350,9 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
-  // El documento interno SIEMPRE se renderiza al ancho lógico del preset.
-  // "Ajustar" reduce sólo su envolvente hasta el ancho real disponible. El
-  // documento conserva el ancho lógico del preset, pero el ajuste nunca debe
-  // arrancar mostrando sólo una fracción de la plantilla en tablet/móvil.
+  // El documento interno SIEMPRE se compone contra el ancho lógico del preset:
+  // la vista elegida manda y el espacio libre del editor jamás re-responsiviza
+  // la plantilla. "Ajustar" reduce sólo el tamaño de presentación del conjunto.
   const scrollportRef = useRef<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
   useEffect(() => {
@@ -3353,26 +3365,21 @@ function HomeCanvas({
     return () => ro.disconnect();
   }, []);
   const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
-  const minimumReadableScale = preset.width <= 430 ? 1 : 0.25;
   const fitScale =
     usableWidth == null || usableWidth <= 0 || usableWidth >= preset.width
       ? 1
-      : Math.max(minimumReadableScale, Math.min(1, usableWidth / preset.width));
-  const scale = zoomOverride ?? fitScale;
+      : roundScale(usableWidth / preset.width);
+  const scale = roundScale(zoomOverride ?? fitScale);
   useEffect(() => setZoomOverride(null), [deviceViewport]);
   useEffect(() => {
     const scrollport = scrollportRef.current;
     if (!scrollport) return;
-    // Cada preset abre desde su borde inicial. Conservar el desplazamiento de
-    // una vista más ancha hacía que Safari mostrara el centro recortado aunque
-    // el nuevo lienzo ya estuviera correctamente ajustado.
+    // Cada vista abre desde su borde inicial. Conservar el desplazamiento de
+    // una vista más ancha hacía que Safari mostrara el centro recortado.
     scrollport.scrollTo({ left: 0, top: 0 });
   }, [deviceViewport]);
   const changeZoom = (delta: number) => {
-    setZoomOverride((current) => {
-      const base = current ?? fitScale;
-      return Math.min(1, Math.max(minimumReadableScale, Math.round((base + delta) * 10) / 10));
-    });
+    setZoomOverride((current) => roundScale((current ?? fitScale) + delta));
   };
   const headerVariant = resolveCanvasHeaderVariant(tree);
   // R1-F1L-R2 · La autoridad Premium de Home se aísla de composiciones antiguas.
@@ -3396,6 +3403,14 @@ function HomeCanvas({
         .filter((section) => section.reorderable)
         .map((section) => section.key)
     : [];
+  const sectionLabels = renderedCompositeEntry
+    ? Object.fromEntries(
+        orderedCompositeSections(
+          renderedCompositeEntry,
+          renderedCompositeNode?.config as Record<string, unknown> | null,
+        ).map((section) => [section.key, section.label]),
+      )
+    : {};
 
   return (
     <div
@@ -3409,7 +3424,7 @@ function HomeCanvas({
         minimumHeight={preset.height}
         scale={scale}
         fitScale={fitScale}
-        minimumScale={minimumReadableScale}
+        minimumScale={CANVAS_MIN_SCALE}
         isFit={zoomOverride === null}
         onZoomIn={() => changeZoom(0.1)}
         onZoomOut={() => changeZoom(-0.1)}
@@ -3418,6 +3433,8 @@ function HomeCanvas({
         compositeNodeId={renderedCompositeNode?.id ?? null}
         selectedSectionKey={selectedCompositeSectionKey}
         reorderableSectionKeys={reorderableSectionKeys}
+        sectionLabels={sectionLabels}
+        editingEnabled={!previewMode}
         onSelectSection={onSelectCompositeSection}
         onReorderSection={onReorderCompositeSection}
       >
@@ -3474,19 +3491,26 @@ function HomeCanvas({
   );
 }
 
+/** Geometría medida de una sección editable dentro del documento lógico. */
+interface CanvasSectionRect {
+  key: string;
+  top: number;
+  height: number;
+}
+
 /**
- * CanvasViewport — viewport aislado del Studio (18.54).
+ * CanvasViewport — escenario aislado del Studio.
  *
  * Renderiza el árbol del canvas dentro de un `<iframe>` same-origin con el
- * ancho real del dispositivo seleccionado. Al ser un documento propio:
+ * ancho lógico exacto del dispositivo elegido. Al ser un documento propio:
  *  - las media queries (`sm:`, `md:`, `lg:`) se resuelven contra 390/768/1280
  *    y no contra la ventana del editor;
- *  - el scroll y el `sticky` del encabezado se comportan como en producción;
+ *  - la distribución, proporciones y tipografía son las reales de ese ancho;
  *  - el overflow horizontal aparece (o no) exactamente igual que en público.
  *
- * No duplica componentes: el árbol React se porta al documento del iframe,
- * conservando providers, contextos y los componentes canónicos.
- * El canvas permanece inerte: se cancelan navegaciones y envíos de formulario.
+ * El zoom sólo escala el conjunto; nunca recalcula la plantilla por sección.
+ * Toda la capa de edición (contornos, etiquetas y asas) vive FUERA del
+ * documento de la plantilla, proyectada sobre coordenadas medidas.
  */
 function CanvasViewport({
   device,
@@ -3503,6 +3527,8 @@ function CanvasViewport({
   compositeNodeId,
   selectedSectionKey,
   reorderableSectionKeys,
+  sectionLabels,
+  editingEnabled,
   onSelectSection,
   onReorderSection,
   children,
@@ -3521,6 +3547,8 @@ function CanvasViewport({
   compositeNodeId: string | null;
   selectedSectionKey: string | null;
   reorderableSectionKeys: string[];
+  sectionLabels: Record<string, string>;
+  editingEnabled: boolean;
   onSelectSection: (nodeId: string, sectionKey: string) => void;
   onReorderSection: (activeKey: string, overKey: string) => void;
   children: React.ReactNode;
@@ -3528,8 +3556,9 @@ function CanvasViewport({
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
   const [documentHeight, setDocumentHeight] = useState(minimumHeight);
-  const [sectionRects, setSectionRects] = useState<Array<{ key: string; top: number }>>([]);
-  const draggedSectionRef = useRef<string | null>(null);
+  const [sectionRects, setSectionRects] = useState<CanvasSectionRect[]>([]);
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [dropKey, setDropKey] = useState<string | null>(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3540,21 +3569,13 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // El componente canónico conserva sus contratos. Esta normalización sólo
-    // actúa dentro del viewport aislado: Safari respeta el ancho útil de 390 px
-    // aunque los controles flex tengan contenido intrínseco más largo.
+    // Única normalización del escenario: el documento no tiene scroll propio
+    // porque el escenario exterior es el único scrollport. No se altera
+    // ninguna medida, tipografía ni distribución de la plantilla.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
-      html, body { overflow-x: hidden; }
-      form[role="search"],
-      form[role="search"] > div,
-      form[role="search"] > div > button {
-        min-width: 0;
-        max-width: 100%;
-      }
-      /* G7-C · El pie de página respeta la safe area inferior del móvil. */
-      footer { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+      html, body { min-height: 100%; height: auto; overflow: visible; }
     `;
     doc.head.appendChild(viewportStyle);
 
@@ -3587,15 +3608,6 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    // El documento no tiene scroll interno: el marco adopta la altura completa
-    // de la página y el Workspace es el único scrollport.
-    const scrollStyle = doc.createElement("style");
-    scrollStyle.setAttribute("data-eb-canvas-scroll-style", "");
-    scrollStyle.textContent = `
-      html, body { min-height: 100%; height: auto; overflow-y: visible; }
-    `;
-    doc.head.appendChild(scrollStyle);
-
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
     doc.body.appendChild(canvasRoot);
@@ -3606,7 +3618,6 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
-      scrollStyle.remove();
       viewportStyle.remove();
       canvasRoot.remove();
     };
@@ -3616,6 +3627,9 @@ function CanvasViewport({
     setDocumentHeight(minimumHeight);
   }, [minimumHeight, width]);
 
+  // Fuente ÚNICA de altura y de geometría de secciones. Una sola lectura por
+  // fotograma evita que la medición compita con el desplazamiento (causa de
+  // los saltos y bloqueos al bajar por el lienzo).
   useEffect(() => {
     if (!mount) return;
     const doc = mount.ownerDocument;
@@ -3623,19 +3637,29 @@ function CanvasViewport({
     const measure = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const nextHeight = Math.max(
-          minimumHeight,
-          Math.ceil(mount.getBoundingClientRect().height),
-          Math.ceil(mount.scrollHeight),
-        );
-        setDocumentHeight((current) => (Math.abs(current - nextHeight) > 1 ? nextHeight : current));
-        setSectionRects(
-          Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
-            .map((section) => ({
+        const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
+        setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
+        const base = mount.getBoundingClientRect().top;
+        const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
+          .map((section) => {
+            const rect = section.getBoundingClientRect();
+            return {
               key: section.dataset.ebSection ?? "",
-              top: Math.max(0, Math.round(section.getBoundingClientRect().top)),
-            }))
-            .filter((section) => section.key.length > 0),
+              top: Math.max(0, Math.round(rect.top - base)),
+              height: Math.round(rect.height),
+            };
+          })
+          .filter((section) => section.key.length > 0);
+        setSectionRects((current) =>
+          current.length === next.length &&
+          current.every(
+            (item, index) =>
+              item.key === next[index].key &&
+              Math.abs(item.top - next[index].top) <= 1 &&
+              Math.abs(item.height - next[index].height) <= 1,
+          )
+            ? current
+            : next,
         );
       });
     };
@@ -3644,73 +3668,50 @@ function CanvasViewport({
     resizeObserver.observe(mount);
     const mutationObserver = new MutationObserver(measure);
     mutationObserver.observe(mount, { childList: true, subtree: true, attributes: true });
-    Array.from(mount.querySelectorAll("img")).forEach((image) =>
-      image.addEventListener("load", measure),
-    );
+    const images = Array.from(mount.querySelectorAll("img"));
+    images.forEach((image) => image.addEventListener("load", measure));
     return () => {
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
-      Array.from(mount.querySelectorAll("img")).forEach((image) =>
-        image.removeEventListener("load", measure),
-      );
+      images.forEach((image) => image.removeEventListener("load", measure));
     };
   }, [minimumHeight, mount, width]);
 
+  // Seleccionar tocando el contenido real de la sección.
   useEffect(() => {
-    if (!mount || !compositeNodeId) return;
+    if (!mount || !compositeNodeId || !editingEnabled) return;
     const doc = mount.ownerDocument;
-    const sections = () => Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"));
-    const sectionFrom = (target: EventTarget | null) =>
-      (target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-section]") ?? null;
-    const sectionKey = (target: EventTarget | null) =>
-      sectionFrom(target)?.dataset.ebSection ?? null;
     const onClick = (event: MouseEvent) => {
-      const key = sectionKey(event.target);
+      const key = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-section]")
+        ?.dataset.ebSection;
       if (!key) return;
       onSelectSection(compositeNodeId, key);
     };
     doc.addEventListener("click", onClick, true);
-    return () => {
-      doc.removeEventListener("click", onClick, true);
-    };
-  }, [compositeNodeId, mount, onSelectSection]);
+    return () => doc.removeEventListener("click", onClick, true);
+  }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Mantiene sincronizados el panel y el escenario exterior. El iframe adopta
-  // toda la altura del documento y no tiene scroll propio, por lo que revelar
-  // una sección debe mover el scrollport del editor, no `window` del iframe.
+  // Revelar la sección activa moviendo el escenario exterior (único scrollport).
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
-    const doc = mount.ownerDocument;
     const frame = iframeRef.current;
     const scrollport = frame?.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
     if (!frame || !scrollport) return;
-    let cancelled = false;
-    const reveal = () => {
-      if (cancelled) return;
-      const section = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]")).find(
-        (candidate) => candidate.dataset.ebSection === selectedSectionKey,
-      );
-      if (!section) return;
-      const scrollportRect = scrollport.getBoundingClientRect();
-      const frameRect = frame.getBoundingClientRect();
-      const top = Math.max(
-        0,
-        scrollport.scrollTop + frameRect.top - scrollportRect.top + section.offsetTop * scale - 16,
-      );
-      if (Math.abs(scrollport.scrollTop - top) > 8) scrollport.scrollTo({ top, behavior: "smooth" });
-    };
-    const first = window.requestAnimationFrame(reveal);
-    const retry = window.setTimeout(reveal, 180);
-    return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(first);
-      window.clearTimeout(retry);
-    };
-  }, [mount, scale, selectedSectionKey]);
+    const target = sectionRects.find((section) => section.key === selectedSectionKey);
+    if (!target) return;
+    const scrollportRect = scrollport.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const top = Math.max(
+      0,
+      scrollport.scrollTop + frameRect.top - scrollportRect.top + target.top * scale - 16,
+    );
+    if (Math.abs(scrollport.scrollTop - top) > 8) scrollport.scrollTo({ top, behavior: "smooth" });
+    // La geometría ya está medida: no se recalcula dentro del efecto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mount, selectedSectionKey]);
 
-  // HUD de medición (sólo entornos no productivos): innerWidth real del
-  // iframe, overflow horizontal y posición efectiva del encabezado.
+  // HUD de medición (sólo entornos no productivos).
   const [hud, setHud] = useState(false);
   const [metrics, setMetrics] = useState<{
     innerWidth: number;
@@ -3752,7 +3753,75 @@ function CanvasViewport({
     };
   }, [hud, mount, width]);
 
-  const scaled = Math.min(1, Math.max(0.2, scale));
+  // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
+  const scaled = scale;
+  const frameWidth = Math.round(width * scaled);
+  const frameHeight = Math.round(documentHeight * scaled);
+  const editableRects = sectionRects.filter((section) =>
+    reorderableSectionKeys.includes(section.key),
+  );
+  const preciseEditing = scaled >= CANVAS_PRECISE_EDIT_SCALE;
+  const showEditingLayer = editingEnabled && Boolean(compositeNodeId);
+
+  /**
+   * Arrastrar y soltar ÚNICO del lienzo: gestos de puntero (ratón, lápiz y
+   * táctil) resueltos contra la geometría proyectada, con auto-desplazamiento
+   * del escenario y una sola confirmación del cambio.
+   */
+  const resolveDropKey = (clientY: number): string | null => {
+    const frame = iframeRef.current;
+    if (!frame) return null;
+    const frameTop = frame.getBoundingClientRect().top;
+    let candidate: string | null = null;
+    for (const section of editableRects) {
+      const top = frameTop + section.top * scaled;
+      const bottom = top + section.height * scaled;
+      if (clientY >= top && clientY <= bottom) return section.key;
+      if (clientY > bottom) candidate = section.key;
+    }
+    return candidate ?? editableRects[0]?.key ?? null;
+  };
+
+  const startSectionDrag = (event: React.PointerEvent<HTMLButtonElement>, key: string) => {
+    if (!compositeNodeId) return;
+    event.preventDefault();
+    const handle = event.currentTarget;
+    handle.setPointerCapture(event.pointerId);
+    setDragKey(key);
+    setDropKey(key);
+    const scrollport = iframeRef.current?.closest<HTMLElement>(
+      '[data-eb-canvas-scrollport="editor"]',
+    );
+
+    const onMove = (moveEvent: PointerEvent) => {
+      setDropKey(resolveDropKey(moveEvent.clientY));
+      if (!scrollport) return;
+      const rect = scrollport.getBoundingClientRect();
+      const edge = 56;
+      if (moveEvent.clientY < rect.top + edge) scrollport.scrollBy({ top: -18 });
+      else if (moveEvent.clientY > rect.bottom - edge) scrollport.scrollBy({ top: 18 });
+    };
+    const onUp = (upEvent: PointerEvent) => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onCancel);
+      const target = resolveDropKey(upEvent.clientY);
+      setDragKey(null);
+      setDropKey(null);
+      if (target && target !== key) onReorderSection(key, target);
+    };
+    const onCancel = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onCancel);
+      setDragKey(null);
+      setDropKey(null);
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onCancel);
+  };
+
   return (
     <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
       <div className="sticky left-0 z-20 flex max-w-full items-center gap-1 self-start rounded-md bg-foreground/90 p-1 text-background shadow-sm">
@@ -3762,13 +3831,13 @@ function CanvasViewport({
         >
           <span>{`${width} px · ${Math.round(scaled * 100)}%`}</span>
           {isFit ? <span>Ajustado</span> : null}
-        {hud && metrics ? (
-          <span data-eb-canvas-hud="">
-            innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
-            {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
-            {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
-          </span>
-        ) : null}
+          {hud && metrics ? (
+            <span data-eb-canvas-hud="">
+              innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+              {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+              {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+            </span>
+          ) : null}
         </div>
         <button
           type="button"
@@ -3801,10 +3870,19 @@ function CanvasViewport({
           +
         </button>
       </div>
+      {showEditingLayer && !preciseEditing ? (
+        <p
+          data-eb-canvas-precision-notice=""
+          className="max-w-full self-start rounded-md border border-border bg-background px-2.5 py-1.5 text-[11px] leading-snug text-muted-foreground"
+        >
+          La plantilla se ve muy reducida a este tamaño. Puedes acercar con “+”, reordenar desde el
+          panel Estructura, o continuar en una computadora para trabajar con más precisión.
+        </p>
+      ) : null}
       <div
         data-eb-canvas-frame=""
         className="relative shrink-0 overflow-visible rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-        style={{ width: Math.round(width * scaled), height: Math.round(documentHeight * scaled) }}
+        style={{ width: frameWidth, height: frameHeight }}
       >
         <iframe
           ref={iframeRef}
@@ -3817,41 +3895,57 @@ function CanvasViewport({
           style={{
             width,
             height: documentHeight,
-             transform: `scale(${scaled})`,
-             transformOrigin: "top left",
+            transform: `scale(${scaled})`,
+            transformOrigin: "top left",
           }}
         />
         {mount ? createPortal(children, mount) : null}
-        {compositeNodeId ? (
-          <div className="pointer-events-none absolute inset-0 z-50" aria-label="Controles de secciones">
-            {sectionRects
-              .filter((section) => reorderableSectionKeys.includes(section.key))
-              .map((section) => (
-                <button
-                  key={section.key}
-                  type="button"
-                  draggable
-                  data-eb-external-section-handle={section.key}
-                  aria-label={`Mover o editar sección ${section.key}`}
-                  title="Arrastra para reordenar; pulsa para editar"
-                  onClick={() => onSelectSection(compositeNodeId, section.key)}
-                  onDragStart={(event) => {
-                    draggedSectionRef.current = section.key;
-                    event.dataTransfer.setData("text/plain", section.key);
-                  }}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    const active = draggedSectionRef.current;
-                    if (active && active !== section.key) onReorderSection(active, section.key);
-                    draggedSectionRef.current = null;
-                  }}
-                  className="pointer-events-auto absolute right-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
-                  style={{ top: section.top * scaled + 10 }}
-                >
-                  <GripVertical className="size-4" aria-hidden />
-                </button>
-              ))}
+        {showEditingLayer ? (
+          <div
+            data-eb-canvas-edit-layer=""
+            className="pointer-events-none absolute inset-0 z-50"
+            aria-label="Controles de secciones"
+          >
+            {editableRects.map((section) => {
+              const top = section.top * scaled;
+              const height = Math.max(24, section.height * scaled);
+              const selected = selectedSectionKey === section.key;
+              const isDropTarget = dragKey !== null && dropKey === section.key;
+              return (
+                <div key={section.key} className="absolute inset-x-0" style={{ top, height }}>
+                  <div
+                    aria-hidden
+                    className={`pointer-events-none absolute inset-0 rounded-md transition-colors ${
+                      isDropTarget
+                        ? "bg-primary/10 outline outline-2 outline-primary"
+                        : selected
+                          ? "outline outline-2 outline-primary"
+                          : "outline outline-1 outline-border/60"
+                    }`}
+                  />
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute left-2 top-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
+                  >
+                    {sectionLabels[section.key] ?? section.key}
+                  </span>
+                  <button
+                    type="button"
+                    data-eb-external-section-handle={section.key}
+                    aria-label={`Mover o editar ${sectionLabels[section.key] ?? section.key}`}
+                    title="Arrastra para reordenar; pulsa para editar"
+                    style={{ touchAction: "none" }}
+                    onPointerDown={(event) => startSectionDrag(event, section.key)}
+                    onClick={() =>
+                      compositeNodeId && onSelectSection(compositeNodeId, section.key)
+                    }
+                    className="pointer-events-auto absolute right-2 top-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
+                  >
+                    <GripVertical className="size-4" aria-hidden />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         ) : null}
       </div>
