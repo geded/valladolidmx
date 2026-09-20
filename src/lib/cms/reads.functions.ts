@@ -276,6 +276,7 @@ export const listProductsCms = createServerFn({ method: "POST" })
  */
 export type MediaUsageFilter = "all" | "cover" | "gallery" | "logo" | "other";
 export type MediaScopeFilter = "all" | "mine";
+export type MediaStateFilter = "all" | "draft" | "in_review" | "published";
 
 const MEDIA_COVER_CONTEXTS = ["cover", "cover_mobile", "hero", "business_cover_preview"];
 const MEDIA_GALLERY_CONTEXTS = ["gallery"];
@@ -289,7 +290,9 @@ const MEDIA_KNOWN_CONTEXTS = [
 interface ListMediaInput extends ListInput {
   scope?: MediaScopeFilter;
   usage?: MediaUsageFilter;
+  state?: MediaStateFilter;
 }
+
 
 export const listMediaCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -303,6 +306,12 @@ export const listMediaCms = createServerFn({ method: "POST" })
     ).includes(data?.usage as never)
       ? (data!.usage as MediaUsageFilter)
       : "all";
+    const state: MediaStateFilter = (["draft", "in_review", "published"] as const).includes(
+      data?.state as never,
+    )
+      ? (data!.state as MediaStateFilter)
+      : "all";
+
 
     let businessIds: string[] = [];
     let productIds: string[] = [];
@@ -356,6 +365,10 @@ export const listMediaCms = createServerFn({ method: "POST" })
             : MEDIA_LOGO_CONTEXTS;
       q = q.in("usage_context", list);
     }
+
+    if (state !== "all") q = q.eq("status", state);
+
+
 
     const { data: rows, count, error } = await q;
     if (error) throw error;

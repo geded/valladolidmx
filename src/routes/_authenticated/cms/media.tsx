@@ -3,7 +3,11 @@ import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
 import { listMediaCms } from "@/lib/cms/reads.functions";
+import { transitionMediaStatus } from "@/lib/cms/media-review.functions";
+
 import { suggestMediaAlt, suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
 import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
 import { Button } from "@/components/ui/button";
@@ -39,7 +43,74 @@ export const Route = createFileRoute("/_authenticated/cms/media")({
   component: MediaPage,
 });
 
+function ReviewActions({ row }: { row: Row }) {
+  const fn = useServerFn(transitionMediaStatus);
+  const queryClient = useQueryClient();
+  const { roles } = useAuth();
+  const isAdmin = roles.includes("admin") || roles.includes("super_admin");
+  const [busy, setBusy] = useState(false);
+
+  const run = async (to: "in_review" | "published" | "draft", okMessage: string) => {
+    try {
+      setBusy(true);
+      await fn({ data: { mediaId: row.id, to } });
+      await queryClient.invalidateQueries({ queryKey: ["cms", "media"] });
+      toast.success(okMessage);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo actualizar la imagen");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const status = row.status ?? "draft";
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {status === "draft" && (
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={busy}
+          onClick={() => void run("in_review", "Imagen enviada a aprobación.")}
+        >
+          Enviar a aprobación
+        </Button>
+      )}
+      {status === "in_review" && isAdmin && (
+        <>
+          <Button
+            size="sm"
+            disabled={busy}
+            onClick={() => void run("published", "Imagen aprobada y publicada.")}
+          >
+            Aprobar y publicar
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={() => void run("draft", "Se solicitaron cambios al editor.")}
+          >
+            Pedir cambios
+          </Button>
+        </>
+      )}
+      {status === "in_review" && !isAdmin && (
+        <span className="text-xs text-muted-foreground">Esperando aprobación</span>
+      )}
+      {status === "approved" && isAdmin && (
+        <Button size="sm" disabled={busy} onClick={() => void run("published", "Imagen publicada.")}>
+          Publicar
+        </Button>
+      )}
+      {status === "published" && <span className="text-xs text-muted-foreground">Aprobada</span>}
+    </div>
+  );
+}
+
 function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: boolean }) {
+
   const fn = useServerFn(suggestMediaAlt);
   const [loading, setLoading] = useState(false);
   return (
@@ -242,6 +313,13 @@ const SCOPE_OPTIONS = [
   { value: "mine", label: "Mis imágenes" },
 ] as const;
 
+const STATE_OPTIONS = [
+  { value: "all", label: "Todos los estados" },
+  { value: "draft", label: "Borradores" },
+  { value: "in_review", label: "Pendientes de aprobación" },
+  { value: "published", label: "Publicadas" },
+] as const;
+
 const USAGE_OPTIONS = [
   { value: "all", label: "Todos los usos" },
   { value: "cover", label: "Portadas" },
@@ -251,7 +329,9 @@ const USAGE_OPTIONS = [
 ] as const;
 
 type ScopeValue = (typeof SCOPE_OPTIONS)[number]["value"];
+type StateValue = (typeof STATE_OPTIONS)[number]["value"];
 type UsageValue = (typeof USAGE_OPTIONS)[number]["value"];
+
 
 const USAGE_LABELS: Record<string, string> = {
   cover: "Portada",
@@ -298,16 +378,17 @@ function FilterChips<T extends string>({
 function MediaPage() {
   const [scope, setScope] = useState<ScopeValue>("all");
   const [usage, setUsage] = useState<UsageValue>("all");
+  const [state, setState] = useState<StateValue>("all");
 
   return (
     <CmsEntityPage<Row>
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-      description="Filtra por quién subió la imagen y para qué se usa. Las versiones ligeras se generan solas."
+      description="Filtra por quién subió la imagen, su estado de aprobación y para qué se usa."
       rowKey={(r) => r.id}
       emptyMessage="Sin imágenes con estos filtros."
-      extraParams={{ scope, usage }}
+      extraParams={{ scope, usage, state }}
       headerActions={
         <div className="flex flex-wrap items-center gap-2">
           <FilterChips
@@ -317,11 +398,18 @@ function MediaPage() {
             onChange={setScope}
           />
           <FilterChips
+            label="Estado de aprobación"
+            options={STATE_OPTIONS}
+            value={state}
+            onChange={setState}
+          />
+          <FilterChips
             label="Uso de la imagen"
             options={USAGE_OPTIONS}
             value={usage}
             onChange={setUsage}
           />
+
           <AiConceptBatchUpload />
           <BatchToolbar />
         </div>
@@ -393,6 +481,11 @@ function MediaPage() {
         },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
+          key: "review",
+          header: "Aprobación",
+          render: (r) => <ReviewActions row={r} />,
+        },
+        {
           key: "actions",
           header: "IA",
           render: (r) => (
@@ -403,6 +496,7 @@ function MediaPage() {
           ),
         },
       ]}
+
     />
   );
 }

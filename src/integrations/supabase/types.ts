@@ -8281,6 +8281,68 @@ export type Database = {
         Args: { _business_id: string; _notes?: string }
         Returns: string
       }
+      cms_media_transition: {
+        Args: {
+          _media_id: string
+          _notes?: string
+          _to: Database["public"]["Enums"]["content_status"]
+        }
+        Returns: {
+          alt_text: string | null
+          alt_text_ai: string | null
+          alt_text_locale: string
+          alt_text_source: Database["public"]["Enums"]["media_text_source"]
+          caption: string | null
+          created_at: string
+          created_by: string | null
+          credit: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
+          description: string | null
+          duration_seconds: number | null
+          entity_id: string | null
+          entity_kind: string | null
+          height: number | null
+          id: string
+          intelligence: Json
+          is_demo_seed: boolean
+          kind: Database["public"]["Enums"]["media_kind"]
+          metadata: Json
+          mime_type: string | null
+          original_bucket: string | null
+          original_bytes: number | null
+          original_checksum: string | null
+          original_height: number | null
+          original_immutable: boolean
+          original_mime: string | null
+          original_path: string | null
+          original_width: number | null
+          pipeline_engine: string | null
+          pipeline_last_error: string | null
+          pipeline_processed_at: string | null
+          pipeline_status: string
+          review_state: Database["public"]["Enums"]["media_review_state"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number | null
+          status: Database["public"]["Enums"]["content_status"]
+          storage_bucket: string
+          storage_path: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          usage_context: string | null
+          width: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "media_assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       commerce_booking_start: {
         Args: {
           _departure_id: string
