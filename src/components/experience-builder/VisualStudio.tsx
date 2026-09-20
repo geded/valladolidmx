@@ -4001,6 +4001,47 @@ function CanvasViewport({
 
 /* --------------------------------------------------------------------- */
 
+/**
+ * G9 · Contenido vivo del lienzo (comportamiento tipo Wix).
+ *
+ * Antes el contenido se envolvía con `pointer-events-none`, lo que congelaba
+ * los carruseles horizontales de la plantilla (destinos, experiencias,
+ * hoteles, eventos) y hacía que el lienzo pareciera una imagen fija.
+ * Ahora el contenido conserva sus gestos reales y sólo se neutraliza la
+ * navegación/envío en fase de captura, de modo que el clic siga seleccionando
+ * la sección para editarla en vez de salir de la página.
+ */
+function CanvasLiveContent({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      data-eb-canvas-live-content=""
+      className={`select-none ${className ?? ""}`}
+      onClickCapture={(event) => {
+        const target = event.target as HTMLElement | null;
+        if (
+          target?.closest("a,button,input,select,textarea,label,summary,[role='button'],[role='link']")
+        ) {
+          event.preventDefault();
+        }
+      }}
+      onAuxClickCapture={(event) => event.preventDefault()}
+      onSubmitCapture={(event) => event.preventDefault()}
+      onDragStartCapture={(event) => event.preventDefault()}
+      onKeyDownCapture={(event) => {
+        if (event.key === "Enter" || event.key === " ") event.preventDefault();
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function InertChrome({
   label,
   selected,
