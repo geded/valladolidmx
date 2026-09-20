@@ -93,11 +93,13 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
     // El iframe conserva el viewport lógico Premium (ancho del preset) y adopta
-    // la altura real del documento; el ajuste conserva un mínimo legible y el
-    // escenario desplaza el resto. Los controles viven fuera de la plantilla.
+    // la altura real del documento; "Ajustar" muestra el ancho completo aun
+    // cuando el editor corre en tablet. Los controles viven fuera de la plantilla.
     expect(studio).toContain('data-eb-canvas-scrollport="editor"');
     expect(studio).toContain("usableWidth / preset.width");
     expect(studio).toContain("minimumReadableScale");
+    expect(studio).toContain("preset.width <= 430 ? 1 : 0.25");
+    expect(studio).toContain('scrollport.scrollTo({ left: 0, top: 0 })');
     expect(studio).toContain("scaled <= minimumScale");
     expect(studio).toContain("Ajustar al espacio de trabajo");
     expect(studio).toContain("new ResizeObserver(read)");
