@@ -3338,9 +3338,9 @@ function HomeCanvas({
   };
 
   // El documento interno SIEMPRE se renderiza al ancho lógico del preset.
-  // "Ajustar" reduce sólo su envolvente, pero nunca por debajo de un nivel
-  // legible: cuando hace falta más espacio, el escenario desplaza el lienzo
-  // horizontalmente en lugar de comprimirlo hasta volverlo inutilizable.
+  // "Ajustar" reduce sólo su envolvente hasta el ancho real disponible. El
+  // documento conserva el ancho lógico del preset, pero el ajuste nunca debe
+  // arrancar mostrando sólo una fracción de la plantilla en tablet/móvil.
   const scrollportRef = useRef<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
   useEffect(() => {
@@ -3353,13 +3353,21 @@ function HomeCanvas({
     return () => ro.disconnect();
   }, []);
   const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
-  const minimumReadableScale = preset.width <= 430 ? 1 : preset.width <= 768 ? 0.85 : 0.7;
+  const minimumReadableScale = preset.width <= 430 ? 1 : 0.25;
   const fitScale =
     usableWidth == null || usableWidth <= 0 || usableWidth >= preset.width
       ? 1
-      : Math.max(minimumReadableScale, usableWidth / preset.width);
+      : Math.max(minimumReadableScale, Math.min(1, usableWidth / preset.width));
   const scale = zoomOverride ?? fitScale;
   useEffect(() => setZoomOverride(null), [deviceViewport]);
+  useEffect(() => {
+    const scrollport = scrollportRef.current;
+    if (!scrollport) return;
+    // Cada preset abre desde su borde inicial. Conservar el desplazamiento de
+    // una vista más ancha hacía que Safari mostrara el centro recortado aunque
+    // el nuevo lienzo ya estuviera correctamente ajustado.
+    scrollport.scrollTo({ left: 0, top: 0 });
+  }, [deviceViewport]);
   const changeZoom = (delta: number) => {
     setZoomOverride((current) => {
       const base = current ?? fitScale;
