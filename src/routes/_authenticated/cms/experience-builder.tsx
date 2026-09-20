@@ -13,6 +13,7 @@
  *  - CMS First, BEA, Customer Case File, Alux read-only.
  */
 
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/_authenticated/cms/experience-builder")({
 type StudioMode = "visual" | "professional";
 
 function ExperienceBuilderShell() {
+  const shellRef = useRef<HTMLDivElement | null>(null);
   const { roles } = useAuth();
   const canAdvanced = roles.includes("admin") || roles.includes("super_admin");
   const search = useSearch({ strict: false }) as {
@@ -77,8 +79,21 @@ function ExperienceBuilderShell() {
       replace: true,
     });
 
+  useEffect(() => {
+    const workspaceMain = shellRef.current?.closest<HTMLElement>("main#main");
+    if (!workspaceMain) return;
+    const previousOverflow = workspaceMain.style.overflow;
+    const previousOverscroll = workspaceMain.style.overscrollBehavior;
+    workspaceMain.style.overflow = "hidden";
+    workspaceMain.style.overscrollBehavior = "none";
+    return () => {
+      workspaceMain.style.overflow = previousOverflow;
+      workspaceMain.style.overscrollBehavior = previousOverscroll;
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col">
+    <div ref={shellRef} className="flex min-h-0 flex-col overflow-hidden">
       <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <Link
           to="/cms"

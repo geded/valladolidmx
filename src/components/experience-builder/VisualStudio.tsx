@@ -3421,6 +3421,7 @@ function HomeCanvas({
       className="flex min-h-0 min-w-0 flex-1 touch-pan-x touch-pan-y items-start justify-start overflow-auto overscroll-contain bg-muted/20 p-3 [-webkit-overflow-scrolling:touch]"
     >
       <CanvasViewport
+        key={deviceViewport}
         device={deviceViewport}
         width={preset.width}
         minimumHeight={preset.height}
@@ -3584,7 +3585,16 @@ function CanvasViewport({
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
-      html, body { min-height: 100%; height: auto; overflow: visible; }
+      html, body {
+        width: ${width}px;
+        min-width: ${width}px;
+        max-width: ${width}px;
+        min-height: 100%;
+        height: auto;
+        overflow: visible;
+        touch-action: pan-x pan-y;
+      }
+      [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
     doc.head.appendChild(viewportStyle);
 
@@ -3640,27 +3650,45 @@ function CanvasViewport({
       event.preventDefault();
       scrollport.scrollBy({ left: event.deltaX, top: event.deltaY });
     };
-    let lastTouch: { x: number; y: number } | null = null;
+    let lastTouch: { x: number; y: number; left: number; top: number } | null = null;
+    let touchFrame = 0;
+    let pendingTouch: { x: number; y: number } | null = null;
     const onTouchStart = (event: TouchEvent) => {
       if (event.touches.length !== 1) {
         lastTouch = null;
         return;
       }
       const touch = event.touches[0];
-      lastTouch = touch ? { x: touch.clientX, y: touch.clientY } : null;
+      lastTouch =
+        touch && scrollport
+          ? {
+              x: touch.clientX,
+              y: touch.clientY,
+              left: scrollport.scrollLeft,
+              top: scrollport.scrollTop,
+            }
+          : null;
     };
     const onTouchMove = (event: TouchEvent) => {
       if (!scrollport || !lastTouch || event.touches.length !== 1) return;
       const touch = event.touches[0];
       if (!touch) return;
-      const deltaX = lastTouch.x - touch.clientX;
-      const deltaY = lastTouch.y - touch.clientY;
-      if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+      pendingTouch = { x: touch.clientX, y: touch.clientY };
       event.preventDefault();
-      scrollport.scrollBy({ left: deltaX, top: deltaY });
-      lastTouch = { x: touch.clientX, y: touch.clientY };
+      if (touchFrame) return;
+      touchFrame = requestAnimationFrame(() => {
+        touchFrame = 0;
+        if (!pendingTouch || !lastTouch) return;
+        scrollport.scrollTo({
+          left: lastTouch.left + lastTouch.x - pendingTouch.x,
+          top: lastTouch.top + lastTouch.y - pendingTouch.y,
+        });
+      });
     };
     const clearTouch = () => {
+      cancelAnimationFrame(touchFrame);
+      touchFrame = 0;
+      pendingTouch = null;
       lastTouch = null;
     };
     doc.addEventListener("wheel", onWheel, { passive: false });
@@ -3677,6 +3705,7 @@ function CanvasViewport({
       setMount(null);
       cancelAnimationFrame(frame);
       observer.disconnect();
+      cancelAnimationFrame(touchFrame);
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
       doc.removeEventListener("wheel", onWheel);
@@ -3988,27 +4017,16 @@ function CanvasViewport({
         className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{ width: frameWidth, height: frameHeight }}
       >
-        <div
-          data-eb-canvas-scaled-stage=""
-          className="absolute left-0 top-0"
-          style={{
-            width,
-            height: documentHeight,
-            transform: `scale(${scaled})`,
-            transformOrigin: "top left",
-          }}
-        >
-          <iframe
-            ref={iframeRef}
-            title="Vista previa del canvas"
-            data-eb-canvas-device={device}
-            data-eb-canvas-width={width}
-            data-eb-canvas-height={documentHeight}
-            data-eb-canvas-scale={scaled}
-            className={`block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
-            style={{ width, height: documentHeight }}
-          />
-        </div>
+        <iframe
+          ref={iframeRef}
+          title="Vista previa del canvas"
+          data-eb-canvas-device={device}
+          data-eb-canvas-width={width}
+          data-eb-canvas-height={documentHeight}
+          data-eb-canvas-scale={scaled}
+          className={`absolute left-0 top-0 block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
+          style={{ width, height: documentHeight, zoom: scaled }}
+        />
         {mount ? createPortal(children, mount) : null}
         {!geometryIsCurrent ? (
           <div

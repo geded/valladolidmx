@@ -2,6 +2,8 @@
 
 ## En curso
 
+- [ ] Experience Builder · Evidencia Safari 20-sep (IMG_0865–0871): la Home pública y el lienzo no conservan la misma distribución tipográfica; Destinos, Categorías, Eventos y Experiencias aparecen partidos o superpuestos, quedan columnas blancas y el desplazamiento se bloquea. Corrección limitada al marco editorial: recreación por preset, zoom sin `transform` sobre el iframe y una sola autoridad de desplazamiento. Pendiente validación humana 1024/1280/1440 y regresión 834/430/390.
+
 - [ ] Experience Builder · Corregir la arquitectura del contenedor editorial: la plantilla sí comparte renderer con la web, pero su envolvente actual puede activar controles públicos, resincronizar estilos y proyectar medidas antiguas. Sustituir esos comportamientos antes de modificar otra sección o extender a más plantillas.
 
 - [ ] Experience Builder · Aclarar y corregir la deuda del objetivo tipo Wix: la implementación anterior sólo ajustó escala/iframe sobre el shell existente; no unificó desplazamiento, medición, selección ni arrastre. La reconstrucción debe sustituir esos mecanismos del shell sin tocar plantillas públicas, y no puede declararse terminada sin aceptación visual humana.
