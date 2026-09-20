@@ -3357,10 +3357,14 @@ function HomeCanvas({
   // la plantilla. "Ajustar" reduce sólo el tamaño de presentación del conjunto.
   const scrollportRef = useRef<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
+  const [availableHeight, setAvailableHeight] = useState<number | null>(null);
   useEffect(() => {
     const el = scrollportRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
-    const read = () => setAvailableWidth(el.clientWidth);
+    const read = () => {
+      setAvailableWidth(el.clientWidth);
+      setAvailableHeight(el.clientHeight);
+    };
     read();
     const ro = new ResizeObserver(read);
     ro.observe(el);
@@ -3372,6 +3376,10 @@ function HomeCanvas({
       ? 1
       : roundScale(usableWidth / preset.width);
   const scale = roundScale(zoomOverride ?? fitScale);
+  const viewportHeight = Math.min(
+    preset.height,
+    Math.max(360, Math.floor(((availableHeight ?? preset.height) - 52) / scale)),
+  );
   useEffect(() => setZoomOverride(null), [deviceViewport]);
   useEffect(() => {
     const scrollport = scrollportRef.current;
@@ -3425,6 +3433,7 @@ function HomeCanvas({
         device={deviceViewport}
         width={preset.width}
         minimumHeight={preset.height}
+        viewportHeight={viewportHeight}
         scale={scale}
         fitScale={fitScale}
         minimumScale={CANVAS_MIN_SCALE}
@@ -3523,6 +3532,7 @@ function CanvasViewport({
   device,
   width,
   minimumHeight,
+  viewportHeight,
   scale,
   fitScale,
   minimumScale,
@@ -3543,6 +3553,7 @@ function CanvasViewport({
   device: DeviceViewport;
   width: number;
   minimumHeight: number;
+  viewportHeight: number;
   scale: number;
   fitScale: number;
   minimumScale: number;
@@ -3569,6 +3580,7 @@ function CanvasViewport({
   const [geometryWidth, setGeometryWidth] = useState<number | null>(null);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
+  const [canvasScrollTop, setCanvasScrollTop] = useState(0);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3589,9 +3601,12 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
+        height: 100%;
         min-height: 100%;
-        height: auto;
-        overflow: visible;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
         touch-action: pan-x pan-y;
       }
       [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
@@ -3640,63 +3655,6 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    // Safari no encadena de forma fiable el gesto desde un iframe sin scroll
-    // hacia su contenedor. El escenario exterior sigue siendo la única
-    // autoridad de desplazamiento: reenviamos rueda y arrastre táctil desde el
-    // documento real sin alterar su ancho lógico, escala ni composición.
-    const scrollport = iframe.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
-    const onWheel = (event: WheelEvent) => {
-      if (!scrollport) return;
-      event.preventDefault();
-      scrollport.scrollBy({ left: event.deltaX, top: event.deltaY });
-    };
-    let lastTouch: { x: number; y: number; left: number; top: number } | null = null;
-    let touchFrame = 0;
-    let pendingTouch: { x: number; y: number } | null = null;
-    const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1) {
-        lastTouch = null;
-        return;
-      }
-      const touch = event.touches[0];
-      lastTouch =
-        touch && scrollport
-          ? {
-              x: touch.clientX,
-              y: touch.clientY,
-              left: scrollport.scrollLeft,
-              top: scrollport.scrollTop,
-            }
-          : null;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      if (!scrollport || !lastTouch || event.touches.length !== 1) return;
-      const touch = event.touches[0];
-      if (!touch) return;
-      pendingTouch = { x: touch.clientX, y: touch.clientY };
-      event.preventDefault();
-      if (touchFrame) return;
-      touchFrame = requestAnimationFrame(() => {
-        touchFrame = 0;
-        if (!pendingTouch || !lastTouch) return;
-        scrollport.scrollTo({
-          left: lastTouch.left + lastTouch.x - pendingTouch.x,
-          top: lastTouch.top + lastTouch.y - pendingTouch.y,
-        });
-      });
-    };
-    const clearTouch = () => {
-      cancelAnimationFrame(touchFrame);
-      touchFrame = 0;
-      pendingTouch = null;
-      lastTouch = null;
-    };
-    doc.addEventListener("wheel", onWheel, { passive: false });
-    doc.addEventListener("touchstart", onTouchStart, { passive: true });
-    doc.addEventListener("touchmove", onTouchMove, { passive: false });
-    doc.addEventListener("touchend", clearTouch, { passive: true });
-    doc.addEventListener("touchcancel", clearTouch, { passive: true });
-
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
     doc.body.appendChild(canvasRoot);
@@ -3705,18 +3663,12 @@ function CanvasViewport({
       setMount(null);
       cancelAnimationFrame(frame);
       observer.disconnect();
-      cancelAnimationFrame(touchFrame);
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
-      doc.removeEventListener("wheel", onWheel);
-      doc.removeEventListener("touchstart", onTouchStart);
-      doc.removeEventListener("touchmove", onTouchMove);
-      doc.removeEventListener("touchend", clearTouch);
-      doc.removeEventListener("touchcancel", clearTouch);
       viewportStyle.remove();
       canvasRoot.remove();
     };
-  }, []);
+  }, [width]);
 
   useEffect(() => {
     setDocumentHeight(minimumHeight);
