@@ -457,8 +457,8 @@ export const getBusinessPublishChecklist = createServerFn({ method: "GET" })
       business_id: b.id,
       display_name: b.display_name,
       status: b.status,
-      review_notes: b.review_notes,
-      submitted_for_review_at: b.submitted_for_review_at,
+      review_notes: reviewState?.review_notes ?? null,
+      submitted_for_review_at: reviewState?.submitted_for_review_at ?? null,
       checks,
       ready,
     };
