@@ -3591,9 +3591,8 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // Única normalización del escenario: el documento no tiene scroll propio
-    // porque el escenario exterior es el único scrollport. No se altera
-    // ninguna medida, tipografía ni distribución de la plantilla.
+    // El documento conserva el ancho lógico exacto y desplaza su propio
+    // contenido. El marco exterior sólo presenta el zoom del viewport entero.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
@@ -3671,6 +3670,16 @@ function CanvasViewport({
   }, [width]);
 
   useEffect(() => {
+    const doc = mount?.ownerDocument;
+    const win = doc?.defaultView;
+    if (!doc || !win) return;
+    const read = () => setCanvasScrollTop(doc.scrollingElement?.scrollTop ?? win.scrollY);
+    read();
+    doc.addEventListener("scroll", read, true);
+    return () => doc.removeEventListener("scroll", read, true);
+  }, [mount]);
+
+  useEffect(() => {
     setDocumentHeight(minimumHeight);
     setSectionRects([]);
     setGeometryWidth(null);
@@ -3709,13 +3718,14 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
+        const scrollTop = doc.scrollingElement?.scrollTop ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
             const rect = section.getBoundingClientRect();
             return {
               key: section.dataset.ebSection ?? "",
-              top: Math.max(0, Math.round(rect.top - base)),
+              top: Math.max(0, Math.round(rect.top - base + scrollTop)),
               height: Math.round(rect.height),
             };
           })
@@ -3776,21 +3786,16 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Revelar la sección activa moviendo el escenario exterior (único scrollport).
+  // Revelar la sección activa dentro del viewport lógico de la plantilla.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
-    const frame = iframeRef.current;
-    const scrollport = frame?.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
-    if (!frame || !scrollport) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const scrollportRect = scrollport.getBoundingClientRect();
-    const frameRect = frame.getBoundingClientRect();
-    const top = Math.max(
-      0,
-      scrollport.scrollTop + frameRect.top - scrollportRect.top + target.top * scale - 16,
-    );
-    if (Math.abs(scrollport.scrollTop - top) > 8) scrollport.scrollTo({ top, behavior: "smooth" });
+    const doc = mount.ownerDocument;
+    const top = Math.max(0, target.top - 16);
+    if (Math.abs((doc.scrollingElement?.scrollTop ?? 0) - top) > 8) {
+      doc.defaultView?.scrollTo({ top, behavior: "smooth" });
+    }
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, selectedSectionKey]);
@@ -3840,7 +3845,7 @@ function CanvasViewport({
   // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
   const scaled = scale;
   const frameWidth = Math.round(width * scaled);
-  const frameHeight = Math.round(documentHeight * scaled);
+  const frameHeight = Math.round(viewportHeight * scaled);
   const editableRects = sectionRects.filter((section) =>
     reorderableSectionKeys.includes(section.key),
   );
@@ -3859,7 +3864,7 @@ function CanvasViewport({
     const frameTop = frame.getBoundingClientRect().top;
     let candidate: string | null = null;
     for (const section of editableRects) {
-      const top = frameTop + section.top * scaled;
+      const top = frameTop + (section.top - canvasScrollTop) * scaled;
       const bottom = top + section.height * scaled;
       if (clientY >= top && clientY <= bottom) return section.key;
       if (clientY > bottom) candidate = section.key;
@@ -3874,17 +3879,16 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const scrollport = iframeRef.current?.closest<HTMLElement>(
-      '[data-eb-canvas-scrollport="editor"]',
-    );
+    const canvasWindow = iframeRef.current?.contentWindow;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
-      if (!scrollport) return;
-      const rect = scrollport.getBoundingClientRect();
+      const frame = iframeRef.current;
+      if (!frame || !canvasWindow) return;
+      const rect = frame.getBoundingClientRect();
       const edge = 56;
-      if (moveEvent.clientY < rect.top + edge) scrollport.scrollBy({ top: -18 });
-      else if (moveEvent.clientY > rect.bottom - edge) scrollport.scrollBy({ top: 18 });
+      if (moveEvent.clientY < rect.top + edge) canvasWindow.scrollBy({ top: -18 / scaled });
+      else if (moveEvent.clientY > rect.bottom - edge) canvasWindow.scrollBy({ top: 18 / scaled });
     };
     const onUp = (upEvent: PointerEvent) => {
       handle.removeEventListener("pointermove", onMove);
@@ -3977,7 +3981,12 @@ function CanvasViewport({
           data-eb-canvas-height={documentHeight}
           data-eb-canvas-scale={scaled}
           className={`absolute left-0 top-0 block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
-          style={{ width, height: documentHeight, zoom: scaled }}
+          style={{
+            width,
+            height: viewportHeight,
+            transform: `scale(${scaled})`,
+            transformOrigin: "top left",
+          }}
         />
         {mount ? createPortal(children, mount) : null}
         {!geometryIsCurrent ? (
@@ -3995,7 +4004,7 @@ function CanvasViewport({
             aria-label="Controles de secciones"
           >
             {editableRects.map((section) => {
-              const top = section.top * scaled;
+              const top = (section.top - canvasScrollTop) * scaled;
               const height = Math.max(24, section.height * scaled);
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
