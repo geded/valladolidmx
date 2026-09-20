@@ -274,12 +274,23 @@ function UsersTable({
     retry: false,
   });
   const customRoles = (customRolesQuery.data ?? []).filter((r) => !r.is_system);
+  // Roles sugeridos al invitar: dependen de la pestaña.
   const assignableForTab: AppRole[] =
     variant === "travelers"
       ? ["traveler"]
       : variant === "staff"
         ? ["admin", "editor", "concierge", "concierge_lead"]
         : ["business_owner"];
+  // Roles asignables a un usuario existente: cualquiera del sistema (super_admin protegido),
+  // para poder agregar un rol adicional sin importar en qué pestaña aparezca el usuario.
+  const assignableForRows: AppRole[] = [
+    "traveler",
+    "business_owner",
+    "concierge",
+    "concierge_lead",
+    "editor",
+    "admin",
+  ];
 
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
@@ -316,13 +327,13 @@ function UsersTable({
           onClose={() => setInviteOpen(false)}
         />
       ) : null}
-      <div className="overflow-hidden rounded-2xl border border-border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-border">
+        <table className="w-full min-w-[720px] text-sm">
           <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-2">Usuario</th>
               <th className="px-4 py-2">Roles actuales</th>
-              <th className="px-4 py-2">Asignar</th>
+              <th className="px-4 py-2">Agregar rol</th>
             </tr>
           </thead>
           <tbody>
@@ -330,7 +341,7 @@ function UsersTable({
               <UserRow
                 key={row.user_id}
                 row={row}
-                assignable={assignableForTab}
+                assignable={assignableForRows}
                 customRoles={customRoles}
               />
             ))}
