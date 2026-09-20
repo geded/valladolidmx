@@ -276,6 +276,7 @@ export const listProductsCms = createServerFn({ method: "POST" })
  */
 export type MediaUsageFilter = "all" | "cover" | "gallery" | "logo" | "other";
 export type MediaScopeFilter = "all" | "mine";
+export type MediaStateFilter = "all" | "draft" | "in_review" | "published";
 
 const MEDIA_COVER_CONTEXTS = ["cover", "cover_mobile", "hero", "business_cover_preview"];
 const MEDIA_GALLERY_CONTEXTS = ["gallery"];
@@ -289,7 +290,9 @@ const MEDIA_KNOWN_CONTEXTS = [
 interface ListMediaInput extends ListInput {
   scope?: MediaScopeFilter;
   usage?: MediaUsageFilter;
+  state?: MediaStateFilter;
 }
+
 
 export const listMediaCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
