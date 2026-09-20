@@ -3561,6 +3561,7 @@ function CanvasViewport({
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [iframeLoadVersion, setIframeLoadVersion] = useState(0);
   const [mount, setMount] = useState<HTMLElement | null>(null);
   const [documentHeight, setDocumentHeight] = useState(minimumHeight);
   const [sectionRects, setSectionRects] = useState<CanvasSectionRect[]>([]);
@@ -3678,7 +3679,7 @@ function CanvasViewport({
       viewportStyle.remove();
       canvasRoot.remove();
     };
-  }, [width]);
+  }, [iframeLoadVersion, width]);
 
   useEffect(() => {
     setDocumentHeight(minimumHeight);
@@ -4004,6 +4005,7 @@ function CanvasViewport({
           ref={iframeRef}
           title="Vista previa del canvas"
           srcDoc="<!doctype html><html><head></head><body></body></html>"
+          onLoad={() => setIframeLoadVersion((version) => version + 1)}
           data-eb-canvas-device={device}
           data-eb-canvas-width={width}
           data-eb-canvas-height={documentHeight}
