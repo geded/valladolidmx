@@ -3567,6 +3567,7 @@ function CanvasViewport({
   const [stylesReady, setStylesReady] = useState(false);
   const [canvasReady, setCanvasReady] = useState(false);
   const [geometryWidth, setGeometryWidth] = useState<number | null>(null);
+  const [canvasScrollTop, setCanvasScrollTop] = useState(0);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
 
@@ -3579,8 +3580,10 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // El documento conserva el ancho lógico exacto y desplaza su propio
-    // contenido. El marco exterior sólo presenta el zoom del viewport entero.
+    // El documento conserva el ancho lógico exacto. El iframe representa un
+    // viewport real de dispositivo y es su única autoridad de desplazamiento.
+    // Esto evita que WebKit tenga que rasterizar un iframe de página completa
+    // (decenas de miles de píxeles), causa de mosaicos blancos y pintura vieja.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
@@ -3588,9 +3591,12 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
-        height: auto;
-        min-height: 0;
-        overflow: visible;
+        height: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
       }
       [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
@@ -3658,6 +3664,7 @@ function CanvasViewport({
     setSectionRects([]);
     setGeometryWidth(null);
     setCanvasReady(false);
+    setCanvasScrollTop(0);
   }, [device, minimumHeight, width]);
 
   // Fuente ÚNICA de altura y de geometría de secciones. Una sola lectura por
@@ -3692,7 +3699,7 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-        const scrollTop = doc.scrollingElement?.scrollTop ?? 0;
+         const scrollTop = doc.scrollingElement?.scrollTop ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
@@ -3746,6 +3753,28 @@ function CanvasViewport({
     };
   }, [device, minimumHeight, mount, stylesReady, width]);
 
+  // El scroll pertenece al viewport lógico del iframe. Sólo reflejamos su
+  // posición para proyectar los controles externos; no vuelve a medir layout.
+  useEffect(() => {
+    if (!mount) return;
+    const doc = mount.ownerDocument;
+    const win = doc.defaultView;
+    if (!win) return;
+    let frame = 0;
+    const read = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        setCanvasScrollTop(doc.scrollingElement?.scrollTop ?? 0);
+      });
+    };
+    read();
+    win.addEventListener("scroll", read, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      win.removeEventListener("scroll", read);
+    };
+  }, [mount]);
+
   // Seleccionar tocando el contenido real de la sección.
   useEffect(() => {
     if (!mount || !compositeNodeId || !editingEnabled) return;
@@ -3760,21 +3789,16 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Revelar la sección activa desplazando el ÚNICO scrollport del editor.
+  // Revelar la sección activa desplazando el viewport lógico del iframe.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const frame = iframeRef.current;
-    const scrollport = frame?.closest<HTMLElement>("[data-eb-canvas-scrollport]");
-    if (!frame || !scrollport) return;
-    const offset =
-      frame.getBoundingClientRect().top -
-      scrollport.getBoundingClientRect().top +
-      scrollport.scrollTop;
-    const top = Math.max(0, Math.round(offset + target.top * scale - 16));
-    if (Math.abs(scrollport.scrollTop - top) > 8) {
-      scrollport.scrollTo({ top, behavior: "smooth" });
+    const win = mount.ownerDocument.defaultView;
+    if (!win) return;
+    const top = Math.max(0, Math.round(target.top - 16));
+    if (Math.abs(win.scrollY - top) > 8) {
+      win.scrollTo({ top, behavior: "smooth" });
     }
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3825,7 +3849,7 @@ function CanvasViewport({
   // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
   const scaled = scale;
   const frameWidth = Math.round(width * scaled);
-  const frameHeight = Math.round(documentHeight * scaled);
+  const frameHeight = Math.round(minimumHeight * scaled);
   const editableRects = sectionRects.filter((section) =>
     reorderableSectionKeys.includes(section.key),
   );
@@ -3844,7 +3868,7 @@ function CanvasViewport({
     const frameTop = frame.getBoundingClientRect().top;
     let candidate: string | null = null;
     for (const section of editableRects) {
-      const top = frameTop + section.top * scaled;
+      const top = frameTop + (section.top - canvasScrollTop) * scaled;
       const bottom = top + section.height * scaled;
       if (clientY >= top && clientY <= bottom) return section.key;
       if (clientY > bottom) candidate = section.key;
@@ -3859,19 +3883,18 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    // Un único desplazamiento: el del área de trabajo. El auto-scroll durante
-    // el arrastre mueve ese mismo scrollport, nunca un scroll interno.
-    const scrollport = iframeRef.current?.closest<HTMLElement>(
-      "[data-eb-canvas-scrollport]",
-    );
+    const canvasWindow = mount?.ownerDocument.defaultView;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
-      if (!scrollport) return;
-      const rect = scrollport.getBoundingClientRect();
+      const frame = iframeRef.current;
+      if (!canvasWindow || !frame) return;
+      const rect = frame.getBoundingClientRect();
       const edge = 56;
-      if (moveEvent.clientY < rect.top + edge) scrollport.scrollBy({ top: -18 });
-      else if (moveEvent.clientY > rect.bottom - edge) scrollport.scrollBy({ top: 18 });
+      const logicalStep = 18 / scaled;
+      if (moveEvent.clientY < rect.top + edge) canvasWindow.scrollBy({ top: -logicalStep });
+      else if (moveEvent.clientY > rect.bottom - edge)
+        canvasWindow.scrollBy({ top: logicalStep });
     };
     const onUp = (upEvent: PointerEvent) => {
       handle.removeEventListener("pointermove", onMove);
@@ -3963,15 +3986,14 @@ function CanvasViewport({
           data-eb-canvas-width={width}
           data-eb-canvas-height={documentHeight}
           data-eb-canvas-scale={scaled}
-          className={`absolute left-0 top-0 block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
+          className={`absolute left-0 top-0 block origin-top-left border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
-            height: documentHeight,
-            // `zoom` escala el conjunto sin recomponer el documento: la
-            // plantilla conserva su ancho lógico, su tipografía y su
-            // distribución reales. A diferencia de `transform`, Safari no
-            // produce costuras ni mosaicos al pintar lienzos muy altos.
-            zoom: scaled,
+            height: minimumHeight,
+            // El transform se aplica a un viewport acotado, no al documento
+            // completo. Conserva ancho lógico, media queries y tipografía sin
+            // activar el fallo de pintura de WebKit en capas gigantes.
+            transform: `scale(${scaled})`,
           }}
         />
         {mount ? createPortal(children, mount) : null}
@@ -3990,8 +4012,10 @@ function CanvasViewport({
             aria-label="Controles de secciones"
           >
             {editableRects.map((section) => {
-              const top = section.top * scaled;
+               const top = (section.top - canvasScrollTop) * scaled;
               const height = Math.max(24, section.height * scaled);
+               const visible = top + height > 0 && top < frameHeight;
+               if (!visible) return null;
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
               return (
