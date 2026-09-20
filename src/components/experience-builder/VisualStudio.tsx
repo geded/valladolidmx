@@ -3357,14 +3357,10 @@ function HomeCanvas({
   // la plantilla. "Ajustar" reduce sólo el tamaño de presentación del conjunto.
   const scrollportRef = useRef<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
-  const [availableHeight, setAvailableHeight] = useState<number | null>(null);
   useEffect(() => {
     const el = scrollportRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
-    const read = () => {
-      setAvailableWidth(el.clientWidth);
-      setAvailableHeight(el.clientHeight);
-    };
+    const read = () => setAvailableWidth(el.clientWidth);
     read();
     const ro = new ResizeObserver(read);
     ro.observe(el);
@@ -3376,10 +3372,6 @@ function HomeCanvas({
       ? 1
       : roundScale(usableWidth / preset.width);
   const scale = roundScale(zoomOverride ?? fitScale);
-  const viewportHeight = Math.min(
-    preset.height,
-    Math.max(360, Math.floor(((availableHeight ?? preset.height) - 52) / scale)),
-  );
   useEffect(() => setZoomOverride(null), [deviceViewport]);
   useEffect(() => {
     const scrollport = scrollportRef.current;
@@ -3433,7 +3425,6 @@ function HomeCanvas({
         device={deviceViewport}
         width={preset.width}
         minimumHeight={preset.height}
-        viewportHeight={viewportHeight}
         scale={scale}
         fitScale={fitScale}
         minimumScale={CANVAS_MIN_SCALE}
@@ -3532,7 +3523,6 @@ function CanvasViewport({
   device,
   width,
   minimumHeight,
-  viewportHeight,
   scale,
   fitScale,
   minimumScale,
@@ -3553,7 +3543,6 @@ function CanvasViewport({
   device: DeviceViewport;
   width: number;
   minimumHeight: number;
-  viewportHeight: number;
   scale: number;
   fitScale: number;
   minimumScale: number;
@@ -3580,7 +3569,6 @@ function CanvasViewport({
   const [geometryWidth, setGeometryWidth] = useState<number | null>(null);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
-  const [canvasScrollTop, setCanvasScrollTop] = useState(0);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3600,13 +3588,9 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
-        height: 100%;
-        min-height: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-x pan-y;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
       }
       [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
@@ -3668,16 +3652,6 @@ function CanvasViewport({
       canvasRoot.remove();
     };
   }, [width]);
-
-  useEffect(() => {
-    const doc = mount?.ownerDocument;
-    const win = doc?.defaultView;
-    if (!doc || !win) return;
-    const read = () => setCanvasScrollTop(doc.scrollingElement?.scrollTop ?? win.scrollY);
-    read();
-    doc.addEventListener("scroll", read, true);
-    return () => doc.removeEventListener("scroll", read, true);
-  }, [mount]);
 
   useEffect(() => {
     setDocumentHeight(minimumHeight);
@@ -3786,15 +3760,21 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Revelar la sección activa dentro del viewport lógico de la plantilla.
+  // Revelar la sección activa desplazando el ÚNICO scrollport del editor.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const doc = mount.ownerDocument;
-    const top = Math.max(0, target.top - 16);
-    if (Math.abs((doc.scrollingElement?.scrollTop ?? 0) - top) > 8) {
-      doc.defaultView?.scrollTo({ top, behavior: "smooth" });
+    const frame = iframeRef.current;
+    const scrollport = frame?.closest<HTMLElement>("[data-eb-canvas-scrollport]");
+    if (!frame || !scrollport) return;
+    const offset =
+      frame.getBoundingClientRect().top -
+      scrollport.getBoundingClientRect().top +
+      scrollport.scrollTop;
+    const top = Math.max(0, Math.round(offset + target.top * scale - 16));
+    if (Math.abs(scrollport.scrollTop - top) > 8) {
+      scrollport.scrollTo({ top, behavior: "smooth" });
     }
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3845,7 +3825,7 @@ function CanvasViewport({
   // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
   const scaled = scale;
   const frameWidth = Math.round(width * scaled);
-  const frameHeight = Math.round(viewportHeight * scaled);
+  const frameHeight = Math.round(documentHeight * scaled);
   const editableRects = sectionRects.filter((section) =>
     reorderableSectionKeys.includes(section.key),
   );
@@ -3864,7 +3844,7 @@ function CanvasViewport({
     const frameTop = frame.getBoundingClientRect().top;
     let candidate: string | null = null;
     for (const section of editableRects) {
-      const top = frameTop + (section.top - canvasScrollTop) * scaled;
+      const top = frameTop + section.top * scaled;
       const bottom = top + section.height * scaled;
       if (clientY >= top && clientY <= bottom) return section.key;
       if (clientY > bottom) candidate = section.key;
@@ -3879,16 +3859,19 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const canvasWindow = iframeRef.current?.contentWindow;
+    // Un único desplazamiento: el del área de trabajo. El auto-scroll durante
+    // el arrastre mueve ese mismo scrollport, nunca un scroll interno.
+    const scrollport = iframeRef.current?.closest<HTMLElement>(
+      "[data-eb-canvas-scrollport]",
+    );
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
-      const frame = iframeRef.current;
-      if (!frame || !canvasWindow) return;
-      const rect = frame.getBoundingClientRect();
+      if (!scrollport) return;
+      const rect = scrollport.getBoundingClientRect();
       const edge = 56;
-      if (moveEvent.clientY < rect.top + edge) canvasWindow.scrollBy({ top: -18 / scaled });
-      else if (moveEvent.clientY > rect.bottom - edge) canvasWindow.scrollBy({ top: 18 / scaled });
+      if (moveEvent.clientY < rect.top + edge) scrollport.scrollBy({ top: -18 });
+      else if (moveEvent.clientY > rect.bottom - edge) scrollport.scrollBy({ top: 18 });
     };
     const onUp = (upEvent: PointerEvent) => {
       handle.removeEventListener("pointermove", onMove);
@@ -3983,9 +3966,12 @@ function CanvasViewport({
           className={`absolute left-0 top-0 block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
-            height: viewportHeight,
-            transform: `scale(${scaled})`,
-            transformOrigin: "top left",
+            height: documentHeight,
+            // `zoom` escala el conjunto sin recomponer el documento: la
+            // plantilla conserva su ancho lógico, su tipografía y su
+            // distribución reales. A diferencia de `transform`, Safari no
+            // produce costuras ni mosaicos al pintar lienzos muy altos.
+            zoom: scaled,
           }}
         />
         {mount ? createPortal(children, mount) : null}
@@ -4004,7 +3990,7 @@ function CanvasViewport({
             aria-label="Controles de secciones"
           >
             {editableRects.map((section) => {
-              const top = (section.top - canvasScrollTop) * scaled;
+              const top = section.top * scaled;
               const height = Math.max(24, section.height * scaled);
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
