@@ -378,16 +378,17 @@ function FilterChips<T extends string>({
 function MediaPage() {
   const [scope, setScope] = useState<ScopeValue>("all");
   const [usage, setUsage] = useState<UsageValue>("all");
+  const [state, setState] = useState<StateValue>("all");
 
   return (
     <CmsEntityPage<Row>
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-      description="Filtra por quién subió la imagen y para qué se usa. Las versiones ligeras se generan solas."
+      description="Filtra por quién subió la imagen, su estado de aprobación y para qué se usa."
       rowKey={(r) => r.id}
       emptyMessage="Sin imágenes con estos filtros."
-      extraParams={{ scope, usage }}
+      extraParams={{ scope, usage, state }}
       headerActions={
         <div className="flex flex-wrap items-center gap-2">
           <FilterChips
@@ -397,11 +398,18 @@ function MediaPage() {
             onChange={setScope}
           />
           <FilterChips
+            label="Estado de aprobación"
+            options={STATE_OPTIONS}
+            value={state}
+            onChange={setState}
+          />
+          <FilterChips
             label="Uso de la imagen"
             options={USAGE_OPTIONS}
             value={usage}
             onChange={setUsage}
           />
+
           <AiConceptBatchUpload />
           <BatchToolbar />
         </div>
