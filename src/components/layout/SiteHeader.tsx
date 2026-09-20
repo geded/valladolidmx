@@ -44,6 +44,11 @@ import { cn } from "@/lib/utils";
 interface Props {
   variant?: "solid" | "overlay";
   config?: Record<string, unknown>;
+  /**
+   * El constructor renderiza la cabecera real para conservar su geometría,
+   * pero sus controles públicos no deben abrir menús ni bloquear el Studio.
+   */
+  interactionMode?: "public" | "editor";
 }
 
 interface HeaderNavItem {
@@ -126,7 +131,7 @@ function linkItems(value: unknown, fallback: HeaderNavItem[]): HeaderNavItem[] {
     .filter((item): item is HeaderNavItem => Boolean(item));
 }
 
-export function SiteHeader({ variant = "solid", config }: Props) {
+export function SiteHeader({ variant = "solid", config, interactionMode = "public" }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -162,9 +167,11 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   // El drawer se porta al body para escapar del stacking context del Header:
   // así el Hero nunca atraviesa el panel móvil (12C.1).
   useEffect(() => {
-    if (!open) return;
-    const { body, documentElement } = document;
-    const scrollY = window.scrollY;
+    if (!open || interactionMode === "editor") return;
+    const ownerDocument = headerRef.current?.ownerDocument ?? document;
+    const ownerWindow = ownerDocument.defaultView ?? window;
+    const { body, documentElement } = ownerDocument;
+    const scrollY = ownerWindow.scrollY;
     const prevBody = body.style.overflow;
     const prevBodyPosition = body.style.position;
     const prevBodyTop = body.style.top;
@@ -192,7 +199,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
+      const active = ownerDocument.activeElement;
 
       if (e.shiftKey && active === first) {
         e.preventDefault();
@@ -202,10 +209,10 @@ export function SiteHeader({ variant = "solid", config }: Props) {
         first.focus();
       }
     };
-    window.addEventListener("keydown", onKey);
+    ownerWindow.addEventListener("keydown", onKey);
 
     // Mover foco al panel para lectores de pantalla y navegación por teclado.
-    const t = window.setTimeout(() => drawerRef.current?.focus(), 0);
+    const t = ownerWindow.setTimeout(() => drawerRef.current?.focus(), 0);
 
     return () => {
       body.style.overflow = prevBody;
@@ -213,12 +220,12 @@ export function SiteHeader({ variant = "solid", config }: Props) {
       body.style.top = prevBodyTop;
       body.style.width = prevBodyWidth;
       documentElement.style.overflow = prevHtml;
-      window.removeEventListener("keydown", onKey);
-      window.clearTimeout(t);
-      window.scrollTo(0, scrollY);
+      ownerWindow.removeEventListener("keydown", onKey);
+      ownerWindow.clearTimeout(t);
+      ownerWindow.scrollTo(0, scrollY);
       menuButtonRef.current?.focus();
     };
-  }, [open]);
+  }, [interactionMode, open]);
 
   const isOverlay = variant === "overlay" && !scrolled && !open;
 
@@ -262,7 +269,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const visibleButtons = buttons.filter((b) => b.visible);
 
   const mobileDrawer =
-    mounted && open
+    interactionMode === "public" && mounted && open
       ? createPortal(
           <>
             <div
@@ -318,7 +325,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               </div>
             </aside>
           </>,
-          document.body,
+          headerRef.current?.ownerDocument.body ?? document.body,
         )
       : null;
 
@@ -367,6 +374,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                   isOverlay,
                   open,
                   setOpen,
+                  interactive: interactionMode === "public",
                   menuButtonRef,
                   ctaFallback: { label: ctaLabel, href: ctaHref },
                 }),
@@ -384,13 +392,14 @@ interface RenderCtx {
   isOverlay: boolean;
   open: boolean;
   setOpen: (updater: (v: boolean) => boolean) => void;
+  interactive: boolean;
   menuButtonRef: React.RefObject<HTMLButtonElement | null>;
   ctaFallback: { label: string; href: string };
 }
 
 function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   const key = `${btn.kind}-${idx}`;
-  const { isOverlay, open, setOpen, menuButtonRef, ctaFallback } = ctx;
+  const { isOverlay, open, setOpen, interactive, menuButtonRef, ctaFallback } = ctx;
 
   if (btn.kind === "language") {
     // El selector permanece en SiteTopBar y en la fila principal cuando la
@@ -424,7 +433,8 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         aria-label={btn.label || "Menú"}
         aria-expanded={open}
         aria-controls="mobile-drawer"
-        onClick={() => setOpen((v) => !v)}
+        aria-disabled={!interactive}
+        onClick={interactive ? () => setOpen((v) => !v) : undefined}
       >
         {open ? <X className="size-5" /> : <Menu className="size-5" />}
       </button>
