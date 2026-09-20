@@ -150,8 +150,17 @@ export function EntityEditor(props: Props) {
 
 
 
-  /** Nombre de la ficha: base de la búsqueda que hace Alux. */
-  const autofillName = values["name"] || values["title"] || "";
+  /* Nombre de la ficha: base de la búsqueda que hace Alux.
+     Cada familia nombra su campo principal distinto (empresas usan
+     `display_name`), por eso se recorren las claves acreditadas y, como
+     último recurso, el primer campo de texto obligatorio del formulario. */
+  const autofillName =
+    values["name"] ||
+    values["title"] ||
+    values["display_name"] ||
+    values["legal_name"] ||
+    values[fields.find((f) => f.type === "text" && f.required)?.name ?? ""] ||
+    "";
   /** Sólo campos de texto: Alux no elige catálogos ni relaciones. */
   const autofillFields = useMemo(
     () =>
