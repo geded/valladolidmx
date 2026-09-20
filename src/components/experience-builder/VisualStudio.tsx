@@ -4028,6 +4028,12 @@ function CanvasLiveContent({
           target?.closest("a,button,input,select,textarea,label,summary,[role='button'],[role='link']")
         ) {
           event.preventDefault();
+          // `preventDefault()` sólo cancela navegación/envío; no impide que
+          // los handlers React del sitio abran menús, diálogos o cambien el
+          // estado de la plantilla dentro del canvas. El documento debe
+          // conservar gestos de desplazamiento, pero sus controles públicos
+          // son inertes mientras se edita.
+          event.stopPropagation();
         }
       }}
       onAuxClickCapture={(event) => event.preventDefault()}
@@ -4059,8 +4065,9 @@ function InertChrome({
     <div
       role="button"
       tabIndex={0}
-      onClick={(event) => {
+      onClickCapture={(event) => {
         event.stopPropagation();
+        event.preventDefault();
         onSelect();
       }}
       onKeyDown={(event) => {
