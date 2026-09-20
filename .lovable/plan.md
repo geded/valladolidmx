@@ -22,6 +22,12 @@ Antes se trató “tipo Wix” como un problema de apariencia y se parchearon es
 - Si una operación concreta no puede realizarse con precisión en el equipo actual, el lienzo lo dice con un aviso claro y una alternativa (acercar, usar el panel Estructura o continuar en computadora). Nunca se comporta de forma errática ni silenciosa.
 - Meta explícita: un editor humano debe poder trabajar las plantillas por su cuenta, sin pedir cambios al agente.
 
+## Fidelidad visual obligatoria del lienzo
+- La vista elegida manda: la plantilla se compone contra su propio ancho (390, 430, 768/834, 1024, 1280 o 1440), no contra el espacio libre del editor.
+- El hero y todas las secciones deben conservar la misma distribución, proporción de columnas, tamaño relativo de títulos y ritmo de texto que la página real de ese ancho.
+- El zoom escala la plantilla completa y por igual; jamás recalcula tipografía, columnas ni saltos de línea sección por sección.
+- Criterio de aceptación: comparación lado a lado lienzo vs. página real en cada ancho; si el hero u otra sección cambia de distribución, es una regresión y se corrige antes de continuar.
+
 ## Scope Gate
 ### Autorizado
 - Reconstruir únicamente el shell del lienzo y sus interacciones dentro del Experience Builder.
