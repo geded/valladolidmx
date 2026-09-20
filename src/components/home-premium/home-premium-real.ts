@@ -210,14 +210,81 @@ function attachMediaAssets<T>(node: T, assets: Record<string, MediaAssetInput>):
   return out as T;
 }
 
+/**
+ * G9 · Máximo declarado por carril en el bloque editorial.
+ *
+ * El contrato ya expone `*_max_items`, pero el corpus real se fusionaba
+ * completo y anulaba esa decisión editorial. Esta lectura permite que el
+ * editor decida cuántas tarjetas se muestran en cada sección.
+ */
+export interface HomeRailLimits {
+  readonly destinos?: number;
+  readonly rutas?: number;
+  readonly experiencias?: number;
+  readonly servicios?: number;
+  readonly eventos?: number;
+  readonly categorias?: number;
+  readonly queHacer?: number;
+}
+
+function positiveLimit(value: unknown): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  const rounded = Math.round(value);
+  if (rounded <= 0) return undefined;
+  return Math.min(24, rounded);
+}
+
+export function readHomeRailLimits(config: unknown): HomeRailLimits {
+  if (!config || typeof config !== "object") return {};
+  const record = config as Record<string, unknown>;
+  return {
+    destinos: positiveLimit(record.destinos_max_items),
+    rutas: positiveLimit(record.rutas_max_items),
+    experiencias: positiveLimit(record.experiencias_max_items),
+    servicios: positiveLimit(record.servicios_max_items),
+    eventos: positiveLimit(record.eventos_max_items),
+    categorias: positiveLimit(record.categorias_max_items),
+    queHacer: positiveLimit(record.que_hacer_max_items),
+  };
+}
+
+function limited<T>(items: readonly T[], max: number | undefined): T[] {
+  return typeof max === "number" ? items.slice(0, max) : [...items];
+}
+
+function applyHomeRailLimits(
+  content: HomePremiumContent,
+  limits: HomeRailLimits | undefined,
+): HomePremiumContent {
+  if (!limits) return content;
+  return {
+    ...content,
+    destinos: { ...content.destinos, items: limited(content.destinos.items, limits.destinos) },
+    rutas: { ...content.rutas, items: limited(content.rutas.items, limits.rutas) },
+    experiencias: {
+      ...content.experiencias,
+      items: limited(content.experiencias.items, limits.experiencias),
+    },
+    servicios: {
+      ...content.servicios,
+      stays: limited(content.servicios.stays, limits.servicios),
+      food: limited(content.servicios.food, limits.servicios),
+    },
+    eventos: { ...content.eventos, items: limited(content.eventos.items, limits.eventos) },
+    categorias: { ...content.categorias, items: limited(content.categorias.items, limits.categorias) },
+    queHacer: { ...content.queHacer, items: limited(content.queHacer.items, limits.queHacer) },
+  };
+}
+
 /** Fusiona el corpus real sobre el contenido editorial resuelto del bloque. */
 export function mergeHomeRealContent(
   content: HomePremiumContent,
   real: HomeRealContent | undefined,
   destinationOverrides?: unknown,
+  limits?: HomeRailLimits,
 ): HomePremiumContent {
   const safeContent = withoutUnapprovedMedia(content);
-  if (!real) return safeContent;
+  if (!real) return applyHomeRailLimits(safeContent, limits);
   const mediaAssets = real.mediaAssets ?? {};
 
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
