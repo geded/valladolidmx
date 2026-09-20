@@ -306,6 +306,12 @@ export const listMediaCms = createServerFn({ method: "POST" })
     ).includes(data?.usage as never)
       ? (data!.usage as MediaUsageFilter)
       : "all";
+    const state: MediaStateFilter = (["draft", "in_review", "published"] as const).includes(
+      data?.state as never,
+    )
+      ? (data!.state as MediaStateFilter)
+      : "all";
+
 
     let businessIds: string[] = [];
     let productIds: string[] = [];
