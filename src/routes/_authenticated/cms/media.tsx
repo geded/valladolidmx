@@ -39,7 +39,74 @@ export const Route = createFileRoute("/_authenticated/cms/media")({
   component: MediaPage,
 });
 
+function ReviewActions({ row }: { row: Row }) {
+  const fn = useServerFn(transitionMediaStatus);
+  const queryClient = useQueryClient();
+  const { roles } = useAuth();
+  const isAdmin = roles.includes("admin") || roles.includes("super_admin");
+  const [busy, setBusy] = useState(false);
+
+  const run = async (to: "in_review" | "published" | "draft", okMessage: string) => {
+    try {
+      setBusy(true);
+      await fn({ data: { mediaId: row.id, to } });
+      await queryClient.invalidateQueries({ queryKey: ["cms", "media"] });
+      toast.success(okMessage);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo actualizar la imagen");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const status = row.status ?? "draft";
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {status === "draft" && (
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={busy}
+          onClick={() => void run("in_review", "Imagen enviada a aprobación.")}
+        >
+          Enviar a aprobación
+        </Button>
+      )}
+      {status === "in_review" && isAdmin && (
+        <>
+          <Button
+            size="sm"
+            disabled={busy}
+            onClick={() => void run("published", "Imagen aprobada y publicada.")}
+          >
+            Aprobar y publicar
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={() => void run("draft", "Se solicitaron cambios al editor.")}
+          >
+            Pedir cambios
+          </Button>
+        </>
+      )}
+      {status === "in_review" && !isAdmin && (
+        <span className="text-xs text-muted-foreground">Esperando aprobación</span>
+      )}
+      {status === "approved" && isAdmin && (
+        <Button size="sm" disabled={busy} onClick={() => void run("published", "Imagen publicada.")}>
+          Publicar
+        </Button>
+      )}
+      {status === "published" && <span className="text-xs text-muted-foreground">Aprobada</span>}
+    </div>
+  );
+}
+
 function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: boolean }) {
+
   const fn = useServerFn(suggestMediaAlt);
   const [loading, setLoading] = useState(false);
   return (
