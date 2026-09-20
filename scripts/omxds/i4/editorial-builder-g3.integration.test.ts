@@ -106,8 +106,7 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("transform: `scale(${scaled})`");
     expect(studio).toContain("origin-top-left");
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
-    expect(studio).toContain('doc.addEventListener("touchmove", onTouchMove, { passive: false })');
-    expect(studio).toContain('doc.addEventListener("wheel", onWheel, { passive: false })');
+    expect(studio).toContain('doc.addEventListener("scroll", read, { passive: true, capture: true })');
     expect(studio).toContain("doc.scrollingElement");
     expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
