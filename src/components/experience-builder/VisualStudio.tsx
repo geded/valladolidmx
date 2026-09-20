@@ -3559,6 +3559,9 @@ function CanvasViewport({
   const [mount, setMount] = useState<HTMLElement | null>(null);
   const [documentHeight, setDocumentHeight] = useState(minimumHeight);
   const [sectionRects, setSectionRects] = useState<CanvasSectionRect[]>([]);
+  const [stylesReady, setStylesReady] = useState(false);
+  const [canvasReady, setCanvasReady] = useState(false);
+  const [geometryWidth, setGeometryWidth] = useState<number | null>(null);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
 
@@ -3582,16 +3585,29 @@ function CanvasViewport({
     doc.head.appendChild(viewportStyle);
 
     let frame = 0;
+    let styleGeneration = 0;
     const syncStyles = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         doc.documentElement.className = document.documentElement.className;
-        doc.head.querySelectorAll("[data-eb-canvas-style]").forEach((n) => n.remove());
+        const generation = String(++styleGeneration);
+        const nextStyles: HTMLElement[] = [];
         document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
           const clone = node.cloneNode(true) as HTMLElement;
           clone.setAttribute("data-eb-canvas-style", "");
+          clone.setAttribute("data-eb-canvas-style-generation", generation);
+          nextStyles.push(clone);
           doc.head.appendChild(clone);
         });
+        // El nuevo juego se inserta antes de retirar el anterior. Así el
+        // documento nunca queda un fotograma sin estilos mientras el editor
+        // o Vite actualizan el <head> anfitrión.
+        doc.head
+          .querySelectorAll<HTMLElement>(
+            `[data-eb-canvas-style]:not([data-eb-canvas-style-generation="${generation}"])`,
+          )
+          .forEach((node) => node.remove());
+        if (nextStyles.length > 0) requestAnimationFrame(() => setStylesReady(true));
       });
     };
     syncStyles();
@@ -3671,7 +3687,10 @@ function CanvasViewport({
 
   useEffect(() => {
     setDocumentHeight(minimumHeight);
-  }, [minimumHeight, width]);
+    setSectionRects([]);
+    setGeometryWidth(null);
+    setCanvasReady(false);
+  }, [device, minimumHeight, width]);
 
   // Fuente ÚNICA de altura y de geometría de secciones. Una sola lectura por
   // fotograma evita que la medición compita con el desplazamiento (causa de
@@ -3679,10 +3698,23 @@ function CanvasViewport({
   useEffect(() => {
     if (!mount) return;
     const doc = mount.ownerDocument;
+    const win = doc.defaultView;
     let frame = 0;
+    let cancelled = false;
+    let fontsSettled = !doc.fonts;
+    let forceReady = false;
+    const trackedImages = new WeakSet<HTMLImageElement>();
     const measure = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
+        if (cancelled) return;
+        const images = Array.from(mount.querySelectorAll("img"));
+        images.forEach((image) => {
+          if (trackedImages.has(image)) return;
+          trackedImages.add(image);
+          image.addEventListener("load", measure, { once: true });
+          image.addEventListener("error", measure, { once: true });
+        });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
         const base = mount.getBoundingClientRect().top;
@@ -3707,22 +3739,36 @@ function CanvasViewport({
             ? current
             : next,
         );
+        setGeometryWidth(width);
+        if (stylesReady && fontsSettled && (forceReady || images.every((image) => image.complete))) {
+          setCanvasReady(true);
+        }
       });
     };
     measure();
+    void doc.fonts?.ready.then(() => {
+      fontsSettled = true;
+      measure();
+    });
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(mount);
     const mutationObserver = new MutationObserver(measure);
     mutationObserver.observe(mount, { childList: true, subtree: true, attributes: true });
-    const images = Array.from(mount.querySelectorAll("img"));
-    images.forEach((image) => image.addEventListener("load", measure));
+    // Un medio remoto no debe bloquear indefinidamente el editor. Tras este
+    // límite mostramos la geometría medida; cualquier carga posterior vuelve
+    // a medir mediante los listeners dinámicos anteriores.
+    const readyTimer = win?.setTimeout(() => {
+      forceReady = true;
+      measure();
+    }, 2500);
     return () => {
+      cancelled = true;
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
-      images.forEach((image) => image.removeEventListener("load", measure));
+      if (readyTimer != null) win?.clearTimeout(readyTimer);
     };
-  }, [minimumHeight, mount, width]);
+  }, [device, minimumHeight, mount, stylesReady, width]);
 
   // Seleccionar tocando el contenido real de la sección.
   useEffect(() => {
@@ -3807,7 +3853,8 @@ function CanvasViewport({
     reorderableSectionKeys.includes(section.key),
   );
   const preciseEditing = scaled >= CANVAS_PRECISE_EDIT_SCALE;
-  const showEditingLayer = editingEnabled && Boolean(compositeNodeId);
+  const geometryIsCurrent = canvasReady && geometryWidth === width;
+  const showEditingLayer = editingEnabled && Boolean(compositeNodeId) && geometryIsCurrent;
 
   /**
    * Arrastrar y soltar ÚNICO del lienzo: gestos de puntero (ratón, lápiz y
@@ -3937,7 +3984,7 @@ function CanvasViewport({
           data-eb-canvas-width={width}
           data-eb-canvas-height={documentHeight}
           data-eb-canvas-scale={scaled}
-          className="block border-0 bg-background"
+          className={`block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
             height: documentHeight,
@@ -3946,6 +3993,14 @@ function CanvasViewport({
           }}
         />
         {mount ? createPortal(children, mount) : null}
+        {!geometryIsCurrent ? (
+          <div
+            className="absolute inset-x-0 top-0 grid min-h-40 place-items-center bg-background text-xs font-medium text-muted-foreground"
+            aria-live="polite"
+          >
+            Preparando la vista de {width} px…
+          </div>
+        ) : null}
         {showEditingLayer ? (
           <div
             data-eb-canvas-edit-layer=""
