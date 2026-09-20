@@ -407,7 +407,7 @@ export function mergeHomeRealContent(
           })),
         },
       },
-    },
+    }, limits),
     mediaAssets,
   );
 }
