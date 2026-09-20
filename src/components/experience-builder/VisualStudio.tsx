@@ -3591,13 +3591,16 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
-        height: 100%;
         min-height: 100%;
       }
       html {
-        overflow: hidden;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: hidden;
       }
       body {
+        height: 100%;
+        min-height: 100%;
         overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
@@ -3718,7 +3721,7 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-         const scrollTop = doc.body.scrollTop;
+        const scrollTop = doc.body.scrollTop;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
@@ -3787,10 +3790,10 @@ function CanvasViewport({
       });
     };
     read();
-    doc.body.addEventListener("scroll", read, { passive: true });
+    doc.addEventListener("scroll", read, { passive: true, capture: true });
     return () => {
       cancelAnimationFrame(frame);
-      doc.body.removeEventListener("scroll", read);
+      doc.removeEventListener("scroll", read, true);
     };
   }, [mount]);
 
@@ -3855,11 +3858,11 @@ function CanvasViewport({
     };
     read();
     const id = win.setInterval(read, 250);
-    doc.body.addEventListener("scroll", read, true);
+    doc.addEventListener("scroll", read, true);
     win.addEventListener("resize", read);
     return () => {
       win.clearInterval(id);
-      doc.body.removeEventListener("scroll", read, true);
+      doc.removeEventListener("scroll", read, true);
       win.removeEventListener("resize", read);
     };
   }, [hud, mount, width]);
