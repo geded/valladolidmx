@@ -278,11 +278,10 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               aria-label="Navegación principal"
               tabIndex={-1}
               style={{ backgroundColor: "var(--background)" }}
-              // 18.55 · En Safari iOS/iPadOS `bottom` se resuelve contra el
-              // viewport grande, por lo que el pie del menú (CTA + sesión)
-              // quedaba debajo de la barra del navegador. Se fija la altura
-              // con `svh` (viewport pequeño) para que el pie siempre sea
-              // visible y el contenido tenga su propio scroll.
+              /* 18.55 · Safari iOS/iPadOS resuelve `bottom` contra el viewport
+                 grande y el pie del menú (CTA + sesión) quedaba bajo la barra
+                 del navegador. Altura fijada con `svh` para que el pie sea
+                 siempre visible. */
               className="fixed inset-x-2 top-2 z-[999] flex h-[calc(100svh-1rem)] max-h-[calc(100svh-1rem)] flex-col overflow-hidden rounded-[1.75rem] border border-border/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)] outline-none sm:inset-x-auto sm:right-3 sm:w-[min(86vw,24rem)]"
             >
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-5">
