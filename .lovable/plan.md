@@ -12,6 +12,16 @@ La captura `IMG_2672.png` queda como evidencia del fallo actual: ancho recortado
 - La barra superior ocupa demasiada altura en tablet y el inspector inferior cubre el lienzo.
 - Las seis vistas deben conservar un ancho lógico propio; el tamaño de la pantalla del editor no debe alterar los breakpoints internos de la plantilla.
 
+## Qué faltó en los intentos anteriores
+Antes se trató “tipo Wix” como un problema de apariencia y se parchearon escala, altura y paneles sobre el mismo mecanismo defectuoso. Nunca se construyó lo que hace utilizable un constructor: un solo desplazamiento estable, una sola geometría, controles totalmente fuera de la plantilla, selección precisa y un único sistema de arrastrar y soltar válido también en pantalla táctil. Esta reconstrucción sustituye esos mecanismos, no los vuelve a parchear.
+
+## Regla de trabajo en cualquier zoom
+- El zoom sólo cambia el tamaño con el que se presenta la plantilla; no altera su contenido, su ancho lógico ni sus medidas internas.
+- Seleccionar, editar, mover y reordenar deben funcionar en todos los niveles de zoom y en las seis vistas.
+- Los objetivos táctiles de edición mantienen un tamaño cómodo aunque la plantilla se vea reducida.
+- Si una operación concreta no puede realizarse con precisión en el equipo actual, el lienzo lo dice con un aviso claro y una alternativa (acercar, usar el panel Estructura o continuar en computadora). Nunca se comporta de forma errática ni silenciosa.
+- Meta explícita: un editor humano debe poder trabajar las plantillas por su cuenta, sin pedir cambios al agente.
+
 ## Scope Gate
 ### Autorizado
 - Reconstruir únicamente el shell del lienzo y sus interacciones dentro del Experience Builder.
