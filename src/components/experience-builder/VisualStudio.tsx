@@ -2112,16 +2112,18 @@ function PageVisualEditor({
   }, [tree]);
 
   // G7-C · Altura acotada real del editor: el shell del Studio se mide contra
-  // la ventana (sin alturas mágicas) para que el canvas nunca sobresalga del
-  // área visible y exista un único scrollport.
+  // el viewport de layout. `getBoundingClientRect().top` ya está expresado en
+  // coordenadas de viewport; sumarle `window.scrollY` acortaba el editor al
+  // desplazarse dentro del Workspace y hacía que Safari pareciera atorarse.
   const shellRef = useRef<HTMLDivElement | null>(null);
   const [shellHeight, setShellHeight] = useState<number | null>(null);
   useEffect(() => {
     const measure = () => {
       const el = shellRef.current;
       if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      const height = Math.max(360, Math.round(window.innerHeight - top));
+      const top = Math.max(0, el.getBoundingClientRect().top);
+      const viewportHeight = document.documentElement.clientHeight;
+      const height = Math.max(360, Math.round(viewportHeight - top));
       setShellHeight((current) =>
         current === null || Math.abs(current - height) > 1 ? height : current,
       );
@@ -2156,9 +2158,9 @@ function PageVisualEditor({
       ref={shellRef}
       data-eb-studio-shell=""
       style={shellHeight ? { height: shellHeight } : undefined}
-      className={`flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background ${focusMode ? "fixed inset-0 z-[70]" : ""}`}
+      className={`flex h-[100svh] min-h-0 flex-col overflow-hidden bg-background lg:h-[100dvh] ${focusMode ? "fixed inset-0 z-[70]" : ""}`}
     >
-      <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+      <div className="sticky top-0 z-40 flex shrink-0 flex-nowrap items-center gap-3 overflow-x-auto border-b border-border bg-background/95 px-4 py-2 backdrop-blur [-webkit-overflow-scrolling:touch]">
         <button
           type="button"
           onClick={onExit}
@@ -2175,7 +2177,7 @@ function PageVisualEditor({
           <h1 className="truncate text-sm font-semibold">{pageDef.title}</h1>
           <p className="truncate text-[10px] text-muted-foreground">{pageDef.publicPath}</p>
         </div>
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-2">
           {!previewMode ? (
             <button
               type="button"
@@ -3416,7 +3418,7 @@ function HomeCanvas({
     <div
       ref={scrollportRef}
       data-eb-canvas-scrollport="editor"
-      className="flex min-h-0 min-w-0 flex-1 items-start justify-start overflow-auto overscroll-contain bg-muted/20 p-3"
+      className="flex min-h-0 min-w-0 flex-1 touch-pan-x touch-pan-y items-start justify-start overflow-auto overscroll-contain bg-muted/20 p-3 [-webkit-overflow-scrolling:touch]"
     >
       <CanvasViewport
         device={deviceViewport}
@@ -3608,6 +3610,45 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
+    // Safari no encadena de forma fiable el gesto desde un iframe sin scroll
+    // hacia su contenedor. El escenario exterior sigue siendo la única
+    // autoridad de desplazamiento: reenviamos rueda y arrastre táctil desde el
+    // documento real sin alterar su ancho lógico, escala ni composición.
+    const scrollport = iframe.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
+    const onWheel = (event: WheelEvent) => {
+      if (!scrollport) return;
+      event.preventDefault();
+      scrollport.scrollBy({ left: event.deltaX, top: event.deltaY });
+    };
+    let lastTouch: { x: number; y: number } | null = null;
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) {
+        lastTouch = null;
+        return;
+      }
+      const touch = event.touches[0];
+      lastTouch = touch ? { x: touch.clientX, y: touch.clientY } : null;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (!scrollport || !lastTouch || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      const deltaX = lastTouch.x - touch.clientX;
+      const deltaY = lastTouch.y - touch.clientY;
+      if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+      event.preventDefault();
+      scrollport.scrollBy({ left: deltaX, top: deltaY });
+      lastTouch = { x: touch.clientX, y: touch.clientY };
+    };
+    const clearTouch = () => {
+      lastTouch = null;
+    };
+    doc.addEventListener("wheel", onWheel, { passive: false });
+    doc.addEventListener("touchstart", onTouchStart, { passive: true });
+    doc.addEventListener("touchmove", onTouchMove, { passive: false });
+    doc.addEventListener("touchend", clearTouch, { passive: true });
+    doc.addEventListener("touchcancel", clearTouch, { passive: true });
+
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
     doc.body.appendChild(canvasRoot);
@@ -3618,6 +3659,11 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
+      doc.removeEventListener("wheel", onWheel);
+      doc.removeEventListener("touchstart", onTouchStart);
+      doc.removeEventListener("touchmove", onTouchMove);
+      doc.removeEventListener("touchend", clearTouch);
+      doc.removeEventListener("touchcancel", clearTouch);
       viewportStyle.remove();
       canvasRoot.remove();
     };

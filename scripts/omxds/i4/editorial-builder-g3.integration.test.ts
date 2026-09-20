@@ -106,6 +106,10 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("transform: `scale(${scaled})`");
     expect(studio).toContain('transformOrigin: "top left"');
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
+    expect(studio).toContain('doc.addEventListener("touchmove", onTouchMove, { passive: false })');
+    expect(studio).toContain('doc.addEventListener("wheel", onWheel, { passive: false })');
+    expect(studio).toContain("document.documentElement.clientHeight");
+    expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
     // Una sola geometría compartida por marco, iframe y capa de edición.
     expect(studio).toContain("const frameWidth = Math.round(width * scaled)");
