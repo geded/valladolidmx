@@ -3714,6 +3714,13 @@ function CanvasViewport({
         if (cancelled) return;
         const images = Array.from(mount.querySelectorAll("img"));
         images.forEach((image) => {
+          // El documento del canvas no tiene desplazamiento propio: el único
+          // scroll vive fuera del iframe. Safari/WebKit no vuelve a evaluar
+          // de forma fiable las imágenes lazy cuando sólo crece la altura del
+          // iframe, por lo que podían quedarse en blanco indefinidamente.
+          // Esta promoción ocurre únicamente en el DOM editorial; la página
+          // pública conserva intacta su estrategia de carga diferida.
+          if (image.loading === "lazy") image.loading = "eager";
           if (trackedImages.has(image)) return;
           trackedImages.add(image);
           image.addEventListener("load", measure, { once: true });
