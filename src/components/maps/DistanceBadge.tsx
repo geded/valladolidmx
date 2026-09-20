@@ -56,6 +56,21 @@ export function DistanceBadge({
   });
 
   if (!location) {
+    const label =
+      status === "prompting"
+        ? "Solicitando ubicación…"
+        : status === "imprecise"
+          ? "Ubicación imprecisa · reintentar"
+          : status === "denied" || status === "unavailable"
+            ? "Reintentar ubicación"
+            : "Compartir mi ubicación";
+    const hint =
+      status === "denied"
+        ? "Permitiste no compartir la ubicación. Actívala en los permisos del navegador y vuelve a intentarlo."
+        : status === "imprecise"
+          ? "Tu navegador entregó una ubicación aproximada por red, muy lejana de donde estás. Activa la ubicación precisa y vuelve a intentarlo."
+          : undefined;
+
     if (compact) {
       return (
         <Button
@@ -64,20 +79,10 @@ export function DistanceBadge({
           className="h-10 max-w-full justify-start px-2.5"
           onClick={request}
           disabled={status === "prompting"}
-          title={
-            status === "denied"
-              ? "Permitiste no compartir la ubicación. Actívala en los permisos del navegador y vuelve a intentarlo."
-              : undefined
-          }
+          title={hint}
         >
           <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-          <span className="truncate">
-            {status === "prompting"
-              ? "Solicitando ubicación…"
-              : status === "denied" || status === "unavailable"
-                ? "Reintentar ubicación"
-                : "Compartir mi ubicación"}
-          </span>
+          <span className="truncate">{label}</span>
         </Button>
       );
     }
@@ -85,18 +90,14 @@ export function DistanceBadge({
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4" aria-hidden />
-        <span>¿Qué tan lejos estás?</span>
-        <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"}>
-          {status === "prompting"
-            ? "Solicitando…"
-            : status === "denied" || status === "unavailable"
-              ? "Reintentar ubicación"
-              : "Compartir mi ubicación"}
+        <span>{status === "imprecise" ? "No pudimos ubicarte con precisión" : "¿Qué tan lejos estás?"}</span>
+        <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"} title={hint}>
+          {label}
         </Button>
-
       </div>
     );
   }
+
 
   if (isLoading) {
     return (
