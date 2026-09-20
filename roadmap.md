@@ -4,6 +4,8 @@
 
 - [ ] Experience Builder · Aclarar y corregir la deuda del objetivo tipo Wix: la implementación anterior sólo ajustó escala/iframe sobre el shell existente; no unificó desplazamiento, medición, selección ni arrastre. La reconstrucción debe sustituir esos mecanismos del shell sin tocar plantillas públicas, y no puede declararse terminada sin aceptación visual humana.
 
+- [ ] Experience Builder · Editable en cualquier zoom: el zoom sólo cambia el tamaño de presentación de la plantilla, nunca su contenido ni sus medidas; seleccionar, mover y editar deben funcionar en todos los niveles de zoom y vistas. Si una operación no puede realizarse en el equipo actual, el lienzo debe decirlo con un aviso claro y accionable, nunca comportarse de forma errática. Objetivo final: que un editor humano trabaje las plantillas sin pedir cambios al agente.
+
 - [ ] Experience Builder · Vistas amplias de Home (1024/1280/1440): reconstrucción del espacio de trabajo en curso. Documento interno a escala lógica real; "Ajustar" usa todo el ancho real disponible sin forzar un mínimo que recorte la plantilla, y cada cambio de preset vuelve al borde inicial; el Studio ocupa temporalmente todo el ancho en tablet; inspector inferior hasta 1279 px y acoplado desde 1280 px; altura medida, controles externos y navegación de secciones sobre el scroll del editor. Pendiente comparación constructor/preview/público en 1440/1280/1024/834/430/390 y aceptación visual humana antes de extender por familias.
 
 - [ ] Experience Builder · Corregir la paridad de Destinos de Home: la corrección está en preview, pero falta publicación autorizada y verificación final del constructor en el dominio de pruebas antes de cerrarla.
