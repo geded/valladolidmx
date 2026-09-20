@@ -3357,10 +3357,14 @@ function HomeCanvas({
   // la plantilla. "Ajustar" reduce sólo el tamaño de presentación del conjunto.
   const scrollportRef = useRef<HTMLDivElement | null>(null);
   const [availableWidth, setAvailableWidth] = useState<number | null>(null);
+  const [availableHeight, setAvailableHeight] = useState<number | null>(null);
   useEffect(() => {
     const el = scrollportRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
-    const read = () => setAvailableWidth(el.clientWidth);
+    const read = () => {
+      setAvailableWidth(el.clientWidth);
+      setAvailableHeight(el.clientHeight);
+    };
     read();
     const ro = new ResizeObserver(read);
     ro.observe(el);
@@ -3372,6 +3376,10 @@ function HomeCanvas({
       ? 1
       : roundScale(usableWidth / preset.width);
   const scale = roundScale(zoomOverride ?? fitScale);
+  const viewportHeight = Math.min(
+    preset.height,
+    Math.max(360, Math.floor(((availableHeight ?? preset.height) - 52) / scale)),
+  );
   useEffect(() => setZoomOverride(null), [deviceViewport]);
   useEffect(() => {
     const scrollport = scrollportRef.current;
@@ -3421,9 +3429,11 @@ function HomeCanvas({
       className="flex min-h-0 min-w-0 flex-1 touch-pan-x touch-pan-y items-start justify-start overflow-auto overscroll-contain bg-muted/20 p-3 [-webkit-overflow-scrolling:touch]"
     >
       <CanvasViewport
+        key={deviceViewport}
         device={deviceViewport}
         width={preset.width}
         minimumHeight={preset.height}
+        viewportHeight={viewportHeight}
         scale={scale}
         fitScale={fitScale}
         minimumScale={CANVAS_MIN_SCALE}
@@ -3522,6 +3532,7 @@ function CanvasViewport({
   device,
   width,
   minimumHeight,
+  viewportHeight,
   scale,
   fitScale,
   minimumScale,
@@ -3542,6 +3553,7 @@ function CanvasViewport({
   device: DeviceViewport;
   width: number;
   minimumHeight: number;
+  viewportHeight: number;
   scale: number;
   fitScale: number;
   minimumScale: number;
@@ -3568,6 +3580,7 @@ function CanvasViewport({
   const [geometryWidth, setGeometryWidth] = useState<number | null>(null);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
+  const [canvasScrollTop, setCanvasScrollTop] = useState(0);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3578,13 +3591,24 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // Única normalización del escenario: el documento no tiene scroll propio
-    // porque el escenario exterior es el único scrollport. No se altera
-    // ninguna medida, tipografía ni distribución de la plantilla.
+    // El documento conserva el ancho lógico exacto y desplaza su propio
+    // contenido. El marco exterior sólo presenta el zoom del viewport entero.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
-      html, body { min-height: 100%; height: auto; overflow: visible; }
+      html, body {
+        width: ${width}px;
+        min-width: ${width}px;
+        max-width: ${width}px;
+        height: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y;
+      }
+      [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
     doc.head.appendChild(viewportStyle);
 
@@ -3630,45 +3654,6 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    // Safari no encadena de forma fiable el gesto desde un iframe sin scroll
-    // hacia su contenedor. El escenario exterior sigue siendo la única
-    // autoridad de desplazamiento: reenviamos rueda y arrastre táctil desde el
-    // documento real sin alterar su ancho lógico, escala ni composición.
-    const scrollport = iframe.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
-    const onWheel = (event: WheelEvent) => {
-      if (!scrollport) return;
-      event.preventDefault();
-      scrollport.scrollBy({ left: event.deltaX, top: event.deltaY });
-    };
-    let lastTouch: { x: number; y: number } | null = null;
-    const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1) {
-        lastTouch = null;
-        return;
-      }
-      const touch = event.touches[0];
-      lastTouch = touch ? { x: touch.clientX, y: touch.clientY } : null;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      if (!scrollport || !lastTouch || event.touches.length !== 1) return;
-      const touch = event.touches[0];
-      if (!touch) return;
-      const deltaX = lastTouch.x - touch.clientX;
-      const deltaY = lastTouch.y - touch.clientY;
-      if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
-      event.preventDefault();
-      scrollport.scrollBy({ left: deltaX, top: deltaY });
-      lastTouch = { x: touch.clientX, y: touch.clientY };
-    };
-    const clearTouch = () => {
-      lastTouch = null;
-    };
-    doc.addEventListener("wheel", onWheel, { passive: false });
-    doc.addEventListener("touchstart", onTouchStart, { passive: true });
-    doc.addEventListener("touchmove", onTouchMove, { passive: false });
-    doc.addEventListener("touchend", clearTouch, { passive: true });
-    doc.addEventListener("touchcancel", clearTouch, { passive: true });
-
     const canvasRoot = doc.createElement("div");
     canvasRoot.setAttribute("data-eb-canvas-root", "");
     doc.body.appendChild(canvasRoot);
@@ -3679,15 +3664,20 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
-      doc.removeEventListener("wheel", onWheel);
-      doc.removeEventListener("touchstart", onTouchStart);
-      doc.removeEventListener("touchmove", onTouchMove);
-      doc.removeEventListener("touchend", clearTouch);
-      doc.removeEventListener("touchcancel", clearTouch);
       viewportStyle.remove();
       canvasRoot.remove();
     };
-  }, []);
+  }, [width]);
+
+  useEffect(() => {
+    const doc = mount?.ownerDocument;
+    const win = doc?.defaultView;
+    if (!doc || !win) return;
+    const read = () => setCanvasScrollTop(doc.scrollingElement?.scrollTop ?? win.scrollY);
+    read();
+    doc.addEventListener("scroll", read, true);
+    return () => doc.removeEventListener("scroll", read, true);
+  }, [mount]);
 
   useEffect(() => {
     setDocumentHeight(minimumHeight);
@@ -3728,13 +3718,14 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
+        const scrollTop = doc.scrollingElement?.scrollTop ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
             const rect = section.getBoundingClientRect();
             return {
               key: section.dataset.ebSection ?? "",
-              top: Math.max(0, Math.round(rect.top - base)),
+              top: Math.max(0, Math.round(rect.top - base + scrollTop)),
               height: Math.round(rect.height),
             };
           })
@@ -3795,21 +3786,16 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Revelar la sección activa moviendo el escenario exterior (único scrollport).
+  // Revelar la sección activa dentro del viewport lógico de la plantilla.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
-    const frame = iframeRef.current;
-    const scrollport = frame?.closest<HTMLElement>('[data-eb-canvas-scrollport="editor"]');
-    if (!frame || !scrollport) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const scrollportRect = scrollport.getBoundingClientRect();
-    const frameRect = frame.getBoundingClientRect();
-    const top = Math.max(
-      0,
-      scrollport.scrollTop + frameRect.top - scrollportRect.top + target.top * scale - 16,
-    );
-    if (Math.abs(scrollport.scrollTop - top) > 8) scrollport.scrollTo({ top, behavior: "smooth" });
+    const doc = mount.ownerDocument;
+    const top = Math.max(0, target.top - 16);
+    if (Math.abs((doc.scrollingElement?.scrollTop ?? 0) - top) > 8) {
+      doc.defaultView?.scrollTo({ top, behavior: "smooth" });
+    }
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, selectedSectionKey]);
@@ -3859,7 +3845,7 @@ function CanvasViewport({
   // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
   const scaled = scale;
   const frameWidth = Math.round(width * scaled);
-  const frameHeight = Math.round(documentHeight * scaled);
+  const frameHeight = Math.round(viewportHeight * scaled);
   const editableRects = sectionRects.filter((section) =>
     reorderableSectionKeys.includes(section.key),
   );
@@ -3878,7 +3864,7 @@ function CanvasViewport({
     const frameTop = frame.getBoundingClientRect().top;
     let candidate: string | null = null;
     for (const section of editableRects) {
-      const top = frameTop + section.top * scaled;
+      const top = frameTop + (section.top - canvasScrollTop) * scaled;
       const bottom = top + section.height * scaled;
       if (clientY >= top && clientY <= bottom) return section.key;
       if (clientY > bottom) candidate = section.key;
@@ -3893,17 +3879,16 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const scrollport = iframeRef.current?.closest<HTMLElement>(
-      '[data-eb-canvas-scrollport="editor"]',
-    );
+    const canvasWindow = iframeRef.current?.contentWindow;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
-      if (!scrollport) return;
-      const rect = scrollport.getBoundingClientRect();
+      const frame = iframeRef.current;
+      if (!frame || !canvasWindow) return;
+      const rect = frame.getBoundingClientRect();
       const edge = 56;
-      if (moveEvent.clientY < rect.top + edge) scrollport.scrollBy({ top: -18 });
-      else if (moveEvent.clientY > rect.bottom - edge) scrollport.scrollBy({ top: 18 });
+      if (moveEvent.clientY < rect.top + edge) canvasWindow.scrollBy({ top: -18 / scaled });
+      else if (moveEvent.clientY > rect.bottom - edge) canvasWindow.scrollBy({ top: 18 / scaled });
     };
     const onUp = (upEvent: PointerEvent) => {
       handle.removeEventListener("pointermove", onMove);
@@ -3988,27 +3973,21 @@ function CanvasViewport({
         className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{ width: frameWidth, height: frameHeight }}
       >
-        <div
-          data-eb-canvas-scaled-stage=""
-          className="absolute left-0 top-0"
+        <iframe
+          ref={iframeRef}
+          title="Vista previa del canvas"
+          data-eb-canvas-device={device}
+          data-eb-canvas-width={width}
+          data-eb-canvas-height={documentHeight}
+          data-eb-canvas-scale={scaled}
+          className={`absolute left-0 top-0 block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
-            height: documentHeight,
+            height: viewportHeight,
             transform: `scale(${scaled})`,
             transformOrigin: "top left",
           }}
-        >
-          <iframe
-            ref={iframeRef}
-            title="Vista previa del canvas"
-            data-eb-canvas-device={device}
-            data-eb-canvas-width={width}
-            data-eb-canvas-height={documentHeight}
-            data-eb-canvas-scale={scaled}
-            className={`block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
-            style={{ width, height: documentHeight }}
-          />
-        </div>
+        />
         {mount ? createPortal(children, mount) : null}
         {!geometryIsCurrent ? (
           <div
@@ -4025,7 +4004,7 @@ function CanvasViewport({
             aria-label="Controles de secciones"
           >
             {editableRects.map((section) => {
-              const top = section.top * scaled;
+              const top = (section.top - canvasScrollTop) * scaled;
               const height = Math.max(24, section.height * scaled);
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
