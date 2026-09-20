@@ -3561,6 +3561,7 @@ function CanvasViewport({
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [iframeLoadVersion, setIframeLoadVersion] = useState(0);
   const [mount, setMount] = useState<HTMLElement | null>(null);
   const [documentHeight, setDocumentHeight] = useState(minimumHeight);
   const [sectionRects, setSectionRects] = useState<CanvasSectionRect[]>([]);
@@ -3580,10 +3581,10 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // El documento conserva el ancho lógico exacto. El iframe representa un
-    // viewport real de dispositivo y es su única autoridad de desplazamiento.
-    // Esto evita que WebKit tenga que rasterizar un iframe de página completa
-    // (decenas de miles de píxeles), causa de mosaicos blancos y pintura vieja.
+    // El documento conserva el ancho lógico exacto. El elemento raíz mantiene
+    // el scroll nativo del viewport del iframe; `body` conserva el flujo normal
+    // de la página. Forzar `body { height:100%; overflow:auto }` crea en WebKit
+    // una segunda caja de composición y deja secciones parcialmente pintadas.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
@@ -3591,20 +3592,19 @@ function CanvasViewport({
         width: ${width}px;
         min-width: ${width}px;
         max-width: ${width}px;
-        min-height: 100%;
       }
       html {
         height: 100%;
         overflow-x: hidden;
-        overflow-y: hidden;
-      }
-      body {
-        height: 100%;
-        min-height: 100%;
-        overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
+      }
+      body {
+        min-height: 100%;
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
@@ -3679,7 +3679,7 @@ function CanvasViewport({
       viewportStyle.remove();
       canvasRoot.remove();
     };
-  }, [width]);
+  }, [iframeLoadVersion, width]);
 
   useEffect(() => {
     setDocumentHeight(minimumHeight);
@@ -3721,7 +3721,7 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-        const scrollTop = doc.body.scrollTop;
+        const scrollTop = win?.scrollY ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
@@ -3786,7 +3786,7 @@ function CanvasViewport({
     const read = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        setCanvasScrollTop(doc.body.scrollTop);
+        setCanvasScrollTop(win.scrollY);
       });
     };
     read();
@@ -3816,10 +3816,10 @@ function CanvasViewport({
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const scroller = mount.ownerDocument.body;
     const top = Math.max(0, Math.round(target.top - 16));
-    if (Math.abs(scroller.scrollTop - top) > 8) {
-      scroller.scrollTo({ top, behavior: "smooth" });
+    const win = mount.ownerDocument.defaultView;
+    if (win && Math.abs(win.scrollY - top) > 8) {
+      win.scrollTo({ top, behavior: "smooth" });
     }
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3844,13 +3844,13 @@ function CanvasViewport({
     const doc = mount.ownerDocument;
     if (!win) return;
     const read = () => {
-      const scroller = doc.body;
+      const scroller = doc.scrollingElement ?? doc.documentElement;
       const header = doc.querySelector("header");
       const rect = header?.getBoundingClientRect();
       setMetrics({
         innerWidth: win.innerWidth,
         overflowX: Math.max(0, Math.round(scroller.scrollWidth - scroller.clientWidth)),
-        scrollY: Math.round(scroller.scrollTop),
+        scrollY: Math.round(win.scrollY),
         headerPosition: header ? win.getComputedStyle(header).position : "n/a",
         headerTop: rect ? Math.round(rect.top) : -1,
         headerVisible: !!rect && rect.bottom > 0 && rect.top < win.innerHeight,
@@ -3904,7 +3904,7 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const canvasScroller = mount?.ownerDocument.body;
+    const canvasScroller = mount?.ownerDocument.defaultView;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
@@ -3913,9 +3913,10 @@ function CanvasViewport({
       const rect = frame.getBoundingClientRect();
       const edge = 56;
       const logicalStep = 18 / scaled;
-      if (moveEvent.clientY < rect.top + edge) canvasScroller.scrollBy({ top: -logicalStep });
+       if (moveEvent.clientY < rect.top + edge)
+         canvasScroller.scrollBy({ top: -logicalStep, behavior: "auto" });
       else if (moveEvent.clientY > rect.bottom - edge)
-        canvasScroller.scrollBy({ top: logicalStep });
+         canvasScroller.scrollBy({ top: logicalStep, behavior: "auto" });
     };
     const onUp = (upEvent: PointerEvent) => {
       handle.removeEventListener("pointermove", onMove);
@@ -4003,6 +4004,8 @@ function CanvasViewport({
         <iframe
           ref={iframeRef}
           title="Vista previa del canvas"
+          srcDoc="<!doctype html><html><head></head><body></body></html>"
+          onLoad={() => setIframeLoadVersion((version) => version + 1)}
           data-eb-canvas-device={device}
           data-eb-canvas-width={width}
           data-eb-canvas-height={documentHeight}
