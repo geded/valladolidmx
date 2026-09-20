@@ -3985,24 +3985,30 @@ function CanvasViewport({
       ) : null}
       <div
         data-eb-canvas-frame=""
-        className="relative shrink-0 overflow-visible rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{ width: frameWidth, height: frameHeight }}
       >
-        <iframe
-          ref={iframeRef}
-          title="Vista previa del canvas"
-          data-eb-canvas-device={device}
-          data-eb-canvas-width={width}
-          data-eb-canvas-height={documentHeight}
-          data-eb-canvas-scale={scaled}
-          className={`block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
+        <div
+          data-eb-canvas-scaled-stage=""
+          className="absolute left-0 top-0"
           style={{
             width,
             height: documentHeight,
             transform: `scale(${scaled})`,
             transformOrigin: "top left",
           }}
-        />
+        >
+          <iframe
+            ref={iframeRef}
+            title="Vista previa del canvas"
+            data-eb-canvas-device={device}
+            data-eb-canvas-width={width}
+            data-eb-canvas-height={documentHeight}
+            data-eb-canvas-scale={scaled}
+            className={`block border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
+            style={{ width, height: documentHeight }}
+          />
+        </div>
         {mount ? createPortal(children, mount) : null}
         {!geometryIsCurrent ? (
           <div
