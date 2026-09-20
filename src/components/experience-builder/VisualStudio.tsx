@@ -3625,7 +3625,21 @@ function CanvasViewport({
             `[data-eb-canvas-style]:not([data-eb-canvas-style-generation="${generation}"])`,
           )
           .forEach((node) => node.remove());
-        if (nextStyles.length > 0) requestAnimationFrame(() => setStylesReady(true));
+        if (nextStyles.length > 0) {
+          const activeGeneration = styleGeneration;
+          // `document.fonts.ready` puede resolverse antes de que las hojas
+          // clonadas registren Fraunces/Inter en Safari. Solicitar las familias
+          // explícitamente evita mostrar primero la fuente de respaldo y el
+          // posterior salto de líneas del Hero.
+          void Promise.all([
+            doc.fonts.load("400 16px Fraunces"),
+            doc.fonts.load("600 16px Fraunces"),
+            doc.fonts.load("400 16px Inter"),
+            doc.fonts.load("600 16px Inter"),
+          ]).finally(() => {
+            if (activeGeneration === styleGeneration) setStylesReady(true);
+          });
+        }
       });
     };
     syncStyles();
