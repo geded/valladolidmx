@@ -77,6 +77,16 @@ function ReviewActions({ row }: { row: Row }) {
           Enviar a aprobación
         </Button>
       )}
+      {status === "draft" && isAdmin && (
+        <Button
+          size="sm"
+          disabled={busy}
+          onClick={() => void run("published", "Imagen aprobada y publicada.")}
+        >
+          Aprobar y publicar
+        </Button>
+      )}
+
       {status === "in_review" && isAdmin && (
         <>
           <Button
