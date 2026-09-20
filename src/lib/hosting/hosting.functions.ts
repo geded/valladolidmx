@@ -306,14 +306,23 @@ export const getVerificationDocumentSignedUrl = createServerFn({ method: "POST" 
   }))
   .handler(async ({ data, context }): Promise<{ url: string | null }> => {
     const { supabase } = context;
-    const { data: biz, error: bErr } = await supabase
+    // Acreditación del solicitante (dueño o administrador) vía RPC con RLS.
+    const { data: state, error: sErr } = await supabase.rpc("business_review_state", {
+      _business_ids: [data.business_id],
+    } as never);
+    if (sErr) throw new Error(sErr.message);
+    const row = (state as { has_verification_document: boolean }[] | null)?.[0];
+    if (!row) throw new Error("forbidden");
+    if (!row.has_verification_document) return { url: null };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: biz, error: bErr } = await supabaseAdmin
       .from("businesses")
       .select("verification_document_url")
       .eq("id", data.business_id)
       .maybeSingle();
     if (bErr) throw new Error(bErr.message);
     if (!biz?.verification_document_url) return { url: null };
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error } = await supabaseAdmin.storage
       .from("business-verification")
       .createSignedUrl(biz.verification_document_url, 60 * 10);
