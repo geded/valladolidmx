@@ -3720,8 +3720,7 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-        const scroller = doc.scrollingElement ?? doc.documentElement;
-        const scrollTop = scroller.scrollTop;
+        const scrollTop = win?.scrollY ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
@@ -3786,8 +3785,7 @@ function CanvasViewport({
     const read = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const scroller = doc.scrollingElement ?? doc.documentElement;
-        setCanvasScrollTop(scroller.scrollTop);
+        setCanvasScrollTop(win.scrollY);
       });
     };
     read();
@@ -3817,11 +3815,10 @@ function CanvasViewport({
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const doc = mount.ownerDocument;
-    const scroller = doc.scrollingElement ?? doc.documentElement;
     const top = Math.max(0, Math.round(target.top - 16));
-    if (Math.abs(scroller.scrollTop - top) > 8) {
-      scroller.scrollTo({ top, behavior: "smooth" });
+    const win = mount.ownerDocument.defaultView;
+    if (win && Math.abs(win.scrollY - top) > 8) {
+      win.scrollTo({ top, behavior: "smooth" });
     }
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3852,7 +3849,7 @@ function CanvasViewport({
       setMetrics({
         innerWidth: win.innerWidth,
         overflowX: Math.max(0, Math.round(scroller.scrollWidth - scroller.clientWidth)),
-        scrollY: Math.round(scroller.scrollTop),
+        scrollY: Math.round(win.scrollY),
         headerPosition: header ? win.getComputedStyle(header).position : "n/a",
         headerTop: rect ? Math.round(rect.top) : -1,
         headerVisible: !!rect && rect.bottom > 0 && rect.top < win.innerHeight,
@@ -3906,8 +3903,7 @@ function CanvasViewport({
     handle.setPointerCapture(event.pointerId);
     setDragKey(key);
     setDropKey(key);
-    const canvasDocument = mount?.ownerDocument;
-    const canvasScroller = canvasDocument?.scrollingElement ?? canvasDocument?.documentElement;
+    const canvasScroller = mount?.ownerDocument.defaultView;
 
     const onMove = (moveEvent: PointerEvent) => {
       setDropKey(resolveDropKey(moveEvent.clientY));
@@ -3916,9 +3912,10 @@ function CanvasViewport({
       const rect = frame.getBoundingClientRect();
       const edge = 56;
       const logicalStep = 18 / scaled;
-      if (moveEvent.clientY < rect.top + edge) canvasScroller.scrollBy({ top: -logicalStep });
+       if (moveEvent.clientY < rect.top + edge)
+         canvasScroller.scrollBy({ top: -logicalStep, behavior: "auto" });
       else if (moveEvent.clientY > rect.bottom - edge)
-        canvasScroller.scrollBy({ top: logicalStep });
+         canvasScroller.scrollBy({ top: logicalStep, behavior: "auto" });
     };
     const onUp = (upEvent: PointerEvent) => {
       handle.removeEventListener("pointermove", onMove);
