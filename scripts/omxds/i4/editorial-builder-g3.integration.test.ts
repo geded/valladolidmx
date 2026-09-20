@@ -104,7 +104,7 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("Ajustar al espacio de trabajo");
     expect(studio).toContain("new ResizeObserver(read)");
     expect(studio).toContain("transform: `scale(${scaled})`");
-    expect(studio).toContain('transformOrigin: "top left"');
+    expect(studio).toContain("origin-top-left");
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
     expect(studio).toContain('doc.addEventListener("touchmove", onTouchMove, { passive: false })');
     expect(studio).toContain('doc.addEventListener("wheel", onWheel, { passive: false })');
