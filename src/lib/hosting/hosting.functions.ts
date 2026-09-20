@@ -408,12 +408,17 @@ export const getBusinessPublishChecklist = createServerFn({ method: "GET" })
     const { data: b, error } = await supabase
       .from("businesses")
       .select(
-        "id, display_name, status, review_notes, submitted_for_review_at, logo_media_id, cover_media_id, description, primary_category_id",
+        "id, display_name, status, logo_media_id, cover_media_id, description, primary_category_id",
       )
       .eq("id", data.business_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!b) throw new Error("business_not_found");
+    const { data: states, error: sErr } = await supabase.rpc("business_review_state", {
+      _business_ids: [data.business_id],
+    } as never);
+    if (sErr) throw new Error(sErr.message);
+    const reviewState = ((states as any[]) ?? [])[0] ?? null;
     const [{ count: galleryCount }, { count: locationCount }, { count: contactCount }] =
       await Promise.all([
         supabase
