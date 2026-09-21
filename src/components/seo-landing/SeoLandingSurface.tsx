@@ -240,7 +240,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   return (
     <div className="pb-8">
       {/* ── 1 · Hero dividido premium (42 / 58) ───────────────────── */}
-      <section className={cn(SHELL, "pt-3 sm:pt-4")} aria-label="Portada">
+      <section className={cn(SHELL, "pt-3 sm:pt-4")} aria-label="Portada" data-eb-section="hero">
         <div
           className={cn(
             "grid overflow-hidden rounded-3xl border border-border bg-card shadow-elevated",
