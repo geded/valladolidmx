@@ -35,6 +35,18 @@ type MenuLink = {
   icon: typeof UserRound;
 };
 
+interface UserMenuProps {
+  /**
+   * El menú móvil vive junto al borde inferior del drawer. En ese contexto el
+   * desplegable debe crecer hacia arriba para permanecer visible y pulsable.
+   */
+  placement?: "below" | "above";
+  /** Muestra una etiqueta estable en superficies estrechas. */
+  mobileLabel?: boolean;
+  /** Permite que el drawer se cierre inmediatamente al navegar. */
+  onNavigate?: () => void;
+}
+
 // Los enlaces del menú se derivan del MODO ACTIVO (Airbnb-style), no
 // solo del rol. En modo Empresa/Concierge/Staff no debe aparecer "Mi
 // viaje"; en modo Viajero no deben aparecer los paneles operativos.
@@ -79,7 +91,7 @@ function buildMenuLinks(role: AppRole | null, mode: ProfileMode): MenuLink[] {
   return links;
 }
 
-export function UserMenu() {
+export function UserMenu({ placement = "below", mobileLabel = false, onNavigate }: UserMenuProps = {}) {
   const { t } = useTranslation();
   const { authUser, role, signOut, loading } = useAuth();
   const [open, setOpen] = useState(false);
@@ -116,7 +128,10 @@ export function UserMenu() {
     return (
       <Link
         to="/auth"
-        onClick={() => rememberAuthReturnPath(`${location.pathname}${location.searchStr ?? ""}`)}
+        onClick={() => {
+          rememberAuthReturnPath(`${location.pathname}${location.searchStr ?? ""}`);
+          onNavigate?.();
+        }}
         className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium text-muted-foreground"
         aria-busy="true"
         title={t("nav.sign_in")}
@@ -143,15 +158,19 @@ export function UserMenu() {
           aria-expanded={open}
         >
           <UserRound className="size-4" aria-hidden />
-          <span className="hidden max-w-[140px] truncate lg:inline">
-            {authUser.display_name ?? authUser.email}
+          <span className={mobileLabel ? "inline max-w-[14rem] truncate" : "hidden max-w-[140px] truncate lg:inline"}>
+            {mobileLabel ? "Mi cuenta" : (authUser.display_name ?? authUser.email)}
           </span>
           <ChevronDown className="size-3 opacity-60" aria-hidden />
         </button>
         {open ? (
           <div
             role="menu"
-            className="absolute right-0 mt-2 w-56 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-xl border border-border bg-popover shadow-lg z-[200]"
+            className={`absolute right-0 z-[200] w-56 max-w-[calc(100vw-3.5rem)] overflow-y-auto rounded-xl border border-border bg-popover shadow-lg ${
+              placement === "above"
+                ? "bottom-full mb-2 max-h-[calc(100dvh-11rem)]"
+                : "top-full mt-2 max-h-[calc(100dvh-5rem)]"
+            }`}
           >
             <div className="border-b border-border px-3 py-2 text-xs text-muted-foreground">
               <div className="truncate font-medium text-foreground">
@@ -166,7 +185,10 @@ export function UserMenu() {
                     key={l.to}
                     to={l.to}
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      setOpen(false);
+                      onNavigate?.();
+                    }}
                     className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
                   >
                     <l.icon className="size-4" aria-hidden />
@@ -177,11 +199,19 @@ export function UserMenu() {
             ) : null}
             {inWorkspace ? (
               <>
-                <ProfileModeSwitcher onSwitched={() => setOpen(false)} />
+                <ProfileModeSwitcher
+                  onSwitched={() => {
+                    setOpen(false);
+                    onNavigate?.();
+                  }}
+                />
                 <Link
                   to="/"
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    onNavigate?.();
+                  }}
                   className="flex items-center gap-2 border-b border-border px-3 py-2 text-sm hover:bg-accent"
                 >
                   <Globe className="size-4" aria-hidden />
@@ -194,7 +224,10 @@ export function UserMenu() {
                   to={accountTarget}
 
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    onNavigate?.();
+                  }}
                   className="flex items-center gap-2 border-b border-border px-3 py-2 text-sm hover:bg-accent"
                 >
                   <UserRound className="size-4" aria-hidden />
@@ -211,6 +244,7 @@ export function UserMenu() {
                   navigate({ to: "/", replace: true }).catch(() => undefined);
                 })();
                 setOpen(false);
+                onNavigate?.();
               }}
               className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent"
             >
@@ -226,7 +260,10 @@ export function UserMenu() {
   return (
     <Link
       to="/auth"
-      onClick={() => rememberAuthReturnPath(`${location.pathname}${location.searchStr ?? ""}`)}
+      onClick={() => {
+        rememberAuthReturnPath(`${location.pathname}${location.searchStr ?? ""}`);
+        onNavigate?.();
+      }}
       className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
       title={t("nav.sign_in")}
     >

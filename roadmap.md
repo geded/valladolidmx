@@ -14,6 +14,8 @@
 
 ## En curso
 
+- [ ] Menú móvil · Cuenta y acceso (21-sep, IMG_2681): mantener “Arma tu Viaje” y la cuenta visibles y pulsables en celulares; el menú de una sesión activa debe abrir hacia arriba dentro del drawer y mostrar “Mi cuenta”, sin quedar recortado por el borde inferior. Validar 430/390, sesión iniciada y cerrada, preservando el header aprobado.
+
 - [x] Experience Builder · Timeout de autoguardado (21-sep): el guardado inmediato ya no espera traducción automática; validaciones independientes se ejecutan en paralelo; los cambios rápidos se compactan con estrategia latest-wins y la escritura falla rápido/reintenta si otra petición ocupa el borrador. Se preservan autorización fail-closed, conflicto de borrador y auditoría.
 
 - [ ] Experience Builder · Selección/arrastre móvil (20-sep, IMG_0887–0888): el inspector debe conservar visible la sección exacta seleccionada; el bloque compuesto Home no debe marcar toda la página ni interceptar la selección interna; el asa debe corresponder únicamente a la sección visible que se editará o moverá. Corrección limitada al shell editorial, sin tocar renderer público, CMS ni orden vigente.
