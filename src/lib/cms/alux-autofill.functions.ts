@@ -926,8 +926,24 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
+
+    // Presupuesto de tiempo por etapa: ninguna fuente externa puede agotar el
+    // tiempo de la petición. Si una tarda de más, se descarta esa fuente y la
+    // búsqueda continúa con las demás (comportamiento fail-soft, no error).
+    const withBudget = async <T,>(task: Promise<T>, ms: number, fallback: T): Promise<T> => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      });
+      try {
+        return await Promise.race([task.catch(() => fallback), timeout]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    };
+
     const site = data.website
-      ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
+      ? await withBudget(searchBusinessSite(data.website), 8000, [] as PhotoCandidate[])
       : [];
 
     // Paso 1: Alux escribe la búsqueda. El editor sólo pone el tema; el destino
