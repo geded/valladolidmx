@@ -435,7 +435,7 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
           "draft_conflict: El borrador cambió desde que lo abriste. Recarga antes de guardar.",
         );
       }
-      let treeToSave = mergeExistingI18n(data.tree, previousTree);
+      let treeToSave = dropLegacyConfig(mergeExistingI18n(data.tree, previousTree));
 
       await assertI4AuthoringTree({
         context,
