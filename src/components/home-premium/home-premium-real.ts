@@ -422,21 +422,45 @@ function applyHomeRailLimits(
   };
 }
 
+/**
+ * Overrides editoriales por carril. Acepta la configuración completa del
+ * bloque o, por compatibilidad, sólo la colección de destinos.
+ */
+function railOverridesOf(source: unknown, rail: HomeEditableRail): unknown {
+  if (Array.isArray(source)) return rail === "destinos" ? source : undefined;
+  if (!source || typeof source !== "object") return undefined;
+  return (source as RowRec)[HOME_RAIL_CONFIG_KEY[rail]];
+}
+
+const str = (value: unknown, fallback: string): string =>
+  typeof value === "string" && value.trim() ? value : fallback;
+const num = (value: unknown, fallback: number): number =>
+  typeof value === "number" && Number.isFinite(value) ? value : fallback;
+const rowMedia = (row: RowRec | undefined, fallback: { url: string; alt: string }) =>
+  row ? { url: str(row.media_url, fallback.url), alt: str(row.media_alt, fallback.alt) } : fallback;
+
 /** Fusiona el corpus real sobre el contenido editorial resuelto del bloque. */
 export function mergeHomeRealContent(
   content: HomePremiumContent,
   real: HomeRealContent | undefined,
-  destinationOverrides?: unknown,
+  editorialOverrides?: unknown,
   limits?: HomeRailLimits,
 ): HomePremiumContent {
   const safeContent = withoutUnapprovedMedia(content);
   if (!real) return applyHomeRailLimits(safeContent, limits);
   const mediaAssets = real.mediaAssets ?? {};
 
+  const rowsFor = (rail: HomeEditableRail) =>
+    buildHomeRailEditorRows(rail, real, railOverridesOf(editorialOverrides, rail));
+
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
-  const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
   const homeDestinations = withValladolidFirst(real.destinos);
-  const destinationRows = buildHomeDestinationEditorRows(real, destinationOverrides);
+  const destinationRows = rowsFor("destinos");
+  const routeRows = rowsFor("rutas");
+  const experienceRows = rowsFor("experiencias");
+  const stayRows = rowsFor("stays");
+  const foodRows = rowsFor("food");
+  const eventRows = rowsFor("eventos");
   const firstEventWithMedia = real.eventos.find((card) => card.mediaUrl.length > 0);
   const realHeroSlides = destinationsWithMedia.slice(0, 3).map((card) => ({
     media: mediaOf(card),
@@ -454,64 +478,81 @@ export function mergeHomeRealContent(
         ...safeContent.destinos,
         items: homeDestinations.map((card, index) => {
           const row = destinationRows[index];
+          const fallback = mediaOf(card, "destination", index);
           return {
-            name: row?.name ?? card.title,
-            note: row?.note ?? card.subtitle,
-            media: row
-              ? { url: row.media_url, alt: row.media_alt }
-              : mediaOf(card, "destination", index),
-            puebloMagico: row?.pueblo_magico ?? card.puebloMagico,
-            href: card.href,
+            name: str(row?.name, card.title),
+            note: str(row?.note, card.subtitle),
+            media: rowMedia(row, fallback),
+            puebloMagico:
+              typeof row?.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
+            href: str(row?.href, card.href),
           };
         }),
       },
       rutas: {
         ...safeContent.rutas,
-        items: real.rutas.map((route) => {
-          const cover = route.sequence
-            .map((title) => destinationByTitle.get(title))
-            .find((card): card is Card => Boolean(card?.mediaUrl));
+        items: real.rutas.map((route, index) => {
+          const row = routeRows[index];
+          const sequence = Array.isArray(row?.sequence)
+            ? (row.sequence as unknown[])
+                .map((stop) =>
+                  stop && typeof stop === "object" ? String((stop as RowRec).label ?? "") : "",
+                )
+                .filter((label) => label.length > 0)
+            : route.sequence;
           return {
             ...route,
-            media: route.mediaUrl
-              ? { url: route.mediaUrl, alt: route.title }
-              : cover
-                ? mediaOf(cover)
-                : mediaOf({ title: route.title, mediaUrl: "" }, "route", real.rutas.indexOf(route)),
+            title: str(row?.title, route.title),
+            duration: str(row?.duration, route.duration),
+            stops: num(row?.stops, route.stops),
+            vibe: str(row?.vibe, route.vibe),
+            description: str(row?.description, route.description),
+            sequence: sequence.length > 0 ? sequence : route.sequence,
+            href: str(row?.href, route.href),
+            media: rowMedia(row, { url: route.mediaUrl, alt: route.title }),
           };
         }),
       },
       experiencias: {
         ...safeContent.experiencias,
-        items: real.experiencias.map((card, index) => ({
-          businessId: card.businessId,
-          title: card.title,
-          category: card.category,
-          summary: card.subtitle,
-          media: mediaOf(card, "experience", index),
-          href: card.href,
-        })),
+        items: real.experiencias.map((card, index) => {
+          const row = experienceRows[index];
+          return {
+            businessId: card.businessId,
+            title: str(row?.title, card.title),
+            category: str(row?.category, card.category),
+            summary: str(row?.summary, card.subtitle),
+            media: rowMedia(row, mediaOf(card, "experience", index)),
+            href: str(row?.href, card.href),
+          };
+        }),
       },
       servicios: {
         ...safeContent.servicios,
-        stays: real.stays.map((card, index) => ({
-          businessId: card.businessId,
-          title: card.title,
-          destination: card.category,
-          category: "Hospedaje",
-          summary: card.subtitle,
-          media: mediaOf(card, "hotel", index),
-          href: card.href,
-        })),
-        food: real.food.map((card, index) => ({
-          businessId: card.businessId,
-          title: card.title,
-          destination: card.category,
-          category: "Gastronomía",
-          summary: card.subtitle,
-          media: mediaOf(card, "restaurant", index),
-          href: card.href,
-        })),
+        stays: real.stays.map((card, index) => {
+          const row = stayRows[index];
+          return {
+            businessId: card.businessId,
+            title: str(row?.title, card.title),
+            destination: str(row?.destination, card.category),
+            category: str(row?.category, "Hospedaje"),
+            summary: str(row?.summary, card.subtitle),
+            media: rowMedia(row, mediaOf(card, "hotel", index)),
+            href: str(row?.href, card.href),
+          };
+        }),
+        food: real.food.map((card, index) => {
+          const row = foodRows[index];
+          return {
+            businessId: card.businessId,
+            title: str(row?.title, card.title),
+            destination: str(row?.destination, card.category),
+            category: str(row?.category, "Gastronomía"),
+            summary: str(row?.summary, card.subtitle),
+            media: rowMedia(row, mediaOf(card, "restaurant", index)),
+            href: str(row?.href, card.href),
+          };
+        }),
       },
       eventos: {
         ...safeContent.eventos,
@@ -524,17 +565,25 @@ export function mergeHomeRealContent(
             : firstEventWithMedia
               ? mediaOf(firstEventWithMedia)
               : safeContent.eventos.media,
-        items: real.eventos.map((card) => ({
-          day: card.day,
-          title: card.title,
-          type: card.category,
-          detail: card.subtitle,
-          href: card.href,
-          startsAt: card.startsAt,
-          recurrence: card.recurrence,
-          media: card.mediaUrl.length > 0 ? { url: card.mediaUrl, alt: card.title } : null,
-        })),
+        items: real.eventos.map((card, index) => {
+          const row = eventRows[index];
+          const media = rowMedia(row, {
+            url: card.mediaUrl,
+            alt: card.mediaUrl.length > 0 ? card.title : "",
+          });
+          return {
+            day: str(row?.day, card.day),
+            title: str(row?.title, card.title),
+            type: str(row?.type, card.category),
+            detail: str(row?.detail, card.subtitle),
+            href: str(row?.href, card.href),
+            startsAt: card.startsAt,
+            recurrence: card.recurrence,
+            media: media.url.length > 0 ? media : null,
+          };
+        }),
       },
+
       mapa: {
         ...safeContent.mapa,
         dto: {
