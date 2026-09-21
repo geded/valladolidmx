@@ -228,50 +228,60 @@ export function HomePremiumSurface({
           />
         </Container>
       );
-    if (key === "categorias")
+    if (key === "experienciasAcceso")
       return (
-        <div data-eb-section="categorias">
-          <Container className="mt-6 sm:mt-8" data-home-journey="experiencias-access">
-            <a
-              href="/experiencias"
-              className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
-            >
-              <span className="flex min-w-0 items-center gap-3">
-                <TourismCategoryIcon slug="experiencias" variant="standard" />
-                <span className="min-w-0">
-                  <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
-                    {content.experiencias.kicker}
-                  </span>
-                  <span className="block text-base font-semibold sm:truncate sm:text-lg">
-                    {content.experiencias.title}
-                  </span>
-                  <span className="block text-sm text-muted-foreground">
-                    {content.experiencias.description}
-                  </span>
+        <Container
+          className="mt-6 sm:mt-8"
+          data-home-journey="experiencias-access"
+          data-eb-section="experienciasAcceso"
+        >
+          <a
+            href="/experiencias"
+            className="group flex flex-col gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-soft ring-focus sm:flex-row sm:items-center sm:justify-between sm:p-5"
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <TourismCategoryIcon slug="experiencias" variant="standard" />
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold uppercase tracking-wide text-primary">
+                  {content.experiencias.kicker}
+                </span>
+                <span className="block text-base font-semibold sm:truncate sm:text-lg">
+                  {content.experiencias.title}
+                </span>
+                <span className="block text-sm text-muted-foreground">
+                  {content.experiencias.description}
                 </span>
               </span>
-              <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
-                {content.experiencias.action}
-              </span>
-            </a>
-          </Container>
-          <Container className="mt-6 sm:mt-8" data-home-journey="categories">
-            <section
-              aria-label={content.categorias.heading}
-              className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
-            >
-              <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
-              <CategoryNavGrid
-                items={content.categorias.items}
-                variant="standard"
-                mode="navigate"
-                showCounts={false}
-                desktopColumnsClassName="lg:grid-cols-6"
-              />
-            </section>
-          </Container>
-        </div>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft">
+              {content.experiencias.action}
+            </span>
+          </a>
+        </Container>
       );
+    if (key === "categorias")
+      return (
+        <Container
+          className="mt-6 sm:mt-8"
+          data-home-journey="categories"
+          data-eb-section="categorias"
+        >
+          <section
+            aria-label={content.categorias.heading}
+            className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5"
+          >
+            <h2 className="mb-4 text-base font-semibold">{content.categorias.heading}</h2>
+            <CategoryNavGrid
+              items={content.categorias.items}
+              variant="standard"
+              mode="navigate"
+              showCounts={false}
+              desktopColumnsClassName="lg:grid-cols-6"
+            />
+          </section>
+        </Container>
+      );
+
     if (key === "travelPlan")
       return (
         <Container

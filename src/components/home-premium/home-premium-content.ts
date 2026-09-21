@@ -61,6 +61,7 @@ export type HomePremiumSectionKey =
   | "hero"
   | "alux"
   | "destinos"
+  | "experienciasAcceso"
   | "categorias"
   | "pueblosMagicos"
   | "rutas"
@@ -241,6 +242,7 @@ export const HOME_PREMIUM_SECTION_LABELS: Record<HomePremiumSectionKey, string> 
   hero: "Portada",
   alux: "Alux",
   destinos: "Destinos del Oriente Maya de Yucatán",
+  experienciasAcceso: "Acceso a Experiencias",
   categorias: "Explora por categoría",
   pueblosMagicos: "Pueblos Mágicos",
   rutas: "Rutas recomendadas por Alux",
@@ -256,6 +258,7 @@ export const HOME_PREMIUM_DEFAULT_ORDER: HomePremiumSectionKey[] = [
   "hero",
   "alux",
   "destinos",
+  "experienciasAcceso",
   "categorias",
   "eventos",
   "experiencias",

@@ -57,6 +57,12 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         reorderable: true,
       },
       {
+        key: "experienciasAcceso",
+        label: "Acceso a Experiencias",
+        prefixes: ["experiencias_acceso_"],
+        reorderable: true,
+      },
+      {
         key: "categorias",
         label: "Explora por categoría",
         prefixes: ["categorias_"],
