@@ -3733,6 +3733,8 @@ function CanvasViewport({
   editingEnabled: boolean;
   onSelectSection: (nodeId: string, sectionKey: string) => void;
   onReorderSection: (activeKey: string, overKey: string) => void;
+  onReorderCard?: (sectionKey: string, from: number, to: number) => void;
+
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
