@@ -79,7 +79,12 @@ function ExperienceBuilderShell() {
       replace: true,
     });
 
+  // El bloqueo de desplazamiento del workspace sólo aplica cuando hay una
+  // página abierta en el lienzo (el lienzo tiene su propio scroller). En el
+  // panel de páginas la lista debe poder desplazarse con normalidad.
+  const canvasOpen = Boolean(page);
   useEffect(() => {
+    if (!canvasOpen) return;
     const workspaceMain = shellRef.current?.closest<HTMLElement>("main#main");
     if (!workspaceMain) return;
     const previousOverflow = workspaceMain.style.overflow;
@@ -90,10 +95,13 @@ function ExperienceBuilderShell() {
       workspaceMain.style.overflow = previousOverflow;
       workspaceMain.style.overscrollBehavior = previousOverscroll;
     };
-  }, []);
+  }, [canvasOpen]);
 
   return (
-    <div ref={shellRef} className="flex min-h-0 flex-col overflow-hidden">
+    <div
+      ref={shellRef}
+      className={`flex min-h-0 flex-col ${canvasOpen ? "overflow-hidden" : ""}`}
+    >
       <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <Link
           to="/cms"
