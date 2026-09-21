@@ -3711,6 +3711,8 @@ function CanvasViewport({
   editingEnabled,
   onSelectSection,
   onReorderSection,
+  onReorderCard,
+
   children,
 }: {
   device: DeviceViewport;
