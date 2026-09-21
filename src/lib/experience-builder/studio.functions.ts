@@ -129,17 +129,18 @@ function isRootOrderOnlyDelta(next: CompositionTree, previous: CompositionTree):
   const a = next.root?.children ?? [];
   const b = previous.root?.children ?? [];
   if (!b.length || a.length !== b.length) return false;
+  const dropUndefined = (value: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined));
   const strip = (node: CompositionNode) => {
     const { order: _order, ...rest } = (node.config ?? {}) as Record<string, unknown>;
-    return canonicalize({ ...node, config: rest });
+    return canonicalize(
+      dropUndefined({ ...(node as unknown as Record<string, unknown>), config: dropUndefined(rest) }),
+    );
   };
   let orderChanged = false;
   for (let i = 0; i < a.length; i += 1) {
     if (a[i].id !== b[i].id) return false;
-    if (strip(a[i]) !== strip(b[i])) {
-      console.log("[eb-order-delta-mismatch]", a[i].id, strip(a[i]), strip(b[i]));
-      return false;
-    }
+    if (strip(a[i]) !== strip(b[i])) return false;
     const na = (a[i].config ?? {})["order"];
     const nb = (b[i].config ?? {})["order"];
     if (na !== nb) {
