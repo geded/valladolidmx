@@ -593,7 +593,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
       {/* Galería complementaria (sólo si el CMS la pobló). */}
       {gallery.length > 0 ? (
-        <div className={cn(SHELL, "mt-6")}>
+        <div className={cn(SHELL, "mt-6")} data-eb-section="gallery">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {gallery.slice(0, 4).map((img) => (
               <figure
