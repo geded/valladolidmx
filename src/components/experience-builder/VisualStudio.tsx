@@ -3533,6 +3533,30 @@ function DeviceToggle({
 const CANVAS_MIN_SCALE = 0.2;
 const CANVAS_PRECISE_EDIT_SCALE = 0.45;
 
+/**
+ * Familia `premium-seo-landing`: la maqueta aprobada se edita región por
+ * región sobre la MISMA superficie pública. Cada clave corresponde al slot
+ * declarado por la plantilla (`data-eb-section` en `SeoLandingSurface`).
+ */
+const SEO_LANDING_SECTION_LABELS: Record<string, string> = {
+  hero: "Portada",
+  badges: "Señales de confianza",
+  intro: "Por qué es extraordinario",
+  offers: "Experiencias destacadas",
+  infoGrid: "Información para tu visita",
+  map: "Contexto territorial",
+  aluxPlanner: "Alux",
+  gallery: "Galería",
+};
+/** Ancla lógica del lienzo cuando la maqueta se edita por regiones. */
+const SEO_LANDING_CANVAS_ID = "__seo_landing_surface__";
+
+/** Slot declarado por el identificador persistido del nodo (`...-hero`). */
+function seoLandingSlotOf(nodeId: string): string {
+  const parts = nodeId.split("-");
+  return parts[parts.length - 1] ?? "";
+}
+
 function roundScale(value: number): number {
   return Math.round(Math.min(1, Math.max(CANVAS_MIN_SCALE, value)) * 1000) / 1000;
 }
