@@ -18,7 +18,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   listMyNotificationDeliveries,
-  countMyUnreadNotifications,
   markNotificationDeliveryRead,
 } from "@/lib/notifications/notifications.functions";
 import {
@@ -63,7 +62,6 @@ function relative(iso: string): string {
 
 export function UncNotificationsBell() {
   const fetchList = useServerFn(listMyNotificationDeliveries);
-  const fetchCount = useServerFn(countMyUnreadNotifications);
   const markRead = useServerFn(markNotificationDeliveryRead);
   const queryClient = useQueryClient();
   const router = useRouter();
