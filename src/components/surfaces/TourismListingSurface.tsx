@@ -416,12 +416,16 @@ export function TourismListingSurface({
       ) : null}
 
       {displayItems.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
+        <div
+          data-eb-section="resultados"
+          className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center"
+        >
           <p className="text-sm text-muted-foreground">{emptyMessage}</p>
           {emptyHint ? <div className="mt-3 text-sm">{emptyHint}</div> : null}
         </div>
       ) : (
         <div
+          data-eb-section="resultados"
           className={cn(
             mapSlot && "grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,.75fr)]",
           )}
