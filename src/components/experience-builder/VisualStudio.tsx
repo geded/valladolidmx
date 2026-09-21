@@ -4202,6 +4202,7 @@ function CanvasViewport({
                if (!visible && dragKey !== section.key) return null;
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
+              const isDragSource = dragKey === section.key;
               // El asa acompaña la parte visible de la sección: si su inicio ya
               // quedó arriba del borde, el control permanece a la vista en vez
               // de desaparecer mientras la sección sigue en pantalla.
@@ -4214,13 +4215,23 @@ function CanvasViewport({
                   <div
                     aria-hidden
                     className={`pointer-events-none absolute inset-0 rounded-md transition-colors ${
-                      isDropTarget
-                        ? "bg-primary/10 outline outline-2 outline-primary"
-                        : selected
-                          ? "outline outline-2 outline-primary"
-                          : "outline outline-1 outline-border/60"
+                      isDragSource
+                        ? "bg-foreground/5 outline outline-2 outline-dashed outline-primary/70"
+                        : isDropTarget
+                          ? "bg-primary/10 outline outline-2 outline-primary"
+                          : selected
+                            ? "outline outline-2 outline-primary"
+                            : "outline outline-1 outline-border/60"
                     }`}
                   />
+                  {isDropTarget && !isDragSource ? (
+                    <div
+                      aria-hidden
+                      data-eb-canvas-drop-indicator={dropBefore ? "before" : "after"}
+                      className="pointer-events-none absolute inset-x-1 h-1 rounded-full bg-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.25)]"
+                      style={dropBefore ? { top: -2 } : { top: height - 2 }}
+                    />
+                  ) : null}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute left-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
@@ -4233,8 +4244,10 @@ function CanvasViewport({
                     data-eb-external-section-handle={section.key}
                     aria-label={`Mover o editar ${sectionLabels[section.key] ?? section.key}`}
                     title="Arrastra para reordenar; pulsa para editar"
+                    draggable={false}
                     style={{ touchAction: "none", top: controlsOffset }}
                     onPointerDown={(event) => startSectionDrag(event, section.key)}
+                    onDragStart={(event) => event.preventDefault()}
                     onClick={() =>
                       compositeNodeId && onSelectSection(compositeNodeId, section.key)
                     }
