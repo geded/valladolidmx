@@ -37,6 +37,9 @@ type Row = {
 };
 
 export const Route = createFileRoute("/_authenticated/cms/media")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    estado: search["estado"] === "in_review" ? ("in_review" as const) : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Media · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
