@@ -3508,11 +3508,18 @@ function HomeCanvas({
     return () => ro.disconnect();
   }, []);
   const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
+  // Vista "Real": el ancho lógico ES el ancho disponible del editor y la escala
+  // queda fija en 1. Así la plantilla se compone exactamente igual que en la
+  // página publicada vista en este mismo dispositivo.
+  const isAutoWidth = deviceViewport === "auto";
+  const logicalWidth = isAutoWidth
+    ? Math.max(320, Math.round(usableWidth && usableWidth > 0 ? usableWidth : 1024))
+    : preset.width;
   const fitScale =
-    usableWidth == null || usableWidth <= 0 || usableWidth >= preset.width
+    isAutoWidth || usableWidth == null || usableWidth <= 0 || usableWidth >= logicalWidth
       ? 1
-      : roundScale(usableWidth / preset.width);
-  const scale = roundScale(zoomOverride ?? fitScale);
+      : roundScale(usableWidth / logicalWidth);
+  const scale = isAutoWidth ? 1 : roundScale(zoomOverride ?? fitScale);
   useEffect(() => setZoomOverride(null), [deviceViewport]);
   useEffect(() => {
     const scrollport = scrollportRef.current;
