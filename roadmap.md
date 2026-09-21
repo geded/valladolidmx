@@ -276,4 +276,4 @@
 - [ ] Regla: toda correccion de plantilla (empezando por Micrositio de Destino v1 oficial) se entrega editable desde la estructura del constructor (textos, imagenes, enlaces, orden).
 - [ ] Extender el lienzo reconstruido a las demás familias sólo después de aceptación humana de Home y validación completa 1440/1280/1024/834/430/390.
 
-- [ ] Aplicar a la landing Zazil Tunich el mismo modelo probado de selección, edición y reordenamiento de Inicio, sin editor paralelo.
+- [x] Aplicar a la landing Zazil Tunich el mismo modelo probado de selección, edición y reordenamiento de Inicio, sin editor paralelo.
