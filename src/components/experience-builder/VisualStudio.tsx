@@ -1338,6 +1338,12 @@ function PageVisualEditor({
   }, [deviceViewport]);
 
   useEffect(() => {
+    // Una recarga del efecto (por re-render o cambio de identidad de funciones)
+    // jamás debe sustituir el árbol en edición: sólo cargamos una vez por
+    // composición. Cambiar de página sí vuelve a cargar.
+    const loadKey = `${pageDef.compositionId ?? ""}|${pageDef.slug}|${pageDef.page_type}`;
+    if (loadedCompositionKeyRef.current === loadKey) return;
+    loadedCompositionKeyRef.current = loadKey;
     let cancelled = false;
     void (async () => {
       try {
