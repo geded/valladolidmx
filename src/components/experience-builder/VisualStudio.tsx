@@ -1520,6 +1520,8 @@ function PageVisualEditor({
       console.log("[eb-save-drain]", saveDrainActiveRef.current);
       if (saveDrainActiveRef.current) return;
       saveDrainActiveRef.current = true;
+      console.log("[eb-save-drain-start]");
+
 
       const drainPendingSaves = async () => {
         try {
