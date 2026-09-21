@@ -3645,6 +3645,11 @@ function CanvasViewport({
   const [canvasScrollTop, setCanvasScrollTop] = useState(0);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
+  // Punto de inserción explícito: `before` indica si la sección arrastrada
+  // quedará arriba de la sección destino. Da control real de destino en vez de
+  // "soltar sobre el bloque" sin retroalimentación.
+  const [dropBefore, setDropBefore] = useState(true);
+  const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
