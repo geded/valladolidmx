@@ -8,6 +8,7 @@ import { getNavItemsForWorkspace } from "@/lib/workspace/navigation-registry";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { ConciergeNotificationsBell } from "@/components/concierge/ConciergeNotificationsBell";
+import { UncNotificationsBell } from "@/components/notifications/UncNotificationsBell";
 
 /** Humaniza un segmento de URL para usarlo como crumb. */
 function humanizeSegment(seg: string): string {
@@ -239,6 +240,7 @@ export function WorkspaceTopbar({
       </button>
       <ConnectivityIndicator />
       {workspace?.id === "concierge" ? <ConciergeNotificationsBell /> : null}
+      <UncNotificationsBell />
       <button
         type="button"
         onClick={() => setInspector(inspectorOpen ? "closed" : "docked")}
