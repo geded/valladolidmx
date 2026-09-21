@@ -4560,9 +4560,14 @@ function CanvasLiveContent({
       className={`select-none ${className ?? ""}`}
       onClickCapture={(event) => {
         const target = event.target as HTMLElement | null;
-        if (
-          target?.closest("a,button,input,select,textarea,label,summary,[role='button'],[role='link']")
-        ) {
+        const control = target?.closest(
+          "a,button,input,select,textarea,label,summary,[role='button'],[role='link']",
+        ) as HTMLElement | null;
+        // El envoltorio de selección de bloque también expone `role="button"`.
+        // Si es el coincidente más cercano, el clic es editorial (seleccionar la
+        // sección) y NO debe neutralizarse; de lo contrario las plantillas por
+        // bloques quedan inseleccionables.
+        if (control && !control.hasAttribute("data-eb-block-overlay")) {
           event.preventDefault();
           // `preventDefault()` sólo cancela navegación/envío; no impide que
           // los handlers React del sitio abran menús, diálogos o cambien el
