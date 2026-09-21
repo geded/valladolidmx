@@ -115,3 +115,42 @@ describe("Studio Standard · resolvers transversales", () => {
     expect(surfaceReorderableSlots("vmx.desconocido")).toEqual([]);
   });
 });
+
+describe("Studio Standard · E3 · Alux por declaración", () => {
+  it("resuelve la plantilla de las rutas públicas declaradas", () => {
+    expect(templateKeyForPath("/")).toBe("vmx.home.premium-g4");
+    expect(templateKeyForPath("/oriente-maya/valladolid")).toBe("vmx.destination.premium-g4");
+    expect(templateKeyForPath("/oriente-maya/valladolid/lugares/cenote-zaci")).toBe(
+      "vmx.place.premium-q2d",
+    );
+    expect(templateKeyForPath("/hoteles")).toBe("vmx.listing.premium-g5");
+    expect(templateKeyForPath("/ruta-inexistente")).toBeNull();
+  });
+
+  it("entrega intenciones declaradas sin repetir", () => {
+    const intents = aluxIntentsForTemplate("vmx.home.premium-g4");
+    expect(intents).toContain("planear-ruta");
+    expect(new Set(intents).size).toBe(intents.length);
+    expect(aluxIntentsForTemplate(null)).toEqual([]);
+    expect(aluxIntentsForTemplate("vmx.desconocido")).toEqual([]);
+  });
+
+  it("el contexto unificado de Alux consume la declaración de la superficie", () => {
+    const base = buildAluxUnifiedContext({
+      context: {
+        origin: "none",
+        reason: "prueba",
+        canonical: null,
+      } as never,
+      pathname: "/",
+    });
+    expect(base.surface.templateKey).toBe("vmx.home.premium-g4");
+    expect(base.surface.intents.length).toBeGreaterThan(0);
+
+    const unknown = buildAluxUnifiedContext({
+      context: { origin: "none", reason: "prueba", canonical: null } as never,
+      pathname: "/ruta-inexistente",
+    });
+    expect(unknown.surface).toEqual({ templateKey: null, intents: [] });
+  });
+});
