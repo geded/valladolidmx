@@ -59,9 +59,20 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
       {
         key: "experienciasAcceso",
         label: "Acceso a Experiencias",
-        prefixes: ["experiencias_acceso_"],
+        // El acceso reutiliza los MISMOS textos aprobados de Experiencias
+        // (kicker, título, descripción, acción y destino). No se crean campos
+        // nuevos: se declaran aquí para que la sección sea editable.
+        prefixes: [
+          "experiencias_acceso_",
+          "experiencias_kicker",
+          "experiencias_title",
+          "experiencias_description",
+          "experiencias_action",
+          "experiencias_action_href",
+        ],
         reorderable: true,
       },
+
       {
         key: "categorias",
         label: "Explora por categoría",
