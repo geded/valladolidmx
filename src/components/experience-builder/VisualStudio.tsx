@@ -4386,7 +4386,11 @@ function CanvasViewport({
   // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
   const scaled = scale;
   const frameWidth = Math.round(width * scaled);
-  const frameHeight = Math.round(minimumHeight * scaled);
+  // El documento lógico completo define la altura del marco: el escenario del
+  // editor es la única superficie con scroll, de modo que cada sección visible
+  // conserva su asa de arrastre sin quedar recortada.
+  const canvasHeight = Math.max(minimumHeight, documentHeight);
+  const frameHeight = Math.round(canvasHeight * scaled);
   const editableRects = sectionRects.filter((section) =>
     reorderableSectionKeys.includes(section.key),
   );
