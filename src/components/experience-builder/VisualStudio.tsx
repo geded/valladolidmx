@@ -3726,12 +3726,21 @@ function HomeCanvas({
         onZoomOut={() => changeZoom(-0.1)}
         onFit={() => setZoomOverride(null)}
         presetLabel={preset.label}
-        compositeNodeId={renderedCompositeNode?.id ?? null}
-        selectedSectionKey={selectedCompositeSectionKey}
-        reorderableSectionKeys={reorderableSectionKeys}
-        sectionLabels={sectionLabels}
+        compositeNodeId={
+          landingSlotNodes ? SEO_LANDING_CANVAS_ID : (renderedCompositeNode?.id ?? null)
+        }
+        selectedSectionKey={landingSlotNodes ? landingSelectedSlot : selectedCompositeSectionKey}
+        reorderableSectionKeys={landingSlotNodes ? [] : reorderableSectionKeys}
+        sectionLabels={landingSectionLabels ?? sectionLabels}
         editingEnabled={!previewMode}
-        onSelectSection={onSelectCompositeSection}
+        onSelectSection={
+          landingSlotNodes
+            ? (_nodeId, sectionKey) => {
+                const targetId = landingSlotNodes[sectionKey];
+                if (targetId) onSelect(targetId);
+              }
+            : onSelectCompositeSection
+        }
         onReorderSection={onReorderCompositeSection}
         onReorderCard={onReorderCard}
       >
