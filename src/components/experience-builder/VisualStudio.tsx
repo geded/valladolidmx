@@ -1512,6 +1512,7 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       const signature = canonicalizeClient(tree);
+      console.log("[eb-save-tick]", page.id, signature === savedSignatureRef.current);
       // Latest-wins: mientras un guardado está en vuelo conservamos sólo el árbol
       // más reciente. Así una edición rápida no genera una cola de escrituras que
       // compiten por el mismo bloqueo de la composición.
