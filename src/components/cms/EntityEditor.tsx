@@ -6,7 +6,7 @@
  * respetan la máquina oficial: draft → in_review → approved → published →
  * archived.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -89,6 +89,46 @@ const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]
   archived: [{ to: "draft", label: "Restaurar a borrador" }],
 };
 
+/**
+ * Respaldo local de lo que el editor está tecleando.
+ *
+ * El sistema operativo puede descartar la pestaña cuando el editor cambia de
+ * aplicación o contesta un mensaje; al volver, el formulario se vuelve a montar
+ * vacío. Guardamos lo escrito en este dispositivo (nunca en el servidor, nunca
+ * como contenido publicado) y lo ofrecemos de vuelta al regresar. Se borra al
+ * guardar la ficha o cuando el editor lo descarta.
+ */
+const LOCAL_DRAFT_PREFIX = "vmx.cms.local-draft.v1";
+const LOCAL_DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface LocalDraft {
+  savedAt: number;
+  values: Record<string, string>;
+}
+
+function readLocalDraft(key: string): LocalDraft | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<LocalDraft>;
+    if (!parsed || typeof parsed.savedAt !== "number" || typeof parsed.values !== "object") {
+      return null;
+    }
+    if (Date.now() - parsed.savedAt > LOCAL_DRAFT_MAX_AGE_MS) {
+      window.localStorage.removeItem(key);
+      return null;
+    }
+    const values: Record<string, string> = {};
+    for (const [k, v] of Object.entries(parsed.values ?? {})) {
+      if (typeof v === "string") values[k] = v;
+    }
+    return Object.keys(values).length ? { savedAt: parsed.savedAt, values } : null;
+  } catch {
+    return null;
+  }
+}
+
 export function EntityEditor(props: Props) {
   const { table, id, title, description, backTo, listQueryKey, fields } = props;
 
@@ -126,6 +166,80 @@ export function EntityEditor(props: Props) {
   const [error, setError] = useState<string | null>(null);
   const [aluxOpen, setAluxOpen] = useState(false);
   const [autofillOpen, setAutofillOpen] = useState(false);
+
+  /* ---- Respaldo local de lo tecleado (ver nota arriba) ---- */
+  const draftKey = `${LOCAL_DRAFT_PREFIX}:${table}:${id ?? "nuevo"}`;
+  const [recovered, setRecovered] = useState<number | null>(null);
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
+  /** Mientras haya respaldo recuperado, la ficha guardada no lo pisa. */
+  const recoveredRef = useRef(false);
+  const dirtyRef = useRef(false);
+
+  const clearLocalDraft = useCallback(() => {
+    dirtyRef.current = false;
+    recoveredRef.current = false;
+    setRecovered(null);
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(draftKey);
+      } catch {
+        /* almacenamiento no disponible: el formulario sigue funcionando */
+      }
+    }
+  }, [draftKey]);
+
+  const writeLocalDraft = useCallback(() => {
+    if (!dirtyRef.current || typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        draftKey,
+        JSON.stringify({ savedAt: Date.now(), values: valuesRef.current }),
+      );
+    } catch {
+      /* sin espacio o modo privado: no interrumpimos la edición */
+    }
+  }, [draftKey]);
+
+  /* Al abrir el formulario, recuperamos lo que quedó escrito en este equipo. */
+  useEffect(() => {
+    const draft = readLocalDraft(draftKey);
+    if (!draft) return;
+    recoveredRef.current = true;
+    dirtyRef.current = true;
+    setRecovered(draft.savedAt);
+    setValues((current) => ({ ...current, ...draft.values }));
+  }, [draftKey]);
+
+  /* Guardado continuo mientras se escribe, y en el momento exacto en que la
+     aplicación pasa a segundo plano (que es cuando el sistema la descarta). */
+  useEffect(() => {
+    if (!dirtyRef.current) return;
+    const timer = setTimeout(writeLocalDraft, 500);
+    return () => clearTimeout(timer);
+  }, [values, writeLocalDraft]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const flush = () => writeLocalDraft();
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("blur", flush);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("blur", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [writeLocalDraft]);
+
+  const updateValue = useCallback((name: string, value: string) => {
+    dirtyRef.current = true;
+    setValues((s) => ({ ...s, [name]: value }));
+  }, []);
+
 
   /* Altas nuevas: adoptan el contexto de trabajo (p. ej. el destino elegido)
      sin pisar lo que el editor ya escribió. */
@@ -175,30 +289,43 @@ export function EntityEditor(props: Props) {
   );
 
 
-  useEffect(() => {
-    if (detail.data) {
-      const next: Record<string, string> = { ...initialValues };
-      for (const f of fields) {
-        const v = (detail.data as Record<string, unknown>)[f.name];
-        if (v === null || v === undefined) {
-          next[f.name] = "";
-        } else if (f.type === "datetime") {
-          // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
-          const date = new Date(String(v));
-          next[f.name] = Number.isNaN(date.getTime())
-            ? ""
-            : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-                .toISOString()
-                .slice(0, 16);
-        } else if (Array.isArray(v)) {
-          next[f.name] = v.join("\n");
-        } else {
-          next[f.name] = String(v);
-        }
+  /** Valores tal como están guardados en el CMS (base para descartar el respaldo). */
+  const savedValues = useMemo(() => {
+    if (!detail.data) return null;
+    const next: Record<string, string> = { ...initialValues };
+    for (const f of fields) {
+      const v = (detail.data as Record<string, unknown>)[f.name];
+      if (v === null || v === undefined) {
+        next[f.name] = "";
+      } else if (f.type === "datetime") {
+        // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
+        const date = new Date(String(v));
+        next[f.name] = Number.isNaN(date.getTime())
+          ? ""
+          : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16);
+      } else if (Array.isArray(v)) {
+        next[f.name] = v.join("\n");
+      } else {
+        next[f.name] = String(v);
       }
-      setValues(next);
     }
+    return next;
   }, [detail.data, fields, initialValues]);
+
+  useEffect(() => {
+    // Lo recuperado del propio equipo tiene prioridad: es trabajo del editor
+    // que todavía no llegó al CMS.
+    if (!savedValues || recoveredRef.current) return;
+    setValues(savedValues);
+  }, [savedValues]);
+
+  const discardLocalDraft = useCallback(() => {
+    clearLocalDraft();
+    setValues(savedValues ?? initialValues);
+  }, [clearLocalDraft, savedValues, initialValues]);
+
 
   const status = (detail.data?.status as unknown as ContentStatus | undefined) ?? "draft";
 
@@ -230,6 +357,8 @@ export function EntityEditor(props: Props) {
       return upsert({ data: { table, id: id ?? null, payload } });
     },
     onSuccess: async (res) => {
+      // Ya está en el CMS: el respaldo local deja de ser necesario.
+      clearLocalDraft();
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       if (!isEdit) {
         navigate({ to: `${backTo}/${res.id}/editar` as never });
@@ -312,7 +441,10 @@ export function EntityEditor(props: Props) {
         {...(props.autofillDestination ? { destination: props.autofillDestination } : {})}
         {...(props.autofillZone ? { zone: props.autofillZone } : {})}
         fields={autofillFields}
-        onApply={(patch) => setValues((v) => ({ ...v, ...patch }))}
+        onApply={(patch) => {
+          dirtyRef.current = true;
+          setValues((v) => ({ ...v, ...patch }));
+        }}
       />
 
       <AluxWorkspaceChat
@@ -333,6 +465,24 @@ export function EntityEditor(props: Props) {
         description="Pregunta qué escribir en cada campo de esta ficha, con qué extensión y qué falta para publicarla."
       />
 
+
+      {recovered !== null && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm">
+          <span>
+            Recuperamos lo que estabas escribiendo en este equipo
+            {" "}
+            ({meridaDateTime(new Date(recovered).toISOString())}). Guarda la ficha para
+            conservarlo.
+          </span>
+          <button
+            type="button"
+            onClick={discardLocalDraft}
+            className="rounded-pill border border-border bg-surface px-3 py-1 text-xs font-medium hover:bg-muted"
+          >
+            Descartar y volver a lo guardado
+          </button>
+        </div>
+      )}
 
       {error && (
         <div
@@ -356,7 +506,7 @@ export function EntityEditor(props: Props) {
             key={f.name}
             field={f}
             value={values[f.name] ?? ""}
-            onChange={(v) => setValues((s) => ({ ...s, [f.name]: v }))}
+            onChange={(v) => updateValue(f.name, v)}
           />
         ))}
 
