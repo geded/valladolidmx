@@ -317,6 +317,9 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       authoring_roles: AUTHORING_ROLES,
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
+        // Orden editorial del cuerpo de la plantilla aprobada (reordenamiento
+        // en el constructor). No altera la maqueta, sólo la secuencia.
+        { field: "order", class: "editorial", type: "number", writable_by: AUTHORING_ROLES },
         {
           field: "eyebrow",
           class: "editorial",
