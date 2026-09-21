@@ -3813,16 +3813,20 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Revelar la sección activa desplazando el viewport lógico del iframe.
+  // Revelar la sección activa SÓLO si está fuera de pantalla. Antes el lienzo
+  // saltaba siempre al borde superior de la sección al seleccionarla, de modo
+  // que el editor perdía de vista justo lo que estaba por modificar.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const top = Math.max(0, Math.round(target.top - 16));
     const win = mount.ownerDocument.defaultView;
-    if (win && Math.abs(win.scrollY - top) > 8) {
-      win.scrollTo({ top, behavior: "smooth" });
-    }
+    if (!win) return;
+    const viewportTop = win.scrollY;
+    const viewportBottom = viewportTop + win.innerHeight;
+    const alreadyVisible = target.top < viewportBottom - 48 && target.top + target.height > viewportTop + 48;
+    if (alreadyVisible) return;
+    win.scrollTo({ top: Math.max(0, Math.round(target.top - 16)), behavior: "smooth" });
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, selectedSectionKey]);
