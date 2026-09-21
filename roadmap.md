@@ -291,3 +291,6 @@
 - [ ] Extender el lienzo reconstruido a las demás familias sólo después de aceptación humana de Home y validación completa 1440/1280/1024/834/430/390.
 
 - [x] Aplicar a la landing Zazil Tunich el mismo modelo probado de selección, edición y reordenamiento de Inicio, sin editor paralelo.
+
+- [x] Avisos · Campana del Centro de Notificaciones (21-sep): campana única en la barra superior de todos los paneles (CMS, Admin, Concierge, Empresa), con contador de no leídos, lista en lenguaje claro, marcado como leído y salto al detalle. Reutiliza los server-fn oficiales del UNC; sin canales, tablas ni estados nuevos. Verificado con sesión de administrador en `/cms/media`.
+- [ ] Avisos · Entrega por correo y celular: las entregas se registran en el ledger pero aún no existe el proceso que las envía (correo requiere dominio de envío activo; celular requiere llaves de notificación push). Pendiente autorización del Founder.
