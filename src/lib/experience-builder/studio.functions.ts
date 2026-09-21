@@ -445,6 +445,24 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
+/**
+ * Fallos transitorios de infraestructura (pooler saturado, tiempo de espera,
+ * lock_timeout). No son errores de contrato ni de autorización: se reintentan.
+ */
+function isTransientDbError(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes("connection pool") ||
+    m.includes("timed out") ||
+    m.includes("timeout") ||
+    m.includes("draft_busy") ||
+    m.includes("canceling statement") ||
+    m.includes("too many clients")
+  );
+}
+
+
+
 export const createComposition = createServerFn({ method: "POST" })
   .inputValidator(
     (data: { slug: string; title: string; description?: string; page_type?: string }) => data,
