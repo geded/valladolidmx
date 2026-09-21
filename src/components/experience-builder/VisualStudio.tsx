@@ -3731,7 +3731,9 @@ function HomeCanvas({
         }
         selectedSectionKey={landingSlotNodes ? landingSelectedSlot : selectedCompositeSectionKey}
         reorderableSectionKeys={
-          landingSlotNodes ? Object.keys(landingSlotNodes) : reorderableSectionKeys
+          landingSlotNodes
+            ? SEO_LANDING_REORDERABLE_SLOTS.filter((slot) => landingSlotNodes[slot])
+            : reorderableSectionKeys
         }
         sectionLabels={landingSectionLabels ?? sectionLabels}
         editingEnabled={!previewMode}
@@ -3746,11 +3748,14 @@ function HomeCanvas({
         onReorderSection={
           landingSlotNodes
             ? (activeKey, overKey) => {
-                /* Landing: el arrastre mueve el bloque raíz real; la maqueta
-                   aprobada se conserva y sólo cambia el orden persistido. */
+                /* Landing: el cuerpo se ordena con el campo `order` que ya
+                   declara cada bloque de la maqueta aprobada. No se altera la
+                   maqueta, sólo la posición persistida de esas columnas. */
                 const activeId = landingSlotNodes[activeKey];
                 const overId = landingSlotNodes[overKey];
-                if (activeId && overId && activeId !== overId) onReorderRoot(activeId, overId);
+                if (activeId && overId && activeId !== overId) {
+                  onReorderLandingBody(activeId, overId);
+                }
               }
             : onReorderCompositeSection
         }
