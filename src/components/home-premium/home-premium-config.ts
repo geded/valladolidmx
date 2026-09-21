@@ -57,8 +57,26 @@ const sectionOrder = (value: unknown): HomePremiumSectionKey[] => {
     if (!picked.includes(key)) picked.push(key);
   }
   if (picked.length === 0) return HOME_PREMIUM_DEFAULT_ORDER;
-  return [...picked, ...HOME_PREMIUM_DEFAULT_ORDER.filter((key) => !picked.includes(key))];
+  // Una sección aprobada que aún no existe en un orden guardado se reinserta en
+  // su lugar del preset (antes de su vecina siguiente), nunca al final: así
+  // dividir una sección no reacomoda la Home publicada.
+  const result = [...picked];
+  for (let i = HOME_PREMIUM_DEFAULT_ORDER.length - 1; i >= 0; i -= 1) {
+    const key = HOME_PREMIUM_DEFAULT_ORDER[i];
+    if (result.includes(key)) continue;
+    let insertAt = result.length;
+    for (let j = i + 1; j < HOME_PREMIUM_DEFAULT_ORDER.length; j += 1) {
+      const next = result.indexOf(HOME_PREMIUM_DEFAULT_ORDER[j]);
+      if (next >= 0) {
+        insertAt = next;
+        break;
+      }
+    }
+    result.splice(insertAt, 0, key);
+  }
+  return result;
 };
+
 
 /**
  * G8-R1-F1L-R2 · Sólo se acepta una ruta interna canónica ("/..."). Cualquier
