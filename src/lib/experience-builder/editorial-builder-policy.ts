@@ -538,7 +538,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       family: "trust",
       variants: ["filled", "soft", "outline", "icon-only"],
       allowed_sources: ["trust.badges"],
-      surfaces: ["destination", "business", "product"],
+      surfaces: ["landing", "destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
