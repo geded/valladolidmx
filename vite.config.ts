@@ -67,6 +67,10 @@ export default defineConfig({
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin &&
+                // Las fotos públicas servidas por el pipeline de medios no son
+                // datos sensibles: se dejan fuera para que puedan guardarse y
+                // verse sin conexión (regla de imágenes más abajo).
+                !url.pathname.startsWith("/api/public/studio-media/") &&
                 /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa)(?:\/|$)/.test(
                   url.pathname,
                 ),
@@ -115,6 +119,26 @@ export default defineConfig({
                       Response.error(),
                   },
                 ],
+              },
+            },
+
+            // 2026-09-21 · Offline First. Las navegaciones dentro de la app
+            // (TanStack Router) no piden HTML: resuelven sus loaders contra
+            // `/_serverFn/...` por GET. Sin esta ruta, al perder la red una
+            // página ya visitada fallaba y el visitante terminaba en la
+            // pantalla "Sin conexión". Sólo GET de lectura pública; las rutas
+            // sensibles siguen en NetworkOnly y nada autenticado se almacena.
+            {
+              urlPattern: ({ url, sameOrigin, request }) =>
+                sameOrigin &&
+                request.method === "GET" &&
+                url.pathname.startsWith("/_serverFn/"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "server-data-v1",
+                networkTimeoutSeconds: 12,
+                expiration: { maxEntries: 96, maxAgeSeconds: 60 * 60 * 24 },
+                cacheableResponse: { statuses: [200] },
               },
             },
 
