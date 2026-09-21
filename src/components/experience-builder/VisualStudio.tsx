@@ -4488,8 +4488,10 @@ function CanvasViewport({
       if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
       const placement = resolveDropPlacement(upEvent.clientY);
       cleanup();
+      console.log("[eb-drag]", key, JSON.stringify(placement));
       if (!placement) return;
       const target = resolveReorderTarget(key, placement);
+      console.log("[eb-drag-target]", target);
       if (target && target !== key) onReorderSection(key, target);
     };
     const onCancel = (cancelEvent: PointerEvent) => {
