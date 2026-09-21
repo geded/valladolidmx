@@ -423,6 +423,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {offers ? (
               <section
                 aria-labelledby="landing-offers"
+                data-eb-section="offers"
                 style={{ order: sections.indexOf("offers") }}
                 className="min-w-0 sm:px-5"
               >
