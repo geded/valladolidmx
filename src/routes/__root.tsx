@@ -224,7 +224,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Fail-safe: ante cualquier error se conserva el fallback de código.
     const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome, siteDomains] =
       await Promise.all([
-        getOmxdsVisualFoundationsFlag(),
+        // Offline First: sin red esta bandera fallaba y derribaba toda la
+        // aplicación. Fail-safe al valor de código, como el resto del loader.
+        getOmxdsVisualFoundationsFlag().catch(() => false),
         context.queryClient
           .ensureQueryData(brandSettingsQueryOptions)
           .catch(() => BRAND_SETTINGS_DEFAULTS),
