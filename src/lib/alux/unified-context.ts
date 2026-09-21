@@ -159,6 +159,13 @@ export interface BuildAluxUnifiedContextInput {
     readonly adults: number;
     readonly children?: number;
   } | null;
+  /**
+   * Studio Standard v1.0 · E3 — Ruta pública activa. Sirve sólo para leer
+   * las intenciones declaradas por la plantilla de esa superficie.
+   */
+  readonly pathname?: string | null;
+  /** Plantilla explícita, cuando el llamador ya la conoce. */
+  readonly surfaceTemplateKey?: string | null;
   /** Inyectable para pruebas deterministas. */
   readonly now?: Date;
 }
@@ -310,6 +317,13 @@ export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): Al
     navigation: { origin: ctx.origin, canonical: ctx.canonical ?? null },
     party,
     scope: resolveAluxContextScope({ entity, territory }),
+    surface: (() => {
+      const templateKey =
+        input.surfaceTemplateKey ??
+        (input.pathname ? templateKeyForPath(input.pathname) : null) ??
+        null;
+      return { templateKey, intents: aluxIntentsForTemplate(templateKey) };
+    })(),
     reason: ctx.reason,
   };
 }
