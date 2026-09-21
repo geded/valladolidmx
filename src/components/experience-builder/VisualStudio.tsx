@@ -3565,32 +3565,25 @@ const CANVAS_PRECISE_EDIT_SCALE = 0.45;
 
 /**
  * Familia `premium-seo-landing`: la maqueta aprobada se edita región por
- * región sobre la MISMA superficie pública. Cada clave corresponde al slot
- * declarado por la plantilla (`data-eb-section` en `SeoLandingSurface`).
+ * región sobre la MISMA superficie pública. Las declaraciones ya NO viven
+ * aquí: son parte del Studio Standard (`studio-standard.ts`), de modo que
+ * cualquier familia futura obtenga selección, inspector y arrastrar/pegar
+ * sólo por declararse.
  */
-const SEO_LANDING_SECTION_LABELS: Record<string, string> = {
-  hero: "Portada",
-  badges: "Señales de confianza",
-  intro: "Por qué es extraordinario",
-  offers: "Experiencias destacadas",
-  infoGrid: "Información para tu visita",
-  map: "Contexto territorial",
-  aluxPlanner: "Alux",
-  gallery: "Galería",
-};
+const SEO_LANDING_SECTION_LABELS: Record<string, string> =
+  surfaceSlotLabels(SEO_LANDING_SURFACE_KEY);
 /**
  * Sólo el cuerpo editorial admite reordenamiento: la maqueta aprobada fija la
  * posición de portada, señales de confianza, Alux y galería.
  */
-const SEO_LANDING_REORDERABLE_SLOTS: readonly string[] = ["intro", "offers", "infoGrid", "map"];
+const SEO_LANDING_REORDERABLE_SLOTS: readonly string[] =
+  surfaceReorderableSlots(SEO_LANDING_SURFACE_KEY);
 /** Ancla lógica del lienzo cuando la maqueta se edita por regiones. */
-const SEO_LANDING_CANVAS_ID = "__seo_landing_surface__";
+const SEO_LANDING_CANVAS_ID =
+  getSurfaceSlots(SEO_LANDING_SURFACE_KEY)?.canvasId ?? "__seo_landing_surface__";
 
 /** Slot declarado por el identificador persistido del nodo (`...-hero`). */
-function seoLandingSlotOf(nodeId: string): string {
-  const parts = nodeId.split("-");
-  return parts[parts.length - 1] ?? "";
-}
+const seoLandingSlotOf = slotOfNodeId;
 
 function roundScale(value: number): number {
   return Math.round(Math.min(1, Math.max(CANVAS_MIN_SCALE, value)) * 1000) / 1000;
