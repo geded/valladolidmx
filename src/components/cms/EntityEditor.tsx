@@ -167,6 +167,80 @@ export function EntityEditor(props: Props) {
   const [aluxOpen, setAluxOpen] = useState(false);
   const [autofillOpen, setAutofillOpen] = useState(false);
 
+  /* ---- Respaldo local de lo tecleado (ver nota arriba) ---- */
+  const draftKey = `${LOCAL_DRAFT_PREFIX}:${table}:${id ?? "nuevo"}`;
+  const [recovered, setRecovered] = useState<number | null>(null);
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
+  /** Mientras haya respaldo recuperado, la ficha guardada no lo pisa. */
+  const recoveredRef = useRef(false);
+  const dirtyRef = useRef(false);
+
+  const clearLocalDraft = useCallback(() => {
+    dirtyRef.current = false;
+    recoveredRef.current = false;
+    setRecovered(null);
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(draftKey);
+      } catch {
+        /* almacenamiento no disponible: el formulario sigue funcionando */
+      }
+    }
+  }, [draftKey]);
+
+  const writeLocalDraft = useCallback(() => {
+    if (!dirtyRef.current || typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        draftKey,
+        JSON.stringify({ savedAt: Date.now(), values: valuesRef.current }),
+      );
+    } catch {
+      /* sin espacio o modo privado: no interrumpimos la edición */
+    }
+  }, [draftKey]);
+
+  /* Al abrir el formulario, recuperamos lo que quedó escrito en este equipo. */
+  useEffect(() => {
+    const draft = readLocalDraft(draftKey);
+    if (!draft) return;
+    recoveredRef.current = true;
+    dirtyRef.current = true;
+    setRecovered(draft.savedAt);
+    setValues((current) => ({ ...current, ...draft.values }));
+  }, [draftKey]);
+
+  /* Guardado continuo mientras se escribe, y en el momento exacto en que la
+     aplicación pasa a segundo plano (que es cuando el sistema la descarta). */
+  useEffect(() => {
+    if (!dirtyRef.current) return;
+    const timer = setTimeout(writeLocalDraft, 500);
+    return () => clearTimeout(timer);
+  }, [values, writeLocalDraft]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const flush = () => writeLocalDraft();
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("blur", flush);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("blur", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [writeLocalDraft]);
+
+  const updateValue = useCallback((name: string, value: string) => {
+    dirtyRef.current = true;
+    setValues((s) => ({ ...s, [name]: value }));
+  }, []);
+
+
   /* Altas nuevas: adoptan el contexto de trabajo (p. ej. el destino elegido)
      sin pisar lo que el editor ya escribió. */
   const defaultsKey = JSON.stringify(props.defaults ?? {});
