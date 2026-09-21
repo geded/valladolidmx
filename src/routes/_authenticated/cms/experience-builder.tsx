@@ -104,7 +104,11 @@ function ExperienceBuilderShell() {
       workspaceMain.removeEventListener("scroll", keepEditorAtTop);
       workspaceMain.style.overflow = previousOverflow;
       workspaceMain.style.overscrollBehavior = previousOverscroll;
-      workspaceMain.scrollTop = previousScrollTop;
+      // La lista vuelve a montarse después del editor; restaurar en el siguiente
+      // cuadro evita que el navegador limite la posición mientras aún no existe.
+      window.requestAnimationFrame(() => {
+        workspaceMain.scrollTop = previousScrollTop;
+      });
     };
   }, [canvasOpen]);
 
