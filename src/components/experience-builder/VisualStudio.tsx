@@ -2062,6 +2062,7 @@ function PageVisualEditor({
 
   const restorePublishedAsDraft = async () => {
     if (!page || pageDef.page_type !== "home" || !page.active_revision_id) return;
+    const activeRevisionId = page.active_revision_id;
     if (
       typeof window !== "undefined" &&
       !window.confirm(
@@ -2081,7 +2082,7 @@ function PageVisualEditor({
         return restore({
           data: {
             id: page.id,
-            revision_id: page.active_revision_id,
+            revision_id: activeRevisionId,
             expected_hash: draftHashRef.current ?? "",
           },
         });
