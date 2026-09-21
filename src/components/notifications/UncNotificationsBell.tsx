@@ -22,6 +22,7 @@ import {
   markNotificationDeliveryRead,
 } from "@/lib/notifications/notifications.functions";
 import { uncEventTitle } from "@/lib/notifications/event-titles";
+import { PushEnableButton } from "./PushEnableButton";
 
 interface DeliveryRow {
   id: string;
@@ -167,6 +168,7 @@ export function UncNotificationsBell() {
             </li>
           ) : null}
         </ul>
+        <PushEnableButton />
       </PopoverContent>
     </Popover>
   );

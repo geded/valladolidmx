@@ -37,6 +37,9 @@ type Row = {
 };
 
 export const Route = createFileRoute("/_authenticated/cms/media")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    estado: search["estado"] === "in_review" ? ("in_review" as const) : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Media · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
@@ -386,9 +389,10 @@ function FilterChips<T extends string>({
 }
 
 function MediaPage() {
+  const { estado } = Route.useSearch();
   const [scope, setScope] = useState<ScopeValue>("all");
   const [usage, setUsage] = useState<UsageValue>("all");
-  const [state, setState] = useState<StateValue>("all");
+  const [state, setState] = useState<StateValue>(estado === "in_review" ? "in_review" : "all");
 
   return (
     <CmsEntityPage<Row>
