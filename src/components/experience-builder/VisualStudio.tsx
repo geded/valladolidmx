@@ -1126,6 +1126,8 @@ function PageVisualEditor({
 
   const [page, setPage] = useState<CompositionDetail | null>(null);
   const [tree, setTree] = useState<CompositionTree | null>(null);
+  /** Composición ya cargada en este montaje; evita recargas que pisan la edición. */
+  const loadedCompositionKeyRef = useRef<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [publishing, setPublishing] = useState(false);
