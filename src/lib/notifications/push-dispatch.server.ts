@@ -49,6 +49,7 @@ function bodyFor(row: DeliveryRow): string {
 }
 
 function urlFor(row: DeliveryRow): string {
+  if (row.event_type === "media.review_requested") return "/cms/media?estado=in_review";
   const url = readString(row.payload_ref, "url");
   return url && url.startsWith("/") ? url : "/";
 }

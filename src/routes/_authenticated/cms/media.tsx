@@ -389,9 +389,10 @@ function FilterChips<T extends string>({
 }
 
 function MediaPage() {
+  const { estado } = Route.useSearch();
   const [scope, setScope] = useState<ScopeValue>("all");
   const [usage, setUsage] = useState<UsageValue>("all");
-  const [state, setState] = useState<StateValue>("all");
+  const [state, setState] = useState<StateValue>(estado === "in_review" ? "in_review" : "all");
 
   return (
     <CmsEntityPage<Row>
