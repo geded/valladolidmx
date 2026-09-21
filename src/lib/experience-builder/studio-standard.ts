@@ -110,6 +110,49 @@ export function surfaceReorderableSlots(surfaceKey: string): readonly string[] {
   return entry.slots.filter((slot) => slot.reorderable).map((slot) => slot.key);
 }
 
+/* ------------------------------------------------------------------ */
+/* Rutas públicas por familia de plantilla (declarativo, sin red)      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Familia de plantilla que gobierna cada ruta pública ya existente. No crea
+ * rutas ni cambia el render: sólo permite que Alux sepa qué intenciones de
+ * viaje declara la superficie que el explorador está mirando.
+ */
+export const SURFACE_ROUTE_TEMPLATES: readonly {
+  readonly test: (pathname: string) => boolean;
+  readonly templateKey: string;
+}[] = [
+  { test: (p) => p === "/" , templateKey: "vmx.home.premium-g4" },
+  {
+    test: (p) => /^\/oriente-maya\/[^/]+\/?$/.test(p) && !p.startsWith("/oriente-maya/destinos"),
+    templateKey: "vmx.destination.premium-g4",
+  },
+  { test: (p) => /^\/(?:oriente-maya\/[^/]+\/)?lugares\/[^/]+\/?$/.test(p), templateKey: "vmx.place.premium-q2d" },
+  {
+    test: (p) =>
+      /^\/(hoteles|restaurantes|casas-de-vacaciones|experiencias|lugares|que-hacer)\/?$/.test(p) ||
+      /^\/oriente-maya\/[^/]+\/[^/]+\/?$/.test(p),
+    templateKey: "vmx.listing.premium-g5",
+  },
+];
+
+/** Plantilla declarada para una ruta pública, o `null` si no hay declaración. */
+export function templateKeyForPath(pathname: string): string | null {
+  const path = pathname.split("?")[0] ?? pathname;
+  return SURFACE_ROUTE_TEMPLATES.find((entry) => entry.test(path))?.templateKey ?? null;
+}
+
+/** Intenciones de viaje declaradas por la plantilla, sin repetir y en orden. */
+export function aluxIntentsForTemplate(templateKey: string | null): readonly CompositeAluxIntent[] {
+  if (!templateKey) return [];
+  const seen = new Set<CompositeAluxIntent>();
+  for (const signal of studioSectionSignals(templateKey)) {
+    if (signal.aluxIntent) seen.add(signal.aluxIntent);
+  }
+  return [...seen];
+}
+
 /** Slot declarado por el identificador persistido del nodo (`...-hero`). */
 export function slotOfNodeId(nodeId: string): string {
   const parts = nodeId.split("-");
