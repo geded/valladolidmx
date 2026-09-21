@@ -3958,12 +3958,15 @@ function CanvasViewport({
     if (!compositeNodeId) return;
     event.preventDefault();
     const handle = event.currentTarget;
-    handle.setPointerCapture(event.pointerId);
+    const pointerId = event.pointerId;
+    handle.setPointerCapture(pointerId);
     setDragKey(key);
     setDropKey(key);
     const canvasScroller = mount?.ownerDocument.defaultView;
 
     const onMove = (moveEvent: PointerEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
+      moveEvent.preventDefault();
       setDropKey(resolveDropKey(moveEvent.clientY));
       const frame = iframeRef.current;
       if (!canvasScroller || !frame) return;
@@ -3976,24 +3979,29 @@ function CanvasViewport({
          canvasScroller.scrollBy({ top: logicalStep, behavior: "auto" });
     };
     const onUp = (upEvent: PointerEvent) => {
-      handle.removeEventListener("pointermove", onMove);
-      handle.removeEventListener("pointerup", onUp);
-      handle.removeEventListener("pointercancel", onCancel);
+      if (upEvent.pointerId !== pointerId) return;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
+      if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
       const target = resolveDropKey(upEvent.clientY);
       setDragKey(null);
       setDropKey(null);
       if (target && target !== key) onReorderSection(key, target);
     };
-    const onCancel = () => {
-      handle.removeEventListener("pointermove", onMove);
-      handle.removeEventListener("pointerup", onUp);
-      handle.removeEventListener("pointercancel", onCancel);
+    const onCancel = (cancelEvent: PointerEvent) => {
+      if (cancelEvent.pointerId !== pointerId) return;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
       setDragKey(null);
       setDropKey(null);
     };
-    handle.addEventListener("pointermove", onMove);
-    handle.addEventListener("pointerup", onUp);
-    handle.addEventListener("pointercancel", onCancel);
+    // Safari cancela la captura cuando el asa sale del área visible durante el
+    // auto-scroll. Escuchar en la ventana mantiene vivo el gesto hasta soltarlo.
+    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onCancel);
   };
 
   return (
@@ -4096,7 +4104,9 @@ function CanvasViewport({
                const top = (section.top - canvasScrollTop) * scaled;
               const height = Math.max(24, section.height * scaled);
                const visible = top + height > 0 && top < frameHeight;
-               if (!visible) return null;
+               // No desmontar el asa origen durante el auto-scroll: Safari
+               // perdería la captura y nunca entregaría el `pointerup` final.
+               if (!visible && dragKey !== section.key) return null;
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
               // El asa acompaña la parte visible de la sección: si su inicio ya
