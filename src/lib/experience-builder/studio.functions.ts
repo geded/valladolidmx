@@ -494,7 +494,7 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
         });
       }
 
-      console.log("[eb-srv-save] pre-rpc", isRootOrderOnlyDelta(treeToSave, previousTree));
+      console.log("[eb-srv-save] pre-rpc", JSON.stringify(treeToSave).length);
       const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
         _id: data.id,
         _tree: treeToSave as never,
