@@ -21,7 +21,12 @@ import {
   countMyUnreadNotifications,
   markNotificationDeliveryRead,
 } from "@/lib/notifications/notifications.functions";
-import { uncEventTitle } from "@/lib/notifications/event-titles";
+import {
+  uncEventTitle,
+  uncEventGroup,
+  UNC_GROUP_LABELS,
+  type UncGroup,
+} from "@/lib/notifications/event-titles";
 import { PushEnableButton } from "./PushEnableButton";
 
 interface DeliveryRow {
