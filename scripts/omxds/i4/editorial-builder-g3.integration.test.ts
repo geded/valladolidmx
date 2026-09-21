@@ -96,7 +96,12 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // documento es la única autoridad de scroll; el zoom sólo escala el conjunto
     // y toda la capa de edición vive fuera de la plantilla.
     expect(studio).toContain('data-eb-canvas-scrollport="editor"');
-    expect(studio).toContain("usableWidth / preset.width");
+    expect(studio).toContain("usableWidth / logicalWidth");
+    // Vista "Real": ancho lógico = ancho disponible y escala fija al 100%,
+    // para que el lienzo reproduzca 1:1 la página publicada.
+    expect(studio).toContain('short: "Real"');
+    expect(studio).toContain('const isAutoWidth = deviceViewport === "auto"');
+    expect(studio).toContain("const scale = isAutoWidth ? 1 :");
     expect(studio).toContain("CANVAS_MIN_SCALE = 0.2");
     expect(studio).toContain("CANVAS_PRECISE_EDIT_SCALE = 0.45");
     expect(studio).toContain("scrollport.scrollTo({ left: 0, top: 0 })");
