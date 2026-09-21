@@ -647,16 +647,18 @@ function RoutesSection({
         tabIndex={0}
         aria-label="Rutas recomendadas"
       >
-        {content.rutas.items.map((route: HomePremiumRoute) => {
+        {content.rutas.items.map((route: HomePremiumRoute, index: number) => {
           const active = route.id === selectedRoute;
           return (
             <article
               key={route.id}
+              data-eb-card={index}
               className={cn(
                 "flex h-full min-w-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition",
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
+
               <div className="relative aspect-[16/11] overflow-hidden">
                 <EditorialMediaFrame
                   media={route.media}
@@ -747,10 +749,12 @@ function DestinationsSection({
         {items.slice(0, 4).map((destination, index) => (
           <Link
             key={destination.name}
+            data-eb-card={index}
             to={destination.href ?? "/destinos"}
             onClick={() => onOpen(destination.name)}
             className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
           >
+
             <EditorialMediaFrame
               media={destination.media}
               label={destination.name}
@@ -769,7 +773,9 @@ function DestinationsSection({
       </div>
       <div className="hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
         <Link
+          data-eb-card={0}
           to={featured.href ?? "/destinos"}
+
           onClick={() => onOpen(featured.name)}
           className="group relative min-h-0 overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
         >
@@ -788,10 +794,12 @@ function DestinationsSection({
           </div>
         </Link>
         <div className="grid grid-rows-3 gap-3">
-          {items.slice(1, 4).map((destination) => (
+          {items.slice(1, 4).map((destination, index) => (
             <Link
               key={destination.name}
+              data-eb-card={index + 1}
               to={destination.href ?? "/destinos"}
+
               onClick={() => onOpen(destination.name)}
               className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
             >
@@ -905,7 +913,7 @@ function ExperiencesSection({
         tabIndex={0}
         aria-label="Experiencias recomendadas"
       >
-        {items.map((item) =>
+        {items.map((item, index) =>
           item.href ? (
             <TrackClick
               key={item.title}
@@ -917,9 +925,11 @@ function ExperiencesSection({
               entityId={item.businessId ?? null}
             >
               <Link
+                data-eb-card={index}
                 to={item.href}
                 className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
               >
+
                 <EditorialMediaFrame
                   media={item.media}
                   label={item.title}
@@ -947,7 +957,9 @@ function ExperiencesSection({
         )}
       >
         <article
+          data-eb-card={0}
           className={cn(
+
             "h-full overflow-hidden rounded-2xl border border-border bg-card",
             cinematic &&
               "relative border-0 bg-[var(--brand-territory-deep)] text-white shadow-elevated",
@@ -1007,8 +1019,8 @@ function ExperiencesSection({
           </div>
         </article>
         <div className="grid min-h-0 auto-rows-[minmax(9rem,auto)] gap-3">
-          {items.slice(1).map((item: HomePremiumExperience) => (
-            <CompactMediaRow key={item.title} item={item} />
+          {items.slice(1).map((item: HomePremiumExperience, index: number) => (
+            <CompactMediaRow key={item.title} item={item} cardIndex={index + 1} />
           ))}
         </div>
       </div>
@@ -1018,6 +1030,7 @@ function ExperiencesSection({
 
 function CompactMediaRow({
   item,
+  cardIndex,
 }: {
   item: {
     businessId?: string | null;
@@ -1027,6 +1040,7 @@ function CompactMediaRow({
     media: HomePremiumMedia;
     href: string | null;
   };
+  cardIndex?: number;
 }) {
   if (!item.href) return null;
   return (
@@ -1046,9 +1060,11 @@ function CompactMediaRow({
         entityId={item.businessId ?? null}
       />
       <Link
+        data-eb-card={cardIndex}
         to={item.href}
         className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
       >
+
         <EditorialMediaFrame
           media={item.media}
           label={item.title}

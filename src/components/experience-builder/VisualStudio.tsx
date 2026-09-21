@@ -1621,6 +1621,37 @@ function PageVisualEditor({
     updateSelectedConfig(compacted);
   };
 
+  /**
+   * Reordenar tarjetas arrastrándolas dentro de la propia sección del lienzo.
+   * Usa exactamente el mismo puente editable que el inspector: sólo cambia el
+   * orden y se guardan diferencias explícitas sobre el corpus del CMS.
+   */
+  const RAIL_BY_SECTION: Record<string, HomeEditableRail> = {
+    destinos: "destinos",
+    rutas: "rutas",
+    experiencias: "experiencias",
+  };
+
+  const reorderRailCard = (sectionKey: string, from: number, to: number) => {
+    const rail = RAIL_BY_SECTION[sectionKey];
+    const node = tree?.root.children.find((n) => n.id === compositeStructure?.nodeId);
+    if (!rail || !node) return;
+    const config = (node.config as Record<string, unknown> | null) ?? {};
+    const key = HOME_RAIL_CONFIG_KEY[rail];
+    const rows = buildHomeRailEditorRows(rail, homeRealContent, config[key]);
+    if (!Array.isArray(rows) || from === to) return;
+    if (from < 0 || to < 0 || from >= rows.length || to >= rows.length) return;
+    const next = arrayMove(rows as unknown[], from, to);
+    commitTree(
+      updateNodeConfig(tree!, node.id, {
+        ...config,
+        [key]: compactHomeRailEditorOverrides(rail, homeRealContent, next),
+      }),
+    );
+  };
+
+
+
 
   const selectUnit = (id: string, sub: string | null) => {
     setSelectedId(id);
@@ -2786,6 +2817,7 @@ function PageVisualEditor({
                 commitTree({ ...tree, root: { children: next } });
               }}
               onSelectCompositeSection={(nodeId, sectionKey) => selectUnit(nodeId, sectionKey)}
+              onReorderCard={reorderRailCard}
               onReorderCompositeSection={(activeKey, overKey) => {
                 if (!tree || !compositeStructure?.orderKey) return;
                 const order = nextCompositeOrder(
@@ -3478,6 +3510,7 @@ function HomeCanvas({
   onReorderRoot,
   onSelectCompositeSection,
   onReorderCompositeSection,
+  onReorderCard,
   commentCounts,
 }: {
   tree: CompositionTree;
@@ -3495,6 +3528,7 @@ function HomeCanvas({
   onReorderRoot: (activeId: string, overId: string) => void;
   onSelectCompositeSection: (nodeId: string, sectionKey: string) => void;
   onReorderCompositeSection: (activeKey: string, overKey: string) => void;
+  onReorderCard?: (sectionKey: string, from: number, to: number) => void;
   commentCounts?: Record<string, number>;
 }) {
   const preset = getDevicePreset(deviceViewport);
@@ -3610,6 +3644,7 @@ function HomeCanvas({
         editingEnabled={!previewMode}
         onSelectSection={onSelectCompositeSection}
         onReorderSection={onReorderCompositeSection}
+        onReorderCard={onReorderCard}
       >
         <InertChrome
           label="Encabezado"
@@ -3711,6 +3746,8 @@ function CanvasViewport({
   editingEnabled,
   onSelectSection,
   onReorderSection,
+  onReorderCard,
+
   children,
 }: {
   device: DeviceViewport;
@@ -3731,6 +3768,8 @@ function CanvasViewport({
   editingEnabled: boolean;
   onSelectSection: (nodeId: string, sectionKey: string) => void;
   onReorderSection: (activeKey: string, overKey: string) => void;
+  onReorderCard?: (sectionKey: string, from: number, to: number) => void;
+
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -3990,6 +4029,124 @@ function CanvasViewport({
     doc.addEventListener("click", onClick, true);
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
+
+  /**
+   * Arrastrar y soltar DENTRO de una sección: mantén pulsada una tarjeta del
+   * carril (destinos, rutas, experiencias) y suéltala sobre otra para cambiar
+   * su posición. Sólo actúa en el documento editorial; la plantilla pública y
+   * su contenido permanecen intactos y sólo se guarda el nuevo orden.
+   */
+  useEffect(() => {
+    if (!mount || !compositeNodeId || !editingEnabled || !onReorderCard) return;
+    const doc = mount.ownerDocument;
+    const win = doc.defaultView;
+    if (!win) return;
+    const view = win;
+    let pressTimer: number | null = null;
+    let active: { sectionKey: string; from: number; el: HTMLElement } | null = null;
+    let target: number | null = null;
+    let marked: HTMLElement | null = null;
+    let suppressClick = false;
+
+    const clearMark = () => {
+      if (!marked) return;
+      marked.style.outline = "";
+      marked.style.outlineOffset = "";
+      marked = null;
+    };
+
+    function cardAt(x: number, y: number): HTMLElement | null {
+      const el = doc.elementFromPoint(x, y) as HTMLElement | null;
+      return el?.closest<HTMLElement>("[data-eb-card]") ?? null;
+    }
+
+    function cleanup() {
+      if (pressTimer != null) {
+        view.clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+      if (active) {
+        active.el.style.opacity = "";
+        doc.body.style.touchAction = "";
+        doc.body.style.userSelect = "";
+      }
+      clearMark();
+      active = null;
+      target = null;
+      doc.removeEventListener("pointermove", onMove, true);
+      doc.removeEventListener("pointerup", onUp, true);
+      doc.removeEventListener("pointercancel", onCancel, true);
+    }
+
+    function onMove(event: PointerEvent) {
+      if (!active) {
+        // Un desplazamiento antes de que se cumpla la pulsación larga es
+        // scroll normal del lienzo, no un arrastre.
+        cleanup();
+        return;
+      }
+      event.preventDefault();
+      const over = cardAt(event.clientX, event.clientY);
+      const overSection = over?.closest<HTMLElement>("[data-eb-section]")?.dataset.ebSection;
+      if (!over || overSection !== active.sectionKey) return;
+      const index = Number(over.dataset.ebCard);
+      if (!Number.isInteger(index)) return;
+      if (marked !== over) {
+        clearMark();
+        marked = over;
+        over.style.outline = "3px solid var(--primary, #a1662f)";
+        over.style.outlineOffset = "2px";
+      }
+      target = index;
+    }
+
+    function onUp() {
+      if (active && target != null && target !== active.from) {
+        suppressClick = true;
+        onReorderCard?.(active.sectionKey, active.from, target);
+      }
+      cleanup();
+    }
+
+    function onCancel() {
+      cleanup();
+    }
+
+    const onDown = (event: PointerEvent) => {
+      const card = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-card]");
+      if (!card) return;
+      const sectionKey = card.closest<HTMLElement>("[data-eb-section]")?.dataset.ebSection;
+      const from = Number(card.dataset.ebCard);
+      if (!sectionKey || !Number.isInteger(from)) return;
+      doc.addEventListener("pointermove", onMove, true);
+      doc.addEventListener("pointerup", onUp, true);
+      doc.addEventListener("pointercancel", onCancel, true);
+      pressTimer = view.setTimeout(() => {
+        pressTimer = null;
+        active = { sectionKey, from, el: card };
+        target = from;
+        card.style.opacity = "0.6";
+        doc.body.style.touchAction = "none";
+        doc.body.style.userSelect = "none";
+      }, 320);
+    };
+
+    const onClickCapture = (event: MouseEvent) => {
+      if (!suppressClick) return;
+      suppressClick = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    doc.addEventListener("pointerdown", onDown, true);
+    doc.addEventListener("click", onClickCapture, true);
+    return () => {
+      doc.removeEventListener("pointerdown", onDown, true);
+      doc.removeEventListener("click", onClickCapture, true);
+      cleanup();
+    };
+  }, [compositeNodeId, editingEnabled, mount, onReorderCard]);
+
 
   // Revelar la sección activa SÓLO si está fuera de pantalla. Antes el lienzo
   // saltaba siempre al borde superior de la sección al seleccionarla, de modo
