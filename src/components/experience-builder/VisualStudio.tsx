@@ -1621,6 +1621,37 @@ function PageVisualEditor({
     updateSelectedConfig(compacted);
   };
 
+  /**
+   * Reordenar tarjetas arrastrándolas dentro de la propia sección del lienzo.
+   * Usa exactamente el mismo puente editable que el inspector: sólo cambia el
+   * orden y se guardan diferencias explícitas sobre el corpus del CMS.
+   */
+  const RAIL_BY_SECTION: Record<string, HomeEditableRail> = {
+    destinos: "destinos",
+    rutas: "rutas",
+    experiencias: "experiencias",
+  };
+
+  const reorderRailCard = (sectionKey: string, from: number, to: number) => {
+    const rail = RAIL_BY_SECTION[sectionKey];
+    const node = tree?.root.children.find((n) => n.id === compositeStructure?.nodeId);
+    if (!rail || !node) return;
+    const config = (node.config as Record<string, unknown> | null) ?? {};
+    const key = HOME_RAIL_CONFIG_KEY[rail];
+    const rows = buildHomeRailEditorRows(rail, homeRealContent, config[key]);
+    if (!Array.isArray(rows) || from === to) return;
+    if (from < 0 || to < 0 || from >= rows.length || to >= rows.length) return;
+    const next = arrayMove(rows as unknown[], from, to);
+    commitTree(
+      updateNodeConfig(tree!, node.id, {
+        ...config,
+        [key]: compactHomeRailEditorOverrides(rail, homeRealContent, next),
+      }),
+    );
+  };
+
+
+
 
   const selectUnit = (id: string, sub: string | null) => {
     setSelectedId(id);
