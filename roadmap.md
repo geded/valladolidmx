@@ -7,6 +7,9 @@
 - [x] E3 · Alux por declaración: `studio-standard.ts` declara la plantilla de cada ruta pública (`templateKeyForPath`) y sus intenciones (`aluxIntentsForTemplate`); el contexto unificado de Alux expone `surface { templateKey, intents }` y el dock lo alimenta con la ruta activa. Aditivo, fail-closed, sin cambio visual.
 - [x] E4 · Visibilidad por declaración: `src/lib/visibility/studio-rails.ts` alimenta `commercial-slots.ts` con `commercialRailsForTemplate` (fail-closed, semilla por plantilla+carril, techo compartido por página).
 - [ ] E5 · Adopción plantilla por plantilla (Destinos, listados, fichas, landings) con comparación 1440/834/430/390 y validación visual del Founder entre cada una.
+  - [x] Listados: marcadores de región (`hero`, `territorio`, `resultados`, `carriles`) en `TerritorialListingReviewSurface` (perfiles descubrimiento y general) y en `TourismListingSurface`. Sólo atributos de datos; maqueta aprobada intacta. Verificado en `/hoteles` y `/que-hacer`, sin desbordes en 1440/834/430/390. Pendiente aceptación visual del Founder.
+  - [x] Destino y Ficha: ya contaban con marcadores en sus superficies aprobadas.
+  - [ ] Pendiente: aceptación visual del Founder por familia antes de habilitar edición en el constructor.
 - [ ] E6 · Regla permanente: ninguna plantilla nueva cierra sin las cinco declaraciones (verificación automática en CI).
 
 ## En curso
