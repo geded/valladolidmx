@@ -1347,6 +1347,7 @@ function PageVisualEditor({
     if (loadedCompositionKeyRef.current === loadKey) return;
     loadedCompositionKeyRef.current = loadKey;
     let cancelled = false;
+    let settled = false;
     void (async () => {
       try {
         let detail: CompositionDetail | null = null;
@@ -1373,7 +1374,13 @@ function PageVisualEditor({
             detail = (await get({ data: { id } })) as CompositionDetail | null;
           }
         }
-        if (cancelled || !detail) return;
+        if (cancelled) return;
+        if (!detail) {
+          // Sin autoridad no hay editor: fail-closed visible en vez de spinner.
+          setLoadError("No se encontró la composición de esta página.");
+          return;
+        }
+        settled = true;
         draftHashRef.current = detail.draft_hash;
         setPage(detail);
         skipNextAutoSave.current = true;
@@ -1382,11 +1389,22 @@ function PageVisualEditor({
         resetHistory();
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
+      } finally {
+        // Si el efecto se desmontó o falló antes de aplicar el borrador, la
+        // clave debe liberarse para que el siguiente montaje vuelva a cargar
+        // (de lo contrario el editor se queda en "Preparando el editor…").
+        if (!settled && loadedCompositionKeyRef.current === loadKey) {
+          loadedCompositionKeyRef.current = null;
+        }
       }
     })();
     return () => {
       cancelled = true;
+      if (!settled && loadedCompositionKeyRef.current === loadKey) {
+        loadedCompositionKeyRef.current = null;
+      }
     };
+
   }, [
     list,
     get,
