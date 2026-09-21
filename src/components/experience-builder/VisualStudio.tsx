@@ -1501,7 +1501,6 @@ function PageVisualEditor({
   }, [page]);
 
   useEffect(() => {
-    console.log("[eb-autosave]", Boolean(page), Boolean(tree), skipNextAutoSave.current);
     if (!page || !tree) return;
     if (skipNextAutoSave.current) {
       skipNextAutoSave.current = false;
@@ -1512,19 +1511,15 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       const signature = canonicalizeClient(tree);
-      console.log("[eb-save-tick]", page.id, signature === savedSignatureRef.current);
       // Latest-wins: mientras un guardado está en vuelo conservamos sólo el árbol
       // más reciente. Así una edición rápida no genera una cola de escrituras que
       // compiten por el mismo bloqueo de la composición.
       pendingSaveRef.current = { pageId: page.id, tree, signature };
-      console.log("[eb-save-drain]", saveDrainActiveRef.current);
       if (saveDrainActiveRef.current) return;
       saveDrainActiveRef.current = true;
-      console.log("[eb-save-drain-start]");
 
 
       const drainPendingSaves = async () => {
-        console.log("[eb-drain-run]", Boolean(pendingSaveRef.current));
         try {
           while (pendingSaveRef.current) {
             const pending = pendingSaveRef.current;
@@ -1550,7 +1545,6 @@ function PageVisualEditor({
             } catch (e) {
               setSaveStatus("error");
               const msg = e instanceof Error ? e.message : String(e);
-              console.log("[eb-save-error]", msg);
               if (msg.includes("draft_busy")) {
                 // Otra petición está terminando el mismo borrador. Conservamos
                 // cualquier cambio más nuevo y reintentamos sin bloquear la UI.
@@ -2888,7 +2882,6 @@ function PageVisualEditor({
                 /* Landing SEO: el cuerpo se ordena con el campo `order` que ya
                    declara cada bloque de la maqueta aprobada. No se crean
                    campos nuevos ni se altera la maqueta. */
-                console.log("[eb-landing-reorder]", activeId, overId, Boolean(tree));
                 if (!tree) return;
                 const BODY = ["intro", "offers", "infoGrid", "map"];
                 const slotOf = (id: string) => id.split("-").pop() ?? "";
@@ -4496,10 +4489,8 @@ function CanvasViewport({
       if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
       const placement = resolveDropPlacement(upEvent.clientY);
       cleanup();
-      console.log("[eb-drag]", key, JSON.stringify(placement));
       if (!placement) return;
       const target = resolveReorderTarget(key, placement);
-      console.log("[eb-drag-target]", target);
       if (target && target !== key) onReorderSection(key, target);
     };
     const onCancel = (cancelEvent: PointerEvent) => {
