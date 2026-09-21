@@ -4006,6 +4006,7 @@ function CanvasViewport({
     const doc = mount.ownerDocument;
     const win = doc.defaultView;
     if (!win) return;
+    const view = win;
     let pressTimer: number | null = null;
     let active: { sectionKey: string; from: number; el: HTMLElement } | null = null;
     let target: number | null = null;
@@ -4026,7 +4027,7 @@ function CanvasViewport({
 
     function cleanup() {
       if (pressTimer != null) {
-        win.clearTimeout(pressTimer);
+        view.clearTimeout(pressTimer);
         pressTimer = null;
       }
       if (active) {
@@ -4085,7 +4086,7 @@ function CanvasViewport({
       doc.addEventListener("pointermove", onMove, true);
       doc.addEventListener("pointerup", onUp, true);
       doc.addEventListener("pointercancel", onCancel, true);
-      pressTimer = win.setTimeout(() => {
+      pressTimer = view.setTimeout(() => {
         pressTimer = null;
         active = { sectionKey, from, el: card };
         target = from;
