@@ -619,7 +619,9 @@ export function resolveHomeSectionVisibility(
     hero: true,
     alux: true,
     destinos: content.destinos.items.length > 0,
+    experienciasAcceso: true,
     categorias: content.categorias.items.length > 0,
+
     pueblosMagicos: content.destinos.items.some((item) => item.puebloMagico),
     rutas: content.rutas.items.length > 0,
     experiencias: content.experiencias.items.length > 0,
