@@ -68,14 +68,6 @@ export function UncNotificationsBell() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const unread = useQuery({
-    queryKey: ["unc", "unread-count"],
-    queryFn: () => fetchCount({}),
-    staleTime: 15_000,
-    refetchInterval: 30_000,
-    retry: false,
-  });
-
   const list = useQuery({
     queryKey: ["unc", "deliveries", "bell"],
     queryFn: () => fetchList({ data: { limit: 30 } }),
