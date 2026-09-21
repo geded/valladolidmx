@@ -204,7 +204,9 @@ const schema: BlockSchema = {
     type: { type: "text", label: "Tipo", translatable: true },
     detail: { type: "text", label: "Detalle", translatable: true },
     href: { type: "text", label: "Enlace canónico", translatable: false },
+    ...mediaFields,
   }),
+
 
   // 10 · Historias (Qué hacer)
   que_hacer_kicker: text("Historias · kicker", "que_hacer_kicker"),

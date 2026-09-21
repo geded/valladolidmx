@@ -102,9 +102,12 @@ import {
   resolveHomePremiumAuthorityTree,
 } from "@/components/home-premium/home-premium-config";
 import {
-  buildHomeDestinationEditorRows,
-  compactHomeDestinationEditorOverrides,
+  HOME_RAIL_CONFIG_KEY,
+  buildHomeRailEditorRows,
+  compactHomeRailEditorOverrides,
+  type HomeEditableRail,
 } from "@/components/home-premium/home-premium-real";
+
 import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
@@ -1572,36 +1575,52 @@ function PageVisualEditor({
   );
   const activeSection: CompositeSectionDef | null =
     compositeSections.find((s) => s.key === subSectionKey) ?? compositeSections[0] ?? null;
-  const inspectorConfig = useMemo(() => {
-    if (
-      !selectedConfig ||
-      selectedNode?.type !== "vmx.home.premium-g4" ||
-      activeSection?.key !== "destinos"
-    ) {
-      return selectedConfig;
+  /**
+   * Puente editable del corpus real: cada carril del Home muestra en el
+   * inspector las tarjetas publicadas y permite ajustar texto, imagen y
+   * enlace sin crear contenido ni sustituir el catálogo del CMS.
+   */
+  const sectionRails: HomeEditableRail[] = useMemo(() => {
+    if (selectedNode?.type !== "vmx.home.premium-g4") return [];
+    switch (activeSection?.key) {
+      case "destinos":
+        return ["destinos"];
+      case "rutas":
+        return ["rutas"];
+      case "experiencias":
+        return ["experiencias"];
+      case "servicios":
+        return ["stays", "food"];
+      case "eventos":
+        return ["eventos"];
+      default:
+        return [];
     }
-    return {
-      ...selectedConfig,
-      destinos_items: buildHomeDestinationEditorRows(
-        homeRealContent,
-        selectedConfig.destinos_items,
-      ),
-    };
-  }, [activeSection?.key, homeRealContent, selectedConfig, selectedNode?.type]);
+  }, [activeSection?.key, selectedNode?.type]);
+
+  const inspectorConfig = useMemo(() => {
+    if (!selectedConfig || sectionRails.length === 0) return selectedConfig;
+    const next = { ...selectedConfig };
+    for (const rail of sectionRails) {
+      const key = HOME_RAIL_CONFIG_KEY[rail];
+      next[key] = buildHomeRailEditorRows(rail, homeRealContent, selectedConfig[key]);
+    }
+    return next;
+  }, [homeRealContent, sectionRails, selectedConfig]);
+
   const updateInspectorConfig = (next: Record<string, unknown>) => {
-    if (
-      selectedNode?.type !== "vmx.home.premium-g4" ||
-      activeSection?.key !== "destinos" ||
-      !selectedConfig
-    ) {
+    if (!selectedConfig || sectionRails.length === 0) {
       updateSelectedConfig(next);
       return;
     }
-    updateSelectedConfig({
-      ...next,
-      destinos_items: compactHomeDestinationEditorOverrides(homeRealContent, next.destinos_items),
-    });
+    const compacted = { ...next };
+    for (const rail of sectionRails) {
+      const key = HOME_RAIL_CONFIG_KEY[rail];
+      compacted[key] = compactHomeRailEditorOverrides(rail, homeRealContent, next[key]);
+    }
+    updateSelectedConfig(compacted);
   };
+
 
   const selectUnit = (id: string, sub: string | null) => {
     setSelectedId(id);
