@@ -1517,6 +1517,7 @@ function PageVisualEditor({
       // más reciente. Así una edición rápida no genera una cola de escrituras que
       // compiten por el mismo bloqueo de la composición.
       pendingSaveRef.current = { pageId: page.id, tree, signature };
+      console.log("[eb-save-drain]", saveDrainActiveRef.current);
       if (saveDrainActiveRef.current) return;
       saveDrainActiveRef.current = true;
 
