@@ -132,7 +132,8 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
     // Una sola geometría compartida por marco, iframe y capa de edición.
     expect(studio).toContain("const frameWidth = Math.round(width * scaled)");
-    expect(studio).toContain("const frameHeight = Math.round(minimumHeight * scaled)");
+    expect(studio).toContain("const canvasHeight = Math.max(minimumHeight, documentHeight)");
+    expect(studio).toContain("const frameHeight = Math.round(canvasHeight * scaled)");
     expect(studio).toContain("data-eb-canvas-edit-layer");
     expect(studio).toContain("data-eb-canvas-precision-notice");
     // Un solo arrastrar y soltar del lienzo, válido también en táctil.
