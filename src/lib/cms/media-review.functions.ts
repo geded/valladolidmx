@@ -36,6 +36,18 @@ export const transitionMediaStatus = createServerFn({ method: "POST" })
       _notes: data.notes ?? null,
     });
     if (error) throw error;
+
+    // Entrega inmediata del canal push ya publicado por el RPC. No cambia el
+    // flujo editorial: si falla, la entrega queda pendiente en el ledger.
+    if (data.to === "in_review") {
+      try {
+        const { dispatchPendingPush } = await import("@/lib/notifications/push-dispatch.server");
+        await dispatchPendingPush({ limit: 25 });
+      } catch {
+        /* el aviso al celular no bloquea el envío a aprobación */
+      }
+    }
+
     return { id: data.mediaId, to: data.to, status: row?.status ?? data.to };
   });
 
