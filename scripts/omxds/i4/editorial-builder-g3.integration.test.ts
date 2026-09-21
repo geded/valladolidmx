@@ -110,7 +110,12 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
     expect(studio).toContain('doc.addEventListener("scroll", read, { passive: true, capture: true })');
     expect(studio).toContain("setCanvasScrollTop(win.scrollY)");
-    expect(studio).toContain('win.scrollTo({ top, behavior: "smooth" })');
+    // La sección seleccionada sólo se revela cuando está fuera de pantalla:
+    // el lienzo ya no salta mientras el editor escribe.
+    expect(studio).toContain("const alreadyVisible =");
+    expect(studio).toContain('behavior: "smooth"');
+    // El asa de arrastre acompaña la parte visible de la sección.
+    expect(studio).toContain("const controlsOffset =");
     expect(studio).not.toContain("doc.body.scrollTop");
     expect(studio).toContain("overflow-y: visible");
     expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
