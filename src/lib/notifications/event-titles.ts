@@ -21,3 +21,24 @@ export const UNC_EVENT_TITLES: Record<string, string> = {
 export function uncEventTitle(eventType: string): string {
   return UNC_EVENT_TITLES[eventType] ?? "Aviso de la plataforma";
 }
+
+/**
+ * Categorías de lectura del Centro de avisos.
+ * Sólo agrupan visualmente los mismos eventos del Delivery Ledger:
+ * no crean canales, estados ni contratos nuevos.
+ */
+export type UncGroup = "aprobaciones" | "viajeros" | "reservas" | "otros";
+
+export const UNC_GROUP_LABELS: Record<UncGroup, string> = {
+  aprobaciones: "Aprobaciones",
+  viajeros: "Viajeros",
+  reservas: "Reservas",
+  otros: "Otros",
+};
+
+export function uncEventGroup(eventType: string): UncGroup {
+  if (eventType.startsWith("media.")) return "aprobaciones";
+  if (eventType.startsWith("Concierge.Booking")) return "reservas";
+  if (eventType.startsWith("Concierge.")) return "viajeros";
+  return "otros";
+}

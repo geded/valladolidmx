@@ -10,7 +10,7 @@
  * imágenes enviadas a aprobación (`media.review_requested`) sin cambiar
  * el flujo editorial aprobado.
  */
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Bell, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -21,7 +21,12 @@ import {
   countMyUnreadNotifications,
   markNotificationDeliveryRead,
 } from "@/lib/notifications/notifications.functions";
-import { uncEventTitle } from "@/lib/notifications/event-titles";
+import {
+  uncEventTitle,
+  uncEventGroup,
+  UNC_GROUP_LABELS,
+  type UncGroup,
+} from "@/lib/notifications/event-titles";
 import { PushEnableButton } from "./PushEnableButton";
 
 interface DeliveryRow {
@@ -79,11 +84,39 @@ export function UncNotificationsBell() {
     retry: false,
   });
 
+  const [tab, setTab] = useState<"unread" | UncGroup>("unread");
+
   const rows = useMemo(
     () => ((list.data?.items ?? []) as DeliveryRow[]).filter((r) => r.channel === "in_app"),
     [list.data],
   );
   const count = unread.data?.unread ?? 0;
+
+  const unreadRows = useMemo(() => rows.filter((r) => !r.read_at), [rows]);
+
+  const groups = useMemo(() => {
+    const map = new Map<UncGroup, DeliveryRow[]>();
+    for (const row of rows) {
+      const g = uncEventGroup(row.event_type);
+      const list = map.get(g) ?? [];
+      list.push(row);
+      map.set(g, list);
+    }
+    return map;
+  }, [rows]);
+
+  const tabs = useMemo(() => {
+    const entries: { key: "unread" | UncGroup; label: string; count: number }[] = [
+      { key: "unread", label: "Sin leer", count: unreadRows.length },
+    ];
+    (Object.keys(UNC_GROUP_LABELS) as UncGroup[]).forEach((g) => {
+      const items = groups.get(g);
+      if (items?.length) entries.push({ key: g, label: UNC_GROUP_LABELS[g], count: items.length });
+    });
+    return entries;
+  }, [groups, unreadRows.length]);
+
+  const visibleRows = tab === "unread" ? unreadRows : (groups.get(tab) ?? []);
 
   async function open(row: DeliveryRow) {
     const target = urlFor(row);
@@ -130,8 +163,25 @@ export function UncNotificationsBell() {
                 : `${count} avisos sin leer`}
           </p>
         </div>
-        <ul className="max-h-[60vh] divide-y overflow-y-auto text-sm">
-          {rows.slice(0, 12).map((row) => (
+        <div className="flex flex-wrap gap-1 border-b px-3 py-2">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              aria-pressed={tab === t.key}
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                tab === t.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label} ({t.count})
+            </button>
+          ))}
+        </div>
+        <ul className="max-h-[50vh] divide-y overflow-y-auto text-sm">
+          {visibleRows.slice(0, 12).map((row) => (
             <li key={row.id}>
               <button
                 type="button"
@@ -162,7 +212,7 @@ export function UncNotificationsBell() {
               </button>
             </li>
           ))}
-          {rows.length === 0 ? (
+          {visibleRows.length === 0 ? (
             <li className="px-4 py-6 text-center text-xs text-muted-foreground">
               Aquí aparecerán las aprobaciones pendientes y otros avisos de la plataforma.
             </li>
