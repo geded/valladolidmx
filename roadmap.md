@@ -4,6 +4,8 @@
 
 - [ ] Experience Builder · Detener parches acumulativos del canvas y recuperar una base estable: comparar/restaurar la última versión visualmente funcional antes de continuar; no gastar más créditos en ajustes del mismo mecanismo sin una prueba Safari/iPad aprobada.
 
+- [ ] Experience Builder · Móvil (20-sep, IMG_0886): el recorrido completo de Home ya funciona. Pendientes de confirmación humana: (a) el control de arrastre debe permanecer visible mientras la sección esté en pantalla, y (b) al seleccionar una sección el lienzo no debe saltar: la parte visual y el panel de edición deben verse a la vez.
+
 - [ ] Experience Builder · Evidencia Safari 20-sep (IMG_0865–0871): la Home pública y el lienzo no conservan la misma distribución tipográfica; Destinos, Categorías, Eventos y Experiencias aparecen partidos o superpuestos, quedan columnas blancas y el desplazamiento se bloquea. Corrección limitada al marco editorial: recreación por preset, zoom sin `transform` sobre el iframe y una sola autoridad de desplazamiento. Pendiente validación humana 1024/1280/1440 y regresión 834/430/390.
 
 - [ ] Experience Builder · Corregir la arquitectura del contenedor editorial: la plantilla sí comparte renderer con la web, pero su envolvente actual puede activar controles públicos, resincronizar estilos y proyectar medidas antiguas. Sustituir esos comportamientos antes de modificar otra sección o extender a más plantillas.
