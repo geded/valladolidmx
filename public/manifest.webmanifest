@@ -1,0 +1,36 @@
+{
+  "name": "Valladolid.mx — Despierta en Valladolid",
+  "short_name": "Valladolid",
+  "description": "Descubre Valladolid y el Oriente Maya de Yucatán: hoteles, restaurantes, experiencias, rutas y eventos.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f9f5ee",
+  "theme_color": "#c87541",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
