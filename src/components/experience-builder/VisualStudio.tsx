@@ -4836,6 +4836,7 @@ function BlockOverlay({
     <div
       ref={composedRef}
       data-node-id={node.id}
+      data-eb-block-overlay={sectionManaged ? undefined : ""}
       style={dndStyle}
       role={sectionManaged ? undefined : "button"}
       tabIndex={sectionManaged ? undefined : 0}
