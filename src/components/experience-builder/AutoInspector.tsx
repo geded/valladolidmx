@@ -1010,13 +1010,56 @@ function StructuredListControl({
     onChange(next);
   };
   // Arrastrar y soltar (aditivo): no sustituye Subir/Bajar, que siguen siendo
-  // la vía accesible y la única disponible en iPad/táctil.
+  // la vía accesible. Usa Pointer Events para que también funcione con el dedo
+  // en iPad/Safari, donde el arrastre nativo HTML5 no se dispara.
   const moveTo = (from: number, to: number) => {
     if (from === to || from < 0 || to < 0 || to >= rows.length) return;
     const next = [...rows];
     const [item] = next.splice(from, 1);
     next.splice(to, 0, item);
     onChange(next);
+  };
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const indexAtPoint = (x: number, y: number): number | null => {
+    if (typeof document === "undefined") return null;
+    const el = document.elementFromPoint(x, y);
+    const host = el?.closest<HTMLElement>("[data-omx-row-index]");
+    if (!host) return null;
+    const parsed = Number(host.dataset.omxRowIndex);
+    return Number.isInteger(parsed) ? parsed : null;
+  };
+  const startPointerDrag = (index: number) => (event: React.PointerEvent<HTMLElement>) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const handle = event.currentTarget;
+    handle.setPointerCapture?.(event.pointerId);
+    setDragIndex(index);
+    setOverIndex(index);
+    let target = index;
+    const onMove = (moveEvent: PointerEvent) => {
+      moveEvent.preventDefault();
+      const next = indexAtPoint(moveEvent.clientX, moveEvent.clientY);
+      if (next !== null) {
+        target = next;
+        setOverIndex(next);
+      }
+    };
+    const finish = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onCancel);
+      setDragIndex(null);
+      setOverIndex(null);
+    };
+    const onUp = () => {
+      moveTo(index, target);
+      finish();
+    };
+    const onCancel = () => finish();
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onCancel);
   };
   return (
     <div className="space-y-2">
@@ -1035,7 +1078,12 @@ function StructuredListControl({
         return (
           <div
             key={index}
-            className="rounded-lg border border-border bg-background p-2"
+            data-omx-row-index={index}
+            className={`rounded-lg border bg-background p-2 ${
+              dragIndex !== null && overIndex === index
+                ? "border-primary ring-2 ring-primary/30"
+                : "border-border"
+            }`}
             onDragOver={(e) => {
               if (dragIndex === null) return;
               e.preventDefault();
@@ -1053,14 +1101,19 @@ function StructuredListControl({
                   draggable
                   onDragStart={() => setDragIndex(index)}
                   onDragEnd={() => setDragIndex(null)}
+                  onPointerDown={startPointerDrag(index)}
+                  role="button"
+                  tabIndex={-1}
                   aria-label="Arrastrar para reordenar"
                   title="Arrastrar para reordenar"
-                  className="inline-flex size-6 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
+                  style={{ touchAction: "none" }}
+                  className="inline-flex size-7 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
                 >
                   <GripVertical className="size-3.5" aria-hidden />
                 </span>
                 {def.item?.label ?? "Elemento"} {index + 1}
               </p>
+
               <div className="flex items-center gap-1">
                 <MiniIconButton
                   label="Subir"
