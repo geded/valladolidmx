@@ -1008,7 +1008,11 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       }
       if (pageSet.size >= 6) break;
     }
-    const contacts = await extractOwnerContacts([...pageSet]).catch(() => [] as OwnerContact[]);
+    const contacts = await withBudget(
+      extractOwnerContacts([...pageSet]),
+      7000,
+      [] as OwnerContact[],
+    );
 
     return {
       ok: true as const,
