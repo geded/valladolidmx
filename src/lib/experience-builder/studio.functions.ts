@@ -445,6 +445,24 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
+/**
+ * Fallos transitorios de infraestructura (pooler saturado, tiempo de espera,
+ * lock_timeout). No son errores de contrato ni de autorización: se reintentan.
+ */
+function isTransientDbError(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes("connection pool") ||
+    m.includes("timed out") ||
+    m.includes("timeout") ||
+    m.includes("draft_busy") ||
+    m.includes("canceling statement") ||
+    m.includes("too many clients")
+  );
+}
+
+
+
 export const createComposition = createServerFn({ method: "POST" })
   .inputValidator(
     (data: { slug: string; title: string; description?: string; page_type?: string }) => data,
@@ -493,12 +511,34 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
         });
       }
 
-      const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
-        _id: data.id,
-        _tree: treeToSave as never,
-        _expected_hash: data.expected_hash,
-      });
-      if (error) throw new Error(error.message);
+      /* Reintento acotado: el pooler puede agotar conexiones o exceder el
+         tiempo de espera en picos de autoguardado. Es transitorio y no debe
+         romper el editor ni alterar contratos. */
+      let result: unknown = null;
+      let lastError: string | null = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const rpc = await context.supabase.rpc("eb_save_composition_draft", {
+          _id: data.id,
+          _tree: treeToSave as never,
+          _expected_hash: data.expected_hash,
+        });
+        if (!rpc.error) {
+          result = rpc.data;
+          lastError = null;
+          break;
+        }
+        lastError = rpc.error.message;
+        if (!isTransientDbError(lastError) || attempt === 1) break;
+        await new Promise((resolve) => setTimeout(resolve, 600));
+      }
+      if (lastError) {
+        throw new Error(
+          isTransientDbError(lastError)
+            ? "draft_busy: El servidor está ocupado. Se reintentará el guardado."
+            : lastError,
+        );
+      }
+
       const payload = (result ?? {}) as { draft_hash?: string; draft_version?: number };
       return {
         ok: true,
@@ -743,7 +783,12 @@ export const heartbeatEditLock = createServerFn({ method: "POST" })
     const { data: res, error } = await context.supabase.rpc("eb_heartbeat_edit_lock", {
       _composition_id: data.id,
     });
-    if (error) throw new Error(error.message);
+    /* El latido es best-effort: un fallo transitorio de infraestructura no
+       revoca el bloqueo ni debe romper la sesión de edición. */
+    if (error) {
+      if (isTransientDbError(error.message)) return { ok: true, lock: null };
+      throw new Error(error.message);
+    }
     const payload = (res ?? {}) as { ok?: boolean; lock?: EditingLock | null };
     return { ok: Boolean(payload.ok), lock: payload.lock ?? null };
   });
