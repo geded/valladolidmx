@@ -82,9 +82,11 @@ export function UncNotificationsBell() {
     () => ((list.data?.items ?? []) as DeliveryRow[]).filter((r) => r.channel === "in_app"),
     [list.data],
   );
-  const count = unread.data?.unread ?? 0;
-
+  // El contador refleja sólo los avisos visibles en la campana (canal in_app).
+  // Los registros de correo/push del mismo evento no son legibles aquí y
+  // antes producían un "1 sin leer" sin aviso visible.
   const unreadRows = useMemo(() => rows.filter((r) => !r.read_at), [rows]);
+  const count = unreadRows.length;
 
   const groups = useMemo(() => {
     const map = new Map<UncGroup, DeliveryRow[]>();
