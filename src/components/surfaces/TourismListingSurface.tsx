@@ -348,7 +348,10 @@ export function TourismListingSurface({
       ) : null}
 
       {territorialChip || facets.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/60 p-3">
+        <div
+          data-eb-section="territorio"
+          className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/60 p-3"
+        >
           {territorialChip ? (
             <span className="inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               {territorialChip}
