@@ -4048,6 +4048,13 @@ function CanvasViewport({
                if (!visible) return null;
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
+              // El asa acompaña la parte visible de la sección: si su inicio ya
+              // quedó arriba del borde, el control permanece a la vista en vez
+              // de desaparecer mientras la sección sigue en pantalla.
+              const controlsOffset = Math.min(
+                Math.max(8, 8 - top),
+                Math.max(8, height - 52),
+              );
               return (
                 <div key={section.key} className="absolute inset-x-0" style={{ top, height }}>
                   <div
@@ -4062,7 +4069,8 @@ function CanvasViewport({
                   />
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute left-2 top-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
+                    className="pointer-events-none absolute left-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
+                    style={{ top: controlsOffset }}
                   >
                     {sectionLabels[section.key] ?? section.key}
                   </span>
@@ -4071,12 +4079,12 @@ function CanvasViewport({
                     data-eb-external-section-handle={section.key}
                     aria-label={`Mover o editar ${sectionLabels[section.key] ?? section.key}`}
                     title="Arrastra para reordenar; pulsa para editar"
-                    style={{ touchAction: "none" }}
+                    style={{ touchAction: "none", top: controlsOffset }}
                     onPointerDown={(event) => startSectionDrag(event, section.key)}
                     onClick={() =>
                       compositeNodeId && onSelectSection(compositeNodeId, section.key)
                     }
-                    className="pointer-events-auto absolute right-2 top-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
+                    className="pointer-events-auto absolute right-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
                   >
                     <GripVertical className="size-4" aria-hidden />
                   </button>
