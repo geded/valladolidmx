@@ -259,22 +259,29 @@ export function TourismListingSurface({
 
   return (
     <div className={cn("space-y-6", className)}>
-      <PremiumHero
-        layout="listing"
-        vm={{
-          presentation: premiumPresentation,
-          eyebrow: hero.eyebrow ?? undefined,
-          title: hero.title,
-          description: hero.subtitle ?? undefined,
-          media: activeHeroMedia
-            ? {
-                url: activeHeroMedia.url,
-                alt: activeHeroMedia.alt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
-              }
-            : null,
-          badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
-        }}
-      />
+      {/* Studio Standard v1.0 · E5: marcadores de región para el constructor.
+          Son atributos de datos, no cambian la maqueta aprobada ni el estilo. */}
+      <div data-eb-section="hero">
+        <PremiumHero
+          layout="listing"
+          vm={{
+            presentation: premiumPresentation,
+            eyebrow: hero.eyebrow ?? undefined,
+            title: hero.title,
+            description: hero.subtitle ?? undefined,
+            media: activeHeroMedia
+              ? {
+                  url: activeHeroMedia.url,
+                  alt:
+                    activeHeroMedia.alt ??
+                    `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
+                }
+              : null,
+            badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
+          }}
+        />
+      </div>
+
 
       <section
         className="rounded-2xl border border-border bg-card p-4 shadow-soft"
@@ -341,7 +348,10 @@ export function TourismListingSurface({
       ) : null}
 
       {territorialChip || facets.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/60 p-3">
+        <div
+          data-eb-section="territorio"
+          className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/60 p-3"
+        >
           {territorialChip ? (
             <span className="inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               {territorialChip}
@@ -406,12 +416,16 @@ export function TourismListingSurface({
       ) : null}
 
       {displayItems.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
+        <div
+          data-eb-section="resultados"
+          className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center"
+        >
           <p className="text-sm text-muted-foreground">{emptyMessage}</p>
           {emptyHint ? <div className="mt-3 text-sm">{emptyHint}</div> : null}
         </div>
       ) : (
         <div
+          data-eb-section="resultados"
           className={cn(
             mapSlot && "grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,.75fr)]",
           )}

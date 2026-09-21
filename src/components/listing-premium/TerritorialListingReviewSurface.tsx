@@ -620,11 +620,16 @@ function QueHacerDiscoveryBody({
 
   return (
     <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
-      <ListingIntro profile={profile} compact />
+      {/* Studio Standard v1.0 · E5 · Listados: marcadores de región para el
+          constructor. Sólo atributos de datos; la maqueta aprobada no cambia. */}
+      <div data-eb-section="hero">
+        <ListingIntro profile={profile} compact />
+      </div>
       <AluxBar profile={profile} />
 
       {territories.length ? (
         <section
+          data-eb-section="territorio"
           className="mt-5 border-y border-[var(--border)] py-4"
           aria-label="Filtro territorial"
         >
@@ -668,7 +673,7 @@ function QueHacerDiscoveryBody({
         </section>
       ) : null}
 
-      <div className="mt-7 space-y-10">
+      <div data-eb-section="carriles" className="mt-7 space-y-10">
         {filteredRails.map((rail) => {
           if (!rail.items.length) return null;
           return (
@@ -819,28 +824,34 @@ function TerritorialListingBody({
   return (
     <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
-        <ListingIntro profile={profile} compact={compactDiscovery} />
+        {/* Studio Standard v1.0 · E5 · Listados: regiones marcadas para el
+            constructor. Sólo atributos de datos, sin cambio visual. */}
+        <div data-eb-section="hero">
+          <ListingIntro profile={profile} compact={compactDiscovery} />
+        </div>
         <AluxBar profile={profile} />
-        <Filters
-          profile={profile}
-          query={query}
-          setQuery={setQuery}
-          zone={zone}
-          setZone={setZone}
-          zones={zones}
-          primary={primary}
-          setPrimary={setPrimary}
-          primaryValues={primaryValues}
-          secondary={secondary}
-          setSecondary={setSecondary}
-          secondaryValues={secondaryValues}
-          facets={facets}
-          activeFacets={activeFacets}
-          setActiveFacets={setActiveFacets}
-          hasMap={mappedItems.length > 0}
-          onShowMap={() => setShowMapMobile(true)}
-          compact={compactDiscovery}
-        />
+        <div data-eb-section="territorio">
+          <Filters
+            profile={profile}
+            query={query}
+            setQuery={setQuery}
+            zone={zone}
+            setZone={setZone}
+            zones={zones}
+            primary={primary}
+            setPrimary={setPrimary}
+            primaryValues={primaryValues}
+            secondary={secondary}
+            setSecondary={setSecondary}
+            secondaryValues={secondaryValues}
+            facets={facets}
+            activeFacets={activeFacets}
+            setActiveFacets={setActiveFacets}
+            hasMap={mappedItems.length > 0}
+            onShowMap={() => setShowMapMobile(true)}
+            compact={compactDiscovery}
+          />
+        </div>
 
         <div
           className={`${compactDiscovery ? "mt-4" : "mt-5"} grid items-start gap-6 ${
@@ -851,7 +862,7 @@ function TerritorialListingBody({
               : "grid-cols-1"
           }`}
         >
-          <div id="resultados" className="min-w-0">
+          <div id="resultados" data-eb-section="resultados" className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
