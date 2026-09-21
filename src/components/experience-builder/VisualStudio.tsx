@@ -3991,6 +3991,123 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
+  /**
+   * Arrastrar y soltar DENTRO de una sección: mantén pulsada una tarjeta del
+   * carril (destinos, rutas, experiencias) y suéltala sobre otra para cambiar
+   * su posición. Sólo actúa en el documento editorial; la plantilla pública y
+   * su contenido permanecen intactos y sólo se guarda el nuevo orden.
+   */
+  useEffect(() => {
+    if (!mount || !compositeNodeId || !editingEnabled || !onReorderCard) return;
+    const doc = mount.ownerDocument;
+    const win = doc.defaultView;
+    if (!win) return;
+    let pressTimer: number | null = null;
+    let active: { sectionKey: string; from: number; el: HTMLElement } | null = null;
+    let target: number | null = null;
+    let marked: HTMLElement | null = null;
+    let suppressClick = false;
+
+    const clearMark = () => {
+      if (!marked) return;
+      marked.style.outline = "";
+      marked.style.outlineOffset = "";
+      marked = null;
+    };
+
+    function cardAt(x: number, y: number): HTMLElement | null {
+      const el = doc.elementFromPoint(x, y) as HTMLElement | null;
+      return el?.closest<HTMLElement>("[data-eb-card]") ?? null;
+    }
+
+    function cleanup() {
+      if (pressTimer != null) {
+        win.clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+      if (active) {
+        active.el.style.opacity = "";
+        doc.body.style.touchAction = "";
+        doc.body.style.userSelect = "";
+      }
+      clearMark();
+      active = null;
+      target = null;
+      doc.removeEventListener("pointermove", onMove, true);
+      doc.removeEventListener("pointerup", onUp, true);
+      doc.removeEventListener("pointercancel", onCancel, true);
+    }
+
+    function onMove(event: PointerEvent) {
+      if (!active) {
+        // Un desplazamiento antes de que se cumpla la pulsación larga es
+        // scroll normal del lienzo, no un arrastre.
+        cleanup();
+        return;
+      }
+      event.preventDefault();
+      const over = cardAt(event.clientX, event.clientY);
+      const overSection = over?.closest<HTMLElement>("[data-eb-section]")?.dataset.ebSection;
+      if (!over || overSection !== active.sectionKey) return;
+      const index = Number(over.dataset.ebCard);
+      if (!Number.isInteger(index)) return;
+      if (marked !== over) {
+        clearMark();
+        marked = over;
+        over.style.outline = "3px solid var(--primary, #a1662f)";
+        over.style.outlineOffset = "2px";
+      }
+      target = index;
+    }
+
+    function onUp() {
+      if (active && target != null && target !== active.from) {
+        suppressClick = true;
+        onReorderCard?.(active.sectionKey, active.from, target);
+      }
+      cleanup();
+    }
+
+    function onCancel() {
+      cleanup();
+    }
+
+    const onDown = (event: PointerEvent) => {
+      const card = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-card]");
+      if (!card) return;
+      const sectionKey = card.closest<HTMLElement>("[data-eb-section]")?.dataset.ebSection;
+      const from = Number(card.dataset.ebCard);
+      if (!sectionKey || !Number.isInteger(from)) return;
+      doc.addEventListener("pointermove", onMove, true);
+      doc.addEventListener("pointerup", onUp, true);
+      doc.addEventListener("pointercancel", onCancel, true);
+      pressTimer = win.setTimeout(() => {
+        pressTimer = null;
+        active = { sectionKey, from, el: card };
+        target = from;
+        card.style.opacity = "0.6";
+        doc.body.style.touchAction = "none";
+        doc.body.style.userSelect = "none";
+      }, 320);
+    };
+
+    const onClickCapture = (event: MouseEvent) => {
+      if (!suppressClick) return;
+      suppressClick = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    doc.addEventListener("pointerdown", onDown, true);
+    doc.addEventListener("click", onClickCapture, true);
+    return () => {
+      doc.removeEventListener("pointerdown", onDown, true);
+      doc.removeEventListener("click", onClickCapture, true);
+      cleanup();
+    };
+  }, [compositeNodeId, editingEnabled, mount, onReorderCard]);
+
+
   // Revelar la sección activa SÓLO si está fuera de pantalla. Antes el lienzo
   // saltaba siempre al borde superior de la sección al seleccionarla, de modo
   // que el editor perdía de vista justo lo que estaba por modificar.
