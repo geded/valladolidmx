@@ -448,7 +448,7 @@ function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
   const content = mergeHomeRealContent(
     resolved.content,
     data,
-    (node.config as Record<string, unknown>).destinos_items,
+    node.config as Record<string, unknown>,
     readHomeRailLimits(node.config),
   );
   const sections = resolveHomeSectionVisibility(content, resolved.sections);

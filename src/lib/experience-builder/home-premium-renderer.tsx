@@ -59,7 +59,7 @@ function HomePremiumNode({
   const content = mergeHomeRealContent(
     resolved.content,
     data,
-    (localized.config as Record<string, unknown>).destinos_items,
+    localized.config as Record<string, unknown>,
     readHomeRailLimits(localized.config),
   );
   const sections = resolveHomeSectionVisibility(content, resolved.sections);
