@@ -995,7 +995,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // lo que pasó el filtro de palabras), que es lo que evita perder fotos
     // buenas con título pobre y descartar las que no son del tema.
     const ordered = ai ? pool : heuristic.length ? heuristic : pool;
-    const curated = await rankWithAi(data.query, data.place, ordered).catch(() => null);
+    const curated = await withBudget(rankWithAi(data.query, data.place, ordered), 12000, null);
     const visible = (curated ?? (heuristic.length ? heuristic : pool)).slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
