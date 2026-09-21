@@ -127,6 +127,7 @@ import {
   orderedCompositeSections,
   type CompositeSectionDef,
 } from "@/lib/experience-builder/composite-sections";
+import { readSeoLandingChrome } from "@/lib/experience-builder/seo-landing/seo-landing-template";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
@@ -3532,6 +3533,30 @@ function DeviceToggle({
 const CANVAS_MIN_SCALE = 0.2;
 const CANVAS_PRECISE_EDIT_SCALE = 0.45;
 
+/**
+ * Familia `premium-seo-landing`: la maqueta aprobada se edita región por
+ * región sobre la MISMA superficie pública. Cada clave corresponde al slot
+ * declarado por la plantilla (`data-eb-section` en `SeoLandingSurface`).
+ */
+const SEO_LANDING_SECTION_LABELS: Record<string, string> = {
+  hero: "Portada",
+  badges: "Señales de confianza",
+  intro: "Por qué es extraordinario",
+  offers: "Experiencias destacadas",
+  infoGrid: "Información para tu visita",
+  map: "Contexto territorial",
+  aluxPlanner: "Alux",
+  gallery: "Galería",
+};
+/** Ancla lógica del lienzo cuando la maqueta se edita por regiones. */
+const SEO_LANDING_CANVAS_ID = "__seo_landing_surface__";
+
+/** Slot declarado por el identificador persistido del nodo (`...-hero`). */
+function seoLandingSlotOf(nodeId: string): string {
+  const parts = nodeId.split("-");
+  return parts[parts.length - 1] ?? "";
+}
+
 function roundScale(value: number): number {
   return Math.round(Math.min(1, Math.max(CANVAS_MIN_SCALE, value)) * 1000) / 1000;
 }
@@ -3660,6 +3685,28 @@ function HomeCanvas({
       )
     : {};
 
+  /* Landing SEO Premium: la maqueta aprobada se conserva intacta y cada región
+     visible se vuelve punto de selección. El nodo real se resuelve por slot,
+     de modo que el inspector edita exactamente el bloque de esa región. */
+  const landingSlotNodes: Record<string, string> | null = readSeoLandingChrome(renderedTree)
+    ? Object.fromEntries(
+        renderedTree.root.children
+          .map((node) => [seoLandingSlotOf(node.id), node.id] as const)
+          .filter(([slot]) => slot.length > 0),
+      )
+    : null;
+  const landingSectionLabels = landingSlotNodes
+    ? Object.fromEntries(
+        Object.keys(landingSlotNodes)
+          .filter((slot) => SEO_LANDING_SECTION_LABELS[slot])
+          .map((slot) => [slot, SEO_LANDING_SECTION_LABELS[slot] as string]),
+      )
+    : null;
+  const landingSelectedSlot =
+    landingSlotNodes && selectedId
+      ? (Object.entries(landingSlotNodes).find(([, id]) => id === selectedId)?.[0] ?? null)
+      : null;
+
   return (
     <div
       ref={scrollportRef}
@@ -3679,12 +3726,21 @@ function HomeCanvas({
         onZoomOut={() => changeZoom(-0.1)}
         onFit={() => setZoomOverride(null)}
         presetLabel={preset.label}
-        compositeNodeId={renderedCompositeNode?.id ?? null}
-        selectedSectionKey={selectedCompositeSectionKey}
-        reorderableSectionKeys={reorderableSectionKeys}
-        sectionLabels={sectionLabels}
+        compositeNodeId={
+          landingSlotNodes ? SEO_LANDING_CANVAS_ID : (renderedCompositeNode?.id ?? null)
+        }
+        selectedSectionKey={landingSlotNodes ? landingSelectedSlot : selectedCompositeSectionKey}
+        reorderableSectionKeys={landingSlotNodes ? [] : reorderableSectionKeys}
+        sectionLabels={landingSectionLabels ?? sectionLabels}
         editingEnabled={!previewMode}
-        onSelectSection={onSelectCompositeSection}
+        onSelectSection={
+          landingSlotNodes
+            ? (_nodeId, sectionKey) => {
+                const targetId = landingSlotNodes[sectionKey];
+                if (targetId) onSelect(targetId);
+              }
+            : onSelectCompositeSection
+        }
         onReorderSection={onReorderCompositeSection}
         onReorderCard={onReorderCard}
       >
