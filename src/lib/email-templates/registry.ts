@@ -14,7 +14,6 @@ import { template as tripPostTemplate } from "./trip-post";
 import { template as tripConfirmedTemplate } from "./trip-confirmed";
 import { template as conciergeProposalSentTemplate } from "./concierge-proposal-sent";
 import { template as bookingPaidAdminTemplate } from "./booking-paid-admin";
-import { template as uncNotificationTemplate } from "./unc-notification";
 import { template as proposalPaymentReminderTemplate } from "./proposal-payment-reminder";
 import { template as proposalPaymentStalledTeamTemplate } from "./proposal-payment-stalled-team";
 import {
@@ -42,7 +41,6 @@ export interface TemplateEntry {
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  "unc-notification": uncNotificationTemplate,
   "coupon-issued": couponIssuedTemplate,
   "coupon-redeemed": couponRedeemedTemplate,
   "coupon-review-reminder": couponReviewReminderTemplate,
