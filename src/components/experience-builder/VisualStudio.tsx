@@ -2877,6 +2877,35 @@ function PageVisualEditor({
                   }),
                 );
               }}
+              onReorderLandingBody={(activeId, overId) => {
+                /* Landing SEO: el cuerpo se ordena con el campo `order` que ya
+                   declara cada bloque de la maqueta aprobada. No se crean
+                   campos nuevos ni se altera la maqueta. */
+                if (!tree) return;
+                const BODY = ["intro", "offers", "infoGrid", "map"];
+                const slotOf = (id: string) => id.split("-").pop() ?? "";
+                const bodyNodes = tree.root.children.filter((n) => BODY.includes(slotOf(n.id)));
+                const ordered = [...bodyNodes].sort((a, b) => {
+                  const ao = Number((a.config as Record<string, unknown>)?.["order"]);
+                  const bo = Number((b.config as Record<string, unknown>)?.["order"]);
+                  const av = Number.isFinite(ao) ? ao : BODY.indexOf(slotOf(a.id)) + 1;
+                  const bv = Number.isFinite(bo) ? bo : BODY.indexOf(slotOf(b.id)) + 1;
+                  return av - bv;
+                });
+                const from = ordered.findIndex((n) => n.id === activeId);
+                const to = ordered.findIndex((n) => n.id === overId);
+                if (from < 0 || to < 0 || from === to) return;
+                if (!canMutateEditorialNode(ordered[from])) return;
+                const next = arrayMove(ordered, from, to);
+                let draft = tree;
+                next.forEach((node, index) => {
+                  draft = updateNodeConfig(draft, node.id, {
+                    ...((node.config ?? {}) as Record<string, unknown>),
+                    order: index + 1,
+                  });
+                });
+                commitTree(draft);
+              }}
               commentCounts={commentCounts}
             />
           );
