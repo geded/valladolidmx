@@ -783,7 +783,12 @@ export const heartbeatEditLock = createServerFn({ method: "POST" })
     const { data: res, error } = await context.supabase.rpc("eb_heartbeat_edit_lock", {
       _composition_id: data.id,
     });
-    if (error) throw new Error(error.message);
+    /* El latido es best-effort: un fallo transitorio de infraestructura no
+       revoca el bloqueo ni debe romper la sesión de edición. */
+    if (error) {
+      if (isTransientDbError(error.message)) return { ok: true, lock: null };
+      throw new Error(error.message);
+    }
     const payload = (res ?? {}) as { ok?: boolean; lock?: EditingLock | null };
     return { ok: Boolean(payload.ok), lock: payload.lock ?? null };
   });
