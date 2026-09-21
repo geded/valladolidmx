@@ -22,6 +22,11 @@
  *  · Capa PURA: sin red, sin base de datos, sin efectos. El llamador
  *    inyecta lo que ya cargó con los contratos existentes.
  */
+import type { CompositeAluxIntent } from "@/lib/experience-builder/composite-sections";
+import {
+  aluxIntentsForTemplate,
+  templateKeyForPath,
+} from "@/lib/experience-builder/studio-standard";
 import { deriveTravelStage, type TravelStage } from "@/lib/traveler/journey-stage";
 import { derivePartyProfile, type PartyProfile } from "@/lib/traveler/party-composition";
 import type { AluxContext } from "./use-alux-context";
@@ -108,6 +113,15 @@ export interface AluxUnifiedContext {
    * `region` sin fingir destino ni entidad; `none` falla de forma segura.
    */
   readonly scope: "entity" | "destination" | "region" | "none";
+  /**
+   * Studio Standard v1.0 · E3 — Señales declaradas por la plantilla que el
+   * explorador está mirando. Fuente única: `studio-standard.ts`. No crea un
+   * modelo nuevo ni cambia el render: sólo etiqueta la superficie activa.
+   */
+  readonly surface: {
+    readonly templateKey: string | null;
+    readonly intents: readonly CompositeAluxIntent[];
+  };
   /** Motivo humano y explicable del contexto actual. */
   readonly reason: string;
 }
