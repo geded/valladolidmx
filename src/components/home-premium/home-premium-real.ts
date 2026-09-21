@@ -38,77 +38,223 @@ function withValladolidFirst(cards: readonly Card[]): Card[] {
   ];
 }
 
-type DestinationEditorRow = {
-  name: string;
-  note: string;
-  pueblo_magico: boolean;
-  href: string;
-  demo: boolean;
-  media_url: string;
-  media_alt: string;
-};
+type RowRec = Record<string, unknown>;
 
 /**
- * Proyección editable de los destinos reales del Home.
- *
- * El corpus publicado conserva la autoridad sobre elegibilidad y URL
- * canónica. El Studio puede guardar ajustes editoriales de texto e imagen
- * sobre esas mismas filas, sin crear destinos ni sustituir el catálogo CMS.
+ * Carriles del Home cuyo corpus publicado admite ajuste editorial explícito
+ * desde el constructor (texto, imagen y enlace), sin crear contenido nuevo
+ * ni sustituir el catálogo del CMS.
  */
-export function buildHomeDestinationEditorRows(
+export type HomeEditableRail =
+  | "destinos"
+  | "rutas"
+  | "experiencias"
+  | "stays"
+  | "food"
+  | "eventos";
+
+export const HOME_RAIL_CONFIG_KEY: Record<HomeEditableRail, string> = {
+  destinos: "destinos_items",
+  rutas: "rutas_items",
+  experiencias: "experiencias_items",
+  stays: "servicios_stays",
+  food: "servicios_food",
+  eventos: "eventos_items",
+};
+
+/** Campos editables por carril. `href_override` cubre el enlace. */
+const RAIL_EDITABLE_KEYS: Record<HomeEditableRail, readonly string[]> = {
+  destinos: ["name", "note", "pueblo_magico", "media_url", "media_alt", "href_override"],
+  rutas: [
+    "title",
+    "duration",
+    "stops",
+    "vibe",
+    "description",
+    "sequence",
+    "media_url",
+    "media_alt",
+    "href_override",
+  ],
+  experiencias: ["title", "category", "summary", "media_url", "media_alt", "href_override"],
+  stays: ["title", "destination", "category", "summary", "media_url", "media_alt", "href_override"],
+  food: ["title", "destination", "category", "summary", "media_url", "media_alt", "href_override"],
+  eventos: ["day", "title", "type", "detail", "media_url", "media_alt", "href_override"],
+};
+
+const savedRowsOf = (configured: unknown): RowRec[] =>
+  Array.isArray(configured)
+    ? configured.filter((row): row is RowRec => Boolean(row) && typeof row === "object")
+    : [];
+
+const normalizeHref = (value: unknown): string =>
+  typeof value === "string" ? value.replace(/\/$/, "") : "";
+
+/** Sólo se acepta un enlace interno canónico como override editorial. */
+const isCanonicalInternalHref = (value: unknown): value is string =>
+  typeof value === "string" && value.startsWith("/") && !value.includes("..");
+
+/** Fila base de cada carril, derivada exclusivamente del corpus publicado. */
+function railBaselineRows(rail: HomeEditableRail, real: HomeRealContent | undefined): RowRec[] {
+  switch (rail) {
+    case "destinos":
+      return withValladolidFirst(real?.destinos ?? []).map((card, index) => {
+        const media = mediaOf(card, "destination", index);
+        return {
+          name: card.title,
+          note: card.subtitle,
+          pueblo_magico: card.puebloMagico,
+          href: card.href,
+          demo: false,
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    case "rutas": {
+      const byTitle = new Map((real?.destinos ?? []).map((card) => [card.title, card]));
+      return (real?.rutas ?? []).map((route, index) => {
+        const cover = route.sequence
+          .map((title) => byTitle.get(title))
+          .find((card): card is Card => Boolean(card?.mediaUrl));
+        const media = route.mediaUrl
+          ? { url: route.mediaUrl, alt: route.title }
+          : cover
+            ? mediaOf(cover)
+            : mediaOf({ title: route.title, mediaUrl: "" }, "route", index);
+        return {
+          id: route.id,
+          title: route.title,
+          duration: route.duration,
+          stops: route.stops,
+          vibe: route.vibe,
+          description: route.description,
+          href: route.href,
+          sequence: route.sequence.map((label) => ({ label })),
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    }
+    case "experiencias":
+      return (real?.experiencias ?? []).map((card, index) => {
+        const media = mediaOf(card, "experience", index);
+        return {
+          title: card.title,
+          category: card.category,
+          summary: card.subtitle,
+          href: card.href,
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    case "stays":
+    case "food":
+      return (real?.[rail] ?? []).map((card, index) => {
+        const media = mediaOf(card, rail === "stays" ? "hotel" : "restaurant", index);
+        return {
+          title: card.title,
+          destination: card.category,
+          category: rail === "stays" ? "Hospedaje" : "Gastronomía",
+          summary: card.subtitle,
+          href: card.href,
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    case "eventos":
+      return (real?.eventos ?? []).map((card) => ({
+        day: card.day,
+        title: card.title,
+        type: card.category,
+        detail: card.subtitle,
+        href: card.href,
+        media_url: card.mediaUrl,
+        media_alt: card.mediaUrl.length > 0 ? card.title : "",
+      }));
+  }
+}
+
+/**
+ * Proyección editable de un carril real del Home: el corpus publicado
+ * conserva la autoridad sobre elegibilidad y existencia de cada tarjeta; el
+ * Studio ajusta texto, imagen y enlace sobre esas mismas filas.
+ */
+export function buildHomeRailEditorRows(
+  rail: HomeEditableRail,
   real: HomeRealContent | undefined,
   configured: unknown,
-): DestinationEditorRow[] {
-  const saved = Array.isArray(configured)
-    ? configured.filter(
-        (row): row is Record<string, unknown> => Boolean(row) && typeof row === "object",
-      )
-    : [];
-  const cards = withValladolidFirst(real?.destinos ?? []);
-
-  return cards.map((card, index) => {
-    const byHref = saved.find(
-      (row) => typeof row.href === "string" && row.href.replace(/\/$/, "") === card.href,
-    );
+): RowRec[] {
+  const saved = savedRowsOf(configured);
+  return railBaselineRows(rail, real).map((base, index) => {
+    const byHref = saved.find((row) => normalizeHref(row.href) === normalizeHref(base.href));
     const row = byHref ?? saved[index] ?? {};
-    const fallbackMedia = mediaOf(card, "destination", index);
-    const text = (key: string, fallback: string) =>
-      typeof row[key] === "string" && row[key].trim() ? row[key].trim() : fallback;
-    return {
-      name: text("name", card.title),
-      note: text("note", card.subtitle),
-      pueblo_magico: typeof row.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
-      href: card.href,
-      demo: false,
-      media_url: text("media_url", fallbackMedia.url),
-      media_alt: text("media_alt", fallbackMedia.alt),
-    };
+    const out: RowRec = { ...base };
+    for (const key of RAIL_EDITABLE_KEYS[rail]) {
+      const value = row[key];
+      if (value === undefined) continue;
+      if (key === "href_override") {
+        if (isCanonicalInternalHref(value)) out.href = value;
+        continue;
+      }
+      if (typeof value === "string") {
+        if (value.trim()) out[key] = value.trim();
+        continue;
+      }
+      out[key] = value;
+    }
+    return out;
   });
 }
 
 /** Conserva únicamente los cambios editoriales explícitos sobre el corpus. */
-export function compactHomeDestinationEditorOverrides(
+export function compactHomeRailEditorOverrides(
+  rail: HomeEditableRail,
   real: HomeRealContent | undefined,
   next: unknown,
-): Array<Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href">> {
-  const baseline = buildHomeDestinationEditorRows(real, undefined);
-  const rows = Array.isArray(next)
-    ? next.filter((row): row is Record<string, unknown> => Boolean(row) && typeof row === "object")
-    : [];
-  const editableKeys = ["name", "note", "pueblo_magico", "media_url", "media_alt"] as const;
+): RowRec[] {
+  const baseline = railBaselineRows(rail, real);
+  const rows = savedRowsOf(next);
+  const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
   return baseline.flatMap((base, index) => {
-    const row =
-      rows.find((candidate) => candidate.href === base.href) ?? rows[index] ?? ({} as const);
-    const override: Partial<DestinationEditorRow> & Pick<DestinationEditorRow, "href"> = {
-      href: base.href,
-    };
-    for (const key of editableKeys) {
-      if (row[key] !== undefined && row[key] !== base[key]) override[key] = row[key] as never;
+    const row = rows.find((c) => normalizeHref(c.href) === normalizeHref(base.href)) ?? rows[index];
+    if (!row) return [];
+    const override: RowRec = { href: base.href };
+    for (const key of RAIL_EDITABLE_KEYS[rail]) {
+      if (key === "href_override") continue;
+      if (row[key] === undefined) continue;
+      if (!same(row[key], base[key])) override[key] = row[key];
     }
+    // El enlace editado llega en `href`; se guarda como override explícito.
+    if (
+      isCanonicalInternalHref(row.href) &&
+      normalizeHref(row.href) !== normalizeHref(base.href) &&
+      !rows.some((c) => normalizeHref(c.href) === normalizeHref(base.href))
+    ) {
+      override.href_override = row.href;
+    }
+    if (isCanonicalInternalHref(row.href_override)) override.href_override = row.href_override;
     return Object.keys(override).length > 1 ? [override] : [];
   });
 }
+
+/** Compatibilidad: puente original de Destinos. */
+export function buildHomeDestinationEditorRows(
+  real: HomeRealContent | undefined,
+  configured: unknown,
+) {
+  return buildHomeRailEditorRows("destinos", real, configured) as Array<
+    RowRec & { href: string; name: string; note: string; media_url: string; media_alt: string }
+  >;
+}
+
+export function compactHomeDestinationEditorOverrides(
+  real: HomeRealContent | undefined,
+  next: unknown,
+) {
+  return compactHomeRailEditorOverrides("destinos", real, next);
+}
+
 
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
