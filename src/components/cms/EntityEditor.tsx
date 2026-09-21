@@ -357,6 +357,8 @@ export function EntityEditor(props: Props) {
       return upsert({ data: { table, id: id ?? null, payload } });
     },
     onSuccess: async (res) => {
+      // Ya está en el CMS: el respaldo local deja de ser necesario.
+      clearLocalDraft();
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       if (!isEdit) {
         navigate({ to: `${backTo}/${res.id}/editar` as never });
