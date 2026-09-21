@@ -163,8 +163,25 @@ export function UncNotificationsBell() {
                 : `${count} avisos sin leer`}
           </p>
         </div>
-        <ul className="max-h-[60vh] divide-y overflow-y-auto text-sm">
-          {rows.slice(0, 12).map((row) => (
+        <div className="flex flex-wrap gap-1 border-b px-3 py-2">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              aria-pressed={tab === t.key}
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                tab === t.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label} ({t.count})
+            </button>
+          ))}
+        </div>
+        <ul className="max-h-[50vh] divide-y overflow-y-auto text-sm">
+          {visibleRows.slice(0, 12).map((row) => (
             <li key={row.id}>
               <button
                 type="button"
