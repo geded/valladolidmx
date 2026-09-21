@@ -1545,6 +1545,7 @@ function PageVisualEditor({
             } catch (e) {
               setSaveStatus("error");
               const msg = e instanceof Error ? e.message : String(e);
+              console.log("[eb-save-error]", msg);
               if (msg.includes("draft_busy")) {
                 // Otra petición está terminando el mismo borrador. Conservamos
                 // cualquier cambio más nuevo y reintentamos sin bloquear la UI.
