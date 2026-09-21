@@ -289,30 +289,43 @@ export function EntityEditor(props: Props) {
   );
 
 
-  useEffect(() => {
-    if (detail.data) {
-      const next: Record<string, string> = { ...initialValues };
-      for (const f of fields) {
-        const v = (detail.data as Record<string, unknown>)[f.name];
-        if (v === null || v === undefined) {
-          next[f.name] = "";
-        } else if (f.type === "datetime") {
-          // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
-          const date = new Date(String(v));
-          next[f.name] = Number.isNaN(date.getTime())
-            ? ""
-            : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-                .toISOString()
-                .slice(0, 16);
-        } else if (Array.isArray(v)) {
-          next[f.name] = v.join("\n");
-        } else {
-          next[f.name] = String(v);
-        }
+  /** Valores tal como están guardados en el CMS (base para descartar el respaldo). */
+  const savedValues = useMemo(() => {
+    if (!detail.data) return null;
+    const next: Record<string, string> = { ...initialValues };
+    for (const f of fields) {
+      const v = (detail.data as Record<string, unknown>)[f.name];
+      if (v === null || v === undefined) {
+        next[f.name] = "";
+      } else if (f.type === "datetime") {
+        // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
+        const date = new Date(String(v));
+        next[f.name] = Number.isNaN(date.getTime())
+          ? ""
+          : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16);
+      } else if (Array.isArray(v)) {
+        next[f.name] = v.join("\n");
+      } else {
+        next[f.name] = String(v);
       }
-      setValues(next);
     }
+    return next;
   }, [detail.data, fields, initialValues]);
+
+  useEffect(() => {
+    // Lo recuperado del propio equipo tiene prioridad: es trabajo del editor
+    // que todavía no llegó al CMS.
+    if (!savedValues || recoveredRef.current) return;
+    setValues(savedValues);
+  }, [savedValues]);
+
+  const discardLocalDraft = useCallback(() => {
+    clearLocalDraft();
+    setValues(savedValues ?? initialValues);
+  }, [clearLocalDraft, savedValues, initialValues]);
+
 
   const status = (detail.data?.status as unknown as ContentStatus | undefined) ?? "draft";
 
