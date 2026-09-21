@@ -5,6 +5,7 @@
  * el estándar siga siendo fail-closed para lo no declarado.
  */
 import { describe, expect, it } from "vitest";
+import { buildAluxUnifiedContext } from "@/lib/alux/unified-context";
 import {
   COMPOSITE_SECTION_REGISTRY,
   type CompositeSectionDef,
@@ -13,6 +14,8 @@ import {
   SEO_LANDING_SURFACE_KEY,
   SURFACE_SLOT_REGISTRY,
   aluxIntentForSection,
+  aluxIntentsForTemplate,
+  templateKeyForPath,
   auditStudioStandard,
   commercialRailsForTemplate,
   getSurfaceSlots,
