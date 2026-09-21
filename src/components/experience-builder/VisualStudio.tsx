@@ -54,7 +54,7 @@ import {
 import {
   DndContext,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   closestCenter,
   useSensor,
@@ -2044,7 +2044,9 @@ function PageVisualEditor({
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // dnd-kit no admite PointerSensor y TouchSensor a la vez: en Safari/iOS
+    // ambos compiten por el mismo gesto y el arrastre se vuelve intermitente.
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
 
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
