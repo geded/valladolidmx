@@ -375,6 +375,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {intro || features.length > 0 ? (
               <section
                 aria-labelledby="landing-intro"
+                data-eb-section="intro"
                 style={{ order: sections.indexOf("intro") }}
                 className="min-w-0 sm:px-5 sm:first:pl-0"
               >
