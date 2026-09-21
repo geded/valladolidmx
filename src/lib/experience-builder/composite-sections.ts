@@ -249,6 +249,7 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         visibilityKey: "show_servicio_preview",
         reorderable: true,
         cmsSource: "businesses",
+        aluxIntent: "dormir",
         commercialSlots: true,
       },
       {
