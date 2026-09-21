@@ -279,6 +279,32 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           source_id: "routing.canonical",
           writable_by: AUTHORING_ROLES,
         },
+        // Campos acreditados de la portada turística ya presentes en plantillas
+        // Premium aprobadas (p. ej. landings de negocio). Se declaran para que el
+        // constructor pueda guardar sin alterar el contenido publicado.
+        {
+          field: "promise",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "typeLine",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaFocal",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
       ],
     },
     {
