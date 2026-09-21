@@ -4560,16 +4560,23 @@ function CanvasLiveContent({
       className={`select-none ${className ?? ""}`}
       onClickCapture={(event) => {
         const target = event.target as HTMLElement | null;
-        if (
-          target?.closest("a,button,input,select,textarea,label,summary,[role='button'],[role='link']")
-        ) {
-          event.preventDefault();
+        const control = target?.closest(
+          "a,button,input,select,textarea,label,summary,[role='button'],[role='link']",
+        ) as HTMLElement | null;
+        // El envoltorio de selección de bloque también expone `role="button"`.
+        // Si es el coincidente más cercano, el clic es editorial (seleccionar la
+        // sección) y NO debe neutralizarse; de lo contrario las plantillas por
+        // bloques quedan inseleccionables.
+        if (control && !control.hasAttribute("data-eb-block-overlay")) {
           // `preventDefault()` sólo cancela navegación/envío; no impide que
           // los handlers React del sitio abran menús, diálogos o cambien el
           // estado de la plantilla dentro del canvas. El documento debe
           // conservar gestos de desplazamiento, pero sus controles públicos
           // son inertes mientras se edita.
-          event.stopPropagation();
+          event.preventDefault();
+          // Los campos de formulario sí se aíslan; enlaces y botones dejan
+          // burbujear el clic para que la sección quede seleccionada.
+          if (control.closest("input,select,textarea,label")) event.stopPropagation();
         }
       }}
       onAuxClickCapture={(event) => event.preventDefault()}
@@ -4836,6 +4843,7 @@ function BlockOverlay({
     <div
       ref={composedRef}
       data-node-id={node.id}
+      data-eb-block-overlay={sectionManaged ? undefined : ""}
       style={dndStyle}
       role={sectionManaged ? undefined : "button"}
       tabIndex={sectionManaged ? undefined : 0}
