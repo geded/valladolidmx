@@ -17,6 +17,39 @@
  *    como hoy (una sola sección).
  */
 
+/**
+ * Catálogo CMS del que se alimenta un carril. Fuente única declarativa:
+ * el constructor no inventa contenido, sólo declara de dónde viene.
+ */
+export type CompositeCmsSource =
+  | "destinations"
+  | "routes"
+  | "experiences"
+  | "stays"
+  | "food"
+  | "events"
+  | "places"
+  | "products"
+  | "businesses"
+  | "categories"
+  | "editorial";
+
+/**
+ * Intención de viaje que representa la sección. Alux la consume como señal de
+ * contexto: no crea un modelo nuevo, sólo etiqueta la superficie.
+ */
+export type CompositeAluxIntent =
+  | "orientarse"
+  | "descubrir-destino"
+  | "planear-ruta"
+  | "elegir-experiencia"
+  | "dormir"
+  | "comer"
+  | "agenda"
+  | "ubicarse"
+  | "conversar"
+  | "mi-viaje";
+
 export interface CompositeSectionDef {
   /** Clave estable de la sección dentro del bloque compuesto. */
   key: string;
@@ -31,6 +64,16 @@ export interface CompositeSectionDef {
    * Las secciones fijas (hero, cierre) no se pueden arrastrar.
    */
   reorderable?: boolean;
+  /** Catálogo CMS real que alimenta el carril, si la sección muestra fichas. */
+  cmsSource?: CompositeCmsSource;
+  /** Intención de viaje declarada para Alux. */
+  aluxIntent?: CompositeAluxIntent;
+  /**
+   * `true` cuando el carril admite presencia contratada de empresas o
+   * productos. El reparto lo resuelve `commercial-slots.ts` con sus reglas
+   * aprobadas; aquí sólo se declara la elegibilidad de la sección.
+   */
+  commercialSlots?: boolean;
 }
 
 export interface CompositeSectionRegistryEntry {
@@ -47,14 +90,22 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
     // muestra una secuencia distinta a la del lienzo y arrastrar una sección
     // reacomoda varias.
     sections: [
-      { key: "hero", label: "Portada (hero)", prefixes: ["hero_"] },
-      { key: "alux", label: "Alux", prefixes: ["alux_"], reorderable: true },
+      { key: "hero", label: "Portada (hero)", prefixes: ["hero_"], aluxIntent: "orientarse" },
+      {
+        key: "alux",
+        label: "Alux",
+        prefixes: ["alux_"],
+        reorderable: true,
+        aluxIntent: "conversar",
+      },
       {
         key: "destinos",
         label: "Destinos del Oriente Maya",
         prefixes: ["destinos_"],
         visibilityKey: "show_destinos",
         reorderable: true,
+        cmsSource: "destinations",
+        aluxIntent: "descubrir-destino",
       },
       {
         key: "experienciasAcceso",
@@ -71,6 +122,7 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
           "experiencias_action_href",
         ],
         reorderable: true,
+        aluxIntent: "elegir-experiencia",
       },
 
       {
@@ -78,6 +130,8 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         label: "Explora por categoría",
         prefixes: ["categorias_"],
         reorderable: true,
+        cmsSource: "categories",
+        aluxIntent: "orientarse",
       },
       {
         key: "eventos",
@@ -85,6 +139,9 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["eventos_"],
         visibilityKey: "show_eventos",
         reorderable: true,
+        cmsSource: "events",
+        aluxIntent: "agenda",
+        commercialSlots: true,
       },
       {
         key: "experiencias",
@@ -92,6 +149,9 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["experiencias_"],
         visibilityKey: "show_experiencias",
         reorderable: true,
+        cmsSource: "experiences",
+        aluxIntent: "elegir-experiencia",
+        commercialSlots: true,
       },
       {
         key: "rutas",
@@ -99,6 +159,8 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["rutas_"],
         visibilityKey: "show_rutas",
         reorderable: true,
+        cmsSource: "routes",
+        aluxIntent: "planear-ruta",
       },
       {
         key: "mapa",
@@ -106,14 +168,22 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["mapa_"],
         visibilityKey: "show_mapa",
         reorderable: true,
+        aluxIntent: "ubicarse",
       },
-      { key: "travelPlan", label: "Mi Viaje", prefixes: ["travel_plan_"] },
+      {
+        key: "travelPlan",
+        label: "Mi Viaje",
+        prefixes: ["travel_plan_"],
+        aluxIntent: "mi-viaje",
+      },
       {
         key: "pueblosMagicos",
         label: "Pueblos Mágicos",
         prefixes: ["pueblos_"],
         visibilityKey: "show_pueblos_magicos",
         reorderable: true,
+        cmsSource: "destinations",
+        aluxIntent: "descubrir-destino",
       },
       {
         key: "servicios",
@@ -121,6 +191,9 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["servicios_"],
         visibilityKey: "show_servicios",
         reorderable: true,
+        cmsSource: "stays",
+        aluxIntent: "dormir",
+        commercialSlots: true,
       },
       {
         key: "queHacer",
@@ -128,6 +201,9 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["que_hacer_"],
         visibilityKey: "show_que_hacer",
         reorderable: true,
+        cmsSource: "places",
+        aluxIntent: "elegir-experiencia",
+        commercialSlots: true,
       },
     ],
   },
@@ -138,6 +214,7 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         key: "hero",
         label: "Portada del destino",
         prefixes: ["hero_", "destination_slug"],
+        aluxIntent: "descubrir-destino",
       },
       {
         key: "descubre",
@@ -145,12 +222,18 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["descubre_"],
         visibilityKey: "show_descubre",
         reorderable: true,
+        cmsSource: "places",
+        aluxIntent: "descubrir-destino",
+        commercialSlots: true,
       },
       {
         key: "services",
         label: "Servicios del destino",
         prefixes: ["servicios_"],
         reorderable: true,
+        cmsSource: "businesses",
+        aluxIntent: "dormir",
+        commercialSlots: true,
       },
       {
         key: "gallery",
@@ -165,14 +248,25 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["servicio_"],
         visibilityKey: "show_servicio_preview",
         reorderable: true,
+        cmsSource: "businesses",
+        aluxIntent: "dormir",
+        commercialSlots: true,
       },
-      { key: "routes", label: "Rutas del destino", prefixes: ["rutas_"], reorderable: true },
+      {
+        key: "routes",
+        label: "Rutas del destino",
+        prefixes: ["rutas_"],
+        reorderable: true,
+        cmsSource: "routes",
+        aluxIntent: "planear-ruta",
+      },
       {
         key: "map",
         label: "Mapa",
         prefixes: ["mapa_"],
         visibilityKey: "show_mapa",
         reorderable: true,
+        aluxIntent: "ubicarse",
       },
       {
         key: "nearby",
@@ -180,6 +274,8 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         prefixes: ["cercanos_"],
         visibilityKey: "show_cercanos",
         reorderable: true,
+        cmsSource: "destinations",
+        aluxIntent: "descubrir-destino",
       },
     ],
   },
@@ -190,39 +286,108 @@ export const COMPOSITE_SECTION_REGISTRY: Record<string, CompositeSectionRegistry
         key: "hero",
         label: "Portada del lugar",
         prefixes: ["hero_", "identity_", "presentation_mode"],
+        aluxIntent: "orientarse",
       },
-      { key: "alux", label: "Alux", prefixes: ["alux_"], reorderable: true },
+      {
+        key: "alux",
+        label: "Alux",
+        prefixes: ["alux_"],
+        reorderable: true,
+        aluxIntent: "conversar",
+      },
       { key: "gallery", label: "Galería", prefixes: ["gallery"], reorderable: true },
       { key: "intro", label: "Relato del lugar", prefixes: ["intro"], reorderable: true },
       { key: "essentials", label: "Lo esencial", prefixes: ["essentials"], reorderable: true },
-      { key: "map", label: "Ubicación y mapa", prefixes: ["map"], reorderable: true },
-      { key: "services", label: "Servicios", prefixes: ["services"], reorderable: true },
-      { key: "experiences", label: "Experiencias", prefixes: ["experiences"], reorderable: true },
-      { key: "events", label: "Eventos", prefixes: ["events"], reorderable: true },
+      {
+        key: "map",
+        label: "Ubicación y mapa",
+        prefixes: ["map"],
+        reorderable: true,
+        aluxIntent: "ubicarse",
+      },
+      {
+        key: "services",
+        label: "Servicios",
+        prefixes: ["services"],
+        reorderable: true,
+        cmsSource: "businesses",
+        aluxIntent: "dormir",
+        commercialSlots: true,
+      },
+      {
+        key: "experiences",
+        label: "Experiencias",
+        prefixes: ["experiences"],
+        reorderable: true,
+        cmsSource: "experiences",
+        aluxIntent: "elegir-experiencia",
+        commercialSlots: true,
+      },
+      {
+        key: "events",
+        label: "Eventos",
+        prefixes: ["events"],
+        reorderable: true,
+        cmsSource: "events",
+        aluxIntent: "agenda",
+        commercialSlots: true,
+      },
       {
         key: "nearbyBusinesses",
         label: "Qué hay cerca",
         prefixes: ["nearbyBusinesses"],
         reorderable: true,
+        cmsSource: "businesses",
+        aluxIntent: "comer",
+        commercialSlots: true,
       },
-      { key: "nearby", label: "Lugares cercanos", prefixes: ["nearbyPlaces"], reorderable: true },
-      { key: "trip", label: "Mi Viaje", prefixes: ["trip"], reorderable: true },
+      {
+        key: "nearby",
+        label: "Lugares cercanos",
+        prefixes: ["nearbyPlaces"],
+        reorderable: true,
+        cmsSource: "places",
+        aluxIntent: "descubrir-destino",
+      },
+      {
+        key: "trip",
+        label: "Mi Viaje",
+        prefixes: ["trip"],
+        reorderable: true,
+        aluxIntent: "mi-viaje",
+      },
     ],
   },
   "vmx.listing.premium-g5": {
     sections: [
-      { key: "hero", label: "Portada del listado", prefixes: ["hero_"] },
+      {
+        key: "hero",
+        label: "Portada del listado",
+        prefixes: ["hero_"],
+        aluxIntent: "orientarse",
+      },
       {
         key: "territorio",
         label: "Territorio y familia",
         prefixes: ["family", "destination_slug", "destination_label"],
+        aluxIntent: "ubicarse",
       },
       {
         key: "resultados",
         label: "Resultados y tarjetas",
         prefixes: ["items", "columns", "empty_message", "show_add_to_trip", "show_favorite"],
+        cmsSource: "businesses",
+        aluxIntent: "elegir-experiencia",
+        commercialSlots: true,
       },
-      { key: "carriles", label: "Carriles de descubrimiento", prefixes: ["discovery_rails"] },
+      {
+        key: "carriles",
+        label: "Carriles de descubrimiento",
+        prefixes: ["discovery_rails"],
+        cmsSource: "editorial",
+        aluxIntent: "descubrir-destino",
+        commercialSlots: true,
+      },
     ],
   },
 };
