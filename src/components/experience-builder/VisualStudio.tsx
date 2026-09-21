@@ -1501,6 +1501,7 @@ function PageVisualEditor({
   }, [page]);
 
   useEffect(() => {
+    console.log("[eb-autosave]", Boolean(page), Boolean(tree), skipNextAutoSave.current);
     if (!page || !tree) return;
     if (skipNextAutoSave.current) {
       skipNextAutoSave.current = false;
