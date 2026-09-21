@@ -188,10 +188,12 @@ export function CompositionRenderer({
   wrap,
   variableContext,
 }: CompositionRendererProps): ReactNode {
-  /* LOTE 3I.1 · Familia `premium-seo-landing`: en producción la composición
-     se presenta con la superficie editorial compartida (maqueta autorizada).
-     En Studio se conserva el render bloque a bloque para poder editar. */
-  if (!studio && readSeoLandingChrome(tree)) {
+  /* LOTE 3I.1 · Familia `premium-seo-landing`: la composición se presenta
+     SIEMPRE con la superficie editorial aprobada (maqueta autorizada), igual
+     que Inicio. En Studio la edición ocurre sobre esa misma superficie: cada
+     región declara `data-eb-section` y el lienzo ancla ahí selección e
+     inspector. No se sustituye la maqueta por bloques sueltos. */
+  if (readSeoLandingChrome(tree)) {
     const landingVm = buildSeoLandingSurfaceVM(tree);
     if (landingVm) return <SeoLandingSurface vm={landingVm} />;
   }
