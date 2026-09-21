@@ -133,6 +133,8 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // Un solo arrastrar y soltar del lienzo, válido también en táctil.
     expect(studio).toContain("startSectionDrag");
     expect(studio).toContain('touchAction: "none"');
+    expect(studio).toContain('window.addEventListener("pointermove", onMove, { passive: false })');
+    expect(studio).toContain("if (!visible && dragKey !== section.key) return null");
     expect(studio).toContain("xl:static");
     expect(studio).toContain('window.matchMedia("(max-width: 1279px)")');
     expect(studio).toContain('setSidebarRef.current("hidden")');
