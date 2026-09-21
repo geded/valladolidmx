@@ -12,6 +12,15 @@ comercial, sólo por declararlo — sin volver a programar el editor.
 
 No se rediseña ninguna plantilla aprobada. No se crea un segundo constructor.
 
+**Alcance, en corto:** sí, al completarse las etapas, las plantillas que ya
+existen quedan editables con el mismo comportamiento de Inicio: seleccionar
+cada sección, cambiar textos, imágenes, botones y enlaces, y arrastrar y pegar
+para reacomodar. Con dos límites deliberados: sólo es editable lo que la
+plantilla declara editable (la maqueta aprobada y su marca quedan protegidas),
+y las secciones fijas por diseño — portada, distintivos institucionales,
+cierre — no se arrastran. La adopción es plantilla por plantilla (etapa E5),
+con tu validación visual entre cada una, no un cambio masivo en un solo paso.
+
 ## El estándar: 5 declaraciones por plantilla
 
 Cada plantilla oficial declara, en los registros que ya existen:
