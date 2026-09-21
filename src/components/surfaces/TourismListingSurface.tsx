@@ -259,22 +259,29 @@ export function TourismListingSurface({
 
   return (
     <div className={cn("space-y-6", className)}>
-      <PremiumHero
-        layout="listing"
-        vm={{
-          presentation: premiumPresentation,
-          eyebrow: hero.eyebrow ?? undefined,
-          title: hero.title,
-          description: hero.subtitle ?? undefined,
-          media: activeHeroMedia
-            ? {
-                url: activeHeroMedia.url,
-                alt: activeHeroMedia.alt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
-              }
-            : null,
-          badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
-        }}
-      />
+      {/* Studio Standard v1.0 · E5: marcadores de región para el constructor.
+          Son atributos de datos, no cambian la maqueta aprobada ni el estilo. */}
+      <div data-eb-section="hero">
+        <PremiumHero
+          layout="listing"
+          vm={{
+            presentation: premiumPresentation,
+            eyebrow: hero.eyebrow ?? undefined,
+            title: hero.title,
+            description: hero.subtitle ?? undefined,
+            media: activeHeroMedia
+              ? {
+                  url: activeHeroMedia.url,
+                  alt:
+                    activeHeroMedia.alt ??
+                    `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
+                }
+              : null,
+            badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
+          }}
+        />
+      </div>
+
 
       <section
         className="rounded-2xl border border-border bg-card p-4 shadow-soft"
