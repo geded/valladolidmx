@@ -91,6 +91,45 @@ export interface CompositionRevisionSummary {
   is_active: boolean;
 }
 
+/**
+ * Claves heredadas de versiones anteriores del borrador que la plantilla
+ * aprobada ya no declara. Se descartan antes de validar para que un borrador
+ * histórico no bloquee el guardado; no sustituyen ningún dato vigente.
+ */
+const LEGACY_CONFIG_KEYS: Readonly<Record<string, readonly string[]>> = {
+  "vmx.home.premium-g4": ["eventos_image", "eventos_image_alt"],
+};
+
+function dropLegacyNodeConfig(node: CompositionNode): CompositionNode {
+  const legacy = LEGACY_CONFIG_KEYS[node.type];
+  let config = node.config;
+  if (legacy && config && typeof config === "object") {
+    const next = { ...(config as Record<string, unknown>) };
+    let changed = false;
+    for (const key of legacy)
+      if (key in next) {
+        delete next[key];
+        changed = true;
+      }
+    if (changed) config = next;
+  }
+  return {
+    ...node,
+    config,
+    children: node.children?.map(dropLegacyNodeConfig),
+  };
+}
+
+function dropLegacyConfig(tree: CompositionTree): CompositionTree {
+  return {
+    ...tree,
+    root: {
+      ...tree.root,
+      children: (tree.root.children ?? []).map(dropLegacyNodeConfig),
+    },
+  };
+}
+
 function mergeExistingNodeI18n(
   incoming: CompositionNode,
   existingById: Map<string, CompositionNode>,
