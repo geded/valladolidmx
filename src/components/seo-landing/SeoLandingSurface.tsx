@@ -492,6 +492,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {territory ? (
               <section
                 aria-labelledby="landing-territory"
+                data-eb-section="map"
                 style={{ order: sections.indexOf("territory") }}
                 className="min-w-0 sm:px-5 sm:last:pr-0"
               >
