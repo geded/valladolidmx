@@ -3344,7 +3344,7 @@ function HomeCanvas({
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
 
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
