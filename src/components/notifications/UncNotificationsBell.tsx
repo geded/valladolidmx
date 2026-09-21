@@ -21,6 +21,7 @@ import {
   countMyUnreadNotifications,
   markNotificationDeliveryRead,
 } from "@/lib/notifications/notifications.functions";
+import { uncEventTitle } from "@/lib/notifications/event-titles";
 
 interface DeliveryRow {
   id: string;
@@ -31,21 +32,8 @@ interface DeliveryRow {
   payload_ref: Record<string, unknown> | null;
 }
 
-const EVENT_TITLES: Record<string, string> = {
-  "media.review_requested": "Imagen enviada a aprobación",
-  "Concierge.Case.Created": "Nuevo expediente de viaje",
-  "Concierge.Message.Received": "Mensaje de un viajero",
-  "Concierge.Booking.Created": "Nueva reservación",
-  "Concierge.Booking.Paid": "Reservación pagada",
-  "Concierge.Booking.Cancelled": "Reservación cancelada",
-  "Concierge.Proposal.Sent": "Propuesta enviada",
-  "Concierge.Proposal.Viewed": "Propuesta vista por el viajero",
-  "Concierge.Proposal.Accepted": "Propuesta aceptada",
-  "Concierge.Quote.Expired": "Cotización vencida",
-};
-
 function titleFor(row: DeliveryRow): string {
-  return EVENT_TITLES[row.event_type] ?? "Aviso de la plataforma";
+  return uncEventTitle(row.event_type);
 }
 
 function detailFor(row: DeliveryRow): string {
