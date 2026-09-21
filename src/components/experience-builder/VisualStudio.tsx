@@ -1408,6 +1408,12 @@ function PageVisualEditor({
   const draftHashPageIdRef = useRef<string | null>(null);
   const draftVersionRef = useRef(-1);
   const saveChainRef = useRef<Promise<unknown>>(Promise.resolve());
+  const pendingSaveRef = useRef<{
+    pageId: string;
+    tree: CompositionTree;
+    signature: string;
+  } | null>(null);
+  const saveDrainActiveRef = useRef(false);
   useEffect(() => {
     // Sólo una huella emitida por el servidor es un token de concurrencia.
     // `draftHash` corresponde al árbol local (posiblemente aún sin guardar) y
@@ -1441,37 +1447,64 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       const signature = canonicalizeClient(tree);
-      // Serializamos los guardados: un guardado en vuelo debe terminar antes
-      // de que el siguiente lea la huella, o el servidor rechaza por conflicto.
-      saveChainRef.current = saveChainRef.current
-        .catch(() => undefined)
-        .then(() =>
-          save({
-            data: { id: page.id, tree, expected_hash: draftHashRef.current ?? "" },
-          })
-            .then((res) => {
+      // Latest-wins: mientras un guardado está en vuelo conservamos sólo el árbol
+      // más reciente. Así una edición rápida no genera una cola de escrituras que
+      // compiten por el mismo bloqueo de la composición.
+      pendingSaveRef.current = { pageId: page.id, tree, signature };
+      if (saveDrainActiveRef.current) return;
+      saveDrainActiveRef.current = true;
+
+      const drainPendingSaves = async () => {
+        try {
+          while (pendingSaveRef.current) {
+            const pending = pendingSaveRef.current;
+            pendingSaveRef.current = null;
+            try {
+              const res = await save({
+                data: {
+                  id: pending.pageId,
+                  tree: pending.tree,
+                  expected_hash: draftHashRef.current ?? "",
+                },
+              });
               draftHashRef.current = res.draft_hash;
-              draftHashPageIdRef.current = page.id;
+              draftHashPageIdRef.current = pending.pageId;
               draftVersionRef.current = res.draft_version;
               setPage((current) =>
-                current
+                current?.id === pending.pageId
                   ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
                   : current,
               );
-              savedSignatureRef.current = signature;
-              setSaveStatus("saved");
-            })
-            .catch((e) => {
+              savedSignatureRef.current = pending.signature;
+              setSaveStatus(pendingSaveRef.current ? "saving" : "saved");
+            } catch (e) {
               setSaveStatus("error");
               const msg = e instanceof Error ? e.message : String(e);
+              if (msg.includes("draft_busy")) {
+                // Otra petición está terminando el mismo borrador. Conservamos
+                // cualquier cambio más nuevo y reintentamos sin bloquear la UI.
+                pendingSaveRef.current ??= pending;
+                setSaveStatus("saving");
+                await new Promise((resolve) => window.setTimeout(resolve, 700));
+                continue;
+              }
               if (msg.includes("draft_conflict")) {
                 setDraftConflict(true);
                 setMessage(
                   "Conflicto de edición: el borrador cambió en el servidor. Recarga el borrador para seguir trabajando.",
                 );
               }
-            }),
-        );
+              break;
+            }
+          }
+        } finally {
+          saveDrainActiveRef.current = false;
+        }
+      };
+
+      saveChainRef.current = saveChainRef.current
+        .catch(() => undefined)
+        .then(drainPendingSaves);
     }, 900);
     return () => {
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
