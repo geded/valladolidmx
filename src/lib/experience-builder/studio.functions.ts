@@ -18,7 +18,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { EMPTY_TREE } from "./composition-tree";
-import { translateTreeBestEffort } from "./translate.functions";
 import {
   getMarketplaceBusinessBySlug,
   type MarketplaceBusinessDetail,
@@ -174,12 +173,17 @@ async function resolveServerEditorialActor(
   context: EditorialServerContext,
 ): Promise<EditorialActorClass> {
   const roles = ["super_admin", "admin", "editor", "business_owner"] as const;
+  const checks = await Promise.all(
+    roles.map(async (role) => {
+      const { data, error } = await context.supabase.rpc("has_role", {
+        _user_id: context.userId,
+        _role: role,
+      });
+      return { role, data, error };
+    }),
+  );
   const resolved: string[] = [];
-  for (const role of roles) {
-    const { data, error } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: role,
-    });
+  for (const { role, data, error } of checks) {
     if (error) throw new Error(`i4_role_check_failed: ${error.message}`);
     if (data) resolved.push(role);
   }
@@ -281,10 +285,12 @@ async function assertI4AuthoringTree(input: {
 }) {
   const surface: EditorialSurface | null = resolveEditorialSurface(input.pageType);
   if (!surface) throw new Error(`i4_authoring_forbidden: unknown page kind "${input.pageType}"`);
-  const actor = await resolveServerEditorialActor(input.context);
+  const [actor, registeredMediaPaths] = await Promise.all([
+    resolveServerEditorialActor(input.context),
+    loadRegisteredMediaPaths(input.context, input.tree),
+  ]);
   if (actor === "business_author" && surface !== "business")
     throw new Error("i4_authoring_forbidden: business authors require business surface");
-  const registeredMediaPaths = await loadRegisteredMediaPaths(input.context, input.tree);
   const validation = validateEditorialCompositionTree({
     tree: input.tree,
     previous_tree: input.previousTree,
@@ -444,7 +450,7 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
           "draft_conflict: El borrador cambió desde que lo abriste. Recarga antes de guardar.",
         );
       }
-      let treeToSave = dropLegacyConfig(mergeExistingI18n(data.tree, previousTree));
+      const treeToSave = dropLegacyConfig(mergeExistingI18n(data.tree, previousTree));
 
       await assertI4AuthoringTree({
         context,
@@ -452,33 +458,6 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
         previousTree,
         pageType: String(existingRow.page_type),
       });
-
-      let didTranslate = false;
-      try {
-        // Deadline duro y corto: la traducción es best-effort y jamás debe agotar el
-        // presupuesto de la petición (upstream request timeout) ni bloquear el guardado.
-        const translated = await Promise.race([
-          translateTreeBestEffort(treeToSave, context.supabase),
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
-        ]);
-        if (translated) {
-          treeToSave = translated.tree;
-          didTranslate = true;
-        }
-      } catch {
-        // La traducción automática nunca debe romper ni bloquear el guardado.
-      }
-
-      // Sólo revalidar si la traducción modificó el árbol; evita duplicar trabajo costoso.
-      if (didTranslate) {
-        await assertI4AuthoringTree({
-          context,
-          tree: treeToSave,
-          previousTree,
-          pageType: String(existingRow.page_type),
-        });
-      }
-
 
       const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
         _id: data.id,
