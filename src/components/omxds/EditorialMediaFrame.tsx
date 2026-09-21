@@ -50,14 +50,20 @@ export function EditorialMediaFrame({
       sizes,
       priority: fetchPriority,
     });
-    const isAbsolute = className?.includes("absolute") ?? false;
-    // El hueco de la foto debe existir ANTES de que la imagen cargue. Sin esto,
-    // al hacer scroll la carga diferida cambia la altura del marco y la sección
-    // "salta" y se reacomoda. El contenedor hereda la forma/tamaño declarados
-    // (sin las clases de encuadre) y reserva la proporción intrínseca.
-    const frameSizingClass = (className ?? "")
-      .split(/\s+/)
-      .filter((token) => token && !/^(object-|absolute$|inset-)/.test(token))
+    const classTokens = (className ?? "").split(/\s+/).filter(Boolean);
+    const isAbsolute = classTokens.includes("absolute");
+    // El marco recibe UNA sola vez toda la geometría declarada por la plantilla
+    // (alto, ancho, proporción, posición, margen y radio). Duplicar esas clases
+    // también sobre <img> creaba una segunda geometría intrínseca: al decodificar
+    // la foto, WebKit recalculaba primero la imagen y después el <picture>, que es
+    // el agrandamiento visible durante el scroll en el canvas de 1024 px.
+    const imagePresentationClass = classTokens
+      .filter(
+        (token) =>
+          /^(object-|transition(?:-|$)|duration-|ease-|opacity-|scale-|transform(?:-|$)|group-hover:|hover:|motion-)/.test(
+            token,
+          ),
+      )
       .join(" ");
     const reservedRatio =
       resolved.width && resolved.height ? `${resolved.width} / ${resolved.height}` : undefined;
@@ -66,7 +72,8 @@ export function EditorialMediaFrame({
       <picture
         className={cn(
           "block min-w-0 max-w-full overflow-hidden",
-          isAbsolute ? "absolute inset-0" : frameSizingClass,
+          className,
+          isAbsolute && "inset-0",
         )}
         style={
           !isAbsolute && !hasExplicitHeight && reservedRatio
@@ -91,7 +98,7 @@ export function EditorialMediaFrame({
           {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
           {...(fetchPriority ? { fetchPriority } : {})}
           data-omxds-media="g8-m1"
-          className={cn(className, "block h-full w-full max-w-full")}
+          className={cn("block h-full w-full max-w-full", imagePresentationClass)}
         />
       </picture>
     );
