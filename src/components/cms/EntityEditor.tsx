@@ -441,7 +441,10 @@ export function EntityEditor(props: Props) {
         {...(props.autofillDestination ? { destination: props.autofillDestination } : {})}
         {...(props.autofillZone ? { zone: props.autofillZone } : {})}
         fields={autofillFields}
-        onApply={(patch) => setValues((v) => ({ ...v, ...patch }))}
+        onApply={(patch) => {
+          dirtyRef.current = true;
+          setValues((v) => ({ ...v, ...patch }));
+        }}
       />
 
       <AluxWorkspaceChat
