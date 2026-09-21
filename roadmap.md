@@ -1,5 +1,14 @@
 # Roadmap
 
+## Estándar Único de Construcción del CMS (Studio Standard v1.0)
+
+- [x] E1 · Contrato del estándar: `composite-sections.ts` declara por sección `cmsSource`, `aluxIntent` y `commercialSlots`; nuevo `studio-standard.ts` (registro de superficies por región, resolvers y verificador `auditStudioStandard`); contrato en `scripts/cms/studio-standard.contract.test.ts`. Sin cambio visual.
+- [x] E2 · Puente genérico de edición: el constructor toma etiquetas, slots reordenables y ancla de lienzo de la landing desde el estándar, no de constantes locales. Cualquier familia futura se habilita declarándose.
+- [ ] E3 · Alux por declaración: consumir `aluxIntentForSection` desde el contexto unificado de Alux.
+- [ ] E4 · Visibilidad por declaración: alimentar `commercial-slots.ts` con `commercialRailsForTemplate` respetando el orden editado.
+- [ ] E5 · Adopción plantilla por plantilla (Destinos, listados, fichas, landings) con comparación 1440/834/430/390 y validación visual del Founder entre cada una.
+- [ ] E6 · Regla permanente: ninguna plantilla nueva cierra sin las cinco declaraciones (verificación automática en CI).
+
 ## En curso
 
 - [x] Experience Builder · Timeout de autoguardado (21-sep): el guardado inmediato ya no espera traducción automática; validaciones independientes se ejecutan en paralelo; los cambios rápidos se compactan con estrategia latest-wins y la escritura falla rápido/reintenta si otra petición ocupa el borrador. Se preservan autorización fail-closed, conflicto de borrador y auditoría.
