@@ -3582,6 +3582,7 @@ function HomeCanvas({
   onReorderRoot,
   onSelectCompositeSection,
   onReorderCompositeSection,
+  onReorderLandingBody,
   onReorderCard,
   commentCounts,
 }: {
@@ -3600,6 +3601,7 @@ function HomeCanvas({
   onReorderRoot: (activeId: string, overId: string) => void;
   onSelectCompositeSection: (nodeId: string, sectionKey: string) => void;
   onReorderCompositeSection: (activeKey: string, overKey: string) => void;
+  onReorderLandingBody: (activeId: string, overId: string) => void;
   onReorderCard?: (sectionKey: string, from: number, to: number) => void;
   commentCounts?: Record<string, number>;
 }) {
