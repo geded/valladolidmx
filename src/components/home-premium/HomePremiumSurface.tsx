@@ -749,10 +749,12 @@ function DestinationsSection({
         {items.slice(0, 4).map((destination, index) => (
           <Link
             key={destination.name}
+            data-eb-card={index}
             to={destination.href ?? "/destinos"}
             onClick={() => onOpen(destination.name)}
             className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
           >
+
             <EditorialMediaFrame
               media={destination.media}
               label={destination.name}
