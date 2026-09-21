@@ -773,7 +773,9 @@ function DestinationsSection({
       </div>
       <div className="hidden gap-4 lg:grid lg:h-[30rem] lg:grid-cols-[1.2fr_1fr]">
         <Link
+          data-eb-card={0}
           to={featured.href ?? "/destinos"}
+
           onClick={() => onOpen(featured.name)}
           className="group relative min-h-0 overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
         >
