@@ -4583,7 +4583,7 @@ function CanvasViewport({
           className={`absolute left-0 top-0 block origin-top-left border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
-            height: minimumHeight,
+            height: canvasHeight,
             // El transform se aplica a un viewport acotado, no al documento
             // completo. Conserva ancho lógico, media queries y tipografía sin
             // activar el fallo de pintura de WebKit en capas gigantes.
