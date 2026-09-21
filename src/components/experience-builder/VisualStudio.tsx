@@ -3305,7 +3305,14 @@ const HOME_CANVAS_WIDTH = 1280;
  * menos espacio se aplica una escala visual externa que NO altera container
  * queries, breakpoints ni medidas internas del documento aislado.
  */
-type DeviceViewport = "mobile" | "mobile430" | "tablet" | "w1024" | "desktop" | "w1440";
+type DeviceViewport =
+  | "auto"
+  | "mobile"
+  | "mobile430"
+  | "tablet"
+  | "w1024"
+  | "desktop"
+  | "w1440";
 
 interface DevicePreset {
   id: DeviceViewport;
@@ -3322,6 +3329,10 @@ const DEVICE_PRESETS: readonly DevicePreset[] = [
   { id: "w1024", width: 1024, height: 1366, short: "1024", label: "iPad Pro · 1024 × 1366" },
   { id: "desktop", width: 1280, height: 800, short: "1280", label: "Escritorio · 1280 × 800" },
   { id: "w1440", width: 1440, height: 900, short: "1440", label: "Escritorio amplio · 1440 × 900" },
+  // "Real": el documento se compone al ancho real disponible del editor y
+  // SIEMPRE al 100%. Es la única vista que reproduce 1:1 la página publicada
+  // tal como la ve el usuario en este dispositivo (sin reducción de escala).
+  { id: "auto", width: 0, height: 900, short: "Real", label: "Ancho real · 100%" },
 ] as const;
 
 const DEVICE_PRESET_BY_ID = new Map<DeviceViewport, DevicePreset>(
@@ -3497,11 +3508,18 @@ function HomeCanvas({
     return () => ro.disconnect();
   }, []);
   const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
+  // Vista "Real": el ancho lógico ES el ancho disponible del editor y la escala
+  // queda fija en 1. Así la plantilla se compone exactamente igual que en la
+  // página publicada vista en este mismo dispositivo.
+  const isAutoWidth = deviceViewport === "auto";
+  const logicalWidth = isAutoWidth
+    ? Math.max(320, Math.round(usableWidth && usableWidth > 0 ? usableWidth : 1024))
+    : preset.width;
   const fitScale =
-    usableWidth == null || usableWidth <= 0 || usableWidth >= preset.width
+    isAutoWidth || usableWidth == null || usableWidth <= 0 || usableWidth >= logicalWidth
       ? 1
-      : roundScale(usableWidth / preset.width);
-  const scale = roundScale(zoomOverride ?? fitScale);
+      : roundScale(usableWidth / logicalWidth);
+  const scale = isAutoWidth ? 1 : roundScale(zoomOverride ?? fitScale);
   useEffect(() => setZoomOverride(null), [deviceViewport]);
   useEffect(() => {
     const scrollport = scrollportRef.current;
@@ -3511,6 +3529,9 @@ function HomeCanvas({
     scrollport.scrollTo({ left: 0, top: 0 });
   }, [deviceViewport]);
   const changeZoom = (delta: number) => {
+    // En vista "Real" la escala es siempre 100%: no hay zoom que desvirtúe la
+    // correspondencia con la página publicada.
+    if (isAutoWidth) return;
     setZoomOverride((current) => roundScale((current ?? fitScale) + delta));
   };
   const headerVariant = resolveCanvasHeaderVariant(tree);
@@ -3553,7 +3574,7 @@ function HomeCanvas({
       <CanvasViewport
         key={deviceViewport}
         device={deviceViewport}
-        width={preset.width}
+        width={logicalWidth}
         minimumHeight={preset.height}
         scale={scale}
         fitScale={fitScale}
