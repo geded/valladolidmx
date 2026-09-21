@@ -3645,6 +3645,11 @@ function CanvasViewport({
   const [canvasScrollTop, setCanvasScrollTop] = useState(0);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropKey, setDropKey] = useState<string | null>(null);
+  // Punto de inserción explícito: `before` indica si la sección arrastrada
+  // quedará arriba de la sección destino. Da control real de destino en vez de
+  // "soltar sobre el bloque" sin retroalimentación.
+  const [dropBefore, setDropBefore] = useState(true);
+  const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -3987,18 +3992,40 @@ function CanvasViewport({
    * táctil) resueltos contra la geometría proyectada, con auto-desplazamiento
    * del escenario y una sola confirmación del cambio.
    */
-  const resolveDropKey = (clientY: number): string | null => {
+  const resolveDropPlacement = (clientY: number): { key: string; before: boolean } | null => {
     const frame = iframeRef.current;
-    if (!frame) return null;
+    if (!frame || editableRects.length === 0) return null;
     const frameTop = frame.getBoundingClientRect().top;
-    let candidate: string | null = null;
+    let last: { key: string; before: boolean } | null = null;
     for (const section of editableRects) {
       const top = frameTop + (section.top - canvasScrollTop) * scaled;
       const bottom = top + section.height * scaled;
-      if (clientY >= top && clientY <= bottom) return section.key;
-      if (clientY > bottom) candidate = section.key;
+      const middle = top + (bottom - top) / 2;
+      if (clientY < top) return last ?? { key: section.key, before: true };
+      if (clientY <= bottom) return { key: section.key, before: clientY < middle };
+      last = { key: section.key, before: false };
     }
-    return candidate ?? editableRects[0]?.key ?? null;
+    return last;
+  };
+
+  /**
+   * Traduce el punto de inserción al contrato existente de reordenamiento
+   * (`activeKey` toma la posición de `overKey`). Así el usuario decide el lugar
+   * exacto y el contrato de orden del bloque compuesto no cambia.
+   */
+  const resolveReorderTarget = (
+    sourceKey: string,
+    placement: { key: string; before: boolean },
+  ): string | null => {
+    const keys = editableRects.map((s) => s.key);
+    const from = keys.indexOf(sourceKey);
+    const overIndex = keys.indexOf(placement.key);
+    if (from < 0 || overIndex < 0) return null;
+    let insertAt = placement.before ? overIndex : overIndex + 1;
+    if (insertAt > from) insertAt -= 1;
+    if (insertAt === from) return null;
+    const bounded = Math.max(0, Math.min(keys.length - 1, insertAt));
+    return keys[bounded] ?? null;
   };
 
   const startSectionDrag = (event: React.PointerEvent<HTMLButtonElement>, key: string) => {
@@ -4009,12 +4036,23 @@ function CanvasViewport({
     handle.setPointerCapture(pointerId);
     setDragKey(key);
     setDropKey(key);
+    setDropBefore(true);
+    setDragPointer({ x: event.clientX, y: event.clientY });
     const canvasScroller = mount?.ownerDocument.defaultView;
+
+    const applyPlacement = (clientY: number) => {
+      const placement = resolveDropPlacement(clientY);
+      if (!placement) return null;
+      setDropKey(placement.key);
+      setDropBefore(placement.before);
+      return placement;
+    };
 
     const onMove = (moveEvent: PointerEvent) => {
       if (moveEvent.pointerId !== pointerId) return;
       moveEvent.preventDefault();
-      setDropKey(resolveDropKey(moveEvent.clientY));
+      setDragPointer({ x: moveEvent.clientX, y: moveEvent.clientY });
+      applyPlacement(moveEvent.clientY);
       const frame = iframeRef.current;
       if (!canvasScroller || !frame) return;
       const rect = frame.getBoundingClientRect();
@@ -4025,30 +4063,38 @@ function CanvasViewport({
       else if (moveEvent.clientY > rect.bottom - edge)
          canvasScroller.scrollBy({ top: logicalStep, behavior: "auto" });
     };
-    const onUp = (upEvent: PointerEvent) => {
-      if (upEvent.pointerId !== pointerId) return;
+    const cleanup = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onCancel);
-      if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
-      const target = resolveDropKey(upEvent.clientY);
+      window.removeEventListener("dragstart", blockNativeDrag, true);
       setDragKey(null);
       setDropKey(null);
+      setDragPointer(null);
+    };
+    const onUp = (upEvent: PointerEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
+      if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
+      const placement = resolveDropPlacement(upEvent.clientY);
+      cleanup();
+      if (!placement) return;
+      const target = resolveReorderTarget(key, placement);
       if (target && target !== key) onReorderSection(key, target);
     };
     const onCancel = (cancelEvent: PointerEvent) => {
       if (cancelEvent.pointerId !== pointerId) return;
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("pointercancel", onCancel);
-      setDragKey(null);
-      setDropKey(null);
+      cleanup();
     };
+    // WebKit intenta iniciar su propio arrastre nativo del documento/iframe y
+    // "levanta" la plantilla completa. Bloquearlo mientras dura el gesto deja
+    // sólo la sección en movimiento.
+    const blockNativeDrag = (dragEvent: Event) => dragEvent.preventDefault();
     // Safari cancela la captura cuando el asa sale del área visible durante el
     // auto-scroll. Escuchar en la ventana mantiene vivo el gesto hasta soltarlo.
     window.addEventListener("pointermove", onMove, { passive: false });
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onCancel);
+    window.addEventListener("dragstart", blockNativeDrag, true);
   };
 
   return (
@@ -4110,8 +4156,9 @@ function CanvasViewport({
       ) : null}
       <div
         data-eb-canvas-frame=""
-        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        className="relative shrink-0 select-none overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{ width: frameWidth, height: frameHeight }}
+        onDragStartCapture={(event) => event.preventDefault()}
       >
         <iframe
           ref={iframeRef}
@@ -4156,6 +4203,7 @@ function CanvasViewport({
                if (!visible && dragKey !== section.key) return null;
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
+              const isDragSource = dragKey === section.key;
               // El asa acompaña la parte visible de la sección: si su inicio ya
               // quedó arriba del borde, el control permanece a la vista en vez
               // de desaparecer mientras la sección sigue en pantalla.
@@ -4168,13 +4216,23 @@ function CanvasViewport({
                   <div
                     aria-hidden
                     className={`pointer-events-none absolute inset-0 rounded-md transition-colors ${
-                      isDropTarget
-                        ? "bg-primary/10 outline outline-2 outline-primary"
-                        : selected
-                          ? "outline outline-2 outline-primary"
-                          : "outline outline-1 outline-border/60"
+                      isDragSource
+                        ? "bg-foreground/5 outline outline-2 outline-dashed outline-primary/70"
+                        : isDropTarget
+                          ? "bg-primary/10 outline outline-2 outline-primary"
+                          : selected
+                            ? "outline outline-2 outline-primary"
+                            : "outline outline-1 outline-border/60"
                     }`}
                   />
+                  {isDropTarget && !isDragSource ? (
+                    <div
+                      aria-hidden
+                      data-eb-canvas-drop-indicator={dropBefore ? "before" : "after"}
+                      className="pointer-events-none absolute inset-x-1 h-1 rounded-full bg-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.25)]"
+                      style={dropBefore ? { top: -2 } : { top: height - 2 }}
+                    />
+                  ) : null}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute left-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
@@ -4187,8 +4245,10 @@ function CanvasViewport({
                     data-eb-external-section-handle={section.key}
                     aria-label={`Mover o editar ${sectionLabels[section.key] ?? section.key}`}
                     title="Arrastra para reordenar; pulsa para editar"
+                    draggable={false}
                     style={{ touchAction: "none", top: controlsOffset }}
                     onPointerDown={(event) => startSectionDrag(event, section.key)}
+                    onDragStart={(event) => event.preventDefault()}
                     onClick={() =>
                       compositeNodeId && onSelectSection(compositeNodeId, section.key)
                     }
@@ -4202,6 +4262,19 @@ function CanvasViewport({
           </div>
         ) : null}
       </div>
+      {dragKey && dragPointer
+        ? createPortal(
+            <div
+              aria-hidden
+              data-eb-canvas-drag-ghost={dragKey}
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary bg-background px-3 py-1.5 text-[11px] font-semibold text-foreground shadow-lg"
+              style={{ left: dragPointer.x, top: dragPointer.y - 28 }}
+            >
+              {sectionLabels[dragKey] ?? dragKey}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
