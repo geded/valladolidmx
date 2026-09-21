@@ -463,6 +463,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {info ? (
               <section
                 aria-labelledby="landing-info"
+                data-eb-section="infoGrid"
                 style={{ order: sections.indexOf("info") }}
                 className="min-w-0 sm:px-5"
               >
