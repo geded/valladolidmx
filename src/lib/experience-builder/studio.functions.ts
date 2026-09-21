@@ -480,12 +480,14 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
       }
       const treeToSave = dropLegacyConfig(mergeExistingI18n(data.tree, previousTree));
 
-      await assertI4AuthoringTree({
-        context,
-        tree: treeToSave,
-        previousTree,
-        pageType: String(existingRow.page_type),
-      });
+      if (!isRootOrderOnlyDelta(treeToSave, previousTree)) {
+        await assertI4AuthoringTree({
+          context,
+          tree: treeToSave,
+          previousTree,
+          pageType: String(existingRow.page_type),
+        });
+      }
 
       const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
         _id: data.id,
