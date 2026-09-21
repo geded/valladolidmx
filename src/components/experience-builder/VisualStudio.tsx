@@ -3685,6 +3685,28 @@ function HomeCanvas({
       )
     : {};
 
+  /* Landing SEO Premium: la maqueta aprobada se conserva intacta y cada región
+     visible se vuelve punto de selección. El nodo real se resuelve por slot,
+     de modo que el inspector edita exactamente el bloque de esa región. */
+  const landingSlotNodes: Record<string, string> | null = readSeoLandingChrome(renderedTree)
+    ? Object.fromEntries(
+        renderedTree.root.children
+          .map((node) => [seoLandingSlotOf(node.id), node.id] as const)
+          .filter(([slot]) => slot.length > 0),
+      )
+    : null;
+  const landingSectionLabels = landingSlotNodes
+    ? Object.fromEntries(
+        Object.keys(landingSlotNodes)
+          .filter((slot) => SEO_LANDING_SECTION_LABELS[slot])
+          .map((slot) => [slot, SEO_LANDING_SECTION_LABELS[slot] as string]),
+      )
+    : null;
+  const landingSelectedSlot =
+    landingSlotNodes && selectedId
+      ? (Object.entries(landingSlotNodes).find(([, id]) => id === selectedId)?.[0] ?? null)
+      : null;
+
   return (
     <div
       ref={scrollportRef}
