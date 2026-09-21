@@ -453,24 +453,32 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
         pageType: String(existingRow.page_type),
       });
 
+      let didTranslate = false;
       try {
-        // Deadline duro: la traducción es best-effort y jamás debe agotar el
+        // Deadline duro y corto: la traducción es best-effort y jamás debe agotar el
         // presupuesto de la petición (upstream request timeout) ni bloquear el guardado.
         const translated = await Promise.race([
           translateTreeBestEffort(treeToSave, context.supabase),
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
         ]);
-        if (translated) treeToSave = translated.tree;
+        if (translated) {
+          treeToSave = translated.tree;
+          didTranslate = true;
+        }
       } catch {
         // La traducción automática nunca debe romper ni bloquear el guardado.
       }
 
-      await assertI4AuthoringTree({
-        context,
-        tree: treeToSave,
-        previousTree,
-        pageType: String(existingRow.page_type),
-      });
+      // Sólo revalidar si la traducción modificó el árbol; evita duplicar trabajo costoso.
+      if (didTranslate) {
+        await assertI4AuthoringTree({
+          context,
+          tree: treeToSave,
+          previousTree,
+          pageType: String(existingRow.page_type),
+        });
+      }
+
 
       const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
         _id: data.id,
