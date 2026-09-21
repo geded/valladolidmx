@@ -120,6 +120,8 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // El asa de arrastre acompaña la parte visible de la sección.
     expect(studio).toContain("const controlsOffset =");
     expect(studio).not.toContain("doc.body.scrollTop");
+    expect(studio).toContain("top: Math.max(0, Math.round(rect.top - base))");
+    expect(studio).not.toContain("rect.top - base + scrollTop");
     expect(studio).toContain("overflow-y: visible");
     expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");

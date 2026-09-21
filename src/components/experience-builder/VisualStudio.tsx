@@ -3728,14 +3728,16 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-        const scrollTop = win?.scrollY ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
             const rect = section.getBoundingClientRect();
             return {
               key: section.dataset.ebSection ?? "",
-              top: Math.max(0, Math.round(rect.top - base + scrollTop)),
+              // Ambas cajas se mueven juntas dentro de la misma ventana. Su
+              // diferencia ya es la coordenada lógica de la sección; sumar
+              // `scrollY` otra vez enviaba la selección hacia otra sección.
+              top: Math.max(0, Math.round(rect.top - base)),
               height: Math.round(rect.height),
             };
           })
