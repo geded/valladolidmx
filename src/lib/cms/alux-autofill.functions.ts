@@ -951,7 +951,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // completa como lo haría un buscador de imágenes. El plan determinista
     // queda únicamente como respaldo cuando la IA no responde.
     const plan = buildQueryPlan(data.query, data.place);
-    const ai = await planWithAi(data.query, data.place).catch(() => null);
+    const ai = await withBudget(planWithAi(data.query, data.place), 9000, null);
     const variants = (
       ai?.queries.length ? ai.queries : plan.variants
     ).slice(0, 5);
