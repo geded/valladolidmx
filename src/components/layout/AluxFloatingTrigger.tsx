@@ -354,8 +354,10 @@ export function AluxFloatingTrigger() {
         // perfil/plan declarado → continuidad anónima → desconocido.
         profilePartySize: plan?.party_size ?? null,
         anonymousTravelerCount: anonymousTrip?.travelerCount ?? null,
+        // Studio Standard v1.0 · E3 — intenciones declaradas por la plantilla.
+        pathname,
       }),
-    [ctx, plan, lens, isAuthed, sessionKey, geo, anonymousTrip],
+    [ctx, plan, lens, isAuthed, sessionKey, geo, anonymousTrip, pathname],
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
