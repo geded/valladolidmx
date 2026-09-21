@@ -44,12 +44,21 @@ function titleFor(row: DeliveryRow): string {
 function detailFor(row: DeliveryRow): string {
   const alt = row.payload_ref?.["alt_text"];
   if (typeof alt === "string" && alt.trim()) return alt;
+  const name = row.payload_ref?.["display_name"];
+  if (typeof name === "string" && name.trim()) return name;
   return "Abre para revisar el detalle.";
 }
 
 function urlFor(row: DeliveryRow): string | null {
   const url = row.payload_ref?.["url"];
-  return typeof url === "string" && url.startsWith("/") ? url : null;
+  if (typeof url === "string" && url.startsWith("/")) return url;
+  // Destinos acreditados por tipo de evento cuando el aviso no trae URL.
+  const caseId = row.payload_ref?.["case_id"];
+  if (row.event_type.startsWith("Concierge.") && typeof caseId === "string" && caseId) {
+    return `/concierge/expedientes/${caseId}`;
+  }
+  if (row.event_type === "Traveler.SignedUp") return "/admin/turistas";
+  return null;
 }
 
 function relative(iso: string): string {
