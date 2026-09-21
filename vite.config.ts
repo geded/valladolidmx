@@ -67,6 +67,10 @@ export default defineConfig({
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin &&
+                // Las fotos públicas servidas por el pipeline de medios no son
+                // datos sensibles: se dejan fuera para que puedan guardarse y
+                // verse sin conexión (regla de imágenes más abajo).
+                !url.pathname.startsWith("/api/public/studio-media/") &&
                 /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa)(?:\/|$)/.test(
                   url.pathname,
                 ),
