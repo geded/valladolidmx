@@ -3548,6 +3548,11 @@ const SEO_LANDING_SECTION_LABELS: Record<string, string> = {
   aluxPlanner: "Alux",
   gallery: "Galería",
 };
+/**
+ * Sólo el cuerpo editorial admite reordenamiento: la maqueta aprobada fija la
+ * posición de portada, señales de confianza, Alux y galería.
+ */
+const SEO_LANDING_REORDERABLE_SLOTS: readonly string[] = ["intro", "offers", "infoGrid", "map"];
 /** Ancla lógica del lienzo cuando la maqueta se edita por regiones. */
 const SEO_LANDING_CANVAS_ID = "__seo_landing_surface__";
 
