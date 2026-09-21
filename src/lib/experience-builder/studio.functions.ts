@@ -136,7 +136,10 @@ function isRootOrderOnlyDelta(next: CompositionTree, previous: CompositionTree):
   let orderChanged = false;
   for (let i = 0; i < a.length; i += 1) {
     if (a[i].id !== b[i].id) return false;
-    if (strip(a[i]) !== strip(b[i])) return false;
+    if (strip(a[i]) !== strip(b[i])) {
+      console.log("[eb-order-delta-mismatch]", a[i].id, strip(a[i]), strip(b[i]));
+      return false;
+    }
     const na = (a[i].config ?? {})["order"];
     const nb = (b[i].config ?? {})["order"];
     if (na !== nb) {
