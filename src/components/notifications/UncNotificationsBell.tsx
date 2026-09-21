@@ -18,7 +18,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   listMyNotificationDeliveries,
-  countMyUnreadNotifications,
   markNotificationDeliveryRead,
 } from "@/lib/notifications/notifications.functions";
 import {
@@ -63,18 +62,9 @@ function relative(iso: string): string {
 
 export function UncNotificationsBell() {
   const fetchList = useServerFn(listMyNotificationDeliveries);
-  const fetchCount = useServerFn(countMyUnreadNotifications);
   const markRead = useServerFn(markNotificationDeliveryRead);
   const queryClient = useQueryClient();
   const router = useRouter();
-
-  const unread = useQuery({
-    queryKey: ["unc", "unread-count"],
-    queryFn: () => fetchCount({}),
-    staleTime: 15_000,
-    refetchInterval: 30_000,
-    retry: false,
-  });
 
   const list = useQuery({
     queryKey: ["unc", "deliveries", "bell"],
@@ -90,9 +80,11 @@ export function UncNotificationsBell() {
     () => ((list.data?.items ?? []) as DeliveryRow[]).filter((r) => r.channel === "in_app"),
     [list.data],
   );
-  const count = unread.data?.unread ?? 0;
-
+  // El contador refleja sólo los avisos visibles en la campana (canal in_app).
+  // Los registros de correo/push del mismo evento no son legibles aquí y
+  // antes producían un "1 sin leer" sin aviso visible.
   const unreadRows = useMemo(() => rows.filter((r) => !r.read_at), [rows]);
+  const count = unreadRows.length;
 
   const groups = useMemo(() => {
     const map = new Map<UncGroup, DeliveryRow[]>();
