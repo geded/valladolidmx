@@ -913,7 +913,7 @@ function ExperiencesSection({
         tabIndex={0}
         aria-label="Experiencias recomendadas"
       >
-        {items.map((item) =>
+        {items.map((item, index) =>
           item.href ? (
             <TrackClick
               key={item.title}
@@ -925,9 +925,11 @@ function ExperiencesSection({
               entityId={item.businessId ?? null}
             >
               <Link
+                data-eb-card={index}
                 to={item.href}
                 className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
               >
+
                 <EditorialMediaFrame
                   media={item.media}
                   label={item.title}
