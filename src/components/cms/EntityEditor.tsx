@@ -466,6 +466,24 @@ export function EntityEditor(props: Props) {
       />
 
 
+      {recovered !== null && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm">
+          <span>
+            Recuperamos lo que estabas escribiendo en este equipo
+            {" "}
+            ({meridaDateTime(new Date(recovered).toISOString())}). Guarda la ficha para
+            conservarlo.
+          </span>
+          <button
+            type="button"
+            onClick={discardLocalDraft}
+            className="rounded-pill border border-border bg-surface px-3 py-1 text-xs font-medium hover:bg-muted"
+          >
+            Descartar y volver a lo guardado
+          </button>
+        </div>
+      )}
+
       {error && (
         <div
           role="alert"
