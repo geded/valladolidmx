@@ -127,6 +127,7 @@ import {
   orderedCompositeSections,
   type CompositeSectionDef,
 } from "@/lib/experience-builder/composite-sections";
+import { readSeoLandingChrome } from "@/lib/experience-builder/seo-landing/seo-landing-template";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
