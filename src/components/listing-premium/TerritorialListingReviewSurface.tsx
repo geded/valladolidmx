@@ -620,11 +620,16 @@ function QueHacerDiscoveryBody({
 
   return (
     <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
-      <ListingIntro profile={profile} compact />
+      {/* Studio Standard v1.0 · E5 · Listados: marcadores de región para el
+          constructor. Sólo atributos de datos; la maqueta aprobada no cambia. */}
+      <div data-eb-section="hero">
+        <ListingIntro profile={profile} compact />
+      </div>
       <AluxBar profile={profile} />
 
       {territories.length ? (
         <section
+          data-eb-section="territorio"
           className="mt-5 border-y border-[var(--border)] py-4"
           aria-label="Filtro territorial"
         >
