@@ -54,7 +54,7 @@ import {
 import {
   DndContext,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   closestCenter,
   useSensor,
@@ -2044,7 +2044,9 @@ function PageVisualEditor({
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // dnd-kit no admite PointerSensor y TouchSensor a la vez: en Safari/iOS
+    // ambos compiten por el mismo gesto y el arrastre se vuelve intermitente.
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
 
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -3342,7 +3344,7 @@ function HomeCanvas({
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
 
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -3811,16 +3813,20 @@ function CanvasViewport({
     return () => doc.removeEventListener("click", onClick, true);
   }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
 
-  // Revelar la sección activa desplazando el viewport lógico del iframe.
+  // Revelar la sección activa SÓLO si está fuera de pantalla. Antes el lienzo
+  // saltaba siempre al borde superior de la sección al seleccionarla, de modo
+  // que el editor perdía de vista justo lo que estaba por modificar.
   useEffect(() => {
     if (!mount || !selectedSectionKey) return;
     const target = sectionRects.find((section) => section.key === selectedSectionKey);
     if (!target) return;
-    const top = Math.max(0, Math.round(target.top - 16));
     const win = mount.ownerDocument.defaultView;
-    if (win && Math.abs(win.scrollY - top) > 8) {
-      win.scrollTo({ top, behavior: "smooth" });
-    }
+    if (!win) return;
+    const viewportTop = win.scrollY;
+    const viewportBottom = viewportTop + win.innerHeight;
+    const alreadyVisible = target.top < viewportBottom - 48 && target.top + target.height > viewportTop + 48;
+    if (alreadyVisible) return;
+    win.scrollTo({ top: Math.max(0, Math.round(target.top - 16)), behavior: "smooth" });
     // La geometría ya está medida: no se recalcula dentro del efecto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, selectedSectionKey]);
@@ -4042,6 +4048,13 @@ function CanvasViewport({
                if (!visible) return null;
               const selected = selectedSectionKey === section.key;
               const isDropTarget = dragKey !== null && dropKey === section.key;
+              // El asa acompaña la parte visible de la sección: si su inicio ya
+              // quedó arriba del borde, el control permanece a la vista en vez
+              // de desaparecer mientras la sección sigue en pantalla.
+              const controlsOffset = Math.min(
+                Math.max(8, 8 - top),
+                Math.max(8, height - 52),
+              );
               return (
                 <div key={section.key} className="absolute inset-x-0" style={{ top, height }}>
                   <div
@@ -4056,7 +4069,8 @@ function CanvasViewport({
                   />
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute left-2 top-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
+                    className="pointer-events-none absolute left-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
+                    style={{ top: controlsOffset }}
                   >
                     {sectionLabels[section.key] ?? section.key}
                   </span>
@@ -4065,12 +4079,12 @@ function CanvasViewport({
                     data-eb-external-section-handle={section.key}
                     aria-label={`Mover o editar ${sectionLabels[section.key] ?? section.key}`}
                     title="Arrastra para reordenar; pulsa para editar"
-                    style={{ touchAction: "none" }}
+                    style={{ touchAction: "none", top: controlsOffset }}
                     onPointerDown={(event) => startSectionDrag(event, section.key)}
                     onClick={() =>
                       compositeNodeId && onSelectSection(compositeNodeId, section.key)
                     }
-                    className="pointer-events-auto absolute right-2 top-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
+                    className="pointer-events-auto absolute right-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
                   >
                     <GripVertical className="size-4" aria-hidden />
                   </button>
