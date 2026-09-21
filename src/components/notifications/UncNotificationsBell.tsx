@@ -84,11 +84,39 @@ export function UncNotificationsBell() {
     retry: false,
   });
 
+  const [tab, setTab] = useState<"unread" | UncGroup>("unread");
+
   const rows = useMemo(
     () => ((list.data?.items ?? []) as DeliveryRow[]).filter((r) => r.channel === "in_app"),
     [list.data],
   );
   const count = unread.data?.unread ?? 0;
+
+  const unreadRows = useMemo(() => rows.filter((r) => !r.read_at), [rows]);
+
+  const groups = useMemo(() => {
+    const map = new Map<UncGroup, DeliveryRow[]>();
+    for (const row of rows) {
+      const g = uncEventGroup(row.event_type);
+      const list = map.get(g) ?? [];
+      list.push(row);
+      map.set(g, list);
+    }
+    return map;
+  }, [rows]);
+
+  const tabs = useMemo(() => {
+    const entries: { key: "unread" | UncGroup; label: string; count: number }[] = [
+      { key: "unread", label: "Sin leer", count: unreadRows.length },
+    ];
+    (Object.keys(UNC_GROUP_LABELS) as UncGroup[]).forEach((g) => {
+      const items = groups.get(g);
+      if (items?.length) entries.push({ key: g, label: UNC_GROUP_LABELS[g], count: items.length });
+    });
+    return entries;
+  }, [groups, unreadRows.length]);
+
+  const visibleRows = tab === "unread" ? unreadRows : (groups.get(tab) ?? []);
 
   async function open(row: DeliveryRow) {
     const target = urlFor(row);
