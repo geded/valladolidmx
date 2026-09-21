@@ -151,6 +151,17 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).not.toContain('[data-eb-section="destinos"] { overflow:clip; }');
     expect(studio).not.toContain("isolation:isolate");
     expect(studio).not.toContain("contain:paint");
+    // La concurrencia usa exclusivamente la huella efectiva entregada por el
+    // servidor; la huella del árbol local no puede convertirse en expected_hash.
+    expect(studio).toContain("draftHashRef.current = page?.draft_hash ?? null");
+    expect(studio).not.toContain("page?.draft_hash ?? draftHash ?? null");
+    expect(studio).toContain("page.draft_version >= draftVersionRef.current");
+    expect(studio).toContain("const restoreTask = saveChainRef.current.catch(() => undefined).then(");
+    expect(studio).toContain('expected_hash: draftHashRef.current ?? ""');
+
+    const studioFunctions = read("src/lib/experience-builder/studio.functions.ts");
+    expect(studioFunctions).toContain("const effectiveDraftHash =");
+    expect(studioFunctions).toContain("draft_hash: effectiveDraftHash");
 
     const inspector = read("src/components/experience-builder/AutoInspector.tsx");
     // Las filas parciales del borrador muestran los valores acreditados por

@@ -1068,6 +1068,7 @@ function PageVisualEditor({
     try {
       const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
       if (refreshed) {
+        draftHashRef.current = refreshed.draft_hash;
         setPage(refreshed);
         skipNextAutoSave.current = true;
         savedSignatureRef.current = canonicalizeClient(refreshed.current_draft);
@@ -1365,6 +1366,7 @@ function PageVisualEditor({
           }
         }
         if (cancelled || !detail) return;
+        draftHashRef.current = detail.draft_hash;
         setPage(detail);
         skipNextAutoSave.current = true;
         savedSignatureRef.current = canonicalizeClient(detail.current_draft);
@@ -1395,11 +1397,30 @@ function PageVisualEditor({
    * render anterior (causa real del falso `draft_conflict`).
    */
   const draftHashRef = useRef<string | null>(null);
+  const draftHashPageIdRef = useRef<string | null>(null);
+  const draftVersionRef = useRef(-1);
   const saveChainRef = useRef<Promise<unknown>>(Promise.resolve());
   useEffect(() => {
-    draftHashRef.current = page?.draft_hash ?? draftHash ?? null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page?.id, page?.draft_hash, draftHash]);
+    // Sólo una huella emitida por el servidor es un token de concurrencia.
+    // `draftHash` corresponde al árbol local (posiblemente aún sin guardar) y
+    // nunca debe sustituir la base esperada por el servidor.
+    if (!page) {
+      draftHashPageIdRef.current = null;
+      draftVersionRef.current = -1;
+      draftHashRef.current = null;
+      return;
+    }
+    // Una respuesta anterior (por ejemplo, un refresh iniciado antes del
+    // autoguardado) nunca puede rebajar el token de concurrencia ya confirmado.
+    if (
+      draftHashPageIdRef.current !== page.id ||
+      page.draft_version >= draftVersionRef.current
+    ) {
+      draftHashPageIdRef.current = page.id;
+      draftVersionRef.current = page.draft_version;
+      draftHashRef.current = page?.draft_hash ?? null;
+    }
+  }, [page]);
 
   useEffect(() => {
     if (!page || !tree) return;
@@ -1422,6 +1443,8 @@ function PageVisualEditor({
           })
             .then((res) => {
               draftHashRef.current = res.draft_hash;
+              draftHashPageIdRef.current = page.id;
+              draftVersionRef.current = res.draft_version;
               setPage((current) =>
                 current
                   ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
@@ -2006,11 +2029,26 @@ function PageVisualEditor({
       )
     )
       return;
-    await restore({
-      data: { id: page.id, revision_id: rev.id, expected_hash: page.draft_hash ?? draftHash ?? "" },
-    });
+    // Una restauración no puede competir con un autoguardado pendiente. Se
+    // incorpora a la misma cola y toma la huella vigente al comenzar.
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    const restoreTask = saveChainRef.current.catch(() => undefined).then(() =>
+      restore({
+        data: {
+          id: page.id,
+          revision_id: rev.id,
+          expected_hash: draftHashRef.current ?? "",
+        },
+      }),
+    );
+    saveChainRef.current = restoreTask;
+    const restored = await restoreTask;
+    draftHashRef.current = restored.draft_hash;
+    draftHashPageIdRef.current = page.id;
+    draftVersionRef.current = restored.draft_version;
     const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
     if (detail) {
+      skipNextAutoSave.current = true;
       setPage(detail);
       setTree(detail.current_draft);
       resetHistory();
@@ -2024,6 +2062,7 @@ function PageVisualEditor({
 
   const restorePublishedAsDraft = async () => {
     if (!page || pageDef.page_type !== "home" || !page.active_revision_id) return;
+    const activeRevisionId = page.active_revision_id;
     if (
       typeof window !== "undefined" &&
       !window.confirm(
@@ -2035,16 +2074,24 @@ function PageVisualEditor({
     setRestoringPublished(true);
     setMessage(null);
     try {
-      await createRevision({
-        data: { id: page.id, notes: "Respaldo automático antes de recuperar la Home publicada" },
+      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+      const restoreTask = saveChainRef.current.catch(() => undefined).then(async () => {
+        await createRevision({
+          data: { id: page.id, notes: "Respaldo automático antes de recuperar la Home publicada" },
+        });
+        return restore({
+          data: {
+            id: page.id,
+            revision_id: activeRevisionId,
+            expected_hash: draftHashRef.current ?? "",
+          },
+        });
       });
-      await restore({
-        data: {
-          id: page.id,
-          revision_id: page.active_revision_id,
-          expected_hash: page.draft_hash ?? draftHash ?? "",
-        },
-      });
+      saveChainRef.current = restoreTask;
+      const restored = await restoreTask;
+      draftHashRef.current = restored.draft_hash;
+      draftHashPageIdRef.current = page.id;
+      draftVersionRef.current = restored.draft_version;
       const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
       if (detail) {
         skipNextAutoSave.current = true;
