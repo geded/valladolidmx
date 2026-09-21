@@ -4598,6 +4598,8 @@ function CanvasViewport({
         {showEditingLayer ? (
           <div
             data-eb-canvas-edit-layer=""
+            data-eb-debug-rects={sectionRects.map((s) => s.key).join(",")}
+            data-eb-debug-reorderable={reorderableSectionKeys.join(",")}
             className="pointer-events-none absolute inset-0 z-50"
             aria-label="Controles de secciones"
           >
