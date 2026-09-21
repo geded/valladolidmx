@@ -926,8 +926,24 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
+
+    // Presupuesto de tiempo por etapa: ninguna fuente externa puede agotar el
+    // tiempo de la petición. Si una tarda de más, se descarta esa fuente y la
+    // búsqueda continúa con las demás (comportamiento fail-soft, no error).
+    const withBudget = async <T,>(task: Promise<T>, ms: number, fallback: T): Promise<T> => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      });
+      try {
+        return await Promise.race([task.catch(() => fallback), timeout]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    };
+
     const site = data.website
-      ? await searchBusinessSite(data.website).catch(() => [] as PhotoCandidate[])
+      ? await withBudget(searchBusinessSite(data.website), 8000, [] as PhotoCandidate[])
       : [];
 
     // Paso 1: Alux escribe la búsqueda. El editor sólo pone el tema; el destino
@@ -935,19 +951,25 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // completa como lo haría un buscador de imágenes. El plan determinista
     // queda únicamente como respaldo cuando la IA no responde.
     const plan = buildQueryPlan(data.query, data.place);
-    const ai = await planWithAi(data.query, data.place).catch(() => null);
+    const ai = await withBudget(planWithAi(data.query, data.place), 9000, null);
     const variants = (
       ai?.queries.length ? ai.queries : plan.variants
     ).slice(0, 5);
     const placeQuery = variants[0] ?? [data.query, data.place].filter(Boolean).join(" ");
 
-    const webBatches = await Promise.all(
-      variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
-    );
-    const [google, commons, openverse] = await Promise.all([
-      searchGooglePhotos(placeQuery).catch(() => [] as PhotoCandidate[]),
-      searchCommons(placeQuery).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(placeQuery).catch(() => [] as PhotoCandidate[]),
+    const [webBatches, google, commons, openverse] = await Promise.all([
+      withBudget(
+        Promise.all(
+          variants.map((variant) =>
+            withBudget(searchWebImages(variant), 12000, [] as PhotoCandidate[]),
+          ),
+        ),
+        13000,
+        [] as PhotoCandidate[][],
+      ),
+      withBudget(searchGooglePhotos(placeQuery), 12000, [] as PhotoCandidate[]),
+      withBudget(searchCommons(placeQuery), 10000, [] as PhotoCandidate[]),
+      withBudget(searchOpenverse(placeQuery), 10000, [] as PhotoCandidate[]),
     ]);
 
     const seen = new Set<string>();
@@ -973,7 +995,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // lo que pasó el filtro de palabras), que es lo que evita perder fotos
     // buenas con título pobre y descartar las que no son del tema.
     const ordered = ai ? pool : heuristic.length ? heuristic : pool;
-    const curated = await rankWithAi(data.query, data.place, ordered).catch(() => null);
+    const curated = await withBudget(rankWithAi(data.query, data.place, ordered), 12000, null);
     const visible = (curated ?? (heuristic.length ? heuristic : pool)).slice(0, 24);
 
     // Contacto publicado por el titular en las páginas de origen, para pedirle
@@ -986,7 +1008,11 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
       }
       if (pageSet.size >= 6) break;
     }
-    const contacts = await extractOwnerContacts([...pageSet]).catch(() => [] as OwnerContact[]);
+    const contacts = await withBudget(
+      extractOwnerContacts([...pageSet]),
+      7000,
+      [] as OwnerContact[],
+    );
 
     return {
       ok: true as const,

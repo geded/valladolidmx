@@ -113,7 +113,11 @@ export function AluxPhotoFinderDialog({
       setError(
         message === "forbidden"
           ? "Esta búsqueda está reservada a editores y administradores."
-          : "No pudimos consultar los acervos en este momento.",
+          : message.startsWith("role_check_failed")
+            ? "No pudimos comprobar tus permisos de edición. Vuelve a intentarlo en unos segundos."
+            : /timeout|network|fetch|failed/i.test(message)
+              ? "La búsqueda tardó demasiado. Intenta de nuevo con una frase más corta."
+              : "No pudimos consultar los acervos en este momento. Inténtalo otra vez.",
       );
     } finally {
       setLoading(false);
