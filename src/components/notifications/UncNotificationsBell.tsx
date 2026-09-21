@@ -33,6 +33,15 @@ interface DeliveryRow {
 
 const EVENT_TITLES: Record<string, string> = {
   "media.review_requested": "Imagen enviada a aprobación",
+  "Concierge.Case.Created": "Nuevo expediente de viaje",
+  "Concierge.Message.Received": "Mensaje de un viajero",
+  "Concierge.Booking.Created": "Nueva reservación",
+  "Concierge.Booking.Paid": "Reservación pagada",
+  "Concierge.Booking.Cancelled": "Reservación cancelada",
+  "Concierge.Proposal.Sent": "Propuesta enviada",
+  "Concierge.Proposal.Viewed": "Propuesta vista por el viajero",
+  "Concierge.Proposal.Accepted": "Propuesta aceptada",
+  "Concierge.Quote.Expired": "Cotización vencida",
 };
 
 function titleFor(row: DeliveryRow): string {
