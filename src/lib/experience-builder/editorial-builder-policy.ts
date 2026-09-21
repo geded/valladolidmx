@@ -1649,6 +1649,12 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
         {
+          field: "order",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "variant",
           class: "editorial",
           type: "select",
