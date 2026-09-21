@@ -13,7 +13,7 @@
  *  - CMS First, BEA, Customer Case File, Alux read-only.
  */
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,17 +83,23 @@ function ExperienceBuilderShell() {
   // página abierta en el lienzo (el lienzo tiene su propio scroller). En el
   // panel de páginas la lista debe poder desplazarse con normalidad.
   const canvasOpen = Boolean(page);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!canvasOpen) return;
     const workspaceMain = shellRef.current?.closest<HTMLElement>("main#main");
     if (!workspaceMain) return;
+    const previousScrollTop = workspaceMain.scrollTop;
     const previousOverflow = workspaceMain.style.overflow;
     const previousOverscroll = workspaceMain.style.overscrollBehavior;
+    // El listado puede estar desplazado al abrir una plantilla. El editor ocupa
+    // su propio lienzo y debe iniciar bajo las barras del Workspace, no heredar
+    // ese desplazamiento y dejar fuera de pantalla su acción de salida.
+    workspaceMain.scrollTop = 0;
     workspaceMain.style.overflow = "hidden";
     workspaceMain.style.overscrollBehavior = "none";
     return () => {
       workspaceMain.style.overflow = previousOverflow;
       workspaceMain.style.overscrollBehavior = previousOverscroll;
+      workspaceMain.scrollTop = previousScrollTop;
     };
   }, [canvasOpen]);
 
