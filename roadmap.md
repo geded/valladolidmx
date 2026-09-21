@@ -5,7 +5,7 @@
 - [x] E1 · Contrato del estándar: `composite-sections.ts` declara por sección `cmsSource`, `aluxIntent` y `commercialSlots`; nuevo `studio-standard.ts` (registro de superficies por región, resolvers y verificador `auditStudioStandard`); contrato en `scripts/cms/studio-standard.contract.test.ts`. Sin cambio visual.
 - [x] E2 · Puente genérico de edición: el constructor toma etiquetas, slots reordenables y ancla de lienzo de la landing desde el estándar, no de constantes locales. Cualquier familia futura se habilita declarándose.
 - [x] E3 · Alux por declaración: `studio-standard.ts` declara la plantilla de cada ruta pública (`templateKeyForPath`) y sus intenciones (`aluxIntentsForTemplate`); el contexto unificado de Alux expone `surface { templateKey, intents }` y el dock lo alimenta con la ruta activa. Aditivo, fail-closed, sin cambio visual.
-- [ ] E4 · Visibilidad por declaración: alimentar `commercial-slots.ts` con `commercialRailsForTemplate` respetando el orden editado.
+- [x] E4 · Visibilidad por declaración: `src/lib/visibility/studio-rails.ts` alimenta `commercial-slots.ts` con `commercialRailsForTemplate` (fail-closed, semilla por plantilla+carril, techo compartido por página).
 - [ ] E5 · Adopción plantilla por plantilla (Destinos, listados, fichas, landings) con comparación 1440/834/430/390 y validación visual del Founder entre cada una.
 - [ ] E6 · Regla permanente: ninguna plantilla nueva cierra sin las cinco declaraciones (verificación automática en CI).
 
