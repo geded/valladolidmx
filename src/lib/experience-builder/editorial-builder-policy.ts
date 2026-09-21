@@ -453,6 +453,12 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
         {
+          field: "order",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "items",
           class: "governed",
           type: "reference",
