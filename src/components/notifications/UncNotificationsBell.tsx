@@ -212,7 +212,7 @@ export function UncNotificationsBell() {
               </button>
             </li>
           ))}
-          {rows.length === 0 ? (
+          {visibleRows.length === 0 ? (
             <li className="px-4 py-6 text-center text-xs text-muted-foreground">
               Aquí aparecerán las aprobaciones pendientes y otros avisos de la plataforma.
             </li>
