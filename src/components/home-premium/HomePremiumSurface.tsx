@@ -957,7 +957,9 @@ function ExperiencesSection({
         )}
       >
         <article
+          data-eb-card={0}
           className={cn(
+
             "h-full overflow-hidden rounded-2xl border border-border bg-card",
             cinematic &&
               "relative border-0 bg-[var(--brand-territory-deep)] text-white shadow-elevated",
