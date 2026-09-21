@@ -93,10 +93,15 @@ function ExperienceBuilderShell() {
     // El listado puede estar desplazado al abrir una plantilla. El editor ocupa
     // su propio lienzo y debe iniciar bajo las barras del Workspace, no heredar
     // ese desplazamiento y dejar fuera de pantalla su acción de salida.
-    workspaceMain.scrollTop = 0;
+    const keepEditorAtTop = () => {
+      if (workspaceMain.scrollTop !== 0) workspaceMain.scrollTop = 0;
+    };
+    keepEditorAtTop();
+    workspaceMain.addEventListener("scroll", keepEditorAtTop, { passive: true });
     workspaceMain.style.overflow = "hidden";
     workspaceMain.style.overscrollBehavior = "none";
     return () => {
+      workspaceMain.removeEventListener("scroll", keepEditorAtTop);
       workspaceMain.style.overflow = previousOverflow;
       workspaceMain.style.overscrollBehavior = previousOverscroll;
       workspaceMain.scrollTop = previousScrollTop;
