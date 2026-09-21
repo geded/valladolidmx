@@ -4156,8 +4156,9 @@ function CanvasViewport({
       ) : null}
       <div
         data-eb-canvas-frame=""
-        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        className="relative shrink-0 select-none overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{ width: frameWidth, height: frameHeight }}
+        onDragStartCapture={(event) => event.preventDefault()}
       >
         <iframe
           ref={iframeRef}
