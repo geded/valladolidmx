@@ -136,26 +136,64 @@ function NotFoundComponent() {
   );
 }
 
+/**
+ * Adenda 15.10.6 · Offline First — Diagnóstico 2026-09-21.
+ * Sin conexión, cualquier fallo de red terminaba en el mensaje genérico de
+ * error. Aquí se distingue "sin conexión" de "error real": se informa con
+ * lenguaje claro y se reintenta automáticamente al recuperar la red.
+ * No cachea, no persiste y no altera ninguna plantilla pública.
+ */
+function isOfflineLikeError(error: Error): boolean {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return true;
+  const message = `${error?.name ?? ""} ${error?.message ?? ""}`.toLowerCase();
+  return (
+    message.includes("failed to fetch") ||
+    message.includes("networkerror") ||
+    message.includes("network request failed") ||
+    message.includes("load failed") ||
+    message.includes("err_internet_disconnected")
+  );
+}
+
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
+  const offline = isOfflineLikeError(error);
+  const [retrying, setRetrying] = useState(false);
+
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
+  useEffect(() => {
+    if (!offline || typeof window === "undefined") return;
+    const retry = () => {
+      setRetrying(true);
+      void router.invalidate();
+      reset();
+    };
+    window.addEventListener("online", retry);
+    return () => window.removeEventListener("online", retry);
+  }, [offline, reset, router]);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-2xl">Algo no cargó</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Intenta de nuevo o vuelve al inicio.</p>
+        <h1 className="text-2xl">{offline ? "Sin conexión" : "Algo no cargó"}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {offline
+            ? "No hay conexión a internet. Puedes seguir viendo las páginas que ya visitaste; el resto se cargará solo cuando vuelva la señal."
+            : "Intenta de nuevo o vuelve al inicio."}
+        </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
+              setRetrying(true);
               router.invalidate();
               reset();
             }}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-95"
           >
-            Reintentar
+            {retrying ? "Reintentando…" : "Reintentar"}
           </button>
           <a
             href="/"
