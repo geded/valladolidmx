@@ -139,6 +139,8 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // dibuja un borde sobre la página completa ni captura el clic interno.
     expect(studio).toContain("sectionManaged={node.id === renderedCompositeNode?.id}");
     expect(studio).toContain("role={sectionManaged ? undefined : \"button\"}");
+    expect(studio).toContain('pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree');
+    expect(studio).toContain("onSelect={(id) => selectUnit(id, null)}");
     // Ya no existe el arrastre nativo HTML5 en el lienzo (competía con dnd-kit).
     expect(studio).not.toContain("onDragStart={(event) => {");
     expect(studio).not.toContain("dataTransfer");

@@ -1568,7 +1568,9 @@ function PageVisualEditor({
    * se listan sus secciones internas en lugar de "una sola sección".
    */
   const compositeStructure = useMemo(() => {
-    const children = tree?.root.children ?? [];
+    const structureTree =
+      pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree;
+    const children = structureTree?.root.children ?? [];
     if (children.length !== 1) return null;
     const node = children[0]!;
     const entry = getCompositeSections(node.type);
@@ -1581,7 +1583,7 @@ function PageVisualEditor({
       config,
       sections: orderedCompositeSections(entry, config),
     };
-  }, [tree]);
+  }, [pageDef.page_type, tree]);
 
   const onCompositeDragEnd = (e: DragEndEvent) => {
     if (!tree || !compositeStructure || !e.over || e.active.id === e.over.id) return;
@@ -2565,7 +2567,7 @@ function PageVisualEditor({
                           <SortableSectionItem
                             node={n}
                             selected={selectedId === n.id}
-                            onSelect={() => setSelectedId(n.id)}
+                            onSelect={() => selectUnit(n.id, null)}
                             onToggleHidden={() => toggleHiddenNode(n.id)}
                           />
                         </div>
@@ -2607,7 +2609,7 @@ function PageVisualEditor({
               deviceViewport={deviceViewport}
               selectedId={selectedId}
               selectedCompositeSectionKey={activeSection?.key ?? null}
-              onSelect={(id) => setSelectedId(id)}
+              onSelect={(id) => selectUnit(id, null)}
               onSelectChrome={(area) =>
                 setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)
               }
