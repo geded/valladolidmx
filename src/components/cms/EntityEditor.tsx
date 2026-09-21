@@ -89,6 +89,46 @@ const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]
   archived: [{ to: "draft", label: "Restaurar a borrador" }],
 };
 
+/**
+ * Respaldo local de lo que el editor está tecleando.
+ *
+ * El sistema operativo puede descartar la pestaña cuando el editor cambia de
+ * aplicación o contesta un mensaje; al volver, el formulario se vuelve a montar
+ * vacío. Guardamos lo escrito en este dispositivo (nunca en el servidor, nunca
+ * como contenido publicado) y lo ofrecemos de vuelta al regresar. Se borra al
+ * guardar la ficha o cuando el editor lo descarta.
+ */
+const LOCAL_DRAFT_PREFIX = "vmx.cms.local-draft.v1";
+const LOCAL_DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface LocalDraft {
+  savedAt: number;
+  values: Record<string, string>;
+}
+
+function readLocalDraft(key: string): LocalDraft | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<LocalDraft>;
+    if (!parsed || typeof parsed.savedAt !== "number" || typeof parsed.values !== "object") {
+      return null;
+    }
+    if (Date.now() - parsed.savedAt > LOCAL_DRAFT_MAX_AGE_MS) {
+      window.localStorage.removeItem(key);
+      return null;
+    }
+    const values: Record<string, string> = {};
+    for (const [k, v] of Object.entries(parsed.values ?? {})) {
+      if (typeof v === "string") values[k] = v;
+    }
+    return Object.keys(values).length ? { savedAt: parsed.savedAt, values } : null;
+  } catch {
+    return null;
+  }
+}
+
 export function EntityEditor(props: Props) {
   const { table, id, title, description, backTo, listQueryKey, fields } = props;
 
