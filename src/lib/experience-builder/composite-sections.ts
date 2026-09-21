@@ -17,6 +17,39 @@
  *    como hoy (una sola sección).
  */
 
+/**
+ * Catálogo CMS del que se alimenta un carril. Fuente única declarativa:
+ * el constructor no inventa contenido, sólo declara de dónde viene.
+ */
+export type CompositeCmsSource =
+  | "destinations"
+  | "routes"
+  | "experiences"
+  | "stays"
+  | "food"
+  | "events"
+  | "places"
+  | "products"
+  | "businesses"
+  | "categories"
+  | "editorial";
+
+/**
+ * Intención de viaje que representa la sección. Alux la consume como señal de
+ * contexto: no crea un modelo nuevo, sólo etiqueta la superficie.
+ */
+export type CompositeAluxIntent =
+  | "orientarse"
+  | "descubrir-destino"
+  | "planear-ruta"
+  | "elegir-experiencia"
+  | "dormir"
+  | "comer"
+  | "agenda"
+  | "ubicarse"
+  | "conversar"
+  | "mi-viaje";
+
 export interface CompositeSectionDef {
   /** Clave estable de la sección dentro del bloque compuesto. */
   key: string;
@@ -31,6 +64,16 @@ export interface CompositeSectionDef {
    * Las secciones fijas (hero, cierre) no se pueden arrastrar.
    */
   reorderable?: boolean;
+  /** Catálogo CMS real que alimenta el carril, si la sección muestra fichas. */
+  cmsSource?: CompositeCmsSource;
+  /** Intención de viaje declarada para Alux. */
+  aluxIntent?: CompositeAluxIntent;
+  /**
+   * `true` cuando el carril admite presencia contratada de empresas o
+   * productos. El reparto lo resuelve `commercial-slots.ts` con sus reglas
+   * aprobadas; aquí sólo se declara la elegibilidad de la sección.
+   */
+  commercialSlots?: boolean;
 }
 
 export interface CompositeSectionRegistryEntry {
