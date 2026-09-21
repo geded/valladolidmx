@@ -118,6 +118,26 @@ export default defineConfig({
               },
             },
 
+            // 2026-09-21 · Offline First. Las navegaciones dentro de la app
+            // (TanStack Router) no piden HTML: resuelven sus loaders contra
+            // `/_serverFn/...` por GET. Sin esta ruta, al perder la red una
+            // página ya visitada fallaba y el visitante terminaba en la
+            // pantalla "Sin conexión". Sólo GET de lectura pública; las rutas
+            // sensibles siguen en NetworkOnly y nada autenticado se almacena.
+            {
+              urlPattern: ({ url, sameOrigin, request }) =>
+                sameOrigin &&
+                request.method === "GET" &&
+                url.pathname.startsWith("/_serverFn/"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "server-data-v1",
+                networkTimeoutSeconds: 12,
+                expiration: { maxEntries: 96, maxAgeSeconds: 60 * 60 * 24 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
+
             // Los archivos construidos llevan hash en el nombre y no contienen
             // datos ni sesiones. Guardarlos permite reabrir offline una página
             // pública ya visitada sin mezclar archivos de versiones distintas.
