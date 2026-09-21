@@ -1019,8 +1019,8 @@ function ExperiencesSection({
           </div>
         </article>
         <div className="grid min-h-0 auto-rows-[minmax(9rem,auto)] gap-3">
-          {items.slice(1).map((item: HomePremiumExperience) => (
-            <CompactMediaRow key={item.title} item={item} />
+          {items.slice(1).map((item: HomePremiumExperience, index: number) => (
+            <CompactMediaRow key={item.title} item={item} cardIndex={index + 1} />
           ))}
         </div>
       </div>
@@ -1030,6 +1030,7 @@ function ExperiencesSection({
 
 function CompactMediaRow({
   item,
+  cardIndex,
 }: {
   item: {
     businessId?: string | null;
@@ -1039,6 +1040,7 @@ function CompactMediaRow({
     media: HomePremiumMedia;
     href: string | null;
   };
+  cardIndex?: number;
 }) {
   if (!item.href) return null;
   return (
@@ -1058,9 +1060,11 @@ function CompactMediaRow({
         entityId={item.businessId ?? null}
       />
       <Link
+        data-eb-card={cardIndex}
         to={item.href}
         className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
       >
+
         <EditorialMediaFrame
           media={item.media}
           label={item.title}
