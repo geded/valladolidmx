@@ -102,9 +102,12 @@ import {
   resolveHomePremiumAuthorityTree,
 } from "@/components/home-premium/home-premium-config";
 import {
-  buildHomeDestinationEditorRows,
-  compactHomeDestinationEditorOverrides,
+  HOME_RAIL_CONFIG_KEY,
+  buildHomeRailEditorRows,
+  compactHomeRailEditorOverrides,
+  type HomeEditableRail,
 } from "@/components/home-premium/home-premium-real";
+
 import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
