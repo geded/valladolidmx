@@ -111,12 +111,17 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain('doc.addEventListener("scroll", read, { passive: true, capture: true })');
     expect(studio).toContain("setCanvasScrollTop(win.scrollY)");
     // La sección seleccionada sólo se revela cuando está fuera de pantalla:
-    // el lienzo ya no salta mientras el editor escribe.
-    expect(studio).toContain("const alreadyVisible =");
+    // el panel inferior se descuenta del área realmente visible y no puede
+    // dejar otra sección en pantalla mientras el inspector edita la activa.
+    expect(studio).toContain("const visibleLogicalHeight =");
+    expect(studio).toContain("const visibleOverlap =");
+    expect(studio).toContain("const requiredOverlap = Math.min(target.height, 160)");
     expect(studio).toContain('behavior: "smooth"');
     // El asa de arrastre acompaña la parte visible de la sección.
     expect(studio).toContain("const controlsOffset =");
     expect(studio).not.toContain("doc.body.scrollTop");
+    expect(studio).toContain("top: Math.max(0, Math.round(rect.top - base))");
+    expect(studio).not.toContain("rect.top - base + scrollTop");
     expect(studio).toContain("overflow-y: visible");
     expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
     expect(studio).toContain("Math.ceil(mount.scrollHeight)");
@@ -132,6 +137,12 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain('window.matchMedia("(max-width: 1279px)")');
     expect(studio).toContain('setSidebarRef.current("hidden")');
     expect(studio).toContain("data-eb-external-section-handle");
+    // Una plantilla compuesta usa selección por sección; su bloque raíz no
+    // dibuja un borde sobre la página completa ni captura el clic interno.
+    expect(studio).toContain("sectionManaged={node.id === renderedCompositeNode?.id}");
+    expect(studio).toContain("role={sectionManaged ? undefined : \"button\"}");
+    expect(studio).toContain('pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree');
+    expect(studio).toContain("onSelect={(id) => selectUnit(id, null)}");
     // Ya no existe el arrastre nativo HTML5 en el lienzo (competía con dnd-kit).
     expect(studio).not.toContain("onDragStart={(event) => {");
     expect(studio).not.toContain("dataTransfer");

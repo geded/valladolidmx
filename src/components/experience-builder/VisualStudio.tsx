@@ -1568,7 +1568,9 @@ function PageVisualEditor({
    * se listan sus secciones internas en lugar de "una sola sección".
    */
   const compositeStructure = useMemo(() => {
-    const children = tree?.root.children ?? [];
+    const structureTree =
+      pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree;
+    const children = structureTree?.root.children ?? [];
     if (children.length !== 1) return null;
     const node = children[0]!;
     const entry = getCompositeSections(node.type);
@@ -1581,7 +1583,7 @@ function PageVisualEditor({
       config,
       sections: orderedCompositeSections(entry, config),
     };
-  }, [tree]);
+  }, [pageDef.page_type, tree]);
 
   const onCompositeDragEnd = (e: DragEndEvent) => {
     if (!tree || !compositeStructure || !e.over || e.active.id === e.over.id) return;
@@ -2565,7 +2567,7 @@ function PageVisualEditor({
                           <SortableSectionItem
                             node={n}
                             selected={selectedId === n.id}
-                            onSelect={() => setSelectedId(n.id)}
+                            onSelect={() => selectUnit(n.id, null)}
                             onToggleHidden={() => toggleHiddenNode(n.id)}
                           />
                         </div>
@@ -2607,7 +2609,7 @@ function PageVisualEditor({
               deviceViewport={deviceViewport}
               selectedId={selectedId}
               selectedCompositeSectionKey={activeSection?.key ?? null}
-              onSelect={(id) => setSelectedId(id)}
+              onSelect={(id) => selectUnit(id, null)}
               onSelectChrome={(area) =>
                 setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)
               }
@@ -3471,14 +3473,17 @@ function HomeCanvas({
                       <BlockOverlay
                         key={node.id}
                         node={node}
-                        selected={selectedId === node.id}
+                        selected={
+                          selectedId === node.id && node.id !== renderedCompositeNode?.id
+                        }
                         onSelect={() => onSelect(node.id)}
                         onDelete={() => onDelete(node.id)}
                         onDuplicate={() => onDuplicate(node.id)}
                         onToggleHidden={() => onToggleHidden(node.id)}
                         onMoveUp={() => onMove(node.id, -1)}
                         onMoveDown={() => onMove(node.id, 1)}
-                        sortable={rootIdSet.has(node.id)}
+                        sortable={rootIdSet.has(node.id) && node.id !== renderedCompositeNode?.id}
+                        sectionManaged={node.id === renderedCompositeNode?.id}
                         commentCount={commentCounts?.[node.id] ?? 0}
                       >
                         {content}
@@ -3723,14 +3728,16 @@ function CanvasViewport({
         });
         const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
         setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
-        const scrollTop = win?.scrollY ?? 0;
         const base = mount.getBoundingClientRect().top;
         const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
           .map((section) => {
             const rect = section.getBoundingClientRect();
             return {
               key: section.dataset.ebSection ?? "",
-              top: Math.max(0, Math.round(rect.top - base + scrollTop)),
+              // Ambas cajas se mueven juntas dentro de la misma ventana. Su
+              // diferencia ya es la coordenada lógica de la sección; sumar
+              // `scrollY` otra vez enviaba la selección hacia otra sección.
+              top: Math.max(0, Math.round(rect.top - base)),
               height: Math.round(rect.height),
             };
           })
@@ -3822,14 +3829,38 @@ function CanvasViewport({
     if (!target) return;
     const win = mount.ownerDocument.defaultView;
     if (!win) return;
-    const viewportTop = win.scrollY;
-    const viewportBottom = viewportTop + win.innerHeight;
-    const alreadyVisible = target.top < viewportBottom - 48 && target.top + target.height > viewportTop + 48;
-    if (alreadyVisible) return;
-    win.scrollTo({ top: Math.max(0, Math.round(target.top - 16)), behavior: "smooth" });
-    // La geometría ya está medida: no se recalcula dentro del efecto.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mount, selectedSectionKey]);
+    let frame = 0;
+    frame = requestAnimationFrame(() => {
+      const iframeRect = iframeRef.current?.getBoundingClientRect();
+      const inspector = document.querySelector<HTMLElement>(
+        '[aria-label="Herramientas para editar el bloque seleccionado"]',
+      );
+      const inspectorRect = inspector?.getBoundingClientRect();
+      const visiblePhysicalBottom = iframeRect
+        ? Math.min(
+            iframeRect.bottom,
+            inspectorRect && inspectorRect.top > iframeRect.top
+              ? inspectorRect.top - 8
+              : iframeRect.bottom,
+          )
+        : null;
+      const visibleLogicalHeight =
+        iframeRect && visiblePhysicalBottom != null
+          ? Math.max(0, (visiblePhysicalBottom - iframeRect.top) / scale)
+          : win.innerHeight;
+      const viewportTop = win.scrollY;
+      const viewportBottom = viewportTop + Math.min(win.innerHeight, visibleLogicalHeight);
+      const visibleOverlap = Math.max(
+        0,
+        Math.min(target.top + target.height, viewportBottom - 24) -
+          Math.max(target.top, viewportTop + 24),
+      );
+      const requiredOverlap = Math.min(target.height, 160);
+      if (visibleOverlap >= requiredOverlap) return;
+      win.scrollTo({ top: Math.max(0, Math.round(target.top - 16)), behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [mount, scale, sectionRects, selectedSectionKey]);
 
   // HUD de medición (sólo entornos no productivos).
   const [hud, setHud] = useState(false);
@@ -4358,6 +4389,7 @@ function BlockOverlay({
   onMoveDown,
   children,
   sortable = false,
+  sectionManaged = false,
   commentCount = 0,
 }: {
   node: CompositionNode;
@@ -4370,6 +4402,7 @@ function BlockOverlay({
   onMoveDown: () => void;
   children: React.ReactNode;
   sortable?: boolean;
+  sectionManaged?: boolean;
   commentCount?: number;
 }) {
   const contract = getBlock(node.type);
@@ -4398,30 +4431,48 @@ function BlockOverlay({
       ref={composedRef}
       data-node-id={node.id}
       style={dndStyle}
-      role="button"
-      tabIndex={0}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onSelect();
-        // Notifica al Inspector para enfocar el primer campo de texto
-        // (edición inline "estilo doble-clic" — US-10).
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }));
-        }
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onSelect();
-        }
-      }}
-      className={`group relative cursor-pointer outline-none ring-inset transition-shadow ${
-        selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"
+      role={sectionManaged ? undefined : "button"}
+      tabIndex={sectionManaged ? undefined : 0}
+      onClick={
+        sectionManaged
+          ? undefined
+          : (e) => {
+              e.stopPropagation();
+              onSelect();
+            }
+      }
+      onDoubleClick={
+        sectionManaged
+          ? undefined
+          : (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onSelect();
+              // Notifica al Inspector para enfocar el primer campo de texto
+              // (edición inline "estilo doble-clic" — US-10).
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(
+                  new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }),
+                );
+              }
+            }
+      }
+      onKeyDown={
+        sectionManaged
+          ? undefined
+          : (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect();
+              }
+            }
+      }
+      className={`group relative outline-none ring-inset transition-shadow ${
+        sectionManaged
+          ? ""
+          : selected
+            ? "cursor-pointer ring-4 ring-primary"
+            : "cursor-pointer hover:ring-2 hover:ring-primary/40"
       }`}
       aria-label={`Editar ${contract?.display_name ?? node.type}`}
     >
@@ -4430,13 +4481,13 @@ function BlockOverlay({
           <EyeOff className="size-3" aria-hidden /> Oculto en el sitio publicado
         </span>
       ) : null}
-      <span
+      {!sectionManaged ? <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
           selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         }`}
       >
         {contract?.display_name ?? node.type}
-      </span>
+      </span> : null}
       {commentCount > 0 ? (
         <span
           className="pointer-events-none absolute left-3 top-10 z-30 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg"
@@ -4445,7 +4496,7 @@ function BlockOverlay({
           💬 {commentCount}
         </span>
       ) : null}
-      {selected ? (
+      {selected && !sectionManaged ? (
         <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
           {sortable ? (
             <button
