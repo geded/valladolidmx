@@ -506,7 +506,7 @@ export function EntityEditor(props: Props) {
             key={f.name}
             field={f}
             value={values[f.name] ?? ""}
-            onChange={(v) => setValues((s) => ({ ...s, [f.name]: v }))}
+            onChange={(v) => updateValue(f.name, v)}
           />
         ))}
 
