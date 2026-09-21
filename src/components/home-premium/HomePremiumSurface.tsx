@@ -794,10 +794,12 @@ function DestinationsSection({
           </div>
         </Link>
         <div className="grid grid-rows-3 gap-3">
-          {items.slice(1, 4).map((destination) => (
+          {items.slice(1, 4).map((destination, index) => (
             <Link
               key={destination.name}
+              data-eb-card={index + 1}
               to={destination.href ?? "/destinos"}
+
               onClick={() => onOpen(destination.name)}
               className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
             >
