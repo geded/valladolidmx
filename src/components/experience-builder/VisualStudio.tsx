@@ -1068,6 +1068,7 @@ function PageVisualEditor({
     try {
       const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
       if (refreshed) {
+        draftHashRef.current = refreshed.draft_hash;
         setPage(refreshed);
         skipNextAutoSave.current = true;
         savedSignatureRef.current = canonicalizeClient(refreshed.current_draft);
@@ -1365,6 +1366,7 @@ function PageVisualEditor({
           }
         }
         if (cancelled || !detail) return;
+        draftHashRef.current = detail.draft_hash;
         setPage(detail);
         skipNextAutoSave.current = true;
         savedSignatureRef.current = canonicalizeClient(detail.current_draft);
@@ -1397,9 +1399,11 @@ function PageVisualEditor({
   const draftHashRef = useRef<string | null>(null);
   const saveChainRef = useRef<Promise<unknown>>(Promise.resolve());
   useEffect(() => {
-    draftHashRef.current = page?.draft_hash ?? draftHash ?? null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page?.id, page?.draft_hash, draftHash]);
+    // Sólo una huella emitida por el servidor es un token de concurrencia.
+    // `draftHash` corresponde al árbol local (posiblemente aún sin guardar) y
+    // nunca debe sustituir la base esperada por el servidor.
+    draftHashRef.current = page?.draft_hash ?? null;
+  }, [page?.id, page?.draft_hash]);
 
   useEffect(() => {
     if (!page || !tree) return;

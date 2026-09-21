@@ -322,6 +322,15 @@ export const getComposition = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!row) return null;
     const activeId = (row as { active_revision_id: string | null }).active_revision_id;
+    const currentDraft =
+      ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE;
+    // Filas creadas antes de I4-C pueden conservar `draft_hash = null`. El
+    // guardado gobernado compara contra la huella efectiva del JSON vigente,
+    // por lo que el Studio debe recibir exactamente ese mismo token y nunca
+    // enviar una cadena vacía en la primera edición.
+    const effectiveDraftHash =
+      (row as { draft_hash: string | null }).draft_hash ??
+      (await sha256Hex(canonicalize(currentDraft)));
     let published_hash: string | null = null;
     if (activeId) {
       const { data: rev } = await context.supabase
@@ -338,8 +347,8 @@ export const getComposition = createServerFn({ method: "GET" })
         CompositionDetail,
         "current_draft" | "published_hash" | "published_at"
       >),
-      current_draft:
-        ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
+      current_draft: currentDraft,
+      draft_hash: effectiveDraftHash,
       published_hash,
       published_at: (row as { published_at: string | null }).published_at ?? null,
       scheduled_publish_at:
