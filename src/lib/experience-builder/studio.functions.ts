@@ -454,8 +454,13 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
       });
 
       try {
-        const translated = await translateTreeBestEffort(treeToSave, context.supabase);
-        treeToSave = translated.tree;
+        // Deadline duro: la traducción es best-effort y jamás debe agotar el
+        // presupuesto de la petición (upstream request timeout) ni bloquear el guardado.
+        const translated = await Promise.race([
+          translateTreeBestEffort(treeToSave, context.supabase),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+        ]);
+        if (translated) treeToSave = translated.tree;
       } catch {
         // La traducción automática nunca debe romper ni bloquear el guardado.
       }
