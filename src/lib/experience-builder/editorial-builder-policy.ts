@@ -1217,6 +1217,15 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           type: "boolean",
           writable_by: ["founder_admin", "territorial_editor"],
         },
+        {
+          // Orden editable de secciones de la plantilla aprobada
+          // (`COMPOSITE_SECTION_REGISTRY["vmx.home.premium-g4"].orderKey`).
+          // Sin esta política el reordenamiento nunca podía guardarse.
+          field: "home_section_order",
+          class: "editorial",
+          type: "reference",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
       ],
     },
     {
