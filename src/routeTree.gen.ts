@@ -213,7 +213,6 @@ import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/publ
 import { Route as ApiPublicMediaDerivedSplatRouteImport } from './routes/api/public/media-derived.$'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
-import { Route as ApiPublicHooksUncEmailDispatchRouteImport } from './routes/api/public/hooks/unc-email-dispatch'
 import { Route as ApiPublicHooksTripJourneyEmailsRouteImport } from './routes/api/public/hooks/trip-journey-emails'
 import { Route as ApiPublicHooksProposalPaymentRemindersRouteImport } from './routes/api/public/hooks/proposal-payment-reminders'
 import { Route as ApiPublicHooksMediaSignatureRenewRouteImport } from './routes/api/public/hooks/media-signature-renew'
@@ -1426,12 +1425,6 @@ const ApiPublicHooksVisibilityNotificationsRoute =
     path: '/api/public/hooks/visibility-notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksUncEmailDispatchRoute =
-  ApiPublicHooksUncEmailDispatchRouteImport.update({
-    id: '/api/public/hooks/unc-email-dispatch',
-    path: '/api/public/hooks/unc-email-dispatch',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicHooksTripJourneyEmailsRoute =
   ApiPublicHooksTripJourneyEmailsRouteImport.update({
     id: '/api/public/hooks/trip-journey-emails',
@@ -1998,7 +1991,6 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
-  '/api/public/hooks/unc-email-dispatch': typeof ApiPublicHooksUncEmailDispatchRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
@@ -2252,7 +2244,6 @@ export interface FileRoutesByTo {
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
-  '/api/public/hooks/unc-email-dispatch': typeof ApiPublicHooksUncEmailDispatchRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
@@ -2518,7 +2509,6 @@ export interface FileRoutesById {
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
-  '/api/public/hooks/unc-email-dispatch': typeof ApiPublicHooksUncEmailDispatchRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
@@ -2785,7 +2775,6 @@ export interface FileRouteTypes {
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
     | '/api/public/hooks/trip-journey-emails'
-    | '/api/public/hooks/unc-email-dispatch'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
@@ -3039,7 +3028,6 @@ export interface FileRouteTypes {
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
     | '/api/public/hooks/trip-journey-emails'
-    | '/api/public/hooks/unc-email-dispatch'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
@@ -3304,7 +3292,6 @@ export interface FileRouteTypes {
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
     | '/api/public/hooks/trip-journey-emails'
-    | '/api/public/hooks/unc-email-dispatch'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
@@ -3465,7 +3452,6 @@ export interface RootRouteChildren {
   ApiPublicHooksMediaSignatureRenewRoute: typeof ApiPublicHooksMediaSignatureRenewRoute
   ApiPublicHooksProposalPaymentRemindersRoute: typeof ApiPublicHooksProposalPaymentRemindersRoute
   ApiPublicHooksTripJourneyEmailsRoute: typeof ApiPublicHooksTripJourneyEmailsRoute
-  ApiPublicHooksUncEmailDispatchRoute: typeof ApiPublicHooksUncEmailDispatchRoute
   ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicMediaDerivedSplatRoute: typeof ApiPublicMediaDerivedSplatRoute
@@ -4908,13 +4894,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksVisibilityNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/unc-email-dispatch': {
-      id: '/api/public/hooks/unc-email-dispatch'
-      path: '/api/public/hooks/unc-email-dispatch'
-      fullPath: '/api/public/hooks/unc-email-dispatch'
-      preLoaderRoute: typeof ApiPublicHooksUncEmailDispatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/hooks/trip-journey-emails': {
       id: '/api/public/hooks/trip-journey-emails'
       path: '/api/public/hooks/trip-journey-emails'
@@ -6047,7 +6026,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksProposalPaymentRemindersRoute:
     ApiPublicHooksProposalPaymentRemindersRoute,
   ApiPublicHooksTripJourneyEmailsRoute: ApiPublicHooksTripJourneyEmailsRoute,
-  ApiPublicHooksUncEmailDispatchRoute: ApiPublicHooksUncEmailDispatchRoute,
   ApiPublicHooksVisibilityNotificationsRoute:
     ApiPublicHooksVisibilityNotificationsRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
