@@ -191,7 +191,11 @@ export function CompositionRenderer({
   /* LOTE 3I.1 · Familia `premium-seo-landing`: en producción la composición
      se presenta con la superficie editorial compartida (maqueta autorizada).
      En Studio se conserva el render bloque a bloque para poder editar. */
-  if (!studio && readSeoLandingChrome(tree)) {
+  // La superficie SEO unificada sólo sustituye el árbol cuando no existe una
+  // capa editorial. En el constructor `wrap` es la misma autoridad de Inicio
+  // para seleccionar, editar y reordenar cada bloque raíz; resolver aquí toda
+  // la landing como una sola superficie eliminaba esos diez puntos de edición.
+  if (!studio && !wrap && readSeoLandingChrome(tree)) {
     const landingVm = buildSeoLandingSurfaceVM(tree);
     if (landingVm) return <SeoLandingSurface vm={landingVm} />;
   }

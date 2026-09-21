@@ -609,8 +609,10 @@ export function VisualStudio({
   onSelectPage,
   advanced = false,
 }: VisualStudioProps = {}) {
+  const list = useServerFn(listCompositions);
   const [internalKey, setInternalKey] = useState<string | null>(page);
   const [customPages, setCustomPages] = useState<SitePage[]>([]);
+  const [resolvingDirectPage, setResolvingDirectPage] = useState(false);
   const openKey = normalizePageKey(page ?? internalKey);
   const setOpen = (k: string | null) => {
     const next = normalizePageKey(k);
@@ -621,9 +623,49 @@ export function VisualStudio({
   const activePage = openKey
     ? (allPages.find((p) => normalizePageKey(p.key) === openKey) ?? null)
     : null;
+  useEffect(() => {
+    if (!openKey || activePage) return;
+    let cancelled = false;
+    setResolvingDirectPage(true);
+    void list()
+      .then((rows) => {
+        if (cancelled) return;
+        const row = rows.find((candidate) => normalizePageKey(candidate.slug) === openKey);
+        if (!row) return;
+        const directPage: SitePage = {
+          key: row.slug,
+          slug: row.slug,
+          title: row.title,
+          description: row.description ?? "",
+          page_type: row.page_type,
+          publicPath: `/p/${row.slug}`,
+          status: "editable",
+          custom: true,
+          compositionId: row.id,
+        };
+        setCustomPages((current) =>
+          current.some((candidate) => normalizePageKey(candidate.key) === openKey)
+            ? current
+            : [...current, directPage],
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setResolvingDirectPage(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activePage, list, openKey]);
   if (activePage) {
     return (
       <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />
+    );
+  }
+  if (openKey && resolvingDirectPage) {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" aria-hidden /> Preparando la página…
+      </div>
     );
   }
   return (
