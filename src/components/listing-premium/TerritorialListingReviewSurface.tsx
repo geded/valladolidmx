@@ -862,7 +862,7 @@ function TerritorialListingBody({
               : "grid-cols-1"
           }`}
         >
-          <div id="resultados" className="min-w-0">
+          <div id="resultados" data-eb-section="resultados" className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
