@@ -2817,6 +2817,7 @@ function PageVisualEditor({
                 commitTree({ ...tree, root: { children: next } });
               }}
               onSelectCompositeSection={(nodeId, sectionKey) => selectUnit(nodeId, sectionKey)}
+              onReorderCard={reorderRailCard}
               onReorderCompositeSection={(activeKey, overKey) => {
                 if (!tree || !compositeStructure?.orderKey) return;
                 const order = nextCompositeOrder(
@@ -3509,6 +3510,7 @@ function HomeCanvas({
   onReorderRoot,
   onSelectCompositeSection,
   onReorderCompositeSection,
+  onReorderCard,
   commentCounts,
 }: {
   tree: CompositionTree;
@@ -3526,6 +3528,7 @@ function HomeCanvas({
   onReorderRoot: (activeId: string, overId: string) => void;
   onSelectCompositeSection: (nodeId: string, sectionKey: string) => void;
   onReorderCompositeSection: (activeKey: string, overKey: string) => void;
+  onReorderCard?: (sectionKey: string, from: number, to: number) => void;
   commentCounts?: Record<string, number>;
 }) {
   const preset = getDevicePreset(deviceViewport);
@@ -3641,6 +3644,7 @@ function HomeCanvas({
         editingEnabled={!previewMode}
         onSelectSection={onSelectCompositeSection}
         onReorderSection={onReorderCompositeSection}
+        onReorderCard={onReorderCard}
       >
         <InertChrome
           label="Encabezado"
