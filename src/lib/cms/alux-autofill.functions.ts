@@ -957,13 +957,19 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     ).slice(0, 5);
     const placeQuery = variants[0] ?? [data.query, data.place].filter(Boolean).join(" ");
 
-    const webBatches = await Promise.all(
-      variants.map((variant) => searchWebImages(variant).catch(() => [] as PhotoCandidate[])),
-    );
-    const [google, commons, openverse] = await Promise.all([
-      searchGooglePhotos(placeQuery).catch(() => [] as PhotoCandidate[]),
-      searchCommons(placeQuery).catch(() => [] as PhotoCandidate[]),
-      searchOpenverse(placeQuery).catch(() => [] as PhotoCandidate[]),
+    const [webBatches, google, commons, openverse] = await Promise.all([
+      withBudget(
+        Promise.all(
+          variants.map((variant) =>
+            withBudget(searchWebImages(variant), 12000, [] as PhotoCandidate[]),
+          ),
+        ),
+        13000,
+        [] as PhotoCandidate[][],
+      ),
+      withBudget(searchGooglePhotos(placeQuery), 12000, [] as PhotoCandidate[]),
+      withBudget(searchCommons(placeQuery), 10000, [] as PhotoCandidate[]),
+      withBudget(searchOpenverse(placeQuery), 10000, [] as PhotoCandidate[]),
     ]);
 
     const seen = new Set<string>();
