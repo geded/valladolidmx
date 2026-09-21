@@ -824,9 +824,14 @@ function TerritorialListingBody({
   return (
     <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
-        <ListingIntro profile={profile} compact={compactDiscovery} />
+        {/* Studio Standard v1.0 · E5 · Listados: regiones marcadas para el
+            constructor. Sólo atributos de datos, sin cambio visual. */}
+        <div data-eb-section="hero">
+          <ListingIntro profile={profile} compact={compactDiscovery} />
+        </div>
         <AluxBar profile={profile} />
-        <Filters
+        <div data-eb-section="territorio">
+          <Filters
           profile={profile}
           query={query}
           setQuery={setQuery}
