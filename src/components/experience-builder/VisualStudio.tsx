@@ -3730,7 +3730,9 @@ function HomeCanvas({
           landingSlotNodes ? SEO_LANDING_CANVAS_ID : (renderedCompositeNode?.id ?? null)
         }
         selectedSectionKey={landingSlotNodes ? landingSelectedSlot : selectedCompositeSectionKey}
-        reorderableSectionKeys={landingSlotNodes ? [] : reorderableSectionKeys}
+        reorderableSectionKeys={
+          landingSlotNodes ? Object.keys(landingSlotNodes) : reorderableSectionKeys
+        }
         sectionLabels={landingSectionLabels ?? sectionLabels}
         editingEnabled={!previewMode}
         onSelectSection={
@@ -3741,7 +3743,17 @@ function HomeCanvas({
               }
             : onSelectCompositeSection
         }
-        onReorderSection={onReorderCompositeSection}
+        onReorderSection={
+          landingSlotNodes
+            ? (activeKey, overKey) => {
+                /* Landing: el arrastre mueve el bloque raíz real; la maqueta
+                   aprobada se conserva y sólo cambia el orden persistido. */
+                const activeId = landingSlotNodes[activeKey];
+                const overId = landingSlotNodes[overKey];
+                if (activeId && overId && activeId !== overId) onReorderRoot(activeId, overId);
+              }
+            : onReorderCompositeSection
+        }
         onReorderCard={onReorderCard}
       >
         <InertChrome
