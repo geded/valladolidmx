@@ -4262,6 +4262,19 @@ function CanvasViewport({
           </div>
         ) : null}
       </div>
+      {dragKey && dragPointer
+        ? createPortal(
+            <div
+              aria-hidden
+              data-eb-canvas-drag-ghost={dragKey}
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary bg-background px-3 py-1.5 text-[11px] font-semibold text-foreground shadow-lg"
+              style={{ left: dragPointer.x, top: dragPointer.y - 28 }}
+            >
+              {sectionLabels[dragKey] ?? dragKey}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
