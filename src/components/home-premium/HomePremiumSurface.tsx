@@ -647,16 +647,18 @@ function RoutesSection({
         tabIndex={0}
         aria-label="Rutas recomendadas"
       >
-        {content.rutas.items.map((route: HomePremiumRoute) => {
+        {content.rutas.items.map((route: HomePremiumRoute, index: number) => {
           const active = route.id === selectedRoute;
           return (
             <article
               key={route.id}
+              data-eb-card={index}
               className={cn(
                 "flex h-full min-w-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition",
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
+
               <div className="relative aspect-[16/11] overflow-hidden">
                 <EditorialMediaFrame
                   media={route.media}
