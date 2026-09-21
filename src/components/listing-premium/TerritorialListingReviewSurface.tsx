@@ -673,7 +673,7 @@ function QueHacerDiscoveryBody({
         </section>
       ) : null}
 
-      <div className="mt-7 space-y-10">
+      <div data-eb-section="carriles" className="mt-7 space-y-10">
         {filteredRails.map((rail) => {
           if (!rail.items.length) return null;
           return (
