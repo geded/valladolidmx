@@ -119,6 +119,34 @@ function dropLegacyNodeConfig(node: CompositionNode): CompositionNode {
   };
 }
 
+/**
+ * Reordenamiento editorial puro: el árbol entrante es idéntico al guardado
+ * salvo el campo `order` de las secciones raíz. Es la capacidad declarada de
+ * reordenar una plantilla Premium aprobada y no modifica contenido, medios,
+ * enlaces ni maqueta, por lo que no re-valida autoría de bloques históricos.
+ */
+function isRootOrderOnlyDelta(next: CompositionTree, previous: CompositionTree): boolean {
+  const a = next.root?.children ?? [];
+  const b = previous.root?.children ?? [];
+  if (!b.length || a.length !== b.length) return false;
+  const strip = (node: CompositionNode) => {
+    const { order: _order, ...rest } = (node.config ?? {}) as Record<string, unknown>;
+    return canonicalize({ ...node, config: rest });
+  };
+  let orderChanged = false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i].id !== b[i].id) return false;
+    if (strip(a[i]) !== strip(b[i])) return false;
+    const na = (a[i].config ?? {})["order"];
+    const nb = (b[i].config ?? {})["order"];
+    if (na !== nb) {
+      if (na !== undefined && typeof na !== "number") return false;
+      orderChanged = true;
+    }
+  }
+  return orderChanged;
+}
+
 function dropLegacyConfig(tree: CompositionTree): CompositionTree {
   return {
     ...tree,
