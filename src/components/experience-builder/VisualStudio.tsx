@@ -127,6 +127,13 @@ import {
   orderedCompositeSections,
   type CompositeSectionDef,
 } from "@/lib/experience-builder/composite-sections";
+import {
+  SEO_LANDING_SURFACE_KEY,
+  getSurfaceSlots,
+  slotOfNodeId,
+  surfaceReorderableSlots,
+  surfaceSlotLabels,
+} from "@/lib/experience-builder/studio-standard";
 import { readSeoLandingChrome } from "@/lib/experience-builder/seo-landing/seo-landing-template";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
