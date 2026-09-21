@@ -2881,6 +2881,7 @@ function PageVisualEditor({
                 /* Landing SEO: el cuerpo se ordena con el campo `order` que ya
                    declara cada bloque de la maqueta aprobada. No se crean
                    campos nuevos ni se altera la maqueta. */
+                console.log("[eb-landing-reorder]", activeId, overId, Boolean(tree));
                 if (!tree) return;
                 const BODY = ["intro", "offers", "infoGrid", "map"];
                 const slotOf = (id: string) => id.split("-").pop() ?? "";
