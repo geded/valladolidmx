@@ -2,7 +2,7 @@
 
 ## En curso
 
-- [x] Experience Builder · Timeout de autoguardado (21-sep): el guardado inmediato ya no espera traducción automática; validaciones independientes de rol y medios se ejecutan en paralelo, preservando autorización fail-closed, conflicto de borrador y RPC auditada.
+- [x] Experience Builder · Timeout de autoguardado (21-sep): el guardado inmediato ya no espera traducción automática; validaciones independientes se ejecutan en paralelo; los cambios rápidos se compactan con estrategia latest-wins y la escritura falla rápido/reintenta si otra petición ocupa el borrador. Se preservan autorización fail-closed, conflicto de borrador y auditoría.
 
 - [ ] Experience Builder · Selección/arrastre móvil (20-sep, IMG_0887–0888): el inspector debe conservar visible la sección exacta seleccionada; el bloque compuesto Home no debe marcar toda la página ni interceptar la selección interna; el asa debe corresponder únicamente a la sección visible que se editará o moverá. Corrección limitada al shell editorial, sin tocar renderer público, CMS ni orden vigente.
 
