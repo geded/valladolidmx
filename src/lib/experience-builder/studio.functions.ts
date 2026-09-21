@@ -466,6 +466,7 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(
     async ({ data, context }): Promise<{ ok: true; draft_hash: string; draft_version: number }> => {
+      console.log("[eb-srv-save] enter", data.id);
       const { data: existingRow } = await context.supabase
         .from("page_compositions")
         .select("current_draft, page_type, slug, draft_hash")
