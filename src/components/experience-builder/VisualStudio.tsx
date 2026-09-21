@@ -1389,6 +1389,18 @@ function PageVisualEditor({
   ]);
 
   const saveTimer = useRef<number | null>(null);
+  /**
+   * Huella vigente del borrador en el servidor. Se mantiene en ref para que
+   * guardados encadenados usen siempre la última firma devuelta y no la del
+   * render anterior (causa real del falso `draft_conflict`).
+   */
+  const draftHashRef = useRef<string | null>(null);
+  const saveChainRef = useRef<Promise<unknown>>(Promise.resolve());
+  useEffect(() => {
+    draftHashRef.current = page?.draft_hash ?? draftHash ?? null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page?.id, page?.draft_hash, draftHash]);
+
   useEffect(() => {
     if (!page || !tree) return;
     if (skipNextAutoSave.current) {
@@ -1400,27 +1412,35 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       const signature = canonicalizeClient(tree);
-      void save({ data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" } })
-        .then((res) => {
-          setPage((current) =>
-            current
-              ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
-              : current,
-          );
-          savedSignatureRef.current = signature;
-          setSaveStatus("saved");
-        })
-
-        .catch((e) => {
-          setSaveStatus("error");
-          const msg = e instanceof Error ? e.message : String(e);
-          if (msg.includes("draft_conflict")) {
-            setDraftConflict(true);
-            setMessage(
-              "Conflicto de edición: el borrador cambió en el servidor. Recarga el borrador para seguir trabajando.",
-            );
-          }
-        });
+      // Serializamos los guardados: un guardado en vuelo debe terminar antes
+      // de que el siguiente lea la huella, o el servidor rechaza por conflicto.
+      saveChainRef.current = saveChainRef.current
+        .catch(() => undefined)
+        .then(() =>
+          save({
+            data: { id: page.id, tree, expected_hash: draftHashRef.current ?? "" },
+          })
+            .then((res) => {
+              draftHashRef.current = res.draft_hash;
+              setPage((current) =>
+                current
+                  ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
+                  : current,
+              );
+              savedSignatureRef.current = signature;
+              setSaveStatus("saved");
+            })
+            .catch((e) => {
+              setSaveStatus("error");
+              const msg = e instanceof Error ? e.message : String(e);
+              if (msg.includes("draft_conflict")) {
+                setDraftConflict(true);
+                setMessage(
+                  "Conflicto de edición: el borrador cambió en el servidor. Recarga el borrador para seguir trabajando.",
+                );
+              }
+            }),
+        );
     }, 900);
     return () => {
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
