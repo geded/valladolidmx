@@ -3571,7 +3571,7 @@ function HomeCanvas({
       <CanvasViewport
         key={deviceViewport}
         device={deviceViewport}
-        width={preset.width}
+        width={logicalWidth}
         minimumHeight={preset.height}
         scale={scale}
         fitScale={fitScale}
