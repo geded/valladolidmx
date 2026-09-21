@@ -1524,6 +1524,7 @@ function PageVisualEditor({
 
 
       const drainPendingSaves = async () => {
+        console.log("[eb-drain-run]", Boolean(pendingSaveRef.current));
         try {
           while (pendingSaveRef.current) {
             const pending = pendingSaveRef.current;
