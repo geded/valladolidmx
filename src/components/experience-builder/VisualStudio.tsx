@@ -3529,6 +3529,9 @@ function HomeCanvas({
     scrollport.scrollTo({ left: 0, top: 0 });
   }, [deviceViewport]);
   const changeZoom = (delta: number) => {
+    // En vista "Real" la escala es siempre 100%: no hay zoom que desvirtúe la
+    // correspondencia con la página publicada.
+    if (isAutoWidth) return;
     setZoomOverride((current) => roundScale((current ?? fitScale) + delta));
   };
   const headerVariant = resolveCanvasHeaderVariant(tree);
