@@ -71,7 +71,22 @@ export default defineConfig({
                   url.pathname,
                 ),
               handler: "NetworkOnly",
-              options: { cacheName: "no-store-sensitive" },
+              options: {
+                cacheName: "no-store-sensitive",
+                // 2026-09-21 · Offline First: estas rutas siguen sin cachearse
+                // (Security Before Offline). Lo único que cambia es que una
+                // navegación sin red muestra la pantalla oficial "Sin conexión"
+                // en vez del error crudo del navegador. Nunca guarda datos.
+                plugins: [
+                  {
+                    handlerDidError: async ({ request }) =>
+                      request?.mode === "navigate"
+                        ? ((await caches.match("/offline.html", { ignoreSearch: true })) ??
+                          Response.error())
+                        : Response.error(),
+                  },
+                ],
+              },
             },
             {
               urlPattern: ({ request, url }) =>
