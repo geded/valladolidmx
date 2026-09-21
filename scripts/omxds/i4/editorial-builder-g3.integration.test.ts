@@ -155,6 +155,9 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // servidor; la huella del árbol local no puede convertirse en expected_hash.
     expect(studio).toContain("draftHashRef.current = page?.draft_hash ?? null");
     expect(studio).not.toContain("page?.draft_hash ?? draftHash ?? null");
+    expect(studio).toContain("page.draft_version >= draftVersionRef.current");
+    expect(studio).toContain("const restoreTask = saveChainRef.current.catch(() => undefined).then(");
+    expect(studio).toContain('expected_hash: draftHashRef.current ?? ""');
 
     const studioFunctions = read("src/lib/experience-builder/studio.functions.ts");
     expect(studioFunctions).toContain("const effectiveDraftHash =");
