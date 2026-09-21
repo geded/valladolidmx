@@ -279,6 +279,69 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           source_id: "routing.canonical",
           writable_by: AUTHORING_ROLES,
         },
+        // Campos acreditados de la portada turística ya presentes en plantillas
+        // Premium aprobadas (p. ej. landings de negocio). Se declaran para que el
+        // constructor pueda guardar sin alterar el contenido publicado.
+        {
+          field: "promise",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "typeLine",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaFocal",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaMobileUrl",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaMobileAlt",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaMobileFocal",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ogImageUrl",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ogImageAlt",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
       ],
     },
     {
@@ -291,6 +354,9 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       authoring_roles: AUTHORING_ROLES,
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
+        // Orden editorial del cuerpo de la plantilla aprobada (reordenamiento
+        // en el constructor). No altera la maqueta, sólo la secuencia.
+        { field: "order", class: "editorial", type: "number", writable_by: AUTHORING_ROLES },
         {
           field: "eyebrow",
           class: "editorial",
@@ -424,6 +490,12 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
         {
+          field: "order",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "items",
           class: "governed",
           type: "reference",
@@ -466,7 +538,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       family: "trust",
       variants: ["filled", "soft", "outline", "icon-only"],
       allowed_sources: ["trust.badges"],
-      surfaces: ["destination", "business", "product"],
+      surfaces: ["landing", "destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
@@ -1613,6 +1685,12 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       surfaces: ["home", "landing", "destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
+        {
+          field: "order",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
         {
           field: "variant",
           class: "editorial",

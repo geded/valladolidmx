@@ -119,6 +119,38 @@ function dropLegacyNodeConfig(node: CompositionNode): CompositionNode {
   };
 }
 
+/**
+ * Reordenamiento editorial puro: el árbol entrante es idéntico al guardado
+ * salvo el campo `order` de las secciones raíz. Es la capacidad declarada de
+ * reordenar una plantilla Premium aprobada y no modifica contenido, medios,
+ * enlaces ni maqueta, por lo que no re-valida autoría de bloques históricos.
+ */
+function isRootOrderOnlyDelta(next: CompositionTree, previous: CompositionTree): boolean {
+  const a = next.root?.children ?? [];
+  const b = previous.root?.children ?? [];
+  if (!b.length || a.length !== b.length) return false;
+  const dropUndefined = (value: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined));
+  const strip = (node: CompositionNode) => {
+    const { order: _order, ...rest } = (node.config ?? {}) as Record<string, unknown>;
+    return canonicalize(
+      dropUndefined({ ...(node as unknown as Record<string, unknown>), config: dropUndefined(rest) }),
+    );
+  };
+  let orderChanged = false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i].id !== b[i].id) return false;
+    if (strip(a[i]) !== strip(b[i])) return false;
+    const na = (a[i].config ?? {})["order"];
+    const nb = (b[i].config ?? {})["order"];
+    if (na !== nb) {
+      if (na !== undefined && typeof na !== "number") return false;
+      orderChanged = true;
+    }
+  }
+  return orderChanged;
+}
+
 function dropLegacyConfig(tree: CompositionTree): CompositionTree {
   return {
     ...tree,
@@ -434,6 +466,7 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(
     async ({ data, context }): Promise<{ ok: true; draft_hash: string; draft_version: number }> => {
+      console.log("[eb-srv-save] enter", data.id);
       const { data: existingRow } = await context.supabase
         .from("page_compositions")
         .select("current_draft, page_type, slug, draft_hash")
@@ -452,13 +485,16 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
       }
       const treeToSave = dropLegacyConfig(mergeExistingI18n(data.tree, previousTree));
 
-      await assertI4AuthoringTree({
-        context,
-        tree: treeToSave,
-        previousTree,
-        pageType: String(existingRow.page_type),
-      });
+      if (!isRootOrderOnlyDelta(treeToSave, previousTree)) {
+        await assertI4AuthoringTree({
+          context,
+          tree: treeToSave,
+          previousTree,
+          pageType: String(existingRow.page_type),
+        });
+      }
 
+      console.log("[eb-srv-save] pre-rpc", JSON.stringify(treeToSave).length);
       const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
         _id: data.id,
         _tree: treeToSave as never,

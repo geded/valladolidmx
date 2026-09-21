@@ -1501,6 +1501,7 @@ function PageVisualEditor({
   }, [page]);
 
   useEffect(() => {
+    console.log("[eb-autosave]", Boolean(page), Boolean(tree), skipNextAutoSave.current);
     if (!page || !tree) return;
     if (skipNextAutoSave.current) {
       skipNextAutoSave.current = false;
@@ -1511,14 +1512,19 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       const signature = canonicalizeClient(tree);
+      console.log("[eb-save-tick]", page.id, signature === savedSignatureRef.current);
       // Latest-wins: mientras un guardado está en vuelo conservamos sólo el árbol
       // más reciente. Así una edición rápida no genera una cola de escrituras que
       // compiten por el mismo bloqueo de la composición.
       pendingSaveRef.current = { pageId: page.id, tree, signature };
+      console.log("[eb-save-drain]", saveDrainActiveRef.current);
       if (saveDrainActiveRef.current) return;
       saveDrainActiveRef.current = true;
+      console.log("[eb-save-drain-start]");
+
 
       const drainPendingSaves = async () => {
+        console.log("[eb-drain-run]", Boolean(pendingSaveRef.current));
         try {
           while (pendingSaveRef.current) {
             const pending = pendingSaveRef.current;
@@ -1544,6 +1550,7 @@ function PageVisualEditor({
             } catch (e) {
               setSaveStatus("error");
               const msg = e instanceof Error ? e.message : String(e);
+              console.log("[eb-save-error]", msg);
               if (msg.includes("draft_busy")) {
                 // Otra petición está terminando el mismo borrador. Conservamos
                 // cualquier cambio más nuevo y reintentamos sin bloquear la UI.
@@ -2877,6 +2884,36 @@ function PageVisualEditor({
                   }),
                 );
               }}
+              onReorderLandingBody={(activeId, overId) => {
+                /* Landing SEO: el cuerpo se ordena con el campo `order` que ya
+                   declara cada bloque de la maqueta aprobada. No se crean
+                   campos nuevos ni se altera la maqueta. */
+                console.log("[eb-landing-reorder]", activeId, overId, Boolean(tree));
+                if (!tree) return;
+                const BODY = ["intro", "offers", "infoGrid", "map"];
+                const slotOf = (id: string) => id.split("-").pop() ?? "";
+                const bodyNodes = tree.root.children.filter((n) => BODY.includes(slotOf(n.id)));
+                const ordered = [...bodyNodes].sort((a, b) => {
+                  const ao = Number((a.config as Record<string, unknown>)?.["order"]);
+                  const bo = Number((b.config as Record<string, unknown>)?.["order"]);
+                  const av = Number.isFinite(ao) ? ao : BODY.indexOf(slotOf(a.id)) + 1;
+                  const bv = Number.isFinite(bo) ? bo : BODY.indexOf(slotOf(b.id)) + 1;
+                  return av - bv;
+                });
+                const from = ordered.findIndex((n) => n.id === activeId);
+                const to = ordered.findIndex((n) => n.id === overId);
+                if (from < 0 || to < 0 || from === to) return;
+                if (!canMutateEditorialNode(ordered[from])) return;
+                const next = arrayMove(ordered, from, to);
+                let draft = tree;
+                next.forEach((node, index) => {
+                  draft = updateNodeConfig(draft, node.id, {
+                    ...((node.config ?? {}) as Record<string, unknown>),
+                    order: index + 1,
+                  });
+                });
+                commitTree(draft);
+              }}
               commentCounts={commentCounts}
             />
           );
@@ -3548,6 +3585,11 @@ const SEO_LANDING_SECTION_LABELS: Record<string, string> = {
   aluxPlanner: "Alux",
   gallery: "Galería",
 };
+/**
+ * Sólo el cuerpo editorial admite reordenamiento: la maqueta aprobada fija la
+ * posición de portada, señales de confianza, Alux y galería.
+ */
+const SEO_LANDING_REORDERABLE_SLOTS: readonly string[] = ["intro", "offers", "infoGrid", "map"];
 /** Ancla lógica del lienzo cuando la maqueta se edita por regiones. */
 const SEO_LANDING_CANVAS_ID = "__seo_landing_surface__";
 
@@ -3577,6 +3619,7 @@ function HomeCanvas({
   onReorderRoot,
   onSelectCompositeSection,
   onReorderCompositeSection,
+  onReorderLandingBody,
   onReorderCard,
   commentCounts,
 }: {
@@ -3595,6 +3638,7 @@ function HomeCanvas({
   onReorderRoot: (activeId: string, overId: string) => void;
   onSelectCompositeSection: (nodeId: string, sectionKey: string) => void;
   onReorderCompositeSection: (activeKey: string, overKey: string) => void;
+  onReorderLandingBody: (activeId: string, overId: string) => void;
   onReorderCard?: (sectionKey: string, from: number, to: number) => void;
   commentCounts?: Record<string, number>;
 }) {
@@ -3730,7 +3774,11 @@ function HomeCanvas({
           landingSlotNodes ? SEO_LANDING_CANVAS_ID : (renderedCompositeNode?.id ?? null)
         }
         selectedSectionKey={landingSlotNodes ? landingSelectedSlot : selectedCompositeSectionKey}
-        reorderableSectionKeys={landingSlotNodes ? [] : reorderableSectionKeys}
+        reorderableSectionKeys={
+          landingSlotNodes
+            ? SEO_LANDING_REORDERABLE_SLOTS.filter((slot) => landingSlotNodes[slot])
+            : reorderableSectionKeys
+        }
         sectionLabels={landingSectionLabels ?? sectionLabels}
         editingEnabled={!previewMode}
         onSelectSection={
@@ -3741,7 +3789,20 @@ function HomeCanvas({
               }
             : onSelectCompositeSection
         }
-        onReorderSection={onReorderCompositeSection}
+        onReorderSection={
+          landingSlotNodes
+            ? (activeKey, overKey) => {
+                /* Landing: el cuerpo se ordena con el campo `order` que ya
+                   declara cada bloque de la maqueta aprobada. No se altera la
+                   maqueta, sólo la posición persistida de esas columnas. */
+                const activeId = landingSlotNodes[activeKey];
+                const overId = landingSlotNodes[overKey];
+                if (activeId && overId && activeId !== overId) {
+                  onReorderLandingBody(activeId, overId);
+                }
+              }
+            : onReorderCompositeSection
+        }
         onReorderCard={onReorderCard}
       >
         <InertChrome
@@ -4333,7 +4394,11 @@ function CanvasViewport({
   // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
   const scaled = scale;
   const frameWidth = Math.round(width * scaled);
-  const frameHeight = Math.round(minimumHeight * scaled);
+  // El documento lógico completo define la altura del marco: el escenario del
+  // editor es la única superficie con scroll, de modo que cada sección visible
+  // conserva su asa de arrastre sin quedar recortada.
+  const canvasHeight = Math.max(minimumHeight, documentHeight);
+  const frameHeight = Math.round(canvasHeight * scaled);
   const editableRects = sectionRects.filter((section) =>
     reorderableSectionKeys.includes(section.key),
   );
@@ -4431,8 +4496,10 @@ function CanvasViewport({
       if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
       const placement = resolveDropPlacement(upEvent.clientY);
       cleanup();
+      console.log("[eb-drag]", key, JSON.stringify(placement));
       if (!placement) return;
       const target = resolveReorderTarget(key, placement);
+      console.log("[eb-drag-target]", target);
       if (target && target !== key) onReorderSection(key, target);
     };
     const onCancel = (cancelEvent: PointerEvent) => {
@@ -4526,7 +4593,7 @@ function CanvasViewport({
           className={`absolute left-0 top-0 block origin-top-left border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
-            height: minimumHeight,
+            height: canvasHeight,
             // El transform se aplica a un viewport acotado, no al documento
             // completo. Conserva ancho lógico, media queries y tipografía sin
             // activar el fallo de pintura de WebKit en capas gigantes.
@@ -4545,6 +4612,8 @@ function CanvasViewport({
         {showEditingLayer ? (
           <div
             data-eb-canvas-edit-layer=""
+            data-eb-debug-rects={sectionRects.map((s) => s.key).join(",")}
+            data-eb-debug-reorderable={reorderableSectionKeys.join(",")}
             className="pointer-events-none absolute inset-0 z-50"
             aria-label="Controles de secciones"
           >
