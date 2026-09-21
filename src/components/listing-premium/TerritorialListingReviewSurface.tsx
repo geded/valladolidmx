@@ -832,25 +832,26 @@ function TerritorialListingBody({
         <AluxBar profile={profile} />
         <div data-eb-section="territorio">
           <Filters
-          profile={profile}
-          query={query}
-          setQuery={setQuery}
-          zone={zone}
-          setZone={setZone}
-          zones={zones}
-          primary={primary}
-          setPrimary={setPrimary}
-          primaryValues={primaryValues}
-          secondary={secondary}
-          setSecondary={setSecondary}
-          secondaryValues={secondaryValues}
-          facets={facets}
-          activeFacets={activeFacets}
-          setActiveFacets={setActiveFacets}
-          hasMap={mappedItems.length > 0}
-          onShowMap={() => setShowMapMobile(true)}
-          compact={compactDiscovery}
-        />
+            profile={profile}
+            query={query}
+            setQuery={setQuery}
+            zone={zone}
+            setZone={setZone}
+            zones={zones}
+            primary={primary}
+            setPrimary={setPrimary}
+            primaryValues={primaryValues}
+            secondary={secondary}
+            setSecondary={setSecondary}
+            secondaryValues={secondaryValues}
+            facets={facets}
+            activeFacets={activeFacets}
+            setActiveFacets={setActiveFacets}
+            hasMap={mappedItems.length > 0}
+            onShowMap={() => setShowMapMobile(true)}
+            compact={compactDiscovery}
+          />
+        </div>
 
         <div
           className={`${compactDiscovery ? "mt-4" : "mt-5"} grid items-start gap-6 ${
