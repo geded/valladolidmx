@@ -38,6 +38,8 @@ export interface AluxPhotoFinderDialogProps {
   website?: string | null;
   /** Territorio explícito. Si se omite, se usa el destino de trabajo del CMS. */
   place?: string | null;
+  /** Pestaña inicial: buscar fotos o crear con IA. */
+  initialMode?: "search" | "generate";
   onPick: (photo: AluxPickedPhoto) => void;
 }
 
@@ -63,6 +65,7 @@ export function AluxPhotoFinderDialog({
   initialQuery,
   website,
   place,
+  initialMode,
   onPick,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
@@ -91,7 +94,7 @@ export function AluxPhotoFinderDialog({
   const [error, setError] = useState<string | null>(null);
 
   // Modo Generar con IA
-  const [mode, setMode] = useState<"search" | "generate">("search");
+  const [mode, setMode] = useState<"search" | "generate">(initialMode ?? "search");
   const [genPrompt, setGenPrompt] = useState(() => stripPlaceTokens(initialQuery, workingPlace));
   const [genImage, setGenImage] = useState<string | null>(null);
   const [genLoading, setGenLoading] = useState(false);

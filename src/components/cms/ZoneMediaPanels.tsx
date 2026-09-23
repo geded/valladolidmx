@@ -22,6 +22,7 @@ import { prepareImageForRole, withRetry, type ImageRole } from "@/lib/cms/image-
 import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
 import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
 import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
+import { AluxMediaSourceButtons } from "@/components/cms/AluxMediaSourceButtons";
 
 type MediaRow = Awaited<ReturnType<typeof listZoneMedia>>[number];
 
@@ -202,14 +203,21 @@ function HeroPanel(props: {
             Se usa como portada de la zona en la ficha del destino.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={props.uploading || alux.upscaling}
-          className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-        >
-          {props.uploading ? "Subiendo…" : props.hero ? "Reemplazar" : "Subir"}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <AluxMediaSourceButtons
+            hint=""
+            disabled={props.uploading || alux.upscaling}
+            onFile={(f) => void handleFile(f)}
+          />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={props.uploading || alux.upscaling}
+            className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
+          >
+            {props.uploading ? "Subiendo…" : props.hero ? "Reemplazar" : "Subir"}
+          </button>
+        </div>
         <input
           ref={inputRef}
           type="file"
@@ -285,7 +293,7 @@ function GalleryPanel(props: {
             Imágenes adicionales de la zona. Arrastra o selecciona varias.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"
@@ -296,6 +304,11 @@ function GalleryPanel(props: {
             />
             Ampliar pequeñas con Alux IA
           </label>
+          <AluxMediaSourceButtons
+            hint=""
+            disabled={props.uploading}
+            onFile={(f) => props.onUpload([f])}
+          />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
