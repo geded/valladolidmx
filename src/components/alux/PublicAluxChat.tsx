@@ -178,8 +178,9 @@ export function PublicAluxChat() {
               : undefined,
           }),
         });
-        const data = await res.json().catch(() => ({}));
+
         if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
           setMessages(nextHistory);
           setError(
             data?.message ||
@@ -194,19 +195,75 @@ export function PublicAluxChat() {
           }
           return;
         }
-        setMessages([
-          ...nextHistory,
-          {
-            role: "assistant",
-            content: data.text,
-            proposals: Array.isArray(data.proposals) ? (data.proposals as Proposal[]) : [],
-          },
-        ]);
-        if (data?.rate) {
-          setRateInfo({ used: data.rate.day_count, limit: data.rate.day_limit });
+
+        // SSE streaming — el texto llega en tiempo real
+        const reader = res.body?.getReader();
+        if (!reader) {
+          setMessages(nextHistory);
+          setError("No se pudo leer la respuesta de Alux.");
+          return;
         }
-        if (typeof data?.nearby_used === "number") setNearbyUsed(data.nearby_used);
-        if (data?.memory?.has_summary) setHasMemory(true);
+
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let assistantText = "";
+        setMessages([...nextHistory, { role: "assistant", content: "" }]);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const events = buffer.split("\n\n");
+          buffer = events.pop() ?? "";
+          for (const event of events) {
+            if (!event.startsWith("data: ")) continue;
+            let parsed: Record<string, unknown>;
+            try {
+              parsed = JSON.parse(event.slice(6));
+            } catch {
+              continue;
+            }
+            if (parsed.type === "text" && typeof parsed.chunk === "string") {
+              assistantText += parsed.chunk;
+              setMessages((prev) => {
+                const next = [...prev];
+                next[next.length - 1] = { role: "assistant" as const, content: assistantText };
+                return next;
+              });
+            } else if (parsed.type === "done") {
+              const proposals = Array.isArray(parsed.proposals)
+                ? (parsed.proposals as Proposal[])
+                : [];
+              setMessages((prev) => {
+                const next = [...prev];
+                next[next.length - 1] = {
+                  role: "assistant" as const,
+                  content: typeof parsed.text === "string" ? parsed.text : assistantText,
+                  proposals,
+                };
+                return next;
+              });
+              if (parsed.rate && typeof parsed.rate === "object") {
+                const rate = parsed.rate as { day_count: number; day_limit: number };
+                setRateInfo({ used: rate.day_count, limit: rate.day_limit });
+              }
+              if (typeof parsed.nearby_used === "number") setNearbyUsed(parsed.nearby_used);
+              if (
+                parsed.memory &&
+                typeof parsed.memory === "object" &&
+                (parsed.memory as { has_summary?: boolean }).has_summary
+              )
+                setHasMemory(true);
+            } else if (parsed.type === "error") {
+              setMessages(nextHistory);
+              setError(
+                typeof parsed.message === "string"
+                  ? parsed.message
+                  : "No pude responder ahora.",
+              );
+            }
+          }
+        }
       } catch {
         setError("Sin conexión. Revisa tu red e inténtalo de nuevo.");
       } finally {
