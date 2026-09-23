@@ -6,10 +6,11 @@
  * siempre (optimización, ampliación opcional con Alux IA, original inmutable y
  * derechos declarados). Sólo editores y administradores.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, MapPin, Search, Sparkles, X } from "lucide-react";
+import { ImageIcon, Loader2, MapPin, Search, Sparkles, Wand2, X } from "lucide-react";
+import { streamImage } from "@/lib/stream-image";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
