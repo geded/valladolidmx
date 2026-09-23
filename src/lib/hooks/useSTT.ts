@@ -38,8 +38,10 @@ export function useSTT() {
       }
 
       recorder.onstop = async () => {
+        const mimeType = recorder.mimeType || "audio/webm";
+        const blob = new Blob(chunksRef.current, { type: mimeType });
         cleanup();
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+
         if (blob.size < 2048) {
           setState("error");
           setError("Grabación demasiado corta");
@@ -53,7 +55,9 @@ export function useSTT() {
 
         try {
           const form = new FormData();
-          form.append("file", blob, "recording.webm");
+          const ext = blob.type.includes("mp4") ? "mp4" : blob.type.includes("ogg") ? "ogg" : "webm";
+          form.append("file", blob, `recording.${ext}`);
+
 
           const response = await fetch("/api/public/stt", {
             method: "POST",
@@ -134,7 +138,12 @@ export function useSTT() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      const preferred = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
+      const supported = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported
+        ? preferred.find((t) => MediaRecorder.isTypeSupported(t))
+        : undefined;
+      const recorder = supported ? new MediaRecorder(stream, { mimeType: supported }) : new MediaRecorder(stream);
+
       recorderRef.current = recorder;
       chunksRef.current = [];
 
