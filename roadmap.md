@@ -24,7 +24,7 @@
 
 ## En curso
 
-- [ ] Biblioteca multimedia · cabecera profesional y responsive (IMG_0921): ordenar sin quitar funciones el total, búsqueda, filtros, selección y acciones para operar grandes acervos con comodidad en escritorio, iPad y celular; tabla, ficha, permisos y aprobación permanecen intactos.
+- [ ] Biblioteca multimedia · cabecera profesional y responsive (IMG_0921): ordenar sin quitar funciones el total, búsqueda, filtros completos de alcance/estado/uso, selección y acciones para operar grandes acervos con comodidad en escritorio, iPad y celular; tabla, ficha, permisos y aprobación permanecen intactos.
 
 - [x] Biblioteca multimedia · revisión compacta y ficha integral: ALT y usos resumidos para explorar grandes acervos; una sola ficha permite editar información, uso, tipo, autor, procedencia, licencia, lugar y fecha, confirmar derechos, enviar a revisión, pedir cambios y aprobar/publicar con controles fail-closed. Verificada con sesión editorial en escritorio, iPad y celular, sin desbordes.
 
