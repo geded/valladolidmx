@@ -252,19 +252,21 @@ function FilterChips<T extends string>({
   value,
   onChange,
   label,
+  className = "",
 }: {
   options: readonly { value: T; label: string }[];
   value: T;
   onChange: (next: T) => void;
   label: string;
+  className?: string;
 }) {
   return (
-    <div className="min-w-0 space-y-1.5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+    <div className={`min-w-0 space-y-1.5 ${className}`}>
+      <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         {label}
       </p>
       <div
-        className="flex min-h-11 items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex min-h-11 flex-wrap items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1"
         role="group"
         aria-label={label}
       >
@@ -273,7 +275,7 @@ function FilterChips<T extends string>({
             key={option.value}
             size="sm"
             variant={option.value === value ? "default" : "outline"}
-            className="h-10 shrink-0 rounded-full px-3 text-xs"
+            className="h-9 min-w-0 rounded-md px-2.5 text-xs shadow-none"
             aria-pressed={option.value === value}
             onClick={() => onChange(option.value)}
           >
@@ -304,8 +306,8 @@ function MediaPage() {
       extraParams={{ scope, usage, state }}
       toolbarVariant="compact"
       headerActions={
-        <div className="grid min-w-0 gap-4">
-          <div className="grid min-w-0 gap-3 lg:grid-cols-[13rem_minmax(29rem,1fr)_minmax(25rem,1fr)]">
+        <div className="grid min-w-0 gap-3 rounded-xl border border-border bg-card p-3 shadow-sm sm:p-4">
+          <div className="grid min-w-0 gap-3 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1.35fr)_minmax(0,1fr)]">
             <FilterChips
               label="Biblioteca"
               options={SCOPE_OPTIONS}
@@ -323,9 +325,10 @@ function MediaPage() {
               options={USAGE_OPTIONS}
               value={usage}
               onChange={setUsage}
+              className="lg:col-span-2 xl:col-span-1"
             />
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+          <div className="grid grid-cols-2 gap-2 border-t border-border/70 pt-3 sm:flex sm:justify-end">
             <AiConceptBatchUpload />
             <BatchToolbar />
           </div>
