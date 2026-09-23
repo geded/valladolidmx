@@ -691,8 +691,9 @@ export const aluxConverse = createServerFn({ method: "POST" })
     );
     const knownSlugs = ((knownProbe.data ?? []) as Array<{ slug: string }>).map((r) => r.slug);
     const deterministicIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
-    const baseIntent = apiKey
-      ? await enhanceIntentWithAI(apiKey, model, message, deterministicIntent, knownSlugs)
+    const intentApiKey = process.env["LOVABLE_API_KEY"];
+    const baseIntent = intentApiKey
+      ? await enhanceIntentWithAI(intentApiKey, INTENT_MODEL, message, deterministicIntent, knownSlugs)
       : deterministicIntent;
     const mentioned = baseIntent.mentionedDestinationSlugs;
     const selectedRouteNeedsStopTerritory = Boolean(
