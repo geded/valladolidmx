@@ -18,6 +18,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  buildRightsMetadata,
+  validateMediaRights,
+  type MediaRightsInput,
+} from "@/lib/experience-builder/media-rights";
 
 const PROMPT_VERSION = "vmx.media-alt.v1";
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
@@ -203,6 +208,19 @@ const SaveInput = z.object({
   entity_kind: z.string().max(40).nullable().optional(),
   entity_id: z.string().uuid().nullable().optional(),
   usage_context: z.string().max(80).nullable().optional(),
+  rights: z
+    .object({
+      author: z.string().max(200).nullable().optional(),
+      source: z.string().max(500).nullable().optional(),
+      license: z.string().max(200).nullable().optional(),
+      place: z.string().max(200).nullable().optional(),
+      capturedOn: z.string().max(40).nullable().optional(),
+      nature: z.enum(["documentary", "conceptual", "ai_generated"]),
+      rightsConfirmed: z.boolean(),
+      focalX: z.number().min(0).max(1).nullable().optional(),
+      focalY: z.number().min(0).max(1).nullable().optional(),
+    })
+    .optional(),
   locale: z.enum(SUPPORTED_LOCALES).default("es"),
   // Marca origen. Por defecto asumimos revisión humana al guardar desde CMS.
   source: z.enum(["human", "ai"]).default("human"),
@@ -232,6 +250,44 @@ export const saveMediaMetadata = createServerFn({ method: "POST" })
       if (data.entity_kind !== undefined) patch.entity_kind = data.entity_kind;
       if (data.entity_id !== undefined) patch.entity_id = data.entity_id;
       if (data.usage_context !== undefined) patch.usage_context = data.usage_context;
+      if (data.rights !== undefined) {
+        const rightsInput: MediaRightsInput = {
+          alt: data.alt_text ?? "",
+          author: data.rights.author,
+          credit: data.credit,
+          source: data.rights.source,
+          license: data.rights.license,
+          place: data.rights.place,
+          capturedOn: data.rights.capturedOn,
+          nature: data.rights.nature,
+          rightsConfirmed: data.rights.rightsConfirmed,
+          focalX: data.rights.focalX,
+          focalY: data.rights.focalY,
+        };
+        const validationError = validateMediaRights(rightsInput);
+        if (validationError) throw new Error(validationError);
+
+        const { data: current, error: currentError } = await context.supabase
+          .from("media_assets")
+          .select("metadata")
+          .eq("id", data.mediaId)
+          .maybeSingle();
+        if (currentError) throw currentError;
+        const currentMetadata =
+          current?.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
+            ? (current.metadata as Record<string, unknown>)
+            : {};
+        const governed = buildRightsMetadata(rightsInput);
+        patch.metadata = {
+          ...currentMetadata,
+          ...governed,
+          rights: { ...(currentMetadata.rights as Record<string, unknown> | undefined), ...governed.rights },
+          lifecycle: {
+            ...(currentMetadata.lifecycle as Record<string, unknown> | undefined),
+            ...governed.lifecycle,
+          },
+        };
+      }
 
       const { error } = await context.supabase
         .from("media_assets")

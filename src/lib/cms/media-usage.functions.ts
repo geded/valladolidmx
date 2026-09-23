@@ -290,6 +290,8 @@ export interface MediaDetail {
   caption: string | null;
   credit: string | null;
   usage_context: string | null;
+  original_checksum: string | null;
+  metadata: Record<string, unknown>;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -309,7 +311,7 @@ export const getMediaDetail = createServerFn({ method: "POST" })
     const { data: media, error } = await context.supabase
       .from("media_assets")
       .select(
-        "id, storage_bucket, storage_path, mime_type, kind, width, height, status, review_state, alt_text, alt_text_ai, alt_text_source, title, description, caption, credit, usage_context, created_at, updated_at",
+        "id, storage_bucket, storage_path, mime_type, kind, width, height, status, review_state, alt_text, alt_text_ai, alt_text_source, title, description, caption, credit, usage_context, original_checksum, metadata, created_at, updated_at",
       )
       .eq("id", data.mediaId)
       .is("deleted_at", null)
@@ -336,6 +338,11 @@ export const getMediaDetail = createServerFn({ method: "POST" })
       caption: text(row.caption),
       credit: text(row.credit),
       usage_context: text(row.usage_context),
+      original_checksum: text(row.original_checksum),
+      metadata:
+        typeof row.metadata === "object" && row.metadata !== null && !Array.isArray(row.metadata)
+          ? (row.metadata as Record<string, unknown>)
+          : {},
       created_at: text(row.created_at),
       updated_at: text(row.updated_at),
     };
