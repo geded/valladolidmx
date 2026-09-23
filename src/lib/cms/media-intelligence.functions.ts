@@ -198,6 +198,8 @@ const SaveInput = z.object({
   title: z.string().max(200).nullable().optional(),
   description: z.string().max(1000).nullable().optional(),
   caption: z.string().max(400).nullable().optional(),
+  credit: z.string().max(200).nullable().optional(),
+
   entity_kind: z.string().max(40).nullable().optional(),
   entity_id: z.string().uuid().nullable().optional(),
   usage_context: z.string().max(80).nullable().optional(),
@@ -225,6 +227,8 @@ export const saveMediaMetadata = createServerFn({ method: "POST" })
       if (data.title !== undefined) patch.title = data.title;
       if (data.description !== undefined) patch.description = data.description;
       if (data.caption !== undefined) patch.caption = data.caption;
+      if (data.credit !== undefined) patch.credit = data.credit;
+
       if (data.entity_kind !== undefined) patch.entity_kind = data.entity_kind;
       if (data.entity_id !== undefined) patch.entity_id = data.entity_id;
       if (data.usage_context !== undefined) patch.usage_context = data.usage_context;
