@@ -198,6 +198,8 @@ const SaveInput = z.object({
   title: z.string().max(200).nullable().optional(),
   description: z.string().max(1000).nullable().optional(),
   caption: z.string().max(400).nullable().optional(),
+  credit: z.string().max(200).nullable().optional(),
+
   entity_kind: z.string().max(40).nullable().optional(),
   entity_id: z.string().uuid().nullable().optional(),
   usage_context: z.string().max(80).nullable().optional(),
