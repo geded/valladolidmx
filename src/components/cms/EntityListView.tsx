@@ -67,7 +67,7 @@ export function EntityListView<Row>(props: Props<Row>) {
   const [draft, setDraft] = useState(search);
 
   return (
-    <section className="mx-auto w-full max-w-6xl">
+    <section className="mx-auto w-full max-w-6xl min-w-0 overflow-x-clip">
       <header
         className={
           toolbarVariant === "compact"
@@ -82,7 +82,7 @@ export function EntityListView<Row>(props: Props<Row>) {
               {stage}
             </p>
           )}
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-normal">{title}</h1>
           {description && (
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
           )}
@@ -108,7 +108,7 @@ export function EntityListView<Row>(props: Props<Row>) {
       <form
         className={
           toolbarVariant === "compact"
-            ? "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 sm:max-w-2xl"
+            ? "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 lg:max-w-3xl"
             : "mt-5 flex flex-wrap items-end gap-3"
         }
         onSubmit={(e) => {
