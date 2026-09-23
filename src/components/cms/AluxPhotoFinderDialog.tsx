@@ -263,37 +263,69 @@ export function AluxPhotoFinderDialog({
           </button>
         </header>
 
-        <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
-          <div className="relative flex-1">
-            <Search
-              className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") void search();
-              }}
-              aria-label="Qué foto buscas"
-              placeholder={
-                workingPlace ? "Sólo el tema: video mapping, cenote, fachada…" : "Qué foto buscas"
-              }
-              className="h-10 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
-            />
-          </div>
+        {/* Conmutador Buscar / Generar con IA */}
+        <div className="flex gap-1 border-b border-border bg-muted/20 px-4 py-2">
           <button
             type="button"
-            onClick={() => void search()}
-            disabled={loading}
-            className="h-10 rounded-pill bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+            onClick={() => setMode("search")}
+            className={
+              "flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-xs font-medium transition " +
+              (mode === "search"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground")
+            }
           >
-            {loading ? "Buscando…" : "Buscar"}
+            <Search className="size-3.5" aria-hidden />
+            Buscar fotos
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("generate")}
+            className={
+              "flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-xs font-medium transition " +
+              (mode === "generate"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground")
+            }
+          >
+            <Wand2 className="size-3.5" aria-hidden />
+            Generar con IA
           </button>
         </div>
 
-        {workingPlace && (
+        {mode === "search" && (
+          <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
+            <div className="relative flex-1">
+              <Search
+                className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+                aria-hidden
+              />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void search();
+                }}
+                aria-label="Qué foto buscas"
+                placeholder={
+                  workingPlace ? "Sólo el tema: video mapping, cenote, fachada…" : "Qué foto buscas"
+                }
+                className="h-10 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => void search()}
+              disabled={loading}
+              className="h-10 rounded-pill bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+            >
+              {loading ? "Buscando…" : "Buscar"}
+            </button>
+          </div>
+        )}
+
+        {mode === "search" && workingPlace && (
           <p className="flex items-center gap-1.5 border-b border-border bg-muted/20 px-4 py-1.5 text-[11px] text-muted-foreground">
             <MapPin className="size-3.5 shrink-0" aria-hidden />
             Buscando en {workingPlace}. No hace falta escribir el destino.
