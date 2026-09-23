@@ -291,7 +291,17 @@ export interface MediaDetail {
   credit: string | null;
   usage_context: string | null;
   original_checksum: string | null;
-  metadata: Record<string, unknown>;
+  metadata: {
+    rights?: {
+      author?: string | null;
+      source?: string | null;
+      license?: string | null;
+      place?: string | null;
+      captured_on?: string | null;
+      nature?: string | null;
+      rights_confirmed?: boolean | null;
+    };
+  };
   created_at: string | null;
   updated_at: string | null;
 }
@@ -320,6 +330,16 @@ export const getMediaDetail = createServerFn({ method: "POST" })
     if (!media) throw new Error("not_found");
 
     const row = media as Record<string, unknown>;
+    const rawMetadata =
+      typeof row.metadata === "object" && row.metadata !== null && !Array.isArray(row.metadata)
+        ? (row.metadata as Record<string, unknown>)
+        : {};
+    const rawRights =
+      typeof rawMetadata.rights === "object" &&
+      rawMetadata.rights !== null &&
+      !Array.isArray(rawMetadata.rights)
+        ? (rawMetadata.rights as Record<string, unknown>)
+        : {};
     const detail: MediaDetail = {
       id: String(row.id),
       storage_bucket: text(row.storage_bucket),
@@ -339,10 +359,20 @@ export const getMediaDetail = createServerFn({ method: "POST" })
       credit: text(row.credit),
       usage_context: text(row.usage_context),
       original_checksum: text(row.original_checksum),
-      metadata:
-        typeof row.metadata === "object" && row.metadata !== null && !Array.isArray(row.metadata)
-          ? (row.metadata as Record<string, unknown>)
-          : {},
+      metadata: {
+        rights: {
+          author: text(rawRights.author),
+          source: text(rawRights.source),
+          license: text(rawRights.license),
+          place: text(rawRights.place),
+          captured_on: text(rawRights.captured_on),
+          nature: text(rawRights.nature),
+          rights_confirmed:
+            typeof rawRights.rights_confirmed === "boolean"
+              ? rawRights.rights_confirmed
+              : null,
+        },
+      },
       created_at: text(row.created_at),
       updated_at: text(row.updated_at),
     };

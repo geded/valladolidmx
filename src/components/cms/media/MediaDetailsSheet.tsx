@@ -68,12 +68,18 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
 
   const detail = useQuery({
     queryKey: ["cms", "media", "detail", mediaId],
-    queryFn: () => detailFn({ data: { mediaId: mediaId! } }),
+    queryFn: () => {
+      if (!mediaId) throw new Error("media_not_selected");
+      return detailFn({ data: { mediaId } });
+    },
     enabled: Boolean(mediaId),
   });
   const usage = useQuery({
     queryKey: ["cms", "media", "usage", mediaId],
-    queryFn: () => usageFn({ data: { mediaIds: [mediaId!] } }),
+    queryFn: () => {
+      if (!mediaId) throw new Error("media_not_selected");
+      return usageFn({ data: { mediaIds: [mediaId] } });
+    },
     enabled: Boolean(mediaId),
   });
 
