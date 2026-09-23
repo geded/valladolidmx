@@ -94,7 +94,7 @@ export function AluxPhotoFinderDialog({
   const [error, setError] = useState<string | null>(null);
 
   // Modo Generar con IA
-  const [mode, setMode] = useState<"search" | "generate">("search");
+  const [mode, setMode] = useState<"search" | "generate">(initialMode ?? "search");
   const [genPrompt, setGenPrompt] = useState(() => stripPlaceTokens(initialQuery, workingPlace));
   const [genImage, setGenImage] = useState<string | null>(null);
   const [genLoading, setGenLoading] = useState(false);
