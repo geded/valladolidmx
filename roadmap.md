@@ -24,6 +24,8 @@
 
 ## En curso
 
+- [x] Biblioteca multimedia · revisión compacta y ficha integral: ALT y usos resumidos para explorar grandes acervos; una sola ficha permite editar información, uso, tipo, autor, procedencia, licencia, lugar y fecha, confirmar derechos, enviar a revisión, pedir cambios y aprobar/publicar con controles fail-closed. Verificada con sesión editorial en escritorio, iPad y celular, sin desbordes.
+
 - [x] Menú móvil · Cuenta y acceso (21-sep, IMG_2681): “Arma tu Viaje” y la cuenta permanecen visibles y pulsables; la sesión activa muestra “Mi cuenta” y abre su panel hacia arriba sin recorte. Verificado en 430/390 con sesión iniciada y cerrada; `/auth` abre correctamente y el header aprobado permanece intacto.
 
 - [x] Experience Builder · Timeout de autoguardado (21-sep): el guardado inmediato ya no espera traducción automática; validaciones independientes se ejecutan en paralelo; los cambios rápidos se compactan con estrategia latest-wins y la escritura falla rápido/reintenta si otra petición ocupa el borrador. Se preservan autorización fail-closed, conflicto de borrador y auditoría.

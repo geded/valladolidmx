@@ -264,8 +264,13 @@ export const saveMediaMetadata = createServerFn({ method: "POST" })
           focalX: data.rights.focalX,
           focalY: data.rights.focalY,
         };
-        const validationError = validateMediaRights(rightsInput);
-        if (validationError) throw new Error(validationError);
+        // La ficha puede conservar datos parciales mientras siga en borrador.
+        // Al confirmar derechos sí exigimos el contrato completo; publicar
+        // continúa bloqueado por la aprobación gobernada del medio.
+        if (rightsInput.rightsConfirmed) {
+          const validationError = validateMediaRights(rightsInput);
+          if (validationError) throw new Error(validationError);
+        }
 
         const { data: current, error: currentError } = await context.supabase
           .from("media_assets")
