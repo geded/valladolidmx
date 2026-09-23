@@ -292,7 +292,7 @@ function GalleryPanel(props: {
           <h2 className="text-sm font-semibold tracking-tight">Galería</h2>
           <p className="text-xs text-muted-foreground">Imágenes adicionales del producto.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"

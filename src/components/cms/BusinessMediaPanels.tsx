@@ -316,7 +316,7 @@ function GalleryPanel(props: {
             Imágenes adicionales de la empresa. Arrastra o selecciona varias.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"
