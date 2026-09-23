@@ -6,10 +6,11 @@
  * siempre (optimización, ampliación opcional con Alux IA, original inmutable y
  * derechos declarados). Sólo editores y administradores.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, MapPin, Search, Sparkles, X } from "lucide-react";
+import { ImageIcon, Loader2, MapPin, Search, Sparkles, Wand2, X } from "lucide-react";
+import { streamImage } from "@/lib/stream-image";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
@@ -89,6 +90,14 @@ export function AluxPhotoFinderDialog({
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Modo Generar con IA
+  const [mode, setMode] = useState<"search" | "generate">("search");
+  const [genPrompt, setGenPrompt] = useState(() => stripPlaceTokens(initialQuery, workingPlace));
+  const [genImage, setGenImage] = useState<string | null>(null);
+  const [genLoading, setGenLoading] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
   if (!open) return null;
 
   const search = async () => {
@@ -160,6 +169,65 @@ export function AluxPhotoFinderDialog({
     }
   };
 
+  const generate = async () => {
+    if (genPrompt.trim().length < 3 || genLoading) return;
+    setGenLoading(true);
+    setGenError(null);
+    setGenImage(null);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const fullPrompt = workingPlace
+        ? `${genPrompt.trim()}, ${workingPlace}, México. Fotografía editorial de alta calidad, realista, sin texto, sin marcas de agua.`
+        : `${genPrompt.trim()}. Fotografía editorial de alta calidad, realista, sin texto, sin marcas de agua.`;
+      await streamImage(
+        "/api/generate-image",
+        { prompt: fullPrompt },
+        (dataUrl, isFinal) => {
+          setGenImage(dataUrl);
+          if (isFinal) setGenLoading(false);
+        },
+        controller.signal,
+      );
+      if (!controller.signal.aborted) setGenLoading(false);
+    } catch (err) {
+      if (controller.signal.aborted) {
+        setGenLoading(false);
+        return;
+      }
+      const msg = err instanceof Error ? err.message : "";
+      setGenError(
+        /content_policy|moderation/i.test(msg)
+          ? "El prompt fue rechazado. Prueba con una descripción más genérica."
+          : /failed|error/i.test(msg)
+            ? "No se pudo generar la imagen. Intenta con otra descripción."
+            : msg || "Error generando imagen",
+      );
+      setGenLoading(false);
+    }
+  };
+
+  const useGenerated = () => {
+    if (!genImage) return;
+    const bin = atob(genImage.split(",")[1] ?? "");
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const file = new File([bytes], `alux-ai-${Date.now()}.png`, {
+      type: "image/png",
+      lastModified: Date.now(),
+    });
+    onPick({
+      file,
+      author: "Alux IA",
+      license: "Generada por IA",
+      sourceUrl: "",
+      title: genPrompt.trim().slice(0, 80),
+      provider: "Alux IA",
+    });
+    onClose();
+  };
+
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
@@ -195,43 +263,76 @@ export function AluxPhotoFinderDialog({
           </button>
         </header>
 
-        <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
-          <div className="relative flex-1">
-            <Search
-              className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") void search();
-              }}
-              aria-label="Qué foto buscas"
-              placeholder={
-                workingPlace ? "Sólo el tema: video mapping, cenote, fachada…" : "Qué foto buscas"
-              }
-              className="h-10 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
-            />
-          </div>
+        {/* Conmutador Buscar / Generar con IA */}
+        <div className="flex gap-1 border-b border-border bg-muted/20 px-4 py-2">
           <button
             type="button"
-            onClick={() => void search()}
-            disabled={loading}
-            className="h-10 rounded-pill bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+            onClick={() => setMode("search")}
+            className={
+              "flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-xs font-medium transition " +
+              (mode === "search"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground")
+            }
           >
-            {loading ? "Buscando…" : "Buscar"}
+            <Search className="size-3.5" aria-hidden />
+            Buscar fotos
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("generate")}
+            className={
+              "flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-xs font-medium transition " +
+              (mode === "generate"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground")
+            }
+          >
+            <Wand2 className="size-3.5" aria-hidden />
+            Generar con IA
           </button>
         </div>
 
-        {workingPlace && (
+        {mode === "search" && (
+          <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
+            <div className="relative flex-1">
+              <Search
+                className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+                aria-hidden
+              />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void search();
+                }}
+                aria-label="Qué foto buscas"
+                placeholder={
+                  workingPlace ? "Sólo el tema: video mapping, cenote, fachada…" : "Qué foto buscas"
+                }
+                className="h-10 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => void search()}
+              disabled={loading}
+              className="h-10 rounded-pill bg-primary px-4 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+            >
+              {loading ? "Buscando…" : "Buscar"}
+            </button>
+          </div>
+        )}
+
+        {mode === "search" && workingPlace && (
           <p className="flex items-center gap-1.5 border-b border-border bg-muted/20 px-4 py-1.5 text-[11px] text-muted-foreground">
             <MapPin className="size-3.5 shrink-0" aria-hidden />
             Buscando en {workingPlace}. No hace falta escribir el destino.
           </p>
         )}
 
+        {mode === "search" && (
         <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
           <input
             type="url"
@@ -278,7 +379,9 @@ export function AluxPhotoFinderDialog({
             </button>
           </div>
         </div>
+        )}
 
+        {mode === "search" && (
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {error && (
             <p
@@ -378,6 +481,110 @@ export function AluxPhotoFinderDialog({
             ))}
           </div>
         </div>
+        )}
+
+        {mode === "generate" && (
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            {genError && (
+              <p
+                role="alert"
+                className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+              >
+                {genError}
+              </p>
+            )}
+
+            <div className="mb-4">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                Describe la imagen que necesitas
+              </label>
+              <textarea
+                value={genPrompt}
+                onChange={(e) => setGenPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void generate();
+                  }
+                }}
+                placeholder={
+                  workingPlace
+                    ? "Sólo el tema: cenote al amanecer, fachada colonial, gastronomía yucateca…"
+                    : "Describe la imagen: foto de un cenote, fachada colonial…"
+                }
+                rows={3}
+                maxLength={500}
+                className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void generate()}
+                  disabled={genLoading || genPrompt.trim().length < 3}
+                  className="flex items-center gap-1.5 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+                >
+                  {genLoading ? (
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                  ) : (
+                    <Wand2 className="size-3.5" aria-hidden />
+                  )}
+                  {genLoading ? "Generando…" : "Generar imagen"}
+                </button>
+                {genLoading && (
+                  <button
+                    type="button"
+                    onClick={() => abortRef.current?.abort()}
+                    className="rounded-pill border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent"
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {genImage && (
+              <div className="space-y-3">
+                <figure className="overflow-hidden rounded-lg border border-border">
+                  <img
+                    src={genImage}
+                    alt={genPrompt}
+                    className={
+                      "w-full bg-muted object-cover transition-[filter] " +
+                      (genLoading ? "blur-2xl" : "blur-0")
+                    }
+                  />
+                  <figcaption className="px-2 py-2 text-[11px] text-muted-foreground">
+                    <p className="truncate font-medium text-foreground" title={genPrompt}>
+                      {genPrompt}
+                    </p>
+                    <p>Generada por Alux IA · Google Gemini</p>
+                  </figcaption>
+                </figure>
+                {!genLoading && (
+                  <button
+                    type="button"
+                    onClick={useGenerated}
+                    className="flex items-center gap-1.5 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                  >
+                    <ImageIcon className="size-3.5" aria-hidden />
+                    Usar esta imagen
+                  </button>
+                )}
+              </div>
+            )}
+
+            {!genImage && !genLoading && (
+              <div className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-8 text-center">
+                <Wand2 className="mx-auto mb-2 size-6 text-muted-foreground" aria-hidden />
+                <p className="text-sm text-muted-foreground">
+                  Escribe qué imagen necesitas y Alux la generará con IA.
+                  Funciona mejor con descripciones concretas: «cenote al amanecer con luz natural»,
+                  «fachada colonial iluminada de noche», «platillo de cochinita pibil sobre madera».
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>,
     document.body,

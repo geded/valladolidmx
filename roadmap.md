@@ -3,9 +3,9 @@
 ## Capacidades de plataforma (IA + infraestructura)
 
 - [x] Streaming del chat de Alux: `generateText` → `streamText` con SSE en `/api/public/alux/chat`; el cliente lee chunks en tiempo real. Typecheck pasó.
-- [~] Push notifications: código completo, llaves VAPID ya existen como secretos. Actualizando valores generados. `PushEnableButton` ya usa server function para obtener la llave pública.
-- [ ] Texto-a-voz (TTS): que Alux y fichas se puedan escuchar en voz alta (AI Gateway).
-- [ ] Voz-a-texto (STT): que el viajero hable a Alux en lugar de escribir (AI Gateway).
+- [~] Push notifications: código completo, llaves VAPID ya existen como secretos. Pendiente: usuario actualiza valores en formulario seguro.
+- [x] Texto-a-voz (TTS): servidor `/api/public/tts` con Gemini TTS SSE; hook `useTTS` con AudioContext y PCM streaming; botón "Escuchar" en mensajes de Alux. Typecheck pasó.
+- [x] Voz-a-texto (STT): servidor `/api/public/stt` con Gemini Transcribe SSE; hook `useSTT` con MediaRecorder; botón micrófono en chat de Alux. Typecheck pasó.
 - [ ] Generación de imágenes: crear imágenes conceptuales desde el CMS (AI Gateway).
 - [ ] Clasificación IA de intenciones: reemplazar regex por IA en `classifyIntent` (AI Gateway).
 - [ ] Dominio: investigar si `valladolid.com.mx` está disponible y cómo conectarlo al proyecto.

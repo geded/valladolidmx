@@ -16,7 +16,13 @@ import {
   RotateCcw,
   Plus,
   Check,
+  Volume2,
+  CircleStop,
+  Mic,
+  Square,
 } from "lucide-react";
+import { useTTS } from "@/lib/hooks/useTTS";
+import { useSTT } from "@/lib/hooks/useSTT";
 import { AluxMark } from "@/components/alux/AluxMark";
 
 import { Button } from "@/components/ui/button";
@@ -76,6 +82,31 @@ export function PublicAluxChat() {
   const [rateInfo, setRateInfo] = useState<{ used: number; limit: number } | null>(null);
   const [nearbyUsed, setNearbyUsed] = useState<number | null>(null);
   const [hasMemory, setHasMemory] = useState(false);
+  const [ttsIdx, setTtsIdx] = useState<number | null>(null);
+  const tts = useTTS();
+  const stt = useSTT();
+  const handleMicClick = useCallback(async () => {
+    if (stt.state === "idle") {
+      stt.start();
+    } else if (stt.state === "recording") {
+      const text = await stt.stop();
+      if (text) setInput((prev) => (prev ? prev + " " + text : text));
+    }
+  }, [stt]);
+
+  const toggleTTS = useCallback(
+    (idx: number, text: string) => {
+      if (ttsIdx === idx && tts.state !== "idle") {
+        tts.stop();
+        setTtsIdx(null);
+      } else {
+        tts.stop();
+        setTtsIdx(idx);
+        tts.speak(text);
+      }
+    },
+    [tts, ttsIdx],
+  );
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const anonymous = useAnonymousTrip();
@@ -383,6 +414,27 @@ export function PublicAluxChat() {
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.content && (
+              <button
+                type="button"
+                onClick={() => toggleTTS(i, m.content)}
+                className="inline-flex items-center gap-1.5 rounded-pill border border-border/60 bg-background px-2.5 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                title={ttsIdx === i && tts.state !== "idle" ? "Detener" : "Escuchar"}
+              >
+                {ttsIdx === i && tts.state === "loading" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : ttsIdx === i && tts.state === "playing" ? (
+                  <CircleStop className="h-3 w-3" />
+                ) : (
+                  <Volume2 className="h-3 w-3" />
+                )}
+                {ttsIdx === i && tts.state === "loading"
+                  ? "Generando…"
+                  : ttsIdx === i && tts.state === "playing"
+                    ? "Detener"
+                    : "Escuchar"}
+              </button>
+            )}
             {m.role === "assistant" && m.proposals && m.proposals.length > 0 && (
               <AluxProposals items={m.proposals} />
             )}
@@ -433,6 +485,34 @@ export function PublicAluxChat() {
           }}
           className="min-h-[44px] max-h-40 resize-none bg-background"
         />
+        <Button
+          type="button"
+          size="icon"
+          variant="outline"
+          onClick={handleMicClick}
+          disabled={!anonymousTripReady || stt.state === "transcribing"}
+          title={
+            stt.state === "recording"
+              ? "Detener y transcribir"
+              : stt.state === "transcribing"
+                ? "Transcribiendo…"
+                : "Hablar a Alux"
+          }
+          className={
+            stt.state === "recording"
+              ? "border-destructive/40 bg-destructive/5 text-destructive animate-pulse"
+              : ""
+          }
+        >
+          {stt.state === "recording" ? (
+            <Square className="h-4 w-4" />
+          ) : stt.state === "transcribing" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+          <span className="sr-only">Hablar a Alux</span>
+        </Button>
         <Button
           type="submit"
           size="icon"
