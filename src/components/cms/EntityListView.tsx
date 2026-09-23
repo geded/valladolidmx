@@ -34,6 +34,7 @@ interface Props<Row> {
   page?: number;
   pageSize?: number;
   onPageChange?: (next: number) => void;
+  toolbarVariant?: "default" | "compact";
 }
 
 export function EntityListView<Row>(props: Props<Row>) {
@@ -54,6 +55,7 @@ export function EntityListView<Row>(props: Props<Row>) {
     page,
     pageSize,
     onPageChange,
+    toolbarVariant = "default",
   } = props;
 
   const hasPaging = typeof page === "number" && typeof pageSize === "number" && !!onPageChange;
@@ -66,8 +68,15 @@ export function EntityListView<Row>(props: Props<Row>) {
 
   return (
     <section className="mx-auto w-full max-w-6xl">
-      <header className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+      <header
+        className={
+          toolbarVariant === "compact"
+            ? "grid gap-4 border-b border-border pb-5"
+            : "flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between"
+        }
+      >
+        <div className={toolbarVariant === "compact" ? "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3" : ""}>
+          <div className="min-w-0">
           {stage && (
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
               {stage}
@@ -77,11 +86,19 @@ export function EntityListView<Row>(props: Props<Row>) {
           {description && (
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
           )}
+          </div>
+          {toolbarVariant === "compact" ? (
+            <div className="shrink-0 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs font-semibold tabular-nums text-foreground">
+              {isFetching ? "Actualizando…" : `${total} imagen${total === 1 ? "" : "es"}`}
+            </div>
+          ) : null}
         </div>
-        <div className="flex items-center gap-3">
+        <div className={toolbarVariant === "compact" ? "min-w-0" : "flex items-center gap-3"}>
+          {toolbarVariant !== "compact" ? (
           <p className="text-xs text-muted-foreground">
             {isFetching ? "Actualizando…" : `${total} registro${total === 1 ? "" : "s"}`}
           </p>
+          ) : null}
           {headerActions}
         </div>
       </header>
@@ -89,13 +106,17 @@ export function EntityListView<Row>(props: Props<Row>) {
       {filters && <div className="mt-5">{filters}</div>}
 
       <form
-        className="mt-5 flex flex-wrap items-end gap-3"
+        className={
+          toolbarVariant === "compact"
+            ? "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 sm:max-w-2xl"
+            : "mt-5 flex flex-wrap items-end gap-3"
+        }
         onSubmit={(e) => {
           e.preventDefault();
           onSearchChange(draft.trim());
         }}
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1">
           <label
             htmlFor={inputId}
             className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground"
@@ -108,12 +129,16 @@ export function EntityListView<Row>(props: Props<Row>) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Filtrar por nombre…"
-            className="h-9 w-72 rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className={
+              toolbarVariant === "compact"
+                ? "h-11 w-full rounded-xl border border-border bg-background px-4 text-sm shadow-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+                : "h-9 w-72 rounded-md border border-border bg-background px-3 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+            }
           />
         </div>
         <button
           type="submit"
-          className="h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"
+          className={toolbarVariant === "compact" ? "h-11 shrink-0 rounded-xl bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95" : "h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"}
         >
           Aplicar
         </button>
@@ -124,7 +149,7 @@ export function EntityListView<Row>(props: Props<Row>) {
               setDraft("");
               onSearchChange("");
             }}
-            className="h-9 rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent"
+            className={toolbarVariant === "compact" ? "col-span-2 h-9 justify-self-start rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent" : "h-9 rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent"}
           >
             Limpiar
           </button>

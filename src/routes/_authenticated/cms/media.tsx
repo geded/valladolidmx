@@ -259,18 +259,28 @@ function FilterChips<T extends string>({
   label: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-1" role="group" aria-label={label}>
-      {options.map((option) => (
-        <Button
-          key={option.value}
-          size="sm"
-          variant={option.value === value ? "default" : "outline"}
-          aria-pressed={option.value === value}
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </Button>
-      ))}
+    <div className="min-w-0 space-y-1.5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        {label}
+      </p>
+      <div
+        className="flex min-h-11 items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="group"
+        aria-label={label}
+      >
+        {options.map((option) => (
+          <Button
+            key={option.value}
+            size="sm"
+            variant={option.value === value ? "default" : "outline"}
+            className="h-10 shrink-0 rounded-full px-3 text-xs"
+            aria-pressed={option.value === value}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -292,29 +302,33 @@ function MediaPage() {
       rowKey={(r) => r.id}
       emptyMessage="Sin imágenes con estos filtros."
       extraParams={{ scope, usage, state }}
+      toolbarVariant="compact"
       headerActions={
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterChips
-            label="Alcance de la biblioteca"
-            options={SCOPE_OPTIONS}
-            value={scope}
-            onChange={setScope}
-          />
-          <FilterChips
-            label="Estado de aprobación"
-            options={STATE_OPTIONS}
-            value={state}
-            onChange={setState}
-          />
-          <FilterChips
-            label="Uso de la imagen"
-            options={USAGE_OPTIONS}
-            value={usage}
-            onChange={setUsage}
-          />
-
-          <AiConceptBatchUpload />
-          <BatchToolbar />
+        <div className="grid min-w-0 gap-4">
+          <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.35fr)_minmax(0,1fr)]">
+            <FilterChips
+              label="Biblioteca"
+              options={SCOPE_OPTIONS}
+              value={scope}
+              onChange={setScope}
+            />
+            <FilterChips
+              label="Estado"
+              options={STATE_OPTIONS}
+              value={state}
+              onChange={setState}
+            />
+            <FilterChips
+              label="Uso"
+              options={USAGE_OPTIONS}
+              value={usage}
+              onChange={setUsage}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+            <AiConceptBatchUpload />
+            <BatchToolbar />
+          </div>
         </div>
       }
       columns={[
