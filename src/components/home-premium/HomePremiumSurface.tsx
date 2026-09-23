@@ -1282,7 +1282,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             <EditorialMediaFrame
               media={content.eventos.media}
               label={content.eventos.title}
-              className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5"
+              className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[16/10] lg:mt-5"
             />
           ) : null}
           <div className="mt-4 grid grid-cols-3 gap-2 lg:gap-3">
@@ -1358,7 +1358,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
             {visible.map((event, index) => (
               <li
                 key={`${event.title}-${index}`}
-                className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 py-2.5 lg:py-3.5"
+                className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 py-2.5 md:py-3.5"
               >
                 {event.media?.url ? (
                   /* H3·A4 · La miniatura de agenda usa la familia `thumbnail`
@@ -1385,7 +1385,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                   <h3 className="mt-0.5 truncate text-[15px] font-semibold leading-snug">
                     {event.title}
                   </h3>
-                  <p className="mt-0.5 hidden text-[13px] text-muted-foreground lg:block">
+                  <p className="mt-0.5 hidden text-[13px] leading-snug text-muted-foreground md:line-clamp-2 md:block">
                     {event.detail}
                   </p>
                 </div>
