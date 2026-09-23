@@ -560,7 +560,9 @@ function MediaPage() {
           ),
         },
       ]}
-
     />
+    <MediaDetailsSheet mediaId={detailId} onOpenChange={(open) => !open && setDetailId(null)} />
+    </>
   );
 }
+
