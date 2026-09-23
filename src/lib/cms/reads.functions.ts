@@ -402,12 +402,25 @@ export const listMediaCms = createServerFn({ method: "POST" })
       }
     }
 
+    // Uso real: derivado de las referencias del CMS, no de la etiqueta manual.
+    const { resolveMediaUsageReferences } = await import("@/lib/cms/media-usage.functions");
+    const usageRefs = await resolveMediaUsageReferences(
+      context.supabase,
+      list.map((row) => String((row as { id: string }).id)),
+    ).catch(() => []);
+    const usageByMedia = new Map<string, typeof usageRefs>();
+    for (const ref of usageRefs) {
+      usageByMedia.set(ref.mediaId, [...(usageByMedia.get(ref.mediaId) ?? []), ref]);
+    }
+
     return {
       rows: list.map((row) => {
         const r = pathOf(row);
+        const id = String((row as { id: string }).id);
         return {
           ...row,
           previewUrl: signedByKey.get(`${r.storage_bucket}:${r.storage_path}`) ?? null,
+          usageRefs: usageByMedia.get(id) ?? [],
         };
       }),
       total: count ?? 0,
@@ -417,6 +430,7 @@ export const listMediaCms = createServerFn({ method: "POST" })
       usage,
     };
   });
+
 
 
 /* ─────────────────────────────  Reseñas  ──────────────────────────────── */
