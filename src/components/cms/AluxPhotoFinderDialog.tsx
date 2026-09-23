@@ -65,6 +65,7 @@ export function AluxPhotoFinderDialog({
   initialQuery,
   website,
   place,
+  initialMode,
   onPick,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
