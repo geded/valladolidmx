@@ -71,7 +71,7 @@ export function EntityListView<Row>(props: Props<Row>) {
       <header
         className={
           toolbarVariant === "compact"
-            ? "grid gap-4 border-b border-border pb-5"
+            ? "grid gap-3 border-b border-border pb-4"
             : "flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between"
         }
       >
@@ -84,7 +84,7 @@ export function EntityListView<Row>(props: Props<Row>) {
           )}
           <h1 className="mt-1 text-2xl font-semibold tracking-normal">{title}</h1>
           {description && (
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
+            <p className="mt-0.5 max-w-2xl text-xs text-muted-foreground sm:text-sm">{description}</p>
           )}
           </div>
           {toolbarVariant === "compact" ? (
@@ -108,7 +108,7 @@ export function EntityListView<Row>(props: Props<Row>) {
       <form
         className={
           toolbarVariant === "compact"
-            ? "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 lg:max-w-3xl"
+            ? "mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 lg:max-w-2xl"
             : "mt-5 flex flex-wrap items-end gap-3"
         }
         onSubmit={(e) => {
@@ -131,14 +131,14 @@ export function EntityListView<Row>(props: Props<Row>) {
             placeholder="Filtrar por nombre…"
             className={
               toolbarVariant === "compact"
-                ? "h-11 w-full rounded-xl border border-border bg-background px-4 text-sm shadow-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+                ? "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm shadow-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
                 : "h-9 w-72 rounded-md border border-border bg-background px-3 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
             }
           />
         </div>
         <button
           type="submit"
-          className={toolbarVariant === "compact" ? "h-11 shrink-0 rounded-xl bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95" : "h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"}
+          className={toolbarVariant === "compact" ? "h-10 shrink-0 rounded-lg bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95" : "h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"}
         >
           Aplicar
         </button>
@@ -156,7 +156,7 @@ export function EntityListView<Row>(props: Props<Row>) {
         )}
       </form>
 
-      <div className="mt-5 overflow-hidden rounded-xl border border-border bg-card">
+      <div className={toolbarVariant === "compact" ? "mt-4 overflow-hidden rounded-xl border border-border bg-card" : "mt-5 overflow-hidden rounded-xl border border-border bg-card"}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-left text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
