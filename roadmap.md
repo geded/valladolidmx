@@ -25,6 +25,7 @@
 ## En curso
 
 - [x] Biblioteca multimedia · cabecera profesional y responsive (IMG_0921): total visible, búsqueda amplia, filtros completos de alcance/estado/uso y acciones ordenadas para operar grandes acervos con comodidad en escritorio, iPad y celular; tabla, ficha, permisos y aprobación permanecen intactos. Verificada en 1440/834/430/390 sin desbordamiento de página.
+- [x] Biblioteca multimedia · compactación IMG_0924: “Todas las imágenes / Mis imágenes”, estado y uso se presentan en selectores únicos; acciones y búsqueda reducen altura sin quitar opciones ni funciones. Pendiente comprobación visual final en 1440/834/430/390.
 
 - [x] Biblioteca multimedia · revisión compacta y ficha integral: ALT y usos resumidos para explorar grandes acervos; una sola ficha permite editar información, uso, tipo, autor, procedencia, licencia, lugar y fecha, confirmar derechos, enviar a revisión, pedir cambios y aprobar/publicar con controles fail-closed. Verificada con sesión editorial en escritorio, iPad y celular, sin desbordes.
 

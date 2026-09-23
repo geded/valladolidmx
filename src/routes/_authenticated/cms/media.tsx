@@ -9,6 +9,13 @@ import { suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
 import { MediaDetailsSheet } from "@/components/cms/media/MediaDetailsSheet";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/lib/toast";
 import { uploadStudioMediaViaServer } from "@/lib/experience-builder/studio-media.functions";
 import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
@@ -247,7 +254,7 @@ const USAGE_LABELS: Record<string, string> = {
   territory: "Territorio",
 };
 
-function FilterChips<T extends string>({
+function CompactFilterSelect<T extends string>({
   options,
   value,
   onChange,
@@ -261,28 +268,22 @@ function FilterChips<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={`min-w-0 space-y-1.5 ${className}`}>
-      <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+    <div className={`min-w-0 space-y-1 ${className}`}>
+      <p className="px-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         {label}
       </p>
-      <div
-        className="flex min-h-11 flex-wrap items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1"
-        role="group"
-        aria-label={label}
-      >
-        {options.map((option) => (
-          <Button
-            key={option.value}
-            size="sm"
-            variant={option.value === value ? "default" : "outline"}
-            className="h-9 min-w-0 rounded-md px-2.5 text-xs shadow-none"
-            aria-pressed={option.value === value}
-            onClick={() => onChange(option.value)}
-          >
-            {option.label}
-          </Button>
-        ))}
-      </div>
+      <Select value={value} onValueChange={(next) => onChange(next as T)}>
+        <SelectTrigger className="h-10 min-w-0 rounded-lg bg-background px-3 text-xs font-medium shadow-none" aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value} className="text-xs">
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
@@ -306,29 +307,28 @@ function MediaPage() {
       extraParams={{ scope, usage, state }}
       toolbarVariant="compact"
       headerActions={
-        <div className="grid min-w-0 gap-3 rounded-xl border border-border bg-card p-3 shadow-sm sm:p-4">
-          <div className="grid min-w-0 gap-3 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1.35fr)_minmax(0,1fr)]">
-            <FilterChips
+        <div className="grid min-w-0 gap-2 rounded-lg border border-border bg-card p-2.5 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-3">
+          <div className="grid min-w-0 grid-cols-1 gap-2 min-[520px]:grid-cols-3">
+            <CompactFilterSelect
               label="Biblioteca"
               options={SCOPE_OPTIONS}
               value={scope}
               onChange={setScope}
             />
-            <FilterChips
+            <CompactFilterSelect
               label="Estado"
               options={STATE_OPTIONS}
               value={state}
               onChange={setState}
             />
-            <FilterChips
+            <CompactFilterSelect
               label="Uso"
               options={USAGE_OPTIONS}
               value={usage}
               onChange={setUsage}
-              className="lg:col-span-2 xl:col-span-1"
             />
           </div>
-          <div className="grid grid-cols-2 gap-2 border-t border-border/70 pt-3 sm:flex sm:justify-end">
+          <div className="grid grid-cols-2 gap-1.5 border-t border-border/70 pt-2 sm:flex sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0 [&_button]:h-10 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:text-xs">
             <AiConceptBatchUpload />
             <BatchToolbar />
           </div>
