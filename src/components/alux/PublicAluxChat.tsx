@@ -81,6 +81,19 @@ export function PublicAluxChat() {
   const [hasMemory, setHasMemory] = useState(false);
   const [ttsIdx, setTtsIdx] = useState<number | null>(null);
   const tts = useTTS();
+  const toggleTTS = useCallback(
+    (idx: number, text: string) => {
+      if (ttsIdx === idx && tts.state !== "idle") {
+        tts.stop();
+        setTtsIdx(null);
+      } else {
+        tts.stop();
+        setTtsIdx(idx);
+        tts.speak(text);
+      }
+    },
+    [tts, ttsIdx],
+  );
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const anonymous = useAnonymousTrip();
