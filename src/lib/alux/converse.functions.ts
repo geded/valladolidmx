@@ -61,6 +61,7 @@ const ANON_DAY_LIMIT = 40;
 const AUTH_HOUR_LIMIT = 30;
 const AUTH_DAY_LIMIT = 120;
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+const INTENT_MODEL = "google/gemini-3-flash-preview";
 
 async function resolvePublishedRouteSelection(
   sb: SupabaseClient,
