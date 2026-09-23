@@ -384,8 +384,8 @@ export function AluxPhotoFinderDialog({
                   license: "Publicada por el negocio",
                   sourceUrl: site.trim() || pasted.trim(),
                   provider: "Enlace directo",
-                })
-              }
+                });
+              }}
               className="h-10 shrink-0 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
             >
               Traer copia
