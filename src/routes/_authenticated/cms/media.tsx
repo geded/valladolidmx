@@ -305,7 +305,7 @@ function MediaPage() {
       toolbarVariant="compact"
       headerActions={
         <div className="grid min-w-0 gap-4">
-          <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.35fr)_minmax(0,1fr)]">
+          <div className="grid min-w-0 gap-3 lg:grid-cols-[13rem_minmax(29rem,1fr)_minmax(25rem,1fr)]">
             <FilterChips
               label="Biblioteca"
               options={SCOPE_OPTIONS}
