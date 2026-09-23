@@ -104,7 +104,11 @@ export function AluxPhotoFinderDialog({
   if (!open) return null;
 
   const search = async () => {
-    if (query.trim().length < 3 || loading) return;
+    if (loading) return;
+    if (query.trim().length < 3) {
+      setError("Escribe al menos tres letras de lo que buscas (por ejemplo: cenote, fachada).");
+      return;
+    }
     setLoading(true);
     setError(null);
     setPhotos([]);
