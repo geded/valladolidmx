@@ -33,6 +33,8 @@ interface Props<Row> {
   filters?: ReactNode;
   /** Tamaño de página; por defecto 50. */
   pageSize?: number;
+  /** Presentación compacta de herramientas para superficies de alta densidad. */
+  toolbarVariant?: "default" | "compact";
 }
 
 export function CmsEntityPage<Row>(props: Props<Row>) {
@@ -99,6 +101,7 @@ export function CmsEntityPage<Row>(props: Props<Row>) {
       page={page}
       pageSize={pageSize}
       onPageChange={setPage}
+      toolbarVariant={props.toolbarVariant}
     />
   );
 }
