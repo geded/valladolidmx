@@ -789,152 +789,194 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           .join("\n\n");
 
         const t0 = Date.now();
-        let text = "";
-        let tokensIn: number | null = null;
-        let tokensOut: number | null = null;
-        try {
-          const res = await generateText({
-            model: provider(model),
-            system,
-            messages: [
-              ...history.map((m) => ({ role: m.role, content: m.content })),
-              {
-                role: "user" as const,
-                content: [message, tripContextToUserBlock(tripContext)]
-                  .filter(Boolean)
-                  .join("\n\n"),
-              },
-            ],
-          });
-          text = res.text;
-          tokensIn = res.usage?.inputTokens ?? null;
-          tokensOut = res.usage?.outputTokens ?? null;
-        } catch (err) {
-          return json(
-            {
-              error: "model_error",
-              message: err instanceof Error ? err.message : "unknown",
-            },
-            502,
-          );
-        }
-        const latency = Date.now() - t0;
+        const encoder = new TextEncoder();
 
-        // 6) Log de la respuesta + incremento del contador.
-        await supabaseAdmin.from("alux_public_messages").insert({
-          session_id: sessionId,
-          ip_hash: ipHash,
-          role: "assistant",
-          content: text,
-          knowledge_ids: knowledgeIds,
-          latency_ms: latency,
-          model,
-          tokens_in: tokensIn,
-          tokens_out: tokensOut,
+        const stream = new ReadableStream<Uint8Array>({
+          async start(controller) {
+            let text = "";
+            let tokensIn: number | null = null;
+            let tokensOut: number | null = null;
+
+            try {
+              const result = streamText({
+                model: provider(model),
+                system,
+                messages: [
+                  ...history.map((m) => ({ role: m.role, content: m.content })),
+                  {
+                    role: "user" as const,
+                    content: [message, tripContextToUserBlock(tripContext)]
+                      .filter(Boolean)
+                      .join("\n\n"),
+                  },
+                ],
+              });
+
+              const reader = result.textStream.getReader();
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                text += value;
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({ type: "text", chunk: value })}\n\n`,
+                  ),
+                );
+              }
+
+              try {
+                const usage = await result.usage;
+                tokensIn = usage?.inputTokens ?? null;
+                tokensOut = usage?.outputTokens ?? null;
+              } catch {
+                /* usage optional */
+              }
+            } catch (err) {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    type: "error",
+                    message: err instanceof Error ? err.message : "model_error",
+                  })}\n\n`,
+                ),
+              );
+              controller.close();
+              return;
+            }
+
+            const latency = Date.now() - t0;
+
+            // 6) Log de la respuesta + incremento del contador.
+            await supabaseAdmin.from("alux_public_messages").insert({
+              session_id: sessionId,
+              ip_hash: ipHash,
+              role: "assistant",
+              content: text,
+              knowledge_ids: knowledgeIds,
+              latency_ms: latency,
+              model,
+              tokens_in: tokensIn,
+              tokens_out: tokensOut,
+            });
+            const newMessageCount = (sessionRow.message_count ?? 0) + 1;
+
+            // 6b) M3 · Refresco por SEÑALES DE VIAJE (concierge, no chatbot).
+            const detected = detectSignals(message);
+            const newSignals = detected.filter((s) => !prevSignals.includes(s));
+            const mergedSignals = Array.from(new Set([...prevSignals, ...detected]));
+
+            const nextSpatialState: string = visitor ? "granted" : (prev.last_spatial_state ?? "none");
+            const spatialTransitioned = !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
+            const geoMovedKm =
+              visitor && prev.last_lat != null && prev.last_lng != null
+                ? haversineKm(visitor, { lat: Number(prev.last_lat), lng: Number(prev.last_lng) })
+                : 0;
+            const geoMoved = geoMovedKm >= GEO_MOVE_KM_THRESHOLD;
+
+            const nextDestination = pathContext?.destination ?? prev.last_destination_slug ?? null;
+            const nextCategory = pathContext?.category ?? prev.last_category_slug ?? null;
+            const territoryChanged =
+              (!!pathContext?.destination &&
+                pathContext.destination !== (prev.last_destination_slug ?? null)) ||
+              (!!pathContext?.category && pathContext.category !== (prev.last_category_slug ?? null));
+
+            const refreshReasons: string[] = [];
+            if (!previousSummary && detected.length > 0) refreshReasons.push("first_signal");
+            if (newSignals.length > 0) refreshReasons.push("new_signal");
+            if (spatialTransitioned) refreshReasons.push("spatial_granted");
+            if (geoMoved) refreshReasons.push("geo_moved");
+            if (territoryChanged) refreshReasons.push("territory_changed");
+
+            let nextSummary: string | null = previousSummary;
+            let nextSummaryCount =
+              (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
+            let memoryRefreshed = false;
+            if (refreshReasons.length > 0) {
+              const refreshed = await refreshSessionSummary(
+                provider,
+                model,
+                previousSummary,
+                history,
+                message,
+                text,
+              );
+              if (refreshed && refreshed !== previousSummary) {
+                nextSummary = refreshed;
+                nextSummaryCount = newMessageCount;
+                memoryRefreshed = true;
+              }
+            }
+
+            await supabaseAdmin
+              .from("alux_public_sessions")
+              .update({
+                message_count: newMessageCount,
+                last_seen_at: new Date().toISOString(),
+                last_signals: mergedSignals,
+                last_spatial_state: nextSpatialState,
+                ...(visitor ? { last_lat: visitor.lat, last_lng: visitor.lng } : {}),
+                ...(nextDestination ? { last_destination_slug: nextDestination } : {}),
+                ...(nextCategory ? { last_category_slug: nextCategory } : {}),
+                ...(memoryRefreshed
+                  ? {
+                      summary: nextSummary,
+                      summary_message_count: nextSummaryCount,
+                      summary_updated_at: new Date().toISOString(),
+                    }
+                  : {}),
+              })
+              .eq("id", sessionId);
+
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: "done",
+                  text,
+                  model,
+                  latency_ms: latency,
+                  knowledge_used: matches.length,
+                  nearby_used: nearbyCount,
+                  proposals: nearbyProposals.map((n) => ({
+                    entity_type: "business" as const,
+                    entity_id: n.id,
+                    entity_slug: n.slug,
+                    title: n.name,
+                    subtitle: n.category
+                      ? `${n.category} · a ${n.km.toFixed(1)} km`
+                      : `a ${n.km.toFixed(1)} km`,
+                    rationale: `Alux te lo sugiere porque está a ${n.km.toFixed(1)} km de tu ubicación.`,
+                  })),
+                  spatial_context: visitor ? "granted" : "none",
+                  temporal: {
+                    local: temporal.isoLocal,
+                    part_of_day: temporal.partOfDay,
+                    season: temporal.season,
+                    events_used: activeEvents.length,
+                  },
+                  memory: {
+                    has_summary: !!nextSummary,
+                    refreshed: memoryRefreshed,
+                    reasons: refreshReasons,
+                    signals: mergedSignals,
+                  },
+                  rate: {
+                    hour_count: (rateRow?.hour_count ?? 0) + 1,
+                    day_count: (rateRow?.day_count ?? 0) + 1,
+                    hour_limit: HOUR_LIMIT,
+                    day_limit: DAY_LIMIT,
+                  },
+                })}\n\n`,
+              ),
+            );
+            controller.close();
+          },
         });
-        const newMessageCount = (sessionRow.message_count ?? 0) + 1;
 
-        // 6b) M3 · Refresco por SEÑALES DE VIAJE (concierge, no chatbot).
-        const detected = detectSignals(message);
-        const newSignals = detected.filter((s) => !prevSignals.includes(s));
-        const mergedSignals = Array.from(new Set([...prevSignals, ...detected]));
-
-        const nextSpatialState: string = visitor ? "granted" : (prev.last_spatial_state ?? "none");
-        const spatialTransitioned = !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
-        const geoMovedKm =
-          visitor && prev.last_lat != null && prev.last_lng != null
-            ? haversineKm(visitor, { lat: Number(prev.last_lat), lng: Number(prev.last_lng) })
-            : 0;
-        const geoMoved = geoMovedKm >= GEO_MOVE_KM_THRESHOLD;
-
-        const nextDestination = pathContext?.destination ?? prev.last_destination_slug ?? null;
-        const nextCategory = pathContext?.category ?? prev.last_category_slug ?? null;
-        const territoryChanged =
-          (!!pathContext?.destination &&
-            pathContext.destination !== (prev.last_destination_slug ?? null)) ||
-          (!!pathContext?.category && pathContext.category !== (prev.last_category_slug ?? null));
-
-        const refreshReasons: string[] = [];
-        if (!previousSummary && detected.length > 0) refreshReasons.push("first_signal");
-        if (newSignals.length > 0) refreshReasons.push("new_signal");
-        if (spatialTransitioned) refreshReasons.push("spatial_granted");
-        if (geoMoved) refreshReasons.push("geo_moved");
-        if (territoryChanged) refreshReasons.push("territory_changed");
-
-        let nextSummary: string | null = previousSummary;
-        let nextSummaryCount =
-          (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
-        let memoryRefreshed = false;
-        if (refreshReasons.length > 0) {
-          const refreshed = await refreshSessionSummary(
-            provider,
-            model,
-            previousSummary,
-            history,
-            message,
-            text,
-          );
-          if (refreshed && refreshed !== previousSummary) {
-            nextSummary = refreshed;
-            nextSummaryCount = newMessageCount;
-            memoryRefreshed = true;
-          }
-        }
-
-        await supabaseAdmin
-          .from("alux_public_sessions")
-          .update({
-            message_count: newMessageCount,
-            last_seen_at: new Date().toISOString(),
-            last_signals: mergedSignals,
-            last_spatial_state: nextSpatialState,
-            ...(visitor ? { last_lat: visitor.lat, last_lng: visitor.lng } : {}),
-            ...(nextDestination ? { last_destination_slug: nextDestination } : {}),
-            ...(nextCategory ? { last_category_slug: nextCategory } : {}),
-            ...(memoryRefreshed
-              ? {
-                  summary: nextSummary,
-                  summary_message_count: nextSummaryCount,
-                  summary_updated_at: new Date().toISOString(),
-                }
-              : {}),
-          })
-          .eq("id", sessionId);
-
-        return json({
-          text,
-          model,
-          latency_ms: latency,
-          knowledge_used: matches.length,
-          nearby_used: nearbyCount,
-          proposals: nearbyProposals.map((n) => ({
-            entity_type: "business" as const,
-            entity_id: n.id,
-            entity_slug: n.slug,
-            title: n.name,
-            subtitle: n.category
-              ? `${n.category} · a ${n.km.toFixed(1)} km`
-              : `a ${n.km.toFixed(1)} km`,
-            rationale: `Alux te lo sugiere porque está a ${n.km.toFixed(1)} km de tu ubicación.`,
-          })),
-          spatial_context: visitor ? "granted" : "none",
-          temporal: {
-            local: temporal.isoLocal,
-            part_of_day: temporal.partOfDay,
-            season: temporal.season,
-            events_used: activeEvents.length,
-          },
-          memory: {
-            has_summary: !!nextSummary,
-            refreshed: memoryRefreshed,
-            reasons: refreshReasons,
-            signals: mergedSignals,
-          },
-          rate: {
-            hour_count: (rateRow?.hour_count ?? 0) + 1,
-            day_count: (rateRow?.day_count ?? 0) + 1,
-            hour_limit: HOUR_LIMIT,
-            day_limit: DAY_LIMIT,
+        return new Response(stream, {
+          headers: {
+            "content-type": "text/event-stream",
+            "cache-control": "no-cache",
+            "access-control-allow-origin": "*",
           },
         });
       },
