@@ -486,6 +486,34 @@ export function PublicAluxChat() {
           className="min-h-[44px] max-h-40 resize-none bg-background"
         />
         <Button
+          type="button"
+          size="icon"
+          variant="outline"
+          onClick={handleMicClick}
+          disabled={!anonymousTripReady || stt.state === "transcribing"}
+          title={
+            stt.state === "recording"
+              ? "Detener y transcribir"
+              : stt.state === "transcribing"
+                ? "Transcribiendo…"
+                : "Hablar a Alux"
+          }
+          className={
+            stt.state === "recording"
+              ? "border-destructive/40 bg-destructive/5 text-destructive animate-pulse"
+              : ""
+          }
+        >
+          {stt.state === "recording" ? (
+            <Square className="h-4 w-4" />
+          ) : stt.state === "transcribing" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+          <span className="sr-only">Hablar a Alux</span>
+        </Button>
+        <Button
           type="submit"
           size="icon"
           disabled={sending || !input.trim() || !anonymousTripReady}
