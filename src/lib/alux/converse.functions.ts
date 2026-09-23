@@ -45,6 +45,7 @@ import {
   type AluxConverseTripItem,
   type AluxTravelIntent,
 } from "./converse-contract";
+import { enhanceIntentWithAI } from "./intent-ai.server";
 import {
   activeKeyFromRef,
   candidateToPromptLine,
@@ -60,6 +61,7 @@ const ANON_DAY_LIMIT = 40;
 const AUTH_HOUR_LIMIT = 30;
 const AUTH_DAY_LIMIT = 120;
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+const INTENT_MODEL = "google/gemini-3-flash-preview";
 
 async function resolvePublishedRouteSelection(
   sb: SupabaseClient,
@@ -689,7 +691,11 @@ export const aluxConverse = createServerFn({ method: "POST" })
       data.context?.selection?.entityRef,
     );
     const knownSlugs = ((knownProbe.data ?? []) as Array<{ slug: string }>).map((r) => r.slug);
-    const baseIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
+    const deterministicIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
+    const intentApiKey = process.env["LOVABLE_API_KEY"];
+    const baseIntent = intentApiKey
+      ? await enhanceIntentWithAI(intentApiKey, INTENT_MODEL, message, deterministicIntent, knownSlugs)
+      : deterministicIntent;
     const mentioned = baseIntent.mentionedDestinationSlugs;
     const selectedRouteNeedsStopTerritory = Boolean(
       selectedRoute && selectedRoute.destinationSlugs.length === 0 && mentioned.length === 0,
