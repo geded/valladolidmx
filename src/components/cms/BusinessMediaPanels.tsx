@@ -23,6 +23,7 @@ import { prepareImageForRole, withRetry, type ImageRole } from "@/lib/cms/image-
 import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
 import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
 import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
+import { AluxMediaSourceButtons } from "@/components/cms/AluxMediaSourceButtons";
 
 type MediaRow = Awaited<ReturnType<typeof listBusinessMedia>>[number];
 
@@ -225,14 +226,21 @@ function SinglePanel(props: {
           <h2 className="text-sm font-semibold tracking-tight">{props.title}</h2>
           <p className="text-xs text-muted-foreground">{props.subtitle}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={props.uploading || alux.upscaling}
-          className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-        >
-          {props.uploading ? "Subiendo…" : props.media ? "Reemplazar" : "Subir"}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <AluxMediaSourceButtons
+            hint=""
+            disabled={props.uploading || alux.upscaling}
+            onFile={(f) => void handleFile(f)}
+          />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={props.uploading || alux.upscaling}
+            className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
+          >
+            {props.uploading ? "Subiendo…" : props.media ? "Reemplazar" : "Subir"}
+          </button>
+        </div>
         <input
           ref={inputRef}
           type="file"
@@ -319,6 +327,11 @@ function GalleryPanel(props: {
             />
             Ampliar pequeñas con Alux IA
           </label>
+          <AluxMediaSourceButtons
+            hint=""
+            disabled={props.uploading}
+            onFile={(f) => props.onUpload([f])}
+          />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
