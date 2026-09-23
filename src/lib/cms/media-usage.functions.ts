@@ -48,7 +48,8 @@ const DIRECT: DirectSpec[] = [
   {
     table: "events",
     column: "cover_media_id",
-    labelColumn: "name",
+    labelColumn: "title",
+
     family: "evento",
     role: "Portada",
     href: (id) => `/cms/eventos/${id}/editar`,
