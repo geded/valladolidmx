@@ -402,8 +402,10 @@ function MediaPage() {
   const [scope, setScope] = useState<ScopeValue>("all");
   const [usage, setUsage] = useState<UsageValue>("all");
   const [state, setState] = useState<StateValue>(estado === "in_review" ? "in_review" : "all");
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   return (
+    <>
     <CmsEntityPage<Row>
       queryKey="media"
       fn={listMediaCms}
@@ -441,19 +443,27 @@ function MediaPage() {
         {
           key: "thumb",
           header: "Imagen",
-          render: (r) =>
-            r.previewUrl ? (
-              <img
-                src={r.previewUrl}
-                alt={r.alt_text ?? ""}
-                loading="lazy"
-                className="h-14 w-20 rounded-md border border-border object-cover"
-              />
-            ) : (
-              <div className="flex h-14 w-20 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
-                Sin vista previa
-              </div>
-            ),
+          render: (r) => (
+            <button
+              type="button"
+              onClick={() => setDetailId(r.id)}
+              className="block rounded-md ring-offset-2 focus-visible:outline-none focus-visible:ring-2"
+              aria-label="Ver ficha de la imagen"
+            >
+              {r.previewUrl ? (
+                <img
+                  src={r.previewUrl}
+                  alt={r.alt_text ?? ""}
+                  loading="lazy"
+                  className="h-14 w-20 rounded-md border border-border object-cover"
+                />
+              ) : (
+                <div className="flex h-14 w-20 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
+                  Sin vista previa
+                </div>
+              )}
+            </button>
+          ),
         },
         {
           key: "alt",
@@ -469,18 +479,49 @@ function MediaPage() {
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 origen: {r.alt_text_source ?? "none"} · revisión: {r.review_state ?? "unreviewed"}
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-1"
+                onClick={() => setDetailId(r.id)}
+              >
+                Ver ficha
+              </Button>
             </div>
           ),
         },
         {
           key: "usage",
           header: "Uso",
-          render: (r) => (
-            <span className="text-xs text-muted-foreground">
-              {r.usage_context ? (USAGE_LABELS[r.usage_context] ?? r.usage_context) : "Sin asignar"}
-            </span>
-          ),
+          render: (r) => {
+            const refs = r.usageRefs ?? [];
+            if (refs.length === 0) {
+              return (
+                <span className="text-xs text-muted-foreground">
+                  {r.usage_context
+                    ? (USAGE_LABELS[r.usage_context] ?? r.usage_context)
+                    : "Sin usar todavía"}
+                </span>
+              );
+            }
+            return (
+              <ul className="max-w-[240px] space-y-0.5 text-xs">
+                {refs.slice(0, 3).map((ref, i) => (
+                  <li key={`${ref.role}-${ref.entityLabel}-${i}`}>
+                    <span className="text-muted-foreground">
+                      {ref.role} · {ref.family}:{" "}
+                    </span>
+                    <span className="font-medium">{ref.entityLabel}</span>
+                  </li>
+                ))}
+                {refs.length > 3 ? (
+                  <li className="text-muted-foreground">+{refs.length - 3} más</li>
+                ) : null}
+              </ul>
+            );
+          },
         },
+
         {
           key: "kind",
           header: "Tipo",
