@@ -10,6 +10,8 @@ import { transitionMediaStatus } from "@/lib/cms/media-review.functions";
 
 import { suggestMediaAlt, suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
 import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
+import { MediaDetailsSheet } from "@/components/cms/media/MediaDetailsSheet";
+
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import { uploadStudioMediaViaServer } from "@/lib/experience-builder/studio-media.functions";
@@ -34,7 +36,14 @@ type Row = {
   entity_kind: string | null;
   entity_id: string | null;
   updated_at: string;
+  usageRefs?: Array<{
+    role: string;
+    family: string;
+    entityLabel: string;
+    href: string | null;
+  }>;
 };
+
 
 export const Route = createFileRoute("/_authenticated/cms/media")({
   validateSearch: (search: Record<string, unknown>) => ({
