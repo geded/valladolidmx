@@ -1285,7 +1285,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
               className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover md:aspect-[4/3] lg:mt-5 lg:aspect-[16/10]"
             />
           ) : null}
-          <div className="mt-4 grid grid-cols-3 gap-2 md:grid-cols-1 lg:grid-cols-[auto_auto_auto] lg:gap-2">
+          <div className="mt-4 grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-[auto_auto_auto] lg:gap-2">
             <Button
               type="button"
               variant={mode === "today" ? "default" : "outline"}
