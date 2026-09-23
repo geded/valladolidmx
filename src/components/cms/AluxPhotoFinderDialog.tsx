@@ -38,6 +38,8 @@ export interface AluxPhotoFinderDialogProps {
   website?: string | null;
   /** Territorio explícito. Si se omite, se usa el destino de trabajo del CMS. */
   place?: string | null;
+  /** Pestaña inicial: buscar fotos o crear con IA. */
+  initialMode?: "search" | "generate";
   onPick: (photo: AluxPickedPhoto) => void;
 }
 
