@@ -85,6 +85,15 @@ export function PublicAluxChat() {
   const [ttsIdx, setTtsIdx] = useState<number | null>(null);
   const tts = useTTS();
   const stt = useSTT();
+  const handleMicClick = useCallback(async () => {
+    if (stt.state === "idle") {
+      stt.start();
+    } else if (stt.state === "recording") {
+      const text = await stt.stop();
+      if (text) setInput((prev) => (prev ? prev + " " + text : text));
+    }
+  }, [stt]);
+
   const toggleTTS = useCallback(
     (idx: number, text: string) => {
       if (ttsIdx === idx && tts.state !== "idle") {
