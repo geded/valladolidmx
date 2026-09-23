@@ -84,6 +84,7 @@ export function PublicAluxChat() {
   const [hasMemory, setHasMemory] = useState(false);
   const [ttsIdx, setTtsIdx] = useState<number | null>(null);
   const tts = useTTS();
+  const stt = useSTT();
   const toggleTTS = useCallback(
     (idx: number, text: string) => {
       if (ttsIdx === idx && tts.state !== "idle") {
