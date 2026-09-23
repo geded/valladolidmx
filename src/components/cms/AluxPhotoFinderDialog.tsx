@@ -481,8 +481,107 @@ export function AluxPhotoFinderDialog({
             ))}
           </div>
         </div>
-      </div>
-    </div>,
-    document.body,
-  );
-}
+        )}
+
+        {mode === "generate" && (
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            {genError && (
+              <p
+                role="alert"
+                className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+              >
+                {genError}
+              </p>
+            )}
+
+            <div className="mb-4">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                Describe la imagen que necesitas
+              </label>
+              <textarea
+                value={genPrompt}
+                onChange={(e) => setGenPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void generate();
+                  }
+                }}
+                placeholder={
+                  workingPlace
+                    ? "Sólo el tema: cenote al amanecer, fachada colonial, gastronomía yucateca…"
+                    : "Describe la imagen: foto de un cenote, fachada colonial…"
+                }
+                rows={3}
+                maxLength={500}
+                className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void generate()}
+                  disabled={genLoading || genPrompt.trim().length < 3}
+                  className="flex items-center gap-1.5 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+                >
+                  {genLoading ? (
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                  ) : (
+                    <Wand2 className="size-3.5" aria-hidden />
+                  )}
+                  {genLoading ? "Generando…" : "Generar imagen"}
+                </button>
+                {genLoading && (
+                  <button
+                    type="button"
+                    onClick={() => abortRef.current?.abort()}
+                    className="rounded-pill border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent"
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {genImage && (
+              <div className="space-y-3">
+                <figure className="overflow-hidden rounded-lg border border-border">
+                  <img
+                    src={genImage}
+                    alt={genPrompt}
+                    className={
+                      "w-full bg-muted object-cover transition-[filter] " +
+                      (genLoading ? "blur-2xl" : "blur-0")
+                    }
+                  />
+                  <figcaption className="px-2 py-2 text-[11px] text-muted-foreground">
+                    <p className="truncate font-medium text-foreground" title={genPrompt}>
+                      {genPrompt}
+                    </p>
+                    <p>Generada por Alux IA · Google Gemini</p>
+                  </figcaption>
+                </figure>
+                {!genLoading && (
+                  <button
+                    type="button"
+                    onClick={useGenerated}
+                    className="flex items-center gap-1.5 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                  >
+                    <ImageIcon className="size-3.5" aria-hidden />
+                    Usar esta imagen
+                  </button>
+                )}
+              </div>
+            )}
+
+            {!genImage && !genLoading && (
+              <div className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-8 text-center">
+                <Wand2 className="mx-auto mb-2 size-6 text-muted-foreground" aria-hidden />
+                <p className="text-sm text-muted-foreground">
+                  Escribe qué imagen necesitas y Alux la generará con IA.
+                  Funciona mejor con descripciones concretas: «cenote al amanecer con luz natural»,
+                  «fachada colonial iluminada de noche», «platillo de cochinita pibil sobre madera».
+                </p>
+              </div>
+            )}
+          </div>
+        )}
