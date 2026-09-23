@@ -332,6 +332,7 @@ export function AluxPhotoFinderDialog({
           </p>
         )}
 
+        {mode === "search" && (
         <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
           <input
             type="url"
