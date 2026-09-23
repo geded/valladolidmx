@@ -379,7 +379,9 @@ export function AluxPhotoFinderDialog({
             </button>
           </div>
         </div>
+        )}
 
+        {mode === "search" && (
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {error && (
             <p
