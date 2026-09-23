@@ -169,6 +169,65 @@ export function AluxPhotoFinderDialog({
     }
   };
 
+  const generate = async () => {
+    if (genPrompt.trim().length < 3 || genLoading) return;
+    setGenLoading(true);
+    setGenError(null);
+    setGenImage(null);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const fullPrompt = workingPlace
+        ? `${genPrompt.trim()}, ${workingPlace}, México. Fotografía editorial de alta calidad, realista, sin texto, sin marcas de agua.`
+        : `${genPrompt.trim()}. Fotografía editorial de alta calidad, realista, sin texto, sin marcas de agua.`;
+      await streamImage(
+        "/api/generate-image",
+        { prompt: fullPrompt },
+        (dataUrl, isFinal) => {
+          setGenImage(dataUrl);
+          if (isFinal) setGenLoading(false);
+        },
+        controller.signal,
+      );
+      if (!controller.signal.aborted) setGenLoading(false);
+    } catch (err) {
+      if (controller.signal.aborted) {
+        setGenLoading(false);
+        return;
+      }
+      const msg = err instanceof Error ? err.message : "";
+      setGenError(
+        /content_policy|moderation/i.test(msg)
+          ? "El prompt fue rechazado. Prueba con una descripción más genérica."
+          : /failed|error/i.test(msg)
+            ? "No se pudo generar la imagen. Intenta con otra descripción."
+            : msg || "Error generando imagen",
+      );
+      setGenLoading(false);
+    }
+  };
+
+  const useGenerated = () => {
+    if (!genImage) return;
+    const bin = atob(genImage.split(",")[1] ?? "");
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const file = new File([bytes], `alux-ai-${Date.now()}.png`, {
+      type: "image/png",
+      lastModified: Date.now(),
+    });
+    onPick({
+      file,
+      author: "Alux IA",
+      license: "Generada por IA",
+      sourceUrl: "",
+      title: genPrompt.trim().slice(0, 80),
+      provider: "Alux IA",
+    });
+    onClose();
+  };
+
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
