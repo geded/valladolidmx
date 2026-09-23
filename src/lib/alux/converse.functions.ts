@@ -45,6 +45,7 @@ import {
   type AluxConverseTripItem,
   type AluxTravelIntent,
 } from "./converse-contract";
+import { enhanceIntentWithAI } from "./intent-ai.server";
 import {
   activeKeyFromRef,
   candidateToPromptLine,
