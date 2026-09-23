@@ -172,92 +172,100 @@ function roleLabel(raw: unknown): string {
 
 const Input = z.object({ mediaIds: z.array(z.string().uuid()).max(200) });
 
+/**
+ * Resolutor compartido: la lista y la ficha muestran exactamente el mismo uso.
+ * `db` es un cliente Supabase ya autenticado por quien llama.
+ */
+export async function resolveMediaUsageReferences(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  mediaIds: string[],
+): Promise<MediaUsageReference[]> {
+  const ids = Array.from(new Set(mediaIds.filter(Boolean)));
+  if (ids.length === 0) return [];
+
+  const references: MediaUsageReference[] = [];
+
+  for (const spec of DIRECT) {
+    try {
+      const { data: rows, error } = await db
+        .from(spec.table)
+        .select(`id, ${spec.labelColumn}, ${spec.column}`)
+        .in(spec.column, ids);
+      if (error || !rows) continue;
+      for (const row of rows as Array<Record<string, unknown>>) {
+        const mediaId = String(row[spec.column] ?? "");
+        const entityId = String(row.id ?? "");
+        if (!mediaId || !entityId) continue;
+        references.push({
+          mediaId,
+          role: spec.role,
+          family: spec.family,
+          entityLabel: String(row[spec.labelColumn] ?? "(sin nombre)"),
+          href: spec.href ? spec.href(entityId) : null,
+        });
+      }
+    } catch {
+      /* fail-soft: una fuente ilegible no inventa ni bloquea el resto. */
+    }
+  }
+
+  for (const spec of JOINS) {
+    try {
+      const { data: links, error } = await db
+        .from(spec.table)
+        .select(`media_asset_id, role, ${spec.fkColumn}`)
+        .in("media_asset_id", ids);
+      if (error || !links || links.length === 0) continue;
+      const linkRows = links as Array<Record<string, unknown>>;
+      const parentIds = Array.from(
+        new Set(linkRows.map((l) => String(l[spec.fkColumn] ?? "")).filter(Boolean)),
+      );
+      const labels = new Map<string, string>();
+      if (parentIds.length > 0) {
+        const { data: parents } = await db
+          .from(spec.parentTable)
+          .select(`id, ${spec.parentLabel}`)
+          .in("id", parentIds);
+        for (const p of (parents ?? []) as Array<Record<string, unknown>>) {
+          labels.set(String(p.id), String(p[spec.parentLabel] ?? "(sin nombre)"));
+        }
+      }
+      for (const link of linkRows) {
+        const mediaId = String(link.media_asset_id ?? "");
+        const parentId = String(link[spec.fkColumn] ?? "");
+        if (!mediaId || !parentId) continue;
+        references.push({
+          mediaId,
+          role: roleLabel(link.role),
+          family: spec.family,
+          entityLabel: labels.get(parentId) ?? "(sin nombre)",
+          href: spec.href ? spec.href(parentId) : null,
+        });
+      }
+    } catch {
+      /* fail-soft */
+    }
+  }
+
+  // Deduplicamos: una misma foto puede estar como portada y en galería.
+  const seen = new Set<string>();
+  return references.filter((r) => {
+    const key = `${r.mediaId}|${r.role}|${r.family}|${r.entityLabel}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export const listMediaUsage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data, context }): Promise<{ references: MediaUsageReference[] }> => {
     await assertEditorial(context);
-    const ids = Array.from(new Set(data.mediaIds));
-    if (ids.length === 0) return { references: [] };
-    // Consultas por nombre de tabla dinámico: el cliente tipado no admite
-    // tablas variables, y aquí sólo leemos columnas ya declaradas arriba.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = context.supabase as any;
-
-    const references: MediaUsageReference[] = [];
-
-    for (const spec of DIRECT) {
-      try {
-        const { data: rows, error } = await db
-          .from(spec.table)
-          .select(`id, ${spec.labelColumn}, ${spec.column}`)
-          .in(spec.column, ids);
-        if (error || !rows) continue;
-        for (const row of rows as Array<Record<string, unknown>>) {
-          const mediaId = String(row[spec.column] ?? "");
-          const entityId = String(row.id ?? "");
-          if (!mediaId || !entityId) continue;
-          references.push({
-            mediaId,
-            role: spec.role,
-            family: spec.family,
-            entityLabel: String(row[spec.labelColumn] ?? "(sin nombre)"),
-            href: spec.href ? spec.href(entityId) : null,
-          });
-        }
-      } catch {
-        /* fail-soft: una fuente ilegible no inventa ni bloquea el resto. */
-      }
-    }
-
-    for (const spec of JOINS) {
-      try {
-        const { data: links, error } = await db
-          .from(spec.table)
-          .select(`media_asset_id, role, ${spec.fkColumn}`)
-          .in("media_asset_id", ids);
-        if (error || !links || links.length === 0) continue;
-        const linkRows = links as Array<Record<string, unknown>>;
-        const parentIds = Array.from(
-          new Set(linkRows.map((l) => String(l[spec.fkColumn] ?? "")).filter(Boolean)),
-        );
-        const labels = new Map<string, string>();
-        if (parentIds.length > 0) {
-          const { data: parents } = await db
-            .from(spec.parentTable)
-            .select(`id, ${spec.parentLabel}`)
-            .in("id", parentIds);
-          for (const p of (parents ?? []) as Array<Record<string, unknown>>) {
-            labels.set(String(p.id), String(p[spec.parentLabel] ?? "(sin nombre)"));
-          }
-        }
-        for (const link of linkRows) {
-          const mediaId = String(link.media_asset_id ?? "");
-          const parentId = String(link[spec.fkColumn] ?? "");
-          if (!mediaId || !parentId) continue;
-          references.push({
-            mediaId,
-            role: roleLabel(link.role),
-            family: spec.family,
-            entityLabel: labels.get(parentId) ?? "(sin nombre)",
-            href: spec.href ? spec.href(parentId) : null,
-          });
-        }
-      } catch {
-        /* fail-soft */
-      }
-    }
-
-    // Deduplicamos: una misma foto puede estar como portada y en galería.
-    const seen = new Set<string>();
-    const unique = references.filter((r) => {
-      const key = `${r.mediaId}|${r.role}|${r.family}|${r.entityLabel}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-    return { references: unique };
+    return { references: await resolveMediaUsageReferences(context.supabase, data.mediaIds) };
   });
+
 
 /* ─────────────────────────  Ficha de la imagen  ─────────────────────── */
 
