@@ -104,7 +104,11 @@ export function AluxPhotoFinderDialog({
   if (!open) return null;
 
   const search = async () => {
-    if (query.trim().length < 3 || loading) return;
+    if (loading) return;
+    if (query.trim().length < 3) {
+      setError("Escribe al menos tres letras de lo que buscas (por ejemplo: cenote, fachada).");
+      return;
+    }
     setLoading(true);
     setError(null);
     setPhotos([]);
@@ -356,8 +360,14 @@ export function AluxPhotoFinderDialog({
             />
             <button
               type="button"
-              disabled={!pasted.trim().startsWith("https://") || picking !== null}
-              onClick={() =>
+              disabled={picking !== null}
+              onClick={() => {
+                if (!pasted.trim().startsWith("https://")) {
+                  setError(
+                    "Pega en este campo el enlace directo de una foto (debe empezar con https:// y terminar en .jpg, .png o .webp). El primer campo es la página del negocio: para traer sus fotos, usa «Buscar».",
+                  );
+                  return;
+                }
                 void choose({
                   url: pasted.trim(),
                   thumbUrl: pasted.trim(),
@@ -374,8 +384,8 @@ export function AluxPhotoFinderDialog({
                   license: "Publicada por el negocio",
                   sourceUrl: site.trim() || pasted.trim(),
                   provider: "Enlace directo",
-                })
-              }
+                });
+              }}
               className="h-10 shrink-0 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
             >
               Traer copia
