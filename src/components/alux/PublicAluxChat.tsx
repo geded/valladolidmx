@@ -18,8 +18,11 @@ import {
   Check,
   Volume2,
   CircleStop,
+  Mic,
+  Square,
 } from "lucide-react";
 import { useTTS } from "@/lib/hooks/useTTS";
+import { useSTT } from "@/lib/hooks/useSTT";
 import { AluxMark } from "@/components/alux/AluxMark";
 
 import { Button } from "@/components/ui/button";
