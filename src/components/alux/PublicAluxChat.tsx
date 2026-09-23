@@ -79,6 +79,8 @@ export function PublicAluxChat() {
   const [rateInfo, setRateInfo] = useState<{ used: number; limit: number } | null>(null);
   const [nearbyUsed, setNearbyUsed] = useState<number | null>(null);
   const [hasMemory, setHasMemory] = useState(false);
+  const [ttsIdx, setTtsIdx] = useState<number | null>(null);
+  const tts = useTTS();
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const anonymous = useAnonymousTrip();
