@@ -16,7 +16,10 @@ import {
   RotateCcw,
   Plus,
   Check,
+  Volume2,
+  CircleStop,
 } from "lucide-react";
+import { useTTS } from "@/lib/hooks/useTTS";
 import { AluxMark } from "@/components/alux/AluxMark";
 
 import { Button } from "@/components/ui/button";
