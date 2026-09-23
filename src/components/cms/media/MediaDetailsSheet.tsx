@@ -171,6 +171,27 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
     if (!mediaId || !media) return;
     try {
       setBusy(true);
+      if (to === "published") {
+        await saveFn({
+          data: {
+            mediaId,
+            alt_text: alt.trim() || null,
+            title: title.trim() || null,
+            credit: credit.trim() || null,
+            description: description.trim() || null,
+            usage_context: usageContext === "other" ? null : usageContext,
+            rights: {
+              author: author.trim() || null,
+              source: source.trim() || null,
+              license: license.trim() || null,
+              place: place.trim() || null,
+              capturedOn: capturedOn.trim() || null,
+              nature,
+              rightsConfirmed,
+            },
+          },
+        });
+      }
       if (to === "published" && media.storage_bucket === "studio-media") {
         await approveFn({ data: { mediaId } });
       } else {

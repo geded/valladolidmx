@@ -3,13 +3,9 @@ import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
-import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { listMediaCms } from "@/lib/cms/reads.functions";
-import { transitionMediaStatus } from "@/lib/cms/media-review.functions";
 
-import { suggestMediaAlt, suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
-import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
+import { suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
 import { MediaDetailsSheet } from "@/components/cms/media/MediaDetailsSheet";
 
 import { Button } from "@/components/ui/button";
@@ -54,124 +50,6 @@ export const Route = createFileRoute("/_authenticated/cms/media")({
   }),
   component: MediaPage,
 });
-
-function ReviewActions({ row }: { row: Row }) {
-  const fn = useServerFn(transitionMediaStatus);
-  const queryClient = useQueryClient();
-  const { roles } = useAuth();
-  const isAdmin = roles.includes("admin") || roles.includes("super_admin");
-  const [busy, setBusy] = useState(false);
-
-  const run = async (to: "in_review" | "published" | "draft", okMessage: string) => {
-    try {
-      setBusy(true);
-      await fn({ data: { mediaId: row.id, to } });
-      await queryClient.invalidateQueries({ queryKey: ["cms", "media"] });
-      toast.success(okMessage);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "No se pudo actualizar la imagen");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const status = row.status ?? "draft";
-
-  return (
-    <div className="flex flex-wrap gap-1">
-      {status === "draft" && (
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={busy}
-          onClick={() => void run("in_review", "Imagen enviada a aprobación.")}
-        >
-          Enviar a aprobación
-        </Button>
-      )}
-      {status === "draft" && isAdmin && (
-        <Button
-          size="sm"
-          disabled={busy}
-          onClick={() => void run("published", "Imagen aprobada y publicada.")}
-        >
-          Aprobar y publicar
-        </Button>
-      )}
-
-      {status === "in_review" && isAdmin && (
-        <>
-          <Button
-            size="sm"
-            disabled={busy}
-            onClick={() => void run("published", "Imagen aprobada y publicada.")}
-          >
-            Aprobar y publicar
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={busy}
-            onClick={() => void run("draft", "Se solicitaron cambios al editor.")}
-          >
-            Pedir cambios
-          </Button>
-        </>
-      )}
-      {status === "in_review" && !isAdmin && (
-        <span className="text-xs text-muted-foreground">Esperando aprobación</span>
-      )}
-      {status === "approved" && isAdmin && (
-        <Button size="sm" disabled={busy} onClick={() => void run("published", "Imagen publicada.")}>
-          Publicar
-        </Button>
-      )}
-      {status === "published" && <span className="text-xs text-muted-foreground">Aprobada</span>}
-    </div>
-  );
-}
-
-function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: boolean }) {
-
-  const fn = useServerFn(suggestMediaAlt);
-  const [loading, setLoading] = useState(false);
-  return (
-    <Button
-      size="sm"
-      variant="outline"
-      disabled={disabled || loading}
-      onClick={async () => {
-        try {
-          setLoading(true);
-          const res = await fn({ data: { mediaId, locale: "es" } });
-          if ("skipped" in res && res.skipped) {
-            toast.info("ALT humano preservado. La IA no lo sobrescribe.");
-          } else {
-            toast.success("Propuesta IA guardada. Revisa y aprueba en el editor.");
-          }
-        } catch (err) {
-          toast.error(err instanceof Error ? err.message : "Error al sugerir ALT");
-        } finally {
-          setLoading(false);
-        }
-      }}
-    >
-      {loading ? "Analizando…" : "Sugerir ALT"}
-    </Button>
-  );
-}
-
-function TranslateButton({ mediaId }: { mediaId: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
-        Traducir
-      </Button>
-      {open && <MediaTranslationsSheet mediaId={mediaId} onClose={() => setOpen(false)} />}
-    </>
-  );
-}
 
 function BatchToolbar() {
   const batch = useServerFn(suggestMediaAltBatch);
