@@ -24,6 +24,8 @@
 
 ## En curso
 
+- [ ] Biblioteca multimedia · cabecera profesional y responsive (IMG_0921): ordenar sin quitar funciones el total, búsqueda, filtros, selección y acciones para operar grandes acervos con comodidad en escritorio, iPad y celular; tabla, ficha, permisos y aprobación permanecen intactos.
+
 - [x] Biblioteca multimedia · revisión compacta y ficha integral: ALT y usos resumidos para explorar grandes acervos; una sola ficha permite editar información, uso, tipo, autor, procedencia, licencia, lugar y fecha, confirmar derechos, enviar a revisión, pedir cambios y aprobar/publicar con controles fail-closed. Verificada con sesión editorial en escritorio, iPad y celular, sin desbordes.
 
 - [x] Menú móvil · Cuenta y acceso (21-sep, IMG_2681): “Arma tu Viaje” y la cuenta permanecen visibles y pulsables; la sesión activa muestra “Mi cuenta” y abre su panel hacia arriba sin recorte. Verificado en 430/390 con sesión iniciada y cerrada; `/auth` abre correctamente y el header aprobado permanece intacto.
