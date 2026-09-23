@@ -401,6 +401,27 @@ export function PublicAluxChat() {
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.content && (
+              <button
+                type="button"
+                onClick={() => toggleTTS(i, m.content)}
+                className="inline-flex items-center gap-1.5 rounded-pill border border-border/60 bg-background px-2.5 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                title={ttsIdx === i && tts.state !== "idle" ? "Detener" : "Escuchar"}
+              >
+                {ttsIdx === i && tts.state === "loading" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : ttsIdx === i && tts.state === "playing" ? (
+                  <CircleStop className="h-3 w-3" />
+                ) : (
+                  <Volume2 className="h-3 w-3" />
+                )}
+                {ttsIdx === i && tts.state === "loading"
+                  ? "Generando…"
+                  : ttsIdx === i && tts.state === "playing"
+                    ? "Detener"
+                    : "Escuchar"}
+              </button>
+            )}
             {m.role === "assistant" && m.proposals && m.proposals.length > 0 && (
               <AluxProposals items={m.proposals} />
             )}
