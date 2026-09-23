@@ -1308,7 +1308,7 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                     setPage(0);
                   }}
                 >
-                  <span className="hidden sm:inline">Buscar por fecha</span>
+                  <span className="hidden lg:inline">Buscar por fecha</span>
                   <CalendarDays className="size-4 shrink-0" aria-hidden />
                 </Button>
               </PopoverTrigger>
@@ -1348,8 +1348,8 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 setPage(0);
               }}
             >
-              <span className="sm:hidden">Mes</span>
-              <span className="hidden sm:inline">Eventos del mes</span>
+              <span className="lg:hidden">Mes</span>
+              <span className="hidden lg:inline">Eventos del mes</span>
             </Button>
           </div>
         </div>
