@@ -360,8 +360,14 @@ export function AluxPhotoFinderDialog({
             />
             <button
               type="button"
-              disabled={!pasted.trim().startsWith("https://") || picking !== null}
-              onClick={() =>
+              disabled={picking !== null}
+              onClick={() => {
+                if (!pasted.trim().startsWith("https://")) {
+                  setError(
+                    "Pega en este campo el enlace directo de una foto (debe empezar con https:// y terminar en .jpg, .png o .webp). El primer campo es la página del negocio: para traer sus fotos, usa «Buscar».",
+                  );
+                  return;
+                }
                 void choose({
                   url: pasted.trim(),
                   thumbUrl: pasted.trim(),
