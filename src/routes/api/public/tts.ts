@@ -101,7 +101,6 @@ export const Route = createFileRoute("/api/public/tts")({
             status: 200,
             headers: {
               "Content-Type": "text/event-stream",
-              "Cache-Control": "no-cache",
               "Connection": "keep-alive",
               ...corsHeaders,
             },
