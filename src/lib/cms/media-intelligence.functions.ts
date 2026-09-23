@@ -227,6 +227,8 @@ export const saveMediaMetadata = createServerFn({ method: "POST" })
       if (data.title !== undefined) patch.title = data.title;
       if (data.description !== undefined) patch.description = data.description;
       if (data.caption !== undefined) patch.caption = data.caption;
+      if (data.credit !== undefined) patch.credit = data.credit;
+
       if (data.entity_kind !== undefined) patch.entity_kind = data.entity_kind;
       if (data.entity_id !== undefined) patch.entity_id = data.entity_id;
       if (data.usage_context !== undefined) patch.usage_context = data.usage_context;
