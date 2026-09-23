@@ -8,7 +8,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { createHash } from "crypto";
-import { generateText } from "ai";
+import { streamText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import {
   retrieveAluxKnowledgeServer,
@@ -517,12 +517,12 @@ async function refreshSessionSummary(
       "",
       "Devuelve SOLO el nuevo resumen incremental.",
     ].join("\n");
-    const res = await generateText({
+    const res = streamText({
       model: provider(model),
       system: sys,
       prompt,
     });
-    const text = (res.text ?? "").trim().slice(0, SUMMARY_MAX_CHARS);
+    const text = ((await res.text) ?? "").trim().slice(0, SUMMARY_MAX_CHARS);
     return text.length > 0 ? text : previousSummary;
   } catch {
     return previousSummary;
