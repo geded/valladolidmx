@@ -179,12 +179,16 @@ export const listMediaUsage = createServerFn({ method: "POST" })
     await assertEditorial(context);
     const ids = Array.from(new Set(data.mediaIds));
     if (ids.length === 0) return { references: [] };
+    // Consultas por nombre de tabla dinámico: el cliente tipado no admite
+    // tablas variables, y aquí sólo leemos columnas ya declaradas arriba.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
 
     const references: MediaUsageReference[] = [];
 
     for (const spec of DIRECT) {
       try {
-        const { data: rows, error } = await context.supabase
+        const { data: rows, error } = await db
           .from(spec.table)
           .select(`id, ${spec.labelColumn}, ${spec.column}`)
           .in(spec.column, ids);
@@ -208,21 +212,18 @@ export const listMediaUsage = createServerFn({ method: "POST" })
 
     for (const spec of JOINS) {
       try {
-        const { data: links, error } = await context.supabase
+        const { data: links, error } = await db
           .from(spec.table)
           .select(`media_asset_id, role, ${spec.fkColumn}`)
           .in("media_asset_id", ids);
         if (error || !links || links.length === 0) continue;
+        const linkRows = links as Array<Record<string, unknown>>;
         const parentIds = Array.from(
-          new Set(
-            (links as Array<Record<string, unknown>>)
-              .map((l) => String(l[spec.fkColumn] ?? ""))
-              .filter(Boolean),
-          ),
+          new Set(linkRows.map((l) => String(l[spec.fkColumn] ?? "")).filter(Boolean)),
         );
         const labels = new Map<string, string>();
         if (parentIds.length > 0) {
-          const { data: parents } = await context.supabase
+          const { data: parents } = await db
             .from(spec.parentTable)
             .select(`id, ${spec.parentLabel}`)
             .in("id", parentIds);
@@ -230,7 +231,7 @@ export const listMediaUsage = createServerFn({ method: "POST" })
             labels.set(String(p.id), String(p[spec.parentLabel] ?? "(sin nombre)"));
           }
         }
-        for (const link of links as Array<Record<string, unknown>>) {
+        for (const link of linkRows) {
           const mediaId = String(link.media_asset_id ?? "");
           const parentId = String(link[spec.fkColumn] ?? "");
           if (!mediaId || !parentId) continue;
@@ -262,15 +263,44 @@ export const listMediaUsage = createServerFn({ method: "POST" })
 
 const DetailInput = z.object({ mediaId: z.string().uuid() });
 
+export interface MediaDetail {
+  id: string;
+  storage_bucket: string | null;
+  storage_path: string | null;
+  mime_type: string | null;
+  kind: string | null;
+  width: number | null;
+  height: number | null;
+  status: string | null;
+  review_state: string | null;
+  alt_text: string | null;
+  alt_text_ai: string | null;
+  alt_text_source: string | null;
+  title: string | null;
+  description: string | null;
+  caption: string | null;
+  credit: string | null;
+  usage_context: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+function text(value: unknown): string | null {
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+function num(value: unknown): number | null {
+  return typeof value === "number" ? value : null;
+}
+
 export const getMediaDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => DetailInput.parse(d))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<{ media: MediaDetail; previewUrl: string | null }> => {
     await assertEditorial(context);
     const { data: media, error } = await context.supabase
       .from("media_assets")
       .select(
-        "id, storage_bucket, storage_path, mime_type, kind, width, height, byte_size, status, review_state, alt_text, alt_text_ai, alt_text_source, title, description, caption, credit, usage_context, entity_kind, entity_id, metadata, created_at, updated_at",
+        "id, storage_bucket, storage_path, mime_type, kind, width, height, status, review_state, alt_text, alt_text_ai, alt_text_source, title, description, caption, credit, usage_context, created_at, updated_at",
       )
       .eq("id", data.mediaId)
       .is("deleted_at", null)
@@ -278,20 +308,43 @@ export const getMediaDetail = createServerFn({ method: "POST" })
     if (error) throw error;
     if (!media) throw new Error("not_found");
 
-    let previewUrl: string | null = null;
     const row = media as Record<string, unknown>;
-    const bucket = typeof row.storage_bucket === "string" ? row.storage_bucket : null;
-    const path = typeof row.storage_path === "string" ? row.storage_path : null;
-    if (bucket && path) {
+    const detail: MediaDetail = {
+      id: String(row.id),
+      storage_bucket: text(row.storage_bucket),
+      storage_path: text(row.storage_path),
+      mime_type: text(row.mime_type),
+      kind: text(row.kind),
+      width: num(row.width),
+      height: num(row.height),
+      status: text(row.status),
+      review_state: text(row.review_state),
+      alt_text: text(row.alt_text),
+      alt_text_ai: text(row.alt_text_ai),
+      alt_text_source: text(row.alt_text_source),
+      title: text(row.title),
+      description: text(row.description),
+      caption: text(row.caption),
+      credit: text(row.credit),
+      usage_context: text(row.usage_context),
+      created_at: text(row.created_at),
+      updated_at: text(row.updated_at),
+    };
+
+    let previewUrl: string | null = null;
+    if (detail.storage_bucket && detail.storage_path) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const storage = (context.supabase as any).storage;
-        const { data: signed } = await storage.from(bucket).createSignedUrl(path, 3600);
+        const { data: signed } = await storage
+          .from(detail.storage_bucket)
+          .createSignedUrl(detail.storage_path, 3600);
         previewUrl = signed?.signedUrl ?? null;
       } catch {
         previewUrl = null;
       }
     }
 
-    return { media: row, previewUrl };
+    return { media: detail, previewUrl };
   });
+
