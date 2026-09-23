@@ -3,20 +3,16 @@ import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
-import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { listMediaCms } from "@/lib/cms/reads.functions";
-import { transitionMediaStatus } from "@/lib/cms/media-review.functions";
 
-import { suggestMediaAlt, suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
-import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
+import { suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
 import { MediaDetailsSheet } from "@/components/cms/media/MediaDetailsSheet";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import { uploadStudioMediaViaServer } from "@/lib/experience-builder/studio-media.functions";
 import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
-import { Loader2, Upload } from "lucide-react";
+import { Edit3, Loader2, Upload } from "lucide-react";
 
 type Row = {
   id: string;
@@ -54,124 +50,6 @@ export const Route = createFileRoute("/_authenticated/cms/media")({
   }),
   component: MediaPage,
 });
-
-function ReviewActions({ row }: { row: Row }) {
-  const fn = useServerFn(transitionMediaStatus);
-  const queryClient = useQueryClient();
-  const { roles } = useAuth();
-  const isAdmin = roles.includes("admin") || roles.includes("super_admin");
-  const [busy, setBusy] = useState(false);
-
-  const run = async (to: "in_review" | "published" | "draft", okMessage: string) => {
-    try {
-      setBusy(true);
-      await fn({ data: { mediaId: row.id, to } });
-      await queryClient.invalidateQueries({ queryKey: ["cms", "media"] });
-      toast.success(okMessage);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "No se pudo actualizar la imagen");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const status = row.status ?? "draft";
-
-  return (
-    <div className="flex flex-wrap gap-1">
-      {status === "draft" && (
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={busy}
-          onClick={() => void run("in_review", "Imagen enviada a aprobación.")}
-        >
-          Enviar a aprobación
-        </Button>
-      )}
-      {status === "draft" && isAdmin && (
-        <Button
-          size="sm"
-          disabled={busy}
-          onClick={() => void run("published", "Imagen aprobada y publicada.")}
-        >
-          Aprobar y publicar
-        </Button>
-      )}
-
-      {status === "in_review" && isAdmin && (
-        <>
-          <Button
-            size="sm"
-            disabled={busy}
-            onClick={() => void run("published", "Imagen aprobada y publicada.")}
-          >
-            Aprobar y publicar
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={busy}
-            onClick={() => void run("draft", "Se solicitaron cambios al editor.")}
-          >
-            Pedir cambios
-          </Button>
-        </>
-      )}
-      {status === "in_review" && !isAdmin && (
-        <span className="text-xs text-muted-foreground">Esperando aprobación</span>
-      )}
-      {status === "approved" && isAdmin && (
-        <Button size="sm" disabled={busy} onClick={() => void run("published", "Imagen publicada.")}>
-          Publicar
-        </Button>
-      )}
-      {status === "published" && <span className="text-xs text-muted-foreground">Aprobada</span>}
-    </div>
-  );
-}
-
-function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: boolean }) {
-
-  const fn = useServerFn(suggestMediaAlt);
-  const [loading, setLoading] = useState(false);
-  return (
-    <Button
-      size="sm"
-      variant="outline"
-      disabled={disabled || loading}
-      onClick={async () => {
-        try {
-          setLoading(true);
-          const res = await fn({ data: { mediaId, locale: "es" } });
-          if ("skipped" in res && res.skipped) {
-            toast.info("ALT humano preservado. La IA no lo sobrescribe.");
-          } else {
-            toast.success("Propuesta IA guardada. Revisa y aprueba en el editor.");
-          }
-        } catch (err) {
-          toast.error(err instanceof Error ? err.message : "Error al sugerir ALT");
-        } finally {
-          setLoading(false);
-        }
-      }}
-    >
-      {loading ? "Analizando…" : "Sugerir ALT"}
-    </Button>
-  );
-}
-
-function TranslateButton({ mediaId }: { mediaId: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
-        Traducir
-      </Button>
-      {open && <MediaTranslationsSheet mediaId={mediaId} onClose={() => setOpen(false)} />}
-    </>
-  );
-}
 
 function BatchToolbar() {
   const batch = useServerFn(suggestMediaAltBatch);
@@ -444,11 +322,13 @@ function MediaPage() {
           key: "thumb",
           header: "Imagen",
           render: (r) => (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setDetailId(r.id)}
-              className="block rounded-md ring-offset-2 focus-visible:outline-none focus-visible:ring-2"
+              className="h-14 w-20 p-0"
               aria-label="Ver ficha de la imagen"
+              title="Ver y editar la imagen"
             >
               {r.previewUrl ? (
                 <img
@@ -462,31 +342,20 @@ function MediaPage() {
                   Sin vista previa
                 </div>
               )}
-            </button>
+            </Button>
           ),
         },
         {
           key: "alt",
           header: "ALT",
           render: (r) => (
-            <div className="max-w-[320px] space-y-1">
-              <div className="font-medium leading-tight">
+            <div className="w-40 space-y-1 sm:w-48">
+              <div className="line-clamp-2 text-xs font-medium leading-snug" title={r.alt_text ?? "Sin ALT"}>
                 {r.alt_text ?? <span className="text-muted-foreground italic">(sin ALT)</span>}
               </div>
               {r.alt_text_ai && r.alt_text_source !== "human" && (
-                <div className="text-xs text-muted-foreground line-clamp-2">🤖 {r.alt_text_ai}</div>
+                <div className="line-clamp-1 text-[10px] text-muted-foreground">IA: {r.alt_text_ai}</div>
               )}
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                origen: {r.alt_text_source ?? "none"} · revisión: {r.review_state ?? "unreviewed"}
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="mt-1"
-                onClick={() => setDetailId(r.id)}
-              >
-                Ver ficha
-              </Button>
             </div>
           ),
         },
@@ -505,17 +374,15 @@ function MediaPage() {
               );
             }
             return (
-              <ul className="max-w-[240px] space-y-0.5 text-xs">
-                {refs.slice(0, 3).map((ref, i) => (
+              <ul className="w-36 space-y-0.5 text-[11px] sm:w-44">
+                {refs.slice(0, 1).map((ref, i) => (
                   <li key={`${ref.role}-${ref.entityLabel}-${i}`}>
-                    <span className="text-muted-foreground">
-                      {ref.role} · {ref.family}:{" "}
-                    </span>
-                    <span className="font-medium">{ref.entityLabel}</span>
+                    <span className="text-muted-foreground">{ref.role} · {ref.family}</span>
+                    <span className="block truncate font-medium" title={ref.entityLabel}>{ref.entityLabel}</span>
                   </li>
                 ))}
-                {refs.length > 3 ? (
-                  <li className="text-muted-foreground">+{refs.length - 3} más</li>
+                {refs.length > 1 ? (
+                  <li className="text-muted-foreground">+{refs.length - 1} uso{refs.length === 2 ? "" : "s"}</li>
                 ) : null}
               </ul>
             );
@@ -525,11 +392,13 @@ function MediaPage() {
         {
           key: "kind",
           header: "Tipo",
+          className: "hidden lg:table-cell",
           render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span>,
         },
         {
           key: "bucket",
           header: "Bucket",
+          className: "hidden xl:table-cell",
           render: (r) => (
             <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code>
           ),
@@ -537,6 +406,7 @@ function MediaPage() {
         {
           key: "dim",
           header: "Dim.",
+          className: "hidden xl:table-cell",
           render: (r) => (
             <span className="text-xs text-muted-foreground">
               {r.width && r.height ? `${r.width}×${r.height}` : "—"}
@@ -545,18 +415,13 @@ function MediaPage() {
         },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
-          key: "review",
-          header: "Aprobación",
-          render: (r) => <ReviewActions row={r} />,
-        },
-        {
           key: "actions",
-          header: "IA",
+          header: "Acción",
           render: (r) => (
-            <div className="flex gap-1">
-              <SuggestAltButton mediaId={r.id} />
-              <TranslateButton mediaId={r.id} />
-            </div>
+            <Button size="sm" variant="outline" onClick={() => setDetailId(r.id)}>
+              <Edit3 className="size-3.5" aria-hidden />
+              Editar
+            </Button>
           ),
         },
       ]}
