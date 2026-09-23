@@ -585,3 +585,8 @@ export function AluxPhotoFinderDialog({
             )}
           </div>
         )}
+      </div>
+    </div>,
+    document.body,
+  );
+}
