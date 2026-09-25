@@ -2,6 +2,7 @@ import * as React from "react";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
 import { SITE } from "@/config/site";
+import { sendManagedPayload } from "@/lib/email/managed-send.server";
 
 const SITE_NAME = "valladolidmx";
 const SENDER_DOMAIN = "notify.alux.travel";
@@ -94,14 +95,8 @@ export async function sendVisibilityEmail(
 
     const messageId = crypto.randomUUID();
 
-    await supabaseAdmin.from("email_send_log").insert({
-      message_id: messageId,
-      template_name: input.templateName,
-      recipient_email: email,
-      status: "pending",
-    });
 
-    const { error: enqueueError } = await supabaseAdmin.rpc("enqueue_email", {
+    const { error: enqueueError } = await sendManagedPayload(supabaseAdmin, {
       queue_name: "transactional_emails",
       payload: {
         message_id: messageId,

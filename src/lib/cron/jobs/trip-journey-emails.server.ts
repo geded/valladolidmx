@@ -22,6 +22,7 @@ import {
   recordDryRunOutcome,
   type DryRunKindStats,
 } from "@/lib/cron/cron-dry-run.server";
+import { sendManagedPayload } from "@/lib/email/managed-send.server";
 
 const SITE_NAME = "valladolidmx";
 const SENDER_DOMAIN = "notify.alux.travel";
@@ -202,14 +203,8 @@ export async function runTripJourneyEmails(
         const messageId = crypto.randomUUID();
         const idempotencyKey = `trip-${step.kind}-${row.order_id}`;
 
-        await supabase.from("email_send_log").insert({
-          message_id: messageId,
-          template_name: step.template,
-          recipient_email: email,
-          status: "pending",
-        });
 
-        const { error: enqueueError } = await supabase.rpc("enqueue_email", {
+        const { error: enqueueError } = await sendManagedPayload(supabase, {
           queue_name: "transactional_emails",
           payload: {
             message_id: messageId,
