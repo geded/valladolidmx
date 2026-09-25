@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 import {
   Body,
@@ -10,13 +10,13 @@ import {
   Link,
   Preview,
   Text,
-} from '@react-email/components'
+} from "@react-email/components";
 
 interface SignupEmailProps {
-  siteName: string
-  siteUrl: string
-  recipient: string
-  confirmationUrl: string
+  siteName: string;
+  siteUrl: string;
+  recipient: string;
+  confirmationUrl: string;
 }
 
 export const SignupEmail = ({
@@ -25,71 +25,81 @@ export const SignupEmail = ({
   recipient,
   confirmationUrl,
 }: SignupEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head>
-      <style>{darkModeCss}</style>
-    </Head>
-    <Preview>Confirm your email for {siteName}</Preview>
+  <Html lang="es" dir="ltr">
+    <Head />
+    <Preview>Confirma tu correo en {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
+        <Heading style={brandMark}>Valladolid.mx</Heading>
+        <Heading style={h1}>Confirma tu correo</Heading>
         <Text style={text}>
-          Thanks for signing up for{' '}
+          Gracias por registrarte en{" "}
           <Link href={siteUrl} style={link}>
             <strong>{siteName}</strong>
           </Link>
-          !
+          . Estamos listos para acompañarte a descubrir el Oriente Maya.
         </Text>
         <Text style={text}>
-          Please confirm your email address (
+          Confirma tu dirección de correo (
           <Link href={`mailto:${recipient}`} style={link}>
             {recipient}
           </Link>
-          ) by clicking the button below:
+          ) dando clic en el botón:
         </Text>
-        <Button className="dm-btn" style={button} href={confirmationUrl}>
-          Verify Email
+        <Button style={button} href={confirmationUrl}>
+          Confirmar mi correo
         </Button>
-        <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
-        </Text>
+        <Text style={footer}>Si no creaste esta cuenta, puedes ignorar este mensaje.</Text>
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default SignupEmail
+export default SignupEmail;
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
+const main = {
+  backgroundColor: "#ffffff",
+  fontFamily: '"Inter","Helvetica Neue",Arial,sans-serif',
+  color: "#2a1e17",
+};
+const container = {
+  padding: "32px 28px",
+  maxWidth: "520px",
+  margin: "0 auto",
+  backgroundColor: "#fdf9f2",
+  borderRadius: "18px",
+  border: "1px solid #ecdcc0",
+};
+const brandMark = {
+  fontSize: "13px",
+  fontWeight: "bold" as const,
+  letterSpacing: "2px",
+  color: "#a4530b",
+  textTransform: "uppercase" as const,
+  margin: "0 0 12px",
+};
 const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
+  fontSize: "24px",
+  fontWeight: "bold" as const,
+  color: "#2a1e17",
+  margin: "0 0 20px",
+  lineHeight: "1.25",
+};
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
+  fontSize: "15px",
+  color: "#4a3a2e",
+  lineHeight: "1.6",
+  margin: "0 0 20px",
+};
+const link = { color: "#a4530b", textDecoration: "underline" };
 const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  border: '1px solid #000000',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
-// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
-const darkModeCss = `
-  @media (prefers-color-scheme: dark) {
-    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-  }
-  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-`
+  backgroundColor: "#c86a12",
+  color: "#ffffff",
+  fontSize: "15px",
+  fontWeight: "bold" as const,
+  borderRadius: "999px",
+  padding: "14px 28px",
+  textDecoration: "none",
+  display: "inline-block",
+};
+const footer = { fontSize: "12px", color: "#8a7a6a", margin: "32px 0 0" };
