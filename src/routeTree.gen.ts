@@ -124,6 +124,7 @@ import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/co
 import { Route as OrienteMayaCategoriaCategoriaRouteImport } from './routes/oriente-maya/categoria.$categoria'
 import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as ApiPublicTtsRouteImport } from './routes/api/public/tts'
 import { Route as ApiPublicSttRouteImport } from './routes/api/public/stt'
 import { Route as ApiDevMediaShadowEvalRouteImport } from './routes/api/dev/media-shadow-eval'
@@ -902,6 +903,11 @@ const OrienteMayaDestinoCategoriaRoute =
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
+  id: '/lovable/email/events',
+  path: '/lovable/email/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTtsRoute = ApiPublicTtsRouteImport.update({
@@ -1962,6 +1968,7 @@ export interface FileRoutesByFullPath {
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/api/public/stt': typeof ApiPublicSttRoute
   '/api/public/tts': typeof ApiPublicTtsRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
@@ -2220,6 +2227,7 @@ export interface FileRoutesByTo {
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/api/public/stt': typeof ApiPublicSttRoute
   '/api/public/tts': typeof ApiPublicTtsRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
@@ -2486,6 +2494,7 @@ export interface FileRoutesById {
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/api/public/stt': typeof ApiPublicSttRoute
   '/api/public/tts': typeof ApiPublicTtsRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
@@ -2755,6 +2764,7 @@ export interface FileRouteTypes {
     | '/api/dev/media-shadow-eval'
     | '/api/public/stt'
     | '/api/public/tts'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/oriente-maya/categoria/$categoria'
@@ -3013,6 +3023,7 @@ export interface FileRouteTypes {
     | '/api/dev/media-shadow-eval'
     | '/api/public/stt'
     | '/api/public/tts'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
@@ -3278,6 +3289,7 @@ export interface FileRouteTypes {
     | '/api/dev/media-shadow-eval'
     | '/api/public/stt'
     | '/api/public/tts'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/oriente-maya/categoria/$categoria'
@@ -3478,6 +3490,7 @@ export interface RootRouteChildren {
   ApiDevMediaShadowEvalRoute: typeof ApiDevMediaShadowEvalRoute
   ApiPublicSttRoute: typeof ApiPublicSttRoute
   ApiPublicTtsRoute: typeof ApiPublicTtsRoute
+  LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   OrienteMayaCategoriaCategoriaRoute: typeof OrienteMayaCategoriaCategoriaRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
@@ -4308,6 +4321,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/events': {
+      id: '/lovable/email/events'
+      path: '/lovable/email/events'
+      fullPath: '/lovable/email/events'
+      preLoaderRoute: typeof LovableEmailEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tts': {
@@ -6072,6 +6092,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDevMediaShadowEvalRoute: ApiDevMediaShadowEvalRoute,
   ApiPublicSttRoute: ApiPublicSttRoute,
   ApiPublicTtsRoute: ApiPublicTtsRoute,
+  LovableEmailEventsRoute: LovableEmailEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   OrienteMayaCategoriaCategoriaRoute: OrienteMayaCategoriaCategoriaRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
