@@ -341,10 +341,17 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
       .select("day_of_week, opens_at, closes_at, is_closed, notes")
       .eq("place_id", place.id)
       .order("day_of_week"),
-    sb
-      .from("place_authorities")
-      .select("authority_kind_id, business_id, authority_name, is_primary")
-      .eq("place_id", place.id),
+    // place_authorities no concede lectura a anon (ACL G8-Q2A-R1). El lugar ya
+    // fue resuelto bajo RLS; se lee sólo su proyección mínima con rol servidor.
+    (input.client
+      ? Promise.resolve(input.client)
+      : import("@/integrations/supabase/client.server").then((m) => m.supabaseAdmin)
+    ).then((c: any) =>
+      c
+        .from("place_authorities")
+        .select("authority_kind_id, business_id, authority_name, is_primary")
+        .eq("place_id", place.id),
+    ),
     sb
       .from("place_products")
       .select("product_id, relation_kind, sort_order")
@@ -622,10 +629,13 @@ export async function readPublishedPlaceCards(
           .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
     sb.from("place_category_links").select("place_id, category_id").in("place_id", placeIds),
-    sb
-      .from("place_authorities")
-      .select("place_id, authority_kind_id, is_primary")
-      .in("place_id", placeIds),
+    // Ver nota ACL: ids ya filtrados por RLS pública (published).
+    import("@/integrations/supabase/client.server").then(({ supabaseAdmin }) =>
+      (supabaseAdmin as any)
+        .from("place_authorities")
+        .select("place_id, authority_kind_id, is_primary")
+        .in("place_id", placeIds),
+    ),
     sb
       .from("place_media")
       .select("place_id, media_asset_id, role, sort_order")
