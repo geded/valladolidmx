@@ -533,7 +533,7 @@ export function MediaPickerDialog({
               rights={rights}
               uploading={uploading}
               readingFile={readingFile}
-              onChooseFile={chooseFile}
+              onChooseFile={(f: File) => void chooseFile(f)}
               onRights={(patch) => setRights((r) => ({ ...r, ...patch }))}
               onSubmit={handleUpload}
               fit={fit}
