@@ -42,6 +42,8 @@ export interface AluxPhotoFinderDialogProps {
   /** Pestaña inicial: buscar fotos o crear con IA. */
   initialMode?: "search" | "generate";
   onPick: (photo: AluxPickedPhoto) => void;
+  /** Selección múltiple: entrega todas las fotos marcadas de una vez. */
+  onPickMany?: (photos: AluxPickedPhoto[]) => void;
 }
 
 /** Quita del texto escrito las palabras del destino de trabajo (ya implícito). */
@@ -68,6 +70,7 @@ export function AluxPhotoFinderDialog({
   place,
   initialMode,
   onPick,
+  onPickMany,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
   const fetchBytes = useServerFn(aluxFetchPhotoBytes);
@@ -93,6 +96,9 @@ export function AluxPhotoFinderDialog({
   const [loading, setLoading] = useState(false);
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Selección múltiple: urls marcadas para usar de una vez.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [pickingMany, setPickingMany] = useState(false);
 
   // Modo Generar con IA
   const [mode, setMode] = useState<"search" | "generate">(initialMode ?? "search");
@@ -141,6 +147,7 @@ export function AluxPhotoFinderDialog({
     setContacts([]);
     setUsedQuery(null);
     setSearched(false);
+    setSelected(new Set());
     try {
       const res = await find({
         data: { query: query.trim(), website: site.trim() || null, place: workingPlace },
@@ -166,29 +173,33 @@ export function AluxPhotoFinderDialog({
     }
   };
 
+  const buildPicked = async (photo: PhotoCandidate): Promise<AluxPickedPhoto> => {
+    const res = await fetchBytes({ data: { url: photo.url } });
+    const bin = atob(res.bytesBase64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const ext = res.mime.split("/")[1]?.split("+")[0] ?? "jpg";
+    const base = photo.title.replace(/\.[^.]+$/, "").replace(/[^\w\- ]+/g, "") || "foto";
+    const file = new File([bytes], `${base}.${ext}`, {
+      type: res.mime,
+      lastModified: Date.now(),
+    });
+    return {
+      file,
+      author: photo.author,
+      license: photo.license,
+      sourceUrl: photo.sourceUrl,
+      title: photo.title,
+      provider: photo.provider,
+    };
+  };
+
   const choose = async (photo: PhotoCandidate) => {
-    if (picking) return;
+    if (picking || pickingMany) return;
     setPicking(photo.url);
     setError(null);
     try {
-      const res = await fetchBytes({ data: { url: photo.url } });
-      const bin = atob(res.bytesBase64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      const ext = res.mime.split("/")[1]?.split("+")[0] ?? "jpg";
-      const base = photo.title.replace(/\.[^.]+$/, "").replace(/[^\w\- ]+/g, "") || "foto";
-      const file = new File([bytes], `${base}.${ext}`, {
-        type: res.mime,
-        lastModified: Date.now(),
-      });
-      onPick({
-        file,
-        author: photo.author,
-        license: photo.license,
-        sourceUrl: photo.sourceUrl,
-        title: photo.title,
-        provider: photo.provider,
-      });
+      onPick(await buildPicked(photo));
       onClose();
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
@@ -199,6 +210,48 @@ export function AluxPhotoFinderDialog({
       );
     } finally {
       setPicking(null);
+    }
+  };
+
+  const toggleSelect = (url: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(url)) next.delete(url);
+      else next.add(url);
+      return next;
+    });
+  };
+
+  const chooseMany = async () => {
+    if (pickingMany || picking || selected.size === 0) return;
+    setPickingMany(true);
+    setError(null);
+    const picked: AluxPickedPhoto[] = [];
+    const failed: string[] = [];
+    try {
+      for (const photo of photos) {
+        if (!selected.has(photo.url)) continue;
+        try {
+          picked.push(await buildPicked(photo));
+        } catch {
+          failed.push(photo.title);
+        }
+      }
+      if (picked.length === 0) {
+        setError("No pudimos traer ninguna de las fotos marcadas. Intenta con otras.");
+        return;
+      }
+      if (failed.length > 0) {
+        setError(`No se pudieron traer ${failed.length} foto(s); se usan las demás.`);
+      }
+      if (onPickMany) {
+        onPickMany(picked);
+      } else {
+        for (const p of picked) onPick(p);
+      }
+      onClose();
+    } finally {
+      setPickingMany(false);
     }
   };
 
@@ -478,48 +531,104 @@ export function AluxPhotoFinderDialog({
           )}
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {photos.map((photo) => (
-              <figure key={photo.url} className="overflow-hidden rounded-lg border border-border">
-                <img
-                  src={photo.thumbUrl}
-                  alt={photo.title}
-                  loading="lazy"
-                  className="h-32 w-full bg-muted object-cover"
-                />
-                <figcaption className="space-y-1 px-2 py-2 text-[11px]">
-                  <p className="truncate font-medium" title={photo.title}>
-                    {photo.title}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
-                    {photo.license}
-                  </p>
-                  <p className="truncate text-muted-foreground">
-                    {photo.author || "Autor no declarado"} · {photo.provider}
-                  </p>
-                  <div className="flex items-center justify-between gap-1 pt-1">
-                    <a
-                      href={photo.sourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline"
+            {photos.map((photo) => {
+              const isSelected = selected.has(photo.url);
+              return (
+                <figure
+                  key={photo.url}
+                  className={
+                    "overflow-hidden rounded-lg border " +
+                    (isSelected ? "border-primary ring-2 ring-primary/40" : "border-border")
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleSelect(photo.url)}
+                    aria-pressed={isSelected}
+                    aria-label={isSelected ? `Quitar ${photo.title} de la selección` : `Seleccionar ${photo.title}`}
+                    className="relative block w-full"
+                  >
+                    <img
+                      src={photo.thumbUrl}
+                      alt={photo.title}
+                      loading="lazy"
+                      className="h-32 w-full bg-muted object-cover"
+                    />
+                    <span
+                      className={
+                        "absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full border text-[11px] font-bold " +
+                        (isSelected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-white/70 bg-black/40 text-white")
+                      }
+                      aria-hidden
                     >
-                      fuente
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => void choose(photo)}
-                      disabled={picking !== null}
-                      className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
-                    >
-                      {picking === photo.url ? "Trayendo…" : "Usar esta"}
-                    </button>
-                  </div>
-                </figcaption>
-              </figure>
-            ))}
+                      {isSelected ? "✓" : "+"}
+                    </span>
+                  </button>
+                  <figcaption className="space-y-1 px-2 py-2 text-[11px]">
+                    <p className="truncate font-medium" title={photo.title}>
+                      {photo.title}
+                    </p>
+                    <p className="text-muted-foreground">
+                      {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
+                      {photo.license}
+                    </p>
+                    <p className="truncate text-muted-foreground">
+                      {photo.author || "Autor no declarado"} · {photo.provider}
+                    </p>
+                    <div className="flex items-center justify-between gap-1 pt-1">
+                      <a
+                        href={photo.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline"
+                      >
+                        fuente
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => void choose(photo)}
+                        disabled={picking !== null || pickingMany}
+                        className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+                      >
+                        {picking === photo.url ? "Trayendo…" : "Usar esta"}
+                      </button>
+                    </div>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
         </div>
+        )}
+
+        {mode === "search" && selected.size > 0 && (
+          <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/30 px-4 py-2.5">
+            <p className="text-xs text-muted-foreground">
+              {selected.size} foto{selected.size === 1 ? "" : "s"} seleccionada
+              {selected.size === 1 ? "" : "s"}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSelected(new Set())}
+                disabled={pickingMany}
+                className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+              >
+                Limpiar
+              </button>
+              <button
+                type="button"
+                onClick={() => void chooseMany()}
+                disabled={pickingMany || picking !== null}
+                className="flex h-9 items-center gap-1.5 rounded-pill bg-primary px-4 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+              >
+                {pickingMany && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
+                {pickingMany ? "Trayendo…" : `Usar ${selected.size} seleccionadas`}
+              </button>
+            </div>
+          </div>
         )}
 
         {mode === "generate" && (

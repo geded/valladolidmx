@@ -400,6 +400,7 @@ function GalleryPanel(props: {
             hint=""
             disabled={props.uploading}
             onFile={(f) => startQueue([f])}
+            onFiles={(files) => startQueue(files)}
           />
           <button
             type="button"

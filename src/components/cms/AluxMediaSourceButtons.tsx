@@ -27,9 +27,11 @@ interface Props {
   website?: string | null;
   disabled?: boolean;
   onFile: (file: File) => void;
+  /** Selección múltiple (galería): recibe todas las fotos marcadas de una vez. */
+  onFiles?: (files: File[]) => void;
 }
 
-export function AluxMediaSourceButtons({ hint, website, disabled, onFile }: Props) {
+export function AluxMediaSourceButtons({ hint, website, disabled, onFile, onFiles }: Props) {
   const [mode, setModeState] = useState<"search" | "generate" | null>(null);
 
   // Al volver de otra app/pestaña, reabrir donde estaba el editor.
@@ -79,6 +81,14 @@ export function AluxMediaSourceButtons({ hint, website, disabled, onFile }: Prop
           website={website ?? null}
           onClose={() => setMode(null)}
           onPick={handlePick}
+          onPickMany={
+            onFiles
+              ? (photos) => {
+                  onFiles(photos.map((p) => p.file));
+                  setMode(null);
+                }
+              : undefined
+          }
         />
       ) : null}
     </>
