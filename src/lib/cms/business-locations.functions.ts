@@ -273,11 +273,45 @@ export const setBusinessPrimaryZone = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!loc?.id) throw new Error("Guarda primero la ubicación en el mapa.");
+    if (!loc?.id) {
+      // Sin ubicación aún: se crea la fila principal sólo con la zona; el pin
+      // del mapa la completa después (la publicación sigue exigiendo coordenadas).
+      if (!data.zoneId) return { ok: true as const };
+      const { error: insErr } = await supabase.from("business_locations").insert({
+        business_id: data.businessId,
+        destination_zone_id: data.zoneId,
+        is_primary: true,
+        created_by: userId,
+        updated_by: userId,
+      });
+      if (insErr) throw new Error(insErr.message);
+      return { ok: true as const };
+    }
     const { error: upErr } = await supabase
       .from("business_locations")
       .update({ destination_zone_id: data.zoneId, updated_by: userId })
       .eq("id", loc.id);
     if (upErr) throw new Error(upErr.message);
     return { ok: true as const };
+  });
+
+/** Zonas activas de un destino (para el formulario principal de la empresa). */
+export const listZonesForDestination = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { destinationId: string }) => {
+    if (!input?.destinationId || typeof input.destinationId !== "string") {
+      throw new Error("destinationId requerido");
+    }
+    return input;
+  })
+  .handler(async ({ data, context }): Promise<BusinessZoneOption[]> => {
+    const { data: rows, error } = await context.supabase
+      .from("destination_zones")
+      .select("id, name")
+      .eq("destination_id", data.destinationId)
+      .is("deleted_at", null)
+      .neq("status", "archived")
+      .order("name", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as BusinessZoneOption[];
   });
