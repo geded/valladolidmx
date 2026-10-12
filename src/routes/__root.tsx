@@ -312,7 +312,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { omxdsVisualFoundationsEnabled, brandSettings, siteDomains } = Route.useLoaderData();
+  // El shell también se pinta cuando el loader raíz no terminó (errores o
+  // not-found tempranos): conservar los valores de código como fallback.
+  const loaderData = Route.useLoaderData() as
+    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings>; siteDomains: typeof SITE_DOMAIN_DEFAULTS }
+    | undefined;
+  const omxdsVisualFoundationsEnabled = loaderData?.omxdsVisualFoundationsEnabled ?? false;
+  const brandSettings = loaderData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
+  const siteDomains = loaderData?.siteDomains ?? SITE_DOMAIN_DEFAULTS;
   // Mantiene el origen canónico sincronizado también tras hidratar.
   setCanonicalDomain(siteDomains.primaryDomain);
   return (
