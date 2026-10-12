@@ -142,6 +142,7 @@ export interface BusinessZoneOption {
   name: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- cliente tipado de Supabase
 async function assertEditorialAccess(supabase: any, userId: string) {
   const { data, error } = await supabase.rpc("is_editor_or_admin", { _user_id: userId });
   if (error) throw new Error(error.message);
