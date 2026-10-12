@@ -16,8 +16,11 @@ import { Button } from "@/components/ui/button";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import {
   getBusinessPrimaryLocation,
+  getBusinessZoneContext,
+  setBusinessPrimaryZone,
   upsertBusinessPrimaryLocation,
 } from "@/lib/cms/business-locations.functions";
+import { QuickCreateZoneDialog } from "@/components/cms/QuickCreateZoneDialog";
 
 const DEFAULT_CENTER = { lat: 20.6896, lng: -88.2019 }; // Valladolid
 
@@ -198,8 +201,102 @@ export function BusinessLocationPanel({ businessId }: Props) {
               {msg}
             </p>
           ) : null}
+
+          <BusinessZoneField businessId={businessId} hasLocation={hasCoords} />
         </div>
       </div>
     </section>
+  );
+}
+
+function BusinessZoneField({
+  businessId,
+  hasLocation,
+}: {
+  businessId: string;
+  hasLocation: boolean;
+}) {
+  const qc = useQueryClient();
+  const ctxFn = useServerFn(getBusinessZoneContext);
+  const setZoneFn = useServerFn(setBusinessPrimaryZone);
+  const key = ["cms", "business", businessId, "zone-context"];
+  const ctx = useQuery({ queryKey: key, queryFn: () => ctxFn({ data: { businessId } }) });
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+
+  const assign = useMutation({
+    mutationFn: (zoneId: string | null) => setZoneFn({ data: { businessId, zoneId } }),
+    onSuccess: async () => {
+      setNote("Zona guardada.");
+      await qc.invalidateQueries({ queryKey: key });
+    },
+    onError: (e) => setNote(e instanceof Error ? e.message : "No se pudo guardar la zona."),
+  });
+
+  const data = ctx.data;
+  const destinationId = data?.destinationId ?? null;
+  const zones = data?.zones ?? [];
+
+  return (
+    <div className="border-t border-border pt-3">
+      <label
+        htmlFor={`zone-${businessId}`}
+        className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground"
+      >
+        Zona o barrio
+      </label>
+      <div className="mt-1 flex gap-2">
+        <select
+          id={`zone-${businessId}`}
+          value={data?.zoneId ?? ""}
+          disabled={!hasLocation || !destinationId || assign.isPending}
+          onChange={(e) => {
+            setNote(null);
+            assign.mutate(e.target.value || null);
+          }}
+          className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+        >
+          <option value="">Sin zona</option>
+          {zones.map((z) => (
+            <option key={z.id} value={z.id}>
+              {z.name}
+            </option>
+          ))}
+        </select>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!hasLocation || !destinationId}
+          onClick={() => setOpen(true)}
+        >
+          + Nueva zona
+        </Button>
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        {!hasLocation
+          ? "Guarda primero la ubicación para asignar la zona."
+          : !destinationId
+            ? "Elige el destino de la empresa para ver sus zonas."
+            : zones.length === 0
+              ? `${data?.destinationName ?? "Este destino"} aún no tiene zonas: créala aquí mismo.`
+              : (note ?? "Si la zona no aparece, créala sin salir de la ficha.")}
+      </p>
+      {destinationId ? (
+        <QuickCreateZoneDialog
+          open={open}
+          onOpenChange={setOpen}
+          destinationId={destinationId}
+          destinationName={data?.destinationName ?? null}
+          onCreated={(zone) => {
+            setNote(null);
+            qc.setQueryData(key, (prev: typeof data) =>
+              prev ? { ...prev, zones: [...prev.zones, zone].sort((a, b) => a.name.localeCompare(b.name)) } : prev,
+            );
+            assign.mutate(zone.id);
+          }}
+        />
+      ) : null}
+    </div>
   );
 }
