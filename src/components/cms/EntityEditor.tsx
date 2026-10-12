@@ -71,6 +71,10 @@ interface Props {
     entity: Record<string, unknown> | undefined;
     refresh: () => void;
   }) => ReactNode;
+  /** Contenido extra justo después de un campo (p. ej. zona tras destino). */
+  renderAfterField?: (fieldName: string, values: Record<string, string>) => ReactNode;
+  /** Se ejecuta tras guardar con éxito (antes de navegar en altas nuevas). */
+  onSaved?: (id: string) => Promise<void> | void;
 }
 
 type ContentStatus = "draft" | "in_review" | "approved" | "published" | "archived";
@@ -359,6 +363,13 @@ export function EntityEditor(props: Props) {
     onSuccess: async (res) => {
       // Ya está en el CMS: el respaldo local deja de ser necesario.
       clearLocalDraft();
+      if (props.onSaved && res?.id) {
+        try {
+          await props.onSaved(res.id as string);
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "No se pudo completar el guardado.");
+        }
+      }
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       if (!isEdit) {
         navigate({ to: `${backTo}/${res.id}/editar` as never });
@@ -502,12 +513,14 @@ export function EntityEditor(props: Props) {
         }}
       >
         {fields.map((f) => (
-          <FieldInput
-            key={f.name}
-            field={f}
-            value={values[f.name] ?? ""}
-            onChange={(v) => updateValue(f.name, v)}
-          />
+          <Fragment key={f.name}>
+            <FieldInput
+              field={f}
+              value={values[f.name] ?? ""}
+              onChange={(v) => updateValue(f.name, v)}
+            />
+            {props.renderAfterField?.(f.name, values)}
+          </Fragment>
         ))}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
