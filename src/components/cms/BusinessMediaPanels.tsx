@@ -24,6 +24,7 @@ import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
 import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
 import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
 import { AluxMediaSourceButtons } from "@/components/cms/AluxMediaSourceButtons";
+import { ImageFramingDialog } from "@/components/cms/ImageFramingDialog";
 
 type MediaRow = Awaited<ReturnType<typeof listBusinessMedia>>[number];
 
@@ -341,6 +342,40 @@ function GalleryPanel(props: {
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  // Cola de encuadre: cada foto se acomoda sin perder el lote.
+  const [queue, setQueue] = useState<File[]>([]);
+  const [done, setDone] = useState<File[]>([]);
+  const [total, setTotal] = useState(0);
+  const startQueue = (files: File[]) => {
+    if (!files.length) return;
+    setQueue(files);
+    setDone([]);
+    setTotal(files.length);
+  };
+  const advance = (f: File) => {
+    const nextDone = [...done, f];
+    const rest = queue.slice(1);
+    if (rest.length === 0) {
+      setQueue([]);
+      setDone([]);
+      props.onUpload(nextDone);
+    } else {
+      setDone(nextDone);
+      setQueue(rest);
+    }
+  };
+  const skipAll = () => {
+    const all = [...done, ...queue];
+    setQueue([]);
+    setDone([]);
+    props.onUpload(all);
+  };
+  const cancelQueue = () => {
+    const kept = done;
+    setQueue([]);
+    setDone([]);
+    if (kept.length) props.onUpload(kept);
+  };
   return (
     <section className="rounded-xl border border-border bg-card p-5">
       <header className="mb-3 flex items-center justify-between">
@@ -364,7 +399,7 @@ function GalleryPanel(props: {
           <AluxMediaSourceButtons
             hint=""
             disabled={props.uploading}
-            onFile={(f) => props.onUpload([f])}
+            onFile={(f) => startQueue([f])}
           />
           <button
             type="button"
@@ -383,7 +418,7 @@ function GalleryPanel(props: {
           className="hidden"
           onChange={(e) => {
             const files = Array.from(e.target.files ?? []);
-            if (files.length) props.onUpload(files);
+            startQueue(files);
             e.target.value = "";
           }}
         />
@@ -401,7 +436,7 @@ function GalleryPanel(props: {
           const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
             f.type.startsWith("image/"),
           );
-          if (files.length) props.onUpload(files);
+          startQueue(files);
         }}
         className={`rounded-lg border border-dashed p-3 ${
           dragOver ? "border-primary bg-primary/5" : "border-border bg-background"
@@ -423,7 +458,7 @@ function GalleryPanel(props: {
                 ) : (
                   <div className="h-28 w-full bg-muted" />
                 )}
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/60 px-1.5 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100">
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/60 px-1.5 py-1 text-[11px] text-white opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
                   <div className="flex gap-1">
                     <button
                       type="button"
@@ -461,6 +496,15 @@ function GalleryPanel(props: {
       {props.error instanceof Error && (
         <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
       )}
+      <ImageFramingDialog
+        file={queue[0] ?? null}
+        role="gallery"
+        progressLabel={total > 1 ? `Foto ${total - queue.length + 1} de ${total}` : undefined}
+        onConfirm={advance}
+        onSkip={advance}
+        onCancel={cancelQueue}
+        onSkipAll={total > 1 ? skipAll : undefined}
+      />
     </section>
   );
 }
