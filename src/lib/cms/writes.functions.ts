@@ -502,6 +502,23 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       }
     }
 
+    if (
+      data.table === "businesses" &&
+      (data.to === "in_review" || data.to === "approved" || data.to === "published")
+    ) {
+      const { data: biz, error: bizErr } = await db
+        .from("businesses")
+        .select("primary_category_id")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (bizErr) throw bizErr;
+      if (!biz?.primary_category_id) {
+        throw new Error(
+          "Falta la categoría (Hotel, Restaurante, etc.). Sin categoría la empresa no aparece en los listados ni en la búsqueda.",
+        );
+      }
+    }
+
     const patch: Record<string, unknown> = {
       status: data.to,
       updated_by: context.userId,
