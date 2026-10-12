@@ -96,6 +96,9 @@ export function AluxPhotoFinderDialog({
   const [loading, setLoading] = useState(false);
   const [picking, setPicking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Selección múltiple: urls marcadas para usar de una vez.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [pickingMany, setPickingMany] = useState(false);
 
   // Modo Generar con IA
   const [mode, setMode] = useState<"search" | "generate">(initialMode ?? "search");
@@ -144,6 +147,7 @@ export function AluxPhotoFinderDialog({
     setContacts([]);
     setUsedQuery(null);
     setSearched(false);
+    setSelected(new Set());
     try {
       const res = await find({
         data: { query: query.trim(), website: site.trim() || null, place: workingPlace },
