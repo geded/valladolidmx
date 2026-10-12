@@ -12,6 +12,7 @@ import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { BusinessLocationPanel } from "@/components/cms/BusinessLocationPanel";
 import { BusinessAttributesPanel } from "@/components/cms/BusinessAttributesPanel";
 import { BusinessZoneSelect } from "@/components/cms/BusinessZoneSelect";
+import { ExistingBusinessMatches } from "@/components/cms/ExistingBusinessMatches";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
 import { BUSINESS_FIELDS } from "@/lib/cms/editor-fields";
 import {
@@ -85,6 +86,9 @@ export function BusinessEditor({ id }: Props) {
       listQueryKey="businesses"
       fields={fields}
       renderAfterField={(name, values) => {
+        if (name === "display_name" && !id) {
+          return <ExistingBusinessMatches name={values.display_name ?? ""} />;
+        }
         if (name !== "destination_id") return null;
         const destId = values.destination_id ?? "";
         return (
