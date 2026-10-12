@@ -20,8 +20,7 @@ import {
   signBusinessImageUpload,
 } from "@/lib/cms/businesses-media.functions";
 import { prepareImageForRole, withRetry, type ImageRole } from "@/lib/cms/image-upload";
-import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
-import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
+import { useAluxUpscale } from "@/lib/cms/use-alux-upscale";
 import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
 import { AluxMediaSourceButtons } from "@/components/cms/AluxMediaSourceButtons";
 import { ImageFramingDialog } from "@/components/cms/ImageFramingDialog";
@@ -40,7 +39,6 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
   const registerFn = useServerFn(registerBusinessMedia);
   const removeFn = useServerFn(removeBusinessMedia);
   const reorderFn = useServerFn(reorderBusinessGallery);
-  const upscaleFn = useServerFn(aluxUpscaleImage);
 
   const media = useQuery({
     queryKey: ["cms", "business_media", businessId],
