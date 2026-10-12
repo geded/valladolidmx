@@ -211,13 +211,30 @@ function SinglePanel(props: {
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const alux = useAluxUpscale(props.role);
+  const [framing, setFraming] = useState<File | null>(null);
 
-  const handleFile = async (f: File) => {
+  const afterFraming = async (f: File) => {
+    setFraming(null);
     const undersized = await alux.evaluate(f);
     if (!undersized) {
       props.onUpload(f);
     }
   };
+  // Toda foto nueva pasa primero por el encuadre manual.
+  const handleFile = (f: File) => setFraming(f);
+
+  const adjustCurrent = async () => {
+    const url = props.media?.previewUrl;
+    if (!url) return;
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      setFraming(new File([blob], `${props.role}.${blob.type.split("/")[1] ?? "jpg"}`, { type: blob.type }));
+    } catch {
+      toast.error("No se pudo abrir la imagen actual para ajustarla.");
+    }
+  };
+
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
@@ -275,13 +292,23 @@ function SinglePanel(props: {
             alt={props.media.alt ?? props.title}
             className={props.aspect}
           />
-          <button
-            type="button"
-            onClick={() => props.media && props.onRemove(props.media.id)}
-            className="absolute right-2 top-2 rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white hover:bg-black/80"
-          >
-            Quitar
-          </button>
+          <div className="absolute right-2 top-2 flex gap-1.5">
+            <button
+              type="button"
+              onClick={() => void adjustCurrent()}
+              disabled={props.uploading}
+              className="rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white hover:bg-black/80"
+            >
+              Ajustar
+            </button>
+            <button
+              type="button"
+              onClick={() => props.media && props.onRemove(props.media.id)}
+              className="rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white hover:bg-black/80"
+            >
+              Quitar
+            </button>
+          </div>
         </div>
       ) : (
         <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border bg-background text-xs text-muted-foreground">
@@ -291,6 +318,13 @@ function SinglePanel(props: {
       {props.error instanceof Error && (
         <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
       )}
+      <ImageFramingDialog
+        file={framing}
+        role={props.role}
+        onConfirm={(f) => void afterFraming(f)}
+        onSkip={(f) => void afterFraming(f)}
+        onCancel={() => setFraming(null)}
+      />
     </section>
   );
 }
