@@ -856,11 +856,21 @@ export interface MarketplaceSearchInput {
  * listMarketplaceBusinesses — Devuelve empresas publicadas para el
  * listado público del Marketplace. Whitelist estricta de columnas.
  */
+/** La zona real (destination_zones) del negocio sustituye la etiqueta de la lista fija. */
+function withRealZone(
+  attrs: TourismFilterAttributes,
+  loc: Record<string, unknown> | null,
+): TourismFilterAttributes {
+  const z = loc?.destination_zones as { name?: unknown; status?: unknown } | null | undefined;
+  if (!z || typeof z.name !== "string" || z.status === "archived") return attrs;
+  return { ...attrs, zone: [z.name] } as TourismFilterAttributes;
+}
+
 export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handler(
   async (): Promise<MarketplaceBusinessCard[]> => {
     const supabase = publicClient();
     const selectWithAttributes =
-      "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
+      "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at, destination_zones ( name, status ) )";
     const legacySelect =
       "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
     const primaryResult = await supabase
@@ -911,8 +921,9 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         latitude: rawLat == null ? null : Number(rawLat),
         longitude: rawLng == null ? null : Number(rawLng),
         address_line1: typeof rawAddr === "string" ? rawAddr : null,
-        filter_attributes: normalizeFilterAttributes(
-          (row as { filter_attributes?: unknown }).filter_attributes,
+        filter_attributes: withRealZone(
+          normalizeFilterAttributes((row as { filter_attributes?: unknown }).filter_attributes),
+          primary,
         ),
       };
     });
