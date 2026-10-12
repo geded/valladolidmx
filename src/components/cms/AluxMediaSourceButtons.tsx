@@ -7,7 +7,13 @@
  * `onUpload` que ya usa la subida desde el equipo (optimización, ampliación
  * opcional con Alux IA y registro gobernado).
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  clearMediaFinder,
+  mediaFinderKey,
+  readMediaFinder,
+  writeMediaFinder,
+} from "@/lib/cms/media-finder-session";
 import { Search, Wand2 } from "lucide-react";
 import {
   AluxPhotoFinderDialog,
@@ -24,7 +30,20 @@ interface Props {
 }
 
 export function AluxMediaSourceButtons({ hint, website, disabled, onFile }: Props) {
-  const [mode, setMode] = useState<"search" | "generate" | null>(null);
+  const [mode, setModeState] = useState<"search" | "generate" | null>(null);
+
+  // Al volver de otra app/pestaña, reabrir donde estaba el editor.
+  useEffect(() => {
+    const saved = readMediaFinder<"search" | "generate">(`${mediaFinderKey(hint)}:mode`);
+    if (saved === "search" || saved === "generate") setModeState(saved);
+  }, [hint]);
+
+  const setMode = (next: "search" | "generate" | null) => {
+    setModeState(next);
+    const key = mediaFinderKey(hint);
+    if (next) writeMediaFinder(`${key}:mode`, next);
+    else clearMediaFinder(key);
+  };
 
   const handlePick = (photo: AluxPickedPhoto) => {
     onFile(photo.file);
