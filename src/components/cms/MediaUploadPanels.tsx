@@ -201,11 +201,18 @@ export function GalleryPanel(props: {
     setDone([]);
     props.onUpload(all);
   };
+  // Cerrar el visor (X, Esc o clic fuera) sólo descarta la foto actual;
+  // el resto del lote continúa. Antes se perdían todas las pendientes.
   const cancelQueue = () => {
-    const kept = done;
-    setQueue([]);
-    setDone([]);
-    if (kept.length) props.onUpload(kept);
+    const rest = queue.slice(1);
+    if (rest.length === 0) {
+      setQueue([]);
+      setDone([]);
+      if (done.length) props.onUpload(done);
+      return;
+    }
+    toast.message(`Foto descartada. Quedan ${rest.length} por acomodar.`);
+    setQueue(rest);
   };
   return (
     <section className="rounded-xl border border-border bg-card p-5">
