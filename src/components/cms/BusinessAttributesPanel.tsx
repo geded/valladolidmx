@@ -65,7 +65,8 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
       </div>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2">
-        {query.data.definitions.map((definition) => {
+        {/* La zona se captura una sola vez, junto al Destino (zonas reales del destino). */}
+        {query.data.definitions.filter((d) => d.key !== "zone").map((definition) => {
           const selected = values[definition.key];
           if (definition.inputType === "single") {
             return (
