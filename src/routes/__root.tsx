@@ -156,7 +156,6 @@ function isOfflineLikeError(error: Error): boolean {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
   const router = useRouter();
   const offline = isOfflineLikeError(error);
   const [retrying, setRetrying] = useState(false);
