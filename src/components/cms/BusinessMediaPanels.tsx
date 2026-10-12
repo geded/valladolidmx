@@ -47,10 +47,6 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
     queryFn: () => listFn({ data: { businessId } }),
   });
 
-  const [upscaleGallery, setUpscaleGallery] = useState(false);
-  const upscaleGalleryRef = useRef(upscaleGallery);
-  upscaleGalleryRef.current = upscaleGallery;
-
   const invalidate = () => {
     void qc.invalidateQueries({
       queryKey: ["cms", "business_media", businessId],
@@ -59,21 +55,7 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
   };
 
   const uploadOne = async (file: File, role: "logo" | "cover" | "gallery") => {
-    let fileToPrepare = file;
-    if (role === "gallery" && upscaleGalleryRef.current) {
-      try {
-        const result = await upscaleIfUndersized(file, "gallery", upscaleFn);
-        if (result.upscaled) {
-          fileToPrepare = result.file;
-          toast.success(`"${file.name}" se amplió con Alux IA.`);
-        }
-      } catch (err) {
-        toast.error(
-          `No se pudo ampliar "${file.name}": ${err instanceof Error ? err.message : "error"}. Se sube la original.`,
-        );
-      }
-    }
-    const prepared = await prepareImageForRole(fileToPrepare, role);
+    const prepared = await prepareImageForRole(file, role);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -192,8 +174,6 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
         }}
         uploading={galleryUpload.isPending}
         error={galleryUpload.error}
-        upscaleSmall={upscaleGallery}
-        onToggleUpscale={() => setUpscaleGallery((v) => !v)}
       />
     </div>
   );
@@ -337,8 +317,6 @@ function GalleryPanel(props: {
   onMove: (id: string, direction: -1 | 1) => void;
   uploading: boolean;
   error: unknown;
-  upscaleSmall: boolean;
-  onToggleUpscale: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -346,13 +324,25 @@ function GalleryPanel(props: {
   const [queue, setQueue] = useState<File[]>([]);
   const [done, setDone] = useState<File[]>([]);
   const [total, setTotal] = useState(0);
+  const [checking, setChecking] = useState(false);
+  // Tras encuadrar, si la foto queda chica para galería se pregunta una por una.
+  const alux = useAluxUpscale("gallery");
   const startQueue = (files: File[]) => {
     if (!files.length) return;
     setQueue(files);
     setDone([]);
     setTotal(files.length);
   };
-  const advance = (f: File) => {
+  const advance = async (f: File) => {
+    setChecking(true);
+    try {
+      if (await alux.evaluate(f)) return;
+    } finally {
+      setChecking(false);
+    }
+    commit(f);
+  };
+  const commit = (f: File) => {
     const nextDone = [...done, f];
     const rest = queue.slice(1);
     if (rest.length === 0) {
@@ -386,16 +376,6 @@ function GalleryPanel(props: {
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={props.upscaleSmall}
-              onChange={props.onToggleUpscale}
-              disabled={props.uploading}
-              className="size-3.5 accent-amber-600"
-            />
-            Ampliar pequeñas con Alux IA
-          </label>
           <AluxMediaSourceButtons
             hint=""
             disabled={props.uploading}
@@ -497,12 +477,35 @@ function GalleryPanel(props: {
       {props.error instanceof Error && (
         <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
       )}
+      {alux.pending && (
+        <div className="mt-3">
+          {total > 1 && (
+            <p className="mb-1 text-xs font-medium text-muted-foreground">
+              Foto {total - queue.length + 1} de {total} quedó chica para la galería
+            </p>
+          )}
+          <AluxUpscaleCard
+            fit={alux.pending.fit}
+            upscaling={alux.upscaling}
+            busy={props.uploading}
+            onUpscale={async () => {
+              const enlarged = await alux.upscale();
+              if (enlarged) commit(enlarged);
+              else toast.error("No se pudo ampliar. Puedes subirla así.");
+            }}
+            onSkip={() => {
+              const f = alux.proceedAsIs();
+              if (f) commit(f);
+            }}
+          />
+        </div>
+      )}
       <ImageFramingDialog
-        file={queue[0] ?? null}
+        file={alux.pending || checking ? null : (queue[0] ?? null)}
         role="gallery"
         progressLabel={total > 1 ? `Foto ${total - queue.length + 1} de ${total}` : undefined}
-        onConfirm={advance}
-        onSkip={advance}
+        onConfirm={(f) => void advance(f)}
+        onSkip={(f) => void advance(f)}
         onCancel={cancelQueue}
         onSkipAll={total > 1 ? skipAll : undefined}
       />
