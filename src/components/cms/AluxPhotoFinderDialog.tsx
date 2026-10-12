@@ -531,48 +531,104 @@ export function AluxPhotoFinderDialog({
           )}
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {photos.map((photo) => (
-              <figure key={photo.url} className="overflow-hidden rounded-lg border border-border">
-                <img
-                  src={photo.thumbUrl}
-                  alt={photo.title}
-                  loading="lazy"
-                  className="h-32 w-full bg-muted object-cover"
-                />
-                <figcaption className="space-y-1 px-2 py-2 text-[11px]">
-                  <p className="truncate font-medium" title={photo.title}>
-                    {photo.title}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
-                    {photo.license}
-                  </p>
-                  <p className="truncate text-muted-foreground">
-                    {photo.author || "Autor no declarado"} · {photo.provider}
-                  </p>
-                  <div className="flex items-center justify-between gap-1 pt-1">
-                    <a
-                      href={photo.sourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline"
+            {photos.map((photo) => {
+              const isSelected = selected.has(photo.url);
+              return (
+                <figure
+                  key={photo.url}
+                  className={
+                    "overflow-hidden rounded-lg border " +
+                    (isSelected ? "border-primary ring-2 ring-primary/40" : "border-border")
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleSelect(photo.url)}
+                    aria-pressed={isSelected}
+                    aria-label={isSelected ? `Quitar ${photo.title} de la selección` : `Seleccionar ${photo.title}`}
+                    className="relative block w-full"
+                  >
+                    <img
+                      src={photo.thumbUrl}
+                      alt={photo.title}
+                      loading="lazy"
+                      className="h-32 w-full bg-muted object-cover"
+                    />
+                    <span
+                      className={
+                        "absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full border text-[11px] font-bold " +
+                        (isSelected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-white/70 bg-black/40 text-white")
+                      }
+                      aria-hidden
                     >
-                      fuente
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => void choose(photo)}
-                      disabled={picking !== null}
-                      className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
-                    >
-                      {picking === photo.url ? "Trayendo…" : "Usar esta"}
-                    </button>
-                  </div>
-                </figcaption>
-              </figure>
-            ))}
+                      {isSelected ? "✓" : "+"}
+                    </span>
+                  </button>
+                  <figcaption className="space-y-1 px-2 py-2 text-[11px]">
+                    <p className="truncate font-medium" title={photo.title}>
+                      {photo.title}
+                    </p>
+                    <p className="text-muted-foreground">
+                      {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
+                      {photo.license}
+                    </p>
+                    <p className="truncate text-muted-foreground">
+                      {photo.author || "Autor no declarado"} · {photo.provider}
+                    </p>
+                    <div className="flex items-center justify-between gap-1 pt-1">
+                      <a
+                        href={photo.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline"
+                      >
+                        fuente
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => void choose(photo)}
+                        disabled={picking !== null || pickingMany}
+                        className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+                      >
+                        {picking === photo.url ? "Trayendo…" : "Usar esta"}
+                      </button>
+                    </div>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
         </div>
+        )}
+
+        {mode === "search" && selected.size > 0 && (
+          <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/30 px-4 py-2.5">
+            <p className="text-xs text-muted-foreground">
+              {selected.size} foto{selected.size === 1 ? "" : "s"} seleccionada
+              {selected.size === 1 ? "" : "s"}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSelected(new Set())}
+                disabled={pickingMany}
+                className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+              >
+                Limpiar
+              </button>
+              <button
+                type="button"
+                onClick={() => void chooseMany()}
+                disabled={pickingMany || picking !== null}
+                className="flex h-9 items-center gap-1.5 rounded-pill bg-primary px-4 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+              >
+                {pickingMany && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
+                {pickingMany ? "Trayendo…" : `Usar ${selected.size} seleccionadas`}
+              </button>
+            </div>
+          </div>
         )}
 
         {mode === "generate" && (
