@@ -326,7 +326,10 @@ export function ImageFramingDialog(props: Props) {
 
   return (
     <Dialog open={!!file} onOpenChange={(o) => !o && props.onCancel()}>
-      <DialogContent className="max-h-[95dvh] w-[calc(100vw-1rem)] max-w-3xl overflow-y-auto p-4 sm:p-6">
+      <DialogContent
+        onInteractOutside={(e) => e.preventDefault()}
+        className="max-h-[95dvh] w-[calc(100vw-1rem)] max-w-3xl overflow-y-auto p-4 sm:p-6"
+      >
         <DialogHeader>
           {props.progressLabel && (
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
