@@ -310,3 +310,10 @@
 - [x] Avisos · Campana del Centro de Notificaciones (21-sep): campana única en la barra superior de todos los paneles (CMS, Admin, Concierge, Empresa), con contador de no leídos, lista en lenguaje claro, marcado como leído y salto al detalle. Reutiliza los server-fn oficiales del UNC; sin canales, tablas ni estados nuevos. Verificado con sesión de administrador en `/cms/media`.
 - [x] Avisos · Celular (push) 21-sep: llaves VAPID configuradas, envío real Web Push (`push-dispatch.server.ts`, WebCrypto compatible con el runtime edge), publicación push añadida a `cms_media_transition` (misma transición, sin cambiar el flujo editorial), botón "Activar avisos en este celular" en la campana y aterrizaje directo en `/cms/media?estado=in_review` al tocar el aviso. Envío inmediato al enviar una foto a aprobación. Sólo opera en el sitio publicado (bloqueado por diseño en dev/preview).
 - [x] Avisos · Correo CANCELADO por el Founder (21-sep): se retiró el despachador, la plantilla `unc-notification` y el job `unc-email-dispatch-5min`; no quedó ningún envío programado.
+
+## Imágenes de empresas
+- [x] Encuadre manual (mover, zoom, pellizco) para logo, portada y galería; logo completo sin cortar letras.
+- [x] Luz y color (luz, sombras, contraste, color, calidez) + "Mejorar con Alux" y comparación con original.
+- [x] Galería por lote: cada foto se acomoda en secuencia, con opción de subir el resto sin ajustar.
+- [x] Optimización oficial conservada después del encuadre.
+- [ ] Prueba visual con sesión editor en 1440/834/430/390 y aceptación del Founder.
