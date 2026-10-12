@@ -41,6 +41,7 @@ import {
   type ImageRole,
   type RoleFit,
 } from "@/lib/cms/image-upload";
+import { ImageFramingDialog } from "@/components/cms/ImageFramingDialog";
 import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
 import {
   AluxPhotoFinderDialog,
@@ -172,6 +173,15 @@ export function MediaPickerDialog({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [mode, setMode] = useState<"library" | "upload">("library");
+  const [framing, setFraming] = useState<{ file: File; photo?: AluxPickedPhoto } | null>(null);
+  const finishFraming = (out: File) => {
+    const current = framing;
+    setFraming(null);
+    if (!current) return;
+    setMode("upload");
+    if (current.photo) void handleAluxPhoto({ ...current.photo, file: out }, true);
+    else void chooseFile(out, true);
+  };
   const [file, setFile] = useState<File | null>(null);
   const [fileBytesBase64, setFileBytesBase64] = useState<string | null>(null);
   const [readingFile, setReadingFile] = useState(false);
@@ -187,7 +197,11 @@ export function MediaPickerDialog({
    * gobernado que una foto del equipo y llega con autoría y licencia ya
    * declaradas para que el editor sólo las confirme.
    */
-  async function handleAluxPhoto(photo: AluxPickedPhoto) {
+  async function handleAluxPhoto(photo: AluxPickedPhoto, framed = false) {
+    if (!framed) {
+      setFraming({ file: photo.file, photo });
+      return;
+    }
     setMode("upload");
     setError(null);
     setReadingFile(true);
@@ -268,10 +282,15 @@ export function MediaPickerDialog({
     return ingest;
   }
 
-  async function chooseFile(f: File) {
+  async function chooseFile(f: File, framed = false) {
     const invalid = validateImageFile(f);
     if (invalid) {
       setError(invalid.reason);
+      return;
+    }
+    // Misma filosofía en todo el CMS: primero se encuadra y se afina la luz.
+    if (!framed) {
+      setFraming({ file: f });
       return;
     }
     setError(null);
@@ -500,6 +519,13 @@ export function MediaPickerDialog({
         ) : null}
 
         <div className="flex-1 overflow-y-auto p-4">
+          <ImageFramingDialog
+            file={framing?.file ?? null}
+            role={role}
+            onConfirm={finishFraming}
+            onSkip={finishFraming}
+            onCancel={() => setFraming(null)}
+          />
           {mode === "upload" ? (
             <UploadForm
               file={file}
