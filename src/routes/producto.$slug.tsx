@@ -225,7 +225,7 @@ export const Route = createFileRoute("/producto/$slug")({
       title="Producto no disponible"
       crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
     >
-      <p className="text-sm text-muted-foreground">{String(error.message)}</p>
+      <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
     </PublicShell>
   ),
   notFoundComponent: () => (

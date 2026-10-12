@@ -169,7 +169,7 @@ export const Route = createFileRoute("/eventos/$slug")({
       title="Evento no disponible"
       crumbs={[{ label: "Eventos", to: "/eventos" }, { label: "—" }]}
     >
-      <p className="text-sm text-muted-foreground">{String(error.message)}</p>
+      <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
     </PublicShell>
   ),
 });

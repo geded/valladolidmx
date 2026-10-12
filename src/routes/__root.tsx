@@ -502,7 +502,7 @@ function PublicChrome({
   // menú, botón destacado y columnas del footer una sola vez desde el
   // Experience Builder y verlo aplicado en cualquier ruta.
   void pathname;
-  const { publishedHome } = Route.useLoaderData();
+  const publishedHome = Route.useLoaderData()?.publishedHome;
   const config = publishedHome?.snapshot?.chrome?.[position];
 
   if (position === "header") {
