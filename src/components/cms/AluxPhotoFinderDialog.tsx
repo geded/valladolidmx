@@ -173,29 +173,33 @@ export function AluxPhotoFinderDialog({
     }
   };
 
+  const buildPicked = async (photo: PhotoCandidate): Promise<AluxPickedPhoto> => {
+    const res = await fetchBytes({ data: { url: photo.url } });
+    const bin = atob(res.bytesBase64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const ext = res.mime.split("/")[1]?.split("+")[0] ?? "jpg";
+    const base = photo.title.replace(/\.[^.]+$/, "").replace(/[^\w\- ]+/g, "") || "foto";
+    const file = new File([bytes], `${base}.${ext}`, {
+      type: res.mime,
+      lastModified: Date.now(),
+    });
+    return {
+      file,
+      author: photo.author,
+      license: photo.license,
+      sourceUrl: photo.sourceUrl,
+      title: photo.title,
+      provider: photo.provider,
+    };
+  };
+
   const choose = async (photo: PhotoCandidate) => {
-    if (picking) return;
+    if (picking || pickingMany) return;
     setPicking(photo.url);
     setError(null);
     try {
-      const res = await fetchBytes({ data: { url: photo.url } });
-      const bin = atob(res.bytesBase64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      const ext = res.mime.split("/")[1]?.split("+")[0] ?? "jpg";
-      const base = photo.title.replace(/\.[^.]+$/, "").replace(/[^\w\- ]+/g, "") || "foto";
-      const file = new File([bytes], `${base}.${ext}`, {
-        type: res.mime,
-        lastModified: Date.now(),
-      });
-      onPick({
-        file,
-        author: photo.author,
-        license: photo.license,
-        sourceUrl: photo.sourceUrl,
-        title: photo.title,
-        provider: photo.provider,
-      });
+      onPick(await buildPicked(photo));
       onClose();
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
@@ -206,6 +210,48 @@ export function AluxPhotoFinderDialog({
       );
     } finally {
       setPicking(null);
+    }
+  };
+
+  const toggleSelect = (url: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(url)) next.delete(url);
+      else next.add(url);
+      return next;
+    });
+  };
+
+  const chooseMany = async () => {
+    if (pickingMany || picking || selected.size === 0) return;
+    setPickingMany(true);
+    setError(null);
+    const picked: AluxPickedPhoto[] = [];
+    const failed: string[] = [];
+    try {
+      for (const photo of photos) {
+        if (!selected.has(photo.url)) continue;
+        try {
+          picked.push(await buildPicked(photo));
+        } catch {
+          failed.push(photo.title);
+        }
+      }
+      if (picked.length === 0) {
+        setError("No pudimos traer ninguna de las fotos marcadas. Intenta con otras.");
+        return;
+      }
+      if (failed.length > 0) {
+        setError(`No se pudieron traer ${failed.length} foto(s); se usan las demás.`);
+      }
+      if (onPickMany) {
+        onPickMany(picked);
+      } else {
+        for (const p of picked) onPick(p);
+      }
+      onClose();
+    } finally {
+      setPickingMany(false);
     }
   };
 
