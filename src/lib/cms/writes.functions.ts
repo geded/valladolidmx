@@ -509,6 +509,12 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
     if (data.to === "published") {
       patch.published_at = new Date().toISOString();
     }
+    // Aprobar/Publicar por personal editorial acredita también la revisión
+    // de origen: es la condición única de descubrimiento público
+    // (`PUBLIC_BUSINESS_ELIGIBILITY_EQ`). Devolver a borrador no la revoca.
+    if (data.table === "businesses" && (data.to === "approved" || data.to === "published")) {
+      patch.source_review_state = "approved";
+    }
 
     const { error: updErr } = await db.from(data.table).update(patch).eq("id", data.id);
     if (updErr) throw updErr;
