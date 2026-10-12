@@ -1,3 +1,4 @@
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, queryOptions } from "@tanstack/react-query";
 import {
   Outlet,
@@ -155,7 +156,8 @@ function isOfflineLikeError(error: Error): boolean {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error: rawError, reset }: ErrorComponentProps) {
+  const error = rawError instanceof Error ? rawError : new Error(String(rawError));
   const router = useRouter();
   const offline = isOfflineLikeError(error);
   const [retrying, setRetrying] = useState(false);
@@ -312,7 +314,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { omxdsVisualFoundationsEnabled, brandSettings, siteDomains } = Route.useLoaderData();
+  // El shell también se pinta cuando el loader raíz no terminó (errores o
+  // not-found tempranos): conservar los valores de código como fallback.
+  const loaderData = Route.useLoaderData() as
+    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings>; siteDomains: typeof SITE_DOMAIN_DEFAULTS }
+    | undefined;
+  const omxdsVisualFoundationsEnabled = loaderData?.omxdsVisualFoundationsEnabled ?? false;
+  const brandSettings = loaderData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
+  const siteDomains = loaderData?.siteDomains ?? SITE_DOMAIN_DEFAULTS;
   // Mantiene el origen canónico sincronizado también tras hidratar.
   setCanonicalDomain(siteDomains.primaryDomain);
   return (
@@ -343,7 +352,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
+  const rootData = Route.useLoaderData() as
+    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings> }
+    | undefined;
+  const omxdsVisualFoundationsEnabled = rootData?.omxdsVisualFoundationsEnabled ?? false;
+  const brandSettings = rootData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerVariant = pathname === "/" ? "overlay" : "solid";
   // Rutas con shell propio (CMS Studio, Portal Empresarial, Admin, Cuenta).
@@ -495,7 +508,9 @@ function PublicChrome({
   // menú, botón destacado y columnas del footer una sola vez desde el
   // Experience Builder y verlo aplicado en cualquier ruta.
   void pathname;
-  const { publishedHome } = Route.useLoaderData();
+  const publishedHome = (
+    Route.useLoaderData() as { publishedHome?: Awaited<ReturnType<typeof getPublishedHomeComposition>> | null } | undefined
+  )?.publishedHome;
   const config = publishedHome?.snapshot?.chrome?.[position];
 
   if (position === "header") {

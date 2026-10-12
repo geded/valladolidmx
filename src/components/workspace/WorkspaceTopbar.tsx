@@ -42,7 +42,9 @@ interface Crumb {
  */
 function pathResolves(router: ReturnType<typeof useRouter>, path: string): boolean {
   try {
-    const found = router.getMatchedRoutes(path)?.foundRoute;
+    const matched = (router.getMatchedRoutes(path) as unknown as { foundRoute?: { fullPath?: string } } | readonly unknown[])
+      ;
+    const found = Array.isArray(matched) ? (matched[2] as { fullPath?: string } | undefined) : (matched as { foundRoute?: { fullPath?: string } })?.foundRoute;
     if (!found?.fullPath) return false;
     // `getMatchedRoutes` cae al layout más cercano cuando la ruta no
     // existe, así que exigimos que la plantilla encontrada tenga el

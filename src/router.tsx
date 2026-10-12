@@ -1,9 +1,9 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
-import { routerWithQueryClient } from "@tanstack/react-router-with-query";
+import { createRouter, type ErrorComponentProps } from "@tanstack/react-router";
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { routeTree } from "./routeTree.gen";
 
-function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function DefaultErrorComponent({ error, reset }: ErrorComponentProps) {
   // El visitante nunca ve el mensaje técnico: se registra para diagnóstico y
   // se ofrece un reintento inmediato, porque la mayoría de estos fallos son
   // lecturas momentáneas que se resuelven al repetir la petición.
@@ -49,5 +49,6 @@ export const getRouter = () => {
     defaultErrorComponent: DefaultErrorComponent,
   });
 
-  return routerWithQueryClient(router, queryClient);
+  setupRouterSsrQueryIntegration({ router, queryClient });
+  return router;
 };
