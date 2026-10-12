@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyAdjust, NEUTRAL_ADJUST, suggestAutoAdjust } from "./image-adjust";
+import { applyAdjust, NEUTRAL_ADJUST, suggestAutoAdjust } from "@/lib/cms/image-adjust";
 
 describe("image-adjust", () => {
   it("leaves pixels untouched when neutral", () => {
