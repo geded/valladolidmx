@@ -3,7 +3,7 @@
  * combos de destino y categoría, y añadiendo paneles de logo, portada
  * y galería debajo del formulario cuando estamos en modo edición.
  */
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
@@ -75,7 +75,6 @@ export function BusinessEditor({ id }: Props) {
   });
   const [zoneId, setZoneId] = useState<string | null>(null);
   const currentZone = zoneId ?? zoneCtx.data?.zoneId ?? "";
-  const lastDestRef = useRef<string | null>(null);
 
   return (
     <EntityEditor
@@ -88,11 +87,6 @@ export function BusinessEditor({ id }: Props) {
       renderAfterField={(name, values) => {
         if (name !== "destination_id") return null;
         const destId = values.destination_id ?? "";
-        if (lastDestRef.current !== null && lastDestRef.current !== destId && currentZone) {
-          // Cambió el destino: la zona anterior ya no aplica.
-          queueMicrotask(() => setZoneId(""));
-        }
-        lastDestRef.current = destId;
         return (
           <BusinessZoneSelect
             destinationId={destId}
