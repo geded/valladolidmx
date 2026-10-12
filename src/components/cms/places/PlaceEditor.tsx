@@ -13,6 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
+import { QuickCreateZoneDialog } from "@/components/cms/QuickCreateZoneDialog";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import {
   checkPlaceDuplicates,
@@ -174,6 +175,7 @@ export function PlaceEditor({ placeId }: Props) {
     description: "",
   });
 
+  const [zoneDialogOpen, setZoneDialogOpen] = useState(false);
   /** Addendum Q2B: zonas activas del destino elegido en el alta. */
   const newPlaceZones = useMemo(
     () => selectableZonesForDestination(opts.zones ?? [], newPlace.destination_id),
@@ -588,25 +590,50 @@ export function PlaceEditor({ placeId }: Props) {
             }
           >
             {({ id, describedBy }) => (
-              <select
-                id={id}
-                aria-describedby={describedBy}
-                className={inputClass}
-                value={newPlace.destination_zone_id}
-                disabled={!newPlace.destination_id || newPlaceZones.length === 0}
-                onChange={(e) =>
-                  setNewPlace((p) => ({ ...p, destination_zone_id: e.target.value }))
-                }
-              >
-                <option value="">Sin zona</option>
-                {newPlaceZones.map((z) => (
-                  <option key={z.id} value={z.id}>
-                    {z.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  id={id}
+                  aria-describedby={describedBy}
+                  className={`${inputClass} min-w-0 flex-1`}
+                  value={newPlace.destination_zone_id}
+                  disabled={!newPlace.destination_id || newPlaceZones.length === 0}
+                  onChange={(e) =>
+                    setNewPlace((p) => ({ ...p, destination_zone_id: e.target.value }))
+                  }
+                >
+                  <option value="">Sin zona</option>
+                  {newPlaceZones.map((z) => (
+                    <option key={z.id} value={z.id}>
+                      {z.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!newPlace.destination_id}
+                  onClick={() => setZoneDialogOpen(true)}
+                  className="shrink-0 rounded-md border border-border px-3 text-xs font-medium hover:bg-muted disabled:opacity-50"
+                >
+                  + Nueva zona
+                </button>
+              </div>
             )}
           </PlaceField>
+          {newPlace.destination_id ? (
+            <QuickCreateZoneDialog
+              open={zoneDialogOpen}
+              onOpenChange={setZoneDialogOpen}
+              destinationId={newPlace.destination_id}
+              destinationName={
+                (opts.destinations ?? []).find((d) => d.id === newPlace.destination_id)?.name ??
+                null
+              }
+              onCreated={async (zone) => {
+                await options.refetch();
+                setNewPlace((p) => ({ ...p, destination_zone_id: zone.id }));
+              }}
+            />
+          ) : null}
           <PlaceField name="new-type" label="Tipo de lugar" required>
             {({ id }) => (
               <select
