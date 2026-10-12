@@ -42,6 +42,8 @@ export interface AluxPhotoFinderDialogProps {
   /** Pestaña inicial: buscar fotos o crear con IA. */
   initialMode?: "search" | "generate";
   onPick: (photo: AluxPickedPhoto) => void;
+  /** Selección múltiple: entrega todas las fotos marcadas de una vez. */
+  onPickMany?: (photos: AluxPickedPhoto[]) => void;
 }
 
 /** Quita del texto escrito las palabras del destino de trabajo (ya implícito). */
@@ -68,6 +70,7 @@ export function AluxPhotoFinderDialog({
   place,
   initialMode,
   onPick,
+  onPickMany,
 }: AluxPhotoFinderDialogProps) {
   const find = useServerFn(aluxFindPhotos);
   const fetchBytes = useServerFn(aluxFetchPhotoBytes);
