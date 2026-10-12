@@ -7,7 +7,6 @@
  * portada, ofrece ampliarla. En galería, casilla para ampliar fotos
  * pequeñas automáticamente en lote.
  */
-import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
@@ -19,13 +18,8 @@ import {
   reorderProductGallery,
   signProductImageUpload,
 } from "@/lib/cms/products-media.functions";
-import { prepareImageForRole, withRetry, type ImageRole } from "@/lib/cms/image-upload";
-import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
-import { useAluxUpscale, upscaleIfUndersized } from "@/lib/cms/use-alux-upscale";
-import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
-import { AluxMediaSourceButtons } from "@/components/cms/AluxMediaSourceButtons";
-
-type MediaRow = Awaited<ReturnType<typeof listProductMedia>>[number];
+import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
 
 interface Props {
   productId: string;
@@ -39,16 +33,12 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
   const registerFn = useServerFn(registerProductMedia);
   const removeFn = useServerFn(removeProductMedia);
   const reorderFn = useServerFn(reorderProductGallery);
-  const upscaleFn = useServerFn(aluxUpscaleImage);
 
   const media = useQuery({
     queryKey: ["cms", "product_media", productId],
     queryFn: () => listFn({ data: { productId } }),
   });
 
-  const [upscaleGallery, setUpscaleGallery] = useState(false);
-  const upscaleGalleryRef = useRef(upscaleGallery);
-  upscaleGalleryRef.current = upscaleGallery;
 
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: ["cms", "product_media", productId] });
@@ -56,21 +46,7 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
   };
 
   const uploadOne = async (file: File, role: "cover" | "gallery") => {
-    let fileToPrepare = file;
-    if (role === "gallery" && upscaleGalleryRef.current) {
-      try {
-        const result = await upscaleIfUndersized(file, "gallery", upscaleFn);
-        if (result.upscaled) {
-          fileToPrepare = result.file;
-          toast.success(`"${file.name}" se amplió con Alux IA.`);
-        }
-      } catch (err) {
-        toast.error(
-          `No se pudo ampliar "${file.name}": ${err instanceof Error ? err.message : "error"}. Se sube la original.`,
-        );
-      }
-    }
-    const prepared = await prepareImageForRole(fileToPrepare, role);
+    const prepared = await prepareImageForRole(file, role);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -150,14 +126,20 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
 
   return (
     <div className="space-y-6">
-      <CoverPanel
-        cover={cover}
+      <SinglePanel
+        title="Portada"
+        subtitle="Imagen principal del producto."
+        role="cover"
+        aspect="h-52 w-full object-cover"
+        emptyLabel="Sin portada"
+        media={cover}
         onUpload={(f) => coverUpload.mutate(f)}
         onRemove={(id) => removeMut.mutate(id)}
         uploading={coverUpload.isPending}
         error={coverUpload.error}
       />
       <GalleryPanel
+        subtitle="Imágenes adicionales del producto. Arrastra o selecciona varias."
         items={gallery}
         onUpload={(files) => galleryUpload.mutate(files)}
         onRemove={(id) => removeMut.mutate(id)}
@@ -173,233 +155,7 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
         }}
         uploading={galleryUpload.isPending}
         error={galleryUpload.error}
-        upscaleSmall={upscaleGallery}
-        onToggleUpscale={() => setUpscaleGallery((v) => !v)}
       />
     </div>
-  );
-}
-
-function CoverPanel(props: {
-  cover: MediaRow | null;
-  onUpload: (file: File) => void;
-  onRemove: (id: string) => void;
-  uploading: boolean;
-  error: unknown;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const alux = useAluxUpscale("cover");
-
-  const handleFile = async (f: File) => {
-    const undersized = await alux.evaluate(f);
-    if (!undersized) {
-      props.onUpload(f);
-    }
-  };
-
-  return (
-    <section className="rounded-xl border border-border bg-card p-5">
-      <header className="mb-3 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-semibold tracking-tight">Portada</h2>
-          <p className="text-xs text-muted-foreground">Imagen principal del producto.</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <AluxMediaSourceButtons
-            hint=""
-            disabled={props.uploading || alux.upscaling}
-            onFile={(f) => void handleFile(f)}
-          />
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={props.uploading || alux.upscaling}
-            className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-          >
-            {props.uploading ? "Subiendo…" : props.cover ? "Reemplazar" : "Subir"}
-          </button>
-        </div>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void handleFile(f);
-            e.target.value = "";
-          }}
-        />
-      </header>
-      {alux.pending && (
-        <AluxUpscaleCard
-          fit={alux.pending.fit}
-          upscaling={alux.upscaling}
-          busy={props.uploading}
-          onUpscale={async () => {
-            const enlarged = await alux.upscale();
-            if (enlarged) props.onUpload(enlarged);
-          }}
-          onSkip={() => {
-            const f = alux.proceedAsIs();
-            if (f) props.onUpload(f);
-          }}
-        />
-      )}
-      {props.cover?.previewUrl ? (
-        <div className="relative overflow-hidden rounded-lg border border-border">
-          <img
-            src={props.cover.previewUrl}
-            alt={props.cover.alt ?? "portada"}
-            className="h-52 w-full object-cover"
-          />
-          <button
-            type="button"
-            onClick={() => props.cover && props.onRemove(props.cover.id)}
-            className="absolute right-2 top-2 rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white hover:bg-black/80"
-          >
-            Quitar
-          </button>
-        </div>
-      ) : (
-        <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border bg-background text-xs text-muted-foreground">
-          Sin portada
-        </div>
-      )}
-      {props.error instanceof Error && (
-        <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
-      )}
-    </section>
-  );
-}
-
-function GalleryPanel(props: {
-  items: MediaRow[];
-  onUpload: (files: File[]) => void;
-  onRemove: (id: string) => void;
-  onMove: (id: string, direction: -1 | 1) => void;
-  uploading: boolean;
-  error: unknown;
-  upscaleSmall: boolean;
-  onToggleUpscale: () => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-  return (
-    <section className="rounded-xl border border-border bg-card p-5">
-      <header className="mb-3 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-semibold tracking-tight">Galería</h2>
-          <p className="text-xs text-muted-foreground">Imágenes adicionales del producto.</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={props.upscaleSmall}
-              onChange={props.onToggleUpscale}
-              disabled={props.uploading}
-              className="size-3.5 accent-amber-600"
-            />
-            Ampliar pequeñas con Alux IA
-          </label>
-          <AluxMediaSourceButtons
-            hint=""
-            disabled={props.uploading}
-            onFile={(f) => props.onUpload([f])}
-          />
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={props.uploading}
-            className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-          >
-            {props.uploading ? "Subiendo…" : "Añadir imágenes"}
-          </button>
-        </div>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            const files = Array.from(e.target.files ?? []);
-            if (files.length) props.onUpload(files);
-            e.target.value = "";
-          }}
-        />
-      </header>
-
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
-            f.type.startsWith("image/"),
-          );
-          if (files.length) props.onUpload(files);
-        }}
-        className={`rounded-lg border border-dashed p-3 ${
-          dragOver ? "border-primary bg-primary/5" : "border-border bg-background"
-        }`}
-      >
-        {props.items.length === 0 ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">
-            Sin imágenes en galería. Arrastra archivos aquí o pulsa "Añadir".
-          </p>
-        ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {props.items.map((m, idx) => (
-              <li
-                key={m.id}
-                className="group relative overflow-hidden rounded-md border border-border bg-card"
-              >
-                {m.previewUrl ? (
-                  <img src={m.previewUrl} alt={m.alt ?? ""} className="h-28 w-full object-cover" />
-                ) : (
-                  <div className="h-28 w-full bg-muted" />
-                )}
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/60 px-1.5 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100">
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => props.onMove(m.id, -1)}
-                      disabled={idx === 0}
-                      className="rounded px-1.5 py-0.5 hover:bg-white/20 disabled:opacity-40"
-                    >
-                      ←
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => props.onMove(m.id, 1)}
-                      disabled={idx === props.items.length - 1}
-                      className="rounded px-1.5 py-0.5 hover:bg-white/20 disabled:opacity-40"
-                    >
-                      →
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => props.onRemove(m.id)}
-                    className="rounded px-1.5 py-0.5 hover:bg-white/20"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      {props.error instanceof Error && (
-        <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
-      )}
-    </section>
   );
 }
