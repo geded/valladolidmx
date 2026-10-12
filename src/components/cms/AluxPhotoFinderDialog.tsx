@@ -6,7 +6,8 @@
  * siempre (optimización, ampliación opcional con Alux IA, original inmutable y
  * derechos declarados). Sólo editores y administradores.
  */
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { mediaFinderKey, readMediaFinder, writeMediaFinder } from "@/lib/cms/media-finder-session";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { ImageIcon, Loader2, MapPin, Search, Sparkles, Wand2, X } from "lucide-react";
@@ -100,6 +101,31 @@ export function AluxPhotoFinderDialog({
   const [genLoading, setGenLoading] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Conserva búsqueda, resultados y creación al salir y volver a la app.
+  const sessionKey = useMemo(() => mediaFinderKey(initialQuery), [initialQuery]);
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    const s = readMediaFinder<{
+      query: string; site: string; pasted: string; photos: PhotoCandidate[];
+      contacts: OwnerContact[]; usedQuery: string | null; searched: boolean;
+      mode: "search" | "generate"; genPrompt: string; genImage: string | null;
+    }>(sessionKey);
+    if (s) {
+      setQuery(s.query ?? ""); setSite(s.site ?? ""); setPasted(s.pasted ?? "");
+      setPhotos(s.photos ?? []); setContacts(s.contacts ?? []);
+      setUsedQuery(s.usedQuery ?? null); setSearched(!!s.searched);
+      if (s.mode) setMode(s.mode);
+      setGenPrompt(s.genPrompt ?? ""); setGenImage(s.genImage ?? null);
+    }
+    restoredRef.current = true;
+  }, [sessionKey]);
+  useEffect(() => {
+    if (!restoredRef.current) return;
+    writeMediaFinder(sessionKey, {
+      query, site, pasted, photos, contacts, usedQuery, searched, mode, genPrompt, genImage,
+    });
+  }, [sessionKey, query, site, pasted, photos, contacts, usedQuery, searched, mode, genPrompt, genImage]);
 
   if (!open) return null;
 
