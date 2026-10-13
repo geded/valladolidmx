@@ -41,18 +41,20 @@ export function ExistingBusinessMatches({ name }: { name: string }) {
         {matches.map((m) => (
           <li
             key={m.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card p-2.5"
+            className="grid gap-3 rounded-lg border border-border bg-card p-3 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-2 sm:p-2.5"
           >
             <div className="min-w-0">
-              <p className="truncate font-medium">{m.display_name}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="truncate text-[15px] font-semibold leading-snug sm:text-sm">
+                {m.display_name}
+              </p>
+              <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
                 {[STATUS_LABEL[m.status] ?? m.status, m.category, m.destination]
                   .filter(Boolean)
                   .join(" · ")}
                 {!m.hasLogo || !m.hasCover ? " · Faltan fotos" : ""}
               </p>
               {m.status === "published" && (
-                <p className="mt-0.5 text-xs font-medium text-warning">
+                <p className="mt-0.5 text-xs font-medium leading-snug text-warning">
                   Ya se ve en la página pública. Edita esta ficha en lugar de crear otra.
                 </p>
               )}
@@ -60,7 +62,7 @@ export function ExistingBusinessMatches({ name }: { name: string }) {
             <Link
               to="/cms/empresas/$businessId/editar"
               params={{ businessId: m.id }}
-              className="inline-flex h-8 items-center rounded-pill bg-primary px-3 text-xs font-semibold text-primary-foreground"
+              className="inline-flex h-10 w-full items-center justify-center rounded-pill bg-primary px-3 text-sm font-semibold text-primary-foreground sm:h-8 sm:w-auto sm:text-xs"
             >
               Cargar esta ficha
             </Link>
