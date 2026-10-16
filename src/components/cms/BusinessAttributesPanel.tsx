@@ -90,9 +90,20 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
           if (definition.inputType === "single") {
             return (
               <label key={definition.key} className="block">
-                <span className="text-sm font-semibold">
-                  {definition.label}
-                  {definition.required ? " *" : ""}
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold">
+                    {definition.label}
+                    {definition.required ? " *" : ""}
+                  </span>
+                  {definition.id ? (
+                    <button
+                      type="button"
+                      onClick={() => setQuickCreateFor(definition)}
+                      className="text-xs font-semibold text-primary hover:underline"
+                    >
+                      + Agregar
+                    </button>
+                  ) : null}
                 </span>
                 {definition.helpText ? (
                   <span className="mt-1 block text-xs text-muted-foreground">
@@ -126,7 +137,18 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
           const chosen = Array.isArray(selected) ? selected : [];
           return (
             <fieldset key={definition.key} className="rounded-lg border border-border p-4">
-              <legend className="px-1 text-sm font-semibold">{definition.label}</legend>
+              <legend className="px-1 text-sm font-semibold">
+                {definition.label}
+                {definition.id ? (
+                  <button
+                    type="button"
+                    onClick={() => setQuickCreateFor(definition)}
+                    className="ml-2 text-xs font-semibold text-primary hover:underline"
+                  >
+                    + Agregar
+                  </button>
+                ) : null}
+              </legend>
               {definition.helpText ? (
                 <p className="mb-3 text-xs text-muted-foreground">{definition.helpText}</p>
               ) : null}
