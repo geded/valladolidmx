@@ -177,6 +177,7 @@ function slugifyOption(label: string): string {
   return label
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
+    // eslint-disable-next-line no-misleading-character-class
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
