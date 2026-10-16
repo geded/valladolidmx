@@ -91,6 +91,7 @@ async function readEditorDTO(
   if (definitionsError) throw new Error(`get_attribute_catalog_failed:${definitionsError.message}`);
 
   const mapped: TourismAttributeDefinition[] = (definitions ?? []).map((definition: any) => ({
+    id: String(definition.id),
     key: String(definition.attribute_key),
     label: String(definition.label),
     helpText: typeof definition.help_text === "string" ? definition.help_text : null,
@@ -165,4 +166,79 @@ export const updateBusinessAttributes = createServerFn({ method: "POST" })
       .is("deleted_at", null);
     if (error) throw new Error(`update_business_attributes_failed:${error.message}`);
     return { ...editor, values: cleaned } satisfies BusinessAttributeEditorDTO;
+  });
+
+export interface AttributeOptionQuickResult {
+  value: string;
+  label: string;
+}
+
+function slugifyOption(label: string): string {
+  return label
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+/**
+ * Alta rápida de una opción del catálogo de características (p. ej. un nuevo
+ * tipo de cocina) sin salir de la ficha. Sólo personal editorial interno:
+ * el catálogo es compartido por todas las fichas de la familia.
+ */
+export const createAttributeOptionQuick = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { definitionId: string; label: string }) => {
+    const label = typeof input?.label === "string" ? input.label.trim().slice(0, 120) : "";
+    if (label.length < 2) throw new Error("Escribe el nombre de la opción.");
+    if (!input?.definitionId || typeof input.definitionId !== "string") {
+      throw new Error("Falta la característica a la que pertenece la opción.");
+    }
+    return { definitionId: input.definitionId, label };
+  })
+  .handler(async ({ data, context }): Promise<AttributeOptionQuickResult> => {
+    const supabase = context.supabase as any;
+    const { data: editorial, error: editorialError } = await supabase.rpc("is_editor_or_admin", {
+      _user_id: context.userId,
+    });
+    if (editorialError) throw new Error(`access_check_failed: ${editorialError.message}`);
+    if (!editorial) throw new Error("No tienes permiso para administrar el catálogo.");
+
+    const { data: existing } = await supabase
+      .from("tourism_attribute_options")
+      .select("value, label")
+      .eq("definition_id", data.definitionId)
+      .ilike("label", data.label)
+      .maybeSingle();
+    if (existing?.value) return { value: existing.value as string, label: existing.label as string };
+
+    const { data: maxRow } = await supabase
+      .from("tourism_attribute_options")
+      .select("sort_order")
+      .eq("definition_id", data.definitionId)
+      .order("sort_order", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const sortOrder = Number(maxRow?.sort_order ?? 0) + 10;
+
+    const base = slugifyOption(data.label) || "opcion";
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const value = attempt === 0 ? base : `${base}-${attempt + 1}`;
+      const { data: row, error } = await supabase
+        .from("tourism_attribute_options")
+        .insert({
+          definition_id: data.definitionId,
+          value,
+          label: data.label,
+          sort_order: sortOrder,
+          active: true,
+        })
+        .select("value, label")
+        .maybeSingle();
+      if (!error && row) return { value: row.value as string, label: row.label as string };
+      if (error && error.code !== "23505") throw new Error(error.message);
+    }
+    throw new Error("Ya existe una opción con un nombre parecido. Usa otro nombre.");
   });
