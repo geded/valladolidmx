@@ -57,6 +57,35 @@ export const Route = createFileRoute("/api/public/stt")({
           );
         }
 
+        // Límite de uso por visitante (misma estrategia que el chat de Alux).
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
+          _ip_hash: hashIp(getClientIp(request)),
+          _hour_limit: HOUR_LIMIT,
+          _day_limit: DAY_LIMIT,
+        });
+        if (rateErr) {
+          return new Response(
+            JSON.stringify({ error: "No se pudo verificar el límite de uso" }),
+            { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } },
+          );
+        }
+        const rateRow = Array.isArray(rate) ? rate[0] : rate;
+        if (rateRow && rateRow.allowed === false) {
+          return new Response(
+            JSON.stringify({
+              error: "rate_limited",
+              hour_count: rateRow.hour_count,
+              day_count: rateRow.day_count,
+              hour_limit: HOUR_LIMIT,
+              day_limit: DAY_LIMIT,
+              message:
+                "Has alcanzado el límite de uso de voz por hoy como visitante. Crea tu cuenta gratuita para seguir usando Alux sin límites.",
+            }),
+            { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
+          );
+        }
+
         // Bound the upload size before buffering
         const contentLength = parseInt(request.headers.get("content-length") || "0", 10);
         if (contentLength > MAX_FILE_BYTES + 1024) {
