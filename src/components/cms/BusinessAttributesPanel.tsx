@@ -5,7 +5,8 @@ import {
   getBusinessAttributeEditor,
   updateBusinessAttributes,
 } from "@/lib/portal/business-attributes.functions";
-import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
+import type { TourismAttributeDefinition, TourismFilterAttributes } from "@/lib/business-attributes/types";
+import { QuickCreateAttributeOptionDialog } from "@/components/cms/QuickCreateAttributeOptionDialog";
 
 export function BusinessAttributesPanel({ businessId }: { businessId: string }) {
   const getEditor = useServerFn(getBusinessAttributeEditor);
@@ -17,6 +18,24 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
   });
   const [values, setValues] = useState<TourismFilterAttributes>({});
   const [dirty, setDirty] = useState(false);
+  const [quickCreateFor, setQuickCreateFor] = useState<TourismAttributeDefinition | null>(null);
+
+  const handleOptionCreated = (definition: TourismAttributeDefinition, value: string) => {
+    setValues((current) => {
+      const next = { ...current };
+      if (definition.inputType === "single") {
+        next[definition.key] = value;
+      } else {
+        const previous = Array.isArray(current[definition.key])
+          ? (current[definition.key] as string[])
+          : [];
+        next[definition.key] = Array.from(new Set([...previous, value]));
+      }
+      return next;
+    });
+    setDirty(true);
+    void queryClient.invalidateQueries({ queryKey: ["business-attribute-editor", businessId] });
+  };
 
   useEffect(() => {
     if (!query.data) return;
