@@ -91,6 +91,7 @@ async function readEditorDTO(
   if (definitionsError) throw new Error(`get_attribute_catalog_failed:${definitionsError.message}`);
 
   const mapped: TourismAttributeDefinition[] = (definitions ?? []).map((definition: any) => ({
+    id: String(definition.id),
     key: String(definition.attribute_key),
     label: String(definition.label),
     helpText: typeof definition.help_text === "string" ? definition.help_text : null,
