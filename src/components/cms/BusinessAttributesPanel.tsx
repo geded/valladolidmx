@@ -19,6 +19,7 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
   const [values, setValues] = useState<TourismFilterAttributes>({});
   const [dirty, setDirty] = useState(false);
   const [quickCreateFor, setQuickCreateFor] = useState<TourismAttributeDefinition | null>(null);
+  const [optionSearch, setOptionSearch] = useState<Record<string, string>>({});
 
   const handleOptionCreated = (definition: TourismAttributeDefinition, value: string) => {
     setValues((current) => {
@@ -111,6 +112,20 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
                     {definition.helpText}
                   </span>
                 ) : null}
+                {definition.options.length > 6 ? (
+                  <input
+                    type="search"
+                    value={optionSearch[definition.key] ?? ""}
+                    onChange={(event) =>
+                      setOptionSearch((current) => ({
+                        ...current,
+                        [definition.key]: event.target.value,
+                      }))
+                    }
+                    placeholder={`Buscar en ${definition.label.toLowerCase()}…`}
+                    className="mt-2 min-h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  />
+                ) : null}
                 <select
                   value={typeof selected === "string" ? selected : ""}
                   onChange={(event) => {
@@ -126,11 +141,17 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
                   className="mt-2 min-h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
                 >
                   <option value="">Sin especificar</option>
-                  {definition.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
+                  {definition.options
+                    .filter((option) => {
+                      const term = (optionSearch[definition.key] ?? "").trim().toLowerCase();
+                      if (!term) return true;
+                      return option.label.toLowerCase().includes(term);
+                    })
+                    .map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                 </select>
               </label>
             );
