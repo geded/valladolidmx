@@ -371,7 +371,7 @@ export function SiteHeader({ variant = "solid", config, interactionMode = "publi
               <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
             </div>
 
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="relative z-10 flex min-w-0 items-center gap-2">
               <MiViajeChip isOverlay={isOverlay} />
               {visibleButtons.map((btn, idx) =>
                 renderHeaderButton(btn, idx, {
