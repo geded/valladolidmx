@@ -41,6 +41,8 @@ export interface AluxPhotoFinderDialogProps {
   place?: string | null;
   /** Pestaña inicial: buscar fotos o crear con IA. */
   initialMode?: "search" | "generate";
+  /** Clave de sesión explícita (por espacio de imagen). Si se omite, se deriva de initialQuery. */
+  sessionKeyOverride?: string;
   onPick: (photo: AluxPickedPhoto) => void;
   /** Selección múltiple: entrega todas las fotos marcadas de una vez. */
   onPickMany?: (photos: AluxPickedPhoto[]) => void;
@@ -69,6 +71,7 @@ export function AluxPhotoFinderDialog({
   website,
   place,
   initialMode,
+  sessionKeyOverride,
   onPick,
   onPickMany,
 }: AluxPhotoFinderDialogProps) {
@@ -109,7 +112,10 @@ export function AluxPhotoFinderDialog({
   const abortRef = useRef<AbortController | null>(null);
 
   // Conserva búsqueda, resultados y creación al salir y volver a la app.
-  const sessionKey = useMemo(() => mediaFinderKey(initialQuery), [initialQuery]);
+  const sessionKey = useMemo(
+    () => sessionKeyOverride ?? mediaFinderKey(initialQuery),
+    [sessionKeyOverride, initialQuery],
+  );
   const restoredRef = useRef(false);
   useEffect(() => {
     const s = readMediaFinder<{

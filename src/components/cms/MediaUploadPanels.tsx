@@ -67,6 +67,7 @@ export function SinglePanel(props: {
         <div className="flex flex-wrap items-center gap-2">
           <AluxMediaSourceButtons
             hint=""
+            slot={`single:${props.role}`}
             disabled={props.uploading || alux.upscaling}
             onFile={(f) => void handleFile(f)}
           />
@@ -226,6 +227,7 @@ export function GalleryPanel(props: {
         <div className="flex flex-wrap items-center justify-end gap-2">
           <AluxMediaSourceButtons
             hint=""
+            slot="gallery"
             disabled={props.uploading}
             onFile={(f) => startQueue([f])}
             onFiles={(files) => startQueue(files)}
