@@ -5,10 +5,30 @@
  * usando Gemini Transcribe. Devuelve SSE con el texto en tiempo real.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { createHash } from "crypto";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/audio/transcriptions";
 const STT_MODEL = "google/gemini-3.5-transcribe";
 const MAX_FILE_BYTES = 14 * 1024 * 1024; // 14 MB (Gemini cap)
+
+// Mismo límite de uso que el chat público de Alux (estrategia de suscripción).
+const HOUR_LIMIT = 10;
+const DAY_LIMIT = 40;
+
+function hashIp(ip: string): string {
+  const salt = process.env.ALUX_PUBLIC_IP_SALT ?? process.env.SUPABASE_URL ?? "vmx";
+  return createHash("sha256").update(`${salt}:${ip}`).digest("hex");
+}
+
+function getClientIp(request: Request): string {
+  const h = request.headers;
+  return (
+    h.get("cf-connecting-ip") ??
+    h.get("x-real-ip") ??
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "0.0.0.0"
+  );
+}
 
 export const Route = createFileRoute("/api/public/stt")({
   server: {
@@ -34,6 +54,35 @@ export const Route = createFileRoute("/api/public/stt")({
           return new Response(
             JSON.stringify({ error: "Transcripción no disponible" }),
             { status: 503, headers: { "Content-Type": "application/json", ...corsHeaders } },
+          );
+        }
+
+        // Límite de uso por visitante (misma estrategia que el chat de Alux).
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
+          _ip_hash: hashIp(getClientIp(request)),
+          _hour_limit: HOUR_LIMIT,
+          _day_limit: DAY_LIMIT,
+        });
+        if (rateErr) {
+          return new Response(
+            JSON.stringify({ error: "No se pudo verificar el límite de uso" }),
+            { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } },
+          );
+        }
+        const rateRow = Array.isArray(rate) ? rate[0] : rate;
+        if (rateRow && rateRow.allowed === false) {
+          return new Response(
+            JSON.stringify({
+              error: "rate_limited",
+              hour_count: rateRow.hour_count,
+              day_count: rateRow.day_count,
+              hour_limit: HOUR_LIMIT,
+              day_limit: DAY_LIMIT,
+              message:
+                "Has alcanzado el límite de uso de voz por hoy como visitante. Crea tu cuenta gratuita para seguir usando Alux sin límites.",
+            }),
+            { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
           );
         }
 

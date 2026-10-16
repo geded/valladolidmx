@@ -67,6 +67,12 @@ export function useSTT() {
 
           if (!response.ok || !response.body) {
             const data = await response.json().catch(() => ({}));
+            if (data?.error === "rate_limited") {
+              throw new Error(
+                data?.message ||
+                  "Has alcanzado el límite de uso de voz por hoy. Crea tu cuenta gratuita para seguir usando Alux sin límites.",
+              );
+            }
             throw new Error(data?.error || `STT falló: ${response.status}`);
           }
 
