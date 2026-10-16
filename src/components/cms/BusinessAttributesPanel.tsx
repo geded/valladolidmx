@@ -38,9 +38,10 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
   };
 
   useEffect(() => {
-    if (!query.data) return;
+    if (!query.data || dirty) return; // no pisar cambios sin guardar (p. ej. opción recién creada)
     setValues(query.data.values);
     setDirty(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- dirty se evalúa al llegar data
   }, [query.data]);
 
   const mutation = useMutation({
