@@ -202,6 +202,17 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
       >
         {mutation.isPending ? "Guardando…" : "Guardar características"}
       </button>
+      {quickCreateFor?.id ? (
+        <QuickCreateAttributeOptionDialog
+          open={!!quickCreateFor}
+          onOpenChange={(open) => {
+            if (!open) setQuickCreateFor(null);
+          }}
+          definitionId={quickCreateFor.id}
+          attributeLabel={quickCreateFor.label}
+          onCreated={(option) => handleOptionCreated(quickCreateFor, option.value)}
+        />
+      ) : null}
     </section>
   );
 }
