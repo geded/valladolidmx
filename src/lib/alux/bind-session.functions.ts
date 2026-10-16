@@ -20,7 +20,8 @@ export const bindAluxSessionToTraveler = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("alux_public_sessions")
       .update({ traveler_user_id: context.userId })
-      .eq("session_key", data.sessionKey);
+      .eq("session_key", data.sessionKey)
+      .or(`traveler_user_id.is.null,traveler_user_id.eq.${context.userId}`);
     if (error) return { bound: false };
     return { bound: true };
   });
