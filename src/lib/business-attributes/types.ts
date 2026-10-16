@@ -9,6 +9,8 @@ export interface TourismAttributeOption {
 }
 
 export interface TourismAttributeDefinition {
+  /** Id del catálogo (`tourism_attribute_definitions.id`); permite alta rápida de opciones. */
+  id?: string;
   key: string;
   label: string;
   helpText: string | null;
