@@ -428,7 +428,12 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-[0.98]",
+          // Safari iOS/iPadOS: el header usa backdrop-blur sobre un sticky y
+          // el hit-testing del botón podía caer en la capa del Hero de abajo
+          // (el toque "no hacía nada"). `relative z-10` fija la capa de
+          // pulsación sin cambiar diseño; `touch-manipulation` evita el
+          // retraso de doble-toque/zoom en móvil.
+          "relative z-10 inline-flex h-11 w-11 cursor-pointer touch-manipulation items-center justify-center rounded-full border transition-all active:scale-[0.98]",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
