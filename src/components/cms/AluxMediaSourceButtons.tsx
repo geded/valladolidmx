@@ -23,6 +23,13 @@ import {
 interface Props {
   /** Nombre de la ficha (destino, empresa, producto, zona…) para la consulta. */
   hint: string;
+  /**
+   * Identificador del espacio de imagen (logo, cover, gallery…). Hace única
+   * la clave de sesión: sin él, todos los paneles de la página comparten la
+   * misma clave y al recargar se reabría el buscador en todos a la vez,
+   * pudiendo soltar la foto en el espacio equivocado.
+   */
+  slot: string;
   /** Sitio web del negocio, si aplica. */
   website?: string | null;
   disabled?: boolean;
@@ -31,20 +38,20 @@ interface Props {
   onFiles?: (files: File[]) => void;
 }
 
-export function AluxMediaSourceButtons({ hint, website, disabled, onFile, onFiles }: Props) {
+export function AluxMediaSourceButtons({ hint, slot, website, disabled, onFile, onFiles }: Props) {
   const [mode, setModeState] = useState<"search" | "generate" | null>(null);
+  const sessionKey = mediaFinderKey(`${slot}:${hint}`);
 
   // Al volver de otra app/pestaña, reabrir donde estaba el editor.
   useEffect(() => {
-    const saved = readMediaFinder<"search" | "generate">(`${mediaFinderKey(hint)}:mode`);
+    const saved = readMediaFinder<"search" | "generate">(`${sessionKey}:mode`);
     if (saved === "search" || saved === "generate") setModeState(saved);
-  }, [hint]);
+  }, [sessionKey]);
 
   const setMode = (next: "search" | "generate" | null) => {
     setModeState(next);
-    const key = mediaFinderKey(hint);
-    if (next) writeMediaFinder(`${key}:mode`, next);
-    else clearMediaFinder(key);
+    if (next) writeMediaFinder(`${sessionKey}:mode`, next);
+    else clearMediaFinder(sessionKey);
   };
 
   const handlePick = (photo: AluxPickedPhoto) => {
@@ -78,6 +85,7 @@ export function AluxMediaSourceButtons({ hint, website, disabled, onFile, onFile
           open
           initialMode={mode}
           initialQuery={hint}
+          sessionKeyOverride={sessionKey}
           website={website ?? null}
           onClose={() => setMode(null)}
           onPick={handlePick}
