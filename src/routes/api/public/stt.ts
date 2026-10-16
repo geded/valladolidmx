@@ -5,10 +5,30 @@
  * usando Gemini Transcribe. Devuelve SSE con el texto en tiempo real.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { createHash } from "crypto";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/audio/transcriptions";
 const STT_MODEL = "google/gemini-3.5-transcribe";
 const MAX_FILE_BYTES = 14 * 1024 * 1024; // 14 MB (Gemini cap)
+
+// Mismo límite de uso que el chat público de Alux (estrategia de suscripción).
+const HOUR_LIMIT = 10;
+const DAY_LIMIT = 40;
+
+function hashIp(ip: string): string {
+  const salt = process.env.ALUX_PUBLIC_IP_SALT ?? process.env.SUPABASE_URL ?? "vmx";
+  return createHash("sha256").update(`${salt}:${ip}`).digest("hex");
+}
+
+function getClientIp(request: Request): string {
+  const h = request.headers;
+  return (
+    h.get("cf-connecting-ip") ??
+    h.get("x-real-ip") ??
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "0.0.0.0"
+  );
+}
 
 export const Route = createFileRoute("/api/public/stt")({
   server: {
