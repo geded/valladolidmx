@@ -1043,7 +1043,16 @@ export const aluxFetchPhotoBytes = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
-    const res = await fetch(data.url, { headers: { "User-Agent": "ValladolidMX-CMS/1.0" } });
+    // Varios acervos (Wikimedia, Openverse, sitios de hoteles) rechazan
+    // peticiones sin identificación de navegador; nos presentamos como uno.
+    const res = await fetch(data.url, {
+      redirect: "follow",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+        Accept: "image/avif,image/webp,image/*,*/*;q=0.8",
+      },
+    });
     if (!res.ok) throw new Error("photo_download_failed");
     const mime = res.headers.get("content-type") ?? "image/jpeg";
     if (!mime.startsWith("image/")) throw new Error("photo_not_an_image");
