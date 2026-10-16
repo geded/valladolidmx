@@ -212,7 +212,11 @@ export function AluxPhotoFinderDialog({
       setError(
         message === "photo_too_large"
           ? "Esa foto es demasiado pesada. Elige otra."
-          : "No pudimos traer esa foto. Elige otra.",
+          : message === "photo_not_an_image"
+            ? "Ese enlace no contiene una imagen. Elige otra foto."
+            : message === "photo_download_failed"
+              ? "El sitio de origen no permitió descargar esa foto. Elige otra."
+              : "No pudimos traer esa foto. Elige otra.",
       );
     } finally {
       setPicking(null);
