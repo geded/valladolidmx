@@ -5,6 +5,7 @@
  * Se monta dentro de /cms/ventas-en-linea (autoridad existente),
  * sin crear una pantalla paralela.
  */
+import { csvCell } from "@/lib/csv-safe";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -61,12 +62,12 @@ function toCsv(result: HostSettlementsResult): string {
     for (const l of row.lines) {
       lines.push(
         [
-          JSON.stringify(row.business_name),
+          csvCell(row.business_name),
           l.folio,
           l.paid_at ?? "",
           SOURCE_LABEL[l.source_kind] ?? l.source_kind,
           METHOD_LABEL[l.payment_method] ?? l.payment_method,
-          JSON.stringify(l.title),
+          csvCell(l.title),
           String(l.quantity),
           l.currency,
           (l.gross_amount / 100).toFixed(2),

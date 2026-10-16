@@ -95,7 +95,7 @@ async function signAvatar(pathOrUrl: string | null): Promise<string | null> {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin.storage
       .from("avatars")
-      .createSignedUrl(pathOrUrl, 60 * 60 * 24 * 7); // 7 días
+      .createSignedUrl(pathOrUrl, 60 * 60); // 1 hora: deja de servir poco después de volver privado el perfil
     return data?.signedUrl ?? null;
   } catch {
     return null;

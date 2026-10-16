@@ -4,6 +4,7 @@
  * CV4.1 · lado operativo. Muestra órdenes con source_kind='direct_sale',
  * comisiones devengadas por proveedor y neto a liquidar. Export CSV.
  */
+import { csvCell } from "@/lib/csv-safe";
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -99,9 +100,9 @@ function toCsv(rows: DirectSaleOrderRow[]): string {
         r.created_at,
         r.paid_at ?? "",
         r.status,
-        JSON.stringify(r.traveler_name ?? ""),
-        JSON.stringify(r.business_name ?? ""),
-        JSON.stringify(r.product_title ?? ""),
+        csvCell(r.traveler_name),
+        csvCell(r.business_name),
+        csvCell(r.product_title),
         String(r.quantity),
         r.currency,
         (r.total_amount / 100).toFixed(2),
