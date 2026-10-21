@@ -1030,34 +1030,69 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
  */
 export const aluxFetchPhotoBytes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { url: string }) => {
+  .inputValidator((d: { url: string; fallbackUrl?: string | null; refererUrl?: string | null }) => {
     if (!d?.url) throw new Error("invalid_input");
-    let parsed: URL;
-    try {
-      parsed = new URL(d.url);
-    } catch {
-      throw new Error("invalid_input");
-    }
-    if (parsed.protocol !== "https:") throw new Error("invalid_input");
-    return { url: parsed.toString() };
+    const safe = (v?: string | null): string | null => {
+      if (!v) return null;
+      try {
+        const u = new URL(v);
+        return u.protocol === "https:" ? u.toString() : null;
+      } catch {
+        return null;
+      }
+    };
+    const url = safe(d.url);
+    if (!url) throw new Error("invalid_input");
+    return { url, fallbackUrl: safe(d.fallbackUrl), refererUrl: safe(d.refererUrl) };
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
-    // Varios acervos (Wikimedia, Openverse, sitios de hoteles) rechazan
-    // peticiones sin identificación de navegador; nos presentamos como uno.
-    const res = await fetch(data.url, {
-      redirect: "follow",
-      headers: {
+    // Detecta el tipo real por los primeros bytes: muchos sitios responden
+    // con content-type genérico (octet-stream) aunque sea una foto.
+    const sniff = (b: Uint8Array): string | null => {
+      if (b[0] === 0xff && b[1] === 0xd8) return "image/jpeg";
+      if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "image/png";
+      if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return "image/gif";
+      if (b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return "image/webp";
+      if (b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 && b[7] === 0x70) return "image/avif";
+      return null;
+    };
+    const tryFetch = async (url: string, referer: string | null) => {
+      // Varios acervos y sitios rechazan peticiones sin navegador o sin
+      // referencia de su propia página (protección anti-hotlink).
+      const headers: Record<string, string> = {
         "User-Agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
         Accept: "image/avif,image/webp,image/*,*/*;q=0.8",
-      },
-    });
-    if (!res.ok) throw new Error("photo_download_failed");
-    const mime = res.headers.get("content-type") ?? "image/jpeg";
-    if (!mime.startsWith("image/")) throw new Error("photo_not_an_image");
-    const buffer = new Uint8Array(await res.arrayBuffer());
-    if (buffer.byteLength > MAX_PHOTO_BYTES) throw new Error("photo_too_large");
+      };
+      if (referer) headers.Referer = referer;
+      const res = await fetch(url, { redirect: "follow", headers });
+      if (!res.ok) return { error: "photo_download_failed" as const };
+      const buffer = new Uint8Array(await res.arrayBuffer());
+      if (buffer.byteLength > MAX_PHOTO_BYTES) return { error: "photo_too_large" as const };
+      const header = res.headers.get("content-type") ?? "";
+      const mime = sniff(buffer) ?? (header.startsWith("image/") && !header.includes("svg") ? header : null);
+      if (!mime) return { error: "photo_not_an_image" as const };
+      return { mime, buffer };
+    };
+    let referer: string | null = null;
+    try {
+      referer = data.refererUrl ? new URL(data.refererUrl).origin + "/" : new URL(data.url).origin + "/";
+    } catch {
+      referer = null;
+    }
+    let result = await tryFetch(data.url, referer).catch(() => ({ error: "photo_download_failed" as const }));
+    if ("error" in result) {
+      // Sin referencia (algunos CDN la rechazan) y, si no, la copia del buscador.
+      const retry = await tryFetch(data.url, null).catch(() => null);
+      if (retry && !("error" in retry)) result = retry;
+      else if (data.fallbackUrl && data.fallbackUrl !== data.url) {
+        const fb = await tryFetch(data.fallbackUrl, null).catch(() => null);
+        if (fb && !("error" in fb)) result = fb;
+      }
+    }
+    if ("error" in result) throw new Error(result.error);
+    const { mime, buffer } = result;
     let binary = "";
     for (let offset = 0; offset < buffer.length; offset += 32_768) {
       binary += String.fromCharCode(...buffer.subarray(offset, offset + 32_768));
