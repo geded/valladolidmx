@@ -180,7 +180,9 @@ export function AluxPhotoFinderDialog({
   };
 
   const buildPicked = async (photo: PhotoCandidate): Promise<AluxPickedPhoto> => {
-    const res = await fetchBytes({ data: { url: photo.url } });
+    const res = await fetchBytes({
+      data: { url: photo.url, fallbackUrl: photo.thumbUrl ?? null, refererUrl: photo.sourceUrl ?? null },
+    });
     const bin = atob(res.bytesBase64);
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
