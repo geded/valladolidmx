@@ -16,6 +16,7 @@
 export const AI_CONCEPTUAL_CREDIT = "Imagen conceptual generada con IA para Valladolid.mx";
 
 export interface PublicMediaAttribution {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** Identidad estable del activo (auditoría y deduplicación). */
   mediaAssetId: string | null;
   /** URL estable o firmada. Nunca se sustituye por el consumidor. */

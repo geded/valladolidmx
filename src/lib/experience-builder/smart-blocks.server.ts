@@ -285,6 +285,8 @@ export async function resolveStableMediaAssets(
   stableUrls: string[],
 ): Promise<Record<string, MediaAssetInput>> {
   const out: Record<string, MediaAssetInput> = {};
+  const { isMediaPipelineEnabled } = await import("@/lib/media/pipeline-flag.server");
+  if (!(await isMediaPipelineEnabled())) return out;
   /* Una misma ruta puede llegar como URL estable o como URL firmada ya
      resuelta: conservamos todas las claves para que la superficie encuentre
      su asset sin cambiar ninguna URL canónica. */
@@ -334,7 +336,8 @@ export async function resolveStableMediaAssets(
         "asset_id",
         ready.map((a) => a.id),
       )
-      .eq("status", "ready");
+      .eq("status", "ready")
+      .eq("is_current", true);
 
     const byAsset = new Map<string, MediaVariantInput[]>();
     for (const v of variants ?? []) {
