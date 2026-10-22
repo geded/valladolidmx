@@ -75,7 +75,8 @@ async function run(file: Blob, assetId: string) {
 export function deriveVariantsInBackground(file: Blob, registerResult: unknown): void {
   const assetId = pickMediaAssetId(registerResult);
   if (!assetId) return;
-  void run(file, assetId).catch(() => {
-    /* fail-safe: la foto conserva su original */
+  void run(file, assetId).catch((err) => {
+    /* fail-safe: la foto conserva su original; el lote la optimiza después. */
+    console.warn("[media] versiones ligeras omitidas:", err instanceof Error ? err.message : err);
   });
 }
