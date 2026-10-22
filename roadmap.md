@@ -1,5 +1,9 @@
 # Roadmap
 
+## Optimización integral de imágenes · 2026-10-22
+- [ ] Completar entrega pública de variantes existentes en listados, destinos, zonas, rutas, experiencias y secciones compartidas; sin cambiar plantillas, editor, originales, Alux ni datos editoriales.
+- [ ] Verificar cobertura de subida compartida, contratos y entrega pública con comparativas 1440/834/430/390; documentar cobertura y bloqueos sin prometer optimización no comprobada.
+
 ## Auditoría de hoteles y restaurantes · 2026-10-22
 
 - [x] Auditar fichas capturadas, fotos, filtros públicos, Alux/coordenadas, visibilidad y optimización; sólo lectura, sin cambios de datos, diseño ni publicación. Informe entregado: 30 hoteles + 30 restaurantes de Valladolid, 2 restaurantes regionales y 464 activos; pendientes de acreditación fotográfica, horarios/zonas, Alux comercial/cercanía y variantes documentados, sin declarar verificaciones end-to-end no realizadas.
