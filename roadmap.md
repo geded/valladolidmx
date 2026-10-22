@@ -346,3 +346,7 @@
 - [x] 4) Fichas de las 60 esperadas: NO faltaban — error de la auditoría anterior (filtraba mal). Base real: 30 hoteles + 32 restaurantes publicados y aprobados; verificado en navegador (30 tarjetas en /hoteles, 32 en /restaurantes).
 - [x] Tests de contrato: scripts/alux/alux-nearby-visibility-geo.contract.test.ts (4 PASS) + suite de experiencias (13 PASS).
 - [ ] Pendiente: que el Founder asigne pesos de visibilidad reales a los operadores de experiencias (los 6 pesos actuales son de otros negocios), sin eso el orden de Experiencias sigue alfabético.
+
+## Fotos del destino Valladolid no visibles en público · 2026-10-22 (Founder reporta en vivo)
+- [ ] Diagnosticar por qué la imagen destacada y la galería subidas desde el CMS (DestinationMediaPanels) no aparecen en la ficha pública de Valladolid.
+- [ ] Aplicar la corrección mínima autorizada y verificar en la ruta pública sin tocar editor, plantilla ni selección editorial.
