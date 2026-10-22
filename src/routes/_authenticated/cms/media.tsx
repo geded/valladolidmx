@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
@@ -160,7 +161,7 @@ function AiConceptBatchUpload() {
           focalX: 0.5,
           focalY: 0.5,
         };
-        await upload({
+        const saved = await upload({
           data: {
             filename: file.name,
             mime: file.type,
@@ -169,6 +170,7 @@ function AiConceptBatchUpload() {
             rights,
           },
         });
+        deriveVariantsInBackground(file, saved);
         uploaded += 1;
         setProgress({ done: uploaded, total: files.length });
       }
