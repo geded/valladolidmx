@@ -992,6 +992,10 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       ...HOME_PREMIUM_STABLE_MEDIA_URLS,
     ]);
 
+    for (const route of publishedRoutes) {
+      if (route.coverUrl && route.coverAsset) mediaAssets[route.coverUrl] = route.coverAsset;
+    }
+
     const value: HomeRealContent = {
       destinos,
       experiencias,
