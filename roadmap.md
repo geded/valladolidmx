@@ -350,3 +350,4 @@
 ## Fotos del destino Valladolid no visibles en público · 2026-10-22 (Founder reporta en vivo)
 - [ ] Diagnosticar por qué la imagen destacada y la galería subidas desde el CMS (DestinationMediaPanels) no aparecen en la ficha pública de Valladolid.
 - [ ] Aplicar la corrección mínima autorizada y verificar en la ruta pública sin tocar editor, plantilla ni selección editorial.
+- [ ] Mejora propuesta (pendiente autorización): que el panel de subida de destinos capture autor/licencia y calcule la huella al subir, para que las fotos no queden ocultas.
