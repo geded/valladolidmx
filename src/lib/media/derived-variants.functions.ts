@@ -115,6 +115,6 @@ export const registerDerivedVariants = createServerFn({ method: "POST" })
       .from("media_assets")
       .update({ pipeline_status: "ready", pipeline_engine: DERIVE_ON_UPLOAD_ENGINE })
       .eq("id", data.assetId)
-      .neq("pipeline_status", "ready");
+      .or("pipeline_status.is.null,pipeline_status.neq.ready");
     return { registered: rows.length };
   });
