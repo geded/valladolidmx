@@ -104,7 +104,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           title: route.name,
           description: route.summary || "Itinerario editorial del Oriente Maya.",
           media: route.coverUrl
-            ? { url: route.coverUrl, alt: route.coverAlt ?? route.name }
+            ? { url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }
             : null,
           badges: [
             ...(route.originDestinationLabel
@@ -280,6 +280,7 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
               items: route.gallery.map((media) => ({
                 kind: "image" as const,
                 url: media.url,
+                asset: media.asset,
                 alt: media.alt ?? route.name,
               })),
               maxVisible: 8,

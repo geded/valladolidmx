@@ -40,6 +40,7 @@ export interface MarketplaceBusinessCard {
   verified: boolean;
   /** URL firmada de la portada oficial (business_media role=cover). */
   cover_url?: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** Coordenadas primarias — para el bloque `vmx.experience.map`. */
   latitude?: number | null;
   longitude?: number | null;
@@ -75,6 +76,7 @@ export interface MarketplaceProductCard {
   visibility_level: string;
   /** URL firmada de la portada oficial (product_media role=cover). */
   cover_url?: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 export interface MarketplacePromotionCard {
@@ -203,6 +205,7 @@ export interface MarketplaceSearchResult {
  * ------------------------------------------------------------------ */
 
 export interface ProductMediaItem {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   id: string;
   role: "cover" | "gallery" | string;
   url: string | null;
@@ -234,6 +237,7 @@ export interface ProductBusinessContext {
    * Opcional: `null` cuando la empresa aún no lo tiene cargado en CMS.
    */
   logo_url?: string | null;
+  logo_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 export interface ProductFaqItem {
@@ -300,6 +304,7 @@ export interface MarketplaceProductDetail {
     terms: string | null;
   };
   cover_url: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   media: ProductMediaItem[];
   business: ProductBusinessContext;
   related: MarketplaceProductCard[];
@@ -447,7 +452,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       supabase
         .from("product_media")
         .select(
-          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state ) )",
+          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text, alt_text_ai, alt_text_source, review_state, title, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state ) )",
         )
         .eq("product_id", prod.id)
         .order("sort_order", { ascending: true })
@@ -559,6 +564,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         title: string | null;
         width: number | null;
         height: number | null;
+        pipeline_status: string | null;
         media_asset_translations?: Array<{
           locale: string;
           alt_text: string | null;
@@ -622,16 +628,29 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       }
     }
 
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) {
+      const bases = media.flatMap((item) => {
+        const a = rows.find((row) => row.id === item.id)?.media_assets;
+        return a && item.url ? [{ id: a.id, file_url: item.url, width: a.width, height: a.height, pipeline_status: a.pipeline_status }] : [];
+      });
+      const bundles = await vb.attachReadyVariants(bases);
+      for (const item of media) {
+        const id = rows.find((row) => row.id === item.id)?.media_assets?.id;
+        if (id && bundles[id]) item.asset = bundles[id];
+      }
+    }
     const cover = media.find((m) => m.role === "cover") ?? media[0] ?? null;
 
     /* Logotipo de la empresa operadora (`business_media` role `logo`).
        Es opcional: sin logotipo acreditado la ficha conserva su composición
        actual y jamás se inventa una imagen de marca. */
     let businessLogoUrl: string | null = null;
+    let businessLogoAsset: import("@/lib/media/resolve-source").MediaAssetInput | undefined;
     try {
       const { data: logoRow } = await supabase
         .from("business_media")
-        .select("media_assets:media_assets ( storage_bucket, storage_path, status, deleted_at )")
+        .select("media_assets:media_assets ( id, width, height, pipeline_status, storage_bucket, storage_path, status, deleted_at )")
         .eq("business_id", String(biz.id))
         .eq("role", "logo")
         .order("sort_order", { ascending: true })
@@ -640,6 +659,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       const logoAsset = (
         logoRow as {
           media_assets?: {
+            id: string; width: number | null; height: number | null; pipeline_status: string | null;
             storage_bucket?: string;
             storage_path?: string;
             status?: string | null;
@@ -653,6 +673,13 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           .from(logoAsset.storage_bucket)
           .createSignedUrl(logoAsset.storage_path, 3600);
         businessLogoUrl = signedLogo?.signedUrl ?? null;
+        if (businessLogoUrl) {
+          const vb = await import("@/lib/media/variant-bundles.server");
+          if (await vb.shouldServePublicVariants()) {
+            const bundles = await vb.attachReadyVariants([{ id: logoAsset.id, file_url: businessLogoUrl, width: logoAsset.width, height: logoAsset.height, pipeline_status: logoAsset.pipeline_status }]);
+            businessLogoAsset = bundles[logoAsset.id];
+          }
+        }
       }
     } catch {
       businessLogoUrl = null;
@@ -772,6 +799,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         terms: ((prod as Record<string, unknown>).direct_sale_terms as string | null) ?? null,
       },
       cover_url: cover?.url ?? null,
+      cover_asset: cover?.asset,
       media,
       business: {
         id: biz.id,
@@ -785,6 +813,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         primary_contact: primaryContact,
         primary_location: primaryLocation,
         logo_url: businessLogoUrl,
+        logo_asset: businessLogoAsset,
       },
       effective_location: primaryLocation,
       related,
@@ -998,7 +1027,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         const { data: bmedia } = await supabase
           .from("business_media")
           .select(
-            "business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, alt_text )",
+            "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text )",
           )
           .in(
             "business_id",
@@ -1015,9 +1044,15 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
             seen.add(bid);
             return true;
           });
+          const variantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+          const assetByBusiness = new Map<string, string>();
           const signed = await Promise.all(
             firstPerBusiness.map(async (r) => {
               const asset = r.media_assets as {
+                id: string;
+                width: number | null;
+                height: number | null;
+                pipeline_status: string | null;
                 storage_bucket?: string;
                 storage_path?: string;
               } | null;
@@ -1026,11 +1061,21 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
               const { data: s } = await supabaseAdmin.storage
                 .from(asset.storage_bucket)
                 .createSignedUrl(asset.storage_path, 3600);
+              if (s?.signedUrl && asset.id) {
+                assetByBusiness.set(String(r.business_id), asset.id);
+                variantBases.push({ id: asset.id, file_url: s.signedUrl, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status });
+              }
               return [String(r.business_id), s?.signedUrl ?? null] as const;
             }),
           );
           const byBiz = new Map(signed);
-          for (const row of rows) row.cover_url = byBiz.get(row.id) ?? null;
+          const vb = await import("@/lib/media/variant-bundles.server");
+          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(variantBases) : {};
+          for (const row of rows) {
+            row.cover_url = byBiz.get(row.id) ?? null;
+            const id = assetByBusiness.get(row.id);
+            if (id && bundles[id]) row.cover_asset = bundles[id];
+          }
         }
       } catch (e) {
         console.warn("[listMarketplaceBusinesses] cover sign failed", e);
@@ -1285,10 +1330,11 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         for (const row of detailMediaRows) {
-          const a = row.media_assets!;
+          const a = row.media_assets;
+          if (!a?.storage_bucket || !a.storage_path) continue;
           const { data: signed } = await supabaseAdmin.storage
-            .from(a.storage_bucket!)
-            .createSignedUrl(a.storage_path!, 3600);
+            .from(a.storage_bucket)
+            .createSignedUrl(a.storage_path, 3600);
           if (!signed?.signedUrl) continue;
           detailMedia.push({
             role: typeof row.role === "string" ? row.role : "gallery",
@@ -1330,13 +1376,16 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
        Sin fila acreditada la tarjeta conserva su fallback editorial: nunca se
        inventan medios ni se construyen URLs fuera del pipeline. */
     const productCovers = new Map<string, string>();
+    const productCoverAssets: Record<string, import("@/lib/media/resolve-source").MediaAssetInput> = {};
+    const productAssetIds = new Map<string, string>();
+    const productVariantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
     const productIds = (products ?? []).map((p) => String(p.id));
     if (productIds.length > 0) {
       try {
         const { data: pmedia } = await supabase
           .from("product_media")
           .select(
-            "product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, status, deleted_at )",
+            "product_id, role, sort_order, media_assets:media_assets ( id, width, height, pipeline_status, storage_bucket, storage_path, status, deleted_at )",
           )
           .in("product_id", productIds)
           .eq("role", "cover")
@@ -1357,11 +1406,15 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           for (const row of validRows) {
             const pid = String(row.product_id);
             if (productCovers.has(pid)) continue;
-            const a = row.media_assets as { storage_bucket: string; storage_path: string };
+            const a = row.media_assets as { id: string; width: number | null; height: number | null; pipeline_status: string | null; storage_bucket: string; storage_path: string };
             const { data: signed } = await supabaseAdmin.storage
               .from(a.storage_bucket)
               .createSignedUrl(a.storage_path, 3600);
-            if (signed?.signedUrl) productCovers.set(pid, signed.signedUrl);
+            if (signed?.signedUrl) {
+              productCovers.set(pid, signed.signedUrl);
+              productAssetIds.set(pid, a.id);
+              productVariantBases.push({ id: a.id, file_url: signed.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+            }
           }
         }
       } catch {
@@ -1371,6 +1424,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
 
 
 
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) Object.assign(productCoverAssets, await vb.attachReadyVariants(productVariantBases));
     return {
       id: String(biz.id),
       media: detailMedia,
@@ -1410,6 +1465,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
         visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
         cover_url: productCovers.get(String(p.id)) ?? null,
+        cover_asset: productCoverAssets[productAssetIds.get(String(p.id)) ?? ""],
       })),
       promotions: (promos ?? []).map((p) => ({
         id: p.id,

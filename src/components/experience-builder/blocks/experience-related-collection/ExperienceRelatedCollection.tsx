@@ -64,6 +64,7 @@ function relatedItemToVM(item: ExperienceRelatedItem, showKindBadge: boolean): T
     tagline,
     businessName: item.businessName,
     mediaUrl: item.imageUrl,
+    mediaAsset: item.imageAsset,
     mediaAlt: item.imageAlt,
     rating: item.rating,
     location: item.location,

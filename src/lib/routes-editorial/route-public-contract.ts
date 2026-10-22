@@ -56,6 +56,7 @@ export interface EditorialRouteCardDTO {
   originDestinationLabel: string | null;
   coverUrl: string | null;
   coverAlt: string | null;
+  coverAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   stopCount: number;
 }
 
@@ -69,7 +70,7 @@ export interface EditorialRouteDetailDTO extends EditorialRouteCardDTO {
     distanceMeters: number | null;
     durationSeconds: number | null;
   } | null;
-  gallery: Array<{ url: string; alt: string | null }>;
+  gallery: Array<{ url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>;
 }
 
 export function routePublicPath(slug: string): string {
@@ -130,6 +131,7 @@ export function routeToTourismCard(
     tagline: route.summary || null,
     businessName: null,
     mediaUrl: route.coverUrl,
+    mediaAsset: route.coverAsset,
     mediaAlt: route.coverAlt,
     rating: null,
     location: null,

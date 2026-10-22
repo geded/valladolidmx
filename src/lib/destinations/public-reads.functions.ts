@@ -54,7 +54,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("destinations")
       .select(
-        "id, slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum )",
+        "id, slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum )",
       )
       .eq("slug", data.slug)
       .maybeSingle();
@@ -80,6 +80,8 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
           deleted_at?: string | null;
           is_demo_seed?: boolean | null;
           pipeline_status?: string | null;
+          width?: number | null;
+          height?: number | null;
           original_checksum?: string | null;
           title?: string | null;
           caption?: string | null;
@@ -104,7 +106,11 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
         const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
         const meta = (media.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(media, { fallback: "" });
+        const vb = await import("@/lib/media/variant-bundles.server");
+        const bundles = media.id && await vb.shouldServePublicVariants()
+          ? await vb.attachReadyVariants([{ id: media.id, file_url: hero_url, width: media.width ?? null, height: media.height ?? null, pipeline_status: media.pipeline_status ?? null }]) : {};
         hero_media = {
+          asset: media.id ? bundles[media.id] : undefined,
           mediaAssetId: media.id ?? null,
           url: hero_url,
           role: "cover",
@@ -249,7 +255,7 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
       rows.map(async (r) => {
         const m = (
           r as unknown as {
-            media_assets?: { storage_bucket: string; storage_path: string } | null;
+            media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
           }
         ).media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
@@ -288,13 +294,14 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
     const { data: rows, error } = await sb
       .from("destination_media")
       .select(
-         "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum ), destinations!inner(slug)",
+         "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum ), destinations!inner(slug)",
       )
       .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
       .limit(12);
     if (error || !rows) return [];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const bases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
     const resolved = await Promise.all(
       rows.map(async (r) => {
         const row = r as unknown as {
@@ -313,6 +320,8 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
             deleted_at: string | null;
             is_demo_seed: boolean | null;
             pipeline_status: string | null;
+            width: number | null;
+            height: number | null;
             original_checksum: string | null;
             title: string | null;
             caption: string | null;
@@ -330,6 +339,7 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         if (!s?.signedUrl) return null;
         const meta = (m.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(m, { fallback: "" });
+        bases.push({ id: m.id, file_url: s.signedUrl, width: m.width ?? null, height: m.height ?? null, pipeline_status: m.pipeline_status });
         const item: PublicMediaAttribution = {
           mediaAssetId: m.id ?? row.media_asset_id ?? null,
           url: s.signedUrl,
@@ -346,7 +356,13 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         return item;
       }),
     );
-    return resolved.filter((x): x is PublicMediaAttribution => x !== null);
+    const items = resolved.filter((x): x is PublicMediaAttribution => x !== null);
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) {
+      const bundles = await vb.attachReadyVariants(bases);
+      for (const item of items) if (item.mediaAssetId && bundles[item.mediaAssetId]) item.asset = bundles[item.mediaAssetId];
+    }
+    return items;
   });
 
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
@@ -507,7 +523,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         sb
           .from("business_media")
           .select(
-            "business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+            "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status )",
           )
           .in("business_id", bizIds)
           .eq("role", "cover")
@@ -541,24 +557,33 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             seen.add(bid);
             return true;
           });
+          const bases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+          const idByBusiness = new Map<string, string>();
           const signed = await Promise.all(
             first.map(async (r) => {
               const a = (
                 r as unknown as {
-                  media_assets?: { storage_bucket: string; storage_path: string } | null;
+                  media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
                 }
               ).media_assets;
               if (!a) return { id: r.business_id as string, url: null as string | null };
               const { data: s } = await supabaseAdmin.storage
                 .from(a.storage_bucket)
                 .createSignedUrl(a.storage_path, 3600);
+              if (s?.signedUrl) {
+                idByBusiness.set(String(r.business_id), a.id);
+                bases.push({ id: a.id, file_url: s.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+              }
               return { id: r.business_id as string, url: s?.signedUrl ?? null };
             }),
           );
           const byBiz = new Map(signed.map((x) => [x.id, x.url] as const));
+          const vb = await import("@/lib/media/variant-bundles.server");
+          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(bases) : {};
           const patchCover = (c: MarketplaceBusinessCard) => ({
             ...c,
             cover_url: byBiz.get(c.id) ?? null,
+            cover_asset: bundles[idByBusiness.get(c.id) ?? ""],
           });
           grouped.hoteles = grouped.hoteles.map(patchCover);
           grouped.restaurantes = grouped.restaurantes.map(patchCover);
@@ -613,12 +638,14 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           const { data: pmedia } = await sb
             .from("product_media")
             .select(
-              "product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+              "product_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status )",
             )
             .in("product_id", prodIds)
             .eq("role", "cover")
             .order("sort_order", { ascending: true });
           const byProd = new Map<string, string | null>();
+          const idByProduct = new Map<string, string>();
+          const productBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
           if (pmedia && pmedia.length > 0) {
             try {
               const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -633,13 +660,17 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
                 first.map(async (r) => {
                   const a = (
                     r as unknown as {
-                      media_assets?: { storage_bucket: string; storage_path: string } | null;
+                      media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
                     }
                   ).media_assets;
                   if (!a) return { id: r.product_id as string, url: null as string | null };
                   const { data: s } = await supabaseAdmin.storage
                     .from(a.storage_bucket)
                     .createSignedUrl(a.storage_path, 3600);
+                  if (s?.signedUrl) {
+                    idByProduct.set(String(r.product_id), a.id);
+                    productBases.push({ id: a.id, file_url: s.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+                  }
                   return { id: r.product_id as string, url: s?.signedUrl ?? null };
                 }),
               );
@@ -648,14 +679,16 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
               console.warn("[getDestinationRelated] product cover sign failed", e);
             }
           }
+          const vb = await import("@/lib/media/variant-bundles.server");
+          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(productBases) : {};
           grouped.productos = grouped.productos.map((p) => {
             const own = byProd.get(p.id) ?? null;
-            if (own) return { ...p, cover_url: own };
+            if (own) return { ...p, cover_url: own, cover_asset: bundles[idByProduct.get(p.id) ?? ""] };
             // Fallback: usar la portada del negocio dueño.
             const parent = grouped.hoteles
               .concat(grouped.restaurantes, grouped.experiencias, grouped.otras)
               .find((b) => b.slug === p.business_slug);
-            return { ...p, cover_url: parent?.cover_url ?? null };
+            return { ...p, cover_url: parent?.cover_url ?? null, cover_asset: parent?.cover_asset };
           });
         }
         if (pinnedIds.product.length > 0) {

@@ -17,6 +17,7 @@
  */
 
 export interface PlacePremiumMedia {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** `null` = placeholder neutral: no existe fotografía acreditada del lugar. */
   url: string | null;
   alt: string;

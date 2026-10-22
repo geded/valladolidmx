@@ -41,6 +41,7 @@ import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import { resolveMediaSource } from "@/lib/media/resolve-source";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
@@ -311,7 +312,7 @@ function DestinationRoutes({
             >
               {route.coverUrl ? (
                 <EditorialMediaFrame
-                  media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name }}
+                  media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }}
                   label={route.name}
                   className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
@@ -528,12 +529,11 @@ function HeroCinematografico({
   if (!content.hero.cover.url) return <HeroEditorial content={content} heroAction={heroAction} />;
   return (
     <section className="relative overflow-hidden rounded-3xl shadow-floating">
-      <img
-        src={content.hero.cover.url}
+      <picture className="contents">{resolveMediaSource(content.hero.cover.asset, { fallbackUrl: content.hero.cover.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img src={resolveMediaSource(content.hero.cover.asset, { fallbackUrl: content.hero.cover.url, context: "hero" }).src}
         alt={content.hero.cover.alt}
         loading="eager"
         className="h-[420px] w-full object-cover sm:h-[520px]"
-      />
+      /></picture>
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
         aria-hidden
@@ -665,16 +665,15 @@ function GaleriaEditorial({
       {layout === "mosaico" ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
+            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
+              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
               alt={m.alt}
               loading="lazy"
               className={cn(
                 "w-full rounded-3xl object-cover shadow-soft",
                 i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
               )}
-            />
+            /></picture>
           ))}
         </div>
       ) : null}
@@ -687,12 +686,11 @@ function GaleriaEditorial({
         >
           {items.map((m, i) => (
             <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
-              <img
-                src={m.url}
+              <picture className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
                 alt={m.alt}
                 loading="lazy"
                 className="h-60 w-full rounded-3xl object-cover shadow-soft"
-              />
+              /></picture>
             </li>
           ))}
         </ul>
@@ -701,13 +699,12 @@ function GaleriaEditorial({
       {layout === "cuadricula" ? (
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
           {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
+            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
+              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
               alt={m.alt}
               loading="lazy"
               className="h-48 w-full rounded-3xl object-cover shadow-soft"
-            />
+            /></picture>
           ))}
         </div>
       ) : null}
@@ -715,13 +712,12 @@ function GaleriaEditorial({
       {layout === "tira" ? (
         <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
           {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
+            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
+              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
               alt={m.alt}
               loading="lazy"
               className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            />
+            /></picture>
           ))}
         </div>
       ) : null}

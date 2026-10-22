@@ -285,6 +285,8 @@ export async function resolveStableMediaAssets(
   stableUrls: string[],
 ): Promise<Record<string, MediaAssetInput>> {
   const out: Record<string, MediaAssetInput> = {};
+  const { isMediaPipelineEnabled } = await import("@/lib/media/pipeline-flag.server");
+  if (!(await isMediaPipelineEnabled())) return out;
   /* Una misma ruta puede llegar como URL estable o como URL firmada ya
      resuelta: conservamos todas las claves para que la superficie encuentre
      su asset sin cambiar ninguna URL canónica. */
@@ -334,7 +336,8 @@ export async function resolveStableMediaAssets(
         "asset_id",
         ready.map((a) => a.id),
       )
-      .eq("status", "ready");
+      .eq("status", "ready")
+      .eq("is_current", true);
 
     const byAsset = new Map<string, MediaVariantInput[]>();
     for (const v of variants ?? []) {
@@ -504,10 +507,12 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
       Array.from(new Set(page.map((i) => i._media).filter((v): v is string => !!v))),
     );
 
+    const mediaAssets = await resolveStableMediaAssets(Array.from(media.values()));
     const items = page.map((i) => {
       const { _media, ...rest } = i;
       const url = _media ? (media.get(_media) ?? null) : null;
       if (url) {
+        if (mediaAssets[url]) rest.media_asset = mediaAssets[url] as unknown as SmartBlockJsonValue;
         if ("hero_image_url" in rest) rest.hero_image_url = url;
         if ("cover_image_url" in rest) rest.cover_image_url = url;
       }
@@ -988,6 +993,10 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       ...rutas.map((r) => r.mediaUrl),
       ...HOME_PREMIUM_STABLE_MEDIA_URLS,
     ]);
+
+    for (const route of publishedRoutes) {
+      if (route.coverUrl && route.coverAsset) mediaAssets[route.coverUrl] = route.coverAsset;
+    }
 
     const value: HomeRealContent = {
       destinos,

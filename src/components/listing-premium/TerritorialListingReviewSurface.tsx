@@ -22,6 +22,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { cn } from "@/lib/utils";
+import { resolveMediaSource, type MediaAssetInput } from "@/lib/media/resolve-source";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import {
   askAluxWithPreferenceMemory,
@@ -54,6 +55,7 @@ type TerritorialListingFamily =
   | "empresas";
 
 interface ListingItem {
+  imageAsset?: MediaAssetInput;
   name: string;
   zone: string;
   copy: string;
@@ -976,6 +978,7 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     // Sin medio CMS acreditado, la variante editorial elimina el marco de
     // imagen. Nunca usa fotografías de otra entidad o familia como relleno.
     image: item.mediaUrl ?? "",
+    imageAsset: item.mediaAsset,
     tags: unique([
       ...structuredTags,
       ...item.highlights,
@@ -1305,12 +1308,15 @@ function ListingCard({
         }`}
       >
         {item.image ? (
+          <picture className="contents">
+          {resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card", sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
           <img
-            src={item.image}
+            src={resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card" }).src}
             alt={item.name}
             loading="lazy"
             className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
           />
+          </picture>
         ) : (
           <div className="absolute inset-0 flex items-end p-4">
             <p className="line-clamp-3 font-display text-lg leading-snug text-[var(--muted-foreground)]">

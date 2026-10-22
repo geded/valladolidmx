@@ -126,7 +126,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       inEvaluationLot:
         isInEvaluationLot(evaluationLot, "destination", params.destino) ||
         isF1kDestination(params.destino),
-      nearbyDestinations: homeRealContent?.destinos ?? [],
+      nearbyDestinations: (homeRealContent?.destinos ?? []).map((card) => ({
+        ...card,
+        mediaAsset: homeRealContent?.mediaAssets?.[card.mediaUrl],
+      })),
       routes,
       listingFamilyTaxonomy,
     };

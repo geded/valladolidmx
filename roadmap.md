@@ -1,5 +1,9 @@
 # Roadmap
 
+## Optimización integral de imágenes · 2026-10-22
+- [x] Conectar variantes existentes a consumidores públicos compartidos de listados, destinos, rutas, experiencias, eventos, productos relacionados y logotipos; originales, editor y datos editoriales sin cambios. Zonas conservan la subida compartida; no se inventó una superficie pública inexistente.
+- [x] Verificar contratos (65 tests PASS), 36 recorridos públicos en 1440/834/430/390 (0 errores, 0 overflow, 0 peticiones originales detectadas en la muestra) y eventos/experiencias/Sutuk (0 imágenes rotas); documentar alcance y limitaciones en docs/media-optimization-2026-10-22.md. No publicación ni cambios de fichas.
+
 ## Auditoría de hoteles y restaurantes · 2026-10-22
 
 - [x] Auditar fichas capturadas, fotos, filtros públicos, Alux/coordenadas, visibilidad y optimización; sólo lectura, sin cambios de datos, diseño ni publicación. Informe entregado: 30 hoteles + 30 restaurantes de Valladolid, 2 restaurantes regionales y 464 activos; pendientes de acreditación fotográfica, horarios/zonas, Alux comercial/cercanía y variantes documentados, sin declarar verificaciones end-to-end no realizadas.

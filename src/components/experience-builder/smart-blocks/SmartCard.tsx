@@ -12,6 +12,7 @@ export interface SmartCardProps {
   subtitle?: string | null;
   description?: string | null;
   imageUrl?: string | null;
+  imageAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   href?: string | null;
   badge?: string | null;
   aspect?: "4/3" | "16/9" | "1/1";
@@ -24,6 +25,7 @@ export function SmartCard({
   subtitle,
   description,
   imageUrl,
+  imageAsset,
   href,
   badge,
   aspect = "4/3",
@@ -40,7 +42,7 @@ export function SmartCard({
         <div className={`${aspectClass} w-full overflow-hidden bg-muted`}>
           {imageUrl ? (
             <EditorialMediaFrame
-              media={{ url: imageUrl, alt: title }}
+              media={{ url: imageUrl, alt: title, asset: imageAsset }}
               context="card"
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"

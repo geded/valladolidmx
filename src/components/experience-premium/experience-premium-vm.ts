@@ -21,6 +21,7 @@ import {
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 
 export interface ExperienceMediaVM {
+  readonly asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   readonly url: string;
   readonly alt: string;
 }
@@ -64,6 +65,7 @@ export interface ExperiencePremiumVM {
   readonly operatorHref: string | null;
   /** Logotipo firmado de la empresa operadora; `null` si no está cargado. */
   readonly operatorLogoUrl: string | null;
+  readonly operatorLogoAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   readonly destinationSlug: string | null;
   readonly destinationLabel: string | null;
   readonly cover: ExperienceMediaVM | null;
@@ -101,12 +103,12 @@ export function buildExperienceVMFromProduct(
   curatedRelated?: ProductRelatedDTO | null,
 ): ExperiencePremiumVM {
   const cover = product.cover_url
-    ? { url: product.cover_url, alt: `${product.name} — ${product.business.display_name}` }
+    ? { url: product.cover_url, alt: `${product.name} — ${product.business.display_name}`, asset: product.cover_asset }
     : null;
   const gallery = product.media
     .filter((item) => Boolean(item.url))
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map((item) => ({ url: item.url as string, alt: item.alt ?? product.name }));
+    .map((item) => ({ url: item.url as string, alt: item.alt ?? product.name, asset: item.asset }));
 
   const destinationSlug = product.business.destination_slug || null;
   const categorySlug = product.business.category_slug || null;
@@ -249,6 +251,7 @@ export function buildExperienceVMFromProduct(
     operatorName: product.business.display_name,
     operatorHref,
     operatorLogoUrl: product.business.logo_url ?? null,
+    operatorLogoAsset: product.business.logo_asset,
     destinationSlug,
     destinationLabel: destinationSlug ? humanize(destinationSlug) : null,
     cover,

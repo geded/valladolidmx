@@ -11,6 +11,7 @@ export interface SmartEventItem {
   starts_at?: string | null;
   ends_at?: string | null;
   href?: string | null;
+  media_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   [k: string]: unknown;
 }
 
@@ -55,7 +56,7 @@ export function SmartEventsList({ items, title }: { items: SmartEventItem[]; tit
               >
                 {e.cover_image_url ? (
                   <EditorialMediaFrame
-                    media={{ url: e.cover_image_url, alt: String(e.name ?? "Evento") }}
+                    media={{ url: e.cover_image_url, alt: String(e.name ?? "Evento"), asset: e.media_asset }}
                     context="thumbnail"
                     sizes="64px"
                     className="h-16 w-16 rounded-lg object-cover"

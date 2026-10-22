@@ -33,9 +33,9 @@ export function ExperienceHeroFromProduct() {
   const gallery = (p.media ?? [])
     .filter((m) => Boolean(m.url))
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-    .map((m) => ({ url: m.url as string, alt: m.alt || p.name }));
+    .map((m) => ({ url: m.url as string, alt: m.alt || p.name, asset: m.asset }));
   if (gallery.length === 0 && p.cover_url) {
-    gallery.push({ url: p.cover_url, alt: p.name });
+    gallery.push({ url: p.cover_url, alt: p.name, asset: p.cover_asset });
   }
 
   const badges: ExperienceHeroDTO["badges"] = [];
@@ -66,7 +66,7 @@ export function ExperienceHeroFromProduct() {
     eyebrow: p.product_type || null,
     title: p.name,
     description: p.tagline || null,
-    media: gallery[0] ? { url: gallery[0].url, alt: gallery[0].alt, overlay: 0 } : null,
+    media: gallery[0] ? { url: gallery[0].url, alt: gallery[0].alt, overlay: 0, asset: gallery[0].asset } : null,
     mediaSlides: gallery,
     badges,
     meta,

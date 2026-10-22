@@ -30,6 +30,7 @@ import type {
 /* ─────────────────────────────  DTO público  ───────────────────────────── */
 
 export interface PublicPlaceMediaDTO {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   mediaAssetId: string | null;
   url: string | null;
   alt: string | null;
@@ -164,6 +165,7 @@ export interface PublicPlaceCard {
   categories: Array<{ slug: string; name: string }>;
   /** Portada gobernada y aprobada del propio lugar; nunca medios ajenos. */
   cover_url: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /**
    * Atributos estructurados derivados EXCLUSIVAMENTE de columnas reales
    * (place_type, experience_category, admission_type, zone, accessibility,
@@ -232,6 +234,7 @@ export function toSurfaceMedia(
   if (!media || !media.url) return neutralPlaceholder(fallbackLabel);
   return {
     url: media.url,
+    asset: media.asset,
     alt: safeAlt(media.alt, fallbackLabel),
     credit: (media.credit ?? "").trim(),
   };

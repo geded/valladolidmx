@@ -41,6 +41,7 @@ export function businessRelatedToItems(
     // Portada canónica del CMS cuando existe; sin ella la tarjeta
     // compartida resuelve su marcador editorial aprobado.
     imageUrl: b.cover_url ?? null,
+    imageAsset: b.cover_asset,
     imageAlt: b.cover_url ? b.display_name : null,
     meta: [],
     badges: b.verified ? [{ label: "Verificado", tone: "primary" as const }] : [],

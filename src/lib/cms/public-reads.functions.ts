@@ -175,13 +175,20 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
     const { data, error } = await supabase
       .from("destinations")
       .select(
-        "id, slug, name, tagline, description, hero_palette, highlights, latitude, longitude, status, deleted_at, tourism_regions ( slug ), media_assets:hero_media_id ( storage_bucket, storage_path, status, deleted_at, is_demo_seed, review_state, pipeline_status, original_checksum, alt_text, credit, metadata )",
+        "id, slug, name, tagline, description, hero_palette, highlights, latitude, longitude, status, deleted_at, tourism_regions ( slug ), media_assets:hero_media_id ( id, width, height, storage_bucket, storage_path, status, deleted_at, is_demo_seed, review_state, pipeline_status, original_checksum, alt_text, credit, metadata )",
       )
       .eq("status", "published")
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .limit(60);
     if (error) throw new Error(`destinations_read_failed: ${error.message}`);
+    const vb = await import("@/lib/media/variant-bundles.server");
+    const bases = (data ?? []).flatMap((row) => {
+      const media = row.media_assets;
+      const url = media && isAccreditedDestinationMedia(media) ? toStablePublicMediaUrl(media.storage_bucket, media.storage_path) : null;
+      return media && url ? [{ id: media.id, file_url: url, width: media.width, height: media.height, pipeline_status: media.pipeline_status }] : [];
+    });
+    const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(bases) : {};
     return (data ?? []).map((row) => {
       const regionSlug =
         row.tourism_regions && typeof (row.tourism_regions as { slug?: unknown }).slug === "string"
@@ -206,7 +213,7 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
         long_description: row.description ?? undefined,
         hero_palette: heroPalette,
         highlights: (row.highlights ?? []) as readonly string[],
-        ...(imageUrl ? { image_url: imageUrl } : {}),
+        ...(imageUrl ? { image_url: imageUrl, image_asset: row.media_assets ? bundles[row.media_assets.id] : undefined } : {}),
         latitude: row.latitude ?? null,
         longitude: row.longitude ?? null,
       };

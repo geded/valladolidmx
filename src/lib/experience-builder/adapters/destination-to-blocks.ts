@@ -154,6 +154,7 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
       const caption = resolveAttributedCaption(a);
       return {
         url,
+        asset: a.asset,
         // G8-F1D · El fallback nunca puede reducirse al nombre del destino:
         // sólo aplica cuando no existe ALT acreditado.
         alt: resolveAttributedAlt(a, {
@@ -181,7 +182,7 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
       eyebrow: null,
       title: d.name,
       description: d.tagline || null,
-      media: { url: slides[0].url, alt: slides[0].alt, overlay: 0 },
+      media: { url: slides[0].url, alt: slides[0].alt, overlay: 0, asset: slides[0].asset },
       mediaSlides: slides,
       badges: [],
       meta: [{ iconKey: "map-pin", label: d.regionName }],
@@ -368,6 +369,7 @@ export function destinationToGalleryDTO(d: DestinationBlockInput): ExperienceGal
       return {
         kind: "image" as const,
         url,
+        asset: a.asset,
         alt: resolveAttributedAlt(a, { fallback: `${d.name} — foto ${i + 1}` }),
         ...(caption ? { caption } : {}),
         ...(credit ? { credit } : {}),

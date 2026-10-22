@@ -150,6 +150,7 @@ export function businessToTourismCard(
     // business_media → media_assets. El adaptador no debe descartarla:
     // es la misma autoridad gobernada que consumen ficha, mapa y Mi Viaje.
     mediaUrl: b.cover_url ?? null,
+    mediaAsset: b.cover_asset,
     mediaAlt: b.cover_url ? b.display_name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -205,6 +206,7 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
     tagline: e.summary || null,
     businessName: e.venue_name || null,
     mediaUrl: e.cover_url || null,
+    mediaAsset: e.cover_asset,
     mediaAlt: e.title,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -243,6 +245,7 @@ export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
     // Portada gobernada del propio lugar (aprobada, no IA); sin medio
     // acreditado la tarjeta muestra el marcador neutral, nunca otra imagen.
     mediaUrl: p.cover_url || null,
+    mediaAsset: p.cover_asset,
     mediaAlt: p.cover_url ? p.name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -369,6 +372,7 @@ export function destinationToTourismCard(d: Destination): TourismCardVM {
     // superó la política pública de acreditación. Conservarla aquí evita que
     // los listados editoriales pierdan el medio gobernado antes del render.
     mediaUrl: d.image_url ?? null,
+    mediaAsset: d.image_asset,
     mediaAlt: d.image_url ? `${d.name} — ${d.tagline}` : null,
     rating: null,
     location: null,

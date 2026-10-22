@@ -193,7 +193,7 @@ export function ProductSurface({
             description: p.tagline || p.description || undefined,
             media:
               p.cover_url && !activeContract.omissions.includes("media")
-                ? { url: p.cover_url, alt: p.name }
+                ? { url: p.cover_url, alt: p.name, asset: p.cover_asset }
                 : null,
           }}
         />

@@ -66,7 +66,7 @@ export function ExperiencePremiumSurface({
     .filter(
       (media, index, all) => all.findIndex((candidate) => candidate.url === media.url) === index,
     )
-    .map((media) => ({ kind: "image" as const, url: media.url, alt: media.alt }));
+    .map((media) => ({ kind: "image" as const, url: media.url, alt: media.alt, asset: media.asset }));
   const anchors = [
     { id: "resumen", label: "Resumen", iconKey: "info" },
     ...(galleryItems.length > 1 ? [{ id: "galeria", label: "Galería", iconKey: "camera" }] : []),
@@ -178,7 +178,7 @@ export function ExperiencePremiumSurface({
             eyebrow: [vm.eyebrow, vm.destinationLabel].filter(Boolean).join(" · ") || undefined,
             title: vm.name,
             description: vm.tagline || undefined,
-            media: vm.cover ? { url: vm.cover.url, alt: vm.cover.alt } : null,
+            media: vm.cover ? { url: vm.cover.url, alt: vm.cover.alt, asset: vm.cover.asset } : null,
             badges: [],
           }}
         />
@@ -248,7 +248,7 @@ export function ExperiencePremiumSurface({
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-sm">
-              <BusinessLogo url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
+              <BusinessLogo asset={vm.operatorLogoAsset} url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
               <span className="min-w-0">
                 <span className="text-muted-foreground">Operada por </span>
                 {vm.operatorHref ? (

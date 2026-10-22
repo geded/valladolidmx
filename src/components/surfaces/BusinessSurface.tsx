@@ -615,7 +615,8 @@ export function BusinessSurface({
      fotografías no se renderiza nada: jamás se inventan medios. */
   /* El logotipo es identidad de marca, no fotografía de la ficha: se muestra
      junto al nombre y queda fuera del mosaico editorial. */
-  const businessLogoUrl = (b.media ?? []).find((m) => m.role === "logo" && m.url)?.url ?? null;
+  const businessLogo = (b.media ?? []).find((m) => m.role === "logo" && m.url);
+  const businessLogoUrl = businessLogo?.url ?? null;
   const cmsGalleryItems = (b.media ?? [])
     .filter((m) => Boolean(m.url) && m.role !== "logo")
     .map((m) => ({
@@ -748,7 +749,7 @@ export function BusinessSurface({
           // El Hero no repite el breadcrumb decorativo.
           eyebrow: variant.eyebrow,
           identity: businessLogoUrl ? (
-            <BusinessLogo url={businessLogoUrl} businessName={b.display_name} size="lg" />
+            <BusinessLogo url={businessLogoUrl} asset={businessLogo?.asset} businessName={b.display_name} size="lg" />
           ) : undefined,
           title: b.display_name,
           description: b.tagline || undefined,
@@ -761,14 +762,7 @@ export function BusinessSurface({
               ? {
                   url: b.cover_url,
                   alt: b.display_name,
-                  ...((b.media ?? []).find((m) => m.role === "cover" && m.url === b.cover_url)
-                    ?.asset
-                    ? {
-                        asset: (b.media ?? []).find(
-                          (m) => m.role === "cover" && m.url === b.cover_url,
-                        )!.asset,
-                      }
-                    : {}),
+                  asset: (b.media ?? []).find((m) => m.role === "cover" && m.url === b.cover_url)?.asset,
                 }
               : null,
           badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],

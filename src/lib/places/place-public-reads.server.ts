@@ -68,7 +68,7 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
   const { data: assets } = await supabaseAdmin
     .from("media_assets")
     .select(
-      "id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, caption, credit, metadata",
+      "id, storage_bucket, storage_path, width, height, pipeline_status, alt_text, alt_text_ai, alt_text_source, review_state, caption, credit, metadata",
     )
     .in(
       "id",
@@ -77,6 +77,7 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
   const byId = new Map<string, any>((assets ?? []).map((a: any) => [a.id, a]));
   const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
 
+  const bases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
   const out: PublicPlaceMediaDTO[] = [];
   for (const link of rows) {
     const asset = byId.get(link.media_asset_id);
@@ -88,6 +89,7 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
         .createSignedUrl(asset.storage_path, 60 * 60);
       url = signed?.signedUrl ?? null;
     }
+    if (url) bases.push({ id: asset.id, file_url: url, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
     const meta = (asset.metadata ?? {}) as Record<string, unknown>;
     const focal = (meta.focal ?? null) as { x: number; y: number } | null;
     out.push({
@@ -102,6 +104,11 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
       aiGenerated: meta.ai_generated === true,
       focal,
     });
+  }
+  const vb = await import("@/lib/media/variant-bundles.server");
+  if (await vb.shouldServePublicVariants()) {
+    const bundles = await vb.attachReadyVariants(bases);
+    for (const item of out) if (item.mediaAssetId && bundles[item.mediaAssetId]) item.asset = bundles[item.mediaAssetId];
   }
   return out;
 }
@@ -720,11 +727,13 @@ export async function readPublishedPlaceCards(
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: assets } = await supabaseAdmin
       .from("media_assets")
-      .select("id, storage_bucket, storage_path, review_state, metadata")
+      .select("id, storage_bucket, storage_path, width, height, pipeline_status, review_state, metadata")
       .in("id", assetIds);
     for (const a of (assets ?? []) as any[]) assetById.set(a.id, a);
   }
   const coverUrlByPlace = new Map<string, string | null>();
+  const coverIdByPlace = new Map<string, string>();
+  const coverBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
   if (assetIds.length) {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     for (const placeId of placeIds) {
@@ -750,11 +759,18 @@ export async function readPublishedPlaceCards(
           .from(asset.storage_bucket)
           .createSignedUrl(asset.storage_path, 60 * 60);
         url = signed?.signedUrl ?? null;
-        if (url) break;
+        if (url) {
+          coverIdByPlace.set(placeId, asset.id);
+          coverBases.push({ id: asset.id, file_url: url, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
+          break;
+        }
       }
       coverUrlByPlace.set(placeId, url);
     }
   }
+
+  const vb = await import("@/lib/media/variant-bundles.server");
+  const coverBundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(coverBases) : {};
 
   /* Fail-closed territorial: un lugar sólo es públicamente navegable si su
      destino también es público (RLS anon: destinos published y no
@@ -821,6 +837,7 @@ export async function readPublishedPlaceCards(
       accessibility,
       categories,
       cover_url: coverUrlByPlace.get(p.id) ?? null,
+      cover_asset: coverBundles[coverIdByPlace.get(p.id) ?? ""],
       filter_attributes: attrs,
     } satisfies PublicPlaceCard;
   });

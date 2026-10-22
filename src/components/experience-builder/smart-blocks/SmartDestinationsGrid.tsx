@@ -8,6 +8,7 @@ export interface SmartDestinationItem {
   short_description?: string | null;
   hero_image_url?: string | null;
   href?: string | null;
+  media_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   [k: string]: unknown;
 }
 
@@ -38,6 +39,7 @@ export function SmartDestinationsGrid({
             title={String(d.name ?? "Destino")}
             description={d.short_description ?? null}
             imageUrl={d.hero_image_url ?? null}
+            imageAsset={d.media_asset}
             href={d.href ?? null}
             actions={
               d.id ? (

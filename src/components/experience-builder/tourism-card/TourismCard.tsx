@@ -91,6 +91,7 @@ export interface TourismCardVM {
   businessName: string | null;
   mediaUrl: string | null;
   mediaAlt: string | null;
+  mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   rating: { value: number; count: number } | null;
   location: { label: string; distanceKm: number | null } | null;
   /**
@@ -365,7 +366,7 @@ export function TourismCard({
         >
           {vm.mediaUrl ? (
             <EditorialMediaFrame
-              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name }}
+              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
               context="card"
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -596,7 +597,7 @@ export function TourismCardRow({
         <div className={cn("shrink-0 overflow-hidden rounded-xl bg-muted", size)}>
           {vm.mediaUrl ? (
             <EditorialMediaFrame
-              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name }}
+              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
               context="thumbnail"
               sizes="96px"
               className="h-full w-full object-cover"
