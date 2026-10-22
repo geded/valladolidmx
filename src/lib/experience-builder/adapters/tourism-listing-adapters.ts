@@ -372,6 +372,7 @@ export function destinationToTourismCard(d: Destination): TourismCardVM {
     // superó la política pública de acreditación. Conservarla aquí evita que
     // los listados editoriales pierdan el medio gobernado antes del render.
     mediaUrl: d.image_url ?? null,
+    mediaAsset: d.image_asset,
     mediaAlt: d.image_url ? `${d.name} — ${d.tagline}` : null,
     rating: null,
     location: null,
