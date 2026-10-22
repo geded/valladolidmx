@@ -102,7 +102,7 @@ export const registerDerivedVariants = createServerFn({ method: "POST" })
         usage_context: "generic",
         status: "ready",
         is_current: true,
-        variant_key: `${DERIVE_ON_UPLOAD_ENGINE}:${DERIVE_ON_UPLOAD_FORMAT}:${v.width}`,
+        variant_key: `${data.assetId}:${DERIVE_ON_UPLOAD_ENGINE}:${DERIVE_ON_UPLOAD_FORMAT}:${v.width}`,
       }));
     if (rows.length === 0) return { registered: 0 };
     const { error } = await admin
