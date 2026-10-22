@@ -461,3 +461,24 @@ export async function withRetry<T>(fn: () => Promise<T>, opts: RetryOptions = {}
   }
   throw lastErr instanceof Error ? lastErr : new Error("Subida fallida.");
 }
+
+/**
+ * Lee ancho/alto reales de un archivo de imagen ya preparado.
+ * Aditivo y fail-safe: si no puede leerse, devuelve nulls (comportamiento previo).
+ */
+export async function readImageDimensions(
+  file: Blob,
+): Promise<{ width: number | null; height: number | null }> {
+  try {
+    if (typeof createImageBitmap === "function") {
+      const bmp = await createImageBitmap(file);
+      const out = { width: bmp.width || null, height: bmp.height || null };
+      bmp.close?.();
+      return out;
+    }
+    const img = await loadImage(file as File);
+    return { width: img.naturalWidth || null, height: img.naturalHeight || null };
+  } catch {
+    return { width: null, height: null };
+  }
+}

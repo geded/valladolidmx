@@ -18,7 +18,7 @@ import {
   reorderBusinessGallery,
   signBusinessImageUpload,
 } from "@/lib/cms/businesses-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { prepareImageForRole, readImageDimensions, withRetry } from "@/lib/cms/image-upload";
 import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
 
 interface Props {
@@ -48,6 +48,7 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
 
   const uploadOne = async (file: File, role: "logo" | "cover" | "gallery") => {
     const prepared = await prepareImageForRole(file, role);
+    const dims = await readImageDimensions(prepared);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -71,6 +72,8 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
           alt: file.name,
           mime: prepared.type,
           sizeBytes: prepared.size,
+          width: dims.width,
+          height: dims.height,
         },
       });
     });
