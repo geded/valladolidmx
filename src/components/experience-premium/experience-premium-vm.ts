@@ -65,6 +65,7 @@ export interface ExperiencePremiumVM {
   readonly operatorHref: string | null;
   /** Logotipo firmado de la empresa operadora; `null` si no está cargado. */
   readonly operatorLogoUrl: string | null;
+  readonly operatorLogoAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   readonly destinationSlug: string | null;
   readonly destinationLabel: string | null;
   readonly cover: ExperienceMediaVM | null;
@@ -250,6 +251,7 @@ export function buildExperienceVMFromProduct(
     operatorName: product.business.display_name,
     operatorHref,
     operatorLogoUrl: product.business.logo_url ?? null,
+    operatorLogoAsset: product.business.logo_asset,
     destinationSlug,
     destinationLabel: destinationSlug ? humanize(destinationSlug) : null,
     cover,

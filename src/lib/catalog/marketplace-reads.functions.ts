@@ -237,6 +237,7 @@ export interface ProductBusinessContext {
    * Opcional: `null` cuando la empresa aún no lo tiene cargado en CMS.
    */
   logo_url?: string | null;
+  logo_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 export interface ProductFaqItem {
@@ -645,10 +646,11 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
        Es opcional: sin logotipo acreditado la ficha conserva su composición
        actual y jamás se inventa una imagen de marca. */
     let businessLogoUrl: string | null = null;
+    let businessLogoAsset: import("@/lib/media/resolve-source").MediaAssetInput | undefined;
     try {
       const { data: logoRow } = await supabase
         .from("business_media")
-        .select("media_assets:media_assets ( storage_bucket, storage_path, status, deleted_at )")
+        .select("media_assets:media_assets ( id, width, height, pipeline_status, storage_bucket, storage_path, status, deleted_at )")
         .eq("business_id", String(biz.id))
         .eq("role", "logo")
         .order("sort_order", { ascending: true })
@@ -657,6 +659,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       const logoAsset = (
         logoRow as {
           media_assets?: {
+            id: string; width: number | null; height: number | null; pipeline_status: string | null;
             storage_bucket?: string;
             storage_path?: string;
             status?: string | null;
@@ -670,6 +673,13 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           .from(logoAsset.storage_bucket)
           .createSignedUrl(logoAsset.storage_path, 3600);
         businessLogoUrl = signedLogo?.signedUrl ?? null;
+        if (businessLogoUrl) {
+          const vb = await import("@/lib/media/variant-bundles.server");
+          if (await vb.shouldServePublicVariants()) {
+            const bundles = await vb.attachReadyVariants([{ id: logoAsset.id, file_url: businessLogoUrl, width: logoAsset.width, height: logoAsset.height, pipeline_status: logoAsset.pipeline_status }]);
+            businessLogoAsset = bundles[logoAsset.id];
+          }
+        }
       }
     } catch {
       businessLogoUrl = null;
@@ -803,6 +813,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         primary_contact: primaryContact,
         primary_location: primaryLocation,
         logo_url: businessLogoUrl,
+        logo_asset: businessLogoAsset,
       },
       effective_location: primaryLocation,
       related,
@@ -1365,13 +1376,16 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
        Sin fila acreditada la tarjeta conserva su fallback editorial: nunca se
        inventan medios ni se construyen URLs fuera del pipeline. */
     const productCovers = new Map<string, string>();
+    const productCoverAssets: Record<string, import("@/lib/media/resolve-source").MediaAssetInput> = {};
+    const productAssetIds = new Map<string, string>();
+    const productVariantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
     const productIds = (products ?? []).map((p) => String(p.id));
     if (productIds.length > 0) {
       try {
         const { data: pmedia } = await supabase
           .from("product_media")
           .select(
-            "product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, status, deleted_at )",
+            "product_id, role, sort_order, media_assets:media_assets ( id, width, height, pipeline_status, storage_bucket, storage_path, status, deleted_at )",
           )
           .in("product_id", productIds)
           .eq("role", "cover")
@@ -1392,11 +1406,15 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
           for (const row of validRows) {
             const pid = String(row.product_id);
             if (productCovers.has(pid)) continue;
-            const a = row.media_assets as { storage_bucket: string; storage_path: string };
+            const a = row.media_assets as { id: string; width: number | null; height: number | null; pipeline_status: string | null; storage_bucket: string; storage_path: string };
             const { data: signed } = await supabaseAdmin.storage
               .from(a.storage_bucket)
               .createSignedUrl(a.storage_path, 3600);
-            if (signed?.signedUrl) productCovers.set(pid, signed.signedUrl);
+            if (signed?.signedUrl) {
+              productCovers.set(pid, signed.signedUrl);
+              productAssetIds.set(pid, a.id);
+              productVariantBases.push({ id: a.id, file_url: signed.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+            }
           }
         }
       } catch {
@@ -1406,6 +1424,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
 
 
 
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) Object.assign(productCoverAssets, await vb.attachReadyVariants(productVariantBases));
     return {
       id: String(biz.id),
       media: detailMedia,
@@ -1445,6 +1465,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
         visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
         cover_url: productCovers.get(String(p.id)) ?? null,
+        cover_asset: productCoverAssets[productAssetIds.get(String(p.id)) ?? ""],
       })),
       promotions: (promos ?? []).map((p) => ({
         id: p.id,

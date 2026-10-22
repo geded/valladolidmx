@@ -248,7 +248,7 @@ export function ExperiencePremiumSurface({
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-sm">
-              <BusinessLogo url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
+              <BusinessLogo asset={vm.operatorLogoAsset} url={vm.operatorLogoUrl} businessName={vm.operatorName} size="sm" />
               <span className="min-w-0">
                 <span className="text-muted-foreground">Operada por </span>
                 {vm.operatorHref ? (

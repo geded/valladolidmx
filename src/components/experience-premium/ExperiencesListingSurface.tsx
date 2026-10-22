@@ -42,6 +42,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import { resolveExperienceCommerce } from "@/lib/experiences/experience-commerce";
 import { cn } from "@/lib/utils";
+import { resolveMediaSource } from "@/lib/media/resolve-source";
 import { CATEGORY_ICON_SLUGS } from "@/lib/omxds/category-icon-registry";
 
 /* El mapa sólo se descarga cuando la vista lo necesita. */
@@ -787,12 +788,15 @@ function ExperienceStoreCard({
       <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">
         <a href={vm.href ?? "/experiencias"} className="block size-full ring-focus">
           {vm.mediaUrl ? (
+            <picture className="contents">
+              {resolveMediaSource(vm.mediaAsset, { fallbackUrl: vm.mediaUrl, context: "card", sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
             <img
-              src={vm.mediaUrl}
+              src={resolveMediaSource(vm.mediaAsset, { fallbackUrl: vm.mediaUrl, context: "card" }).src}
               alt={vm.mediaAlt ?? vm.name}
               className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
               loading="lazy"
             />
+            </picture>
           ) : (
             <span className="grid size-full place-items-center text-xs text-muted-foreground">
               Sin fotografía publicada
