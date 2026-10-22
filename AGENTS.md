@@ -51,5 +51,5 @@ Airbnb, Tripadvisor y Google Travel son referencias de claridad, confianza, desc
 
 No reescribir historial publicado, no hacer force-push y no eliminar la rama de integración. Los commits enviados a la rama conectada deben quedar funcionales y trazables.
 
-- Media variants: every official upload path calls `deriveVariantsInBackground` (`src/lib/media/derive-on-upload.client.ts`) after registering the original; it writes WebP 400/800/1200 (`browser-canvas` engine) via `derived-variants.functions.ts`, never touches the original and never blocks the upload. Why: sharp cannot run in the Worker; the `scripts/media-pipeline/derive.mjs` batch remains the fallback for missed or failed photos.
+- Media variants: every official upload path calls `deriveVariantsInBackground` (`src/lib/media/derive-on-upload-browser.ts`) after registering the original; it writes WebP 400/800/1200 (`browser-canvas` engine) via `derived-variants.functions.ts`, never touches the original and never blocks the upload. Why: sharp cannot run in the Worker; the `scripts/media-pipeline/derive.mjs` batch remains the fallback for missed or failed photos.
 - Public variant reads go through `src/lib/media/variant-bundles.server.ts` and are gated by `media_pipeline_enabled` (pilot slugs only outside production). Why: the visitor-facing switch stays a single, reversible flag.

@@ -11,7 +11,7 @@
  *    puede `Aprobar para uso público`.
  *  - Sólo los activos aprobados pueden seleccionarse para un slot.
  */
-import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";

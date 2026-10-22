@@ -8,7 +8,7 @@
  *
  * Mobile-first: layout en columna, botones grandes, contraste alto.
  */
-import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

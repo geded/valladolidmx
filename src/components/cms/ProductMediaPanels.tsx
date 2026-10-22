@@ -7,7 +7,7 @@
  * portada, ofrece ampliarla. En galería, casilla para ampliar fotos
  * pequeñas automáticamente en lote.
  */
-import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";

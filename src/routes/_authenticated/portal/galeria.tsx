@@ -7,7 +7,7 @@
  *   2) supabase.storage.uploadToSignedUrl(path, token, file) directo a Storage.
  *   3) registerBusinessMedia → media_assets + business_media + auditoría.
  */
-import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
