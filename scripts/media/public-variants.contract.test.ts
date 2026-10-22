@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { resolveMediaSource, type MediaAssetInput } from "@/lib/media/resolve-source";
 import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
-import { routeToTourismCard } from "@/lib/routes-editorial/route-public-contract";
+import { experienceProductItemSchema } from "@/lib/experience-builder/blocks/experience-products/contract";
 vi.mock("@/lib/media/pipeline-flag.server", () => ({ isMediaPipelineEnabled: vi.fn() }));
 import { isMediaPipelineEnabled } from "@/lib/media/pipeline-flag.server";
 import { shouldServePublicVariants, attachReadyVariants } from "@/lib/media/variant-bundles.server";
@@ -31,6 +31,11 @@ describe("public image transport preserves originals and shared rollout", () => 
       expect(resolved.sources).toEqual([{type:"image/webp",srcSet:"https://example.test/400.webp 400w, https://example.test/800.webp 800w"}]);
     });
   }
+  it("product contract preserves the original and optional bundle", () => {
+    const item = experienceProductItemSchema.parse({ id: "product", name: "Experience", mediaUrl: asset.file_url, mediaAsset: asset });
+    expect(item.mediaUrl).toBe("https://example.test/original.jpg");
+    expect(item.mediaAsset).toEqual(asset);
+  });
   it("business card forwards the selected asset without replacing its cover", () => {
     const card = businessToTourismCard({id:"b",slug:"hotel",display_name:"Hotel",tagline:"",destination_slug:"valladolid",category_slug:"hoteles",verified:false,cover_url:asset.file_url,cover_asset:asset});
     expect(card.mediaUrl).toBe(asset.file_url);

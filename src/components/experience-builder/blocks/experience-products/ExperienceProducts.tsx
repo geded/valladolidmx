@@ -50,6 +50,7 @@ function productItemToVM(item: ExperienceProductItem): TourismCardVM {
     tagline: item.tagline,
     businessName: item.businessName,
     mediaUrl: item.mediaUrl,
+    mediaAsset: item.mediaAsset,
     mediaAlt: item.mediaAlt,
     rating: item.rating,
     location: item.location,

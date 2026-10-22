@@ -78,6 +78,7 @@ export const experienceProductItemSchema = z.object({
   entityKind: experienceEntityKindSchema.nullable().default(null),
   href: z.string().nullable().default(null),
   mediaUrl: z.string().nullable().default(null),
+  mediaAsset: z.custom<import("@/lib/media/resolve-source").MediaAssetInput>().optional(),
   mediaAlt: z.string().nullable().default(null),
   priceAmount: z.number().nullable().default(null),
   priceCurrency: z.string().nullable().default(null),

@@ -63,6 +63,7 @@ export function marketplaceProductToItem(p: MarketplaceProductCard): ExperienceP
           ? `/marketplace/${p.business_slug}#p-${p.slug}`
           : null,
     mediaUrl: p.cover_url ?? null,
+    mediaAsset: p.cover_asset,
     mediaAlt: p.cover_url ? p.name : null,
     priceAmount: p.price_amount != null ? Number(p.price_amount) : null,
     priceCurrency: p.price_currency || "MXN",
