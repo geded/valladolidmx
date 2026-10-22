@@ -3,7 +3,7 @@
 ## Auditoría de hoteles y restaurantes · 2026-10-22
 
 - [x] Auditar fichas capturadas, fotos, filtros públicos, Alux/coordenadas, visibilidad y optimización; sólo lectura, sin cambios de datos, diseño ni publicación. Informe entregado: 30 hoteles + 30 restaurantes de Valladolid, 2 restaurantes regionales y 464 activos; pendientes de acreditación fotográfica, horarios/zonas, Alux comercial/cercanía y variantes documentados, sin declarar verificaciones end-to-end no realizadas.
-- [ ] Reauditar altas de hoteles/restaurantes, destinos, zonas, rutas y experiencias, optimización por subida y entrega pública, e integración con Alux/Arma tu Viaje; sólo lectura y documentación, sin crear registros ni modificar la aplicación.
+- [x] Reauditar altas de hoteles/restaurantes, destinos, zonas, rutas y experiencias, optimización por subida y entrega pública, e integración con Alux/Arma tu Viaje; informe en Files `auditoria-altas-imagenes-alux-2026-10-22.md`. Sin cambios de fichas, imágenes, diseño ni publicación. Captura disponible; entrega ligera integral y calidad de recomendaciones pendientes de corrección autorizada; subida real y guardado de viaje no certificados en esta auditoría.
 
 ## Capacidades de plataforma (IA + infraestructura)
 
