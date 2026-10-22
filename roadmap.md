@@ -1,5 +1,9 @@
 # Roadmap
 
+## Auditoría de hoteles y restaurantes · 2026-10-22
+
+- [x] Auditar fichas capturadas, fotos, filtros públicos, Alux/coordenadas, visibilidad y optimización; sólo lectura, sin cambios de datos, diseño ni publicación. Informe entregado: 30 hoteles + 30 restaurantes de Valladolid, 2 restaurantes regionales y 464 activos; pendientes de acreditación fotográfica, horarios/zonas, Alux comercial/cercanía y variantes documentados, sin declarar verificaciones end-to-end no realizadas.
+
 ## Capacidades de plataforma (IA + infraestructura)
 
 - [x] Streaming del chat de Alux: `generateText` → `streamText` con SSE en `/api/public/alux/chat`; el cliente lee chunks en tiempo real. Typecheck pasó.
