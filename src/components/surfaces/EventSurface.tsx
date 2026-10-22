@@ -6,6 +6,7 @@
  * datos DTO ya cargados. Reutiliza `PublicShell` y tipografía global,
  * sin crear registries ni bloques nuevos.
  */
+import { resolveMediaSource } from "@/lib/media/resolve-source";
 import { PublicShell } from "@/components/discovery";
 import { Link } from "@tanstack/react-router";
 import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
@@ -120,7 +121,7 @@ export function EventSurface({
             description: event.summary ?? undefined,
             media:
               event.cover_url && !activeContract.omissions.includes("media")
-                ? { url: event.cover_url, alt: event.title }
+                ? { url: event.cover_url, alt: event.title, asset: event.cover_asset }
                 : null,
           }}
         />
@@ -130,12 +131,15 @@ export function EventSurface({
         <div className="lg:col-span-2 space-y-6">
           {!activeContract ? (
             event.cover_url ? (
+              <picture className="contents">
+              {resolveMediaSource(event.cover_asset, { fallbackUrl: event.cover_url, context: "hero", sizes: "(min-width: 1024px) 66vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
               <img
-                src={event.cover_url}
+                src={resolveMediaSource(event.cover_asset, { fallbackUrl: event.cover_url, context: "hero" }).src}
                 alt={event.title}
                 className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
                 loading="eager"
               />
+              </picture>
             ) : (
               <div className="aspect-video w-full rounded-2xl border border-dashed border-border bg-muted/30" />
             )

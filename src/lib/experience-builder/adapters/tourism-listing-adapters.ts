@@ -206,6 +206,7 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
     tagline: e.summary || null,
     businessName: e.venue_name || null,
     mediaUrl: e.cover_url || null,
+    mediaAsset: e.cover_asset,
     mediaAlt: e.title,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -244,6 +245,7 @@ export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
     // Portada gobernada del propio lugar (aprobada, no IA); sin medio
     // acreditado la tarjeta muestra el marcador neutral, nunca otra imagen.
     mediaUrl: p.cover_url || null,
+    mediaAsset: p.cover_asset,
     mediaAlt: p.cover_url ? p.name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,

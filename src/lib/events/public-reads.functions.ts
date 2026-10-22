@@ -36,6 +36,7 @@ export interface PublicEventCard {
   destination_slug: string | null;
   destination_name: string | null;
   cover_url: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /**
    * Atributos estructurados administrables (event_type, audience,
    * admission_type, time_of_day, venue_type, accessibility,
@@ -103,7 +104,7 @@ function isSlug(s: unknown): s is string {
 }
 
 const SELECT_CARD =
-  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, latitude, longitude, filter_attributes, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( storage_bucket, storage_path )";
+  "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, latitude, longitude, filter_attributes, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone, destination_id, cover_media_id, destinations:destination_id ( slug, name, latitude, longitude ), media_assets:cover_media_id ( id, storage_bucket, storage_path, width, height, pipeline_status )";
 
 type CardRow = {
   id: string;
@@ -132,7 +133,7 @@ type CardRow = {
     latitude?: number | null;
     longitude?: number | null;
   } | null;
-  media_assets?: { storage_bucket?: string | null; storage_path?: string | null } | null;
+  media_assets?: { id: string; storage_bucket?: string | null; storage_path?: string | null; width: number | null; height: number | null; pipeline_status: string | null } | null;
 };
 
 /**
@@ -150,6 +151,20 @@ function eventLng(r: CardRow): number | null {
   const own = Number(r.longitude);
   if (Number.isFinite(own) && own !== 0) return own;
   return typeof r.destinations?.longitude === "number" ? r.destinations.longitude : null;
+}
+
+async function attachEventCovers(cards: PublicEventCard[], rows: CardRow[]) {
+  const vb = await import("@/lib/media/variant-bundles.server");
+  if (!(await vb.shouldServePublicVariants())) return;
+  const bases = cards.flatMap((card) => {
+    const asset = rows.find((r) => r.id === card.id)?.media_assets;
+    return asset && card.cover_url ? [{ id: asset.id, file_url: card.cover_url, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status }] : [];
+  });
+  const bundles = await vb.attachReadyVariants(bases);
+  for (const card of cards) {
+    const id = rows.find((r) => r.id === card.id)?.media_assets?.id;
+    if (id && bundles[id]) card.cover_asset = bundles[id];
+  }
 }
 
 async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEventCard[]> {
@@ -185,6 +200,7 @@ async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEven
       };
     }),
   );
+  await attachEventCovers(cards, rows);
   return cards;
 }
 
@@ -364,7 +380,7 @@ export const getEventBySlug = createServerFn({ method: "GET" })
          schedule_times, exception_dates, event_timezone,
          latitude, longitude, external_url, destination_id, business_id, cover_media_id, published_at, updated_at,
          destinations:destination_id ( slug, name, latitude, longitude ),
-         media_assets:cover_media_id ( storage_bucket, storage_path ),
+         media_assets:cover_media_id ( id, storage_bucket, storage_path, width, height, pipeline_status ),
          businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )`,
       )
 
@@ -394,6 +410,9 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       } | null;
     };
     const cover = await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path);
+    const vb = await import("@/lib/media/variant-bundles.server");
+    const asset = r.media_assets;
+    const bundles = asset && cover && await vb.shouldServePublicVariants() ? await vb.attachReadyVariants([{ id: asset.id, file_url: cover, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status }]) : {};
     // Sólo consideramos organizador si la empresa está publicada, no
     // eliminada, y expone destino + categoría primaria + slug — datos
     // necesarios para construir un `@id` canónico y visible.
@@ -428,6 +447,7 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       destination_name: r.destinations?.name ?? null,
       business_id: r.business_id ?? null,
       cover_url: cover,
+      cover_asset: asset ? bundles[asset.id] : undefined,
       published_at: r.published_at ?? null,
       updated_at: r.updated_at ?? null,
       recurrence_frequency: r.recurrence_frequency ?? null,

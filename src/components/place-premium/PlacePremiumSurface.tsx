@@ -116,6 +116,7 @@ export function PlacePremiumSurface({
     .map((media) => ({
       kind: "image" as const,
       url: media.url as string,
+      asset: media.asset,
       alt: media.alt || content.identity.title,
     }));
   const galleryDto =
@@ -240,6 +241,7 @@ export function PlacePremiumSurface({
               media: content.hero.cover.url
                 ? {
                     url: content.hero.cover.url,
+                    asset: content.hero.cover.asset,
                     alt: content.hero.cover.alt,
                     credit: content.hero.cover.credit,
                   }
@@ -638,7 +640,7 @@ function DemoImage({
   return (
     <figure className={cn("relative overflow-hidden bg-muted", className)}>
       <EditorialMediaFrame
-        media={{ url: media.url, alt: media.alt }}
+        media={{ url: media.url, alt: media.alt, asset: media.asset }}
         context="gallery"
         sizes="(min-width: 1024px) 50vw, 100vw"
         className="size-full object-cover"
