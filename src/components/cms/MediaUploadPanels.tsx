@@ -11,6 +11,9 @@ import { useAluxUpscale } from "@/lib/cms/use-alux-upscale";
 import { AluxUpscaleCard } from "@/components/cms/AluxUpscaleCard";
 import { AluxMediaSourceButtons } from "@/components/cms/AluxMediaSourceButtons";
 import { ImageFramingDialog } from "@/components/cms/ImageFramingDialog";
+import { MediaUploadRightsDialog } from "@/components/cms/MediaUploadRightsDialog";
+import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
+import type { AluxPickedPhoto } from "@/components/cms/AluxPhotoFinderDialog";
 
 export interface MediaRow {
   id: string;
@@ -23,7 +26,8 @@ export function SinglePanel(props: {
   subtitle: string;
   role: ImageRole;
   media: MediaRow | null;
-  onUpload: (file: File) => void;
+  onUpload: (file: File, rights?: MediaRightsInput) => void;
+  requireRights?: boolean;
   onRemove: (id: string) => void;
   uploading: boolean;
   error: unknown;
@@ -33,20 +37,27 @@ export function SinglePanel(props: {
   const inputRef = useRef<HTMLInputElement>(null);
   const alux = useAluxUpscale(props.role);
   const [framing, setFraming] = useState<File | null>(null);
+  const [rightsFile, setRightsFile] = useState<File | null>(null);
+  const sourceRef = useRef<AluxPickedPhoto | undefined>(undefined);
+  const submit = (file: File) => {
+    if (props.requireRights) setRightsFile(file);
+    else props.onUpload(file);
+  };
 
   const afterFraming = async (f: File) => {
     setFraming(null);
     const undersized = await alux.evaluate(f);
     if (!undersized) {
-      props.onUpload(f);
+      submit(f);
     }
   };
   // Toda foto nueva pasa primero por el encuadre manual.
-  const handleFile = (f: File) => setFraming(f);
+  const handleFile = (f: File, source?: AluxPickedPhoto) => { sourceRef.current = source; setFraming(f); };
 
   const adjustCurrent = async () => {
     const url = props.media?.previewUrl;
     if (!url) return;
+    sourceRef.current = undefined;
     try {
       const res = await fetch(url);
       const blob = await res.blob();
@@ -69,7 +80,7 @@ export function SinglePanel(props: {
             hint=""
             slot={`single:${props.role}`}
             disabled={props.uploading || alux.upscaling}
-            onFile={(f) => void handleFile(f)}
+            onFile={(f, source) => void handleFile(f, source)}
           />
           <button
             type="button"
@@ -99,11 +110,11 @@ export function SinglePanel(props: {
           busy={props.uploading}
           onUpscale={async () => {
             const enlarged = await alux.upscale();
-            if (enlarged) props.onUpload(enlarged);
+            if (enlarged) submit(enlarged);
           }}
           onSkip={() => {
             const f = alux.proceedAsIs();
-            if (f) props.onUpload(f);
+            if (f) submit(f);
           }}
         />
       )}
@@ -147,6 +158,8 @@ export function SinglePanel(props: {
         onSkip={(f) => void afterFraming(f)}
         onCancel={() => setFraming(null)}
       />
+      {rightsFile && <MediaUploadRightsDialog files={[rightsFile]} source={sourceRef.current}
+        onCancel={() => setRightsFile(null)} onConfirm={(rights) => { props.onUpload(rightsFile, rights); setRightsFile(null); }} />}
     </section>
   );
 }
@@ -154,7 +167,8 @@ export function SinglePanel(props: {
 export function GalleryPanel(props: {
   subtitle?: string;
   items: MediaRow[];
-  onUpload: (files: File[]) => void;
+  onUpload: (files: File[], rights?: MediaRightsInput) => void;
+  requireRights?: boolean;
   onRemove: (id: string) => void;
   onMove: (id: string, direction: -1 | 1) => void;
   uploading: boolean;
@@ -167,10 +181,23 @@ export function GalleryPanel(props: {
   const [done, setDone] = useState<File[]>([]);
   const [total, setTotal] = useState(0);
   const [checking, setChecking] = useState(false);
+  const [rightsFiles, setRightsFiles] = useState<File[]>([]);
+  const [rightsSources, setRightsSources] = useState<(AluxPickedPhoto | undefined)[]>([]);
+  const sourceQueueRef = useRef<(AluxPickedPhoto | undefined)[]>([]);
+  const doneSourcesRef = useRef<(AluxPickedPhoto | undefined)[]>([]);
+  const submit = (files: File[]) => {
+    if (props.requireRights) {
+      setRightsSources([...doneSourcesRef.current]);
+      setRightsFiles(files);
+    }
+    else props.onUpload(files);
+  };
   // Tras encuadrar, si la foto queda chica para galería se pregunta una por una.
   const alux = useAluxUpscale("gallery");
-  const startQueue = (files: File[]) => {
+  const startQueue = (files: File[], sources?: AluxPickedPhoto[]) => {
     if (!files.length) return;
+    sourceQueueRef.current = files.map((_, i) => sources?.[i]);
+    doneSourcesRef.current = [];
     setQueue(files);
     setDone([]);
     setTotal(files.length);
@@ -185,12 +212,13 @@ export function GalleryPanel(props: {
     commit(f);
   };
   const commit = (f: File) => {
+    doneSourcesRef.current.push(sourceQueueRef.current.shift());
     const nextDone = [...done, f];
     const rest = queue.slice(1);
     if (rest.length === 0) {
       setQueue([]);
       setDone([]);
-      props.onUpload(nextDone);
+      submit(nextDone);
     } else {
       setDone(nextDone);
       setQueue(rest);
@@ -198,18 +226,21 @@ export function GalleryPanel(props: {
   };
   const skipAll = () => {
     const all = [...done, ...queue];
+    doneSourcesRef.current.push(...sourceQueueRef.current);
+    sourceQueueRef.current = [];
     setQueue([]);
     setDone([]);
-    props.onUpload(all);
+    submit(all);
   };
   // Cerrar el visor (X, Esc o clic fuera) sólo descarta la foto actual;
   // el resto del lote continúa. Antes se perdían todas las pendientes.
   const cancelQueue = () => {
+    sourceQueueRef.current.shift();
     const rest = queue.slice(1);
     if (rest.length === 0) {
       setQueue([]);
       setDone([]);
-      if (done.length) props.onUpload(done);
+      if (done.length) submit(done);
       return;
     }
     toast.message(`Foto descartada. Quedan ${rest.length} por acomodar.`);
@@ -229,8 +260,8 @@ export function GalleryPanel(props: {
             hint=""
             slot="gallery"
             disabled={props.uploading}
-            onFile={(f) => startQueue([f])}
-            onFiles={(files) => startQueue(files)}
+            onFile={(f, source) => startQueue([f], source ? [source] : undefined)}
+            onFiles={(files, sources) => startQueue(files, sources)}
           />
           <button
             type="button"
@@ -359,6 +390,15 @@ export function GalleryPanel(props: {
         onCancel={cancelQueue}
         onSkipAll={total > 1 ? skipAll : undefined}
       />
+      {rightsFiles.length > 0 && <MediaUploadRightsDialog key={rightsFiles[0]?.name}
+        files={rightsSources.some(Boolean) ? rightsFiles.slice(0, 1) : rightsFiles} source={rightsSources[0]}
+        onCancel={() => { setRightsFiles([]); setRightsSources([]); }} onConfirm={(rights) => {
+          // Search results can have different authors/licenses: never share the first credit across the batch.
+          if (rightsSources.some(Boolean)) {
+            props.onUpload(rightsFiles.slice(0, 1), rights);
+            setRightsFiles((files) => files.slice(1)); setRightsSources((sources) => sources.slice(1));
+          } else { props.onUpload(rightsFiles, rights); setRightsFiles([]); }
+        }} />}
     </section>
   );
 }

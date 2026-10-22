@@ -20,6 +20,17 @@ export interface MediaRightsInput {
   rightsConfirmed: boolean;
   focalX?: number | null;
   focalY?: number | null;
+  ownership?: "own" | "permission";
+}
+
+/** Upload-time declaration: no client-supplied reviewer or publication state. */
+export function validateUploadRights(r: MediaRightsInput): string | null {
+  const invalid = validateMediaRights(r);
+  if (invalid) return invalid;
+  if (r.nature === "documentary" && r.ownership !== "own" && r.ownership !== "permission") {
+    return "ownership_required";
+  }
+  return null;
 }
 
 const clamp01 = (n: unknown) => {
@@ -66,6 +77,7 @@ export function buildRightsMetadata(r: MediaRightsInput) {
       documentary: r.nature === "documentary",
       conceptual: r.nature !== "documentary",
       rights_confirmed: true,
+      ownership: r.ownership ?? null,
     },
     lifecycle: {
       temporary: aiGenerated,

@@ -19,7 +19,8 @@ import {
   reorderDestinationGallery,
   signDestinationImageUpload,
 } from "@/lib/cms/destinations-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { prepareImageForRole, readImageDimensions, withRetry } from "@/lib/cms/image-upload";
+import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
 import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
 
 interface Props {
@@ -48,8 +49,10 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     onChanged?.();
   };
 
-  const uploadOne = async (file: File, role: "hero" | "gallery") => {
+  const uploadOne = async (file: File, role: "hero" | "gallery", rights?: MediaRightsInput) => {
+    if (!rights) throw new Error("Confirma la autoría y el permiso de uso antes de subir.");
     const prepared = await prepareImageForRole(file, role);
+    const dimensions = await readImageDimensions(prepared);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -73,6 +76,8 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
           alt: file.name,
           mime: prepared.type,
           sizeBytes: prepared.size,
+          ...dimensions,
+          rights,
         },
       });
       deriveVariantsInBackground(prepared, registered);
@@ -80,7 +85,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
   };
 
   const heroUpload = useMutation({
-    mutationFn: async (file: File) => uploadOne(file, "hero"),
+    mutationFn: async ({ file, rights }: { file: File; rights?: MediaRightsInput }) => uploadOne(file, "hero", rights),
     onSuccess: () => {
       invalidate();
       toast.success("Imagen destacada actualizada.");
@@ -88,12 +93,12 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const galleryUpload = useMutation({
-    mutationFn: async (files: File[]) => {
+    mutationFn: async ({ files, rights }: { files: File[]; rights?: MediaRightsInput }) => {
       let ok = 0;
       const errors: string[] = [];
       for (const f of files) {
         try {
-          await uploadOne(f, "gallery");
+          await uploadOne(f, "gallery", rights ? { ...rights, alt: files.length > 1 ? f.name.replace(/\.[^.]+$/, "") : rights.alt } : undefined);
           ok += 1;
         } catch (err) {
           errors.push(`${f.name}: ${err instanceof Error ? err.message : "error"}`);
@@ -137,7 +142,8 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
         aspect="h-52 w-full object-cover"
         emptyLabel="Sin imagen destacada"
         media={hero}
-        onUpload={(f) => heroUpload.mutate(f)}
+        requireRights
+        onUpload={(file, rights) => heroUpload.mutate({ file, rights })}
         onRemove={(id) => removeMut.mutate(id)}
         uploading={heroUpload.isPending}
         error={heroUpload.error}
@@ -145,7 +151,8 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
       <GalleryPanel
         subtitle="Imágenes adicionales del destino. Arrastra o selecciona varias."
         items={gallery}
-        onUpload={(files) => galleryUpload.mutate(files)}
+        requireRights
+        onUpload={(files, rights) => galleryUpload.mutate({ files, rights })}
         onRemove={(id) => removeMut.mutate(id)}
         onMove={(id, dir) => {
           const idx = gallery.findIndex((g) => g.id === id);
