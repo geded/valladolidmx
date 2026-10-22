@@ -1,5 +1,8 @@
 # Roadmap
 
+## Validación de subidas, IA y ampliación · 2026-10-22
+- [ ] Auditar sólo lectura todas las vías de ingreso, búsqueda/generación IA y ampliación de fotos pequeñas; ejecutar contratos y distinguir cobertura comprobada de pendientes, sin subir contenido ni consumir generación IA.
+
 ## Optimización integral de imágenes · 2026-10-22
 - [x] Conectar variantes existentes a consumidores públicos compartidos de listados, destinos, rutas, experiencias, eventos, productos relacionados y logotipos; originales, editor y datos editoriales sin cambios. Zonas conservan la subida compartida; no se inventó una superficie pública inexistente.
 - [x] Verificar contratos (65 tests PASS), 36 recorridos públicos en 1440/834/430/390 (0 errores, 0 overflow, 0 peticiones originales detectadas en la muestra) y eventos/experiencias/Sutuk (0 imágenes rotas); documentar alcance y limitaciones en docs/media-optimization-2026-10-22.md. No publicación ni cambios de fichas.
