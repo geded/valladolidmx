@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Optimización integral de imágenes · 2026-10-22
-- [ ] Completar entrega pública de variantes existentes en listados, destinos, zonas, rutas, experiencias y secciones compartidas; sin cambiar plantillas, editor, originales, Alux ni datos editoriales.
-- [ ] Verificar cobertura de subida compartida, contratos y entrega pública con comparativas 1440/834/430/390; documentar cobertura y bloqueos sin prometer optimización no comprobada.
+- [x] Conectar variantes existentes a consumidores públicos compartidos de listados, destinos, rutas, experiencias, eventos, productos relacionados y logotipos; originales, editor y datos editoriales sin cambios. Zonas conservan la subida compartida; no se inventó una superficie pública inexistente.
+- [x] Verificar contratos (65 tests PASS), 36 recorridos públicos en 1440/834/430/390 (0 errores, 0 overflow, 0 peticiones originales detectadas en la muestra) y eventos/experiencias/Sutuk (0 imágenes rotas); documentar alcance y limitaciones en docs/media-optimization-2026-10-22.md. No publicación ni cambios de fichas.
 
 ## Auditoría de hoteles y restaurantes · 2026-10-22
 
