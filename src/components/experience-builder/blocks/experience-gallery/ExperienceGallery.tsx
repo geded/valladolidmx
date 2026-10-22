@@ -5,6 +5,7 @@
  * Soporta lightbox opcional (browser-only). No emite side-effects
  * cuando `capabilities.lightbox` es `false`.
  */
+import { resolveMediaSource } from "@/lib/media/resolve-source";
 import { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -232,6 +233,7 @@ function Thumb({
     <>
       <img
         src={item.url}
+        {...thumbSrcSet(item)}
         alt={item.alt}
         loading="lazy"
         className={cn(
@@ -275,4 +277,20 @@ function Thumb({
       {inner}
     </button>
   );
+}
+
+/**
+ * H3·A4 · Versiones ligeras vía `resolveMediaSource()` (fuente única). Sin
+ * variantes listas no añade nada y la miniatura queda idéntica a hoy.
+ */
+function thumbSrcSet(item: ExperienceGalleryItem): { srcSet?: string; sizes?: string } {
+  if (!item.asset) return {};
+  const resolved = resolveMediaSource(item.asset, {
+    context: "gallery",
+    fallbackUrl: item.url,
+  });
+  if (!resolved.usedPipeline) return {};
+  const webp = resolved.sources.find((s) => s.type === "image/webp") ?? resolved.sources[0];
+  if (!webp?.srcSet) return {};
+  return { srcSet: webp.srcSet, sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" };
 }

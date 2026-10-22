@@ -8,6 +8,7 @@
  *
  * Mobile-first: layout en columna, botones grandes, contraste alto.
  */
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -97,7 +98,7 @@ function MediaSection({ productId }: { productId: string }) {
         upsert: false,
       });
       if (upErr) throw upErr;
-      await registerFn({
+      const registered = await registerFn({
         data: {
           productId,
           storagePath: path,
@@ -106,6 +107,7 @@ function MediaSection({ productId }: { productId: string }) {
           sizeBytes: file.size,
         },
       });
+      deriveVariantsInBackground(file, registered);
       refresh();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error al subir");

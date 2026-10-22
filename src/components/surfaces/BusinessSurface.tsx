@@ -622,6 +622,7 @@ export function BusinessSurface({
       kind: "image" as const,
       url: m.url,
       alt: m.alt || b.display_name,
+      ...(m.asset ? { asset: m.asset } : {}),
     }));
   const galleryDto =
     premiumGalleryDto ??
@@ -760,6 +761,14 @@ export function BusinessSurface({
               ? {
                   url: b.cover_url,
                   alt: b.display_name,
+                  ...((b.media ?? []).find((m) => m.role === "cover" && m.url === b.cover_url)
+                    ?.asset
+                    ? {
+                        asset: (b.media ?? []).find(
+                          (m) => m.role === "cover" && m.url === b.cover_url,
+                        )!.asset,
+                      }
+                    : {}),
                 }
               : null,
           badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],

@@ -62,7 +62,7 @@ export function PremiumHero({
           {vm.media ? (
             <figure className="order-1 min-h-64 overflow-hidden bg-muted sm:min-h-80 lg:order-2 lg:min-h-[30rem]">
               <EditorialMediaFrame
-                media={{ url: vm.media.url, alt: vm.media.alt ?? "" }}
+                media={{ url: vm.media.url, alt: vm.media.alt ?? "", asset: vm.media.asset ?? null }}
                 context="hero"
                 loading="eager"
                 fetchPriority="high"
@@ -104,7 +104,7 @@ export function PremiumHero({
               )}
             >
               <EditorialMediaFrame
-                media={vm.media ? { url: vm.media.url, alt: vm.media.alt ?? "" } : null}
+                media={vm.media ? { url: vm.media.url, alt: vm.media.alt ?? "", asset: vm.media.asset ?? null } : null}
                 context="hero"
                 loading="eager"
                 fetchPriority="high"
@@ -169,7 +169,7 @@ export function PremiumHero({
     >
       {vm.media ? (
         <EditorialMediaFrame
-          media={{ url: vm.media.url, alt: vm.media.alt ?? "" }}
+          media={{ url: vm.media.url, alt: vm.media.alt ?? "", asset: vm.media.asset ?? null }}
           context="hero"
           loading="eager"
           fetchPriority="high"

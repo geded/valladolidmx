@@ -11,6 +11,7 @@
  *    puede `Aprobar para uso público`.
  *  - Sólo los activos aprobados pueden seleccionarse para un slot.
  */
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
@@ -384,7 +385,7 @@ export function MediaPickerDialog({
       // La biblioteca conserva el original. El rol sólo gobierna cómo se
       // presenta en el slot; no debe recortar destructivamente el activo.
       void role;
-      await serverUpload({
+      const uploaded = await serverUpload({
         data: {
           filename: file.name,
           mime: file.type,
@@ -394,6 +395,7 @@ export function MediaPickerDialog({
           rights,
         },
       });
+      deriveVariantsInBackground(file, uploaded);
       setNotice(
         "Imagen subida como borrador. Queda pendiente de aprobación antes de poder usarse en un slot.",
       );

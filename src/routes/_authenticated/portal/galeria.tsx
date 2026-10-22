@@ -7,6 +7,7 @@
  *   2) supabase.storage.uploadToSignedUrl(path, token, file) directo a Storage.
  *   3) registerBusinessMedia → media_assets + business_media + auditoría.
  */
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -180,7 +181,7 @@ function MediaSection({
 
       const dims = await readImageDimensions(file);
 
-      await registerFn({
+      const registered = await registerFn({
         data: {
           businessId,
           role,
@@ -195,6 +196,7 @@ function MediaSection({
           sortOrder: items.length,
         },
       });
+      deriveVariantsInBackground(file, registered);
       setStatus("Archivo cargado.");
       await refresh();
     } catch (err) {
