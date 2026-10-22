@@ -72,8 +72,12 @@ export const getPlanItemsGeo = createServerFn({ method: "POST" })
         .is("deleted_at", null);
       const best = new Map<string, { lat: number; lng: number; primary: boolean }>();
       for (const l of locs ?? []) {
-        const lat = Number((l as { latitude: unknown }).latitude);
-        const lng = Number((l as { longitude: unknown }).longitude);
+        const rawLat = (l as { latitude: unknown }).latitude;
+        const rawLng = (l as { longitude: unknown }).longitude;
+        // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
+        if (rawLat == null || rawLng == null) continue;
+        const lat = Number(rawLat);
+        const lng = Number(rawLng);
         const bid = (l as { business_id: string }).business_id;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
         const prev = best.get(bid);
@@ -95,8 +99,12 @@ export const getPlanItemsGeo = createServerFn({ method: "POST" })
         .select("id, latitude, longitude")
         .in("id", Array.from(destIds));
       for (const d of dests ?? []) {
-        const lat = Number((d as { latitude: unknown }).latitude);
-        const lng = Number((d as { longitude: unknown }).longitude);
+        const rawLat = (d as { latitude: unknown }).latitude;
+        const rawLng = (d as { longitude: unknown }).longitude;
+        // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
+        if (rawLat == null || rawLng == null) continue;
+        const lat = Number(rawLat);
+        const lng = Number(rawLng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
         const did = (d as { id: string }).id;
         for (const itemId of byDest.get(did) ?? []) {

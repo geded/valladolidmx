@@ -115,8 +115,12 @@ export const optimizePlanDay = createServerFn({ method: "POST" })
         .is("deleted_at", null);
       const best = new Map<string, { lat: number; lng: number; primary: boolean }>();
       for (const l of locs ?? []) {
-        const lat = Number((l as { latitude: unknown }).latitude);
-        const lng = Number((l as { longitude: unknown }).longitude);
+        const rawLat = (l as { latitude: unknown }).latitude;
+        const rawLng = (l as { longitude: unknown }).longitude;
+        // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
+        if (rawLat == null || rawLng == null) continue;
+        const lat = Number(rawLat);
+        const lng = Number(rawLng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
         const bid = (l as { business_id: string }).business_id;
         const primary = Boolean((l as { is_primary?: boolean }).is_primary);
@@ -138,8 +142,12 @@ export const optimizePlanDay = createServerFn({ method: "POST" })
         if (r.item_kind !== "destination" || !r.target_id) continue;
         const d = (dests ?? []).find((x) => (x as { id: string }).id === r.target_id);
         if (!d) continue;
-        const lat = Number((d as { latitude: unknown }).latitude);
-        const lng = Number((d as { longitude: unknown }).longitude);
+        const rawLat = (d as { latitude: unknown }).latitude;
+        const rawLng = (d as { longitude: unknown }).longitude;
+        // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
+        if (rawLat == null || rawLng == null) continue;
+        const lat = Number(rawLat);
+        const lng = Number(rawLng);
         if (Number.isFinite(lat) && Number.isFinite(lng)) {
           geoByItem.set(r.id, { lat, lng });
         }
