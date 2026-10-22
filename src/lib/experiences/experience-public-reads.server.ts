@@ -523,12 +523,14 @@ export async function readExperienceReviewDetail(
       terms: (row.direct_sale_terms as string | null) ?? null,
     },
     cover_url: cover?.url ?? null,
+    cover_asset: cover?.asset,
     media: cover
       ? [
           {
             id: `${row.id}-cover`,
             role: "cover",
             url: cover.url,
+            asset: cover.asset,
             alt: cover.alt,
             width: null,
             height: null,

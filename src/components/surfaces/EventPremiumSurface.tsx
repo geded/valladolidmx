@@ -71,6 +71,7 @@ function eventCardToVM(card: PublicEventCard): TourismCardVM {
     tagline: card.summary,
     businessName: card.venue_name,
     mediaUrl: card.cover_url,
+    mediaAsset: card.cover_asset,
     mediaAlt: card.title,
     rating: null,
     location: card.destination_name ? { label: card.destination_name, distanceKm: null } : null,
@@ -216,7 +217,7 @@ export function EventPremiumSurface({
           eyebrow: eventType ? humanizeAttributeValue(eventType) : "Evento",
           title: event.title,
           description: event.summary ?? undefined,
-          media: event.cover_url ? { url: event.cover_url, alt: event.title } : null,
+          media: event.cover_url ? { url: event.cover_url, alt: event.title, asset: event.cover_asset } : null,
           badges: event.destination_name
             ? [
                 {

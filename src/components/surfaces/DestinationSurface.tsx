@@ -396,6 +396,7 @@ export function DestinationSurface({
   const premiumHeroMedia = premiumHeroUrl
     ? {
         url: premiumHeroUrl,
+        asset: effectiveGalleryMedia.find((item) => item.url === premiumHeroUrl)?.asset ?? db?.hero_media?.asset,
         alt:
           (heroSlide?.url === premiumHeroUrl ? heroSlide?.alt : null) ||
           `Vista de ${input.name}, Oriente Maya de Yucatán`,

@@ -79,6 +79,7 @@ export interface ListingPremiumSurfaceProps {
     title: string;
     subtitle: string | null;
     mediaUrl: string | null;
+    mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
     mediaAlt: string | null;
     metaLabel?: string | null;
   };
@@ -123,6 +124,7 @@ export function ListingPremiumSurface({
         title: hero.title,
         subtitle: hero.subtitle,
         mediaUrl: hero.mediaUrl,
+        mediaAsset: hero.mediaAsset,
         mediaAlt: hero.mediaAlt,
         metaLabel: hero.metaLabel ?? null,
       }}
@@ -264,6 +266,7 @@ export function ListingPremiumSurfaceFromDTO({
         title: titleOverride?.trim() || dto.hero.title,
         subtitle: subtitleOverride?.trim() || dto.hero.subtitle,
         mediaUrl: mediaItems[0]?.mediaUrl ?? null,
+        mediaAsset: mediaItems[0]?.mediaAsset,
         mediaAlt: mediaItems[0]?.mediaAlt ?? mediaItems[0]?.name ?? null,
         metaLabel: dto.hero.metaLabel,
       }}

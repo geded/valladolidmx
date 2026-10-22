@@ -11,10 +11,11 @@ export interface DestinationPremiumNearbySource {
   subtitle: string;
   href: string;
   mediaUrl: string;
+  mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 function mediaOf(item: PublicMediaAttribution): DestinationPremiumMedia {
-  return { url: item.url, alt: item.alt ?? "" };
+  return { url: item.url, alt: item.alt ?? "", asset: item.asset };
 }
 
 export function buildDestinationPremiumRuntime(input: {
@@ -173,7 +174,7 @@ export function buildDestinationPremiumRuntime(input: {
           name: item.title,
           distance: "",
           tagline: item.subtitle,
-          media: { url: item.mediaUrl, alt: item.title },
+          media: { url: item.mediaUrl, alt: item.title, asset: item.mediaAsset },
           href: item.href,
         })),
     },

@@ -16,6 +16,7 @@ import {
 } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
 export interface DestinationPremiumMedia {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** Cadena vacía representa marcador Editorial neutral; nunca una imagen sustituta. */
   url: string;
   alt: string;

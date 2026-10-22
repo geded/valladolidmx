@@ -56,6 +56,7 @@ export interface TourismListingHeroSpec {
   title: string;
   subtitle?: string | null;
   mediaUrl?: string | null;
+  mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   mediaAlt?: string | null;
   badges?: ExperienceHeroBadge[];
   metaLabel?: string | null;
@@ -212,15 +213,15 @@ export function TourismListingSurface({
 
   const heroMedia = useMemo(() => {
     const rows = [
-      ...(hero.mediaUrl ? [{ url: hero.mediaUrl, alt: hero.mediaAlt }] : []),
+      ...(hero.mediaUrl ? [{ url: hero.mediaUrl, alt: hero.mediaAlt, asset: hero.mediaAsset }] : []),
       ...items
         .filter((item) => Boolean(item.mediaUrl))
-        .map((item) => ({ url: item.mediaUrl as string, alt: item.mediaAlt ?? item.name })),
+        .map((item) => ({ url: item.mediaUrl as string, alt: item.mediaAlt ?? item.name, asset: item.mediaAsset })),
     ];
     return rows
       .filter((row, index) => rows.findIndex((candidate) => candidate.url === row.url) === index)
       .slice(0, 3);
-  }, [hero.mediaAlt, hero.mediaUrl, items]);
+  }, [hero.mediaAlt, hero.mediaUrl, hero.mediaAsset, items]);
 
   // Editorial es el fallback universal. Cinematográfica sólo se activa
   // cuando fue seleccionada y existe fotografía gobernada.
@@ -272,6 +273,7 @@ export function TourismListingSurface({
             media: activeHeroMedia
               ? {
                   url: activeHeroMedia.url,
+                  asset: activeHeroMedia.asset,
                   alt:
                     activeHeroMedia.alt ??
                     `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
