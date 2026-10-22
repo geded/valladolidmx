@@ -1,45 +1,37 @@
-# Cabecera profesional para la Biblioteca multimedia
+# Fotos ligeras: comparación del Hotel Sutuk y optimización automática en cada subida
 
-## Objetivo
-Ordenar la parte superior de **Media** para trabajar grandes volúmenes de imágenes con una jerarquía clara inspirada en la usabilidad de Airbnb, sin copiar su identidad visual y sin quitar ninguna función existente.
+## Lo que ya existe (se conserva tal cual)
+- 622 de 624 fotos ya tienen sus versiones ligeras creadas (celular, tablet, computadora). Las originales siguen intactas.
+- El Inicio ya sabe mostrar versiones ligeras cuando existen. Si una foto no las tiene, muestra la original.
+- El editor sube fotos con el mismo encuadre, ajustes, Alux y lote de siempre. Nada de eso cambia.
 
-## Scope Gate
-El cambio se limita a la cabecera y controles superiores de `/cms/media`:
+## Parte 1 · Comparación del Hotel Sutuk (antes de encender nada)
+1. Conectar la ficha de empresa (hoteles, restaurantes, etc.) para que lea las versiones ligeras de sus fotos (portada, galería y logo). Si algo falla, muestra la original como hoy.
+2. Encenderlo solo para el Hotel Sutuk en el ambiente de prueba.
+3. Capturar el antes y después en 1440, 834, 430 y 390 px y medir cuánto pesa la página.
+4. Te entrego las capturas. **No se enciende para todo el sitio hasta que lo apruebes.**
 
-- Título, descripción y cantidad total de imágenes.
-- Buscador.
-- Filtros de alcance, estado y uso.
-- Acciones “Subir imágenes IA” y “Lote IA”.
-- Adaptación de esa zona en escritorio, iPad y celular.
+## Parte 2 · Optimización automática en cada subida
+Cada foto nueva genera sus versiones ligeras en el momento de subirla, en todas las secciones que usan el sistema único de subida:
+- Empresas (logo, portada, galería), portal del empresario
+- Destinos, zonas, productos/experiencias
+- Eventos (portada) y biblioteca del constructor
 
-No se cambiarán la tabla, la ficha de edición, datos, estados, permisos, aprobaciones, carga de archivos ni superficies públicas.
+Cómo funciona, sin que el editor note diferencia:
+1. El editor sube la foto igual que hoy y la original se guarda igual que hoy.
+2. Justo después, el mismo navegador crea las versiones de 400, 800 y 1200 px en WebP y las entrega al servidor.
+3. El servidor revisa que la persona pueda editar esa ficha, guarda las versiones y marca la foto como lista.
+4. Si cualquier paso falla (celular viejo, conexión lenta), la subida **no se interrumpe**: la foto queda con su original y el proceso por lotes la optimiza después.
+5. Una tarea periódica de respaldo vuelve a revisar fotos sin versiones ligeras.
 
-## Preservation Gate
-Se mantienen intactos:
+## Lo que no cambia
+- Pantallas, botones, diseño, plantillas, orden y textos del CMS y del sitio público.
+- Las URLs públicas de las fotos (SEO intacto).
+- Las 2 fotos con fallo parcial siguen mostrando su original.
 
-- Las 60 imágenes y cualquier contenido real del CMS.
-- Todos los filtros y sus valores actuales.
-- Búsqueda, paginación, subida y procesamiento por lote.
-- Ficha completa, edición, derechos, revisión y aprobación.
-- Menú lateral, Workspace, roles y seguridad.
-- Tokens y lenguaje visual Valladolid Colonial/OMXDS.
-
-## Implementación
-
-1. Crear una cabecera compacta con el título y un indicador visible del total de imágenes.
-2. Colocar las acciones principales juntas y con prioridad clara: subir imágenes como acción principal y lote como secundaria.
-3. Convertir búsqueda y filtros en una barra de trabajo ordenada:
-   - buscador amplio;
-   - grupo “Biblioteca” para todas/mías;
-   - grupo “Estado”;
-   - grupo “Uso”.
-4. Mantener los controles como segmentos compactos, con selección clara y sin filas desordenadas.
-5. En iPad y celular, permitir que los grupos bajen de línea de forma limpia sin recortar botones ni crear desplazamiento horizontal.
-
-## Validación
-
-- Comparar antes/después en 1440, 834, 430 y 390 px.
-- Confirmar que ningún control desaparezca y que todos sigan funcionando.
-- Verificar búsqueda, filtros, subida, lote IA, tabla y apertura de ficha.
-- Revisar consola, solicitudes fallidas y desbordamiento horizontal.
-- Sin publicación.
+## Detalles técnicos
+- Lectura pública: cargador server-side batched de `{asset, variants ready}` por `cover_media_id`/`business_media`, consumido vía `resolveMediaSource()` (Transparent Derivation). Gate por `media_pipeline_enabled` + allowlist temporal del asset/empresa para la comparación.
+- Subida: helper compartido `deriveAndRegisterVariants(file, mediaAssetId)` llamado desde el sistema único (`MediaUploadPanels`/`BusinessMediaPanels`/`DestinationMediaPanels`/`ZoneMediaPanels`/`ProductMediaPanels`/`MediaPickerDialog`/portal). Canvas → WebP; engine `browser-canvas`.
+- Server fns: `signDerivedVariantUploads` (autoriza con la misma regla de edición de la ficha; firma rutas en `media-derived/{assetId}/browser-canvas/...`) y `registerDerivedVariants` (valida formato/anchos/bytes, upsert `media_asset_variants`, `pipeline_status='ready'`).
+- Respaldo: el script `derive.mjs` (sharp) queda para lotes y fotos fallidas.
+- Pruebas: contrato de anchos/formatos permitidos y del fallback a original.
