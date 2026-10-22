@@ -321,3 +321,11 @@
 - [x] Galería por lote: cada foto se acomoda en secuencia, con opción de subir el resto sin ajustar.
 - [x] Optimización oficial conservada después del encuadre.
 - [ ] Prueba visual con sesión editor en 1440/834/430/390 y aceptación del Founder.
+
+## Fotos ligeras (H3·A4)
+- [x] Tamaño real guardado en las 624 fotos y en cada subida nueva de empresa.
+- [x] Versiones ligeras creadas para 622 de 624 fotos (2 con fallo parcial siguen con su original).
+- [x] Ficha de empresa lee versiones ligeras (piloto Hotel Sutuk en vista previa) + comparación 1440/834/430/390.
+- [x] Optimización automática al subir en empresas, portal, destinos, zonas, productos, constructor y biblioteca.
+- [ ] Encender versiones ligeras para todo el sitio — espera aprobación del Founder tras ver la comparación.
+- [ ] Respaldo periódico automático para fotos que no se optimizaron al subir — requiere decidir un servidor externo para el proceso por lotes.
