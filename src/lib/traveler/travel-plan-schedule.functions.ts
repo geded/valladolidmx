@@ -128,6 +128,8 @@ export const suggestPlanDaySchedule = createServerFn({ method: "POST" })
         longitude: unknown;
         is_primary?: boolean | null;
       }>) {
+        // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
+        if (l.latitude == null || l.longitude == null) continue;
         const lat = Number(l.latitude);
         const lng = Number(l.longitude);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
@@ -142,6 +144,8 @@ export const suggestPlanDaySchedule = createServerFn({ method: "POST" })
         .select("id, latitude, longitude")
         .in("id", Array.from(new Set(destIds)));
       for (const d of (dests ?? []) as Array<{ id: string; latitude: unknown; longitude: unknown }>) {
+        // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
+        if (d.latitude == null || d.longitude == null) continue;
         const lat = Number(d.latitude);
         const lng = Number(d.longitude);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
