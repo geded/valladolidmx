@@ -507,10 +507,12 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
       Array.from(new Set(page.map((i) => i._media).filter((v): v is string => !!v))),
     );
 
+    const mediaAssets = await resolveStableMediaAssets(Array.from(media.values()));
     const items = page.map((i) => {
       const { _media, ...rest } = i;
       const url = _media ? (media.get(_media) ?? null) : null;
       if (url) {
+        if (mediaAssets[url]) rest.media_asset = mediaAssets[url] as unknown as SmartBlockJsonValue;
         if ("hero_image_url" in rest) rest.hero_image_url = url;
         if ("cover_image_url" in rest) rest.cover_image_url = url;
       }
