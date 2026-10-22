@@ -297,8 +297,38 @@ export async function listExperiencesListing(
     }
   }
 
+  /* Peso de visibilidad del CMS (misma autoridad que el listado de empresas,
+     `listMarketplaceBusinesses`): plan efectivo del negocio operador.
+     Fail-closed: si la lectura falla, el listado conserva su orden alfabético. */
+  const boostByBusinessId = new Map<string, number>();
+  if (businessIds.length) {
+    try {
+      const { data: viz } = await client
+        .from("business_effective_visibility")
+        .select("business_id, levers, is_default")
+        .in("business_id", businessIds);
+      for (const row of (viz ?? []) as Row[]) {
+        if (row.is_default === true) continue;
+        const levers = (row.levers as Record<string, unknown> | null) ?? {};
+        const boost = Number(
+          (levers.discovery_boost as number | undefined) ??
+            (levers.search_weight as number | undefined) ??
+            0,
+        );
+        boostByBusinessId.set(String(row.business_id), Number.isFinite(boost) ? boost : 0);
+      }
+    } catch {
+      // Fail-closed: orden alfabético.
+    }
+  }
+  const boostByProductId = new Map<string, number>();
+
   const items: TourismCardVM[] = products
     .map((product) => {
+      boostByProductId.set(
+        String(product.id),
+        boostByBusinessId.get(String(product.business_id)) ?? 0,
+      );
       const business = (product.businesses as Row | null) ?? null;
       const destination = (business?.destinations as Row | null) ?? null;
       const cover = coverByProduct.get(product.id) ?? null;
