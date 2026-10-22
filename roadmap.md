@@ -348,6 +348,7 @@
 - [ ] Pendiente: que el Founder asigne pesos de visibilidad reales a los operadores de experiencias (los 6 pesos actuales son de otros negocios), sin eso el orden de Experiencias sigue alfabético.
 
 ## Fotos del destino Valladolid no visibles en público · 2026-10-22 (Founder reporta en vivo)
-- [ ] Diagnosticar por qué la imagen destacada y la galería subidas desde el CMS (DestinationMediaPanels) no aparecen en la ficha pública de Valladolid.
-- [ ] Aplicar la corrección mínima autorizada y verificar en la ruta pública sin tocar editor, plantilla ni selección editorial.
+- [x] Diagnosticado: las 12 fotos subidas hoy estaban publicadas pero sin acreditar (review_state=unreviewed, sin crédito/licencia/huella); la política pública fail-closed G8 las ocultaba por diseño.
+- [x] Acreditación aplicada con autorización del Founder (fotos suyas o con permiso): huella sha256 de cada original, crédito/licencia Valladolid.mx, revisión aprobada. Verificado en navegador: hero y galería visibles en /oriente-maya/valladolid, 0 errores de página.
 - [ ] Mejora propuesta (pendiente autorización): que el panel de subida de destinos capture autor/licencia y calcule la huella al subir, para que las fotos no queden ocultas.
+- [ ] Hallazgo: la tarjeta de la ruta "Uayma y Espita en dos días" muestra imagen rota porque su asset es conceptual IA en borrador (proxy lo bloquea por diseño). Requiere decisión del Founder (foto real o retirar tarjeta); contenido demo protegido por Demo Pack Policy.
