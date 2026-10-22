@@ -426,7 +426,7 @@ export function ExperiencesListingSurface({
         subtitle={dto.hero.subtitle}
         media={
           heroMedia?.mediaUrl
-            ? { url: heroMedia.mediaUrl, alt: heroMedia.mediaAlt ?? dto.hero.title }
+            ? { url: heroMedia.mediaUrl, alt: heroMedia.mediaAlt ?? dto.hero.title, asset: heroMedia.mediaAsset }
             : null
         }
         caption={dto.destinationLabel ? `Experiencias en ${dto.destinationLabel}` : undefined}

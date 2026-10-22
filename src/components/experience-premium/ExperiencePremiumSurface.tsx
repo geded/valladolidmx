@@ -66,7 +66,7 @@ export function ExperiencePremiumSurface({
     .filter(
       (media, index, all) => all.findIndex((candidate) => candidate.url === media.url) === index,
     )
-    .map((media) => ({ kind: "image" as const, url: media.url, alt: media.alt }));
+    .map((media) => ({ kind: "image" as const, url: media.url, alt: media.alt, asset: media.asset }));
   const anchors = [
     { id: "resumen", label: "Resumen", iconKey: "info" },
     ...(galleryItems.length > 1 ? [{ id: "galeria", label: "Galería", iconKey: "camera" }] : []),
@@ -178,7 +178,7 @@ export function ExperiencePremiumSurface({
             eyebrow: [vm.eyebrow, vm.destinationLabel].filter(Boolean).join(" · ") || undefined,
             title: vm.name,
             description: vm.tagline || undefined,
-            media: vm.cover ? { url: vm.cover.url, alt: vm.cover.alt } : null,
+            media: vm.cover ? { url: vm.cover.url, alt: vm.cover.alt, asset: vm.cover.asset } : null,
             badges: [],
           }}
         />

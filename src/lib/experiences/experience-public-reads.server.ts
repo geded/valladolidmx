@@ -37,6 +37,7 @@ import {
   EXPERIENCE_ATTRIBUTE_FAMILY,
   EXPERIENCE_TYPE_ATTRIBUTE_KEY,
 } from "@/lib/experiences/experience-attributes";
+import { attachReadyVariants, shouldServePublicVariants, type AssetBaseForVariants } from "@/lib/media/variant-bundles.server";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 /**
@@ -163,14 +164,16 @@ export function resolveExperienceTypeLabel(
 async function signCovers(
   client: SupabaseClient<Database>,
   productIds: readonly string[],
-): Promise<Map<string, { url: string; alt: string | null }>> {
-  const coverByProduct = new Map<string, { url: string; alt: string | null }>();
+): Promise<Map<string, { url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>> {
+  const coverByProduct = new Map<string, { url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>();
+  const bases: AssetBaseForVariants[] = [];
+  const assetByProduct = new Map<string, string>();
   if (!productIds.length) return coverByProduct;
 
   const { data: links } = await client
     .from("product_media")
     .select(
-      "product_id, media_asset_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text )",
+      "product_id, media_asset_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text )",
     )
     .in("product_id", [...productIds])
     .order("sort_order", { ascending: true });
@@ -203,12 +206,21 @@ async function signCovers(
         .from(asset.storage_bucket)
         .createSignedUrl(asset.storage_path, 60 * 60);
       if (signed?.signedUrl) {
+        assetByProduct.set(productId, String(asset.id));
+        bases.push({ id: String(asset.id), file_url: signed.signedUrl, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
         coverByProduct.set(productId, {
           url: signed.signedUrl,
           alt: (asset.alt_text as string | null) ?? null,
         });
         break;
       }
+    }
+  }
+  if (await shouldServePublicVariants()) {
+    const bundles = await attachReadyVariants(bases);
+    for (const [id, media] of coverByProduct) {
+      const assetId = assetByProduct.get(id);
+      if (assetId && bundles[assetId]) media.asset = bundles[assetId];
     }
   }
   return coverByProduct;
@@ -309,6 +321,7 @@ export async function listExperiencesListing(
         tagline: (product.tagline as string | null) ?? null,
         businessName: (business?.display_name as string | null) ?? null,
         mediaUrl: cover?.url ?? null,
+        mediaAsset: cover?.asset,
         mediaAlt: cover?.alt ?? String(product.name),
         rating: null,
         location: destination ? { label: String(destination.name), distanceKm: null } : null,

@@ -150,6 +150,7 @@ export function businessToTourismCard(
     // business_media → media_assets. El adaptador no debe descartarla:
     // es la misma autoridad gobernada que consumen ficha, mapa y Mi Viaje.
     mediaUrl: b.cover_url ?? null,
+    mediaAsset: b.cover_asset,
     mediaAlt: b.cover_url ? b.display_name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,

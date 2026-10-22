@@ -7,6 +7,9 @@
  * título editorial sin enlace (nunca se inventa destino).
  */
 import { createClient } from "@supabase/supabase-js";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
+import { attachReadyVariants, shouldServePublicVariants, type AssetBaseForVariants } from "@/lib/media/variant-bundles.server";
+type RouteMedia = { url: string | null; alt: string | null; asset?: MediaAssetInput };
 import type {
   EditorialRouteCardDTO,
   EditorialRouteDetailDTO,
@@ -73,18 +76,19 @@ async function destinationSlugMap(
 
 async function signMedia(
   ids: string[],
-): Promise<Map<string, { url: string | null; alt: string | null }>> {
-  const out = new Map<string, { url: string | null; alt: string | null }>();
+): Promise<Map<string, RouteMedia>> {
+  const out = new Map<string, RouteMedia>();
   const unique = Array.from(new Set(ids.filter(Boolean)));
   if (!unique.length) return out;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("media_assets")
     .select(
-      "id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state",
+      "id, storage_bucket, storage_path, width, height, pipeline_status, alt_text, alt_text_ai, alt_text_source, review_state",
     )
     .in("id", unique);
   const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
+  const bases: AssetBaseForVariants[] = [];
   for (const asset of (data ?? []) as Array<Record<string, unknown>>) {
     let url: string | null = null;
     if (asset.storage_bucket && asset.storage_path) {
@@ -93,11 +97,16 @@ async function signMedia(
         .createSignedUrl(String(asset.storage_path), 60 * 60);
       url = signed?.signedUrl ?? null;
     }
+    if (url) bases.push({ id: String(asset.id), file_url: url, width: typeof asset.width === "number" ? asset.width : null, height: typeof asset.height === "number" ? asset.height : null, pipeline_status: typeof asset.pipeline_status === "string" ? asset.pipeline_status : null });
     out.set(String(asset.id), {
       url,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       alt: resolveMediaAlt(asset as any, { fallback: "" }) || null,
     });
+  }
+  if (await shouldServePublicVariants()) {
+    const bundles = await attachReadyVariants(bases);
+    for (const [id, media] of out) if (bundles[id]) media.asset = bundles[id];
   }
   return out;
 }
@@ -105,7 +114,7 @@ async function signMedia(
 function toCard(
   row: EditorialRouteRow,
   destinations: Map<string, { slug: string; name: string }>,
-  cover: { url: string | null; alt: string | null } | undefined,
+  cover: RouteMedia | undefined,
   stopCount: number,
 ): EditorialRouteCardDTO {
   const origin = row.origin_destination_id
@@ -132,6 +141,7 @@ function toCard(
     originDestinationLabel: origin?.name ?? null,
     coverUrl: cover?.url ?? null,
     coverAlt: cover?.alt ?? null,
+    coverAsset: cover?.asset,
     stopCount,
   };
 }
@@ -418,7 +428,7 @@ export async function readPublicRoute(slug: string): Promise<EditorialRouteDetai
         : null,
     gallery: galleryIds
       .map((id) => media.get(id))
-      .filter((m): m is { url: string | null; alt: string | null } => Boolean(m?.url))
-      .map((m) => ({ url: m.url as string, alt: m.alt })),
+      .filter((m): m is RouteMedia => Boolean(m?.url))
+      .map((m) => ({ url: m.url as string, alt: m.alt, asset: m.asset })),
   };
 }

@@ -23,6 +23,11 @@ export async function shouldServeVariantsForBusiness(slug: string | null | undef
   return Boolean(slug && MEDIA_PIPELINE_PILOT_BUSINESS_SLUGS.has(slug));
 }
 
+/** Global rollout for non-business families; no preview-only pilot leakage. */
+export async function shouldServePublicVariants() {
+  return isMediaPipelineEnabled();
+}
+
 export interface AssetBaseForVariants {
   id: string;
   file_url: string;
