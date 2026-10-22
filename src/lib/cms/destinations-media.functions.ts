@@ -6,6 +6,8 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
+import { buildRightsMetadata, sha256Hex, validateUploadRights, type MediaRightsInput } from "@/lib/experience-builder/media-rights";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function assertEditorial(ctx: { supabase: any; userId: string }) {
@@ -99,19 +101,53 @@ interface RegisterMediaInput {
   sizeBytes?: number | null;
   width?: number | null;
   height?: number | null;
+  rights: MediaRightsInput;
 }
+
+const destinationRegistrationSchema = z.object({
+  destinationId: z.string().uuid(), storagePath: z.string().min(1).max(1024),
+  role: z.enum(["hero", "gallery"]), alt: z.string().max(1000).nullish(),
+  mime: z.enum(["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"]).nullish(),
+  sizeBytes: z.number().int().positive().max(20 * 1024 * 1024).nullish(),
+  width: z.number().int().positive().nullish(), height: z.number().int().positive().nullish(),
+  rights: z.object({
+    alt: z.string().trim().min(3).max(1000), author: z.string().max(300).nullish(),
+    credit: z.string().max(300).nullish(), source: z.string().max(1000).nullish(),
+    license: z.string().max(1000).nullish(), place: z.string().max(300).nullish(),
+    capturedOn: z.string().max(50).nullish(), nature: z.enum(["documentary", "conceptual", "ai_generated"]),
+    rightsConfirmed: z.literal(true), ownership: z.enum(["own", "permission"]).optional(),
+    focalX: z.number().min(0).max(1).nullish(), focalY: z.number().min(0).max(1).nullish(),
+  }),
+});
 
 export const registerDestinationMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: RegisterMediaInput) => {
-    if (!d?.destinationId || !d?.storagePath || !d?.role) throw new Error("invalid_input");
-    if (d.role !== "hero" && d.role !== "gallery") throw new Error("invalid_role");
-    return d;
+    const parsed = destinationRegistrationSchema.parse(d);
+    const invalid = validateUploadRights(parsed.rights);
+    if (invalid) throw new Error(invalid);
+    if (!parsed.storagePath.startsWith(`${parsed.destinationId}/`) || parsed.storagePath.includes("..")) throw new Error("invalid_storage_scope");
+    return parsed;
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const db = context.supabase as any;
+
+    const { data: destination, error: destinationError } = await db.from("destinations")
+      .select("id").eq("id", data.destinationId).is("deleted_at", null).single();
+    if (destinationError || !destination) throw new Error("destination_not_available");
+    // Hash the stored bytes, never trust a checksum supplied by the browser.
+    const { data: original, error: downloadError } = await context.supabase.storage.from(BUCKET).download(data.storagePath);
+    if (downloadError || !original) throw new Error("No se pudo comprobar el archivo subido.");
+    if (original.size > 20 * 1024 * 1024 || (data.sizeBytes != null && original.size !== data.sizeBytes)) throw new Error("upload_size_mismatch");
+    const checksum = await sha256Hex(await original.arrayBuffer());
+    const reviewedAt = new Date().toISOString();
+    const documentary = data.rights.nature === "documentary";
+    const metadata = {
+      ...buildRightsMetadata(data.rights),
+      upload_declaration: { actor: context.userId, at: reviewedAt, policy: "destination-editor-rights-2026-10-22" },
+    };
 
     // 1) media_assets
     const { data: asset, error: assetErr } = await db
@@ -120,18 +156,35 @@ export const registerDestinationMedia = createServerFn({ method: "POST" })
         kind: "image",
         storage_bucket: BUCKET,
         storage_path: data.storagePath,
-        alt_text: data.alt ?? null,
+        alt_text: data.rights.alt.trim(),
+        alt_text_source: "human",
+        credit: data.rights.credit?.trim() || data.rights.author?.trim() || null,
+        original_checksum: checksum,
+        metadata,
+        review_state: documentary ? "approved" : "unreviewed",
+        reviewed_by: documentary ? context.userId : null,
+        reviewed_at: documentary ? reviewedAt : null,
         mime_type: data.mime ?? null,
         size_bytes: data.sizeBytes ?? null,
         width: data.width ?? null,
         height: data.height ?? null,
-        status: "published",
+        status: documentary ? "published" : "draft",
         created_by: context.userId,
         updated_by: context.userId,
       })
       .select("id")
       .single();
     if (assetErr) throw assetErr;
+
+    const { error: auditError } = await db.from("content_audit_log").insert({
+      entity_kind: "media_asset", entity_id: asset.id,
+      action: documentary ? "destination_editor_rights_publish" : "destination_upload_draft",
+      to_status: documentary ? "published" : "draft", actor_user_id: context.userId,
+      metadata: { destination_id: data.destinationId, checksum, ownership: data.rights.ownership ?? null },
+    });
+    if (auditError) throw auditError;
+    // Conceptual/AI assets remain in the library; never replace an accredited hero.
+    if (!documentary) return { mediaAssetId: asset.id as string };
 
     if (data.role === "hero") {
       // reemplaza el hero anterior (si había otro en destination_media)

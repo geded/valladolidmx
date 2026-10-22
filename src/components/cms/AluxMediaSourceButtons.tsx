@@ -33,9 +33,9 @@ interface Props {
   /** Sitio web del negocio, si aplica. */
   website?: string | null;
   disabled?: boolean;
-  onFile: (file: File) => void;
+  onFile: (file: File, source?: AluxPickedPhoto) => void;
   /** Selección múltiple (galería): recibe todas las fotos marcadas de una vez. */
-  onFiles?: (files: File[]) => void;
+  onFiles?: (files: File[], sources?: AluxPickedPhoto[]) => void;
 }
 
 export function AluxMediaSourceButtons({ hint, slot, website, disabled, onFile, onFiles }: Props) {
@@ -55,7 +55,7 @@ export function AluxMediaSourceButtons({ hint, slot, website, disabled, onFile, 
   };
 
   const handlePick = (photo: AluxPickedPhoto) => {
-    onFile(photo.file);
+    onFile(photo.file, photo);
     setMode(null);
   };
 
@@ -92,7 +92,7 @@ export function AluxMediaSourceButtons({ hint, slot, website, disabled, onFile, 
           onPickMany={
             onFiles
               ? (photos) => {
-                  onFiles(photos.map((p) => p.file));
+                  onFiles(photos.map((p) => p.file), photos);
                   setMode(null);
                 }
               : undefined
