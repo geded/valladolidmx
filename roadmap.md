@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Validación de subidas, IA y ampliación · 2026-10-22
-- [ ] Auditar sólo lectura todas las vías de ingreso, búsqueda/generación IA y ampliación de fotos pequeñas; ejecutar contratos y distinguir cobertura comprobada de pendientes, sin subir contenido ni consumir generación IA.
+- [x] Auditoría de código de subidas CMS/Portal/selector compartido, búsqueda/generación IA y ampliación: derivación tras registro conectada; 15 contratos PASS y codificación WebP en navegador comprobada sin persistencia. No certificación de subida autenticada ni IA real: no se subieron fotos ni consumió generación.
+- Hallazgos para corrección autorizada: AluxMediaSourceButtons sólo entrega File y pierde metadatos de autor/fuente/licencia/IA; ampliación IA no valida dimensiones devueltas; galería permite omitir evaluación de tamaño. Derivación en segundo plano no garantiza copias si falla/cierra navegador; <400 px, GIF/SVG y formatos sin soporte pueden conservar original. Fotos personales/documentos no quedan certificados por el flujo de medios CMS. No se declara cobertura universal ni blindaje completo.
 
 ## Optimización integral de imágenes · 2026-10-22
 - [x] Conectar variantes existentes a consumidores públicos compartidos de listados, destinos, rutas, experiencias, eventos, productos relacionados y logotipos; originales, editor y datos editoriales sin cambios. Zonas conservan la subida compartida; no se inventó una superficie pública inexistente.
