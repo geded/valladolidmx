@@ -387,6 +387,15 @@ export async function listExperiencesListing(
     })
     .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);
 
+  // Mismo criterio que los listados de empresas: peso de visibilidad DESC,
+  // luego alfabético. Sin pesos configurados el orden queda alfabético.
+  items.sort((a, b) => {
+    const scoreA = boostByProductId.get(a.id) ?? 0;
+    const scoreB = boostByProductId.get(b.id) ?? 0;
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    return a.name.localeCompare(b.name, "es");
+  });
+
   const destinationLabel = destino
     ? (destinationName ??
       (items[0] as { territorialContext: string | null } | undefined)?.territorialContext ??
