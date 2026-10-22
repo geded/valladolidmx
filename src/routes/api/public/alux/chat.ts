@@ -422,7 +422,7 @@ async function fetchNearbyBusinesses(
   const { data, error } = await supabaseAdmin
     .from("businesses")
     .select(
-      "id, slug, display_name, primary_category:business_categories!businesses_primary_category_id_fkey ( slug, display_name ), business_locations!business_locations_business_id_fkey ( latitude, longitude, is_primary )",
+      "id, slug, display_name, primary_category:business_categories!businesses_primary_category_id_fkey ( slug, name ), business_locations!business_locations_business_id_fkey ( latitude, longitude, is_primary )",
     )
     .eq("status", "published")
     // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
@@ -440,7 +440,7 @@ async function fetchNearbyBusinesses(
     id: string;
     slug: string;
     display_name: string;
-    primary_category?: { slug: string; display_name: string | null } | null;
+    primary_category?: { slug: string; name: string | null } | null;
     business_locations?: Array<{
       latitude: number | null;
       longitude: number | null;
@@ -459,7 +459,7 @@ async function fetchNearbyBusinesses(
       id: r.id,
       slug: r.slug,
       name: r.display_name,
-      category: r.primary_category?.display_name ?? r.primary_category?.slug ?? null,
+      category: r.primary_category?.name ?? r.primary_category?.slug ?? null,
       km,
     });
   }
