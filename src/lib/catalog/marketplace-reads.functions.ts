@@ -145,6 +145,10 @@ export interface MarketplaceBusinessMediaItem {
   role: string;
   url: string;
   alt: string | null;
+  /** H3·A4 (aditivo): identidad del asset. */
+  assetId?: string;
+  /** H3·A4 (aditivo): asset + variantes `ready` para `resolveMediaSource()`. */
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 /** Atributo administrable resuelto (misma forma que el de producto). */
@@ -1144,7 +1148,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       supabase
         .from("business_media")
         .select(
-          "role, sort_order, media_assets:media_assets ( storage_bucket, storage_path, alt_text, status, deleted_at )",
+          "role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, status, deleted_at, width, height, pipeline_status )",
         )
         .eq("business_id", String(biz.id))
         .order("role", { ascending: true })
@@ -1260,6 +1264,10 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       role?: string | null;
       sort_order?: number | null;
       media_assets?: {
+        id?: string | null;
+        width?: number | null;
+        height?: number | null;
+        pipeline_status?: string | null;
         storage_bucket?: string | null;
         storage_path?: string | null;
         alt_text?: string | null;
@@ -1273,6 +1281,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       );
     });
     if (detailMediaRows.length > 0) {
+      const variantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         for (const row of detailMediaRows) {
@@ -1285,7 +1294,31 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
             role: typeof row.role === "string" ? row.role : "gallery",
             url: signed.signedUrl,
             alt: typeof a.alt_text === "string" ? a.alt_text : null,
+            ...(a.id ? { assetId: a.id } : {}),
           });
+          if (a.id) {
+            variantBases.push({
+              id: a.id,
+              file_url: signed.signedUrl,
+              width: a.width ?? null,
+              height: a.height ?? null,
+              pipeline_status: a.pipeline_status ?? null,
+            });
+          }
+        }
+        /* H3·A4 · Versiones ligeras (fail-closed): sólo cuando el pipeline
+           está encendido o la ficha es piloto en preview. */
+        try {
+          const vb = await import("@/lib/media/variant-bundles.server");
+          if (await vb.shouldServeVariantsForBusiness(String(biz.slug ?? ""))) {
+            const bundles = await vb.attachReadyVariants(variantBases);
+            for (const m of detailMedia) {
+              const bundle = m.assetId ? bundles[m.assetId] : undefined;
+              if (bundle) m.asset = bundle;
+            }
+          }
+        } catch {
+          /* Sin variantes la ficha conserva las originales. */
         }
       } catch {
         /* Sin credencial de firma la ficha simplemente no muestra medios. */
