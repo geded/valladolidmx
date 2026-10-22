@@ -340,7 +340,9 @@
 - [ ] Respaldo periódico automático para fotos que no se optimizaron al subir — requiere decidir un servidor externo para el proceso por lotes.
 
 ## Correcciones Alux/listados autorizadas · 2026-10-22 (Founder: "Autorizado todo")
-- [ ] 1) Corregir la búsqueda de cercanía del chat público de Alux (defecto detectado en auditoría).
-- [ ] 2) Conectar el peso de visibilidad en el listado de Experiencias (igualar criterio de hoteles/restaurantes).
-- [ ] 3) Blindar coordenadas vacías/inválidas en altas y actualizaciones de ubicación.
-- [ ] 4) Investigar por qué faltan fichas de las 60 esperadas (14 hoteles/10 restaurantes en base; 9+9 publicados) y reportar.
+- [x] 1) Corregir la búsqueda de cercanía del chat público de Alux (campo inexistente `display_name` → `name` en la consulta de categorías). Verificado end-to-end: Alux respondió con Casa Colonial Sisal a 0.1 km con ubicación de visitante real.
+- [x] 2) Conectar el peso de visibilidad en el listado de Experiencias (misma autoridad `business_effective_visibility` que hoteles/restaurantes; peso DESC + alfabético; fail-closed).
+- [x] 3) Blindar coordenadas vacías/inválidas: guardia `== null` antes de `Number()` en travel-plan-geo/optimize/schedule (Number(null) era 0 → punto (0,0)).
+- [x] 4) Fichas de las 60 esperadas: NO faltaban — error de la auditoría anterior (filtraba mal). Base real: 30 hoteles + 32 restaurantes publicados y aprobados; verificado en navegador (30 tarjetas en /hoteles, 32 en /restaurantes).
+- [x] Tests de contrato: scripts/alux/alux-nearby-visibility-geo.contract.test.ts (4 PASS) + suite de experiencias (13 PASS).
+- [ ] Pendiente: que el Founder asigne pesos de visibilidad reales a los operadores de experiencias (los 6 pesos actuales son de otros negocios), sin eso el orden de Experiencias sigue alfabético.
