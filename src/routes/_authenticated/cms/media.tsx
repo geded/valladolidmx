@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload.client";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
