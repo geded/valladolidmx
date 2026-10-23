@@ -1,5 +1,8 @@
 # Roadmap
 
+## Tarjetas compactas inferiores del destino · 2026-10-23
+- [ ] Compactar únicamente Rutas, Sigue explorando y Cerca del destino con anchos y fotos equivalentes a hoteles, desplazamiento horizontal y títulos locales compactos. Conservar catálogo regional, contenido, enlaces, hero, hoteles, mapas y demás secciones; comparar 1440/834/430/390 antes/después, sin publicar.
+
 ## Acciones del destino en una sola fila · 2026-10-23
 - [x] Corregido sólo el ancho del grupo Explorar servicios / Compartir / Agregar a Mi Viaje en DestinationPremiumSurface: sin límite de 22rem y sin salto desde tableta. Capturas 1024/834 inspeccionadas: tres acciones en una fila. Comparativa 1440/1024/834/430/390: nueve secciones, textos/enlaces/fuentes de imágenes intactos y dimensiones de secciones restantes idénticas; Compartir PASS, cero errores/desbordes, textos largos PASS. Cuatro pruebas de contrato del destino PASS y build automático OK; contrato G5 de presentación falla por marca corta existente, ajena a esta clase CSS. Sin cambios CMS ni publicación; constructor autenticado y aceptación humana siguen pendientes.
 
