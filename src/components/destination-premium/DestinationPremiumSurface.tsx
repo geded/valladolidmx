@@ -826,16 +826,16 @@ function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
       aria-labelledby="descubre-destino"
       className={cn(
         "border-y border-border py-10 sm:py-14",
-        hasMedia ? "grid gap-8 md:grid-cols-12 md:items-start lg:gap-16" : "grid gap-8",
+        hasMedia ? "grid gap-8 md:grid-cols-12 md:items-start lg:items-center lg:gap-16" : "grid gap-8",
       )}
     >
       {hasMedia ? (
-        <div className="md:sticky md:top-24 md:col-span-5">
+        <div className="md:sticky md:top-24 md:col-span-5 lg:static">
           <EditorialMediaFrame
             media={lead}
             label={content.hero.title}
             sizes="(min-width: 768px) 40vw, 100vw"
-            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated md:aspect-[4/5]"
+            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated md:aspect-[4/5] lg:aspect-[5/4]"
           />
         </div>
       ) : null}
