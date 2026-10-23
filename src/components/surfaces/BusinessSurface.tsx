@@ -916,7 +916,7 @@ export function BusinessSurface({
           <section id="resumen" data-eb-anchor className="scroll-mt-24">
             {stayEssentialsDto ? <ExperienceInfoGrid dto={stayEssentialsDto} /> : null}
             {descriptionSection ? (
-              <ExperienceSection dto={descriptionSection} className="mt-8" />
+              <ExperienceSection dto={descriptionSection} className="mt-6 sm:mt-8" />
             ) : null}
           </section>
         ) : null
@@ -927,19 +927,19 @@ export function BusinessSurface({
       ) : null}
 
       {!isImmersive && !descriptionBeforeGallery && descriptionSection ? (
-        <section data-eb-anchor className="mt-10 scroll-mt-24">
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceSection dto={descriptionSection} />
         </section>
       ) : null}
 
       {stayAmenitiesDto ? (
-        <section data-eb-anchor className="mt-10 scroll-mt-24">
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceInfoGrid dto={stayAmenitiesDto} />
         </section>
       ) : null}
 
       {stayPolicyDto ? (
-        <section data-eb-anchor className="mt-10 scroll-mt-24">
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceInfoGrid dto={stayPolicyDto} />
         </section>
       ) : null}
@@ -948,7 +948,7 @@ export function BusinessSurface({
           bloque de estancia, no se repite la tarjeta genérica de producto.
           Con dos o más servicios publicados el catálogo se mantiene. */}
       {!activeContract?.omissions.includes("offer") && !hidesGenericOffer ? (
-        <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="servicios" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceProductsBlock
             config={{
               source: "business",
@@ -965,7 +965,7 @@ export function BusinessSurface({
       ) : null}
 
       {showPromotions ? (
-        <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="promociones" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperiencePromotionsBlock
             config={{
               source: "business",
@@ -980,7 +980,7 @@ export function BusinessSurface({
       {!activeContract?.omissions.includes("map") &&
       b.primary_location?.latitude != null &&
       b.primary_location?.longitude != null ? (
-        <section id="ubicacion" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="ubicacion" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <BusinessLocationBlock
             lat={b.primary_location.latitude}
             lng={b.primary_location.longitude}
@@ -994,7 +994,7 @@ export function BusinessSurface({
       ) : null}
 
       {!activeContract?.omissions.includes("reputation") ? (
-        <section id="resenas" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="resenas" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceReviewsBlock
             config={{
               source: "business",
@@ -1009,7 +1009,7 @@ export function BusinessSurface({
       {related &&
       !activeContract?.omissions.includes("collection") &&
       (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0) ? (
-        <section id="descubre" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="descubre" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceRelatedCollectionBlock
             config={{
               source: "business",
@@ -1082,7 +1082,7 @@ export function BusinessSurface({
       ) : null}
 
       {premiumContactDto ? (
-        <section id="contacto" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="contacto" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceInfoGrid dto={premiumContactDto} />
         </section>
       ) : null}
@@ -1091,7 +1091,7 @@ export function BusinessSurface({
           final invita a sumar el hospedaje a Mi Viaje para que el concierge
           arme el itinerario completo. */}
       {isImmersive ? (
-        <section className="mx-auto mt-10 w-full max-w-7xl px-5 pb-4 sm:px-8 lg:px-12">
+        <section className="mx-auto mt-8 w-full max-w-7xl px-5 pb-4 sm:mt-10 sm:px-8 lg:px-12">
           <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-lg font-semibold text-foreground">

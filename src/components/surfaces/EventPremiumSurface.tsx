@@ -294,14 +294,14 @@ export function EventPremiumSurface({
 
       {/* ---- Descripción editorial ---- */}
       {descriptionSection ? (
-        <section data-eb-anchor className="mt-10 scroll-mt-24">
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceSection dto={descriptionSection} />
         </section>
       ) : null}
 
       {/* ---- Ubicación / Cómo llegar ---- */}
       {hasLocation ? (
-        <section id="ubicacion" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="ubicacion" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <BusinessLocationBlock
             lat={event.latitude!}
             lng={event.longitude!}
@@ -317,7 +317,7 @@ export function EventPremiumSurface({
         <section
           id="descubre"
           data-eb-anchor
-          className="mx-auto mt-10 w-full max-w-7xl scroll-mt-24"
+          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24 sm:mt-10"
         >
           <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
             {fillEventCopy(copy.relatedHeading, event.title)}
@@ -356,7 +356,7 @@ export function EventPremiumSurface({
       ) : null}
 
       {/* ---- CTA final ---- */}
-      <section className="mx-auto mt-10 w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+      <section className="mx-auto mt-8 w-full max-w-7xl px-4 pb-4 sm:mt-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-lg font-semibold text-foreground">
