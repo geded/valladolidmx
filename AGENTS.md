@@ -15,6 +15,8 @@ Antes de proponer o modificar una superficie, respetar en este orden:
 
 ## Preservación
 
+- Destination identity links reuse the institutional badge renderer through optional internal navigation overrides; planner and region links retain the origin destination through validated search context. Why: preserve one badge authority and existing territorial return navigation without parallel routes.
+
 - Una plantilla aprobada es una autoridad, no un punto de partida descartable.
 - “Corregir”, “mejorar”, “conectar”, “agregar” o “continuar” no autorizan rediseño.
 - Modificar el componente aprobado; no crear superficies `V2`, `New`, paralelas o fallbacks visuales.

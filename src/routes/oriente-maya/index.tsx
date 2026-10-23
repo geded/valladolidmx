@@ -5,7 +5,10 @@
  * de destino. Los datos siguen llegando del CMS; la composición visual
  * corresponde a IMG_0575 y comparte el sistema multi-marca del sitio.
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/layout/Container";
 import { PublicShell } from "@/components/discovery";
 import {
   buildPublicHead,
@@ -45,6 +48,10 @@ function buildRegionContext(): RouteContextDeclaration {
 }
 
 export const Route = createFileRoute("/oriente-maya/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    destination: typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination) ? search.destination : undefined,
+    presentacion: search.presentacion === "cinematografica" ? "cinematografica" : undefined,
+  }),
   loader: async () => {
     const destinations = await listPublishedDestinations().catch(() => []);
     return { destinations };
@@ -100,10 +107,20 @@ export const Route = createFileRoute("/oriente-maya/")({
 
 function OrienteMayaIndex() {
   const { destinations } = Route.useLoaderData();
-  const { presentacion } = Route.useSearch() as { presentacion?: string };
+  const { presentacion, destination } = Route.useSearch();
+  const returnDestination = destinations.find((item) => item.slug === destination);
   const declaration = buildRegionContext();
   return (
     <PublicShell variant="hero" contextDeclaration={declaration} useContextCrumbs>
+      {returnDestination ? (
+        <Container className="pt-3 text-center">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/oriente-maya/$destino" params={{ destino: returnDestination.slug }}>
+              <ArrowLeft className="size-4" aria-hidden />Volver a {returnDestination.name}
+            </Link>
+          </Button>
+        </Container>
+      ) : null}
       <div
         data-region-template="premium-approved"
         data-region-presentation={presentacion === "cinematografica" ? "cinematic" : "editorial"}

@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -400,6 +401,11 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
   ];
   return (
     <InstitutionalBadgesBlock
+      className="w-auto [&>ul]:justify-center"
+      navigationHrefs={{
+        "pueblo-magico": `${resolveCanonicalPath({ kind: "region" })}?destination=${encodeURIComponent(content.slug)}#pueblos-magicos`,
+        "oriente-maya": `${resolveCanonicalPath({ kind: "region" })}?destination=${encodeURIComponent(content.slug)}`,
+      }}
       config={{
         source: "destination",
         subjectSlug: content.slug,
@@ -426,37 +432,28 @@ function HeroCopy({
   heroAction?: ReactNode;
 }) {
   return (
-    <div className={distributed ? "grid min-w-0 gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-10" : compact ? "" : "max-w-2xl"}>
-      <div className={distributed ? "min-w-0 lg:row-span-2" : ""}>
+    <div className={compact ? "min-w-0 text-center" : "max-w-2xl text-center"}>
+      <div className="min-w-0">
+      <div className="flex flex-wrap items-center justify-center gap-2">
       <DestinationIdentity content={content} />
+      <Button variant="ghost" size="sm" className="h-8 rounded-pill px-3 text-xs font-medium" asChild>
+        <Link to="/arma-tu-viaje" search={{ destination: content.slug, destinationLabel: content.hero.title }}>
+          {content.hero.primaryCta.label}<ArrowRight className="size-3.5 shrink-0" aria-hidden />
+        </Link>
+      </Button>
+      </div>
       <h1 className="mt-3 text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
         {content.hero.title}
       </h1>
       <p className="mt-2.5 text-base text-foreground/80 sm:text-lg">{content.hero.subtitle}</p>
       {content.hero.description ? (
-        <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground">
+        <p className="mx-auto mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground">
           {content.hero.description}
         </p>
       ) : null}
       </div>
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className={distributed ? "contents" : "mt-5 flex flex-wrap items-center gap-2 gap-y-2.5"}>
-        <div className={distributed ? "mt-1 justify-self-start sm:col-start-2 sm:row-start-1 sm:mt-0 sm:self-center sm:justify-self-end lg:self-end" : "contents"}>
-        <Button
-          size="sm"
-          className="h-9 rounded-pill px-4 text-[13px] font-medium sm:h-10 sm:px-5 sm:text-sm"
-          asChild
-        >
-          <Link
-            to="/arma-tu-viaje"
-            search={{ destination: content.slug, destinationLabel: content.hero.title }}
-          >
-            {content.hero.primaryCta.label}
-            <ArrowRight className="ml-1.5 size-4" aria-hidden />
-          </Link>
-        </Button>
-        </div>
-        <div className={distributed ? "flex min-w-0 flex-wrap items-center gap-1 sm:col-span-2 sm:justify-end lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start" : "contents"}>
+      <div className="mt-4 flex min-w-0 flex-wrap items-center justify-center gap-1 gap-y-2">
         <Button
           size="sm"
           variant="ghost"
@@ -470,7 +467,6 @@ function HeroCopy({
         </Button>
         <DestinationShareButton title={content.hero.title} />
         {heroAction}
-        </div>
       </div>
     </div>
   );
@@ -623,7 +619,7 @@ function HeroEditorial({
           </>
         )}
       </div>
-      <div className="mt-5 sm:mt-6">
+      <div className="mt-5 text-center sm:mt-6">
         <HeroCopy content={content} compact distributed heroAction={heroAction} />
         {total > 1 ? (
           <Button
