@@ -35,15 +35,17 @@ function buildDTO(cfg: ExperienceBadgesConfig): ExperienceBadgesDTO {
 
 export interface InstitutionalBadgesBlockProps {
   config?: unknown;
+  className?: string;
+  navigationHrefs?: Readonly<Record<string, string>>;
 }
 
-export function InstitutionalBadgesBlock({ config }: InstitutionalBadgesBlockProps) {
+export function InstitutionalBadgesBlock({ config, className, navigationHrefs }: InstitutionalBadgesBlockProps) {
   const cfg = safeParse(config);
   const dto = useMemo(() => buildDTO(cfg), [cfg]);
   if (dto.items.length === 0) {
     return <InstitutionalBadges dto={buildExperienceBadgesPreviewDTO()} subjectSlug="valladolid" />;
   }
-  return <InstitutionalBadges dto={dto} subjectSlug={cfg.subjectSlug} />;
+  return <InstitutionalBadges dto={dto} subjectSlug={cfg.subjectSlug} className={className} navigationHrefs={navigationHrefs} />;
 }
 
 export function InstitutionalBadgesPreview() {

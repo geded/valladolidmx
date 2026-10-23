@@ -22,6 +22,8 @@ export interface InstitutionalBadgesProps {
   /** Slug del sujeto (destino/negocio/producto) — para autorizaciones. */
   subjectSlug?: string;
   className?: string;
+  /** Internal navigation overrides supplied by the territorial consumer. */
+  navigationHrefs?: Readonly<Record<string, string>>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -35,9 +37,10 @@ interface BadgeChipProps {
   showLabel: boolean;
   monochrome: boolean;
   linkToProgram: boolean;
+  navigationHref?: string;
 }
 
-function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram }: BadgeChipProps) {
+function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram, navigationHref }: BadgeChipProps) {
   const entry = getBadgeRegistryEntry(item.kind);
   const Icon = entry.icon;
   const label = item.label || entry.label;
@@ -82,8 +85,9 @@ function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram }
 
   const iconSizePx = size === "sm" ? 12 : size === "lg" ? 18 : 14;
   const showText = showLabel && variant !== "icon-only";
-  const isLink = linkToProgram && (item.programUrl || entry.programUrl);
-  const href = item.programUrl || entry.programUrl || "";
+  const internalHref = navigationHref?.startsWith("/") && !navigationHref.startsWith("//") ? navigationHref : undefined;
+  const isLink = internalHref || (linkToProgram && (item.programUrl || entry.programUrl));
+  const href = internalHref || item.programUrl || entry.programUrl || "";
 
   const inner = (
     <>
@@ -114,8 +118,8 @@ function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram }
     return (
       <a
         href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={internalHref ? undefined : "_blank"}
+        rel={internalHref ? undefined : "noopener noreferrer"}
         role="link"
         aria-label={accessibleLabel}
         className={commonClass}
@@ -142,7 +146,7 @@ function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram }
 /* Componente principal                                                       */
 /* -------------------------------------------------------------------------- */
 
-export function InstitutionalBadges({ dto, subjectSlug, className }: InstitutionalBadgesProps) {
+export function InstitutionalBadges({ dto, subjectSlug, className, navigationHrefs }: InstitutionalBadgesProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const { variant, size, layout, items, ariaLabel, capabilities } = dto;
 
@@ -171,6 +175,7 @@ export function InstitutionalBadges({ dto, subjectSlug, className }: Institution
         showLabel={capabilities.showLabel && !capabilities.compact}
         monochrome={capabilities.monochrome}
         linkToProgram={capabilities.linkToProgram}
+        navigationHref={navigationHrefs?.[it.kind]}
       />
     );
     if (!capabilities.showTooltip && variant !== "icon-only") {
@@ -234,6 +239,7 @@ export function InstitutionalBadges({ dto, subjectSlug, className }: Institution
                 showLabel={capabilities.showLabel && !capabilities.compact}
                 monochrome={capabilities.monochrome}
                 linkToProgram={capabilities.linkToProgram}
+                navigationHref={navigationHrefs?.[it.kind]}
               />
             </li>
           ))}
@@ -272,6 +278,7 @@ export function InstitutionalBadges({ dto, subjectSlug, className }: Institution
                           showLabel
                           monochrome={capabilities.monochrome}
                           linkToProgram={capabilities.linkToProgram}
+                          navigationHref={navigationHrefs?.[it.kind]}
                         />
                       </li>
                     ))}
