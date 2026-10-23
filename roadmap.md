@@ -3,12 +3,14 @@
 ## Compactación de fichas existentes · 2026-10-23
 - [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
 - [x] Preflight autenticado de las cinco familias: negocios abren bloques individuales demo; eventos abre Kit genérico; lugar no muestra ficha en el lienzo observado. Informe: docs/governance/audit/2026-10-23-COMPACT-FICHES-PREFLIGHT.md. Scope de lectura PASS; Preservation de implementación BLOQUEADO.
-- [ ] Compactación pendiente: requiere autorización delimitada para reconectar el constructor con las autoridades existentes y comparación completa por familia; no reconstruir plantillas, no cambiar CMS ni publicar.
+- [x] Founder autoriza revisar y corregir la conexión constructor/público sin modificar forma ni estructura, sustituir datos CMS ni publicar.
+- [ ] Reconectar únicamente cuando sea posible preservar composición y controles editoriales existentes; comparar la plantilla completa antes de compactar. Revalidación 04:40: Sutuk SÍ carga al esperar el selector; el bloqueo no es transferencia al iframe, sino composición granular distinta. Se descarta preview alternativo que oculte la divergencia o pierda edición.
+- [ ] Compactar espacios y armonizar tamaños de textos en celulares para hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; referencia de legibilidad Airbnb, conservando fuente de marca, forma, estructura y funciones. Comprobar 1440/834/430/390 y acciones en 360.
 
 ## Armonía visual de todas las plantillas públicas · 2026-10-23
 - [x] Alcance confirmado: Inicio, región, destinos, listados y fichas; sólo presentación, conservando partes y funciones establecidas.
 - [x] Inventario de autoridades y preflight de primera ficha: Sutuk público recorrido en 1440/834/430/390; recomendaciones ya compactas 240px/16:9. Informe: docs/governance/audit/2026-10-23-PUBLIC-TEMPLATE-HARMONY-PREFLIGHT.md.
-- [ ] BLOQUEADO: «Hotel Premium» abre __tpl_business__ con bloques individuales y datos demo; no muestra la sección de recomendaciones pública, incluso tras seleccionar hotel-sutuk. Reconciliación constructor/público requiere alcance correctivo separado conforme a política 19.47. Sin cambios visuales, CMS ni publicación.
+- [ ] BLOQUEADO: «Hotel Premium» abre __tpl_business__ con bloques individuales, sin recomendaciones de la ficha pública. Revalidación: hotel-sutuk SÍ reemplaza los datos demo al esperar la carga; persiste la diferencia de composición. Conexión autorizada sin cambiar estructura; reconciliación debe preservar controles editoriales y datos. Sin cambios visuales, CMS ni publicación.
 - [ ] Comparación visual y aceptación de primera muestra antes de extender a otros lotes; depende de resolver la divergencia. Scope Gate de investigación PASS; Preservation Gate de implementación BLOQUEADO.
 
 ## Armonía de acciones en tarjetas del destino · 2026-10-23
