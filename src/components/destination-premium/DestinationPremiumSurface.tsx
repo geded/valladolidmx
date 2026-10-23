@@ -403,8 +403,8 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
     <InstitutionalBadgesBlock
       className="w-auto [&>ul]:justify-center"
       navigationHrefs={{
-        "pueblo-magico": `${resolveCanonicalPath({ kind: "region" })}?destination=${encodeURIComponent(content.slug)}#pueblos-magicos`,
-        "oriente-maya": `${resolveCanonicalPath({ kind: "region" })}?destination=${encodeURIComponent(content.slug)}`,
+        "pueblo-magico": `${resolveCanonicalPath({ kind: "region", slug: "oriente-maya" })}?destination=${encodeURIComponent(content.slug)}#pueblos-magicos`,
+        "oriente-maya": `${resolveCanonicalPath({ kind: "region", slug: "oriente-maya" })}?destination=${encodeURIComponent(content.slug)}`,
       }}
       config={{
         source: "destination",

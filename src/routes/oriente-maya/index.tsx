@@ -48,7 +48,7 @@ function buildRegionContext(): RouteContextDeclaration {
 }
 
 export const Route = createFileRoute("/oriente-maya/")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { destination?: string; presentacion?: string } => ({
     destination: typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination) ? search.destination : undefined,
     presentacion: search.presentacion === "cinematografica" ? "cinematografica" : undefined,
   }),
