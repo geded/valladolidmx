@@ -17,7 +17,7 @@
  *  - Pueblo Mágico sólo desde el registro y la marca institucional acreditada.
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -513,6 +513,13 @@ function HeroEditorial({
   const [open, setOpen] = useState(false);
   const total = slides.length;
   const mosaic = slides.slice(0, 5);
+  const sliderRef = useRef<HTMLUListElement>(null);
+  const slideTo = (i: number) => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const next = (i + total) % total;
+    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+  };
   const openAt = (i: number) => {
     setIndex(i);
     setOpen(true);
@@ -533,7 +540,8 @@ function HeroEditorial({
             {/* Móvil: deslizable a todo el ancho con contador. */}
             <div className="relative -mx-4 sm:hidden">
               <ul
-                className="flex snap-x snap-mandatory overflow-x-auto"
+                ref={sliderRef}
+                className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 aria-label={`Fotografías de ${content.hero.title}`}
                 onScroll={(e) => {
                   const el = e.currentTarget;
@@ -561,9 +569,43 @@ function HeroEditorial({
                 ))}
               </ul>
               {total > 1 ? (
-                <span className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-foreground/70 px-2 py-1 text-xs font-semibold text-background">
-                  {Math.min(index, total - 1) + 1} / {total}
-                </span>
+                <>
+                  <span className="pointer-events-none absolute right-3 top-3 rounded-lg bg-foreground/70 px-2 py-1 text-xs font-semibold text-background">
+                    {Math.min(index, total - 1) + 1} / {total}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => slideTo(index - 1)}
+                    aria-label="Fotografía anterior"
+                    className="absolute left-3 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-soft ring-focus"
+                  >
+                    <ChevronLeft className="size-5" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => slideTo(index + 1)}
+                    aria-label="Fotografía siguiente"
+                    className="absolute right-3 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-soft ring-focus"
+                  >
+                    <ChevronRight className="size-5" aria-hidden />
+                  </button>
+                  <div className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5" aria-hidden>
+                    {slides.slice(0, Math.min(total, 7)).map((_, d) => {
+                      const active = Math.min(index, total - 1) === d || (d === 6 && index >= 6);
+                      return <span key={d} className={cn("size-1.5 rounded-full bg-background/60 transition-all", active && "w-4 bg-background")} />;
+                    })}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAt(Math.min(index, total - 1))}
+                    className="absolute bottom-3 right-3 h-8 bg-background px-2.5 text-xs"
+                  >
+                    <Images className="size-3.5" aria-hidden />
+                    Ver todas ({total})
+                  </Button>
+                </>
               ) : null}
             </div>
             {/* Tableta y escritorio: mosaico de hasta 5 fotografías. */}
@@ -620,18 +662,6 @@ function HeroEditorial({
       </div>
       <div className="mt-5 sm:mt-6">
         <HeroCopy content={content} compact distributed heroAction={heroAction} />
-        {total > 1 ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => openAt(0)}
-            className="mt-3 sm:hidden"
-          >
-            <Images className="size-4" aria-hidden />
-            Ver las {total} fotos
-          </Button>
-        ) : null}
       </div>
       <DestinationPhotoLightbox
         title={content.hero.title}
