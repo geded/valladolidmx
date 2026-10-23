@@ -297,11 +297,11 @@ function DestinationRoutes({
     items.length > 0 ? (
       <section aria-labelledby={id} className="mt-10 first:mt-0">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{kicker}</p>
-        <h2 id={id} className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+        <h2 id={id} className="mt-2 font-serif text-xl leading-snug sm:text-2xl">
           {title}
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p>
-        <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&>a]:w-[78%] [&>a]:shrink-0 [&>a]:snap-start sm:[&>a]:w-auto">
+        <div className="mt-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin] [&>a]:w-60 [&>a]:max-w-[calc(100%-1rem)] [&>a]:shrink-0 [&>a]:snap-start">
           {items.map((route) => (
             <Link
               key={route.id}
@@ -314,20 +314,20 @@ function DestinationRoutes({
                   purpose: "personalization",
                 })
               }
-              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {route.coverUrl ? (
                 <EditorialMediaFrame
                   media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }}
                   label={route.name}
-                  className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="aspect-video w-full shrink-0 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
               ) : null}
               <div className="p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                   {route.originDestinationLabel ?? "Oriente Maya de Yucatán"}
                 </p>
-                <h3 className="mt-1 font-serif text-xl">{route.name}</h3>
+                <h3 className="mt-1 font-serif text-base font-semibold leading-snug">{route.name}</h3>
                 {route.summary ? (
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{route.summary}</p>
                 ) : null}
@@ -1032,7 +1032,7 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
         {content.nearby.kicker}
       </p>
-      <h2 id="cerca-del-destino" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+      <h2 id="cerca-del-destino" className={cn("mt-2 font-serif", regionalCatalog ? "text-3xl tracking-tight sm:text-4xl" : "text-xl leading-snug sm:text-2xl")}>
         {content.nearby.title}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{content.nearby.description}</p>
@@ -1054,18 +1054,18 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
           />
         </div>
       ) : null}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={regionalCatalog ? "mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "mt-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin] [&>a]:w-60 [&>a]:max-w-[calc(100%-1rem)] [&>a]:shrink-0 [&>a]:snap-start [&>article]:w-60 [&>article]:max-w-[calc(100%-1rem)] [&>article]:shrink-0 [&>article]:snap-start"}>
         {shown.map((d) => {
           const card = (
             <article
               key={d.slug}
-              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+              className={cn("group min-w-0 overflow-hidden border border-border bg-card shadow-soft", regionalCatalog ? "rounded-3xl" : "h-full rounded-2xl")}
             >
               <div className="relative">
                 <EditorialMediaFrame
                   media={d.media}
                   label={d.name}
-                  className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className={cn("w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]", regionalCatalog ? "h-44" : "aspect-video")}
                 />
                 {isPuebloMagico(d.slug) ? (
                   <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
@@ -1074,7 +1074,7 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
                 ) : null}
               </div>
               <div className="p-4">
-                <h3 className="font-serif text-lg">{d.name}</h3>
+                <h3 className={cn("font-serif", regionalCatalog ? "text-lg" : "text-base font-semibold leading-snug")}>{d.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
                 {d.distance ? (
                   <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
@@ -1089,7 +1089,7 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
             <Link
               key={d.slug}
               to={d.href}
-              className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className={cn("block min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", regionalCatalog ? "rounded-3xl" : "rounded-2xl")}
             >
               {card}
             </Link>
