@@ -6,7 +6,7 @@
  * comparte una URL canónica ya existente. Nunca expone instrucciones internas
  * de Alux — sólo título turístico + URL + marca.
  */
-import { Copy, Facebook, Mail, MessageCircle, Share2 } from "lucide-react";
+import { AtSign, Copy, Facebook, Linkedin, Mail, MessageCircle, Pin, Send, Share2, Twitter } from "lucide-react";
 
 import {
   Sheet,
@@ -37,6 +37,23 @@ function absoluteUrl(url: string): string {
   return new URL(url, window.location.origin).toString();
 }
 
+/**
+ * Marketing orgánico: cada canal recibe su propia etiqueta UTM para medir
+ * qué red trae visitantes. Nunca sobrescribe UTMs ya presentes.
+ */
+export function withShareUtm(href: string, source: string): string {
+  try {
+    const u = new URL(href);
+    if (u.searchParams.has("utm_source")) return u.toString();
+    u.searchParams.set("utm_source", source);
+    u.searchParams.set("utm_medium", "social_share");
+    u.searchParams.set("utm_campaign", "compartir");
+    return u.toString();
+  } catch {
+    return href;
+  }
+}
+
 export function ShareSheet({
   open,
   onOpenChange,
@@ -47,14 +64,16 @@ export function ShareSheet({
 }: ShareSheetProps) {
   const href = absoluteUrl(url);
   const message = `${title} — ${text ? `${text} ` : ""}Valladolid.mx · Oriente Maya`;
-  const shareText = `${message}\n${href}`;
+  const link = (source: string) => withShareUtm(href, source);
+  const textFor = (source: string) => `${message}\n${link(source)}`;
+  const enc = encodeURIComponent;
 
   const options: Array<{ key: string; label: string; icon: typeof Copy; run: () => void }> = [
     {
       key: "whatsapp",
       label: "WhatsApp",
       icon: MessageCircle,
-      run: () => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank"),
+      run: () => window.open(`https://wa.me/?text=${enc(textFor("whatsapp"))}`, "_blank"),
     },
     {
       key: "copy",
@@ -62,7 +81,7 @@ export function ShareSheet({
       icon: Copy,
       run: () => {
         void navigator.clipboard
-          ?.writeText(href)
+          ?.writeText(link("copy"))
           .then(() => toast.success("Enlace copiado"))
           .catch(() => toast.error("No se pudo copiar el enlace"));
       },
@@ -73,7 +92,7 @@ export function ShareSheet({
       icon: Facebook,
       run: () =>
         window.open(
-          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(href)}`,
+          `https://www.facebook.com/sharer/sharer.php?u=${enc(link("facebook"))}`,
           "_blank",
         ),
     },
@@ -82,24 +101,61 @@ export function ShareSheet({
       label: "Correo",
       icon: Mail,
       run: () => {
-        window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(shareText)}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${enc(textFor("email"))}`;
       },
     },
     {
       key: "x",
       label: "X",
-      icon: Share2,
+      icon: Twitter,
       run: () =>
         window.open(
-          `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(href)}`,
+          `https://twitter.com/intent/tweet?text=${enc(message)}&url=${enc(link("x"))}`,
           "_blank",
         ),
+    },
+    {
+      key: "telegram",
+      label: "Telegram",
+      icon: Send,
+      run: () =>
+        window.open(
+          `https://t.me/share/url?url=${enc(link("telegram"))}&text=${enc(message)}`,
+          "_blank",
+        ),
+    },
+    {
+      key: "linkedin",
+      label: "LinkedIn",
+      icon: Linkedin,
+      run: () =>
+        window.open(
+          `https://www.linkedin.com/sharing/share-offsite/?url=${enc(link("linkedin"))}`,
+          "_blank",
+        ),
+    },
+    {
+      key: "pinterest",
+      label: "Pinterest",
+      icon: Pin,
+      run: () =>
+        window.open(
+          `https://pinterest.com/pin/create/button/?url=${enc(link("pinterest"))}&description=${enc(message)}`,
+          "_blank",
+        ),
+    },
+    {
+      key: "threads",
+      label: "Threads",
+      icon: AtSign,
+      run: () =>
+        window.open(`https://www.threads.net/intent/post?text=${enc(textFor("threads"))}`, "_blank"),
     },
   ];
 
   const nativeShare = () => {
     if (typeof navigator === "undefined" || !navigator.share) return;
-    void navigator.share({ title, text: message, url: href }).catch(() => undefined);
+    void navigator.share({ title, text: message, url: link("native") }).catch(() => undefined);
     onOpenChange(false);
   };
 
