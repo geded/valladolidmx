@@ -15,7 +15,7 @@
  *    los bloques individuales no conocen su contenedor.
  */
 
-import { Fragment, type ReactNode } from "react";
+import { Fragment, useContext, type ReactNode } from "react";
 import { getBlock } from "./block-registry";
 import { isContainerBlock } from "./layout-engine";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
@@ -37,6 +37,11 @@ import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremi
 import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
 import { resolvePlacePremiumQ2d } from "@/components/place-premium/place-premium-config";
+import { PlacePreviewContext } from "./preview-registry";
+import { adaptPlaceToPremiumSurface } from "@/lib/places/place-public-contract";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { SeoLandingSurface } from "@/components/seo-landing/SeoLandingSurface";
 import { readSeoLandingChrome } from "./seo-landing/seo-landing-template";
 import { buildSeoLandingSurfaceVM } from "./seo-landing/seo-landing-surface-vm";
@@ -510,14 +515,26 @@ function ListingPremiumG5Render({ node }: BlockPreviewProps): ReactNode {
  */
 function PlacePremiumQ2dRender({ node }: BlockPreviewProps): ReactNode {
   const resolved = resolvePlacePremiumQ2d(node.config as Record<string, unknown>);
+  const place = useContext(PlacePreviewContext);
+  const projection = place ? adaptPlaceToPremiumSurface(place) : null;
   return (
     <PlacePremiumSurface
-      content={resolved.content}
-      presentation={resolved.presentation}
-      variant={resolved.variant}
-      builderNotice={resolved.builderNotice}
+      content={projection?.content ?? resolved.content}
+      presentation={projection?.presentation ?? resolved.presentation}
+      variant={projection?.variant ?? resolved.variant}
+      builderNotice={projection?.resolution.builderNotice ?? (place ? null : resolved.builderNotice)}
       copy={resolved.copy}
       order={resolved.order}
+      saveSlot={place ? <FavoriteButton entityKind="place" entityId={place.id} entityTitle={place.name} entitySlug={place.slug} /> : undefined}
+      tripSlot={place ? <AddToTravelPlanButton kind="place" targetId={place.id} title={place.name} slug={place.slug} subtitle={place.destination.name} variant="full" /> : undefined}
+      aluxSlot={place && projection ? <TourismAluxPanel
+        title="¿Cuándo estarás en la región?"
+        description={`Alux combina ${place.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+        task={`Ayúdame a integrar ${place.name} en mi viaje por el Oriente Maya.`}
+        prompts={projection.content.alux.prompts}
+        selection={{ entityRef: `place:${place.id}`, title: place.name, destinationSlug: place.destination.slug, destinationLabel: place.destination.name, familySlug: "lugares", href: projection.canonicalPath }}
+        compact
+      /> : undefined}
     />
   );
 }
