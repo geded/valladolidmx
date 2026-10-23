@@ -1,5 +1,11 @@
 # Roadmap
 
+## Armonía visual de todas las plantillas públicas · 2026-10-23
+- [x] Alcance confirmado: Inicio, región, destinos, listados y fichas; sólo presentación, conservando partes y funciones establecidas.
+- [ ] Inventario de autoridades, consumidores compartidos y paridad constructor/preview/público; propuesta de deltas por familia.
+- [ ] Comparación visual previa y aceptación del Founder por familia antes de aplicar; sin reemplazo global de estilos.
+- [ ] Implementación localizada y regresión completa por familia en 1440/834/430/390; Scope Gate y Preservation Gate separados. Sin publicación implícita.
+
 ## Armonía de acciones en tarjetas del destino · 2026-10-23
 - [x] Retirado únicamente «Ver ruta» de las tarjetas de Rutas y Sigue explorando en DestinationPremiumSurface; conservados enlace de toda la tarjeta, señal Alux, contenido CMS, fuentes de imágenes, duración y paradas. Comparativa de nueve secciones en 1440/834/430/390: sólo cambia la acción retirada y altura de esas tarjetas, demás contenido y dimensiones intactos; cero errores/desbordes. Navegación real a /rutas/pueblos-coloniales PASS en cuatro tamaños, cuatro contratos PASS, build automático OK. Capturas móvil/tableta inspeccionadas; fotos diferidas no cargaron en esas capturas, disponibilidad no certificada. Sin publicación ni cambios CMS; constructor y aceptación humana pendientes.
 
