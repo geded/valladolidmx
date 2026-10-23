@@ -423,16 +423,17 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
 function HeroCopy({
   content,
   compact = false,
+  distributed = false,
   heroAction,
 }: {
   content: DestinationPremiumContent;
   compact?: boolean;
+  distributed?: boolean;
   heroAction?: ReactNode;
 }) {
   return (
-    <div className={compact ? "min-w-0 text-center" : "max-w-2xl text-center"}>
-      <div className="min-w-0">
-      <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className={cn(compact ? "min-w-0" : "max-w-2xl", !distributed && "text-center")}>
+      <div className="flex min-w-0 flex-wrap items-center justify-center gap-2">
       <DestinationIdentity content={content} />
       <Button variant="ghost" size="sm" className="h-8 rounded-pill px-3 text-xs font-medium" asChild>
         <Link to="/arma-tu-viaje" search={{ destination: content.slug, destinationLabel: content.hero.title }}>
@@ -440,18 +441,20 @@ function HeroCopy({
         </Link>
       </Button>
       </div>
-      <h1 className="mt-3 text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
+      <div className={cn("mt-3", distributed && "grid min-w-0 gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:gap-x-10")}>
+      <div className="min-w-0">
+      <h1 className="text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
         {content.hero.title}
       </h1>
       <p className="mt-2.5 text-base text-foreground/80 sm:text-lg">{content.hero.subtitle}</p>
       {content.hero.description ? (
-        <p className="mx-auto mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground">
+        <p className={cn("mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground", !distributed && "mx-auto")}>
           {content.hero.description}
         </p>
       ) : null}
       </div>
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className="mt-4 flex min-w-0 flex-wrap items-center justify-center gap-1 gap-y-2">
+      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start sm:max-w-[22rem] sm:justify-end" : "mt-4 justify-center")}>
         <Button
           size="sm"
           variant="ghost"
@@ -465,6 +468,7 @@ function HeroCopy({
         </Button>
         <DestinationShareButton title={content.hero.title} />
         {heroAction}
+      </div>
       </div>
     </div>
   );
@@ -617,8 +621,8 @@ function HeroEditorial({
           </>
         )}
       </div>
-      <div className="mt-5 text-center sm:mt-6">
-        <HeroCopy content={content} compact heroAction={heroAction} />
+      <div className="mt-5 sm:mt-6">
+        <HeroCopy content={content} compact distributed heroAction={heroAction} />
         {total > 1 ? (
           <Button
             type="button"
@@ -829,20 +833,20 @@ function DescubreDestino({ content, compactTop = false }: { content: Destination
       className={cn(
         "border-y border-border",
         compactTop ? "pb-10 pt-8 sm:pb-14" : "py-10 sm:py-14",
-        hasMedia ? "grid gap-8 md:grid-cols-12 md:items-start lg:items-center lg:gap-16" : "grid gap-8",
+        hasMedia ? "grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-12" : "grid gap-8",
       )}
     >
       {hasMedia ? (
-        <div className="md:sticky md:top-24 md:col-span-5 lg:static">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:col-span-5">
           <EditorialMediaFrame
             media={lead}
             label={content.hero.title}
-            sizes="(min-width: 768px) 40vw, 100vw"
-            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated md:aspect-[4/5] lg:aspect-[5/4]"
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated sm:aspect-[16/9] lg:aspect-[4/3]"
           />
         </div>
       ) : null}
-      <div className={hasMedia ? "md:col-span-7 md:pl-2" : "max-w-3xl"}>
+      <div className={hasMedia ? "min-w-0 lg:col-span-7" : "max-w-3xl"}>
         <div className="flex items-center gap-3">
           <span className="h-px w-8 shrink-0 bg-primary" aria-hidden />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
