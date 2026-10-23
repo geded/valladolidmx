@@ -6,7 +6,7 @@
  * tarjetas compactas, distancia opcional) SIN sacar al visitante del
  * micrositio. Respeta el DSL Colonial — sin nuevos tokens.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, MapPin, X, Navigation, Share2, ExternalLink, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -262,7 +262,7 @@ export function InlineCategoryExplorer({
               <InlineExplorerCard
                 key={it.id}
                 item={it}
-                index={(page - 1) * pageSize + idx}
+                index={idx}
                 visitor={location}
                 onDetails={() => setPanel({ type: "details", item: it })}
                 onDirections={() => setPanel({ type: "directions", item: it })}
