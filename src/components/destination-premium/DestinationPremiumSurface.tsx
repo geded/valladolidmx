@@ -18,7 +18,6 @@
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
 import { useMemo, useState, type ReactNode } from "react";
-import { useHeroAutoplay } from "@/components/premium/use-hero-autoplay";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -36,6 +35,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
