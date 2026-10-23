@@ -15,6 +15,7 @@ Antes de proponer o modificar una superficie, respetar en este orden:
 
 ## Preservación
 
+- Approved place compositions register their existing block through the shared runtime library and retain normal node traversal and editorial wrappers. Why: a declared renderer cannot display an unregistered saved node; preset replacement would lose editorial state.
 - Destination identity links reuse the institutional badge renderer through optional internal navigation overrides; planner and region links retain the origin destination through validated search context. Why: preserve one badge authority and existing territorial return navigation without parallel routes.
 - Destination presentation adjustments stay inside DestinationPremiumSurface; narrative media uses EditorialMediaFrame with a fixed aspect ratio independent of description length. Why: keep builder/public authority shared and prevent text growth from distorting photos.
 - Destination route and nearby cards keep their entity-specific links inside the existing surface; compact destination rails do not alter the regional catalog branch. Why: harmonize presentation without changing territorial discovery or introducing another renderer.

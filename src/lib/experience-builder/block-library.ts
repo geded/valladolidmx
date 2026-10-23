@@ -2828,6 +2828,29 @@ const aluxPlannerBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+// Restore the already-approved place family to the runtime library. Its
+// renderer and editorial policy already exist; no saved tree is replaced.
+const placePremiumPolicy = getEditorialBlockPolicy("vmx.place.premium-q2d");
+const placePremiumBlock: BlockContract = {
+  type: "vmx.place.premium-q2d",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Lugar Premium",
+  description: "Ficha oficial de lugares y sitios de interés.",
+  schema: Object.fromEntries(
+    (placePremiumPolicy?.fields ?? []).map((field) => [
+      field.field,
+      {
+        type: field.type,
+        label: field.field.replace(/^copy_/, "").replaceAll("_", " "),
+      },
+    ]),
+  ),
+  capabilities: { soporta_preview: true, soporta_responsive: true },
+  constraints: { surfaces: ["landing"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+};
+
 const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   // NOTE: `experienceMapBlock` is appended near the end of this array.
   containerBlock,
@@ -2926,6 +2949,7 @@ const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   // G8-E · Fast Track de plantillas premium aprobadas.
   destinationPremiumG4Block,
   listingPremiumG5Block,
+  placePremiumBlock,
 ];
 
 /** I4-A: proyecta metadata de la única policy sobre los contratos runtime. */
