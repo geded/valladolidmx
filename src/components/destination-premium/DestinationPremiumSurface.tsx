@@ -300,7 +300,7 @@ function DestinationRoutes({
           {title}
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&>a]:w-[78%] [&>a]:shrink-0 [&>a]:snap-start sm:[&>a]:w-auto">
           {items.map((route) => (
             <Link
               key={route.id}

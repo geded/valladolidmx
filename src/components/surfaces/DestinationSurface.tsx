@@ -218,12 +218,13 @@ function PremiumRelatedCollection({ service, name }: { service: string; name: st
       config={{
         source: "destination",
         entityKind: kind,
-        variant: "grid",
-        columns: 3,
+        // Fila deslizable estilo Airbnb (variante oficial `carousel`).
+        variant: "carousel",
+        columns: 4,
         heading: `${service === "que-hacer" ? "Qué hacer" : service.charAt(0).toUpperCase() + service.slice(1)} en ${name}`,
         emptyMessage: "Aún no hay opciones publicadas en esta categoría.",
         groups: [
-          { id: service, entityKind: kind, categorySlug: service, maxItems: 6, variant: "grid" },
+          { id: service, entityKind: kind, categorySlug: service, maxItems: 10, variant: "carousel" },
         ],
         capabilities: {
           showImage: true,
@@ -233,6 +234,7 @@ function PremiumRelatedCollection({ service, name }: { service: string; name: st
           showDate: true,
           showKindBadge: true,
           dedupe: true,
+          compact: true,
         },
       }}
     />
