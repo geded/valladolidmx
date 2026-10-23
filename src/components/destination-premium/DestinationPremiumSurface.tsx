@@ -339,9 +339,6 @@ function DestinationRoutes({
                     .filter(Boolean)
                     .join(" · ")}
                 </p>
-                <span className="mt-3 inline-flex items-center text-xs font-semibold text-foreground">
-                  Ver ruta <ArrowRight className="ml-1 size-3" aria-hidden />
-                </span>
               </div>
             </Link>
           ))}
