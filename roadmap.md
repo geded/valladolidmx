@@ -353,3 +353,10 @@
 - [x] Mejora autorizada implementada en destinos: declaración compartida de propiedad/permiso y atribución; validación editorial, SHA del archivo almacenado y auditoría al acreditar fotos reales completas sin espera administrativa. Protecciones IA, encuadre y compresión conservadas; 38 pruebas PASS y formulario comprobado con sesión en 1440/834/430/390.
 - [ ] Cierre de validación: subir una fotografía real nueva con rol editor y comprobar acreditación, variantes y lectura pública; la prueba actual llegó a confirmación y cancelación sin crear ni alterar fotos del destino. Sin certificación de publicación automática end-to-end todavía.
 - [ ] Hallazgo: la tarjeta de la ruta "Uayma y Espita en dos días" muestra imagen rota porque su asset es conceptual IA en borrador (proxy lo bloquea por diseño). Requiere decisión del Founder (foto real o retirar tarjeta); contenido demo protegido por Demo Pack Policy.
+
+## Fotos de destino estilo Airbnb · 2026-10-23
+- [x] Portada en mosaico (escritorio/tableta) y deslizable con contador (móvil) en la plantilla única de destinos
+- [x] Galería única en "Ver todas las fotos"; Descubre con una sola foto
+- [x] Acomodar foto (punto de enfoque) al subir y en fotos ya subidas
+- [x] Tarjeta de Valladolid en Inicio con su portada real
+- [ ] Probar "Acomodar fotos" guardando como editor real (pendiente de validación del usuario)

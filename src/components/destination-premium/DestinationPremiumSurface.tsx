@@ -662,7 +662,7 @@ function DestinationPhotoLightbox({
             loading="eager"
             context="gallery"
             sizes="(min-width: 1024px) 64rem, 100vw"
-            className="h-[60dvh] w-full object-contain"
+            className="h-[42dvh] w-full object-contain sm:h-[62dvh]"
           />
           {total > 1 ? (
             <>
@@ -708,6 +708,7 @@ function DestinationPhotoLightbox({
                     label={title}
                     context="gallery"
                     sizes="5rem"
+                    loading="eager"
                     className="h-14 w-20 object-cover"
                   />
                 </button>
