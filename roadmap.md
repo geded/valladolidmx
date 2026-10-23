@@ -1,7 +1,13 @@
 # Roadmap
 
+## Equilibrio de presentación y descripción del destino · 2026-10-23
+- [x] Etiquetas centradas al pie de la galería; título a la izquierda y acciones distribuidas en desktop/tableta, agrupadas a la izquierda en móvil. Sólo DestinationPremiumSurface; navegación y contenido intactos.
+- [x] Descubre: foto horizontal sobre el texto hasta 1023 px; desde 1024 px, dos columnas con proporción fija y foto que acompaña el desplazamiento, sin estirar ni truncar descripción.
+- [x] Valladolid comparado en 1440/834/430/390: nueve secciones, mismas fuentes de fotos, textos y enlaces; sólo cambia geometría de presentación y Descubre. Compartir abre, cero errores de página y desbordes; descripción cuatro veces más larga comprobada sin escrituras CMS. 59 pruebas PASS, build automático OK, diff-check limpio. Capturas en /tmp/browser/destination-balance. Disponibilidad completa de fotos no certificada por cargas diferidas variables.
+- [ ] Aceptación visual del Founder y comprobación autenticada en el constructor pendientes; controles globales conservan deuda previa fuera del alcance. Sin publicación.
+
 ## Etiquetas navegables y acciones de viaje · 2026-10-23
-- [x] Centrado permanente solicitado por el Founder: etiquetas y acciones centradas en computadora, tableta y celular, incluso al ocupar varias líneas.
+- [x] Preferencia sustituida por la corrección del Founder: sólo etiquetas centradas; título y acciones equilibrados según dispositivo (ver sección anterior).
 - [x] Plan aprobado e implementado: Arma tu viaje junto a las etiquetas institucionales, sin botón grande duplicado; Agregar a Mi Viaje conserva su función. Enlaces internos de los distintivos reutilizan el renderer compartido y no abren pestañas nuevas.
 - [x] Región conserva origen validado contra destinos publicados y muestra Volver al destino; Pueblo Mágico llega al ancla de su sección existente. Arma tu viaje conserva destination/destinationLabel y breadcrumb de regreso también con composición publicada.
 - [x] Playwright 1440/834/430/390: los tres enlaces y vuelta a Valladolid PASS, Compartir PASS, cero errores/desbordes. Comparación de toda la ficha: sólo cambia presentación del hero; otras secciones conservan textos, enlaces, medios y dimensiones. 7 pruebas existentes PASS; build automático OK.
