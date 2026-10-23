@@ -562,7 +562,7 @@ function HeroEditorial({
                         loading={i === 0 ? "eager" : "lazy"}
                         context="hero"
                         sizes="100vw"
-                        className="h-72 w-full object-cover"
+                        className="aspect-[4/3] w-full object-cover"
                       />
                     </button>
                   </li>
@@ -882,11 +882,11 @@ function DescubreDestino({ content, compactTop = false }: { content: Destination
         </div>
         <h2
           id="descubre-destino"
-          className="mt-4 max-w-2xl font-serif text-3xl leading-tight tracking-tight sm:text-4xl"
+          className="mt-4 max-w-2xl font-serif text-2xl leading-tight tracking-tight sm:text-3xl"
         >
           {content.descubre.title}
         </h2>
-        <div className="mt-5 max-w-[68ch] space-y-4 text-base leading-relaxed text-foreground/80 sm:text-lg">
+        <div className="mt-5 max-w-[68ch] space-y-4 text-base leading-relaxed text-foreground/80">
           {content.descubre.paragraphs.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
