@@ -20,3 +20,11 @@ Revisar acumulación de márgenes `mt-10`/`sm:mt-16` y relleno editorial interno
 
 ## Pendiente
 Autorización delimitada para reconectar las composiciones existentes del constructor con sus autoridades públicas, sin reconstruir diseño ni sustituir datos CMS. Después, comparación completa por familia y compactación localizada. No ampliar implícitamente el alcance actual para corregir esa dependencia.
+
+## Revalidación · 2026-10-23 04:40 UTC
+- Founder autoriza la conexión y compactación, pero prohíbe modificar la forma y estructura de las plantillas. Solicita tamaños tipográficos coherentes y legibilidad compacta en celulares, con Airbnb como referente de proporción, no reemplazo de identidad.
+- Corrección del diagnóstico anterior: esperando la carga del selector y seleccionando `hotel-sutuk`, el lienzo SÍ muestra «Hotel Sutuk». No se acredita un fallo de transferencia al iframe: `createPortal` conserva el contexto React. La observación previa de demo tras seleccionar no era evidencia suficiente de fallo de lectura.
+- La divergencia estructural editorial permanece: el árbol guardado muestra `vmx.business.*`, con galería/información/productos separados, en lugar de la composición pública completa `BusinessSurface`. La selección real no introduce las recomendaciones públicas ni cambia esa autoridad.
+- Evidencia nueva: `/tmp/browser/compact-connection/check_connection.py`, captura `selected.png`; sesión del solicitante, sin guardar ni publicar. No hay cambios en superficies, fuentes o datos CMS.
+- Se descarta montar una ficha completa alternativa sólo en preview: ocultaría la diferencia de estructura editable y podría perder selección, visibilidad y reordenamiento de nodos guardados. Tampoco se autoriza reemplazar automáticamente el árbol por un preset.
+- Scope de investigación PASS. Preservation de compactación sigue bloqueado hasta una reconciliación editorial que preserve los controles y datos de cada composición, no sólo su apariencia pública.
