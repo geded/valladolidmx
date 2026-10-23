@@ -15,7 +15,7 @@ export interface DestinationPremiumNearbySource {
 }
 
 function mediaOf(item: PublicMediaAttribution): DestinationPremiumMedia {
-  return { url: item.url, alt: item.alt ?? "", asset: item.asset };
+  return { url: item.url, alt: item.alt ?? "", asset: item.asset, focal: item.focal ?? null };
 }
 
 export function buildDestinationPremiumRuntime(input: {
@@ -50,12 +50,13 @@ export function buildDestinationPremiumRuntime(input: {
   // Reparto editorial: el hero rota entre sus propias fotografías,
   // "Descubre" usa otras y la galería se queda con el resto.
   const poolSize = editorialPool.length;
-  const heroCount = poolSize >= 6 ? 3 : poolSize >= 3 ? 2 : 1;
-  const heroSupporting = editorialPool.slice(1, heroCount);
-  const afterHero = editorialPool.slice(heroCount);
-  const narrativeCount = afterHero.length >= 4 ? 2 : afterHero.length >= 1 ? 1 : 0;
-  const narrativeMedia = afterHero.slice(0, narrativeCount);
-  const galleryItems = afterHero.slice(narrativeCount);
+  // Portada tipo Airbnb: el hero reúne TODAS las fotografías (mosaico +
+  // "Ver todas las fotos"); "Descubre" toma una sola, distinta del mosaico
+  // cuando existe, y la galería conserva el resto para variantes que la usan.
+  const heroSupporting = editorialPool.slice(1);
+  const afterHero = editorialPool.slice(Math.min(poolSize, 5));
+  const narrativeMedia = (afterHero[0] ?? editorialPool[1]) ? [afterHero[0] ?? editorialPool[1]] : [];
+  const galleryItems = editorialPool.slice(1);
   const heroDescription = destination.tagline?.trim() ?? "";
   const descubreText = destination.description?.trim() ?? "";
   const paragraphs = descubreText ? [descubreText] : [];
