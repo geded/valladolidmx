@@ -19,7 +19,13 @@
  * Añadir una plantilla madre nueva = registrar aquí, sin tocar el Studio.
  */
 
-import { Component, createContext, type ComponentType, type ErrorInfo, type ReactNode } from "react";
+import {
+  Component,
+  createContext,
+  type ComponentType,
+  type ErrorInfo,
+  type ReactNode,
+} from "react";
 import {
   getMarketplaceBusinessBySlug,
   listMarketplaceBusinesses,
@@ -47,7 +53,13 @@ import type { PublicPlaceDTO } from "@/lib/places/place-public-contract";
 
 export const PlacePreviewContext = createContext<PublicPlaceDTO | null>(null);
 
-function PlaceDataProvider({ data, children }: { data: PublicPlaceDTO | null; children: ReactNode }) {
+function PlaceDataProvider({
+  data,
+  children,
+}: {
+  data: PublicPlaceDTO | null;
+  children: ReactNode;
+}) {
   return <PlacePreviewContext.Provider value={data}>{children}</PlacePreviewContext.Provider>;
 }
 
@@ -421,11 +433,17 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     placeholder: "Selecciona un lugar…",
     async loadCandidates() {
       const places = await listPublishedPlaces();
-      return places.flatMap((place) => place.destination_slug ? [{
-        slug: `${place.destination_slug}/${place.slug}`,
-        label: place.name,
-        secondary: place.destination_name ?? undefined,
-      }] : []);
+      return places.flatMap((place) =>
+        place.destination_slug
+          ? [
+              {
+                slug: `${place.destination_slug}/${place.slug}`,
+                label: place.name,
+                secondary: place.destination_name ?? undefined,
+              },
+            ]
+          : [],
+      );
     },
     async loadDetail(slug) {
       const [destinationSlug, placeSlug] = slug.split("/");

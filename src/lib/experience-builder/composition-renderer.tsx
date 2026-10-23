@@ -522,19 +522,52 @@ function PlacePremiumQ2dRender({ node }: BlockPreviewProps): ReactNode {
       content={projection?.content ?? resolved.content}
       presentation={projection?.presentation ?? resolved.presentation}
       variant={projection?.variant ?? resolved.variant}
-      builderNotice={projection?.resolution.builderNotice ?? (place ? null : resolved.builderNotice)}
+      builderNotice={
+        projection?.resolution.builderNotice ?? (place ? null : resolved.builderNotice)
+      }
       copy={resolved.copy}
       order={resolved.order}
-      saveSlot={place ? <FavoriteButton entityKind="place" entityId={place.id} entityTitle={place.name} entitySlug={place.slug} /> : undefined}
-      tripSlot={place ? <AddToTravelPlanButton kind="place" targetId={place.id} title={place.name} slug={place.slug} subtitle={place.destination.name} variant="full" /> : undefined}
-      aluxSlot={place && projection ? <TourismAluxPanel
-        title="¿Cuándo estarás en la región?"
-        description={`Alux combina ${place.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
-        task={`Ayúdame a integrar ${place.name} en mi viaje por el Oriente Maya.`}
-        prompts={projection.content.alux.prompts}
-        selection={{ entityRef: `place:${place.id}`, title: place.name, destinationSlug: place.destination.slug, destinationLabel: place.destination.name, familySlug: "lugares", href: projection.canonicalPath }}
-        compact
-      /> : undefined}
+      saveSlot={
+        place ? (
+          <FavoriteButton
+            entityKind="place"
+            entityId={place.id}
+            entityTitle={place.name}
+            entitySlug={place.slug}
+          />
+        ) : undefined
+      }
+      tripSlot={
+        place ? (
+          <AddToTravelPlanButton
+            kind="place"
+            targetId={place.id}
+            title={place.name}
+            slug={place.slug}
+            subtitle={place.destination.name}
+            variant="full"
+          />
+        ) : undefined
+      }
+      aluxSlot={
+        place && projection ? (
+          <TourismAluxPanel
+            title="¿Cuándo estarás en la región?"
+            description={`Alux combina ${place.name} con mesas, hospedajes y experiencias cercanas sin romper el ritmo de tu viaje.`}
+            task={`Ayúdame a integrar ${place.name} en mi viaje por el Oriente Maya.`}
+            prompts={projection.content.alux.prompts}
+            selection={{
+              entityRef: `place:${place.id}`,
+              title: place.name,
+              destinationSlug: place.destination.slug,
+              destinationLabel: place.destination.name,
+              familySlug: "lugares",
+              href: projection.canonicalPath,
+            }}
+            compact
+          />
+        ) : undefined
+      }
     />
   );
 }

@@ -1106,7 +1106,15 @@ const smartProductsGridBlock: BlockContract = {
       read_only: true,
       query: {
         table: "products",
-        select: ["id", "slug", "name", "tagline", "cover_media_id", "price_amount", "price_currency"],
+        select: [
+          "id",
+          "slug",
+          "name",
+          "tagline",
+          "cover_media_id",
+          "price_amount",
+          "price_currency",
+        ],
         filters: [{ column: "status", op: "eq", value: "published" }],
         order_by: [{ column: "name", direction: "asc" }],
         limit: 6,
