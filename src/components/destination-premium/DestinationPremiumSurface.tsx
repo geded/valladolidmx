@@ -221,6 +221,9 @@ export function DestinationPremiumSurface({
               // Sin fotografías propias la galería sólo aportaba espacio en blanco.
               const hasGalleryMedia = content.gallery.items.some((m) => Boolean(m.url));
               if (!hasGalleryMedia) return null;
+              // Portada editorial tipo Airbnb: todas las fotografías ya viven en
+              // "Ver todas las fotos"; no se repite una segunda galería suelta.
+              if (heroVariant !== "cinematic") return null;
               return (
                 <Container key={key} className="mt-14">
                   <GaleriaEditorial content={content} layout={galleryLayout} />
@@ -474,48 +477,245 @@ function HeroEditorial({
     Boolean(m?.url),
   ) as DestinationPremiumMedia[];
   const [index, setIndex] = useState(0);
-  useHeroAutoplay(slides.length, setIndex);
-  const active = slides[index] ?? content.hero.cover;
+  const [open, setOpen] = useState(false);
+  const total = slides.length;
+  const mosaic = slides.slice(0, 5);
+  const openAt = (i: number) => {
+    setIndex(i);
+    setOpen(true);
+  };
   return (
-    // Misma composición editorial que la guía (Home): tarjeta única 43/57.
-    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="grid lg:grid-cols-[minmax(0,43%)_minmax(0,57%)]">
-        <div className="order-2 flex flex-col justify-center p-5 sm:p-7 lg:order-1 lg:p-10">
-          <HeroCopy content={content} compact heroAction={heroAction} />
-        </div>
-        <div
-          className="order-1 lg:order-2"
-          data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}
-        >
-          <figure className="relative h-full min-h-[15rem] overflow-hidden sm:min-h-[20rem] lg:min-h-[30rem]">
-            <EditorialMediaFrame
-              media={active}
-              label={content.hero.title}
-              loading="eager"
-              className="absolute inset-0 size-full object-cover"
-              markerClassName="shadow-soft"
-            />
-            {slides.length > 1 ? (
-              <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
-                {slides.map((slide, i) => (
-                  <button
-                    key={slide.url || `slide-${i}`}
-                    type="button"
-                    aria-label={`Ver fotografía ${i + 1} de ${content.hero.title}`}
-                    aria-current={i === index}
-                    onClick={() => setIndex(i)}
-                    className={cn(
-                      "size-2.5 rounded-full ring-focus transition",
-                      i === index ? "bg-background" : "bg-background/50",
-                    )}
-                  />
+    // Portada tipo Airbnb: la fotografía manda; título y acciones debajo.
+    <section aria-label={`Fotografías y presentación de ${content.hero.title}`}>
+      <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}>
+        {total === 0 ? (
+          <EditorialMediaFrame
+            media={null}
+            label={content.hero.title}
+            className="h-60 w-full rounded-3xl sm:h-96"
+            markerClassName="shadow-soft"
+          />
+        ) : (
+          <>
+            {/* Móvil: deslizable a todo el ancho con contador. */}
+            <div className="relative -mx-4 sm:hidden">
+              <ul
+                className="flex snap-x snap-mandatory overflow-x-auto"
+                aria-label={`Fotografías de ${content.hero.title}`}
+                onScroll={(e) => {
+                  const el = e.currentTarget;
+                  setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)));
+                }}
+              >
+                {slides.map((m, i) => (
+                  <li key={(m.url || "s") + i} className="w-full shrink-0 snap-center">
+                    <button
+                      type="button"
+                      className="block w-full"
+                      onClick={() => openAt(i)}
+                      aria-label={`Ampliar fotografía ${i + 1} de ${total}`}
+                    >
+                      <EditorialMediaFrame
+                        media={m}
+                        label={content.hero.title}
+                        loading={i === 0 ? "eager" : "lazy"}
+                        context="hero"
+                        sizes="100vw"
+                        className="h-72 w-full object-cover"
+                      />
+                    </button>
+                  </li>
                 ))}
-              </div>
-            ) : null}
-          </figure>
-        </div>
+              </ul>
+              {total > 1 ? (
+                <span className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-foreground/70 px-2 py-1 text-xs font-semibold text-background">
+                  {Math.min(index, total - 1) + 1} / {total}
+                </span>
+              ) : null}
+            </div>
+            {/* Tableta y escritorio: mosaico de hasta 5 fotografías. */}
+            <div
+              className={cn(
+                "relative hidden gap-2 overflow-hidden rounded-3xl sm:grid sm:h-[22rem] lg:h-[28rem]",
+                mosaic.length >= 5
+                  ? "sm:grid-cols-4 sm:grid-rows-2"
+                  : mosaic.length >= 3
+                    ? "sm:grid-cols-3 sm:grid-rows-2"
+                    : mosaic.length === 2
+                      ? "sm:grid-cols-2"
+                      : "sm:grid-cols-1",
+              )}
+            >
+              {mosaic.map((m, i) => (
+                <button
+                  key={(m.url || "m") + i}
+                  type="button"
+                  onClick={() => openAt(i)}
+                  aria-label={`Ampliar fotografía ${i + 1} de ${total}`}
+                  className={cn(
+                    "group relative min-h-0 overflow-hidden ring-focus",
+                    i === 0 && mosaic.length >= 3 && "col-span-2 row-span-2",
+                    i === 0 && mosaic.length === 3 && "col-span-2",
+                  )}
+                >
+                  <EditorialMediaFrame
+                    media={m}
+                    label={content.hero.title}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : undefined}
+                    context="hero"
+                    sizes={i === 0 ? "(min-width: 640px) 50vw, 100vw" : "25vw"}
+                    className="absolute inset-0 size-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                  />
+                </button>
+              ))}
+              {total > 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openAt(0)}
+                  className="absolute bottom-4 right-4 bg-background"
+                >
+                  <Images className="size-4" aria-hidden />
+                  Ver todas las fotos ({total})
+                </Button>
+              ) : null}
+            </div>
+          </>
+        )}
       </div>
+      <div className="mt-5 sm:mt-6">
+        <HeroCopy content={content} compact heroAction={heroAction} />
+        {total > 1 ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => openAt(0)}
+            className="mt-3 sm:hidden"
+          >
+            <Images className="size-4" aria-hidden />
+            Ver las {total} fotos
+          </Button>
+        ) : null}
+      </div>
+      <DestinationPhotoLightbox
+        title={content.hero.title}
+        slides={slides}
+        open={open}
+        index={index}
+        onIndex={setIndex}
+        onOpenChange={setOpen}
+      />
     </section>
+  );
+}
+
+function DestinationPhotoLightbox({
+  title,
+  slides,
+  open,
+  index,
+  onIndex,
+  onOpenChange,
+}: {
+  title: string;
+  slides: DestinationPremiumMedia[];
+  open: boolean;
+  index: number;
+  onIndex: (i: number) => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const total = slides.length;
+  const i = Math.min(Math.max(0, index), Math.max(0, total - 1));
+  const current = slides[i];
+  const go = (d: number) => onIndex((i + d + total) % total);
+  const [touchX, setTouchX] = useState<number | null>(null);
+  if (!current) return null;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="max-w-5xl gap-3 p-3 sm:p-5"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") go(1);
+          if (e.key === "ArrowLeft") go(-1);
+        }}
+      >
+        <DialogTitle className="font-serif text-lg">
+          {title} · {i + 1} / {total}
+        </DialogTitle>
+        <div
+          className="relative overflow-hidden rounded-2xl bg-muted"
+          onTouchStart={(e) => setTouchX(e.touches[0]?.clientX ?? null)}
+          onTouchEnd={(e) => {
+            const end = e.changedTouches[0]?.clientX;
+            if (touchX != null && end != null && Math.abs(end - touchX) > 40) go(end < touchX ? 1 : -1);
+            setTouchX(null);
+          }}
+        >
+          <EditorialMediaFrame
+            key={current.url + i}
+            media={current}
+            label={title}
+            loading="eager"
+            context="gallery"
+            sizes="(min-width: 1024px) 64rem, 100vw"
+            className="h-[60dvh] w-full object-contain"
+          />
+          {total > 1 ? (
+            <>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                aria-label="Fotografía anterior"
+                onClick={() => go(-1)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/90"
+              >
+                <ChevronLeft className="size-5" aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                aria-label="Fotografía siguiente"
+                onClick={() => go(1)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/90"
+              >
+                <ChevronRight className="size-5" aria-hidden />
+              </Button>
+            </>
+          ) : null}
+        </div>
+        {total > 1 ? (
+          <ul className="flex gap-2 overflow-x-auto pb-1" aria-label="Miniaturas">
+            {slides.map((m, j) => (
+              <li key={(m.url || "t") + j} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onIndex(j)}
+                  aria-label={`Ver fotografía ${j + 1}`}
+                  aria-current={j === i}
+                  className={cn(
+                    "block overflow-hidden rounded-lg ring-focus transition",
+                    j === i ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100",
+                  )}
+                >
+                  <EditorialMediaFrame
+                    media={m}
+                    label={title}
+                    context="gallery"
+                    sizes="5rem"
+                    className="h-14 w-20 object-cover"
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -588,7 +788,7 @@ function ServiciosStrip({
 }
 
 function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
-  const [lead, ...rest] = content.descubre.media.filter((item) => Boolean(item.url));
+  const [lead] = content.descubre.media.filter((item) => Boolean(item.url));
   const hasMedia = Boolean(lead);
   return (
     <section
@@ -605,13 +805,6 @@ function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
             label={content.hero.title}
             className="col-span-2 aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated"
           />
-          {rest.slice(0, 2).map((m, index) => (
-            <EditorialMediaFrame
-              key={m.url || `destination-narrative-${index}`}
-              media={m}
-              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-soft"
-            />
-          ))}
         </div>
       ) : null}
       <div className={hasMedia ? "md:col-span-7 md:pl-2" : "max-w-3xl"}>
