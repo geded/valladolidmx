@@ -6,7 +6,7 @@
 - **Oriente Maya de Yucatán** lleva al catálogo regional existente.
 - **Arma tu viaje** abre la planeación conservando el destino de origen; se retira el botón grande repetido de esta franja.
 - Debajo del nombre quedan **Explorar servicios**, **Compartir** y la acción actual **Agregar a Mi Viaje**. Esta última conserva su función de guardar el destino, no iniciar otro viaje.
-- Tableta y computadora: etiquetas juntas cuando quepan y acciones agrupadas a la derecha. Celular: etiquetas en líneas naturales y acciones debajo, sin recortes ni desplazamiento horizontal.
+- En computadora, tableta y celular: etiquetas y acciones siempre centradas. Las etiquetas quedan juntas cuando quepan; si necesitan varias líneas, cada línea conserva el centrado. Las acciones se agrupan centradas debajo del nombre, sin recortes ni desplazamiento horizontal.
 
 ## Regreso al destino
 - Al abrir región o Pueblos Mágicos desde Valladolid, mostrar un enlace **Volver a Valladolid**; desde otro destino, usar su nombre correspondiente.
