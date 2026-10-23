@@ -460,9 +460,37 @@ function HeroCopy({
             {content.hero.secondaryCta.label}
           </a>
         </Button>
+        <DestinationShareButton title={content.hero.title} />
         {heroAction}
       </div>
     </div>
+  );
+}
+
+/* Compartir destino: mismo patrón oficial (ShareSheet) que lugares y empresas. */
+function DestinationShareButton({ title }: { title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        type="button"
+        size="sm"
+        variant="ghost"
+        onClick={() => setOpen(true)}
+        className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm"
+      >
+        <Share2 className="mr-1.5 size-4" aria-hidden />
+        Compartir
+      </Button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descubre este destino del Oriente Maya."
+        heading="Compartir destino"
+      />
+    </>
   );
 }
 
