@@ -430,9 +430,9 @@ function HeroCopy({
 }) {
   return (
     <div className={cn(compact ? "min-w-0" : "max-w-2xl", !distributed && "text-center")}>
-      <div className="flex min-w-0 flex-wrap items-center justify-center gap-2 max-sm:flex-nowrap max-sm:gap-1 max-sm:[--badge-gap-sm:0.25rem] max-sm:[--badge-px-sm:0.5rem] max-sm:[&_ul]:flex-nowrap">
+      <div className="flex min-w-0 flex-wrap items-center justify-center gap-2 max-sm:flex-nowrap max-sm:gap-1 max-sm:[--badge-gap-sm:0.25rem] max-sm:[--badge-px-sm:0.375rem] max-sm:[--badge-text-sm:10px] max-sm:[&_img]:size-5 max-sm:[&_ul]:flex-nowrap">
       <DestinationIdentity content={content} />
-      <Button variant="ghost" size="sm" className="h-8 shrink-0 rounded-pill px-3 text-xs font-medium max-sm:gap-1 max-sm:px-1.5" asChild>
+      <Button variant="ghost" size="sm" className="h-8 shrink-0 rounded-pill px-3 text-xs font-medium max-sm:gap-0.5 max-sm:px-1 max-sm:text-[10px] max-sm:[&_svg]:size-3" asChild>
         <Link to="/arma-tu-viaje" search={{ destination: content.slug, destinationLabel: content.hero.title }}>
           {content.hero.primaryCta.label}<ArrowRight className="size-3.5 shrink-0" aria-hidden />
         </Link>
