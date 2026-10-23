@@ -1,5 +1,10 @@
 # Roadmap
 
+## Equilibrio de presentación y descripción del destino · 2026-10-23
+- [ ] Mantener etiquetas centradas al pie de la galería; recuperar título a la izquierda y acciones distribuidas en desktop/tableta, con agrupación compacta en móvil. Sólo DestinationPremiumSurface, sin cambiar navegación ni contenido.
+- [ ] Acomodar fotografía y texto de Descubre en iPad sin distorsión ni alturas dependientes de descripciones largas; preservar fotos, secciones restantes, CMS, Alux, mapa, header y footer.
+- [ ] Comparar ficha completa antes/después en 1440/834/430/390 y descripción ampliada temporalmente en navegador; probar enlaces y Compartir. Sin publicación; aceptación visual y constructor autenticado pendientes.
+
 ## Etiquetas navegables y acciones de viaje · 2026-10-23
 - [x] Centrado permanente solicitado por el Founder: etiquetas y acciones centradas en computadora, tableta y celular, incluso al ocupar varias líneas.
 - [x] Plan aprobado e implementado: Arma tu viaje junto a las etiquetas institucionales, sin botón grande duplicado; Agregar a Mi Viaje conserva su función. Enlaces internos de los distintivos reutilizan el renderer compartido y no abren pestañas nuevas.
