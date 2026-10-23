@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Etiquetas navegables y acciones de viaje · 2026-10-23
+- [ ] Centrado permanente solicitado por el Founder: etiquetas y acciones centradas en computadora, tableta y celular, incluso al ocupar varias líneas.
 - [ ] Delimitar la propuesta del Founder: Arma tu viaje junto a las etiquetas institucionales, distinguirlo de guardar el destino y conservar regreso al destino de origen.
 - [ ] Implementar sólo tras aprobación de la distribución localizada; reutilizar región, sección Pueblos Mágicos y continuidad del planificador, sin rutas ni motores paralelos.
 
