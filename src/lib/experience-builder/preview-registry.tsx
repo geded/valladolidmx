@@ -19,7 +19,13 @@
  * Añadir una plantilla madre nueva = registrar aquí, sin tocar el Studio.
  */
 
-import { Component, type ComponentType, type ErrorInfo, type ReactNode } from "react";
+import {
+  Component,
+  createContext,
+  type ComponentType,
+  type ErrorInfo,
+  type ReactNode,
+} from "react";
 import {
   getMarketplaceBusinessBySlug,
   listMarketplaceBusinesses,
@@ -42,6 +48,20 @@ import {
 } from "@/lib/destinations/public-reads.functions";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { getPublicPlace, listPublishedPlaces } from "@/lib/places/place-public-reads.functions";
+import type { PublicPlaceDTO } from "@/lib/places/place-public-contract";
+
+export const PlacePreviewContext = createContext<PublicPlaceDTO | null>(null);
+
+function PlaceDataProvider({
+  data,
+  children,
+}: {
+  data: PublicPlaceDTO | null;
+  children: ReactNode;
+}) {
+  return <PlacePreviewContext.Provider value={data}>{children}</PlacePreviewContext.Provider>;
+}
 
 /** Candidato ligero para poblar el selector "Vista previa con…". */
 export interface PreviewCandidate {
@@ -407,6 +427,32 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     demoData: demoDestination,
     Provider: DestinationDataProvider,
   } satisfies TemplatePreviewProvider<DestinationSurfaceContextValue>,
+  {
+    kind: "place",
+    label: "Vista previa con lugar",
+    placeholder: "Selecciona un lugar…",
+    async loadCandidates() {
+      const places = await listPublishedPlaces();
+      return places.flatMap((place) =>
+        place.destination_slug
+          ? [
+              {
+                slug: `${place.destination_slug}/${place.slug}`,
+                label: place.name,
+                secondary: place.destination_name ?? undefined,
+              },
+            ]
+          : [],
+      );
+    },
+    async loadDetail(slug) {
+      const [destinationSlug, placeSlug] = slug.split("/");
+      if (!destinationSlug || !placeSlug) return null;
+      return getPublicPlace({ data: { destinationSlug, placeSlug } });
+    },
+    demoData: () => null,
+    Provider: PlaceDataProvider,
+  } satisfies TemplatePreviewProvider<PublicPlaceDTO | null>,
   // NOTA: `region`, `event`, `experience`, `restaurant`, `category`
   // se registrarán aquí cuando expongan un `SurfaceProvider` equivalente
   // con `db + related`. El Studio no requiere cambios: consulta este
