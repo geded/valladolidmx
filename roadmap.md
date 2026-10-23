@@ -4,6 +4,7 @@
 - [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
 - [x] Preflight autenticado de las cinco familias: negocios abren bloques individuales demo; eventos abre Kit genérico; lugar no muestra ficha en el lienzo observado. Informe: docs/governance/audit/2026-10-23-COMPACT-FICHES-PREFLIGHT.md. Scope de lectura PASS; Preservation de implementación BLOQUEADO.
 - [x] Founder autoriza revisar y corregir la conexión constructor/público sin modificar forma ni estructura, sustituir datos CMS ni publicar.
+- [x] Autorización reiterada 2026-10-23 04:47 UTC: ejecutar puntos 1 y 2 (reconciliación y compactación) exclusivamente en las cinco familias indicadas; no publicar.
 - [ ] Reconectar únicamente cuando sea posible preservar composición y controles editoriales existentes; comparar la plantilla completa antes de compactar. Revalidación 04:40: Sutuk SÍ carga al esperar el selector; el bloqueo no es transferencia al iframe, sino composición granular distinta. Se descarta preview alternativo que oculte la divergencia o pierda edición.
 - [ ] Compactar espacios y armonizar tamaños de textos en celulares para hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; referencia de legibilidad Airbnb, conservando fuente de marca, forma, estructura y funciones. Comprobar 1440/834/430/390 y acciones en 360.
 
