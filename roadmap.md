@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Acciones del destino en una sola fila · 2026-10-23
-- [ ] Corregir sólo el ancho del grupo Explorar servicios / Compartir / Agregar a Mi Viaje en DestinationPremiumSurface para evitar el salto en iPad/computadora; preservar móvil, etiquetas, fotos, contenido y todas las demás secciones. Comparar antes/después en 1440/1024/834/430/390, sin publicar.
+- [x] Corregido sólo el ancho del grupo Explorar servicios / Compartir / Agregar a Mi Viaje en DestinationPremiumSurface: sin límite de 22rem y sin salto desde tableta. Capturas 1024/834 inspeccionadas: tres acciones en una fila. Comparativa 1440/1024/834/430/390: nueve secciones, textos/enlaces/fuentes de imágenes intactos y dimensiones de secciones restantes idénticas; Compartir PASS, cero errores/desbordes, textos largos PASS. Cuatro pruebas de contrato del destino PASS y build automático OK; contrato G5 de presentación falla por marca corta existente, ajena a esta clase CSS. Sin cambios CMS ni publicación; constructor autenticado y aceptación humana siguen pendientes.
 
 ## Equilibrio de presentación y descripción del destino · 2026-10-23
 - [x] Etiquetas centradas al pie de la galería; título a la izquierda y acciones distribuidas en desktop/tableta, agrupadas a la izquierda en móvil. Sólo DestinationPremiumSurface; navegación y contenido intactos.
