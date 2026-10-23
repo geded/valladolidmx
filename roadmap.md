@@ -1,5 +1,9 @@
 # Roadmap
 
+## Etiquetas navegables y acciones de viaje · 2026-10-23
+- [ ] Delimitar la propuesta del Founder: Arma tu viaje junto a las etiquetas institucionales, distinguirlo de guardar el destino y conservar regreso al destino de origen.
+- [ ] Implementar sólo tras aprobación de la distribución localizada; reutilizar región, sección Pueblos Mágicos y continuidad del planificador, sin rutas ni motores paralelos.
+
 ## Franja de presentación del destino · 2026-10-23
 - [x] Ajuste autorizado: título y acciones distribuidos en escritorio/tableta, una columna compacta en móvil y menor separación antes de Descubre. Sólo DestinationPremiumSurface; sin nuevos contenidos, cambios CMS, fotos, mapa, Alux, tarjetas, navegación o publicación.
 - [x] Valladolid antes/después en 1440/834/430/390: cero errores/desbordes; Compartir abre en los cuatro anchos; contenido, enlaces, imágenes y dimensiones de las secciones ajenas al delta idénticos. Capturas de la franja inspeccionadas. Cinematográfico mantiene su disposición anterior al no habilitar distributed/compactTop. 20 pruebas PASS; build automático OK y diff-check limpio.
