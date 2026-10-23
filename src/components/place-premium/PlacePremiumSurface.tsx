@@ -285,17 +285,17 @@ export function PlacePremiumSurface({
       </PlaceContainer>
     ) : null,
     intro: hasIntro ? (
-      <PlaceContainer className="mt-8 sm:mt-12">
+      <PlaceContainer className="mt-6 sm:mt-8">
         {cinematic ? <IntroCentered content={content} /> : <IntroEditorial content={content} />}
       </PlaceContainer>
     ) : null,
     essentials: hasEssentials ? (
-      <PlaceContainer className="mt-8 sm:mt-12">
+      <PlaceContainer className="mt-6 sm:mt-8">
         {cinematic ? <EssentialsBand content={content} /> : <EssentialsPanel content={content} />}
       </PlaceContainer>
     ) : null,
     map: hasMap ? (
-      <PlaceContainer className="mt-10 sm:mt-16" id="mapa-lugar">
+      <PlaceContainer className="mt-8 sm:mt-10" id="mapa-lugar">
         {/* Paridad exacta con hotel, restaurante y casa: se reutiliza el
             bloque oficial de ubicación (mapa a todo lo ancho, distancia y
             "Cómo llegar" debajo). Sin superficie de mapa paralela. */}
@@ -327,7 +327,7 @@ export function PlacePremiumSurface({
       </PlaceContainer>
     ) : null,
     services: content.services.length ? (
-      <PlaceContainer className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-8 sm:mt-10">
         <SectionHeading
           id="servicios-lugar"
           kicker={copy.servicesKicker}
@@ -347,7 +347,7 @@ export function PlacePremiumSurface({
       </PlaceContainer>
     ) : null,
     experiences: content.experiences.length ? (
-      <PlaceContainer className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-8 sm:mt-10">
         <SectionHeading
           id="experiencias-lugar"
           kicker={copy.experiencesKicker}
@@ -378,7 +378,7 @@ export function PlacePremiumSurface({
     ) : null,
     /* Eventos: sin contenido → el módulo se oculta por completo. */
     events: content.events.length ? (
-      <PlaceContainer className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-8 sm:mt-10">
         <SectionHeading id="eventos-lugar" kicker={copy.eventsKicker} title={copy.eventsTitle} />
         <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {content.events.map((item) => (
@@ -392,7 +392,7 @@ export function PlacePremiumSurface({
       </PlaceContainer>
     ) : null,
     nearbyBusinesses: nearbyGroups.length ? (
-      <PlaceContainer className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-8 sm:mt-10">
         <ExperienceRelatedCollectionBlock
           config={{
             source: "manual",
@@ -417,7 +417,7 @@ export function PlacePremiumSurface({
       </PlaceContainer>
     ) : null,
     nearby: content.nearby.length ? (
-      <PlaceContainer className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-8 sm:mt-10">
         <SectionHeading
           id="cerca-lugar"
           kicker={copy.nearbyPlacesKicker}
@@ -446,7 +446,7 @@ export function PlacePremiumSurface({
       </PlaceContainer>
     ) : null,
     trip: (
-      <PlaceContainer className="mt-10 sm:mt-16">
+      <PlaceContainer className="mt-8 sm:mt-10">
         <div
           className={cn(
             "grid gap-5",
@@ -659,7 +659,7 @@ function DemoImage({
 function IntroEditorial({ content }: { content: PlacePremiumContent }) {
   return (
     <section aria-labelledby="intro-lugar-title">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-14">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-10">
         <header>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             {content.intro.kicker}
@@ -670,14 +670,14 @@ function IntroEditorial({ content }: { content: PlacePremiumContent }) {
           >
             {content.intro.title}
           </h2>
-          <blockquote className="mt-6 border-l-2 border-primary/50 pl-4 font-serif text-lg italic leading-7 text-muted-foreground">
+          <blockquote className="mt-4 border-l-2 border-primary/50 pl-4 font-serif text-base italic leading-6 text-muted-foreground sm:text-lg sm:leading-7">
             {content.intro.pullQuote}
           </blockquote>
         </header>
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-4 sm:space-y-5">
           {content.intro.paragraphs.map((paragraph, index) => (
-            <div key={`intro-${index}`} className="space-y-6">
-              <p className="text-pretty text-base leading-8">{paragraph}</p>
+            <div key={`intro-${index}`} className="space-y-4 sm:space-y-5">
+              <p className="text-pretty text-base leading-6 sm:leading-7">{paragraph}</p>
               {content.intro.media[index] ? (
                 <DemoImage
                   media={content.intro.media[index]!}
