@@ -1,5 +1,8 @@
 # Roadmap
 
+## Armonía de acciones en tarjetas del destino · 2026-10-23
+- [ ] Retirar únicamente «Ver ruta» de las tarjetas de Rutas y Sigue explorando; conservar el enlace de toda la tarjeta, señal Alux, contenido CMS, imágenes, duración y paradas. Comparar plantilla completa 1440/834/430/390 y comprobar navegación sin publicar.
+
 ## Enlaces compactos del destino en celular · 2026-10-23
 - [x] Reducidos sólo texto, separación e iconos de Explorar servicios, Compartir y Agregar a Mi Viaje en DestinationPremiumSurface por debajo de tableta; áreas táctiles de 44px. Valladolid completo comparado en 1440/834/430/390: nueve secciones, contenido/enlaces/fuentes de medios intactos y geometría de las demás secciones idéntica; cero errores de página/desbordes, cuatro contratos PASS y build automático OK. Captura 390 inspeccionada: tres acciones en una fila. Sin CMS ni publicación.
 - [ ] Verificación de apertura de Compartir no completada: el clic no mostró la hoja en la automatización; lógica compartida intacta, pendiente comprobar interactividad del entorno antes de certificarla. Constructor autenticado y aceptación humana pendientes.
