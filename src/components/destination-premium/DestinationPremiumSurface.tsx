@@ -430,9 +430,9 @@ function HeroCopy({
 }) {
   return (
     <div className={cn(compact ? "min-w-0" : "max-w-2xl", !distributed && "text-center")}>
-      <div className="flex min-w-0 flex-wrap items-center justify-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center justify-center gap-2 max-sm:flex-nowrap max-sm:gap-1 max-sm:[--badge-gap-sm:0.25rem] max-sm:[--badge-px-sm:0.5rem] max-sm:[&_ul]:flex-nowrap">
       <DestinationIdentity content={content} />
-      <Button variant="ghost" size="sm" className="h-8 rounded-pill px-3 text-xs font-medium" asChild>
+      <Button variant="ghost" size="sm" className="h-8 shrink-0 rounded-pill px-3 text-xs font-medium max-sm:gap-1 max-sm:px-1.5" asChild>
         <Link to="/arma-tu-viaje" search={{ destination: content.slug, destinationLabel: content.hero.title }}>
           {content.hero.primaryCta.label}<ArrowRight className="size-3.5 shrink-0" aria-hidden />
         </Link>
@@ -451,7 +451,7 @@ function HeroCopy({
       ) : null}
       </div>
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start sm:shrink-0 sm:flex-nowrap sm:justify-end max-sm:[&>a]:min-h-11 max-sm:[&>button]:min-h-11 max-sm:[&>a]:px-1 max-sm:[&>button]:px-1 max-sm:[&>a]:text-xs max-sm:[&>button]:text-xs max-sm:[&>a]:gap-1 max-sm:[&>button]:gap-1 max-sm:[&>a_svg]:mr-0 max-sm:[&>button_svg]:mr-0 max-sm:[&>a_svg]:size-3.5 max-sm:[&>button_svg]:size-3.5" : "mt-4 justify-center")}>
+      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start flex-nowrap sm:shrink-0 sm:justify-end max-sm:gap-0.5 max-sm:[&>*]:shrink-0 max-sm:[&>a]:min-h-11 max-sm:[&>button]:min-h-11 max-sm:[&>a]:px-1 max-sm:[&>button]:px-1 max-sm:[&>a]:text-xs max-sm:[&>button]:text-xs max-sm:[&>a]:gap-1 max-sm:[&>button]:gap-1 max-sm:[&>a_svg]:mr-0 max-sm:[&>button_svg]:mr-0 max-sm:[&>a_svg]:size-3.5 max-sm:[&>button_svg]:size-3.5" : "mt-4 justify-center")}>
         <Button
           size="sm"
           variant="ghost"
