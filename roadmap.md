@@ -47,7 +47,11 @@
 ## Franja de presentación del destino · 2026-10-23
 - [x] Ajuste autorizado: título y acciones distribuidos en escritorio/tableta, una columna compacta en móvil y menor separación antes de Descubre. Sólo DestinationPremiumSurface; sin nuevos contenidos, cambios CMS, fotos, mapa, Alux, tarjetas, navegación o publicación.
 - [x] Valladolid antes/después en 1440/834/430/390: cero errores/desbordes; Compartir abre en los cuatro anchos; contenido, enlaces, imágenes y dimensiones de las secciones ajenas al delta idénticos. Capturas de la franja inspeccionadas. Cinematográfico mantiene su disposición anterior al no habilitar distributed/compactTop. 20 pruebas PASS; build automático OK y diff-check limpio.
-- [ ] Cierre global pendiente: Route Inventory reporta rutas previas sin registrar y Governance conserva artefactos ausentes/gap obsoleto (607 avisos). No se alteran registros ni rutas fuera de alcance; constructor autenticado y aceptación visual humana pendientes, sin publicación.
+ - [ ] Cierre global pendiente: Route Inventory reporta rutas previas sin registrar y Governance conserva artefactos ausentes/gap obsoleto (607 avisos). No se alteran registros ni rutas fuera de alcance; constructor autenticado y aceptación visual humana pendientes, sin publicación.
+
+## Portada y Descubre del destino armonizados · 2026-10-23
+- [x] Ajuste autorizado en DestinationPremiumSurface: en celular la portada pasa de altura fija 288 px a proporción 4:3 (igual que la foto de "El destino"), el título "Descubre" baja de text-3xl/4xl a text-2xl/3xl (igual que "Galería") y el texto descriptivo pierde el aumento sm:text-lg. Sólo clases de presentación; sin cambios de estructura, contenido, medios, funciones ni CMS.
+- [x] Verificación móvil 430/390/360: portada llena el ancho y manda visualmente sobre la foto de descripción, título a 24 px, cero errores de página; build automático OK. El contrato G5 sigue en deuda previa documentada (marca corta), ajena a esta clase CSS. Capturas en /tmp/browser/dest-hero-fix. Aceptación visual humana pendiente; sin publicación.
 
 ## Validación de subidas, IA y ampliación · 2026-10-22
 - [x] Auditoría de código de subidas CMS/Portal/selector compartido, búsqueda/generación IA y ampliación: derivación tras registro conectada; 15 contratos PASS y codificación WebP en navegador comprobada sin persistencia. No certificación de subida autenticada ni IA real: no se subieron fotos ni consumió generación.
