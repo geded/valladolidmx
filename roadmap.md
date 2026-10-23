@@ -1,5 +1,10 @@
 # Roadmap
 
+## Compactación de fichas existentes · 2026-10-23
+- [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
+- [x] Preflight autenticado de las cinco familias: negocios abren bloques individuales demo; eventos abre Kit genérico; lugar no muestra ficha en el lienzo observado. Informe: docs/governance/audit/2026-10-23-COMPACT-FICHES-PREFLIGHT.md. Scope de lectura PASS; Preservation de implementación BLOQUEADO.
+- [ ] Compactación pendiente: requiere autorización delimitada para reconectar el constructor con las autoridades existentes y comparación completa por familia; no reconstruir plantillas, no cambiar CMS ni publicar.
+
 ## Armonía visual de todas las plantillas públicas · 2026-10-23
 - [x] Alcance confirmado: Inicio, región, destinos, listados y fichas; sólo presentación, conservando partes y funciones establecidas.
 - [x] Inventario de autoridades y preflight de primera ficha: Sutuk público recorrido en 1440/834/430/390; recomendaciones ya compactas 240px/16:9. Informe: docs/governance/audit/2026-10-23-PUBLIC-TEMPLATE-HARMONY-PREFLIGHT.md.
