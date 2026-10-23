@@ -31,6 +31,8 @@ export interface PublicMediaAttribution {
   conceptual: boolean;
   documentary: boolean;
   temporary: boolean;
+  /** Punto de enfoque editorial (0–1), si fue declarado. */
+  focal?: { x: number; y: number } | null;
 }
 
 export function emptyAttribution(url: string): PublicMediaAttribution {

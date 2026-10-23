@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FocalPointPicker } from "@/components/cms/FocalPointPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,14 @@ export function MediaUploadRightsDialog({ files, source, onConfirm, onCancel }: 
   const generated = rights.nature !== "documentary";
   const update = (patch: Partial<MediaRightsInput>) => setRights((r) => ({ ...r, ...patch }));
   const valid = validateUploadRights(rights) === null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    const f = files.length === 1 ? files[0] : null;
+    if (!f || !f.type.startsWith("image/")) return;
+    const url = URL.createObjectURL(f);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [files]);
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onCancel(); }}>
       <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto">
@@ -33,6 +42,11 @@ export function MediaUploadRightsDialog({ files, source, onConfirm, onCancel }: 
           <DialogDescription>{files.length === 1 ? files[0]?.name : `${files.length} imágenes · misma autoría y permiso`}</DialogDescription>
         </DialogHeader>
         <form className="grid gap-4" onSubmit={(e) => { e.preventDefault(); if (valid) onConfirm(rights); }}>
+          {previewUrl && (
+            <fieldset className="space-y-2"><legend className="mb-1 text-sm font-medium">Acomodar la foto</legend>
+              <FocalPointPicker src={previewUrl} value={{ x: rights.focalX ?? 0.5, y: rights.focalY ?? 0.5 }} onChange={(p) => update({ focalX: p.x, focalY: p.y })} />
+            </fieldset>
+          )}
           <div className="space-y-2"><Label htmlFor="upload-nature">Naturaleza de la imagen</Label>
             <Select disabled={knownGenerated} value={rights.nature} onValueChange={(value) => {
               if (value === "documentary" || value === "conceptual" || value === "ai_generated") update({ nature: value });

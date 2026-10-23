@@ -12,6 +12,8 @@ export interface EditorialMedia {
   alt: string;
   /** Identidad y variantes opcionales; una URL legacy sigue siendo suficiente. */
   asset?: MediaAssetInput | null;
+  /** Punto que siempre debe verse al recortar (0–1). Ausente ⇒ centro. */
+  focal?: { x: number; y: number } | null;
 }
 
 /** `true` cuando existe un medio acreditado renderizable. */

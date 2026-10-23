@@ -20,6 +20,7 @@ export interface DestinationPremiumMedia {
   /** Cadena vacía representa marcador Editorial neutral; nunca una imagen sustituta. */
   url: string;
   alt: string;
+  focal?: { x: number; y: number } | null;
 }
 
 export interface DestinationPremiumService {

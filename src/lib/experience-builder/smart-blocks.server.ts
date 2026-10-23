@@ -443,7 +443,21 @@ async function resolveStableMedia(ids: string[]): Promise<Map<string, string>> {
       });
       if (!accredited) continue;
       const stableUrl = toStablePublicMediaUrl(bucket, path);
-      if (stableUrl) out.set(id, stableUrl);
+      if (stableUrl) {
+        out.set(id, stableUrl);
+      } else if (bucket === "destinations") {
+        // Portadas de destino subidas desde el CMS viven en el bucket privado
+        // de destinos: se firman igual que en la ficha pública del destino.
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: signed } = await supabaseAdmin.storage
+            .from(bucket)
+            .createSignedUrl(path, 60 * 60 * 6);
+          if (signed?.signedUrl) out.set(id, signed.signedUrl);
+        } catch {
+          /* fail-closed: la tarjeta conserva su contenido sin medio */
+        }
+      }
     }
   } catch {
     /* Fail-closed sobre imagen: la tarjeta conserva su contenido sin medio. */

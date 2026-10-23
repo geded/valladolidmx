@@ -33,6 +33,13 @@ export interface EditorialMediaFrameProps {
   context?: MediaUsageContext;
 }
 
+/** `object-position` a partir del punto de enfoque editorial (0–1). */
+export function focalStyle(focal?: { x: number; y: number } | null) {
+  if (!focal || !Number.isFinite(focal.x) || !Number.isFinite(focal.y)) return undefined;
+  const c = (v: number) => Math.round(Math.min(1, Math.max(0, v)) * 100);
+  return { objectPosition: `${c(focal.x)}% ${c(focal.y)}%` };
+}
+
 export function EditorialMediaFrame({
   media,
   label,
@@ -98,6 +105,7 @@ export function EditorialMediaFrame({
           {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
           {...(fetchPriority ? { fetchPriority } : {})}
           data-omxds-media="g8-m1"
+          style={focalStyle(media!.focal)}
           className={cn("block h-full w-full max-w-full", imagePresentationClass)}
         />
       </picture>

@@ -122,6 +122,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
           conceptual: meta.conceptual === true,
           documentary: meta.documentary === true,
           temporary: meta.temporary === true,
+          focal: readFocal(meta.focal),
         };
       }
     }
@@ -761,3 +762,9 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     }
     return grouped;
   });
+
+function readFocal(v: unknown): { x: number; y: number } | null {
+  if (!v || typeof v !== "object") return null;
+  const { x, y } = v as { x?: unknown; y?: unknown };
+  return typeof x === "number" && typeof y === "number" ? { x, y } : null;
+}

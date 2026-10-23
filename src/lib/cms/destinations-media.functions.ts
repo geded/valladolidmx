@@ -250,7 +250,7 @@ export const listDestinationMedia = createServerFn({ method: "POST" })
     const { data: rows, error } = await db
       .from("destination_media")
       .select(
-        "id, role, sort_order, media_asset_id, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, width, height )",
+        "id, role, sort_order, media_asset_id, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, width, height, metadata )",
       )
       .eq("destination_id", data.destinationId)
       .order("role", { ascending: true })
@@ -268,6 +268,7 @@ export const listDestinationMedia = createServerFn({ method: "POST" })
       storagePath: string;
       alt: string | null;
       previewUrl: string | null;
+      focal: { x: number; y: number } | null;
     }[] = [];
     for (const r of rows ?? []) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -287,6 +288,10 @@ export const listDestinationMedia = createServerFn({ method: "POST" })
         storagePath: asset?.storage_path ?? "",
         alt: asset?.alt_text ?? null,
         previewUrl,
+        focal:
+          typeof asset?.metadata?.focal?.x === "number" && typeof asset?.metadata?.focal?.y === "number"
+            ? { x: asset.metadata.focal.x, y: asset.metadata.focal.y }
+            : null,
       });
     }
     return out;
@@ -375,5 +380,36 @@ export const removeDestinationMedia = createServerFn({ method: "POST" })
     }
     await db.from("media_assets").delete().eq("id", link.media_asset_id);
 
+    return { ok: true as const };
+  });
+
+/* ─────────────────────  Acomodar foto (punto de enfoque)  ─────────── */
+
+const focalSchema = z.object({
+  destinationMediaId: z.string().uuid(),
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+});
+
+/** Sólo cambia qué parte de la foto se ve; el archivo original no se toca. */
+export const setDestinationMediaFocal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: z.infer<typeof focalSchema>) => focalSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+    const { data: link, error } = await db
+      .from("destination_media")
+      .select("media_asset_id, media_assets:media_assets ( id, metadata )")
+      .eq("id", data.destinationMediaId)
+      .maybeSingle();
+    if (error) throw error;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const asset = link?.media_assets as any;
+    if (!asset?.id) throw new Error("media_not_found");
+    const metadata = { ...(asset.metadata ?? {}), focal: { x: data.x, y: data.y } };
+    const { error: upErr } = await db.from("media_assets").update({ metadata }).eq("id", asset.id);
+    if (upErr) throw upErr;
     return { ok: true as const };
   });
