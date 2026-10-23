@@ -175,7 +175,7 @@ export function InlineCategoryExplorer({
   return (
     // G6-S1-A · D-G6-02: todos los controles reales del explorador
     // (botones y enlaces accionables) garantizan 44×44 px y foco visible.
-    <section
+    <section ref={sectionRef}
       aria-label={`Explorando ${label}${destinationName ? ` en ${destinationName}` : ""}`}
       className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5 [&_a[href]]:min-h-[44px] [&_button]:min-h-[44px] [&_button]:min-w-[44px] [&_button]:focus-visible:ring-2 [&_button]:focus-visible:ring-ring"
       data-inline-explorer
