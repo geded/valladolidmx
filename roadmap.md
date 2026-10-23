@@ -1,5 +1,8 @@
 # Roadmap
 
+## Acciones del destino en una sola fila · 2026-10-23
+- [ ] Corregir sólo el ancho del grupo Explorar servicios / Compartir / Agregar a Mi Viaje en DestinationPremiumSurface para evitar el salto en iPad/computadora; preservar móvil, etiquetas, fotos, contenido y todas las demás secciones. Comparar antes/después en 1440/1024/834/430/390, sin publicar.
+
 ## Equilibrio de presentación y descripción del destino · 2026-10-23
 - [x] Etiquetas centradas al pie de la galería; título a la izquierda y acciones distribuidas en desktop/tableta, agrupadas a la izquierda en móvil. Sólo DestinationPremiumSurface; navegación y contenido intactos.
 - [x] Descubre: foto horizontal sobre el texto hasta 1023 px; desde 1024 px, dos columnas con proporción fija y foto que acompaña el desplazamiento, sin estirar ni truncar descripción.
