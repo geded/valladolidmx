@@ -214,8 +214,8 @@ export function DestinationPremiumSurface({
               const hasDescubreMedia = content.descubre.media.some((m) => Boolean(m.url));
               if (!hasDescubreText && !hasDescubreMedia) return null;
               return (
-                <Container key={key} className="mt-14">
-                  <DescubreDestino content={content} />
+                <Container key={key} className={heroVariant === "editorial" ? "mt-8" : "mt-14"}>
+                  <DescubreDestino content={content} compactTop={heroVariant === "editorial"} />
                 </Container>
               );
             }
@@ -417,14 +417,17 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
 function HeroCopy({
   content,
   compact = false,
+  distributed = false,
   heroAction,
 }: {
   content: DestinationPremiumContent;
   compact?: boolean;
+  distributed?: boolean;
   heroAction?: ReactNode;
 }) {
   return (
-    <div className={compact ? "" : "max-w-2xl"}>
+    <div className={distributed ? "grid min-w-0 gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-10" : compact ? "" : "max-w-2xl"}>
+      <div className={distributed ? "min-w-0 lg:row-span-2" : ""}>
       <DestinationIdentity content={content} />
       <h1 className="mt-3 text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
         {content.hero.title}
@@ -435,8 +438,10 @@ function HeroCopy({
           {content.hero.description}
         </p>
       ) : null}
+      </div>
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className="mt-5 flex flex-wrap items-center gap-2 gap-y-2.5">
+      <div className={distributed ? "contents" : "mt-5 flex flex-wrap items-center gap-2 gap-y-2.5"}>
+        <div className={distributed ? "mt-1 justify-self-start sm:col-start-2 sm:row-start-1 sm:mt-0 sm:self-center sm:justify-self-end lg:self-end" : "contents"}>
         <Button
           size="sm"
           className="h-9 rounded-pill px-4 text-[13px] font-medium sm:h-10 sm:px-5 sm:text-sm"
@@ -450,6 +455,8 @@ function HeroCopy({
             <ArrowRight className="ml-1.5 size-4" aria-hidden />
           </Link>
         </Button>
+        </div>
+        <div className={distributed ? "flex min-w-0 flex-wrap items-center gap-1 sm:col-span-2 sm:justify-end lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start" : "contents"}>
         <Button
           size="sm"
           variant="ghost"
@@ -463,6 +470,7 @@ function HeroCopy({
         </Button>
         <DestinationShareButton title={content.hero.title} />
         {heroAction}
+        </div>
       </div>
     </div>
   );
@@ -616,7 +624,7 @@ function HeroEditorial({
         )}
       </div>
       <div className="mt-5 sm:mt-6">
-        <HeroCopy content={content} compact heroAction={heroAction} />
+        <HeroCopy content={content} compact distributed heroAction={heroAction} />
         {total > 1 ? (
           <Button
             type="button"
@@ -818,14 +826,15 @@ function ServiciosStrip({
   );
 }
 
-function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
+function DescubreDestino({ content, compactTop = false }: { content: DestinationPremiumContent; compactTop?: boolean }) {
   const [lead] = content.descubre.media.filter((item) => Boolean(item.url));
   const hasMedia = Boolean(lead);
   return (
     <section
       aria-labelledby="descubre-destino"
       className={cn(
-        "border-y border-border py-10 sm:py-14",
+        "border-y border-border",
+        compactTop ? "pb-10 pt-8 sm:pb-14" : "py-10 sm:py-14",
         hasMedia ? "grid gap-8 md:grid-cols-12 md:items-start lg:items-center lg:gap-16" : "grid gap-8",
       )}
     >
