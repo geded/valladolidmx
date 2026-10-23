@@ -2,8 +2,8 @@
 
 ## Compactación de fichas existentes · 2026-10-23
 - [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
-- [ ] Comprobar paridad de las autoridades existentes y evidencia completa por familia antes de editar; hoteles conservan el bloqueo de constructor documentado, sin autorización para reconstruirlo.
-- [ ] Aplicar únicamente deltas de compactación en familias sin divergencia, verificar plantilla completa y presentar comparación para aceptación; sin publicación.
+- [x] Preflight autenticado de las cinco familias: negocios abren bloques individuales demo; eventos abre Kit genérico; lugar no muestra ficha en el lienzo observado. Informe: docs/governance/audit/2026-10-23-COMPACT-FICHES-PREFLIGHT.md. Scope de lectura PASS; Preservation de implementación BLOQUEADO.
+- [ ] Compactación pendiente: requiere autorización delimitada para reconectar el constructor con las autoridades existentes y comparación completa por familia; no reconstruir plantillas, no cambiar CMS ni publicar.
 
 ## Armonía visual de todas las plantillas públicas · 2026-10-23
 - [x] Alcance confirmado: Inicio, región, destinos, listados y fichas; sólo presentación, conservando partes y funciones establecidas.
