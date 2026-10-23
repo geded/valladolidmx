@@ -1,5 +1,10 @@
 # Roadmap
 
+## Franja de presentación del destino · 2026-10-23
+- [x] Ajuste autorizado: título y acciones distribuidos en escritorio/tableta, una columna compacta en móvil y menor separación antes de Descubre. Sólo DestinationPremiumSurface; sin nuevos contenidos, cambios CMS, fotos, mapa, Alux, tarjetas, navegación o publicación.
+- [x] Valladolid antes/después en 1440/834/430/390: cero errores/desbordes; Compartir abre en los cuatro anchos; contenido, enlaces, imágenes y dimensiones de las secciones ajenas al delta idénticos. Capturas de la franja inspeccionadas. Cinematográfico mantiene su disposición anterior al no habilitar distributed/compactTop. 20 pruebas PASS; build automático OK y diff-check limpio.
+- [ ] Cierre global pendiente: Route Inventory reporta rutas previas sin registrar y Governance conserva artefactos ausentes/gap obsoleto (607 avisos). No se alteran registros ni rutas fuera de alcance; constructor autenticado y aceptación visual humana pendientes, sin publicación.
+
 ## Validación de subidas, IA y ampliación · 2026-10-22
 - [x] Auditoría de código de subidas CMS/Portal/selector compartido, búsqueda/generación IA y ampliación: derivación tras registro conectada; 15 contratos PASS y codificación WebP en navegador comprobada sin persistencia. No certificación de subida autenticada ni IA real: no se subieron fotos ni consumió generación.
 - Hallazgos para corrección autorizada: AluxMediaSourceButtons sólo entrega File y pierde metadatos de autor/fuente/licencia/IA; ampliación IA no valida dimensiones devueltas; galería permite omitir evaluación de tamaño. Derivación en segundo plano no garantiza copias si falla/cierra navegador; <400 px, GIF/SVG y formatos sin soporte pueden conservar original. Fotos personales/documentos no quedan certificados por el flujo de medios CMS. No se declara cobertura universal ni blindaje completo.
