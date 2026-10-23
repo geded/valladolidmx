@@ -1,9 +1,11 @@
 # Roadmap
 
 ## Etiquetas navegables y acciones de viaje · 2026-10-23
-- [ ] Centrado permanente solicitado por el Founder: etiquetas y acciones centradas en computadora, tableta y celular, incluso al ocupar varias líneas.
-- [ ] Delimitar la propuesta del Founder: Arma tu viaje junto a las etiquetas institucionales, distinguirlo de guardar el destino y conservar regreso al destino de origen.
-- [ ] Implementar sólo tras aprobación de la distribución localizada; reutilizar región, sección Pueblos Mágicos y continuidad del planificador, sin rutas ni motores paralelos.
+- [x] Centrado permanente solicitado por el Founder: etiquetas y acciones centradas en computadora, tableta y celular, incluso al ocupar varias líneas.
+- [x] Plan aprobado e implementado: Arma tu viaje junto a las etiquetas institucionales, sin botón grande duplicado; Agregar a Mi Viaje conserva su función. Enlaces internos de los distintivos reutilizan el renderer compartido y no abren pestañas nuevas.
+- [x] Región conserva origen validado contra destinos publicados y muestra Volver al destino; Pueblo Mágico llega al ancla de su sección existente. Arma tu viaje conserva destination/destinationLabel y breadcrumb de regreso también con composición publicada.
+- [x] Playwright 1440/834/430/390: los tres enlaces y vuelta a Valladolid PASS, Compartir PASS, cero errores/desbordes. Comparación de toda la ficha: sólo cambia presentación del hero; otras secciones conservan textos, enlaces, medios y dimensiones. 7 pruebas existentes PASS; build automático OK.
+- [ ] Pendiente aceptación visual humana y constructor autenticado; controles globales Route Inventory/Governance conservan deuda previa documentada. Sin publicación.
 
 ## Franja de presentación del destino · 2026-10-23
 - [x] Ajuste autorizado: título y acciones distribuidos en escritorio/tableta, una columna compacta en móvil y menor separación antes de Descubre. Sólo DestinationPremiumSurface; sin nuevos contenidos, cambios CMS, fotos, mapa, Alux, tarjetas, navegación o publicación.

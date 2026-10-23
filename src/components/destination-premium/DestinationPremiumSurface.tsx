@@ -423,12 +423,10 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
 function HeroCopy({
   content,
   compact = false,
-  distributed = false,
   heroAction,
 }: {
   content: DestinationPremiumContent;
   compact?: boolean;
-  distributed?: boolean;
   heroAction?: ReactNode;
 }) {
   return (
@@ -620,7 +618,7 @@ function HeroEditorial({
         )}
       </div>
       <div className="mt-5 text-center sm:mt-6">
-        <HeroCopy content={content} compact distributed heroAction={heroAction} />
+        <HeroCopy content={content} compact heroAction={heroAction} />
         {total > 1 ? (
           <Button
             type="button"
