@@ -1,5 +1,8 @@
 # Roadmap
 
+## Enlaces compactos del destino en celular · 2026-10-23
+- [ ] Reducir sólo texto, separación e iconos de Explorar servicios, Compartir y Agregar a Mi Viaje en la autoridad existente; conservar áreas táctiles y presentación desde tableta. Comparar Valladolid completo en 1440/834/430/390, comprobar las acciones y no publicar.
+
 ## Tarjetas compactas inferiores del destino · 2026-10-23
 - [x] Compactadas únicamente Rutas, Sigue explorando y Cerca del destino: tarjetas de 240px, imágenes 16:9 (238×134 interiores como hoteles), filas deslizables y títulos locales compactos. Catálogo regional conserva su rama sin cambios. Comparativa pública Valladolid 1440/834/430/390: nueve secciones, textos/enlaces/fuentes de medios intactos, geometría de las demás secciones idéntica, cero errores/desbordes. En 390 desplazamiento rutas/cercanos y enlace /rutas/pueblos-coloniales PASS; capturas móviles inspeccionadas. Cuatro contratos PASS, build automático OK. Algunas fotos no cargaron en las capturas: disponibilidad completa de medios no certificada. Sin publicación ni cambios CMS; constructor autenticado y aceptación humana pendientes.
 
