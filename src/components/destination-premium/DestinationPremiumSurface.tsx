@@ -454,7 +454,7 @@ function HeroCopy({
       ) : null}
       </div>
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start sm:max-w-[22rem] sm:justify-end" : "mt-4 justify-center")}>
+      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start sm:shrink-0 sm:flex-nowrap sm:justify-end" : "mt-4 justify-center")}>
         <Button
           size="sm"
           variant="ghost"
