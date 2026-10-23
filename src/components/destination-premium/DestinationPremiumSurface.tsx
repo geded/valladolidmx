@@ -454,7 +454,7 @@ function HeroCopy({
       ) : null}
       </div>
       {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start sm:shrink-0 sm:flex-nowrap sm:justify-end" : "mt-4 justify-center")}>
+      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start sm:shrink-0 sm:flex-nowrap sm:justify-end max-sm:[&>a]:min-h-11 max-sm:[&>button]:min-h-11 max-sm:[&>a]:px-1 max-sm:[&>button]:px-1 max-sm:[&>a]:text-xs max-sm:[&>button]:text-xs max-sm:[&>a]:gap-1 max-sm:[&>button]:gap-1 max-sm:[&>a_svg]:mr-0 max-sm:[&>button_svg]:mr-0 max-sm:[&>a_svg]:size-3.5 max-sm:[&>button_svg]:size-3.5" : "mt-4 justify-center")}>
         <Button
           size="sm"
           variant="ghost"

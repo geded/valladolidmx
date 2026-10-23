@@ -1,5 +1,9 @@
 # Roadmap
 
+## Enlaces compactos del destino en celular · 2026-10-23
+- [x] Reducidos sólo texto, separación e iconos de Explorar servicios, Compartir y Agregar a Mi Viaje en DestinationPremiumSurface por debajo de tableta; áreas táctiles de 44px. Valladolid completo comparado en 1440/834/430/390: nueve secciones, contenido/enlaces/fuentes de medios intactos y geometría de las demás secciones idéntica; cero errores de página/desbordes, cuatro contratos PASS y build automático OK. Captura 390 inspeccionada: tres acciones en una fila. Sin CMS ni publicación.
+- [ ] Verificación de apertura de Compartir no completada: el clic no mostró la hoja en la automatización; lógica compartida intacta, pendiente comprobar interactividad del entorno antes de certificarla. Constructor autenticado y aceptación humana pendientes.
+
 ## Tarjetas compactas inferiores del destino · 2026-10-23
 - [x] Compactadas únicamente Rutas, Sigue explorando y Cerca del destino: tarjetas de 240px, imágenes 16:9 (238×134 interiores como hoteles), filas deslizables y títulos locales compactos. Catálogo regional conserva su rama sin cambios. Comparativa pública Valladolid 1440/834/430/390: nueve secciones, textos/enlaces/fuentes de medios intactos, geometría de las demás secciones idéntica, cero errores/desbordes. En 390 desplazamiento rutas/cercanos y enlace /rutas/pueblos-coloniales PASS; capturas móviles inspeccionadas. Cuatro contratos PASS, build automático OK. Algunas fotos no cargaron en las capturas: disponibilidad completa de medios no certificada. Sin publicación ni cambios CMS; constructor autenticado y aceptación humana pendientes.
 
