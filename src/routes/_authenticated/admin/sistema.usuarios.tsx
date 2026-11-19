@@ -323,7 +323,7 @@ function UsersTable({
       {inviteOpen ? (
         <InviteDialog
           defaultRole={assignableForTab[0]}
-          allowedRoles={assignableForTab}
+          allowedRoles={Array.from(new Set([...assignableForTab, ...assignableForRows]))}
           onClose={() => setInviteOpen(false)}
         />
       ) : null}
@@ -961,7 +961,11 @@ function InviteDialog({
         },
       }),
     onSuccess: (res) => {
-      toast.success(`Invitación enviada a ${res.email}`);
+      toast.success(
+        res.existing
+          ? `${res.email} ya tenía cuenta: se le asignó el rol ${ROLE_LABELS[role]}. Puede entrar con su misma cuenta.`
+          : `Invitación enviada a ${res.email}`,
+      );
       qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
       onClose();
     },

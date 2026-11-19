@@ -52,41 +52,75 @@ export const inviteUser = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1) Invitación por email (magic link). Usa plantilla `invite` de Lovable Emails.
+    //    Si el correo ya pertenece a una cuenta (p. ej. un visitante), no se puede
+    //    "invitar" de nuevo: se reutiliza esa cuenta y sólo se le agrega el rol.
+    let targetUserId: string | null = null;
+    let targetEmail: string | null = null;
+    let existing = false;
     const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
       data.email,
       {
         data: data.displayName ? { display_name: data.displayName } : undefined,
       },
     );
-    if (inviteError || !invited?.user) {
-      throw new Error(inviteError?.message ?? "No se pudo enviar la invitación.");
+    if (invited?.user && !inviteError) {
+      targetUserId = invited.user.id;
+      targetEmail = invited.user.email ?? data.email;
+    } else {
+      const alreadyRegistered =
+        inviteError?.code === "email_exists" ||
+        /already (been )?registered|already exists/i.test(inviteError?.message ?? "");
+      if (!alreadyRegistered) {
+        throw new Error(inviteError?.message ?? "No se pudo enviar la invitación.");
+      }
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("user_id, email")
+        .ilike("email", data.email)
+        .maybeSingle();
+      if (!profile?.user_id) {
+        throw new Error(
+          "Ese correo ya tiene una cuenta, pero no se encontró su perfil. Búscalo en la lista y agrégale el rol desde «Agregar rol».",
+        );
+      }
+      targetUserId = profile.user_id;
+      targetEmail = profile.email ?? data.email;
+      existing = true;
     }
 
     // 2) Asigna el rol solicitado (además del rol traveler por defecto que crea el trigger).
     if (data.role !== "traveler") {
       const { error: roleError } = await supabaseAdmin.from("user_roles").insert({
-        user_id: invited.user.id,
+        user_id: targetUserId,
         role: data.role,
         created_by: context.userId,
       });
       if (roleError && !roleError.message.includes("duplicate")) {
-        throw new Error(`Invitación enviada, pero no se pudo asignar el rol: ${roleError.message}`);
+        throw new Error(
+          existing
+            ? `No se pudo asignar el rol: ${roleError.message}`
+            : `Invitación enviada, pero no se pudo asignar el rol: ${roleError.message}`,
+        );
       }
 
       // 3) Auditoría explícita.
       await supabaseAdmin.from("permissions_audit_log").insert({
         actor_user_id: context.userId,
-        target_user_id: invited.user.id,
+        target_user_id: targetUserId,
         action: "role.assign",
         role: data.role,
-        metadata: { surface: "/admin/sistema/usuarios", via: "invite" },
+        metadata: {
+          surface: "/admin/sistema/usuarios",
+          via: existing ? "invite_existing_account" : "invite",
+        },
       });
     }
 
     return {
       ok: true as const,
-      userId: invited.user.id,
-      email: invited.user.email,
+      existing,
+      userId: targetUserId,
+      email: targetEmail,
     };
   });
 
