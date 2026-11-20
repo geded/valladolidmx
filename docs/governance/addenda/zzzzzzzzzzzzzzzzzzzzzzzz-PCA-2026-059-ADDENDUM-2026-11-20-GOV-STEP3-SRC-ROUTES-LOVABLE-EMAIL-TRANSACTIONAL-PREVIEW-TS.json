@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-LOVABLE-EMAIL-TRANSACTIONAL-PREVIEW-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/lovable/email/transactional/preview.ts",
+    "previous_sha256": "f0266b4b5082caec60e09118659342e1ef467d4a888d4c536cc0bc76e884b85d",
+    "current_sha256": "31315e5f96431a6ffb4b41f8b33ea8c36c137b2dd4033b6c5116945e40daf10d",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

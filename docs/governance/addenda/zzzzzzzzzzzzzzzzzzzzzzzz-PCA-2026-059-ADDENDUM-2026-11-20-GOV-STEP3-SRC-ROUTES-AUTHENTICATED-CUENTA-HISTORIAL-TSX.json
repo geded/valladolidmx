@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-AUTHENTICATED-CUENTA-HISTORIAL-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cuenta/historial.tsx",
+    "previous_sha256": "a9836f602879316c63141e7ead9f08cfb5d96ee2a634e4388c00da8ec1cefb19",
+    "current_sha256": "a454125c342f6f159dbe612115a15b74d9abdbdb1281d5e93604ac82f7bfcb5d",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

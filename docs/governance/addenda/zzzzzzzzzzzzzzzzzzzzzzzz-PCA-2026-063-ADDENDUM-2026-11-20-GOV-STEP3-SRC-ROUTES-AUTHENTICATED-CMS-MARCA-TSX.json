@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-AUTHENTICATED-CMS-MARCA-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/routes/_authenticated/cms/marca.tsx",
+    "previous_sha256": "c98f5ff22e44901804fbb30fa1b295d6e262d6ecc5582ad1f4a90a6768c812d5",
+    "current_sha256": "5e88b43ec71a7b558091cf8e7e59a50b68d615c13db936bb0ef73ad2fb761835",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

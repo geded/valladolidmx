@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-GOV-STEP3-SRC-LIB-PORTAL-BUSINESS-CATALOG-FUNCTIONS-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/portal/business-catalog.functions.ts",
+    "previous_sha256": "fd30b28566e2070b5188ae8e25358fe5e90fbe5d1e88adc61c3da9f2d75796bc",
+    "current_sha256": "77b74c2c7432c1fbfb0f425d6cc9aed07e6335df683fa6be595ee0021ea85430",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

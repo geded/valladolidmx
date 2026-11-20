@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-2026-11-20-GOV-STEP3-SRC-COMPONENTS-ALUX-TOURISMALUXPANEL-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/alux/TourismAluxPanel.tsx",
+    "previous_sha256": "3c748d552fc3f5c3c8d5f8be4f0e8d20daedc327eb6d5933b2e572c33dc4b5ca",
+    "current_sha256": "6f959f54db4ac351831191169246badd83a11fc5b0f72cb70780ae232e89547b",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

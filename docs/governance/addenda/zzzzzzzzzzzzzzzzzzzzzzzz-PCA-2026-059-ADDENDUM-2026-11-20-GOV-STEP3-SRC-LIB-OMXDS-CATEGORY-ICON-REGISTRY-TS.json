@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-GOV-STEP3-SRC-LIB-OMXDS-CATEGORY-ICON-REGISTRY-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/omxds/category-icon-registry.ts",
+    "previous_sha256": "6dbcebc117ddf77d4db7a4652eb560bc16edc62b38f4c4d38d76e2bf159788b5",
+    "current_sha256": "a8d8564da0fc4e270dee7e05873f4fe22c90e101c04fa56c216038078c16b91e",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

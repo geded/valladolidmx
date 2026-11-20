@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-AUTHENTICATED-CMS-EVENTOS-INDEX-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/routes/_authenticated/cms/eventos.index.tsx",
+    "previous_sha256": "ad184c76152867c3a8b1a38d8c54159a4c489e0ff3abe5015acc0526977efac6",
+    "current_sha256": "3c947a544d82d61f340cf8123fb5dbda5dd2cb232071fe126d2c553c8876c32e",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

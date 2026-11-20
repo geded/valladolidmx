@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-066-ADDENDUM-2026-11-20-GOV-STEP3-SRC-LIB-EXPERIENCE-BUILDER-EDITORIAL-BUILDER-POLICY-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-066",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/editorial-builder-policy.ts",
+    "previous_sha256": "b31f96672a241a6df334f47eb4fb9d165717e4bf6122f2d331b4c357c9a64e32",
+    "current_sha256": "cf84fc7acb6fa26915809c8e04a1bf1b3061326a5d979001ffc4956d35b9be65",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

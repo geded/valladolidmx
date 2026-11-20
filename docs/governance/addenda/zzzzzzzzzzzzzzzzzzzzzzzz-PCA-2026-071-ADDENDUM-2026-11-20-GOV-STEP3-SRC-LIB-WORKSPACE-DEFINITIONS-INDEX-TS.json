@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-071-ADDENDUM-2026-11-20-GOV-STEP3-SRC-LIB-WORKSPACE-DEFINITIONS-INDEX-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-071",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/workspace/definitions/index.ts",
+    "previous_sha256": "4d7dfd5f7cd60b53fa2378e5bd4ba75833f0afd9b46521435fcfa71f0eb1328c",
+    "current_sha256": "ba0a86388ccfff90876737a49fc021d050b5afa181ef907bf99db11f0177499c",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

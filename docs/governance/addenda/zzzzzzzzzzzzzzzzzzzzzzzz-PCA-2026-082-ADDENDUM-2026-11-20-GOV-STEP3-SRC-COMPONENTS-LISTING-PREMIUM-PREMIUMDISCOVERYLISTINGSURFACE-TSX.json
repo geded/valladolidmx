@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-082-ADDENDUM-2026-11-20-GOV-STEP3-SRC-COMPONENTS-LISTING-PREMIUM-PREMIUMDISCOVERYLISTINGSURFACE-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-082",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/listing-premium/PremiumDiscoveryListingSurface.tsx",
+    "previous_sha256": "1e00c034b02397f4a97a6a2a06a05bb683b37b8b0f22ea4a6c732fe0b3a367a3",
+    "current_sha256": "2e51aea5d44a5efa0917b82347e06cbec70a54464aa981141caca8e1c98d7e61",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

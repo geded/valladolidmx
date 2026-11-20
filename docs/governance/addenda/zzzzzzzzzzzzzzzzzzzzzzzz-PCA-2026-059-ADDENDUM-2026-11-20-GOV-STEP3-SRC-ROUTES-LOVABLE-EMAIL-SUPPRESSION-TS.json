@@ -1,0 +1,18 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-LOVABLE-EMAIL-SUPPRESSION-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/lovable/email/suppression.ts",
+    "previous_sha256": "184a8d24bf12f5d128a66a291b985d55006ef6d4635b3b4939dc7c65b01d7aaa",
+    "current_sha256": null,
+    "semantic_change": "registra el retiro del archivo en la recuperación del trabajo de Lovable",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20",
+    "current_state": "deleted"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-2026-11-20-GOV-STEP3-SRC-COMPONENTS-CMS-SEOLANDINGACTION-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/cms/SeoLandingAction.tsx",
+    "previous_sha256": "19535808b0abd03d43a022fb73bc671e29a633f2557afc682a530fb3dac36f7d",
+    "current_sha256": "1ff203568c60f838f86cf4ce1256a25b24fd37053f4d1b60c0490b270b9517a1",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

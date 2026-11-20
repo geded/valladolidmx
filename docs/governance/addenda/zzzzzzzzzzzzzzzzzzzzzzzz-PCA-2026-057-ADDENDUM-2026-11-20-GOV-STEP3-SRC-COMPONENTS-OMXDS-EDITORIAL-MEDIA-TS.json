@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-2026-11-20-GOV-STEP3-SRC-COMPONENTS-OMXDS-EDITORIAL-MEDIA-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/omxds/editorial-media.ts",
+    "previous_sha256": "a71e214c50921d950d604dc6eeb4e8befaf7bbff56b6b0ab103f1b04412c2fed",
+    "current_sha256": "fc25c5d0c6df4445ad978aa3bce8360faf23a294dd6d928eaff93f1b2a2e9ca6",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

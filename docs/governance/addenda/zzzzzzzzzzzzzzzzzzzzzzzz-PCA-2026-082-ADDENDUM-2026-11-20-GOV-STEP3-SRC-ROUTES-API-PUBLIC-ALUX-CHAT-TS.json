@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-082-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-API-PUBLIC-ALUX-CHAT-TS.json",
+  "status": "Approved",
+  "parent": "PCA-2026-082",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/alux/chat.ts",
+    "previous_sha256": "3ac9c581fb935254841c2205f43d4fdce52a1a9bf8cc164f2f5d592f81bbb673",
+    "current_sha256": "b95ea12f6aae05f752ea6de02c4cfcabe653afceaf4fd84a6a4464af09f3ec3c",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

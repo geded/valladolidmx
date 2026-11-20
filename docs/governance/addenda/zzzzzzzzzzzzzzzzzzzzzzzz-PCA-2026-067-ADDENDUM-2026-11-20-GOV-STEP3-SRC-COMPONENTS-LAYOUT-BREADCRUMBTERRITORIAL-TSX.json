@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-067-ADDENDUM-2026-11-20-GOV-STEP3-SRC-COMPONENTS-LAYOUT-BREADCRUMBTERRITORIAL-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-067",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/layout/BreadcrumbTerritorial.tsx",
+    "previous_sha256": "7052ecc49770afdb38b4a61f11739c38c553543f93fd77a3296544aa6b48849a",
+    "current_sha256": "05323cfa8011f4a1e560b176fdd090887b16c4ae4452fd3cd70d3e78cfb250ae",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

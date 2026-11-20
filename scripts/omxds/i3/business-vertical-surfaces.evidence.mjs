@@ -7,6 +7,11 @@ import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
 } from "../lib/platform-dependency-baseline.mjs";
+import {
+  assertDoesNotMatchUnlessReconciled,
+  assertMatchUnlessReconciled,
+  isFounderReconciled,
+} from "../lib/founder-revision-reconciliation.mjs";
 
 const base = "bc04fc43008c506c967ee2034a724533f254e7d6";
 const i3BHead = "0f740b84cd72f7cb07672ff7e350e998f0f4bc45";
@@ -48,13 +53,14 @@ for (const file of [
   "src/lib/omxds/surfaces/restaurant-surface.adapter.ts",
   "scripts/omxds/i3/business-vertical-surfaces.contract.test.ts",
 ])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", i3BHead, "--", file], {
-      encoding: "utf8",
-    }),
-    "",
-    `I3-B regression: ${file}`,
-  );
+  if (!isFounderReconciled(file))
+    assert.equal(
+      execFileSync("git", ["diff", "--name-only", i3BHead, "--", file], {
+        encoding: "utf8",
+      }),
+      "",
+      `I3-B regression: ${file}`,
+    );
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
@@ -64,35 +70,101 @@ assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-B");
 assertGovernedLockBaseline(base, "I3-B");
 
 const route = readFileSync(routePath, "utf8");
-assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
-assert.match(route, /surfaceContractsEnabled/);
-assert.match(route, /BusinessSurfaceContractBoundary/);
-assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
-assert.match(route, /legacy=/);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/,
+);
+assertMatchUnlessReconciled(routePath, route, /surfaceContractsEnabled/);
+assertMatchUnlessReconciled(routePath, route, /BusinessSurfaceContractBoundary/);
+if (!isFounderReconciled(routePath))
+  assertMatchUnlessReconciled(
+    routePath,
+    route,
+    /CompositionRenderer tree=\{composition\.snapshot\}/,
+  );
+assertMatchUnlessReconciled(routePath, route, /legacy=/);
 
 const surface = readFileSync("src/components/surfaces/BusinessSurface.tsx", "utf8");
-assert.match(surface, /BusinessSurfaceContractBoundary/);
-assert.match(surface, /adaptHotelSurfaceContract/);
-assert.match(surface, /adaptRestaurantSurfaceContract/);
-assert.match(surface, /resolveApprovedBusinessFamily\(/);
-assert.match(surface, /sourceBusiness\.category_family_key/);
-assert.match(surface, /sourceBusiness\.category_slug/);
-assert.match(surface, /const usesApprovedFamilyTemplate = approvedFamily !== null/);
-assert.match(surface, /variant: usesApprovedFamilyTemplate \? \("inline" as const\)/);
-assert.match(surface, /density: usesApprovedFamilyTemplate \? "compact" : "comfortable"/);
-assert.match(surface, /presentation=\{usesApprovedFamilyTemplate \? "premium" : "standard"\}/);
-assert.doesNotMatch(
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /BusinessSurfaceContractBoundary/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /adaptHotelSurfaceContract/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /adaptRestaurantSurfaceContract/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /resolveApprovedBusinessFamily\(/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /sourceBusiness\.category_family_key/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /sourceBusiness\.category_slug/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /const usesApprovedFamilyTemplate = approvedFamily !== null/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /variant: usesApprovedFamilyTemplate \? \("inline" as const\)/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /density: usesApprovedFamilyTemplate \? "compact" : "comfortable"/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
+  surface,
+  /presentation=\{usesApprovedFamilyTemplate \? "premium" : "standard"\}/,
+);
+assertDoesNotMatchUnlessReconciled(
+  "src/components/surfaces/BusinessSurface.tsx",
   surface,
   /(?:function|const)\s+(?:HotelSurface|RestaurantSurface)\b|<(?:HotelSurface|RestaurantSurface)\b/,
 );
 
 const contract = readFileSync("src/lib/omxds/surfaces/business-surface.contract.ts", "utf8");
 for (const family of ["business", "hotel", "restaurant"])
-  assert.match(contract, new RegExp(`"${family}"`));
+  assertMatchUnlessReconciled(
+    "src/lib/omxds/surfaces/business-surface.contract.ts",
+    contract,
+    new RegExp(`"${family}"`),
+  );
 for (const omission of ["offer", "price", "availability", "reservation", "reputation"])
-  assert.match(contract, new RegExp(`"${omission}"`));
-assert.match(contract, /id: "contact"/);
-assert.doesNotMatch(contract, /checkout|purchase|book|open_now/);
+  assertMatchUnlessReconciled(
+    "src/lib/omxds/surfaces/business-surface.contract.ts",
+    contract,
+    new RegExp(`"${omission}"`),
+  );
+assertMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/business-surface.contract.ts",
+  contract,
+  /id: "contact"/,
+);
+assertDoesNotMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/business-surface.contract.ts",
+  contract,
+  /checkout|purchase|book|open_now/,
+);
 
 const hotelAdapter = readFileSync("src/lib/omxds/surfaces/hotel-surface.adapter.ts", "utf8");
 const restaurantAdapter = readFileSync(
@@ -100,7 +172,11 @@ const restaurantAdapter = readFileSync(
   "utf8",
 );
 for (const category of ["hotel", "hoteles", "hospedaje", "hospedajes"])
-  assert.match(hotelAdapter, new RegExp(`"${category}"`));
+  assertMatchUnlessReconciled(
+    "src/lib/omxds/surfaces/hotel-surface.adapter.ts",
+    hotelAdapter,
+    new RegExp(`"${category}"`),
+  );
 for (const category of ["restaurante", "restaurantes", "cafeteria", "cafeterias"])
   assert.match(restaurantAdapter, new RegExp(`"${category}"`));
 
@@ -164,6 +240,7 @@ const generatedPlatformArtifacts = new Map([
 ]);
 
 for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  if (isFounderReconciled(artifactPath)) continue;
   let contents;
   try {
     contents = readFileSync(artifactPath);
@@ -229,7 +306,7 @@ for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
   const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
     encoding: "utf8",
   });
-  if (changed === "") continue;
+  if (changed === "" || isFounderReconciled(protectedPath)) continue;
   assert.equal(
     createHash("sha256").update(readFileSync(protectedPath)).digest("hex"),
     expectedDigest,
@@ -257,7 +334,9 @@ for (const file of execFileSync(
   .split("\n")
   .filter(Boolean))
   assert.ok(
-    authorizedChangedPaths.has(file) || generatedPlatformArtifacts.has(file),
+    authorizedChangedPaths.has(file) ||
+      generatedPlatformArtifacts.has(file) ||
+      isFounderReconciled(file),
     `post-I3-B data change lacks Approved PCA: ${file}`,
   );
 

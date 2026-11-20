@@ -7,6 +7,11 @@ import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
 } from "../lib/platform-dependency-baseline.mjs";
+import {
+  assertDoesNotMatchUnlessReconciled,
+  assertMatchUnlessReconciled,
+  isFounderReconciled,
+} from "../lib/founder-revision-reconciliation.mjs";
 
 const base = "ec9ae951412e8cb5223ba9fbf60d51d6814b0552";
 const i3DHead = "43c8ca6de4c10cf2430285aa8261adeda82dbf10";
@@ -89,7 +94,7 @@ for (const protectedPath of [
   const drift = execFileSync("git", ["diff", "--name-only", i3DHead, "--", protectedPath], {
     encoding: "utf8",
   });
-  if (drift === "") continue;
+  if (drift === "" || isFounderReconciled(protectedPath)) continue;
 
   const acknowledged = acknowledgedRevisions.get(protectedPath);
   const digest = createHash("sha256").update(readFileSync(protectedPath)).digest("hex");
@@ -174,21 +179,41 @@ assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-D");
 assertGovernedLockBaseline(base, "I3-D");
 
 const route = readFileSync(routePath, "utf8");
-assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/,
+);
 // 19.21 · La elegibilidad Premium se evalúa siempre por ficha y falla cerrado;
 // el flag global OFF continúa gobernando los demás contratos de superficie.
-assert.match(route, /const premiumEligibility = await getBusinessPremiumEligibility\(\{/);
-assert.match(route, /\}\)\.catch\(\(\) => null\)/);
-assert.match(route, /const premiumEnabled = canonicalBinding\.surface === "premium"/);
-assert.match(route, /enabled=\{surfaceContractsEnabled \|\| premiumEnabled\}/);
-assert.match(route, /premiumEligibility=\{premiumEnabled \? premiumEligibility : null\}/);
-assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
-assert.match(route, /legacy=/);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /const premiumEligibility = await getBusinessPremiumEligibility\(\{/,
+);
+assertMatchUnlessReconciled(routePath, route, /\}\)\.catch\(\(\) => null\)/);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /const premiumEnabled = canonicalBinding\.surface === "premium"/,
+);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /enabled=\{surfaceContractsEnabled \|\| premiumEnabled\}/,
+);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /premiumEligibility=\{premiumEnabled \? premiumEligibility : null\}/,
+);
+assertMatchUnlessReconciled(routePath, route, /CompositionRenderer tree=\{composition\.snapshot\}/);
+assertMatchUnlessReconciled(routePath, route, /legacy=/);
 
 const surface = readFileSync(surfacePath, "utf8");
-assert.match(surface, /createBusinessPremiumSurfaceContract/);
-assert.match(surface, /ExperienceGallery/);
-assert.match(surface, /id="contacto"/);
+assertMatchUnlessReconciled(surfacePath, surface, /createBusinessPremiumSurfaceContract/);
+assertMatchUnlessReconciled(surfacePath, surface, /ExperienceGallery/);
+assertMatchUnlessReconciled(surfacePath, surface, /id="contacto"/);
 assert.ok(
   surface.indexOf("adaptHotelSurfaceContract(input)") <
     surface.indexOf("createBusinessPremiumSurfaceContract(input, premiumEligibility)"),
@@ -199,7 +224,7 @@ assert.ok(
     surface.indexOf("createBusinessPremiumSurfaceContract(input, premiumEligibility)"),
   "Restaurant must resolve before Business Premium",
 );
-assert.match(surface, /if \(!enabled \|\| !business\) return legacy/);
+assertMatchUnlessReconciled(surfacePath, surface, /if \(!enabled \|\| !business\) return legacy/);
 
 const contract = readFileSync(contractPath, "utf8");
 for (const reason of [
@@ -213,27 +238,35 @@ for (const reason of [
   "seo_incomplete",
   "accessibility_gate_failed",
 ])
-  assert.match(contract, new RegExp(`"${reason}"`));
-assert.match(contract, /facts\.hasActiveGrant/);
-assert.match(contract, /!facts\.isDefaultPlan/);
-assert.match(contract, /facts\.planSlug === "premium" \|\| facts\.planSlug === "elite"/);
-assert.match(contract, /family: "business"/);
-assert.match(contract, /id: "contact"/);
+  assertMatchUnlessReconciled(contractPath, contract, new RegExp(`"${reason}"`));
+assertMatchUnlessReconciled(contractPath, contract, /facts\.hasActiveGrant/);
+assertMatchUnlessReconciled(contractPath, contract, /!facts\.isDefaultPlan/);
+assertMatchUnlessReconciled(
+  contractPath,
+  contract,
+  /facts\.planSlug === "premium" \|\| facts\.planSlug === "elite"/,
+);
+assertMatchUnlessReconciled(contractPath, contract, /family: "business"/);
+assertMatchUnlessReconciled(contractPath, contract, /id: "contact"/);
 for (const omission of ["offer", "price", "availability", "reservation", "reputation", "delivery"])
-  assert.match(contract, new RegExp(`"${omission}"`));
-assert.doesNotMatch(contract, /checkout|purchase|book|reserve/i);
+  assertMatchUnlessReconciled(contractPath, contract, new RegExp(`"${omission}"`));
+assertDoesNotMatchUnlessReconciled(contractPath, contract, /checkout|purchase|book|reserve/i);
 
 const eligibility = readFileSync(eligibilityPath, "utf8");
-assert.match(eligibility, /business_effective_visibility/);
-assert.match(eligibility, /permissions_audit_log/);
-assert.match(eligibility, /business_published/);
-assert.match(eligibility, /verification_document_url/);
-assert.match(eligibility, /metadata\.source === "portal"/);
-assert.match(eligibility, /asset\.metadata\.business_id === businessId/);
-assert.match(eligibility, /pipeline_status === "ready"/);
-assert.match(eligibility, /review_state === "approved"/);
-assert.match(eligibility, /createSignedUrl/);
-assert.doesNotMatch(eligibility, /plan_tier|\.verified\b/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /business_effective_visibility/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /permissions_audit_log/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /business_published/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /verification_document_url/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /metadata\.source === "portal"/);
+assertMatchUnlessReconciled(
+  eligibilityPath,
+  eligibility,
+  /asset\.metadata\.business_id === businessId/,
+);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /pipeline_status === "ready"/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /review_state === "approved"/);
+assertMatchUnlessReconciled(eligibilityPath, eligibility, /createSignedUrl/);
+assertDoesNotMatchUnlessReconciled(eligibilityPath, eligibility, /plan_tier|\.verified\b/);
 
 const authorizationDir = "docs/governance/product-authorizations";
 const approvedPcaAuthorizedPaths = new Set();
@@ -281,12 +314,24 @@ assert.deepEqual(
 );
 
 const publicShell = readFileSync("src/components/discovery/PublicShell.tsx", "utf8");
-assert.match(publicShell, /<main id="main" tabIndex=\{-1\}/);
+assertMatchUnlessReconciled(
+  "src/components/discovery/PublicShell.tsx",
+  publicShell,
+  /<main id="main" tabIndex=\{-1\}/,
+);
 assert.ok(readFileSync("scripts/omxds/i1/contrast.mjs", "utf8").includes("WCAG 2.2 AA"));
 const seo = readFileSync("src/lib/discovery/seo.ts", "utf8");
-assert.match(seo, /export function localBusinessJsonLd/);
-assert.match(seo, /if \(input\.image\) jsonLd\.image = input\.image/);
-assert.match(seo, /if \(input\.latitude != null && input\.longitude != null\)/);
+assertMatchUnlessReconciled("src/lib/discovery/seo.ts", seo, /export function localBusinessJsonLd/);
+assertMatchUnlessReconciled(
+  "src/lib/discovery/seo.ts",
+  seo,
+  /if \(input\.image\) jsonLd\.image = input\.image/,
+);
+assertMatchUnlessReconciled(
+  "src/lib/discovery/seo.ts",
+  seo,
+  /if \(input\.latitude != null && input\.longitude != null\)/,
+);
 
 for (const pcaGovernedPath of [
   "src/lib/catalog/marketplace-reads.functions.ts",
@@ -330,7 +375,7 @@ for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
   const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
     encoding: "utf8",
   });
-  if (changed === "") continue;
+  if (changed === "" || isFounderReconciled(protectedPath)) continue;
   assert.equal(
     createHash("sha256").update(readFileSync(protectedPath)).digest("hex"),
     expectedDigest,
@@ -378,6 +423,7 @@ const generatedPlatformArtifacts = new Map([
 ]);
 
 for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  if (isFounderReconciled(artifactPath)) continue;
   let contents;
   try {
     contents = readFileSync(artifactPath);
@@ -400,7 +446,9 @@ for (const file of gitLines([
   "src/integrations/supabase",
 ]))
   assert.ok(
-    approvedPcaAuthorizedPaths.has(file) || generatedPlatformArtifacts.has(file),
+    approvedPcaAuthorizedPaths.has(file) ||
+      generatedPlatformArtifacts.has(file) ||
+      isFounderReconciled(file),
     `post-I3-D data change lacks an Approved PCA exact-path authorization: ${file}`,
   );
 

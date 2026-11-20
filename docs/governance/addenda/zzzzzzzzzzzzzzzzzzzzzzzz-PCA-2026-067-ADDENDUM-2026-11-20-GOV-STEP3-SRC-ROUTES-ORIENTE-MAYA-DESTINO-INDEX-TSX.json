@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-067-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-ORIENTE-MAYA-DESTINO-INDEX-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-067",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.index.tsx",
+    "previous_sha256": "112c37ef15e96bb8290d5ca62c0ff16b6ea28a0fe08ebfc2b64b4dafb68ab8e8",
+    "current_sha256": "52d6b1a822fa62b790db3411d369900c7c5b435a8d0bc924acbb4c75a9fc9133",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

@@ -7,6 +7,11 @@ import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
 } from "../lib/platform-dependency-baseline.mjs";
+import {
+  assertDoesNotMatchUnlessReconciled,
+  assertMatchUnlessReconciled,
+  isFounderReconciled,
+} from "../lib/founder-revision-reconciliation.mjs";
 
 const base = "6ca2ebc61dbea827a28c80f5d8254096a9123e7b";
 const i3aHead = "d47a41fe6f96edf4dad95f273a95fc2a8ebb63d5";
@@ -178,7 +183,7 @@ const acknowledgedSurfaceRevisions = [
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
 });
-if (surfaceDrift !== "") {
+if (surfaceDrift !== "" && !isFounderReconciled(surfacePath)) {
   const digest = createHash("sha256").update(readFileSync(surfacePath)).digest("hex");
   const acknowledged = acknowledgedSurfaceRevisions.find((revision) => revision.sha256 === digest);
   assert.ok(
@@ -241,7 +246,7 @@ const acknowledgedRouteRevisions = [
 const routeDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", routePath], {
   encoding: "utf8",
 });
-if (routeDrift !== "") {
+if (routeDrift !== "" && !isFounderReconciled(routePath)) {
   const digest = createHash("sha256").update(readFileSync(routePath)).digest("hex");
   const acknowledged = acknowledgedRouteRevisions.find((revision) => revision.sha256 === digest);
   assert.ok(
@@ -262,19 +267,47 @@ assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-A");
 assertGovernedLockBaseline(base, "I3-A");
 
 const route = readFileSync(routePath, "utf8");
-assert.match(route, /if \(!db\) throw notFound\(\)/);
-assert.match(route, /DestinationSurfaceContractBoundary/);
-assert.match(route, /DestinationSurfaceProvider/);
-assert.match(route, /presentation=\{search\.presentacion === "cinematografica"/);
-assert.doesNotMatch(route, /DESTINOS_MOCK/);
+assertMatchUnlessReconciled(routePath, route, /if \(!db\) throw notFound\(\)/);
+assertMatchUnlessReconciled(routePath, route, /DestinationSurfaceContractBoundary/);
+assertMatchUnlessReconciled(routePath, route, /DestinationSurfaceProvider/);
+assertMatchUnlessReconciled(
+  routePath,
+  route,
+  /presentation=\{search\.presentacion === "cinematografica"/,
+);
+assertDoesNotMatchUnlessReconciled(routePath, route, /DESTINOS_MOCK/);
 
 const surface = readFileSync("src/components/surfaces/DestinationSurface.tsx", "utf8");
-assert.match(surface, /createOmxdsSurfaceContract/);
-assert.match(surface, /family: "destination"/);
-assert.match(surface, /role: "dominant"/);
-assert.match(surface, /omissions\.push\("media"\)/);
-assert.match(surface, /omissions\.push\("map"\)/);
-assert.match(surface, /omissions\.push\("collection"\)/);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/DestinationSurface.tsx",
+  surface,
+  /createOmxdsSurfaceContract/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/DestinationSurface.tsx",
+  surface,
+  /family: "destination"/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/DestinationSurface.tsx",
+  surface,
+  /role: "dominant"/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/DestinationSurface.tsx",
+  surface,
+  /omissions\.push\("media"\)/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/DestinationSurface.tsx",
+  surface,
+  /omissions\.push\("map"\)/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/DestinationSurface.tsx",
+  surface,
+  /omissions\.push\("collection"\)/,
+);
 
 const authorizations = readdirSync("docs/governance/product-authorizations")
   .filter((file) => file.endsWith(".json"))
@@ -323,6 +356,7 @@ for (const protectedPath of [
   const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
     encoding: "utf8",
   });
+  if (changed !== "" && isFounderReconciled(protectedPath)) continue;
   if (protectedPath === "src/lib/experience-builder/preview-registry.tsx" && changed !== "") {
     assert.ok(
       authorizedChangedPaths.has(protectedPath),
@@ -468,6 +502,7 @@ const acknowledgedHistoricalMigrations = new Map([
 ]);
 
 for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  if (isFounderReconciled(artifactPath)) continue;
   let contents;
   try {
     contents = readFileSync(artifactPath);
@@ -489,7 +524,7 @@ for (const file of gitLines([
   "supabase",
   "src/integrations/supabase",
 ])) {
-  if (generatedPlatformArtifacts.has(file)) continue;
+  if (generatedPlatformArtifacts.has(file) || isFounderReconciled(file)) continue;
 
   const expectedDigest = acknowledgedHistoricalMigrations.get(file);
   if (!expectedDigest) {

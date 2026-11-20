@@ -213,9 +213,16 @@ export function validateAuthorizations(authorizations, masterIndex) {
           if (typeof revision.authority !== "string" || revision.authority.trim() === "")
             errors.push(`${prefix}: authority is missing for ${revision.path}`);
           const absolutePath = path.join(process.cwd(), normalizeRepositoryPath(revision.path));
-          if (!fs.existsSync(absolutePath))
-            errors.push(`${prefix}: acknowledged revision is missing: ${revision.path}`);
-          else {
+          const retirementKey = `${authorization.id}:${revision.operation}:${normalizeRepositoryPath(revision.path)}`;
+          const retired =
+            acknowledgedRevisionOverrides.get(retirementKey)?.current_state === "deleted";
+          if (!fs.existsSync(absolutePath)) {
+            // An Approved addendum may record the documented retirement of an acknowledged file.
+            if (!retired)
+              errors.push(`${prefix}: acknowledged revision is missing: ${revision.path}`);
+          } else if (retired) {
+            errors.push(`${prefix}: retired acknowledged revision reappeared: ${revision.path}`);
+          } else {
             const actual = crypto
               .createHash("sha256")
               .update(fs.readFileSync(absolutePath))

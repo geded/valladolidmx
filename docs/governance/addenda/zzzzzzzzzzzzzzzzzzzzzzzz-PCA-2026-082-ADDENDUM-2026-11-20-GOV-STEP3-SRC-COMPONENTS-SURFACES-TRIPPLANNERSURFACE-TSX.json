@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-082-ADDENDUM-2026-11-20-GOV-STEP3-SRC-COMPONENTS-SURFACES-TRIPPLANNERSURFACE-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-082",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/surfaces/TripPlannerSurface.tsx",
+    "previous_sha256": "d0ddb4aa6573f0b75e247ed6c75db682d7f6a4460b91adf6a842df8326e7297f",
+    "current_sha256": "d6cf09672110571c6b35a62d6a169d2bcef19bc17a3d9c6d5e25148736fb5bdb",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

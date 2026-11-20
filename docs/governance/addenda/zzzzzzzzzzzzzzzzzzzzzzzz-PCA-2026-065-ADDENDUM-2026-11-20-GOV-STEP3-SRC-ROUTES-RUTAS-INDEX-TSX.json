@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-065-ADDENDUM-2026-11-20-GOV-STEP3-SRC-ROUTES-RUTAS-INDEX-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-065",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 (paso 3 de la puesta al día de gobernanza) para registrar como aprobadas las versiones actuales tras la recuperación del trabajo de Lovable (503aa36e), el ajuste de formato (067096f8) y la corrección de avisos de código (58994ddc), sin rediseño, publicación ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/rutas.index.tsx",
+    "previous_sha256": "7970f66c183187acb72a009b728b1dc23d101a39378634a249c686a1985ca7d7",
+    "current_sha256": "422f4189f0a6d896839987572f4fc9a9ce1fc38d41520ef50c62306f2158e1ca",
+    "semantic_change": "registra la versión vigente tras recuperación, formato y avisos de código",
+    "authority": "Founder · reconciliación de gobernanza paso 3 · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

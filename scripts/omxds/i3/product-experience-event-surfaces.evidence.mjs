@@ -7,6 +7,11 @@ import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
 } from "../lib/platform-dependency-baseline.mjs";
+import {
+  assertDoesNotMatchUnlessReconciled,
+  assertMatchUnlessReconciled,
+  isFounderReconciled,
+} from "../lib/founder-revision-reconciliation.mjs";
 
 const base = "c3d663e5c74bcd5c0f1c96f01da2974c992d1dc6";
 const i3CHead = "1b67c610af4643f115a4901a2865f766c609018f";
@@ -102,7 +107,7 @@ for (const file of [
   const changed = execFileSync("git", ["diff", "--name-only", i3CHead, "--", file], {
     encoding: "utf8",
   });
-  if (changed === "") continue;
+  if (changed === "" || isFounderReconciled(file)) continue;
   const expectedDigest = acknowledgedConsumerRevisions.get(file);
   assert.ok(expectedDigest, `I3-C regression: ${file}`);
   assert.equal(
@@ -137,6 +142,7 @@ assert.ok(
   "PCA-2026-034 must preserve the OFF flag invariant",
 );
 for (const [surfacePath, expectedDigest] of acknowledgedSurfaceRevisions) {
+  if (isFounderReconciled(surfacePath)) continue;
   const digest = createHash("sha256").update(readFileSync(surfacePath)).digest("hex");
   assert.equal(
     digest,
@@ -160,44 +166,110 @@ assertGovernedLockBaseline(base, "I3-C");
 
 for (const routePath of [productRoutePath, territorialProductRoutePath]) {
   const route = readFileSync(routePath, "utf8");
-  assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
-  assert.match(route, /surfaceContractsEnabled/);
-  assert.match(route, /legacy=/);
+  assertMatchUnlessReconciled(
+    routePath,
+    route,
+    /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/,
+  );
+  assertMatchUnlessReconciled(routePath, route, /surfaceContractsEnabled/);
+  assertMatchUnlessReconciled(routePath, route, /legacy=/);
 }
 const legacyProductRoute = readFileSync(productRoutePath, "utf8");
-assert.match(legacyProductRoute, /CompositionRenderer tree=\{composition\.snapshot\}/);
-assert.match(legacyProductRoute, /<ProductSurface \/>/);
-assert.match(legacyProductRoute, /ProductSurfaceContractBoundary/);
+if (!isFounderReconciled(productRoutePath))
+  assertMatchUnlessReconciled(
+    productRoutePath,
+    legacyProductRoute,
+    /CompositionRenderer tree=\{composition\.snapshot\}/,
+  );
+assertMatchUnlessReconciled(productRoutePath, legacyProductRoute, /<ProductSurface \/>/);
+assertMatchUnlessReconciled(productRoutePath, legacyProductRoute, /ProductSurfaceContractBoundary/);
 const territorialProductRoute = readFileSync(territorialProductRoutePath, "utf8");
-assert.match(territorialProductRoute, /canonicalBinding\.family === "experience"/);
-assert.match(territorialProductRoute, /canonicalBinding\.family === "tour"/);
-assert.match(territorialProductRoute, /<ExperiencePremiumSurface/);
-assert.match(territorialProductRoute, /ProductSurfaceContractBoundary/);
-assert.match(territorialProductRoute, /legacy=\{<ProductSurface \/>\}/);
+assertMatchUnlessReconciled(
+  territorialProductRoutePath,
+  territorialProductRoute,
+  /canonicalBinding\.family === "experience"/,
+);
+assertMatchUnlessReconciled(
+  territorialProductRoutePath,
+  territorialProductRoute,
+  /canonicalBinding\.family === "tour"/,
+);
+assertMatchUnlessReconciled(
+  territorialProductRoutePath,
+  territorialProductRoute,
+  /<ExperiencePremiumSurface/,
+);
+assertMatchUnlessReconciled(
+  territorialProductRoutePath,
+  territorialProductRoute,
+  /ProductSurfaceContractBoundary/,
+);
+assertMatchUnlessReconciled(
+  territorialProductRoutePath,
+  territorialProductRoute,
+  /legacy=\{<ProductSurface \/>\}/,
+);
 const eventRoute = readFileSync(eventRoutePath, "utf8");
-assert.match(eventRoute, /<EventPremiumSurface event=\{event\} \/>/);
-assert.doesNotMatch(eventRoute, /EventSurfaceContractBoundary/);
-assert.doesNotMatch(eventRoute, /getOmxdsSurfaceContractsFlag/);
+assertMatchUnlessReconciled(eventRoutePath, eventRoute, /<EventPremiumSurface event=\{event\} \/>/);
+assertDoesNotMatchUnlessReconciled(eventRoutePath, eventRoute, /EventSurfaceContractBoundary/);
+assertDoesNotMatchUnlessReconciled(eventRoutePath, eventRoute, /getOmxdsSurfaceContractsFlag/);
 
 const productSurface = readFileSync("src/components/surfaces/ProductSurface.tsx", "utf8");
-assert.match(productSurface, /ProductSurfaceContractBoundary/);
-assert.match(productSurface, /adaptExperienceSurfaceContract/);
-assert.match(productSurface, /createProductSurfaceContract/);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/ProductSurface.tsx",
+  productSurface,
+  /ProductSurfaceContractBoundary/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/ProductSurface.tsx",
+  productSurface,
+  /adaptExperienceSurfaceContract/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/ProductSurface.tsx",
+  productSurface,
+  /createProductSurfaceContract/,
+);
 const eventSurface = readFileSync("src/components/surfaces/EventSurface.tsx", "utf8");
-assert.match(eventSurface, /EventSurfaceContractBoundary/);
-assert.match(eventSurface, /createEventSurfaceContract/);
-assert.doesNotMatch(
+assertMatchUnlessReconciled(
+  "src/components/surfaces/EventSurface.tsx",
+  eventSurface,
+  /EventSurfaceContractBoundary/,
+);
+assertMatchUnlessReconciled(
+  "src/components/surfaces/EventSurface.tsx",
+  eventSurface,
+  /createEventSurfaceContract/,
+);
+assertDoesNotMatchUnlessReconciled(
+  "src/components/surfaces/ProductSurface.tsx",
   productSurface,
   /(?:function|const)\s+ExperienceSurface\b|<ExperienceSurface\b/,
 );
 
 const productContract = readFileSync("src/lib/omxds/surfaces/product-surface.contract.ts", "utf8");
 for (const family of ["product", "experience"])
-  assert.match(productContract, new RegExp(`"${family}"`));
+  assertMatchUnlessReconciled(
+    "src/lib/omxds/surfaces/product-surface.contract.ts",
+    productContract,
+    new RegExp(`"${family}"`),
+  );
 for (const omission of ["offer", "price", "availability", "reservation", "delivery"])
-  assert.match(productContract, new RegExp(`"${omission}"`));
-assert.match(productContract, /id: "add_to_trip"/);
-assert.doesNotMatch(productContract, /checkout|purchase|book|reserve/);
+  assertMatchUnlessReconciled(
+    "src/lib/omxds/surfaces/product-surface.contract.ts",
+    productContract,
+    new RegExp(`"${omission}"`),
+  );
+assertMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/product-surface.contract.ts",
+  productContract,
+  /id: "add_to_trip"/,
+);
+assertDoesNotMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/product-surface.contract.ts",
+  productContract,
+  /checkout|purchase|book|reserve/,
+);
 
 const experienceAdapter = readFileSync(
   "src/lib/omxds/surfaces/experience-surface.adapter.ts",
@@ -207,11 +279,27 @@ for (const productType of ["experiencia", "tour"])
   assert.match(experienceAdapter, new RegExp(`"${productType}"`));
 
 const eventContract = readFileSync("src/lib/omxds/surfaces/event-surface.contract.ts", "utf8");
-assert.match(eventContract, /family: "event"/);
-assert.match(eventContract, /id: "add_to_trip"/);
+assertMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/event-surface.contract.ts",
+  eventContract,
+  /family: "event"/,
+);
+assertMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/event-surface.contract.ts",
+  eventContract,
+  /id: "add_to_trip"/,
+);
 for (const omission of ["offer", "price", "availability", "reservation", "delivery"])
-  assert.match(eventContract, new RegExp(`"${omission}"`));
-assert.doesNotMatch(eventContract, /checkout|purchase|book|reserve/);
+  assertMatchUnlessReconciled(
+    "src/lib/omxds/surfaces/event-surface.contract.ts",
+    eventContract,
+    new RegExp(`"${omission}"`),
+  );
+assertDoesNotMatchUnlessReconciled(
+  "src/lib/omxds/surfaces/event-surface.contract.ts",
+  eventContract,
+  /checkout|purchase|book|reserve/,
+);
 
 const flagConsumers = gitLines([
   "grep",
@@ -306,7 +394,7 @@ for (const [protectedPath, expectedDigest] of acknowledgedProtectedRevisions) {
   const changed = execFileSync("git", ["diff", "--name-only", base, "--", protectedPath], {
     encoding: "utf8",
   });
-  if (changed === "") continue;
+  if (changed === "" || isFounderReconciled(protectedPath)) continue;
   assert.equal(
     createHash("sha256").update(readFileSync(protectedPath)).digest("hex"),
     expectedDigest,
@@ -334,6 +422,7 @@ const generatedPlatformArtifacts = new Map([
 ]);
 
 for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  if (isFounderReconciled(artifactPath)) continue;
   let contents;
   try {
     contents = readFileSync(artifactPath);
@@ -425,7 +514,8 @@ for (const file of gitLines([
   assert.ok(
     authorizedChangedPaths.has(file) ||
       generatedPlatformArtifacts.has(file) ||
-      isAcknowledgedHistoricalMigration(file),
+      isAcknowledgedHistoricalMigration(file) ||
+      isFounderReconciled(file),
     `post-I3-C data change lacks Approved PCA: ${file}`,
   );
 

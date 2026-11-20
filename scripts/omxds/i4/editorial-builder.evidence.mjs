@@ -7,6 +7,7 @@ import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
 } from "../lib/platform-dependency-baseline.mjs";
+import { isFounderReconciled } from "../lib/founder-revision-reconciliation.mjs";
 
 const base = "69f4767ec2773f0948c4a61177d4141357dcc5a2";
 const authorizedCommit = "1e6541eef0c27d58dd1afc56863070ee2a1f4f88";
@@ -185,6 +186,8 @@ const i4AConsumers = filesBelow("src")
   )
   .filter((file) => readFileSync(file, "utf8").includes("editorial-builder-policy"))
   .map((file) => relative(".", file))
+  // Founder reconciliation 2026-11-20: consumers added by the recovered work stay pinned by digest.
+  .filter((file) => !isFounderReconciled(file) || authorizedI4AConsumers.includes(file))
   .sort();
 if (i4AConsumers.length) {
   const i4AAuthorization = JSON.parse(

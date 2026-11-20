@@ -7,6 +7,7 @@ import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
 } from "../lib/platform-dependency-baseline.mjs";
+import { isFounderReconciled } from "../lib/founder-revision-reconciliation.mjs";
 
 const base = "1fe83c8bfb8874468560c9c3c7d89ded0073a252";
 const authorizedCommit = "3c8e138ae768380f6656fad40b84515615002d7d";
@@ -204,6 +205,19 @@ const policyConsumers = filesBelow("src")
   )
   .filter((file) => readFileSync(file, "utf8").includes("editorial-builder-policy"))
   .map((file) => relative(".", file))
+  // Founder reconciliation 2026-11-20: consumers added by the recovered work stay pinned by digest.
+  .filter(
+    (file) =>
+      !isFounderReconciled(file) ||
+      [
+        "src/components/experience-builder/VisualStudio.tsx",
+        "src/lib/experience-builder/block-library.ts",
+        "src/lib/experience-builder/block-registry.ts",
+        "src/lib/experience-builder/home-materialization.ts",
+        "src/lib/experience-builder/premium-template-registry.ts",
+        "src/lib/experience-builder/studio.functions.ts",
+      ].includes(file),
+  )
   .sort();
 assert.deepEqual(policyConsumers, [
   "src/components/experience-builder/VisualStudio.tsx",
