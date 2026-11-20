@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-071-ADDENDUM-2026-11-20-VISITOR-MONITOR-SRC-LIB-WORKSPACE-DEFINITIONS-INDEX-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-071",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Autorizado, si ha habido más de 1000 visitantes al sitio ¿dónde veo las estadísticas? Quiero que me llegue como administrador un email cada vez que un viajero se registre»): reparar la lectura del monitor de visitantes (sin tope de 1,000 y sin depender de un esquema no expuesto), medir la invitación a registrarse y el paso Anónimo → Identificado, añadir la entrada del monitor al menú del CMS para administradores y enviar a la administración el correo «Nuevo viajero registrado»; sin cambiar plantillas públicas, contenido CMS, datos de viajeros, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/workspace/definitions/index.ts",
+    "previous_sha256": "ba0a86388ccfff90876737a49fc021d050b5afa181ef907bf99db11f0177499c",
+    "current_sha256": "d57425b296146619516ef8b0642d00ec548acd64ae79e3aab7fd01d956e8e891",
+    "semantic_change": "Delta aditivo del monitor de visitantes y del aviso de nuevo viajero (PCA-2026-099); el comportamiento aprobado del archivo se conserva.",
+    "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+  },
+  "invariants": [
+    "Plantillas públicas, contenido CMS y datos de viajeros sin cambios.",
+    "Lecturas del monitor sólo vía funciones internas de servidor; sin datos personales en señales.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

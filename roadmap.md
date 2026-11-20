@@ -1,5 +1,13 @@
 # Roadmap
 
+## Monitor de visitantes y registro de viajeros · 2026-11-20
+- [x] Estadísticas del monitor visibles: la pantalla Inteligencia del visitante fallaba para todos (lectura de un esquema no expuesto) y se topaba en 1,000 registros; ahora lee todo por páginas. Verificado como administrador: 1,084 visitantes y 1,739 visitas en 30 días.
+- [x] Entrada «Inteligencia del visitante» en el menú del CMS (sólo administradores).
+- [x] Correo «Nuevo viajero registrado» al administrador; probado con un viajero de prueba: enviado a geded@valladolid.com.mx.
+- [x] El monitor registra el paso Anónimo → Identificado y cada invitación a registrarse (sólo tipo y motivo, sin datos personales).
+- [ ] Opción voluntaria para dejar WhatsApp o correo sin crear cuenta, para que un concierge contacte al visitante (espera aprobación del Founder del diseño).
+- [ ] Herramienta de simulación del monitor sigue usando la lectura antigua (sólo pruebas internas, no afecta cifras reales).
+
 ## Alux · resumen de reseñas de Google · 2026-11-20
 - [x] Alux muestra solo, al abrirse desde una ficha, «Este es un resumen basado en las reseñas de [Nombre]» con el resumen oficial de Google (Gemini) sin modificar, encabezado, divulgación y enlaces exigidos.
 - [x] Dos momentos: planeando («Estás explorando…») y en sitio con ubicación («Estás a 150 m de…»).

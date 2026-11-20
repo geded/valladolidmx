@@ -1,0 +1,212 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-099",
+  "title": "Monitor de visitantes legible, medición del registro y aviso por correo de nuevo viajero",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Autorizado, si ha habido más de 1000 visitantes al sitio ¿dónde veo las estadísticas? Quiero que me llegue como administrador un email cada vez que un viajero se registre»): reparar la lectura del monitor de visitantes (sin tope de 1,000 y sin depender de un esquema no expuesto), medir la invitación a registrarse y el paso Anónimo → Identificado, añadir la entrada del monitor al menú del CMS para administradores y enviar a la administración el correo «Nuevo viajero registrado»; sin cambiar plantillas públicas, contenido CMS, datos de viajeros, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/analytics/PageSignalsProbe.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/traveler/TravelerSignupNotifier.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/email-templates/registry.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/email-templates/traveler-signup-admin.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/notifications/traveler-signup-admin.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/notifications/traveler-signup-admin.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/decision-projection.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/decisions.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/visitor-intel/event-reads.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/intel-aggregate.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/opportunities.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/page-performance.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/projection.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/recommendations.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/segments.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/session-signals.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/analytics/PageSignalsProbe.tsx",
+      "sha256": "3e57faf9bfb2104e98050feedcaeb146540e74fb51794006597e0aa30091d822",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/traveler/TravelerSignupNotifier.tsx",
+      "sha256": "e334c9aeb778befdc7b02184b162fe647d009a0731fae8ebf242de40a0fb883f",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts",
+      "sha256": "e2ec44436bae353684fe6694b33b93f4dfa3925dd3d260f32ff7396730f8f7c2",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/email-templates/registry.ts",
+      "sha256": "db6cf2d6264c3f558b3cecfa39d8d5cf3ec5eef55d55085741ed5c1d8d9bdd82",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/email-templates/traveler-signup-admin.tsx",
+      "sha256": "56f082adb06c261149df97267902b0fd281bcb833118a18e61a1799534369a89",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/notifications/traveler-signup-admin.functions.ts",
+      "sha256": "97d93148d802954d6b216c561466c37c252d4eadd863d138c91d36da40088ff3",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/notifications/traveler-signup-admin.ts",
+      "sha256": "b6ae1130ea8f39e383a9c4c206b9cf99c4505f737c725b30acf93df42aab39cc",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/decision-projection.server.ts",
+      "sha256": "aa371df6f17dec7427bc2b271b312999eeea69abff4623ea690952b64f0f239c",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/decisions.functions.ts",
+      "sha256": "97fad883b9d55df4b44830f6676873e00e2d49ea4759a1e7984d0dfe36005671",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/visitor-intel/event-reads.server.ts",
+      "sha256": "f0969e007743ff0be2e23216bea78563b2cd28c7e6efe849d09348c3a473a606",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/intel-aggregate.functions.ts",
+      "sha256": "33ca7c4a0b90f1b59f5a8cab7f62be53ca7359e01b4259dd299eaabe2592ce6b",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/opportunities.functions.ts",
+      "sha256": "ef3349e607ce039c71ac36c854d345c83297281a4532cbdf18ce0b008a8f7891",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/page-performance.functions.ts",
+      "sha256": "be409fdf9c103fb8acaa0edf08fbf379004851ae36bf7fc05d292a9c0651ba8a",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/projection.functions.ts",
+      "sha256": "b0d0382c67c9cc9bdd68a675b8d0c9c6d260965f0b262a7b4b330fd87b6c1f54",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/recommendations.functions.ts",
+      "sha256": "e45b9cbc01d8acdeb8216b1ac5bc55246b51febaa6a28dffc958d686311543c0",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/segments.functions.ts",
+      "sha256": "1acb6574394e116b7a1215b2a9b3fd7d6aea005e5d85556775f56e990d311d4b",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/session-signals.ts",
+      "sha256": "0f7004f332a67a99f983e458986e316054b0566c63e5ae6fe961b314aa72a06f",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts",
+      "sha256": "d57425b296146619516ef8b0642d00ec548acd64ae79e3aab7fd01d956e8e891",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx",
+      "sha256": "682cb4096e0bb08c86ffbf1003935a197e6b20613d359f5ddfe259eff981cb15",
+      "authority": "Founder · monitor de visitantes, registro y aviso de nuevo viajero · 2026-11-20"
+    }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya/valladolid",
+    "/cms/visitor-intel"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "scripts/traveler-signup-admin.test.ts"
+  ]
+}
