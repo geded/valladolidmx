@@ -11,6 +11,8 @@
  */
 import { ensureAluxMemory } from "@/lib/alux/memory-store";
 
+import { isMeasurableVisit } from "./measurement-gate";
+
 import { VISITOR_EVENT_SCHEMA_VERSION, type VisitorEvent } from "./events";
 
 export const PAGE_SIGNAL_ACTIONS = ["page_view", "page_engaged", "cta_click"] as const;
@@ -211,7 +213,7 @@ export interface EmitPageSignalInput {
  * degradar la experiencia pública.
  */
 export async function emitPageSignal(input: EmitPageSignalInput): Promise<boolean> {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined" || !isMeasurableVisit()) return false;
   const now = Date.now();
   const route = normalizeRoute(input.pathname);
   const key = `${input.action}|${route}|${input.targetId ?? ""}`;

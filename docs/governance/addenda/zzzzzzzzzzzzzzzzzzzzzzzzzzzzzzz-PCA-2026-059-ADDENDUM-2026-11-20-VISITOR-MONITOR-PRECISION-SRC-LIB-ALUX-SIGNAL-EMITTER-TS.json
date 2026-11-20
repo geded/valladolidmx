@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-VISITOR-MONITOR-PRECISION-SRC-LIB-ALUX-SIGNAL-EMITTER-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Quiero que la página que está registrando sea más preciso, si dice 1086 y hay 479 y los demás son robots o cómo vamos a identificar para poder medir mejor esa inteligencia de la plataforma»): el monitor deja de publicar señales desde la vista previa, el servidor local, navegadores automatizados y robots declarados; sin cambiar el esquema de eventos, plantillas públicas, contenido CMS, datos existentes, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/alux/signal-emitter.ts",
+    "previous_sha256": "c10eae7b95f09e3e501ea0ae0f84e816c6bf5d493c30ce0027178911945db30f",
+    "current_sha256": "1dcbc9870e7357d46223a30d01ca1d0e84026b0e45bdece15fecb0a40b008587",
+    "semantic_change": "Las señales de Alux siguen registrándose en la memoria local; sólo se envían al monitor desde visitas reales del sitio publicado (PCA-2026-100).",
+    "authority": "Founder · monitor de visitantes preciso (sin vista previa, pruebas ni robots) · 2026-11-20"
+  },
+  "invariants": [
+    "Memoria local de Alux, deduplicación y límites sin cambios.",
+    "Esquema de eventos y datos existentes sin cambios; sin datos personales.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

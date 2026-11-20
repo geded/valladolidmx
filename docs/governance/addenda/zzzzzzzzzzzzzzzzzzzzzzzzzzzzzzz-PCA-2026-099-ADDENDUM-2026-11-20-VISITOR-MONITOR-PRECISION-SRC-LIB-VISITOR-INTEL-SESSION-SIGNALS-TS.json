@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-099-ADDENDUM-2026-11-20-VISITOR-MONITOR-PRECISION-SRC-LIB-VISITOR-INTEL-SESSION-SIGNALS-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-099",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Quiero que la página que está registrando sea más preciso, si dice 1086 y hay 479 y los demás son robots o cómo vamos a identificar para poder medir mejor esa inteligencia de la plataforma»): el monitor deja de publicar señales desde la vista previa, el servidor local, navegadores automatizados y robots declarados; sin cambiar el esquema de eventos, plantillas públicas, contenido CMS, datos existentes, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/visitor-intel/session-signals.ts",
+    "previous_sha256": "0f7004f332a67a99f983e458986e316054b0566c63e5ae6fe961b314aa72a06f",
+    "current_sha256": "746304e955ad134dba0edcf989cc3e680feafef448718c609ee74cb65623b57a",
+    "semantic_change": "Las señales de sesión sólo se publican desde visitas reales del sitio publicado (PCA-2026-100); contrato de eventos y lógica de hitos sin cambios.",
+    "authority": "Founder · monitor de visitantes preciso (sin vista previa, pruebas ni robots) · 2026-11-20"
+  },
+  "invariants": [
+    "Esquema de eventos, plantillas públicas, contenido CMS y datos existentes sin cambios.",
+    "Sin datos personales ni huellas digitales; el filtro decide en el navegador antes de enviar.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

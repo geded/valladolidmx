@@ -14,6 +14,8 @@
  *  · Cero PII: la clave siempre es un slug/id canónico.
  *  · Fallo de red ⇒ silencioso; la señal local ya quedó registrada.
  */
+import { isMeasurableVisit } from "@/lib/visitor-intel/measurement-gate";
+
 import type { AluxSignalKind, AluxSignalPurpose } from "./behavior-signals";
 import { isAllowedSignal } from "./behavior-signals";
 import { readAluxMemory, ensureAluxMemory, recordAluxSignal } from "./memory-store";
@@ -91,7 +93,9 @@ export async function emitAluxSignal(input: EmitAluxSignalInput): Promise<EmitAl
     subjectId: memory.subjectId,
     personalizationState: memory.personalization,
   });
-  if (!event) return { emitted: true, published: false };
+  // La memoria local de Alux sigue funcionando; al monitor sólo llegan visitas
+  // reales del sitio publicado (sin vista previa, pruebas ni robots).
+  if (!event || !isMeasurableVisit()) return { emitted: true, published: false };
 
   try {
     const mod = await import("@/lib/visitor-intel/ingest.functions");

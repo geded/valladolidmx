@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-100",
+  "title": "Monitor de visitantes preciso: sólo visitas reales del sitio publicado",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Quiero que la página que está registrando sea más preciso, si dice 1086 y hay 479 y los demás son robots o cómo vamos a identificar para poder medir mejor esa inteligencia de la plataforma»): el monitor deja de publicar señales desde la vista previa, el servidor local, navegadores automatizados y robots declarados; sin cambiar el esquema de eventos, plantillas públicas, contenido CMS, datos existentes, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/visitor-intel/measurement-gate.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/page-signals.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/signal-emitter.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/lib/visitor-intel/measurement-gate.ts",
+      "sha256": "a4f0249fd1adb38cde94995ea300388a453aa9d1541fb7b729d7cc3a7262d425",
+      "authority": "Founder · monitor de visitantes preciso (sin vista previa, pruebas ni robots) · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/page-signals.ts",
+      "sha256": "6b82a8656d9f81effa2ff98b07d86218f4468cf5776a8455fd8bfd31b54be5b9",
+      "authority": "Founder · monitor de visitantes preciso (sin vista previa, pruebas ni robots) · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/signal-emitter.ts",
+      "sha256": "1dcbc9870e7357d46223a30d01ca1d0e84026b0e45bdece15fecb0a40b008587",
+      "authority": "Founder · monitor de visitantes preciso (sin vista previa, pruebas ni robots) · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/", "/oriente-maya/valladolid"],
+  "required_feature_flags": [],
+  "required_tests": ["scripts/visitor-intel-measurement-gate.test.ts"]
+}

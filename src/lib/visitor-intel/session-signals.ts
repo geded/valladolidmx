@@ -16,6 +16,7 @@
 import { ensureAluxMemory } from "@/lib/alux/memory-store";
 
 import type { VisitorEvent } from "./events";
+import { isMeasurableVisit } from "./measurement-gate";
 import { VISITOR_EVENT_SCHEMA_VERSION } from "./events";
 import {
   classifyDevice,
@@ -124,6 +125,8 @@ interface EmitBase {
 }
 
 async function publish(event: VisitorEvent, isAuthenticated: boolean): Promise<boolean> {
+  // Sólo visitas reales del sitio publicado (sin vista previa, pruebas ni robots).
+  if (!isMeasurableVisit()) return false;
   try {
     const mod = await import("./ingest.functions");
     const fn = isAuthenticated ? mod.ingestVisitorEvent : mod.ingestAnonymousVisitorEvent;

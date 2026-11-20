@@ -5,6 +5,7 @@
 - [x] Entrada «Inteligencia del visitante» en el menú del CMS (sólo administradores).
 - [x] Correo «Nuevo viajero registrado» al administrador; probado con un viajero de prueba: enviado a geded@valladolid.com.mx.
 - [x] El monitor registra el paso Anónimo → Identificado y cada invitación a registrarse (sólo tipo y motivo, sin datos personales).
+- [x] Monitor preciso: desde ahora sólo cuenta visitas del sitio publicado; descarta vista previa, pruebas automáticas y robots declarados (las cifras anteriores al 20 nov siguen incluyéndolos).
 - [ ] Opción voluntaria para dejar WhatsApp o correo sin crear cuenta, para que un concierge contacte al visitante (espera aprobación del Founder del diseño).
 - [ ] Herramienta de simulación del monitor sigue usando la lectura antigua (sólo pruebas internas, no afecta cifras reales).
 
