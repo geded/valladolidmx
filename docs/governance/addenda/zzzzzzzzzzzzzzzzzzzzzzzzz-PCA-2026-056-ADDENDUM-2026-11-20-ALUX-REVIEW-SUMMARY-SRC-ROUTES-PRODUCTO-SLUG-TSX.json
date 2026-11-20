@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-056-ADDENDUM-2026-11-20-ALUX-REVIEW-SUMMARY-SRC-ROUTES-PRODUCTO-SLUG-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-056",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 («Autorizado, me gusta», ampliada a Zazil Tunich, sus eventos y experiencias) para que Alux muestre el resumen oficial de reseñas de Google Maps al abrirse desde fichas de negocios, lugares, experiencias y eventos, y en sus recomendaciones, en los momentos planeando y en sitio, sin rediseñar plantillas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/producto.$slug.tsx",
+    "previous_sha256": "c03f0b02bfa8b3259fa37276ce7fa86506015bd03c531cc893a6d639212d230b",
+    "current_sha256": "7cd806190e3ecdc5fa8277e16e9d47ec7ad9847205fa9590da6442cdfd2f6651",
+    "semantic_change": "resumen oficial de reseñas de Google en Alux (PCA-2026-090)",
+    "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

@@ -263,6 +263,7 @@ function MarketplaceProductPage() {
                 description="Alux la compara con tu contexto y la guarda en Mi Viaje."
                 task={`Ayúdame a decidir si la experiencia "${vm.name}" encaja en mi viaje por el Oriente Maya.`}
                 prompts={["Con niños", "Medio día", "Cerca del centro", "Naturaleza"]}
+                selection={{ entityRef: `product:${product.id}`, title: vm.name }}
               />
             }
           />

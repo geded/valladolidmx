@@ -49,7 +49,7 @@
     "src/assets/maqueta-experiencias/izamal.jpg": "88ea8171b5c4c73285df462912bdb293af8d0e60b03bc2977aefc346e476b17c",
     "src/assets/maqueta-experiencias/temazcal.jpg": "404a6561b75a5e94b973ad067dc3a58c76ee8f6001fea79fd3a4b97739ca437f",
     "src/components/alux/AluxContextChip.tsx": "8581727406782501752665d7c65c186af035622a51167fec73c26c9c3f303050",
-    "src/components/alux/AluxConverseChat.tsx": "20097516889711ac782aaa1c58cb0881bd1ee0bb4958bf0ccb408c92e7adfda9",
+    "src/components/alux/AluxConverseChat.tsx": "b4011d66a8e17af252cd08b7dd2ef070c8d64a4e111f890a58bc0b984faf35bc",
     "src/components/alux/AluxMark.tsx": "c28a15f69157e09f7cdd8637ace9367ddf972275400de24dc99a765d6cf3a017",
     "src/components/alux/AluxMemoryPanel.tsx": "b3b863a6912e98fbe4bd53b423709ab5109facb0c176b0148196d05d7b0ad613",
     "src/components/alux/AluxNearbySuggestionBanner.tsx": "b2ff5161c2cdead4f181318a42c07237ea8ed3c4c3d7fbe255d79bf02d77ab2a",
@@ -231,7 +231,7 @@
     "src/config/site.ts": "7eeabb31eb2ccb7a05f29bb98fca947d293f5b14ac91c59bbc375f3dbf93f031",
     "src/hooks/useAuth.tsx": "f650f4526864e57c53922c6983ff432c38fda4192d2fbc367c32d4601bd46096",
     "src/integrations/supabase/previewAuthStorage.ts": "03dd0ffe0501fa1f0b055d8644e079c573e7197a36e2e08fd494e70831484d18",
-    "src/integrations/supabase/types.ts": "14756ae800f3fc40cf33b6017b1f6056e9d90f1ead6999daebc658508597a0d9",
+    "src/integrations/supabase/types.ts": "defd907f8d3b33f5b2cb163e15d0eddcd0a79657a38abb700c6a36fc58cb034d",
     "src/lib/admin/direct-sales-commissions.functions.ts": "b4ab4152bc861ae169a4f23b05475b970b2992a130c922c98b58b0812cd851eb",
     "src/lib/admin/user-management.functions.ts": "9a9a96c7173ce6de4acca77d2de12d96ca3d7e0b1cc54455aefe3887318b7fdc",
     "src/lib/alux/bind-session.functions.ts": "16dbc8082b508ecbb24fa2a0181bc02fb7445e1de3bfcbc1ec63af45ea0e512f",
@@ -492,13 +492,14 @@
     "src/routes/manifest[.]webmanifest.ts": "dffe11d27320b929e7ab05f4ab31dbe2ac4805b7c1a9c5ca430bcb677793fe2e",
     "src/routes/mapa.tsx": "6a38f83db8f55b93d5caf54542b9a966a9dd3760761021a79401c50c4e4bdcd5",
     "src/routes/offline.tsx": "8a9fc12bfedb92cfa18e0e539c772c65c8a61e3907d12739116d2ebbfb3d3b01",
+    "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx": "b040b9d25f4b52298c983246ffa9d3101b879cf66d9d479aa5a66338b8a5c1c6",
     "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx": "7a5dae839f085ec97ee18d729f575df1e9809254cccb8bdc53034b49a46c9ace",
     "src/routes/oriente-maya/$destino.$categoria.index.tsx": "e525668296cdf44babf18d9601ee2c61f9f9e0ae09009545f2044fb487e4efa9",
     "src/routes/oriente-maya/$destino.index.tsx": "52d6b1a822fa62b790db3411d369900c7c5b435a8d0bc924acbb4c75a9fc9133",
     "src/routes/oriente-maya/$destino.lugares.$slug.tsx": "37c2b49b43a4debb855b2f8d9bbd452c95b54818b6d64dca81c8232fc766fedf",
     "src/routes/oriente-maya/categoria.$categoria.tsx": "0cb67a8e95b000bc3b79d1e3b0c816684440628a1a95c8d25c5364b441ee5163",
     "src/routes/oriente-maya/index.tsx": "8b0dc263a4a6832244d23be8f85add65aa95c3efa3b2a37580b43270d955f97a",
-    "src/routes/producto.$slug.tsx": "c03f0b02bfa8b3259fa37276ce7fa86506015bd03c531cc893a6d639212d230b",
+    "src/routes/producto.$slug.tsx": "7cd806190e3ecdc5fa8277e16e9d47ec7ad9847205fa9590da6442cdfd2f6651",
     "src/routes/que-hacer.tsx": "ebcfa12f306c0e2940bde4d4eb3fb3d15c32f9c660a20c587eb6a06b319fceb4",
     "src/routes/resenar.negocio.$slug.tsx": "cc51fcd7fe029aebc80fafa3ab3a6c4fc2191f99e8b4350832e6e76be43b8561",
     "src/routes/restaurantes.tsx": "57048ca806facab27c40af2641bdabe794c092e63dfeb219cbe414105ceea3dd",
@@ -589,5 +590,11 @@
     "supabase/migrations/20260921195925_edf35822-3d8b-42ec-84a4-d4fc942e7c19.sql": "e2a6bb2d34c0982548f98f2a0f3a2ac623b0adaa693cbc1ea17533332c1966d5",
     "supabase/migrations/20260921201447_a2c05ad8-5847-4be1-b461-18a377a97e0b.sql": "8fd8ca909b8499fb0a654dfb828e4795de9c73065099a19ee9c6ee4572c32e58",
     "vite.config.ts": "1d377cd7e35d3d8de15ab630590849932e4e96994077ac88c4a4654942357aca"
-  }
+  },
+  "amendments": [
+    {
+      "recorded_at": "2026-11-20",
+      "authority": "Autorización Founder del 2026-11-20 para el resumen oficial de reseñas de Google en Alux (PCA-2026-090): actualiza sólo los digests de src/routes/producto.$slug.tsx, src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx (nuevo registro), src/components/alux/AluxConverseChat.tsx y src/integrations/supabase/types.ts."
+    }
+  ]
 }

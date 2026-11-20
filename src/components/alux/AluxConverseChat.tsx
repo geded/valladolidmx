@@ -58,6 +58,10 @@ import {
 import { useAnonymousTrip, type AnonymousItemKind } from "@/lib/traveler/anonymous-draft";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { AluxMark } from "@/components/alux/AluxMark";
+import {
+  AluxReviewSummaryCard,
+  AluxReviewSummaryToggle,
+} from "@/components/alux/AluxReviewSummary";
 import { useAluxBrand } from "@/lib/brand/brand-context";
 
 /* ─────────────────────────── persistencia local del hilo ─────────────────────────── */
@@ -458,6 +462,8 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
         {alux.copy("conversationDescription")}
       </p>
+      {/* Resumen oficial de reseñas de la ficha desde la que se abrió Alux. */}
+      <AluxReviewSummaryCard entityRef={props.selection?.entityRef} travelerCoords={props.coords} />
       {isAuthed && isPlanPending ? (
         <p role="status" className="mt-3 flex items-center gap-2 text-[12px] text-muted-foreground">
           <Loader2 className="size-3.5 animate-spin" aria-hidden />
@@ -525,6 +531,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               removing={removeMutation.isPending}
               onApplyOrder={(keys) => reorderMutation.mutate(keys)}
               applyingOrder={reorderMutation.isPending}
+              coords={props.coords}
             />
           ),
         )}
@@ -663,6 +670,7 @@ function AssistantTurn({
   removing,
   onApplyOrder,
   applyingOrder,
+  coords,
 }: {
   message: ThreadMessage;
   tripKeys: ReadonlySet<string>;
@@ -673,6 +681,7 @@ function AssistantTurn({
   removing: boolean;
   onApplyOrder: (keys: readonly string[]) => void;
   applyingOrder: boolean;
+  coords: { lat: number; lng: number } | null;
 }) {
   const res = message.response;
   return (
@@ -721,6 +730,7 @@ function AssistantTurn({
                 }
                 onRemove={onRemove}
                 removing={removing}
+                coords={coords}
               />
             ))}
           </ul>
@@ -819,11 +829,13 @@ function RecommendationCard({
   inTrip,
   onRemove,
   removing,
+  coords,
 }: {
   rec: AluxConverseRecommendation;
   inTrip: boolean;
   onRemove: (rec: AluxConverseRecommendation) => void;
   removing: boolean;
+  coords: { lat: number; lng: number } | null;
 }) {
   const [confirmRemove, setConfirmRemove] = useState(false);
   useEffect(() => {
@@ -877,6 +889,12 @@ function RecommendationCard({
         <p className="mt-1 text-[10px] text-muted-foreground">
           Sin dato publicado: {rec.unavailableFacts.slice(0, 3).join(", ").toLowerCase()}
         </p>
+      ) : null}
+      {rec.entityType === "business" || rec.entityType === "place" || rec.entityType === "event" ? (
+        <AluxReviewSummaryToggle
+          entityRef={`${rec.entityType}:${rec.entityId}`}
+          travelerCoords={coords}
+        />
       ) : null}
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {canAdd && rec.planKind ? (

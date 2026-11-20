@@ -1,0 +1,96 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-090",
+  "title": "Alux · resumen oficial de reseñas de Google en el concierge",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 («Autorizado, me gusta», ampliada a Zazil Tunich, sus eventos y experiencias) para que Alux muestre el resumen oficial de reseñas de Google Maps al abrirse desde fichas de negocios, lugares, experiencias y eventos, y en sus recomendaciones, en los momentos planeando y en sitio, sin rediseñar plantillas, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/components/alux/AluxReviewSummary.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/review-summary-contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/review-summary.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/review-summary.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/components/alux/AluxReviewSummary.tsx",
+      "sha256": "622a5e22eb9711bd6bf084c3f79fae7890235e4348499d17c9a42a5aae74d878",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/review-summary-contract.ts",
+      "sha256": "36b511fc562d72eac2897d319a8320b96515abc870ffb9f2be592540472db94a",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/review-summary.functions.ts",
+      "sha256": "d12dcf36a2c8b8d6b84f0297abb0e5f47ee4e5b5d40344d44358a4ab3167f36e",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/review-summary.server.ts",
+      "sha256": "2cdfd891fb67102312d774fdee682045b2149bddaa5960c5cd1fc71983d5e09a",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "sha256": "b4011d66a8e17af252cd08b7dd2ef070c8d64a4e111f890a58bc0b984faf35bc",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts",
+      "sha256": "defd907f8d3b33f5b2cb163e15d0eddcd0a79657a38abb700c6a36fc58cb034d",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/producto.$slug.tsx",
+      "sha256": "7cd806190e3ecdc5fa8277e16e9d47ec7ad9847205fa9590da6442cdfd2f6651",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "sha256": "b040b9d25f4b52298c983246ffa9d3101b879cf66d9d479aa5a66338b8a5c1c6",
+      "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": ["bun test scripts/alux/alux-review-summary.contract.test.ts"]
+}

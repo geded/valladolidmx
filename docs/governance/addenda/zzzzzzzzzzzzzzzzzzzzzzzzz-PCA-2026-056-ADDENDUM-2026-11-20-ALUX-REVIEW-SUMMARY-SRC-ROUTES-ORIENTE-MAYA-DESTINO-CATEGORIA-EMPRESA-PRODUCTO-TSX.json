@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-056-ADDENDUM-2026-11-20-ALUX-REVIEW-SUMMARY-SRC-ROUTES-ORIENTE-MAYA-DESTINO-CATEGORIA-EMPRESA-PRODUCTO-TSX.json",
+  "status": "Approved",
+  "parent": "PCA-2026-056",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 («Autorizado, me gusta», ampliada a Zazil Tunich, sus eventos y experiencias) para que Alux muestre el resumen oficial de reseñas de Google Maps al abrirse desde fichas de negocios, lugares, experiencias y eventos, y en sus recomendaciones, en los momentos planeando y en sitio, sin rediseñar plantillas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+    "previous_sha256": "9bde84c256ff66f3fd73024d3732eee927c8cc7764195a6ac6bbdd9c6a61650d",
+    "current_sha256": "b040b9d25f4b52298c983246ffa9d3101b879cf66d9d479aa5a66338b8a5c1c6",
+    "semantic_change": "resumen oficial de reseñas de Google en Alux (PCA-2026-090)",
+    "authority": "Founder · resumen de reseñas en Alux · 2026-11-20"
+  },
+  "invariants": ["Sin rediseño de la plantilla Premium", "Sin publicación ni despliegue"],
+  "recorded_at": "2026-11-20"
+}

@@ -1577,6 +1577,8 @@ export type Database = {
           destination_id: string
           display_name: string
           filter_attributes: Json
+          google_place_id: string | null
+          google_place_matched_at: string | null
           id: string
           is_demo_seed: boolean
           last_verified_at: string | null
@@ -1612,6 +1614,8 @@ export type Database = {
           destination_id: string
           display_name: string
           filter_attributes?: Json
+          google_place_id?: string | null
+          google_place_matched_at?: string | null
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -1647,6 +1651,8 @@ export type Database = {
           destination_id?: string
           display_name?: string
           filter_attributes?: Json
+          google_place_id?: string | null
+          google_place_matched_at?: string | null
           id?: string
           is_demo_seed?: boolean
           last_verified_at?: string | null
@@ -3841,6 +3847,8 @@ export type Database = {
           exception_dates: Json
           external_url: string | null
           filter_attributes: Json
+          google_place_id: string | null
+          google_place_matched_at: string | null
           id: string
           is_demo_seed: boolean
           is_free: boolean
@@ -3878,6 +3886,8 @@ export type Database = {
           exception_dates?: Json
           external_url?: string | null
           filter_attributes?: Json
+          google_place_id?: string | null
+          google_place_matched_at?: string | null
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
@@ -3915,6 +3925,8 @@ export type Database = {
           exception_dates?: Json
           external_url?: string | null
           filter_attributes?: Json
+          google_place_id?: string | null
+          google_place_matched_at?: string | null
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
@@ -5989,6 +6001,7 @@ export type Database = {
           directions: string | null
           entry_fee_notes: string | null
           google_place_id: string | null
+          google_place_matched_at: string | null
           highlights: Json
           id: string
           is_demo_seed: boolean
@@ -6033,6 +6046,7 @@ export type Database = {
           directions?: string | null
           entry_fee_notes?: string | null
           google_place_id?: string | null
+          google_place_matched_at?: string | null
           highlights?: Json
           id?: string
           is_demo_seed?: boolean
@@ -6077,6 +6091,7 @@ export type Database = {
           directions?: string | null
           entry_fee_notes?: string | null
           google_place_id?: string | null
+          google_place_matched_at?: string | null
           highlights?: Json
           id?: string
           is_demo_seed?: boolean

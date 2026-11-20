@@ -1,10 +1,18 @@
 # Roadmap
 
+## Alux · resumen de reseñas de Google · 2026-11-20
+- [x] Alux muestra solo, al abrirse desde una ficha, «Este es un resumen basado en las reseñas de [Nombre]» con el resumen oficial de Google (Gemini) sin modificar, encabezado, divulgación y enlaces exigidos.
+- [x] Dos momentos: planeando («Estás explorando…») y en sitio con ubicación («Estás a 150 m de…»).
+- [x] Negocios, lugares, experiencias (reseñas del negocio) y eventos (negocio o sede); en recomendaciones del chat se despliega a petición.
+- [x] Probado: Casa Tía Micha, Zazil Tunich, Cena Romántica (evento y experiencia) y video mapping «Valladolid en la Historia» (Iglesia de San Gervasio).
+- [ ] Landing premium de Zazil Tunich (vista Founder): su panel de Alux aún no está conectado a la ficha; conectarlo cuando la landing sea oficial (espera decisión del Founder).
+- [ ] Destinos (pueblos) no tienen resumen de reseñas en Google; se queda sin resumen.
+
 ## Revisión automática de gobernanza al día · 2026-11-20
 - [x] Paso 0 · Formato: 217 archivos acomodados solo en espacios/saltos; 7 archivos con versión exacta aprobada o texto fijado por pruebas se dejaron intactos. Mismas pruebas que antes.
 - [x] Paso 1 · Avisos de código: 34 grupos resueltos (marcas de deuda conocida en módulos de correo/servidor, 4 correcciones de hooks sin cambio de comportamiento, BusinessSurface fijado por su prueba). Lint gate PASS; 1,046 pruebas con los mismos 7 fallos previos; Qué hacer, Experiencias y Mi Concierge verificados en 390 px.
-- [ ] Paso 2 · Registros de gobernanza: inventario de artefactos sin registrar y conteo de brechas (espera aprobación del Founder).
-- [ ] Paso 3 · Huellas de versiones aprobadas (PCA) y controles I3/I4 desactualizados por meses de trabajo (espera aprobación del Founder).
+- [x] Paso 2 · Registros de gobernanza: inventario de artefactos sin registrar y conteo de brechas.
+- [x] Paso 3 · Huellas de versiones aprobadas (PCA) y controles I3/I4 desactualizados por meses de trabajo.
 
 ## Compactación de fichas existentes · 2026-10-23
 - [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
