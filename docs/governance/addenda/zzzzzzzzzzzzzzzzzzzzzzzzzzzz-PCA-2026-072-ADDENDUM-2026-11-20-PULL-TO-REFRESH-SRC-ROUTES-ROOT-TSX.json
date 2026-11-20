@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-072-ADDENDUM-2026-11-20-PULL-TO-REFRESH-SRC-ROUTES-ROOT-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-072",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Porque si le doy hacia abajo a la aplicación no aparece actualizando? Quiero que uses la parte redonda del logo que esté dando vueltas»; vista previa aprobada: «Sí, implementarlo así» con círculo blanco, sombra suave y giro pausado) para añadir jalar-para-actualizar en las páginas públicas táctiles de la app instalada, reutilizando el gesto oficial del Workspace Engine, sin cambiar plantillas, header, footer, Alux, Mi Viaje, contenido CMS, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/__root.tsx",
+    "previous_sha256": "3978cea9e9900ef7e15749e60e7e8e27d89ccc5ef578350642754d8321a5734e",
+    "current_sha256": "7bc2f10f7e7fa148bf54735a7b9f595000cd4841c4f1a0fee2678f7c79b3263e",
+    "semantic_change": "Delta de interacción: el gesto oficial usePullToRefresh admite scroll de ventana, filtro de inicio y desactivación; el root público monta en diferido un indicador con el símbolo de la marca que actualiza datos sin recargar. Sin cambios de plantillas, orden, contenido CMS, header, footer ni superficies autenticadas.",
+    "authority": "Founder · jalar para actualizar con símbolo de marca · 2026-11-20"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "El gesto sólo existe en pantallas táctiles de la app instalada o la vista previa; navegador normal, escritorio y superficies autenticadas no cambian.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-095",
+  "title": "Jalar para actualizar con el símbolo de la marca",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Porque si le doy hacia abajo a la aplicación no aparece actualizando? Quiero que uses la parte redonda del logo que esté dando vueltas»; vista previa aprobada: «Sí, implementarlo así» con círculo blanco, sombra suave y giro pausado) para añadir jalar-para-actualizar en las páginas públicas táctiles de la app instalada, reutilizando el gesto oficial del Workspace Engine, sin cambiar plantillas, header, footer, Alux, Mi Viaje, contenido CMS, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/workspace/hooks/gestures/usePullToRefresh.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/assets/brand/logo-symbol.png.asset.json"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/discovery/PullToRefreshIndicator.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/workspace/hooks/gestures/usePullToRefresh.ts",
+      "sha256": "beadaa74e4a7a06a7ec8b3afc08f77110abf0d52bbd08d8c12438444156f9d98",
+      "authority": "Founder · jalar para actualizar con símbolo de marca · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx",
+      "sha256": "7bc2f10f7e7fa148bf54735a7b9f595000cd4841c4f1a0fee2678f7c79b3263e",
+      "authority": "Founder · jalar para actualizar con símbolo de marca · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/assets/brand/logo-symbol.png.asset.json",
+      "sha256": "7d0d9f7b080a5cbc5d0efbfed645b912abc0df28e5cec49286ae2e75f9af6128",
+      "authority": "Founder · jalar para actualizar con símbolo de marca · 2026-11-20"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/discovery/PullToRefreshIndicator.tsx",
+      "sha256": "2d5870b8e2c13a417d8fe69884551b13e15f90b7fa5ab9f58ea9191dd5a760db",
+      "authority": "Founder · jalar para actualizar con símbolo de marca · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/", "/oriente-maya/valladolid"],
+  "required_feature_flags": [],
+  "required_tests": ["bun test ./scripts/maps/map-fallback.contract.test.tsx"]
+}

@@ -77,6 +77,11 @@ const SyncStatusBanner = React.lazy(() =>
     default: m.SyncStatusBanner,
   })),
 );
+const PullToRefreshIndicator = React.lazy(() =>
+  import("@/components/discovery/PullToRefreshIndicator").then((m) => ({
+    default: m.PullToRefreshIndicator,
+  })),
+);
 const UpdateBanner = React.lazy(() =>
   import("@/components/discovery/UpdateBanner").then((m) => ({
     default: m.UpdateBanner,
@@ -450,6 +455,11 @@ function RootComponent() {
               <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
             ) : null}
             {!isAppShellRoute ? <OfflineBanner /> : null}
+            {!isAppShellRoute ? (
+              <React.Suspense fallback={null}>
+                <PullToRefreshIndicator />
+              </React.Suspense>
+            ) : null}
             <React.Suspense fallback={null}>
               <SyncStatusBanner />
               <UpdateBanner />
