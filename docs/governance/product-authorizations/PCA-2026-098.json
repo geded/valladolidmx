@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-098",
+  "title": "Ruta territorial · selector de destinos sin quedar pegado en celular",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («en la parte de arriba, abajo del header, se junta el selector de destinos con el indicador de la ruta de la página, revisa y corrige»): en celular la ruta territorial y el selector de destinos comparten fila cuando caben y, si no, el selector baja compacto a la derecha; sin cambiar migas, selector, destinos, tableta, escritorio, contenido CMS, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/layout/BreadcrumbTerritorial.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/layout/BreadcrumbTerritorial.tsx",
+      "sha256": "a3d488d432cab9e5c6d3f408ed2dff71f337a8f0f8864157a5fee5a693745766",
+      "authority": "Founder · ruta y selector de destinos separados en celular · 2026-11-20"
+    }
+  ],
+  "public_routes": [
+    "/oriente-maya/valladolid",
+    "/oriente-maya/izamal",
+    "/oriente-maya/chichen-itza",
+    "/oriente-maya/valladolid/hoteles"
+  ],
+  "required_feature_flags": [],
+  "required_tests": []
+}

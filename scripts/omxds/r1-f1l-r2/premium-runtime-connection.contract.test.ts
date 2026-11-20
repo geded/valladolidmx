@@ -440,10 +440,18 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
   test("el breadcrumb territorial no puede ser desplazado por el selector en tablet", () => {
     const breadcrumb = read("src/components/layout/BreadcrumbTerritorial.tsx");
 
-    expect(breadcrumb).toContain("flex-col items-stretch");
-    expect(breadcrumb).toContain("sm:flex-row");
-    expect(breadcrumb).toContain("w-full min-w-0");
-    expect(breadcrumb).toContain("sm:w-auto");
+    expect(breadcrumb).toContain("sm:flex-nowrap");
+    expect(breadcrumb).toContain('className="min-w-0 max-w-full lg:flex-1"');
+  });
+
+  test("en celular el selector de destinos no queda pegado bajo la ruta territorial", () => {
+    const breadcrumb = read("src/components/layout/BreadcrumbTerritorial.tsx");
+
+    // Comparten fila cuando caben; si no, el selector baja compacto a la derecha.
+    expect(breadcrumb).toContain("flex flex-wrap items-center justify-between gap-x-3 gap-y-2");
+    expect(breadcrumb).not.toContain("flex-col items-stretch");
+    expect(breadcrumb).toContain('className="ml-auto shrink-0 empty:hidden"');
+    expect(breadcrumb).toContain("w-auto min-w-0 max-w-[8.5rem]");
   });
 
   test("todas las familias aprobadas conservan breadcrumb, Alux y conexión productiva", () => {

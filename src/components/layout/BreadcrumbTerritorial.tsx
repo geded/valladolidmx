@@ -80,7 +80,10 @@ export function BreadcrumbTerritorial({
   return (
     <div
       className={cn(
-        "flex flex-col items-stretch gap-2 text-xs sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:text-sm",
+        // Móvil: ruta y selector comparten fila cuando caben (como en
+        // tableta); si la ruta es larga, el selector baja completo a la
+        // derecha en vez de quedar pegado como un campo a todo lo ancho.
+        "flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-xs sm:flex-nowrap sm:gap-3 sm:text-sm",
         className,
       )}
     >
@@ -88,7 +91,7 @@ export function BreadcrumbTerritorial({
         El selector de destino vive FUERA del `nav` de migajas: dentro se
         leía como una migaja más y repetía el destino al final de la ruta.
       */}
-      <nav aria-label="Ruta territorial" className="min-w-0 lg:flex-1">
+      <nav aria-label="Ruta territorial" className="min-w-0 max-w-full lg:flex-1">
         {compact ? (
           <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
         ) : null}
@@ -163,8 +166,8 @@ export function BreadcrumbTerritorial({
         existe un único destino publicado — no genera ruido en Home,
         Blog, Contacto ni superficies sin ancla.
       */}
-      <div role="group" aria-label="Cambiar de destino" className="shrink-0">
-        <TerritorialSwitcherMount className="h-9 w-full min-w-0 text-xs sm:h-8 sm:w-auto sm:max-w-56" />
+      <div role="group" aria-label="Cambiar de destino" className="ml-auto shrink-0 empty:hidden">
+        <TerritorialSwitcherMount className="h-9 w-auto min-w-0 max-w-[8.5rem] gap-1.5 text-xs sm:gap-0 sm:h-8 sm:max-w-56" />
       </div>
     </div>
   );

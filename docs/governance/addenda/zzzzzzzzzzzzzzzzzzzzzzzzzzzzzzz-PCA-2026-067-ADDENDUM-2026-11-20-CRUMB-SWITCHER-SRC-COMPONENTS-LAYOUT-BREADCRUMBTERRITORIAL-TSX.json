@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-067-ADDENDUM-2026-11-20-CRUMB-SWITCHER-SRC-COMPONENTS-LAYOUT-BREADCRUMBTERRITORIAL-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-067",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («en la parte de arriba, abajo del header, se junta el selector de destinos con el indicador de la ruta de la página, revisa y corrige»): en celular la ruta territorial y el selector de destinos comparten fila cuando caben y, si no, el selector baja compacto a la derecha; sin cambiar migas, selector, destinos, tableta, escritorio, contenido CMS, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/layout/BreadcrumbTerritorial.tsx",
+    "previous_sha256": "05323cfa8011f4a1e560b176fdd090887b16c4ae4452fd3cd70d3e78cfb250ae",
+    "current_sha256": "a3d488d432cab9e5c6d3f408ed2dff71f337a8f0f8864157a5fee5a693745766",
+    "semantic_change": "En móvil la ruta y el selector de destinos se acomodan en una fila (o el selector baja compacto a la derecha) en lugar de un campo a todo lo ancho pegado debajo; desde sm no cambia.",
+    "authority": "Founder · ruta y selector de destinos separados en celular · 2026-11-20"
+  },
+  "invariants": [
+    "Las migas, su orden, enlaces y compactación se conservan.",
+    "El selector conserva destinos, comportamiento y montaje único.",
+    "Tableta y escritorio no cambian.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}
