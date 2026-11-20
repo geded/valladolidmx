@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * Experience Builder · Template Preview Registry (US-R3 · Ola 2 · Sub-ola 2.2b)
  *

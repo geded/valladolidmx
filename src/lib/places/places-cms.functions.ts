@@ -311,7 +311,6 @@ export const getPlaceCms = createServerFn({ method: "POST" })
       // Miniatura editorial: el bucket es privado y los borradores no pasan
       // por el proxy público, así que firmamos una URL temporal (1 h) con la
       // sesión del editor. Mismo patrón aprobado en los paneles de medios.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const storage = (ctx.supabase as any).storage;
       const byBucket = new Map<string, string[]>();
       for (const a of assets) {

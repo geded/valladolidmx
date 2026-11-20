@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- untyped external/legacy payloads kept as-is to avoid behavior changes; tracked lint debt. */
 /**
  * Paso 10 · Correo al viajero de una reservación en línea (folio ERL).
  *

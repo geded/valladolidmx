@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * CmsFilters — Controles de filtrado reutilizables para los listados del CMS.
  * Sólo presentación: mismos tokens y lenguaje editorial ya aprobados.

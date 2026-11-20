@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * CmsTerritoryBar — Barra territorial compartida de los listados del CMS.
  *

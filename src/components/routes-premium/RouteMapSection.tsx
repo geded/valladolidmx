@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * `RouteMapSection` — mapa de marca de una ruta editorial dentro de su ficha.
  *

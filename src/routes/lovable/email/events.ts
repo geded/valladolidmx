@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- untyped external/legacy payloads kept as-is to avoid behavior changes; tracked lint debt. */
 import { createEmailWebhookHandler } from "@lovable.dev/email-js";
 import { createFileRoute } from "@tanstack/react-router";
 

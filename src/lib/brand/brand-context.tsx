@@ -71,6 +71,7 @@ export function useBrand(): BrandSettings {
   return useContext(BrandContext) ?? BRAND_SETTINGS_DEFAULTS;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAluxBrand(): {
   name: string;
   palette: AluxPalette;

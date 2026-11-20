@@ -74,7 +74,7 @@ export function ReserveOnlineButton({
     staleTime: 60_000,
   });
 
-  const departures = departuresQ.data ?? [];
+  const departures = useMemo(() => departuresQ.data ?? [], [departuresQ.data]);
 
   const days = useMemo(() => groupDeparturesByDay(departures), [departures]);
   const daysByKey = useMemo(() => new Map(days.map((item) => [item.key, item])), [days]);

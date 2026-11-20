@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- untyped external/legacy payloads kept as-is to avoid behavior changes; tracked lint debt. */
 /**
  * orders.functions.ts — CV4.2 · Checkout narrativo del viajero
  *

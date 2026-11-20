@@ -1,5 +1,11 @@
 # Roadmap
 
+## Revisión automática de gobernanza al día · 2026-11-20
+- [x] Paso 0 · Formato: 217 archivos acomodados solo en espacios/saltos; 7 archivos con versión exacta aprobada o texto fijado por pruebas se dejaron intactos. Mismas pruebas que antes.
+- [x] Paso 1 · Avisos de código: 34 grupos resueltos (marcas de deuda conocida en módulos de correo/servidor, 4 correcciones de hooks sin cambio de comportamiento, BusinessSurface fijado por su prueba). Lint gate PASS; 1,046 pruebas con los mismos 7 fallos previos; Qué hacer, Experiencias y Mi Concierge verificados en 390 px.
+- [ ] Paso 2 · Registros de gobernanza: inventario de artefactos sin registrar y conteo de brechas (espera aprobación del Founder).
+- [ ] Paso 3 · Huellas de versiones aprobadas (PCA) y controles I3/I4 desactualizados por meses de trabajo (espera aprobación del Founder).
+
 ## Compactación de fichas existentes · 2026-10-23
 - [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
 - [x] Preflight autenticado de las cinco familias: negocios abren bloques individuales demo; eventos abre Kit genérico; lugar no muestra ficha en el lienzo observado. Informe: docs/governance/audit/2026-10-23-COMPACT-FICHES-PREFLIGHT.md. Scope de lectura PASS; Preservation de implementación BLOQUEADO.

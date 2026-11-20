@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- untyped external/legacy payloads kept as-is to avoid behavior changes; tracked lint debt. */
 /**
  * Acción de servidor para los correos de la app disparados desde pantallas
  * autenticadas. Conserva la compuerta de autorización fail-closed del antiguo

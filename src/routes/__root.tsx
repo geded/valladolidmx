@@ -9,7 +9,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -157,7 +157,10 @@ function isOfflineLikeError(error: Error): boolean {
 }
 
 function ErrorComponent({ error: rawError, reset }: ErrorComponentProps) {
-  const error = rawError instanceof Error ? rawError : new Error(String(rawError));
+  const error = useMemo(
+    () => (rawError instanceof Error ? rawError : new Error(String(rawError))),
+    [rawError],
+  );
   const router = useRouter();
   const offline = isOfflineLikeError(error);
   const [retrying, setRetrying] = useState(false);

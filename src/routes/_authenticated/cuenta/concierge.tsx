@@ -58,6 +58,10 @@ function TravelerConciergePage() {
     return <Outlet />;
   }
 
+  return <TravelerConciergeList />;
+}
+
+function TravelerConciergeList() {
   const fn = useServerFn(listConciergeCases);
   const q = useSuspenseQuery(
     queryOptions({

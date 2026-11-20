@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * Aviso interno: la propuesta lleva 72 h aceptada sin pago registrado.
  * Va al Concierge asignado y a administración para seguimiento personal.

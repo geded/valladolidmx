@@ -581,7 +581,7 @@ function QueHacerDiscoveryBody({
 }) {
   const [territory, setTerritory] = useState("");
   const [showMapMobile, setShowMapMobile] = useState(false);
-  const rails = dto?.discoveryRails ?? [];
+  const rails = useMemo(() => dto?.discoveryRails ?? [], [dto?.discoveryRails]);
   const isDestinationScope = Boolean(lockedDestinationLabel || dto?.destinationSlug);
   const allItems = useMemo(() => rails.flatMap((rail) => [...rail.items]), [rails]);
   const territories = useMemo(

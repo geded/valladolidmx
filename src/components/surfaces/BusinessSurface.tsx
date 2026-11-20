@@ -748,6 +748,8 @@ export function BusinessSurface({
           // D-03 · La ruta territorial navegable la emite PublicShell.
           // El Hero no repite el breadcrumb decorativo.
           eyebrow: variant.eyebrow,
+          // The template-integrity contract pins this single-line logo call.
+          // prettier-ignore
           identity: businessLogoUrl ? (
             <BusinessLogo url={businessLogoUrl} asset={businessLogo?.asset} businessName={b.display_name} size="lg" />
           ) : undefined,
@@ -762,7 +764,8 @@ export function BusinessSurface({
               ? {
                   url: b.cover_url,
                   alt: b.display_name,
-                  asset: (b.media ?? []).find((m) => m.role === "cover" && m.url === b.cover_url)?.asset,
+                  asset: (b.media ?? []).find((m) => m.role === "cover" && m.url === b.cover_url)
+                    ?.asset,
                 }
               : null,
           badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],

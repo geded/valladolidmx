@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- untyped external/legacy payloads kept as-is to avoid behavior changes; tracked lint debt. */
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * Paso 10 · Correos al viajero de una reservación en línea (folio ERL).
  * Cuatro momentos: registrada, pagada, cancelada y reembolsada.

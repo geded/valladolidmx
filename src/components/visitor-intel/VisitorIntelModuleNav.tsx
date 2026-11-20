@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * CV8.3 · A6 — Menú de módulos del Centro de Inteligencia del Visitante.
  *

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 /**
  * ShareSheet — hoja compacta de compartir (sin iconos permanentes en la UI).
  *

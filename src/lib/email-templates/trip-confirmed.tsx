@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- module intentionally co-exports helpers with its components; affects only dev fast refresh. */
 import * as React from "react";
 import { SITE } from "@/config/site";
 import { Text } from "@react-email/components";
