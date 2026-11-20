@@ -328,8 +328,8 @@ function UsersTable({
         />
       ) : null}
       <div className="overflow-x-auto rounded-2xl border border-border">
-        <table className="w-full min-w-[720px] text-sm">
-          <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
+        <table className="w-full text-sm md:min-w-[720px]">
+          <thead className="hidden bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground md:table-header-group">
             <tr>
               <th className="px-4 py-2">Usuario</th>
               <th className="px-4 py-2">Roles actuales</th>
@@ -416,8 +416,8 @@ function UserRow({
   const availableCustom = customRoles.filter((c) => !assignedCustomIds.has(c.id));
 
   return (
-    <tr className="border-t border-border align-top">
-      <td className="px-4 py-3">
+    <tr className="block border-t border-border align-top md:table-row">
+      <td className="block px-4 py-3 md:table-cell">
         <div className="font-medium">{row.display_name ?? "—"}</div>
         <div className="text-xs text-muted-foreground">{row.email}</div>
         <div className="mt-1 text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -446,7 +446,10 @@ function UserRow({
           />
         ) : null}
       </td>
-      <td className="px-4 py-3">
+      <td className="block px-4 pb-3 pt-0 md:table-cell md:pt-3">
+        <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground md:hidden">
+          Roles actuales
+        </div>
         <div className="flex flex-wrap gap-1.5">
           {row.roles.length === 0 ? (
             <span className="text-xs text-muted-foreground">Sin roles</span>
@@ -507,7 +510,10 @@ function UserRow({
           </div>
         ) : null}
       </td>
-      <td className="px-4 py-3">
+      <td className="block px-4 pb-4 pt-0 md:table-cell md:pt-3">
+        <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground md:hidden">
+          Agregar rol
+        </div>
         {available.length === 0 ? (
           <span className="text-xs text-muted-foreground">Sin roles de sistema disponibles.</span>
         ) : (
