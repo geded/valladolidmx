@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-057-ADDENDUM-2026-11-20-PHOTO-WAIT-SRC-COMPONENTS-OMXDS-EDITORIALMEDIAFRAME-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-057",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («las imágenes tienen un fondo verde obscuro que no me gusta») y aprobación explícita («Sí, aplícala») de la recomendación: fondo crema claro mientras la foto carga, aparición suave al llegar y símbolo tenue de la marca sólo en portadas, sin logo girando en cada foto, sin cambiar estructura, orden, geometría, contenido CMS, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/omxds/EditorialMediaFrame.tsx",
+    "previous_sha256": "a91955e72ab674fcaa466f0ddfbcb686add17b4867fc66dc91808daf0235b163",
+    "current_sha256": "2aa41f1cbc3d4c4baccc3e0c7f64fa2beaae395efab7b9607ca67e61d8d97691",
+    "semantic_change": "El marco compartido de fotografías muestra fondo crema (y en portadas el símbolo tenue de la marca) mientras la foto carga, y la foto aparece con un desvanecido corto; no cambia geometría, fuente, variantes ni el marcador neutral.",
+    "authority": "Founder · fondo crema discreto mientras cargan las fotos · 2026-11-20"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, geometría, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Las fotos conservan fuente, variantes, crédito, enfoque y tamaño; sólo cambia la espera mientras cargan.",
+    "El HTML del servidor no oculta la foto; la animación respeta reducir movimiento.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

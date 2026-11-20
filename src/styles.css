@@ -40,7 +40,6 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-script: "Tangerine", "Fraunces", ui-serif, Georgia, cursive;
 
-
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -395,7 +394,6 @@
 }
 
 @utility ws-shadow-card {
-
   box-shadow: var(--shadow-card);
 }
 @utility ws-shadow-raised {
@@ -424,6 +422,38 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ws-shimmer {
+    animation: none;
+  }
+}
+
+/* Espera discreta de fotografías (EditorialMediaFrame): fondo crema mientras la
+   foto carga; en portadas, el símbolo de la marca muy tenue al centro. */
+picture[data-omxds-media-state="loading"] {
+  background-color: var(--color-muted);
+}
+picture[data-omxds-media-state="loading"][data-omxds-media-mark] {
+  background-image:
+    linear-gradient(
+      color-mix(in oklab, var(--color-muted) 84%, transparent),
+      color-mix(in oklab, var(--color-muted) 84%, transparent)
+    ),
+    var(--omxds-media-mark);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size:
+    100% 100%,
+    clamp(2.75rem, 14%, 4.5rem) auto;
+}
+.omxds-media-reveal {
+  animation: omxds-media-reveal 320ms var(--ease-standard, ease-out) backwards;
+}
+@keyframes omxds-media-reveal {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .omxds-media-reveal {
     animation: none;
   }
 }

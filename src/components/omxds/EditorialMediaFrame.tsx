@@ -11,6 +11,9 @@
  * Toda superficie premium (Home, Destino, Empresa, Producto, Evento, Lugar)
  * debe consumirlo en lugar de emitir `<img>` sin fallback.
  */
+import { useLayoutEffect, useRef, useState } from "react";
+import { useHydrated } from "@tanstack/react-router";
+import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import { cn } from "@/lib/utils";
 import { resolveMediaSource, type MediaUsageContext } from "@/lib/media/resolve-source";
 import { hasEditorialMedia, type EditorialMedia } from "./editorial-media";
@@ -32,7 +35,15 @@ export interface EditorialMediaFrameProps {
   sizes?: string;
   /** Contexto que selecciona la familia correcta de variantes derivadas. */
   context?: MediaUsageContext;
+  /**
+   * Símbolo tenue de la marca en el fondo crema mientras la foto carga.
+   * Por omisión sólo en portadas (`context="hero"`); las tarjetas usan el
+   * fondo crema sin símbolo.
+   */
+  placeholderMark?: boolean;
 }
+
+const MEDIA_MARK_STYLE = { "--omxds-media-mark": `url("${logoSymbol.url}")` } as const;
 
 /** `object-position` a partir del punto de enfoque editorial (0–1). */
 export function focalStyle(focal?: { x: number; y: number } | null) {
@@ -50,6 +61,7 @@ export function EditorialMediaFrame({
   fetchPriority,
   sizes,
   context = "editorial",
+  placeholderMark,
 }: EditorialMediaFrameProps) {
   if (hasEditorialMedia(media)) {
     const resolved = resolveMediaSource(media?.asset, {
@@ -58,57 +70,15 @@ export function EditorialMediaFrame({
       sizes,
       priority: fetchPriority,
     });
-    const classTokens = (className ?? "").split(/\s+/).filter(Boolean);
-    const isAbsolute = classTokens.includes("absolute");
-    // El marco recibe UNA sola vez toda la geometría declarada por la plantilla
-    // (alto, ancho, proporción, posición, margen y radio). Duplicar esas clases
-    // también sobre <img> creaba una segunda geometría intrínseca: al decodificar
-    // la foto, WebKit recalculaba primero la imagen y después el <picture>, que es
-    // el agrandamiento visible durante el scroll en el canvas de 1024 px.
-    const imagePresentationClass = classTokens
-      .filter((token) =>
-        /^(object-|transition(?:-|$)|duration-|ease-|opacity-|scale-|transform(?:-|$)|group-hover:|hover:|motion-)/.test(
-          token,
-        ),
-      )
-      .join(" ");
-    const reservedRatio =
-      resolved.width && resolved.height ? `${resolved.width} / ${resolved.height}` : undefined;
-    const hasExplicitHeight = /(^|\s)(h-|aspect-|min-h-)/.test(className ?? "");
     return (
-      <picture
-        className={cn(
-          "block min-w-0 max-w-full overflow-hidden",
-          className,
-          isAbsolute && "inset-0",
-        )}
-        style={
-          !isAbsolute && !hasExplicitHeight && reservedRatio
-            ? { aspectRatio: reservedRatio }
-            : undefined
-        }
-      >
-        {resolved.sources.map((source) => (
-          <source
-            key={source.type}
-            type={source.type}
-            srcSet={source.srcSet}
-            {...(source.sizes ? { sizes: source.sizes } : {})}
-          />
-        ))}
-        <img
-          src={resolved.src}
-          alt={media!.alt}
-          loading={loading}
-          width={resolved.width}
-          height={resolved.height}
-          {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
-          {...(fetchPriority ? { fetchPriority } : {})}
-          data-omxds-media="g8-m1"
-          style={focalStyle(media!.focal)}
-          className={cn("block h-full w-full max-w-full", imagePresentationClass)}
-        />
-      </picture>
+      <EditorialPicture
+        resolved={resolved}
+        media={media!}
+        className={className}
+        loading={loading}
+        fetchPriority={fetchPriority}
+        placeholderMark={placeholderMark ?? context === "hero"}
+      />
     );
   }
 
@@ -129,5 +99,114 @@ export function EditorialMediaFrame({
         </p>
       ) : null}
     </div>
+  );
+}
+
+type ResolvedMedia = ReturnType<typeof resolveMediaSource>;
+
+/**
+ * Fotografía acreditada con espera discreta: fondo crema (y, en portadas, el
+ * símbolo tenue de la marca) hasta que la foto decodifica; después aparece con
+ * un desvanecido corto. El HTML del servidor nunca oculta la foto, para no
+ * retrasar la primera pintura; la espera sólo aplica tras hidratar.
+ */
+function EditorialPicture({
+  resolved,
+  media,
+  className,
+  loading,
+  fetchPriority,
+  placeholderMark,
+}: {
+  resolved: ResolvedMedia;
+  media: EditorialMedia;
+  className?: string;
+  loading: "eager" | "lazy";
+  fetchPriority?: "high" | "low" | "auto";
+  placeholderMark: boolean;
+}) {
+  const hydrated = useHydrated();
+  const imgRef = useRef<HTMLImageElement>(null);
+  // Sólo la primera carga espera: si después cambia la fuente (carrusel,
+  // URL firmada renovada al actualizar), la foto anterior sigue visible.
+  const [revealed, setRevealed] = useState(false);
+  const [animate, setAnimate] = useState(false);
+  const hideUntilLoaded = hydrated && !revealed;
+
+  useLayoutEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+    // Foto ya en caché o pintada antes de hidratar: se muestra sin animación.
+    if (img.complete) {
+      setRevealed(true);
+      return;
+    }
+    const reveal = () => {
+      setAnimate(true);
+      setRevealed(true);
+    };
+    img.addEventListener("load", reveal, { once: true });
+    img.addEventListener("error", reveal, { once: true });
+    return () => {
+      img.removeEventListener("load", reveal);
+      img.removeEventListener("error", reveal);
+    };
+  }, []);
+
+  const classTokens = (className ?? "").split(/\s+/).filter(Boolean);
+  const isAbsolute = classTokens.includes("absolute");
+  // El marco recibe UNA sola vez toda la geometría declarada por la plantilla
+  // (alto, ancho, proporción, posición, margen y radio). Duplicar esas clases
+  // también sobre <img> creaba una segunda geometría intrínseca: al decodificar
+  // la foto, WebKit recalculaba primero la imagen y después el <picture>, que es
+  // el agrandamiento visible durante el scroll en el canvas de 1024 px.
+  const imagePresentationClass = classTokens
+    .filter((token) =>
+      /^(object-|transition(?:-|$)|duration-|ease-|opacity-|scale-|transform(?:-|$)|group-hover:|hover:|motion-)/.test(
+        token,
+      ),
+    )
+    .join(" ");
+  const reservedRatio =
+    resolved.width && resolved.height ? `${resolved.width} / ${resolved.height}` : undefined;
+  const hasExplicitHeight = /(^|\s)(h-|aspect-|min-h-)/.test(className ?? "");
+  return (
+    <picture
+      data-omxds-media-state={revealed ? "ready" : "loading"}
+      {...(placeholderMark ? { "data-omxds-media-mark": "" } : {})}
+      className={cn("block min-w-0 max-w-full overflow-hidden", className, isAbsolute && "inset-0")}
+      style={{
+        ...(placeholderMark && !revealed ? MEDIA_MARK_STYLE : {}),
+        ...(!isAbsolute && !hasExplicitHeight && reservedRatio
+          ? { aspectRatio: reservedRatio }
+          : {}),
+      }}
+    >
+      {resolved.sources.map((source) => (
+        <source
+          key={source.type}
+          type={source.type}
+          srcSet={source.srcSet}
+          {...(source.sizes ? { sizes: source.sizes } : {})}
+        />
+      ))}
+      <img
+        src={resolved.src}
+        alt={media.alt}
+        loading={loading}
+        width={resolved.width}
+        height={resolved.height}
+        {...(resolved.sizes ? { sizes: resolved.sizes } : {})}
+        {...(fetchPriority ? { fetchPriority } : {})}
+        data-omxds-media="g8-m1"
+        ref={imgRef}
+        style={{ ...focalStyle(media.focal), ...(hideUntilLoaded ? { opacity: 0 } : {}) }}
+        className={cn(
+          "block h-full w-full max-w-full",
+          imagePresentationClass,
+          revealed && animate && "omxds-media-reveal",
+        )}
+      />
+    </picture>
   );
 }

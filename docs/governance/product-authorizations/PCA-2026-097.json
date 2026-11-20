@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-097",
+  "title": "Fotos · espera discreta con fondo crema en lugar de verde oscuro",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («las imágenes tienen un fondo verde obscuro que no me gusta») y aprobación explícita («Sí, aplícala») de la recomendación: fondo crema claro mientras la foto carga, aparición suave al llegar y símbolo tenue de la marca sólo en portadas, sin logo girando en cada foto, sin cambiar estructura, orden, geometría, contenido CMS, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/omxds/EditorialMediaFrame.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/styles.css"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/omxds/EditorialMediaFrame.tsx",
+      "sha256": "2aa41f1cbc3d4c4baccc3e0c7f64fa2beaae395efab7b9607ca67e61d8d97691",
+      "authority": "Founder · fondo crema discreto mientras cargan las fotos · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/styles.css",
+      "sha256": "533d086dd572c48fd293caff4b9002d1b744ceb089b6361ef5e20b127a5b4db1",
+      "authority": "Founder · fondo crema discreto mientras cargan las fotos · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/", "/oriente-maya/valladolid", "/hoteles", "/restaurantes"],
+  "required_feature_flags": [],
+  "required_tests": []
+}

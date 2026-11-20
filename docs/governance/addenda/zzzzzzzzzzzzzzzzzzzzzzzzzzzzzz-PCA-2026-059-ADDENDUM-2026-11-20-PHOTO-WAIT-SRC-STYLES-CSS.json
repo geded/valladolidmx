@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-PHOTO-WAIT-SRC-STYLES-CSS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («las imágenes tienen un fondo verde obscuro que no me gusta») y aprobación explícita («Sí, aplícala») de la recomendación: fondo crema claro mientras la foto carga, aparición suave al llegar y símbolo tenue de la marca sólo en portadas, sin logo girando en cada foto, sin cambiar estructura, orden, geometría, contenido CMS, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/styles.css",
+    "previous_sha256": "d38c6782ce476afcc602721403e9ede80b5267b84869769c6d23fa20ee6c7409",
+    "current_sha256": "533d086dd572c48fd293caff4b9002d1b744ceb089b6361ef5e20b127a5b4db1",
+    "semantic_change": "Agrega las reglas de espera discreta de fotografías (fondo crema, símbolo tenue en portadas y desvanecido que respeta reducir movimiento); no cambia tokens ni otras reglas.",
+    "authority": "Founder · fondo crema discreto mientras cargan las fotos · 2026-11-20"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, geometría, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Las fotos conservan fuente, variantes, crédito, enfoque y tamaño; sólo cambia la espera mientras cargan.",
+    "El HTML del servidor no oculta la foto; la animación respeta reducir movimiento.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}
