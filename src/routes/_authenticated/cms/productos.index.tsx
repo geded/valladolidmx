@@ -69,9 +69,7 @@ function ProductosPage() {
               label="Empresa"
               value={businessId}
               onChange={setBusinessId}
-              allLabel={
-                territory.destinationId ? "Todas las del destino" : "Todas las empresas"
-              }
+              allLabel={territory.destinationId ? "Todas las del destino" : "Todas las empresas"}
               options={businesses.map((b) => ({ value: b.id, label: b.display_name }))}
             />
             <CmsSelectFilter

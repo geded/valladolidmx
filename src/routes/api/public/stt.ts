@@ -35,9 +35,10 @@ export const Route = createFileRoute("/api/public/stt")({
     handlers: {
       POST: async ({ request }) => {
         const origin = request.headers.get("origin") || "";
-        const corsOrigin = origin && origin.includes("lovable.app")
-          ? origin
-          : "https://www.quehacerenvalladolid.com";
+        const corsOrigin =
+          origin && origin.includes("lovable.app")
+            ? origin
+            : "https://www.quehacerenvalladolid.com";
 
         const corsHeaders = {
           "Access-Control-Allow-Origin": corsOrigin,
@@ -51,10 +52,10 @@ export const Route = createFileRoute("/api/public/stt")({
 
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) {
-          return new Response(
-            JSON.stringify({ error: "Transcripción no disponible" }),
-            { status: 503, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "Transcripción no disponible" }), {
+            status: 503,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         // Límite de uso por visitante (misma estrategia que el chat de Alux).
@@ -65,10 +66,10 @@ export const Route = createFileRoute("/api/public/stt")({
           _day_limit: DAY_LIMIT,
         });
         if (rateErr) {
-          return new Response(
-            JSON.stringify({ error: "No se pudo verificar el límite de uso" }),
-            { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "No se pudo verificar el límite de uso" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
         const rateRow = Array.isArray(rate) ? rate[0] : rate;
         if (rateRow && rateRow.allowed === false) {
@@ -89,35 +90,35 @@ export const Route = createFileRoute("/api/public/stt")({
         // Bound the upload size before buffering
         const contentLength = parseInt(request.headers.get("content-length") || "0", 10);
         if (contentLength > MAX_FILE_BYTES + 1024) {
-          return new Response(
-            JSON.stringify({ error: "Audio demasiado largo" }),
-            { status: 413, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "Audio demasiado largo" }), {
+            status: 413,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         let formData: FormData;
         try {
           formData = await request.formData();
         } catch {
-          return new Response(
-            JSON.stringify({ error: "Se esperaba multipart/form-data" }),
-            { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "Se esperaba multipart/form-data" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         const file = formData.get("file");
         if (!(file instanceof File) || !file.size) {
-          return new Response(
-            JSON.stringify({ error: "Archivo de audio no encontrado" }),
-            { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "Archivo de audio no encontrado" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         if (file.size > MAX_FILE_BYTES) {
-          return new Response(
-            JSON.stringify({ error: "Audio demasiado largo (máximo 14 MB)" }),
-            { status: 413, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "Audio demasiado largo (máximo 14 MB)" }), {
+            status: 413,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         // Asegurar MIME type audio/* (MediaRecorder puede etiquetar como video/webm)
@@ -160,7 +161,7 @@ export const Route = createFileRoute("/api/public/stt")({
             status: 200,
             headers: {
               "Content-Type": "text/event-stream",
-              "Connection": "keep-alive",
+              Connection: "keep-alive",
               ...corsHeaders,
             },
           });

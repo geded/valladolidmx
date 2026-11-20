@@ -8,7 +8,10 @@ import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
 import { CaseMessages } from "@/components/concierge/CaseMessages";
 import { CaseItineraryPanel } from "@/components/concierge/CaseItineraryPanel";
-import { getConciergeReservationForCase, reservationPaymentLabel } from "@/lib/concierge/orders.functions";
+import {
+  getConciergeReservationForCase,
+  reservationPaymentLabel,
+} from "@/lib/concierge/orders.functions";
 
 export const Route = createFileRoute("/_authenticated/concierge/expedientes/$caseId/")({
   component: StaffCasePage,
@@ -33,7 +36,10 @@ function StaffCasePage() {
     }),
   );
   const getReservation = useServerFn(getConciergeReservationForCase);
-  const reservation = useQuery({ queryKey: ["concierge", "case-reservation", caseId], queryFn: () => getReservation({ data: { caseId } }) });
+  const reservation = useQuery({
+    queryKey: ["concierge", "case-reservation", caseId],
+    queryFn: () => getReservation({ data: { caseId } }),
+  });
   return (
     <section className="mx-auto w-full max-w-[1100px]">
       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -46,10 +52,40 @@ function StaffCasePage() {
       {reservation.data ? (
         <section className="mb-6 rounded-lg border border-border bg-card p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Reservación y pago</p><p className="mt-1 font-mono text-lg font-semibold">{reservation.data.folio}</p><p className="mt-1 text-sm text-muted-foreground">{reservationPaymentLabel(reservation.data.payment_provider, reservation.data.paid_at)} · {reservation.data.status}</p></div>
-            <div className="text-right"><p className="font-serif text-2xl">{new Intl.NumberFormat("es-MX", { style: "currency", currency: reservation.data.currency }).format(reservation.data.total_amount / 100)}</p><Link to="/concierge/reservaciones/$orderId" params={{ orderId: reservation.data.id }} className="mt-2 inline-flex text-sm font-semibold text-primary hover:underline">Ver reservación completa</Link></div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Reservación y pago
+              </p>
+              <p className="mt-1 font-mono text-lg font-semibold">{reservation.data.folio}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {reservationPaymentLabel(
+                  reservation.data.payment_provider,
+                  reservation.data.paid_at,
+                )}{" "}
+                · {reservation.data.status}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-serif text-2xl">
+                {new Intl.NumberFormat("es-MX", {
+                  style: "currency",
+                  currency: reservation.data.currency,
+                }).format(reservation.data.total_amount / 100)}
+              </p>
+              <Link
+                to="/concierge/reservaciones/$orderId"
+                params={{ orderId: reservation.data.id }}
+                className="mt-2 inline-flex text-sm font-semibold text-primary hover:underline"
+              >
+                Ver reservación completa
+              </Link>
+            </div>
           </div>
-          {!reservation.data.paid_at ? <p className="mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm text-warning-foreground">La propuesta fue aceptada, pero el cobro sigue pendiente.</p> : null}
+          {!reservation.data.paid_at ? (
+            <p className="mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm text-warning-foreground">
+              La propuesta fue aceptada, pero el cobro sigue pendiente.
+            </p>
+          ) : null}
         </section>
       ) : null}
       <CaseItineraryPanel caseId={caseId} />

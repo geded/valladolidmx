@@ -1309,13 +1309,27 @@ function ListingCard({
       >
         {item.image ? (
           <picture className="contents">
-          {resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card", sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-          <img
-            src={resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card" }).src}
-            alt={item.name}
-            loading="lazy"
-            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
-          />
+            {resolveMediaSource(item.imageAsset, {
+              fallbackUrl: item.image,
+              context: "card",
+              sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
+            }).sources.map((source) => (
+              <source
+                key={source.type}
+                type={source.type}
+                srcSet={source.srcSet}
+                sizes={source.sizes}
+              />
+            ))}
+            <img
+              src={
+                resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card" })
+                  .src
+              }
+              alt={item.name}
+              loading="lazy"
+              className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            />
           </picture>
         ) : (
           <div className="absolute inset-0 flex items-end p-4">

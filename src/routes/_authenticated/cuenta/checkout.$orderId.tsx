@@ -171,8 +171,11 @@ function CheckoutPage() {
   async function handleOnlinePayment() {
     setBusy(true);
     try {
-      const result = await startOnlinePayment({ data: { orderId, clientRequestId: crypto.randomUUID() } });
-      if (result.mode === "redirect" && result.redirectUrl) window.location.assign(result.redirectUrl);
+      const result = await startOnlinePayment({
+        data: { orderId, clientRequestId: crypto.randomUUID() },
+      });
+      if (result.mode === "redirect" && result.redirectUrl)
+        window.location.assign(result.redirectUrl);
       else throw new Error("No se pudo abrir el pago en línea");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo iniciar el pago");
@@ -247,8 +250,7 @@ function CheckoutPage() {
                   }).format(new Date(b.starts_at))}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {b.product_name} · {b.quantity}{" "}
-                  {b.quantity === 1 ? "persona" : "personas"} ·{" "}
+                  {b.product_name} · {b.quantity} {b.quantity === 1 ? "persona" : "personas"} ·{" "}
                   {b.status === "confirmed"
                     ? "Lugares confirmados"
                     : `Lugares apartados hasta las ${new Intl.DateTimeFormat("es-MX", {
@@ -329,7 +331,11 @@ function CheckoutPage() {
             </div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button onClick={handleOnlinePayment} disabled={busy || !paymentsQ.data?.ready} size="lg">
+            <Button
+              onClick={handleOnlinePayment}
+              disabled={busy || !paymentsQ.data?.ready}
+              size="lg"
+            >
               {busy ? "Abriendo pago…" : "Pagar en línea"}
             </Button>
             <Button onClick={handleConfirm} disabled={busy} size="lg">

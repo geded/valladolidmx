@@ -263,7 +263,6 @@ function sanitizePayload(table: EditableTable, payload: Record<string, unknown>)
   return out;
 }
 
-
 /* ─────────────────  Capa conceptual reservada  ─────────────────────── */
 /**
  * assertBusinessRules — Hook arquitectónico reservado (Ola 1 · Etapa 4).
@@ -477,7 +476,11 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
             .is("deleted_at", null)
             .maybeSingle();
           if (productLocationError) throw productLocationError;
-          if (!productLocation || productLocation.latitude == null || productLocation.longitude == null) {
+          if (
+            !productLocation ||
+            productLocation.latitude == null ||
+            productLocation.longitude == null
+          ) {
             throw new Error("Falta ubicar el punto de encuentro de la experiencia en el mapa.");
           }
           businessIdToCheck = null;

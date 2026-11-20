@@ -68,7 +68,6 @@ export function AluxWorkspaceChat({
   const [followUps, setFollowUps] = useState<string[]>(initialStarters);
   const threadRef = useRef<HTMLDivElement | null>(null);
 
-
   useEffect(() => {
     threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight });
   }, [turns, busy]);
@@ -95,7 +94,6 @@ export function AluxWorkspaceChat({
       });
       setTurns((t) => [...t, { role: "assistant", content: res.answer }]);
       setFollowUps(res.followUps.length ? res.followUps : initialStarters);
-
     } catch {
       setError("No se pudo abrir la conversación. Inténtalo de nuevo en un momento.");
     } finally {
@@ -117,7 +115,6 @@ export function AluxWorkspaceChat({
             {description ??
               `Pregunta cómo funciona ${workspace?.label ?? "este panel"}: bandejas, etapas, fases del viaje, folios y pagos. También puedes escribir un folio (por ejemplo AVL-260915-001) para consultar esa reservación.`}
           </DialogDescription>
-
         </DialogHeader>
 
         <div
@@ -128,7 +125,8 @@ export function AluxWorkspaceChat({
         >
           {turns.length === 0 ? (
             <p className="text-muted-foreground">
-              Escribe tu pregunta o elige una de abajo. Alux explica y consulta; nunca cambia nada por su cuenta.
+              Escribe tu pregunta o elige una de abajo. Alux explica y consulta; nunca cambia nada
+              por su cuenta.
             </p>
           ) : (
             turns.map((t, i) => (

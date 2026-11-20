@@ -218,7 +218,9 @@ export const createZoneQuick = createServerFn({ method: "POST" })
       throw new Error("La empresa necesita un destino antes de crear zonas.");
     }
     const description =
-      typeof input.description === "string" ? input.description.trim().slice(0, 1000) || null : null;
+      typeof input.description === "string"
+        ? input.description.trim().slice(0, 1000) || null
+        : null;
     return { destinationId: input.destinationId, name, description };
   })
   .handler(async ({ data, context }): Promise<BusinessZoneOption> => {

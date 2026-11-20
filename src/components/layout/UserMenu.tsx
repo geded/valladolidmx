@@ -91,7 +91,11 @@ function buildMenuLinks(role: AppRole | null, mode: ProfileMode): MenuLink[] {
   return links;
 }
 
-export function UserMenu({ placement = "below", mobileLabel = false, onNavigate }: UserMenuProps = {}) {
+export function UserMenu({
+  placement = "below",
+  mobileLabel = false,
+  onNavigate,
+}: UserMenuProps = {}) {
   const { t } = useTranslation();
   const { authUser, role, signOut, loading } = useAuth();
   const [open, setOpen] = useState(false);
@@ -142,7 +146,6 @@ export function UserMenu({ placement = "below", mobileLabel = false, onNavigate 
     );
   }
 
-
   if (authUser) {
     const links = inWorkspace ? buildMenuLinks(role, activeMode) : [];
     const accountTarget = MODE_LANDING[activeMode] ?? "/cuenta";
@@ -158,7 +161,13 @@ export function UserMenu({ placement = "below", mobileLabel = false, onNavigate 
           aria-expanded={open}
         >
           <UserRound className="size-4" aria-hidden />
-          <span className={mobileLabel ? "inline max-w-[14rem] truncate" : "hidden max-w-[140px] truncate lg:inline"}>
+          <span
+            className={
+              mobileLabel
+                ? "inline max-w-[14rem] truncate"
+                : "hidden max-w-[140px] truncate lg:inline"
+            }
+          >
             {mobileLabel ? "Mi cuenta" : (authUser.display_name ?? authUser.email)}
           </span>
           <ChevronDown className="size-3 opacity-60" aria-hidden />
@@ -222,7 +231,6 @@ export function UserMenu({ placement = "below", mobileLabel = false, onNavigate 
               <>
                 <Link
                   to={accountTarget}
-
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     setOpen(false);

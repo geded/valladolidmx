@@ -109,16 +109,24 @@ export function validateBrandSettingsInput(input: Partial<BrandSettings>): Brand
       : {};
   if (
     !ALUX_PALETTE_KEYS.every(
-      (key) => typeof rawAluxPalette[key] === "string" && /^#[0-9a-f]{6}$/i.test(String(rawAluxPalette[key])),
+      (key) =>
+        typeof rawAluxPalette[key] === "string" &&
+        /^#[0-9a-f]{6}$/i.test(String(rawAluxPalette[key])),
     )
-  ) throw new Error("alux_palette_invalid_color");
+  )
+    throw new Error("alux_palette_invalid_color");
   const aluxPalette = Object.fromEntries(
     ALUX_PALETTE_KEYS.map((key) => [key, String(rawAluxPalette[key]).toLowerCase()]),
   ) as unknown as AluxPalette;
   if (aluxPaletteContrastChecks(aluxPalette).some((check) => !check.pass)) {
     throw new Error("alux_palette_contrast_failed");
   }
-  return { ...normalizeBrandSettings(input), palette, aluxPalette, aluxCopy: normalizeAluxCopy(row.aluxCopy) };
+  return {
+    ...normalizeBrandSettings(input),
+    palette,
+    aluxPalette,
+    aluxCopy: normalizeAluxCopy(row.aluxCopy),
+  };
 }
 
 function publicClient() {

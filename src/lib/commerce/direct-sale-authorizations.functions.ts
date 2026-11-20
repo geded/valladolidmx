@@ -14,12 +14,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type DirectSaleRequestStatus =
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "cancelled"
-  | "revoked";
+export type DirectSaleRequestStatus = "pending" | "approved" | "rejected" | "cancelled" | "revoked";
 
 export interface DirectSaleRequestRow {
   id: string;
@@ -121,10 +116,10 @@ export const submitDirectSaleRequest = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data, context }): Promise<{ requestId: string }> => {
-    const { data: id, error } = await context.supabase.rpc(
-      "product_direct_sale_request_submit",
-      { _product_id: data.productId, _note: data.note ?? undefined },
-    );
+    const { data: id, error } = await context.supabase.rpc("product_direct_sale_request_submit", {
+      _product_id: data.productId,
+      _note: data.note ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { requestId: id as unknown as string };
   });

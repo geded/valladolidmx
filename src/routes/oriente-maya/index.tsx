@@ -48,8 +48,13 @@ function buildRegionContext(): RouteContextDeclaration {
 }
 
 export const Route = createFileRoute("/oriente-maya/")({
-  validateSearch: (search: Record<string, unknown>): { destination?: string; presentacion?: string } => ({
-    destination: typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination) ? search.destination : undefined,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { destination?: string; presentacion?: string } => ({
+    destination:
+      typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination)
+        ? search.destination
+        : undefined,
     presentacion: search.presentacion === "cinematografica" ? "cinematografica" : undefined,
   }),
   loader: async () => {
@@ -116,7 +121,8 @@ function OrienteMayaIndex() {
         <Container className="pt-3 text-center">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/oriente-maya/$destino" params={{ destino: returnDestination.slug }}>
-              <ArrowLeft className="size-4" aria-hidden />Volver a {returnDestination.name}
+              <ArrowLeft className="size-4" aria-hidden />
+              Volver a {returnDestination.name}
             </Link>
           </Button>
         </Container>

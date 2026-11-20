@@ -40,7 +40,6 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
     queryFn: () => listFn({ data: { productId } }),
   });
 
-
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: ["cms", "product_media", productId] });
     onChanged?.();

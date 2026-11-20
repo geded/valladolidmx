@@ -427,7 +427,11 @@ export function ExperiencesListingSurface({
         subtitle={dto.hero.subtitle}
         media={
           heroMedia?.mediaUrl
-            ? { url: heroMedia.mediaUrl, alt: heroMedia.mediaAlt ?? dto.hero.title, asset: heroMedia.mediaAsset }
+            ? {
+                url: heroMedia.mediaUrl,
+                alt: heroMedia.mediaAlt ?? dto.hero.title,
+                asset: heroMedia.mediaAsset,
+              }
             : null
         }
         caption={dto.destinationLabel ? `Experiencias en ${dto.destinationLabel}` : undefined}
@@ -487,7 +491,6 @@ export function ExperiencesListingSurface({
                 selectCategory(hit?.value ?? ALL);
               }}
               desktopColumnsClassName="lg:grid-cols-6"
-
             />
           </div>
         </section>
@@ -586,7 +589,12 @@ export function ExperiencesListingSurface({
                 ? "Ninguna experiencia publicada coincide con esa búsqueda."
                 : dto.emptyMessage}
             </p>
-            <Button type="button" variant="outline" className="mt-5 rounded-pill" onClick={clearAll}>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-5 rounded-pill"
+              onClick={clearAll}
+            >
               Ver todas las experiencias
             </Button>
           </div>
@@ -789,13 +797,27 @@ function ExperienceStoreCard({
         <a href={vm.href ?? "/experiencias"} className="block size-full ring-focus">
           {vm.mediaUrl ? (
             <picture className="contents">
-              {resolveMediaSource(vm.mediaAsset, { fallbackUrl: vm.mediaUrl, context: "card", sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-            <img
-              src={resolveMediaSource(vm.mediaAsset, { fallbackUrl: vm.mediaUrl, context: "card" }).src}
-              alt={vm.mediaAlt ?? vm.name}
-              className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
-              loading="lazy"
-            />
+              {resolveMediaSource(vm.mediaAsset, {
+                fallbackUrl: vm.mediaUrl,
+                context: "card",
+                sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
+              }).sources.map((source) => (
+                <source
+                  key={source.type}
+                  type={source.type}
+                  srcSet={source.srcSet}
+                  sizes={source.sizes}
+                />
+              ))}
+              <img
+                src={
+                  resolveMediaSource(vm.mediaAsset, { fallbackUrl: vm.mediaUrl, context: "card" })
+                    .src
+                }
+                alt={vm.mediaAlt ?? vm.name}
+                className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
+                loading="lazy"
+              />
             </picture>
           ) : (
             <span className="grid size-full place-items-center text-xs text-muted-foreground">

@@ -24,9 +24,19 @@ const SIZE_CLASS: Record<NonNullable<BusinessLogoProps["size"]>, string> = {
   lg: "size-16 sm:size-20",
 };
 
-export function BusinessLogo({ url, asset, businessName, size = "sm", className }: BusinessLogoProps) {
+export function BusinessLogo({
+  url,
+  asset,
+  businessName,
+  size = "sm",
+  className,
+}: BusinessLogoProps) {
   if (!url) return null;
-  const resolved = resolveMediaSource(asset, { fallbackUrl: url, context: "logo", sizes: size === "lg" ? "80px" : size === "md" ? "48px" : "32px" });
+  const resolved = resolveMediaSource(asset, {
+    fallbackUrl: url,
+    context: "logo",
+    sizes: size === "lg" ? "80px" : size === "md" ? "48px" : "32px",
+  });
   return (
     <span
       className={cn(
@@ -36,13 +46,20 @@ export function BusinessLogo({ url, asset, businessName, size = "sm", className 
       )}
     >
       <picture className="contents">
-      {resolved.sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-      <img
-        src={resolved.src}
-        alt={`Logotipo de ${businessName}`}
-        loading="lazy"
-        className="size-full object-contain"
-      />
+        {resolved.sources.map((source) => (
+          <source
+            key={source.type}
+            type={source.type}
+            srcSet={source.srcSet}
+            sizes={source.sizes}
+          />
+        ))}
+        <img
+          src={resolved.src}
+          alt={`Logotipo de ${businessName}`}
+          loading="lazy"
+          className="size-full object-contain"
+        />
       </picture>
     </span>
   );

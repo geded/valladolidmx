@@ -21,10 +21,7 @@ import {
   validateMediaRights,
   type MediaRightsInput,
 } from "./media-rights";
-import {
-  getEventBySlug,
-  type PublicEventDetail,
-} from "@/lib/events/public-reads.functions";
+import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
 
 const BUCKET = "studio-media";
 
@@ -103,9 +100,9 @@ export const resolveSafeEventCoverPreview = createServerFn({ method: "POST" })
     if (!event || event.status !== "published") throw new Error("event_not_available");
     if (!media || media.storage_bucket !== BUCKET) throw new Error("media_not_available");
 
-    const metadata = (media.metadata && typeof media.metadata === "object"
-      ? media.metadata
-      : {}) as {
+    const metadata = (
+      media.metadata && typeof media.metadata === "object" ? media.metadata : {}
+    ) as {
       rights?: { nature?: unknown; ai_generated?: unknown; documentary?: unknown };
       lifecycle?: { temporary?: unknown; production_eligible?: unknown; usage?: unknown };
     };

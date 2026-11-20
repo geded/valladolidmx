@@ -180,7 +180,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.rationale ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                             {alux.copy("workspaceRationale")}
+                            {alux.copy("workspaceRationale")}
                           </div>
                           <p className="mt-0.5">{a.rationale}</p>
                         </div>
@@ -188,7 +188,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.effect ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                             {alux.copy("workspaceEffect")}
+                            {alux.copy("workspaceEffect")}
                           </div>
                           <p className="mt-0.5">{a.effect}</p>
                         </div>
@@ -196,7 +196,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.sources && a.sources.length > 0 ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                             {alux.copy("workspaceSources")}
+                            {alux.copy("workspaceSources")}
                           </div>
                           <ul className="mt-1 flex flex-wrap gap-1">
                             {a.sources.map((s) => (
@@ -224,12 +224,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
       </div>
 
       <footer>
-        <Button
-          variant="outline"
-          className="w-full"
-          size="sm"
-          onClick={() => setChatOpen(true)}
-        >
+        <Button variant="outline" className="w-full" size="sm" onClick={() => setChatOpen(true)}>
           {alux.copy("workspaceOpen")}
         </Button>
       </footer>

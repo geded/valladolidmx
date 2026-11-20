@@ -590,7 +590,9 @@ function buildQueryPlan(query: string, place?: string | null): QueryPlan {
   const subject = all.filter(
     (token) => !SEARCH_CONTEXT_WORDS.has(token) && !contextTokens.includes(token),
   );
-  const place_ = [...new Set([...all.filter((t) => SEARCH_CONTEXT_WORDS.has(t)), ...contextTokens])];
+  const place_ = [
+    ...new Set([...all.filter((t) => SEARCH_CONTEXT_WORDS.has(t)), ...contextTokens]),
+  ];
   // Lo que el editor escribió y no es el destino de trabajo: acota la sede.
   const qualifiers = [
     ...new Set(all.filter((t) => SEARCH_CONTEXT_WORDS.has(t) && !contextTokens.includes(t))),
@@ -620,8 +622,6 @@ function buildQueryPlan(query: string, place?: string | null): QueryPlan {
     variants: [...variants].slice(0, 5),
   };
 }
-
-
 
 /** Un token cuenta como presente si aparece igual, como sinónimo o como raíz. */
 function tokenPresent(token: string, available: Set<string>, haystack: string): boolean {
@@ -682,7 +682,6 @@ function photoMatch(photo: PhotoCandidate, plan: QueryPlan): PhotoMatch {
     qualifierMatch: plan.qualifiers.length > 0 && qualifierMatches > 0,
   };
 }
-
 
 /**
  * Fotos del propio lugar o sede publicadas en Google (ficha del negocio o del
@@ -887,7 +886,7 @@ async function rankWithAi(
     [
       "Filtras resultados de búsqueda de imágenes para una guía turística.",
       "Recibes candidatas con su título, autor y página de origen.",
-      "Devuelves SOLO JSON válido: {\"keep\":[índices en orden de utilidad]}.",
+      'Devuelves SOLO JSON válido: {"keep":[índices en orden de utilidad]}.',
       "Conserva únicamente las que razonablemente muestran lo pedido en el lugar indicado.",
       "Descarta lo ajeno al tema aunque mencione el lugar, y lo de otra ciudad o país.",
       "Si la frase nombra una sede concreta (centro histórico, convento, parque, plaza),",
@@ -913,7 +912,6 @@ async function rankWithAi(
   return kept.length ? kept : null;
 }
 
-
 export const aluxFindPhotos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { query: string; website?: string | null; place?: string | null }) => {
@@ -930,7 +928,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // Presupuesto de tiempo por etapa: ninguna fuente externa puede agotar el
     // tiempo de la petición. Si una tarda de más, se descarta esa fuente y la
     // búsqueda continúa con las demás (comportamiento fail-soft, no error).
-    const withBudget = async <T,>(task: Promise<T>, ms: number, fallback: T): Promise<T> => {
+    const withBudget = async <T>(task: Promise<T>, ms: number, fallback: T): Promise<T> => {
       let timer: ReturnType<typeof setTimeout> | undefined;
       const timeout = new Promise<T>((resolve) => {
         timer = setTimeout(() => resolve(fallback), ms);
@@ -952,9 +950,7 @@ export const aluxFindPhotos = createServerFn({ method: "POST" })
     // queda únicamente como respaldo cuando la IA no responde.
     const plan = buildQueryPlan(data.query, data.place);
     const ai = await withBudget(planWithAi(data.query, data.place), 9000, null);
-    const variants = (
-      ai?.queries.length ? ai.queries : plan.variants
-    ).slice(0, 5);
+    const variants = (ai?.queries.length ? ai.queries : plan.variants).slice(0, 5);
     const placeQuery = variants[0] ?? [data.query, data.place].filter(Boolean).join(" ");
 
     const [webBatches, google, commons, openverse] = await Promise.all([
@@ -1071,17 +1067,22 @@ export const aluxFetchPhotoBytes = createServerFn({ method: "POST" })
       const buffer = new Uint8Array(await res.arrayBuffer());
       if (buffer.byteLength > MAX_PHOTO_BYTES) return { error: "photo_too_large" as const };
       const header = res.headers.get("content-type") ?? "";
-      const mime = sniff(buffer) ?? (header.startsWith("image/") && !header.includes("svg") ? header : null);
+      const mime =
+        sniff(buffer) ?? (header.startsWith("image/") && !header.includes("svg") ? header : null);
       if (!mime) return { error: "photo_not_an_image" as const };
       return { mime, buffer };
     };
     let referer: string | null = null;
     try {
-      referer = data.refererUrl ? new URL(data.refererUrl).origin + "/" : new URL(data.url).origin + "/";
+      referer = data.refererUrl
+        ? new URL(data.refererUrl).origin + "/"
+        : new URL(data.url).origin + "/";
     } catch {
       referer = null;
     }
-    let result = await tryFetch(data.url, referer).catch(() => ({ error: "photo_download_failed" as const }));
+    let result = await tryFetch(data.url, referer).catch(() => ({
+      error: "photo_download_failed" as const,
+    }));
     if ("error" in result) {
       // Sin referencia (algunos CDN la rechazan) y, si no, la copia del buscador.
       const retry = await tryFetch(data.url, null).catch(() => null);

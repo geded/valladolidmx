@@ -52,14 +52,16 @@ export const listConciergeCaseMessages = createServerFn({ method: "GET" })
       directory.set(row.user_id, row.display_name);
     }
 
-    return ((rows ?? []) as Array<{
-      id: string;
-      case_id: string;
-      author_user_id: string | null;
-      body: string;
-      visibility: string;
-      created_at: string;
-    }>).map<CaseMessage>((r) => ({
+    return (
+      (rows ?? []) as Array<{
+        id: string;
+        case_id: string;
+        author_user_id: string | null;
+        body: string;
+        visibility: string;
+        created_at: string;
+      }>
+    ).map<CaseMessage>((r) => ({
       id: r.id,
       case_id: r.case_id,
       author_user_id: r.author_user_id,

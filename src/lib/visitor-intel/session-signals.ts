@@ -71,7 +71,9 @@ export function readSession(now = Date.now()): VisitorSessionState {
         return {
           sessionId: parsed.sessionId,
           startedAt: typeof parsed.startedAt === "number" ? parsed.startedAt : now,
-          routes: Array.isArray(parsed.routes) ? parsed.routes.filter((r) => typeof r === "string") : [],
+          routes: Array.isArray(parsed.routes)
+            ? parsed.routes.filter((r) => typeof r === "string")
+            : [],
           startEmitted: parsed.startEmitted === true,
           depthEmitted: parsed.depthEmitted === true,
           intentEmitted: parsed.intentEmitted === true,

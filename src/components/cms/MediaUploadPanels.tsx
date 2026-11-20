@@ -52,7 +52,10 @@ export function SinglePanel(props: {
     }
   };
   // Toda foto nueva pasa primero por el encuadre manual.
-  const handleFile = (f: File, source?: AluxPickedPhoto) => { sourceRef.current = source; setFraming(f); };
+  const handleFile = (f: File, source?: AluxPickedPhoto) => {
+    sourceRef.current = source;
+    setFraming(f);
+  };
 
   const adjustCurrent = async () => {
     const url = props.media?.previewUrl;
@@ -61,12 +64,13 @@ export function SinglePanel(props: {
     try {
       const res = await fetch(url);
       const blob = await res.blob();
-      setFraming(new File([blob], `${props.role}.${blob.type.split("/")[1] ?? "jpg"}`, { type: blob.type }));
+      setFraming(
+        new File([blob], `${props.role}.${blob.type.split("/")[1] ?? "jpg"}`, { type: blob.type }),
+      );
     } catch {
       toast.error("No se pudo abrir la imagen actual para ajustarla.");
     }
   };
-
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
@@ -158,8 +162,17 @@ export function SinglePanel(props: {
         onSkip={(f) => void afterFraming(f)}
         onCancel={() => setFraming(null)}
       />
-      {rightsFile && <MediaUploadRightsDialog files={[rightsFile]} source={sourceRef.current}
-        onCancel={() => setRightsFile(null)} onConfirm={(rights) => { props.onUpload(rightsFile, rights); setRightsFile(null); }} />}
+      {rightsFile && (
+        <MediaUploadRightsDialog
+          files={[rightsFile]}
+          source={sourceRef.current}
+          onCancel={() => setRightsFile(null)}
+          onConfirm={(rights) => {
+            props.onUpload(rightsFile, rights);
+            setRightsFile(null);
+          }}
+        />
+      )}
     </section>
   );
 }
@@ -189,8 +202,7 @@ export function GalleryPanel(props: {
     if (props.requireRights) {
       setRightsSources([...doneSourcesRef.current]);
       setRightsFiles(files);
-    }
-    else props.onUpload(files);
+    } else props.onUpload(files);
   };
   // Tras encuadrar, si la foto queda chica para galería se pregunta una por una.
   const alux = useAluxUpscale("gallery");
@@ -390,15 +402,28 @@ export function GalleryPanel(props: {
         onCancel={cancelQueue}
         onSkipAll={total > 1 ? skipAll : undefined}
       />
-      {rightsFiles.length > 0 && <MediaUploadRightsDialog key={rightsFiles[0]?.name}
-        files={rightsSources.some(Boolean) ? rightsFiles.slice(0, 1) : rightsFiles} source={rightsSources[0]}
-        onCancel={() => { setRightsFiles([]); setRightsSources([]); }} onConfirm={(rights) => {
-          // Search results can have different authors/licenses: never share the first credit across the batch.
-          if (rightsSources.some(Boolean)) {
-            props.onUpload(rightsFiles.slice(0, 1), rights);
-            setRightsFiles((files) => files.slice(1)); setRightsSources((sources) => sources.slice(1));
-          } else { props.onUpload(rightsFiles, rights); setRightsFiles([]); }
-        }} />}
+      {rightsFiles.length > 0 && (
+        <MediaUploadRightsDialog
+          key={rightsFiles[0]?.name}
+          files={rightsSources.some(Boolean) ? rightsFiles.slice(0, 1) : rightsFiles}
+          source={rightsSources[0]}
+          onCancel={() => {
+            setRightsFiles([]);
+            setRightsSources([]);
+          }}
+          onConfirm={(rights) => {
+            // Search results can have different authors/licenses: never share the first credit across the batch.
+            if (rightsSources.some(Boolean)) {
+              props.onUpload(rightsFiles.slice(0, 1), rights);
+              setRightsFiles((files) => files.slice(1));
+              setRightsSources((sources) => sources.slice(1));
+            } else {
+              props.onUpload(rightsFiles, rights);
+              setRightsFiles([]);
+            }
+          }}
+        />
+      )}
     </section>
   );
 }

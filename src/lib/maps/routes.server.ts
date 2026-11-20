@@ -246,8 +246,7 @@ async function computeRoadRouteSingle(
       headers: {
         ...gatewayHeaders(),
         "Content-Type": "application/json",
-        "X-Goog-FieldMask":
-          "routes.polyline.encodedPolyline,routes.distanceMeters,routes.duration",
+        "X-Goog-FieldMask": "routes.polyline.encodedPolyline,routes.distanceMeters,routes.duration",
       },
       body: JSON.stringify({
         origin: { location: { latLng: { latitude: origin.lat, longitude: origin.lng } } },

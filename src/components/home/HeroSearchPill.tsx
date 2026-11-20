@@ -217,10 +217,7 @@ export function HeroSearchPill({
             >
               <Compass className="size-4 shrink-0 text-primary" aria-hidden />
               <span
-                className={cn(
-                  "hidden min-w-0 flex-col leading-tight sm:flex",
-                  hasExtras && "flex",
-                )}
+                className={cn("hidden min-w-0 flex-col leading-tight sm:flex", hasExtras && "flex")}
               >
                 <span className="text-[9px] font-semibold uppercase tracking-[0.13em] text-muted-foreground sm:text-[10px] sm:tracking-[0.14em]">
                   {categoriaLabel}
@@ -256,8 +253,6 @@ export function HeroSearchPill({
 
         {/* Segmentos adicionales de la superficie consumidora (misma píldora) */}
         {extraSegments}
-
-
 
         {/* Botón lupa */}
         <button

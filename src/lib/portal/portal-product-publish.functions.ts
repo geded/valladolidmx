@@ -336,17 +336,15 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
           label: contactRows[0].label,
         }
       : null;
-    const locationRows = (
-      (locations ?? []) as Array<{
-        id?: string;
-        is_primary?: boolean;
-        label: string | null;
-        address_line1: string | null;
-        address_line2: string | null;
-        latitude: number | string | null;
-        longitude: number | string | null;
-      }>
-    );
+    const locationRows = (locations ?? []) as Array<{
+      id?: string;
+      is_primary?: boolean;
+      label: string | null;
+      address_line1: string | null;
+      address_line2: string | null;
+      latitude: number | string | null;
+      longitude: number | string | null;
+    }>;
     const locRow =
       locationRows.find((row) => row.id === prod.location_id) ??
       locationRows.find((row) => row.is_primary) ??

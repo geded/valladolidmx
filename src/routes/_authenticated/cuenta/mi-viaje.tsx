@@ -877,10 +877,7 @@ function AluxWorkspaceHeader({
   const start = p.start_date ?? null;
   const party = p.party_size ?? null;
   const contextBits: string[] = [];
-  if (start)
-    contextBits.push(
-      `Llegada ${meridaDayMonth(start)}`,
-    );
+  if (start) contextBits.push(`Llegada ${meridaDayMonth(start)}`);
   if (party) contextBits.push(`${party} ${party === 1 ? "viajero" : "viajeros"}`);
   contextBits.push(`${itemCount} ${itemCount === 1 ? "parada" : "paradas"} en el plan`);
 
@@ -1054,7 +1051,8 @@ function ItinerarioTimeline({
   });
 
   const suggestSchedule = useMutation({
-    mutationFn: (dayIndex: number | null) => suggestFn({ data: { planId: data.plan.id, dayIndex } }),
+    mutationFn: (dayIndex: number | null) =>
+      suggestFn({ data: { planId: data.plan.id, dayIndex } }),
     onSuccess: (res) => {
       onChanged();
       if (res.updated === 0) {
@@ -1370,8 +1368,6 @@ function ItemScheduleRow({
     </div>
   );
 }
-
-
 
 function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
   const fetchGeo = useServerFn(getPlanItemsGeo);
@@ -1889,8 +1885,7 @@ function ShareExportSection({
             </div>
             {plan.shared_at ? (
               <p className="mt-2 text-[11px] text-muted-foreground">
-                Activado el{" "}
-                {meridaLongDate(plan.shared_at)}
+                Activado el {meridaLongDate(plan.shared_at)}
               </p>
             ) : null}
           </div>
@@ -2281,7 +2276,6 @@ function ConciergeSection({
   cases: CaseSummary[];
   onChanged: () => void;
 }) {
-
   return (
     <section className="rounded-lg border bg-card p-5">
       <h2 className="text-lg font-medium">Enviar al Concierge</h2>

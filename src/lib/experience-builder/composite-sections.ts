@@ -433,7 +433,10 @@ export function orderedCompositeSections(
   );
   const unique = Array.from(new Set(valid));
   if (unique.length === 0) return sections;
-  const resolved = [...unique, ...sections.filter((s) => !unique.includes(s.key)).map((s) => s.key)];
+  const resolved = [
+    ...unique,
+    ...sections.filter((s) => !unique.includes(s.key)).map((s) => s.key),
+  ];
   return resolved
     .map((key) => sections.find((s) => s.key === key))
     .filter((section): section is CompositeSectionDef => Boolean(section));

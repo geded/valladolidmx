@@ -39,7 +39,6 @@ export function ZoneMediaPanels({ zoneId, onChanged }: Props) {
     queryFn: () => listFn({ data: { zoneId } }),
   });
 
-
   const invalidate = () => {
     void qc.invalidateQueries({
       queryKey: ["cms", "destination_zone_media", zoneId],

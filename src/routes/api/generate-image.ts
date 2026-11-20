@@ -12,7 +12,12 @@ export const Route = createFileRoute("/api/generate-image")({
           return new Response("Prompt required", { status: 400 });
         }
         try {
-          const upstream = await generateImage({ ...imageSettings, apiKey }, prompt, stream, request.signal);
+          const upstream = await generateImage(
+            { ...imageSettings, apiKey },
+            prompt,
+            stream,
+            request.signal,
+          );
           return new Response(upstream.body, {
             status: upstream.status,
             headers: {

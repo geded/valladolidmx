@@ -37,7 +37,8 @@ export async function sendManagedPayload(
         recipient_email: p.to,
         status,
       });
-      if (error) console.error("email_send_log insert failed", { code: error.code, message: error.message });
+      if (error)
+        console.error("email_send_log insert failed", { code: error.code, message: error.message });
     } catch (err) {
       console.error("email_send_log insert failed", err instanceof Error ? err.message : err);
     }

@@ -162,8 +162,7 @@ export const listCmsTerritoryOptions = createServerFn({ method: "POST" })
         .order("display_name", { ascending: true })
         .limit(2000),
     ]);
-    const err =
-      destinations.error ?? zones.error ?? categories.error ?? businesses.error ?? null;
+    const err = destinations.error ?? zones.error ?? categories.error ?? businesses.error ?? null;
     if (err) throw err;
     return {
       destinations: destinations.data ?? [],
@@ -293,7 +292,6 @@ interface ListMediaInput extends ListInput {
   state?: MediaStateFilter;
 }
 
-
 export const listMediaCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ListMediaInput | undefined) => d ?? {})
@@ -301,9 +299,9 @@ export const listMediaCms = createServerFn({ method: "POST" })
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
     const scope: MediaScopeFilter = data?.scope === "mine" ? "mine" : "all";
-    const usage: MediaUsageFilter = (
-      ["cover", "gallery", "logo", "other"] as const
-    ).includes(data?.usage as never)
+    const usage: MediaUsageFilter = (["cover", "gallery", "logo", "other"] as const).includes(
+      data?.usage as never,
+    )
       ? (data!.usage as MediaUsageFilter)
       : "all";
     const state: MediaStateFilter = (["draft", "in_review", "published"] as const).includes(
@@ -311,7 +309,6 @@ export const listMediaCms = createServerFn({ method: "POST" })
     )
       ? (data!.state as MediaStateFilter)
       : "all";
-
 
     let businessIds: string[] = [];
     let productIds: string[] = [];
@@ -353,9 +350,7 @@ export const listMediaCms = createServerFn({ method: "POST" })
     }
 
     if (usage === "other") {
-      q = q.or(
-        `usage_context.is.null,usage_context.not.in.(${MEDIA_KNOWN_CONTEXTS.join(",")})`,
-      );
+      q = q.or(`usage_context.is.null,usage_context.not.in.(${MEDIA_KNOWN_CONTEXTS.join(",")})`);
     } else if (usage !== "all") {
       const list =
         usage === "cover"
@@ -367,8 +362,6 @@ export const listMediaCms = createServerFn({ method: "POST" })
     }
 
     if (state !== "all") q = q.eq("status", state);
-
-
 
     const { data: rows, count, error } = await q;
     if (error) throw error;
@@ -430,8 +423,6 @@ export const listMediaCms = createServerFn({ method: "POST" })
       usage,
     };
   });
-
-
 
 /* ─────────────────────────────  Reseñas  ──────────────────────────────── */
 

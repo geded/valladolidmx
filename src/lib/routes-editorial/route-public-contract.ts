@@ -70,7 +70,11 @@ export interface EditorialRouteDetailDTO extends EditorialRouteCardDTO {
     distanceMeters: number | null;
     durationSeconds: number | null;
   } | null;
-  gallery: Array<{ url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>;
+  gallery: Array<{
+    url: string;
+    alt: string | null;
+    asset?: import("@/lib/media/resolve-source").MediaAssetInput;
+  }>;
 }
 
 export function routePublicPath(slug: string): string {

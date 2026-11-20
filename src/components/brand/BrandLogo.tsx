@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 // dentro del propio hook; aquí no se referencia directamente.
 import { useBrandLogo } from "@/lib/brand/brand-context";
 
-
 interface Props {
   tone?: "dark" | "light";
   showWordmark?: boolean;
@@ -44,7 +43,6 @@ export function BrandLogo({
       alt={logo.alt}
       width={logo.width}
       height={logo.height}
-
       className={cn(
         "w-auto select-none",
         SIZE_MAP[size],

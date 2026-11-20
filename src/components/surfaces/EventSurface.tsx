@@ -132,13 +132,29 @@ export function EventSurface({
           {!activeContract ? (
             event.cover_url ? (
               <picture className="contents">
-              {resolveMediaSource(event.cover_asset, { fallbackUrl: event.cover_url, context: "hero", sizes: "(min-width: 1024px) 66vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-              <img
-                src={resolveMediaSource(event.cover_asset, { fallbackUrl: event.cover_url, context: "hero" }).src}
-                alt={event.title}
-                className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
-                loading="eager"
-              />
+                {resolveMediaSource(event.cover_asset, {
+                  fallbackUrl: event.cover_url,
+                  context: "hero",
+                  sizes: "(min-width: 1024px) 66vw, 100vw",
+                }).sources.map((source) => (
+                  <source
+                    key={source.type}
+                    type={source.type}
+                    srcSet={source.srcSet}
+                    sizes={source.sizes}
+                  />
+                ))}
+                <img
+                  src={
+                    resolveMediaSource(event.cover_asset, {
+                      fallbackUrl: event.cover_url,
+                      context: "hero",
+                    }).src
+                  }
+                  alt={event.title}
+                  className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
+                  loading="eager"
+                />
               </picture>
             ) : (
               <div className="aspect-video w-full rounded-2xl border border-dashed border-border bg-muted/30" />

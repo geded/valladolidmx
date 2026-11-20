@@ -63,10 +63,7 @@ function CategoriaRegionalPage() {
 
   return (
     <PublicShell
-      crumbs={[
-        { label: "Oriente Maya", to: "/oriente-maya" },
-        { label },
-      ]}
+      crumbs={[{ label: "Oriente Maya", to: "/oriente-maya" }, { label }]}
       compactCrumbsOnMobile
     >
       <ListingPremiumSurfaceFromDTO

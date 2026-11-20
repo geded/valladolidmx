@@ -144,14 +144,28 @@ export const saveScheduleTemplate = createServerFn({ method: "POST" })
         label: z.string().max(120).optional(),
         weekdays: z.array(z.number().int().min(0).max(6)).min(1),
         startTimes: z.array(z.string().regex(/^\d{2}:\d{2}$/)).min(1),
-        durationMinutes: z.number().int().min(15).max(24 * 60),
+        durationMinutes: z
+          .number()
+          .int()
+          .min(15)
+          .max(24 * 60),
         capacityTotal: z.number().int().min(1).max(5000),
         capacityReservable: z.number().int().min(0).max(5000).nullable().optional(),
         minParticipants: z.number().int().min(1).max(500).default(1),
         maxParticipants: z.number().int().min(1).max(5000).nullable().optional(),
-        minLeadHours: z.number().int().min(0).max(24 * 60).default(24),
+        minLeadHours: z
+          .number()
+          .int()
+          .min(0)
+          .max(24 * 60)
+          .default(24),
         saleHorizonDays: z.number().int().min(1).max(365).default(120),
-        cutoffMinutes: z.number().int().min(0).max(24 * 60).default(0),
+        cutoffMinutes: z
+          .number()
+          .int()
+          .min(0)
+          .max(24 * 60)
+          .default(0),
         validFrom: z.string(),
         validUntil: z.string().nullable().optional(),
         active: z.boolean().default(true),
@@ -162,10 +176,7 @@ export const saveScheduleTemplate = createServerFn({ method: "POST" })
     await assertStaff(context);
     const c = client(context);
 
-    if (
-      data.capacityReservable != null &&
-      data.capacityReservable > data.capacityTotal
-    ) {
+    if (data.capacityReservable != null && data.capacityReservable > data.capacityTotal) {
       throw new Error("capacity_reservable_exceeds_total");
     }
 
@@ -189,7 +200,12 @@ export const saveScheduleTemplate = createServerFn({ method: "POST" })
     };
 
     const query = data.id
-      ? c.from("commerce_schedule_templates").update(payload).eq("id", data.id).select("id").single()
+      ? c
+          .from("commerce_schedule_templates")
+          .update(payload)
+          .eq("id", data.id)
+          .select("id")
+          .single()
       : c.from("commerce_schedule_templates").insert(payload).select("id").single();
 
     const { data: row, error } = await query;
@@ -243,7 +259,10 @@ export const adjustDepartureCapacity = createServerFn({ method: "POST" })
     z
       .object({
         departureId: z.string().uuid(),
-        delta: z.number().int().refine((v) => v !== 0, "delta_required"),
+        delta: z
+          .number()
+          .int()
+          .refine((v) => v !== 0, "delta_required"),
         reason: z.string().trim().min(3).max(500),
       })
       .parse(input),
@@ -275,15 +294,13 @@ export const saveBlackout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertStaff(context);
     if (new Date(data.endsAt) <= new Date(data.startsAt)) throw new Error("invalid_range");
-    const { error } = await client(context)
-      .from("commerce_blackouts")
-      .insert({
-        product_id: data.productId,
-        starts_at: data.startsAt,
-        ends_at: data.endsAt,
-        reason: data.reason,
-        created_by: context.userId,
-      });
+    const { error } = await client(context).from("commerce_blackouts").insert({
+      product_id: data.productId,
+      starts_at: data.startsAt,
+      ends_at: data.endsAt,
+      reason: data.reason,
+      created_by: context.userId,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

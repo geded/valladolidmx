@@ -5,7 +5,10 @@ import {
   getBusinessAttributeEditor,
   updateBusinessAttributes,
 } from "@/lib/portal/business-attributes.functions";
-import type { TourismAttributeDefinition, TourismFilterAttributes } from "@/lib/business-attributes/types";
+import type {
+  TourismAttributeDefinition,
+  TourismFilterAttributes,
+} from "@/lib/business-attributes/types";
 import { QuickCreateAttributeOptionDialog } from "@/components/cms/QuickCreateAttributeOptionDialog";
 
 export function BusinessAttributesPanel({ businessId }: { businessId: string }) {
@@ -87,123 +90,125 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
 
       <div className="mt-6 grid gap-5 md:grid-cols-2">
         {/* La zona se captura una sola vez, junto al Destino (zonas reales del destino). */}
-        {query.data.definitions.filter((d) => d.key !== "zone").map((definition) => {
-          const selected = values[definition.key];
-          if (definition.inputType === "single") {
-            return (
-              <label key={definition.key} className="block">
-                <span className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold">
-                    {definition.label}
-                    {definition.required ? " *" : ""}
+        {query.data.definitions
+          .filter((d) => d.key !== "zone")
+          .map((definition) => {
+            const selected = values[definition.key];
+            if (definition.inputType === "single") {
+              return (
+                <label key={definition.key} className="block">
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold">
+                      {definition.label}
+                      {definition.required ? " *" : ""}
+                    </span>
+                    {definition.id ? (
+                      <button
+                        type="button"
+                        onClick={() => setQuickCreateFor(definition)}
+                        className="text-xs font-semibold text-primary hover:underline"
+                      >
+                        + Agregar
+                      </button>
+                    ) : null}
                   </span>
+                  {definition.helpText ? (
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {definition.helpText}
+                    </span>
+                  ) : null}
+                  {definition.options.length > 6 ? (
+                    <input
+                      type="search"
+                      value={optionSearch[definition.key] ?? ""}
+                      onChange={(event) =>
+                        setOptionSearch((current) => ({
+                          ...current,
+                          [definition.key]: event.target.value,
+                        }))
+                      }
+                      placeholder={`Buscar en ${definition.label.toLowerCase()}…`}
+                      className="mt-2 min-h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                    />
+                  ) : null}
+                  <select
+                    value={typeof selected === "string" ? selected : ""}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setValues((current) => {
+                        const next = { ...current };
+                        if (value) next[definition.key] = value;
+                        else delete next[definition.key];
+                        return next;
+                      });
+                      setDirty(true);
+                    }}
+                    className="mt-2 min-h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  >
+                    <option value="">Sin especificar</option>
+                    {definition.options
+                      .filter((option) => {
+                        const term = (optionSearch[definition.key] ?? "").trim().toLowerCase();
+                        if (!term) return true;
+                        return option.label.toLowerCase().includes(term);
+                      })
+                      .map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              );
+            }
+            const chosen = Array.isArray(selected) ? selected : [];
+            return (
+              <fieldset key={definition.key} className="rounded-lg border border-border p-4">
+                <legend className="px-1 text-sm font-semibold">
+                  {definition.label}
                   {definition.id ? (
                     <button
                       type="button"
                       onClick={() => setQuickCreateFor(definition)}
-                      className="text-xs font-semibold text-primary hover:underline"
+                      className="ml-2 text-xs font-semibold text-primary hover:underline"
                     >
                       + Agregar
                     </button>
                   ) : null}
-                </span>
+                </legend>
                 {definition.helpText ? (
-                  <span className="mt-1 block text-xs text-muted-foreground">
-                    {definition.helpText}
-                  </span>
+                  <p className="mb-3 text-xs text-muted-foreground">{definition.helpText}</p>
                 ) : null}
-                {definition.options.length > 6 ? (
-                  <input
-                    type="search"
-                    value={optionSearch[definition.key] ?? ""}
-                    onChange={(event) =>
-                      setOptionSearch((current) => ({
-                        ...current,
-                        [definition.key]: event.target.value,
-                      }))
-                    }
-                    placeholder={`Buscar en ${definition.label.toLowerCase()}…`}
-                    className="mt-2 min-h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"
-                  />
-                ) : null}
-                <select
-                  value={typeof selected === "string" ? selected : ""}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setValues((current) => {
-                      const next = { ...current };
-                      if (value) next[definition.key] = value;
-                      else delete next[definition.key];
-                      return next;
-                    });
-                    setDirty(true);
-                  }}
-                  className="mt-2 min-h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
-                >
-                  <option value="">Sin especificar</option>
-                  {definition.options
-                    .filter((option) => {
-                      const term = (optionSearch[definition.key] ?? "").trim().toLowerCase();
-                      if (!term) return true;
-                      return option.label.toLowerCase().includes(term);
-                    })
-                    .map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                </select>
-              </label>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {definition.options.map((option) => (
+                    <label key={option.value} className="flex min-h-10 items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={chosen.includes(option.value)}
+                        onChange={(event) => {
+                          setValues((current) => {
+                            const previous = Array.isArray(current[definition.key])
+                              ? (current[definition.key] as string[])
+                              : [];
+                            const nextValues = event.target.checked
+                              ? [...previous, option.value]
+                              : previous.filter((value) => value !== option.value);
+                            const next = { ...current };
+                            if (nextValues.length) next[definition.key] = nextValues;
+                            else delete next[definition.key];
+                            return next;
+                          });
+                          setDirty(true);
+                        }}
+                        className="size-4 rounded border-border"
+                      />
+                      {option.label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
             );
-          }
-          const chosen = Array.isArray(selected) ? selected : [];
-          return (
-            <fieldset key={definition.key} className="rounded-lg border border-border p-4">
-              <legend className="px-1 text-sm font-semibold">
-                {definition.label}
-                {definition.id ? (
-                  <button
-                    type="button"
-                    onClick={() => setQuickCreateFor(definition)}
-                    className="ml-2 text-xs font-semibold text-primary hover:underline"
-                  >
-                    + Agregar
-                  </button>
-                ) : null}
-              </legend>
-              {definition.helpText ? (
-                <p className="mb-3 text-xs text-muted-foreground">{definition.helpText}</p>
-              ) : null}
-              <div className="grid gap-2 sm:grid-cols-2">
-                {definition.options.map((option) => (
-                  <label key={option.value} className="flex min-h-10 items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={chosen.includes(option.value)}
-                      onChange={(event) => {
-                        setValues((current) => {
-                          const previous = Array.isArray(current[definition.key])
-                            ? (current[definition.key] as string[])
-                            : [];
-                          const nextValues = event.target.checked
-                            ? [...previous, option.value]
-                            : previous.filter((value) => value !== option.value);
-                          const next = { ...current };
-                          if (nextValues.length) next[definition.key] = nextValues;
-                          else delete next[definition.key];
-                          return next;
-                        });
-                        setDirty(true);
-                      }}
-                      className="size-4 rounded border-border"
-                    />
-                    {option.label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          );
-        })}
+          })}
       </div>
 
       {mutation.isError ? (

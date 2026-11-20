@@ -217,7 +217,9 @@ export function EventPremiumSurface({
           eyebrow: eventType ? humanizeAttributeValue(eventType) : "Evento",
           title: event.title,
           description: event.summary ?? undefined,
-          media: event.cover_url ? { url: event.cover_url, alt: event.title, asset: event.cover_asset } : null,
+          media: event.cover_url
+            ? { url: event.cover_url, alt: event.title, asset: event.cover_asset }
+            : null,
           badges: event.destination_name
             ? [
                 {

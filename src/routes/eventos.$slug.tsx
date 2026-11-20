@@ -9,7 +9,11 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { getEventBySlug, getEventRelated, type PublicEventDetail } from "@/lib/events/public-reads.functions";
+import {
+  getEventBySlug,
+  getEventRelated,
+  type PublicEventDetail,
+} from "@/lib/events/public-reads.functions";
 import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import {
@@ -169,7 +173,9 @@ export const Route = createFileRoute("/eventos/$slug")({
       title="Evento no disponible"
       crumbs={[{ label: "Eventos", to: "/eventos" }, { label: "—" }]}
     >
-      <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
+      <p className="text-sm text-muted-foreground">
+        {error instanceof Error ? error.message : String(error)}
+      </p>
     </PublicShell>
   ),
 });

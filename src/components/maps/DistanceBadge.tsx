@@ -90,14 +90,21 @@ export function DistanceBadge({
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4" aria-hidden />
-        <span>{status === "imprecise" ? "No pudimos ubicarte con precisión" : "¿Qué tan lejos estás?"}</span>
-        <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"} title={hint}>
+        <span>
+          {status === "imprecise" ? "No pudimos ubicarte con precisión" : "¿Qué tan lejos estás?"}
+        </span>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={request}
+          disabled={status === "prompting"}
+          title={hint}
+        >
           {label}
         </Button>
       </div>
     );
   }
-
 
   if (isLoading) {
     return (

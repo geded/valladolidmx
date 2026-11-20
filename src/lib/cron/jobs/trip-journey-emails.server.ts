@@ -62,11 +62,8 @@ function formatStartDate(iso: string | null, locale: string | null): string | un
   if (!iso) return undefined;
   try {
     return (
-      formatInMerida(
-        iso,
-        { day: "numeric", month: "long", year: "numeric" },
-        locale || "es-MX",
-      ) || undefined
+      formatInMerida(iso, { day: "numeric", month: "long", year: "numeric" }, locale || "es-MX") ||
+      undefined
     );
   } catch {
     return undefined;
@@ -202,7 +199,6 @@ export async function runTripJourneyEmails(
 
         const messageId = crypto.randomUUID();
         const idempotencyKey = `trip-${step.kind}-${row.order_id}`;
-
 
         const { error: enqueueError } = await sendManagedPayload(supabase, {
           queue_name: "transactional_emails",

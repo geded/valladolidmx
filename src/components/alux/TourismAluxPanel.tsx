@@ -55,7 +55,10 @@ export function TourismAluxPanel({
   /* Lote 3G · sin pistas duplicadas: las sugerencias de la plantilla no
      pueden repetir las dos pistas base (clave React duplicada). */
   const chips = useMemo(
-    () => Array.from(new Set<string>([alux.copy("planningPrompt"), alux.copy("onsitePrompt"), ...prompts])),
+    () =>
+      Array.from(
+        new Set<string>([alux.copy("planningPrompt"), alux.copy("onsitePrompt"), ...prompts]),
+      ),
     [alux, prompts],
   );
   const ask = (preference?: string) =>
@@ -97,7 +100,9 @@ export function TourismAluxPanel({
             <h2 className="truncate font-display text-sm leading-tight text-alux-accent">
               {brand.conciergeName}
             </h2>
-            <p className="text-[10.5px] leading-tight text-muted-foreground">{alux.copy("shortDescriptor")}</p>
+            <p className="text-[10.5px] leading-tight text-muted-foreground">
+              {alux.copy("shortDescriptor")}
+            </p>
           </div>
         </div>
 

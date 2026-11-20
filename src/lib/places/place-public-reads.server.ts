@@ -89,7 +89,14 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
         .createSignedUrl(asset.storage_path, 60 * 60);
       url = signed?.signedUrl ?? null;
     }
-    if (url) bases.push({ id: asset.id, file_url: url, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
+    if (url)
+      bases.push({
+        id: asset.id,
+        file_url: url,
+        width: asset.width ?? null,
+        height: asset.height ?? null,
+        pipeline_status: asset.pipeline_status ?? null,
+      });
     const meta = (asset.metadata ?? {}) as Record<string, unknown>;
     const focal = (meta.focal ?? null) as { x: number; y: number } | null;
     out.push({
@@ -108,11 +115,11 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
   const vb = await import("@/lib/media/variant-bundles.server");
   if (await vb.shouldServePublicVariants()) {
     const bundles = await vb.attachReadyVariants(bases);
-    for (const item of out) if (item.mediaAssetId && bundles[item.mediaAssetId]) item.asset = bundles[item.mediaAssetId];
+    for (const item of out)
+      if (item.mediaAssetId && bundles[item.mediaAssetId]) item.asset = bundles[item.mediaAssetId];
   }
   return out;
 }
-
 
 /* ------------------------------------------------------------------ *
  * "Qué hay cerca" — empresas publicadas del mismo destino cuya ubicación
@@ -123,19 +130,13 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
 const NEARBY_RADIUS_KM = 1.2;
 const NEARBY_LIMIT = 8;
 
-function haversineKm(
-  aLat: number,
-  aLng: number,
-  bLat: number,
-  bLng: number,
-): number {
+function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
   const R = 6371;
   const dLat = ((bLat - aLat) * Math.PI) / 180;
   const dLng = ((bLng - aLng) * Math.PI) / 180;
   const lat1 = (aLat * Math.PI) / 180;
   const lat2 = (bLat * Math.PI) / 180;
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  const h = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
@@ -727,7 +728,9 @@ export async function readPublishedPlaceCards(
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: assets } = await supabaseAdmin
       .from("media_assets")
-      .select("id, storage_bucket, storage_path, width, height, pipeline_status, review_state, metadata")
+      .select(
+        "id, storage_bucket, storage_path, width, height, pipeline_status, review_state, metadata",
+      )
       .in("id", assetIds);
     for (const a of (assets ?? []) as any[]) assetById.set(a.id, a);
   }
@@ -761,7 +764,13 @@ export async function readPublishedPlaceCards(
         url = signed?.signedUrl ?? null;
         if (url) {
           coverIdByPlace.set(placeId, asset.id);
-          coverBases.push({ id: asset.id, file_url: url, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
+          coverBases.push({
+            id: asset.id,
+            file_url: url,
+            width: asset.width ?? null,
+            height: asset.height ?? null,
+            pipeline_status: asset.pipeline_status ?? null,
+          });
           break;
         }
       }
@@ -770,7 +779,9 @@ export async function readPublishedPlaceCards(
   }
 
   const vb = await import("@/lib/media/variant-bundles.server");
-  const coverBundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(coverBases) : {};
+  const coverBundles = (await vb.shouldServePublicVariants())
+    ? await vb.attachReadyVariants(coverBases)
+    : {};
 
   /* Fail-closed territorial: un lugar sólo es públicamente navegable si su
      destino también es público (RLS anon: destinos published y no

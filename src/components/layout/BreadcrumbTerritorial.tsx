@@ -70,9 +70,7 @@ export function BreadcrumbTerritorial({
    * se omite para no duplicar el mismo destino de navegación.
    */
   const effectiveCrumbs: readonly BreadcrumbCrumb[] =
-    sourceCrumbs.length > 1 && sourceCrumbs[0]?.to === "/"
-      ? sourceCrumbs.slice(1)
-      : sourceCrumbs;
+    sourceCrumbs.length > 1 && sourceCrumbs[0]?.to === "/" ? sourceCrumbs.slice(1) : sourceCrumbs;
 
   if (effectiveCrumbs.length === 0) return null;
 
@@ -122,10 +120,7 @@ export function BreadcrumbTerritorial({
             return (
               <li
                 key={`${c.label}-${i}`}
-                className={cn(
-                  "flex min-w-0 items-center gap-1.5",
-                  isLast ? "shrink" : "shrink-0",
-                )}
+                className={cn("flex min-w-0 items-center gap-1.5", isLast ? "shrink" : "shrink-0")}
               >
                 <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
 
@@ -168,11 +163,7 @@ export function BreadcrumbTerritorial({
         existe un único destino publicado — no genera ruido en Home,
         Blog, Contacto ni superficies sin ancla.
       */}
-      <div
-        role="group"
-        aria-label="Cambiar de destino"
-        className="shrink-0"
-      >
+      <div role="group" aria-label="Cambiar de destino" className="shrink-0">
         <TerritorialSwitcherMount className="h-9 w-full min-w-0 text-xs sm:h-8 sm:w-auto sm:max-w-56" />
       </div>
     </div>

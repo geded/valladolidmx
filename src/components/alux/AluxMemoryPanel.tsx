@@ -37,12 +37,10 @@ export function AluxMemoryPanel() {
         <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-sm">
           <p className="font-medium text-foreground">
             {paused
-               ? alux.copy("memoryGeneral")
-               : alux.copy("memorySignals", { count: remembered })}
+              ? alux.copy("memoryGeneral")
+              : alux.copy("memorySignals", { count: remembered })}
           </p>
-          <p className="mt-1 text-muted-foreground">
-            {alux.copy("memoryPreserved")}
-          </p>
+          <p className="mt-1 text-muted-foreground">{alux.copy("memoryPreserved")}</p>
         </div>
 
         <div className="flex flex-wrap gap-3">

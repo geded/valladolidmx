@@ -36,15 +36,23 @@ export const sendAppEmail = createServerFn({ method: "POST" })
     // staff de plataforma, concierge interno o viajero con cupón del negocio.
     let authorized = Boolean(template.to) || (callerEmail !== "" && target === callerEmail);
     if (!authorized) {
-      const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: userId,
+        _role: "admin",
+      });
       authorized = Boolean(isAdmin);
     }
     if (!authorized) {
-      const { data: isSuper } = await supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" });
+      const { data: isSuper } = await supabase.rpc("has_role", {
+        _user_id: userId,
+        _role: "super_admin",
+      });
       authorized = Boolean(isSuper);
     }
     if (!authorized) {
-      const { data: isInternal } = await supabase.rpc("concierge_is_internal", { _user_id: userId });
+      const { data: isInternal } = await supabase.rpc("concierge_is_internal", {
+        _user_id: userId,
+      });
       authorized = Boolean(isInternal);
     }
     if (!authorized) {
@@ -89,7 +97,8 @@ export const sendAppEmail = createServerFn({ method: "POST" })
         recipient_email: effectiveRecipient,
         ...row,
       });
-      if (error) console.error("email_send_log insert failed", { code: error.code, message: error.message });
+      if (error)
+        console.error("email_send_log insert failed", { code: error.code, message: error.message });
     };
 
     try {
@@ -104,7 +113,10 @@ export const sendAppEmail = createServerFn({ method: "POST" })
       await logRow({ status: "sent" });
       return { success: true };
     } catch (err) {
-      await logRow({ status: "failed", error_message: err instanceof Error ? err.message : String(err) });
+      await logRow({
+        status: "failed",
+        error_message: err instanceof Error ? err.message : String(err),
+      });
       throw err;
     }
   });

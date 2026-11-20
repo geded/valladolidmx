@@ -81,9 +81,10 @@ export async function enhanceIntentWithAI(
 
     // Fusionar: la IA puede añadir intereses/compañía que el regex no captó,
     // pero la base determinista siempre conserva lo suyo.
-    const mergedInterests = Array.from(
-      new Set([...base.interests, ...output.interests]),
-    ).slice(0, 10);
+    const mergedInterests = Array.from(new Set([...base.interests, ...output.interests])).slice(
+      0,
+      10,
+    );
 
     const known = new Set(knownDestinationSlugs.map((s) => s.toLowerCase()));
     const mergedDestinations = Array.from(

@@ -25,7 +25,13 @@ import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
 import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FocalPointPicker, type FocalPoint } from "@/components/cms/FocalPointPicker";
 
 interface Props {
@@ -45,7 +51,6 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     queryKey: ["cms", "destination_media", destinationId],
     queryFn: () => listFn({ data: { destinationId } }),
   });
-
 
   const invalidate = () => {
     void qc.invalidateQueries({
@@ -90,7 +95,8 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
   };
 
   const heroUpload = useMutation({
-    mutationFn: async ({ file, rights }: { file: File; rights?: MediaRightsInput }) => uploadOne(file, "hero", rights),
+    mutationFn: async ({ file, rights }: { file: File; rights?: MediaRightsInput }) =>
+      uploadOne(file, "hero", rights),
     onSuccess: () => {
       invalidate();
       toast.success("Imagen destacada actualizada.");
@@ -103,7 +109,13 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
       const errors: string[] = [];
       for (const f of files) {
         try {
-          await uploadOne(f, "gallery", rights ? { ...rights, alt: files.length > 1 ? f.name.replace(/\.[^.]+$/, "") : rights.alt } : undefined);
+          await uploadOne(
+            f,
+            "gallery",
+            rights
+              ? { ...rights, alt: files.length > 1 ? f.name.replace(/\.[^.]+$/, "") : rights.alt }
+              : undefined,
+          );
           ok += 1;
         } catch (err) {
           errors.push(`${f.name}: ${err instanceof Error ? err.message : "error"}`);
@@ -172,10 +184,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
         uploading={galleryUpload.isPending}
         error={galleryUpload.error}
       />
-      <FocalAdjustPanel
-        items={rows.filter((r) => Boolean(r.previewUrl))}
-        onSaved={invalidate}
-      />
+      <FocalAdjustPanel items={rows.filter((r) => Boolean(r.previewUrl))} onSaved={invalidate} />
     </div>
   );
 }

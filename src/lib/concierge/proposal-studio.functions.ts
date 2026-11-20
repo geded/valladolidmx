@@ -33,7 +33,6 @@ export interface ProposalTemplate {
   owner_user_id: string;
 }
 
-
 export const listProposalTemplates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -174,8 +173,12 @@ export const listConciergeItineraries = createServerFn({ method: "POST" })
       updated_at: (p["updated_at"] as string) ?? new Date().toISOString(),
     }));
 
-
-    return { rows: result, total: count ?? result.length, page: data.page, pageSize: data.pageSize };
+    return {
+      rows: result,
+      total: count ?? result.length,
+      page: data.page,
+      pageSize: data.pageSize,
+    };
   });
 
 export interface ItineraryStop {
@@ -205,7 +208,6 @@ export interface CaseItinerary {
   proposal_scheduled_count: number;
 }
 
-
 /** Itinerario del viaje ligado a un expediente (sólo lectura). */
 export const getCaseItinerary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -223,7 +225,9 @@ export const getCaseItinerary = createServerFn({ method: "POST" })
 
     const { data: items } = await context.supabase
       .from("travel_plan_items")
-      .select("id, day_index, position, starts_at_local, duration_minutes, item_kind, notes, snapshot")
+      .select(
+        "id, day_index, position, starts_at_local, duration_minutes, item_kind, notes, snapshot",
+      )
       .eq("plan_id", (plan as Record<string, unknown>)["id"] as string)
       .order("day_index", { ascending: true })
       .order("position", { ascending: true });
@@ -231,9 +235,7 @@ export const getCaseItinerary = createServerFn({ method: "POST" })
     const stops: ItineraryStop[] = ((items ?? []) as Array<Record<string, unknown>>).map((i) => {
       const snapshot = (i["snapshot"] ?? {}) as Record<string, unknown>;
       const title =
-        (snapshot["title"] as string | null) ??
-        (snapshot["name"] as string | null) ??
-        null;
+        (snapshot["title"] as string | null) ?? (snapshot["name"] as string | null) ?? null;
       return {
         id: i["id"] as string,
         day_index: (i["day_index"] as number | null) ?? null,
@@ -253,8 +255,7 @@ export const getCaseItinerary = createServerFn({ method: "POST" })
       .eq("case_id", data.caseId)
       .order("created_at", { ascending: false });
     const proposalRows = (proposals ?? []) as Array<Record<string, unknown>>;
-    const current =
-      proposalRows.find((p) => p["status"] === "accepted") ?? proposalRows[0] ?? null;
+    const current = proposalRows.find((p) => p["status"] === "accepted") ?? proposalRows[0] ?? null;
     let proposalScheduled = 0;
     if (current) {
       const { data: pItems } = await context.supabase
@@ -279,7 +280,6 @@ export const getCaseItinerary = createServerFn({ method: "POST" })
       latest_proposal_id: current ? (current["id"] as string) : null,
       proposal_scheduled_count: proposalScheduled,
     } satisfies CaseItinerary;
-
   });
 
 export interface AdjustmentSummary {
@@ -316,8 +316,7 @@ export const getCaseAdjustmentSummary = createServerFn({ method: "POST" })
     if (ordersRes.error) throw new Error(ordersRes.error.message);
 
     const proposals = (proposalsRes.data ?? []) as Array<Record<string, unknown>>;
-    const current =
-      proposals.find((p) => p["status"] === "accepted") ?? proposals[0] ?? null;
+    const current = proposals.find((p) => p["status"] === "accepted") ?? proposals[0] ?? null;
 
     let paid = 0;
     let pending = 0;
@@ -563,11 +562,12 @@ export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
       return {
         index,
         id: i["id"] as string,
-        title:
-          ((snapshot["title"] as string | null) ??
-            (snapshot["name"] as string | null) ??
-            (i["notes"] as string | null) ??
-            "Parada del itinerario").slice(0, 160),
+        title: (
+          (snapshot["title"] as string | null) ??
+          (snapshot["name"] as string | null) ??
+          (i["notes"] as string | null) ??
+          "Parada del itinerario"
+        ).slice(0, 160),
         notes: ((i["notes"] as string | null) ?? "").slice(0, 400),
         dayIndex: (i["day_index"] as number | null) ?? null,
         startsAt: (i["starts_at_local"] as string | null) ?? null,
@@ -579,7 +579,8 @@ export const aluxScheduleCaseItinerary = createServerFn({ method: "POST" })
     let days = 1;
     if (startDate && endDate) {
       const diff =
-        (new Date(`${endDate}T00:00:00Z`).getTime() - new Date(`${startDate}T00:00:00Z`).getTime()) /
+        (new Date(`${endDate}T00:00:00Z`).getTime() -
+          new Date(`${startDate}T00:00:00Z`).getTime()) /
         86_400_000;
       days = Math.min(30, Math.max(1, Math.round(diff) + 1));
     } else {
@@ -658,10 +659,9 @@ export const listCaseSuggestions = createServerFn({ method: "POST" })
       total_days: 0,
     };
 
-    const { data: raw, error } = await context.supabase.rpc(
-      "concierge_traveler_interests",
-      { _case_id: data.caseId } as never,
-    );
+    const { data: raw, error } = await context.supabase.rpc("concierge_traveler_interests", {
+      _case_id: data.caseId,
+    } as never);
     if (error) throw new Error(error.message);
 
     const info = (raw ?? {}) as Record<string, unknown>;
@@ -682,19 +682,23 @@ export const listCaseSuggestions = createServerFn({ method: "POST" })
       ? (info["planned"] as Array<Record<string, unknown>>)
       : [];
 
-    const plannedIds = new Set(
-      planned.map((p) => String(p["entity_id"] ?? "")).filter(Boolean),
-    );
+    const plannedIds = new Set(planned.map((p) => String(p["entity_id"] ?? "")).filter(Boolean));
     const plannedLabels = new Set(
       planned
-        .map((p) => String(p["label"] ?? "").trim().toLowerCase())
+        .map((p) =>
+          String(p["label"] ?? "")
+            .trim()
+            .toLowerCase(),
+        )
         .filter(Boolean),
     );
 
     const suggestions: CaseSuggestion[] = favorites
       .filter((f) => {
         const id = String(f["entity_id"] ?? "");
-        const label = String(f["label"] ?? "").trim().toLowerCase();
+        const label = String(f["label"] ?? "")
+          .trim()
+          .toLowerCase();
         if (id && plannedIds.has(id)) return false;
         if (label && plannedLabels.has(label)) return false;
         return Boolean(label);
@@ -751,8 +755,6 @@ export const listCaseSuggestions = createServerFn({ method: "POST" })
       total_days: totalDays,
     };
   });
-
-
 
 type ScheduleCallInput = z.infer<typeof ScheduleInput>;
 

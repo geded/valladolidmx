@@ -204,24 +204,21 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
     setLines((prev) => prev.filter((l) => l.key !== key));
   }, []);
 
-  const addQuote = useCallback(
-    (quote: NonNullable<StudioCaseFile["quotes"]>[number]) => {
-      setLines((prev) =>
-        prev.some((l) => l.quoteId === quote.quote_id)
-          ? prev
-          : [
-              ...prev,
-              newLine({
-                source: "quote",
-                quoteId: quote.quote_id,
-                title: `${quote.business_name ?? "Empresa"} · ${quote.request_title}`,
-                amount: ((quote.total_amount_cents ?? 0) / 100).toFixed(2),
-              }),
-            ],
-      );
-    },
-    [],
-  );
+  const addQuote = useCallback((quote: NonNullable<StudioCaseFile["quotes"]>[number]) => {
+    setLines((prev) =>
+      prev.some((l) => l.quoteId === quote.quote_id)
+        ? prev
+        : [
+            ...prev,
+            newLine({
+              source: "quote",
+              quoteId: quote.quote_id,
+              title: `${quote.business_name ?? "Empresa"} · ${quote.request_title}`,
+              amount: ((quote.total_amount_cents ?? 0) / 100).toFixed(2),
+            }),
+          ],
+    );
+  }, []);
 
   const addPlanItem = useCallback(
     (item: NonNullable<NonNullable<StudioCaseFile["travel_plan"]>["items"]>[number]) => {
@@ -314,7 +311,9 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
             title: e.line.title.trim(),
             ...(e.line.notes.trim() ? { notes: e.line.notes.trim().slice(0, 400) } : {}),
             dayIndex: e.line.dayIndex,
-            ...(normalizeTime(e.line.startsAt) ? { startsAt: normalizeTime(e.line.startsAt)! } : {}),
+            ...(normalizeTime(e.line.startsAt)
+              ? { startsAt: normalizeTime(e.line.startsAt)! }
+              : {}),
             durationMinutes: e.line.durationMinutes ? Number(e.line.durationMinutes) : null,
           })),
         },
@@ -473,7 +472,12 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
                     </span>
                     <span className="text-[11px] text-muted-foreground">{item.item_kind}</span>
                   </span>
-                  <Button type="button" size="sm" variant="outline" onClick={() => addPlanItem(item)}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addPlanItem(item)}
+                  >
                     Agregar
                   </Button>
                 </li>
@@ -545,7 +549,12 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
             </ul>
           )}
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button type="button" size="sm" variant="outline" onClick={() => setLines((p) => [...p, newLine()])}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setLines((p) => [...p, newLine()])}
+            >
               Agregar partida
             </Button>
             <Button
@@ -577,7 +586,11 @@ export function ProposalStudio({ data }: { data: StudioCaseFile }) {
       {/* Columna 3 · resumen y envío */}
       <aside className="grid content-start gap-3">
         <Panel title="Resumen del itinerario">
-          <DaySummary lines={prepared.map((e) => ({ ...e.line, resolvedTitle: e.title, time: e.time }))} days={days} startDate={plan?.start_date ?? null} />
+          <DaySummary
+            lines={prepared.map((e) => ({ ...e.line, resolvedTitle: e.title, time: e.time }))}
+            days={days}
+            startDate={plan?.start_date ?? null}
+          />
         </Panel>
 
         {warnings.length > 0 ? (
@@ -703,7 +716,9 @@ function LineRow({
           <select
             className="h-9 rounded border border-border bg-background px-2 text-xs text-foreground"
             value={line.dayIndex == null ? "" : String(line.dayIndex)}
-            onChange={(e) => onChange({ dayIndex: e.target.value === "" ? null : Number(e.target.value) })}
+            onChange={(e) =>
+              onChange({ dayIndex: e.target.value === "" ? null : Number(e.target.value) })
+            }
           >
             <option value="">Sin día</option>
             {Array.from({ length: days }, (_, i) => (

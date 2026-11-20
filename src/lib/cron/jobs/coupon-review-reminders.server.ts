@@ -183,7 +183,6 @@ export async function runCouponReviewReminders(
         const messageId = crypto.randomUUID();
         const idempotencyKey = `review-reminder-${reminderNumber}-${row.coupon_id}`;
 
-
         const { error: enqueueError } = await sendManagedPayload(supabase, {
           queue_name: "transactional_emails",
           payload: {

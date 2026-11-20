@@ -65,9 +65,7 @@ describe("planificador de viaje · coordenadas ausentes", () => {
           /Number\((?:\([^)]*\)|\w+)\.(?:latitude|longitude)\)/.test(block) ||
           /Number\((?:rawLat|rawLng)\)/.test(block);
         if (!converts) continue;
-        expect(
-          /(?:latitude|longitude|rawLat|rawLng)\s*==\s*null/.test(block),
-        ).toBe(true);
+        expect(/(?:latitude|longitude|rawLat|rawLng)\s*==\s*null/.test(block)).toBe(true);
       }
     }
   });

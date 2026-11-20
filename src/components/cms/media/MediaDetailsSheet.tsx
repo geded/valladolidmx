@@ -155,7 +155,7 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
   const media = detail.data?.media;
   const references = usage.data?.references ?? [];
   const approvalChecks = media
-    ? [
+    ? ([
         [Boolean(alt.trim()), "Texto ALT"],
         [Boolean(credit.trim()), "Crédito"],
         [Boolean(media.original_checksum), "Archivo original verificado"],
@@ -163,7 +163,7 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
         [nature !== "documentary" || Boolean(author.trim()), "Autor"],
         [nature !== "documentary" || Boolean(source.trim()), "Procedencia"],
         [nature !== "documentary" || Boolean(license.trim()), "Licencia"],
-      ] as const
+      ] as const)
     : [];
   const readyForApproval = approvalChecks.every(([ok]) => ok);
 
@@ -283,16 +283,14 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
                   onChange={(e) => setAlt(e.target.value)}
                 />
                 {media.alt_text_ai && media.alt_text_source !== "human" ? (
-                  <p className="text-xs text-muted-foreground">Sugerencia IA: {media.alt_text_ai}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Sugerencia IA: {media.alt_text_ai}
+                  </p>
                 ) : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="media-title">Título</Label>
-                <Input
-                  id="media-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
+                <Input id="media-title" value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="media-credit">Crédito</Label>
@@ -314,10 +312,14 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
               <div className="space-y-2">
                 <Label>Uso editorial</Label>
                 <Select value={usageContext} onValueChange={setUsageContext}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {USAGE_OPTIONS.map(([value, label]) => (
-                      <SelectItem key={value} value={value}>{label}</SelectItem>
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -328,13 +330,16 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
               <div>
                 <h3 className="text-sm font-semibold">Tipo, procedencia y derechos</h3>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Una foto documental sólo puede publicarse con autor, procedencia y licencia reales.
+                  Una foto documental sólo puede publicarse con autor, procedencia y licencia
+                  reales.
                 </p>
               </div>
               <div className="space-y-2">
                 <Label>Tipo de foto</Label>
                 <Select value={nature} onValueChange={(value) => setNature(value as Nature)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="documentary">Documental / fotografía real</SelectItem>
                     <SelectItem value="conceptual">Conceptual / referencia</SelectItem>
@@ -345,23 +350,44 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="media-author">Autor</Label>
-                  <Input id="media-author" value={author} onChange={(e) => setAuthor(e.target.value)} />
+                  <Input
+                    id="media-author"
+                    value={author}
+                    onChange={(e) => setAuthor(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="media-license">Licencia o permiso</Label>
-                  <Input id="media-license" value={license} onChange={(e) => setLicense(e.target.value)} />
+                  <Input
+                    id="media-license"
+                    value={license}
+                    onChange={(e) => setLicense(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="media-source">Procedencia</Label>
-                  <Input id="media-source" value={source} onChange={(e) => setSource(e.target.value)} />
+                  <Input
+                    id="media-source"
+                    value={source}
+                    onChange={(e) => setSource(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="media-place">Lugar</Label>
-                  <Input id="media-place" value={place} onChange={(e) => setPlace(e.target.value)} />
+                  <Input
+                    id="media-place"
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="media-date">Fecha de captura</Label>
-                  <Input id="media-date" type="date" value={capturedOn} onChange={(e) => setCapturedOn(e.target.value)} />
+                  <Input
+                    id="media-date"
+                    type="date"
+                    value={capturedOn}
+                    onChange={(e) => setCapturedOn(e.target.value)}
+                  />
                 </div>
               </div>
               <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
@@ -387,12 +413,17 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
               </ul>
               {nature !== "documentary" ? (
                 <p className="text-xs text-destructive">
-                  Las imágenes conceptuales o generadas con IA no son aptas para mostrarse como fotografía pública.
+                  Las imágenes conceptuales o generadas con IA no son aptas para mostrarse como
+                  fotografía pública.
                 </p>
               ) : null}
               <div className="flex flex-wrap gap-2">
                 {media.status === "draft" ? (
-                  <Button variant="outline" disabled={busy} onClick={() => void changeStatus("in_review")}>
+                  <Button
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() => void changeStatus("in_review")}
+                  >
                     Enviar a aprobación
                   </Button>
                 ) : null}
@@ -405,7 +436,11 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
                   </Button>
                 ) : null}
                 {isAdmin && media.status === "in_review" ? (
-                  <Button variant="outline" disabled={busy} onClick={() => void changeStatus("draft")}>
+                  <Button
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() => void changeStatus("draft")}
+                  >
                     Pedir cambios
                   </Button>
                 ) : null}

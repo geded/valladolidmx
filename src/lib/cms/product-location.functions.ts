@@ -77,26 +77,28 @@ export const getProductLocation = createServerFn({ method: "GET" })
 
 export const saveProductLocation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: {
-    productId: string;
-    mode: "inherited" | "specific";
-    label?: string | null;
-    addressLine1?: string | null;
-    addressLine2?: string | null;
-    latitude?: number | null;
-    longitude?: number | null;
-  }) => {
-    if (!input?.productId) throw new Error("productId requerido");
-    if (input.mode === "inherited") return { ...input, latitude: null, longitude: null };
-    return {
-      ...input,
-      label: input.label?.trim().slice(0, 80) || "Punto de encuentro",
-      addressLine1: input.addressLine1?.trim().slice(0, 200) || null,
-      addressLine2: input.addressLine2?.trim().slice(0, 200) || null,
-      latitude: coordinate(input.latitude, -90, 90),
-      longitude: coordinate(input.longitude, -180, 180),
-    };
-  })
+  .inputValidator(
+    (input: {
+      productId: string;
+      mode: "inherited" | "specific";
+      label?: string | null;
+      addressLine1?: string | null;
+      addressLine2?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+    }) => {
+      if (!input?.productId) throw new Error("productId requerido");
+      if (input.mode === "inherited") return { ...input, latitude: null, longitude: null };
+      return {
+        ...input,
+        label: input.label?.trim().slice(0, 80) || "Punto de encuentro",
+        addressLine1: input.addressLine1?.trim().slice(0, 200) || null,
+        addressLine2: input.addressLine2?.trim().slice(0, 200) || null,
+        latitude: coordinate(input.latitude, -90, 90),
+        longitude: coordinate(input.longitude, -180, 180),
+      };
+    },
+  )
   .handler(async ({ data, context }) => {
     const product = await assertProductAccess(context.supabase, context.userId, data.productId);
     if (data.mode === "inherited") {

@@ -153,8 +153,8 @@ export function RouteMapSection({
 
           {status?.mode === "none" ? (
             <p className="text-xs text-muted-foreground">
-              El recorrido por carretera no está disponible en este momento. Conservamos las
-              paradas publicadas y puedes abrir la ruta completa en “Cómo llegar”.
+              El recorrido por carretera no está disponible en este momento. Conservamos las paradas
+              publicadas y puedes abrir la ruta completa en “Cómo llegar”.
             </p>
           ) : null}
 

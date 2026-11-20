@@ -6,7 +6,18 @@
  * comparte una URL canónica ya existente. Nunca expone instrucciones internas
  * de Alux — sólo título turístico + URL + marca.
  */
-import { AtSign, Copy, Facebook, Linkedin, Mail, MessageCircle, Pin, Send, Share2, Twitter } from "lucide-react";
+import {
+  AtSign,
+  Copy,
+  Facebook,
+  Linkedin,
+  Mail,
+  MessageCircle,
+  Pin,
+  Send,
+  Share2,
+  Twitter,
+} from "lucide-react";
 
 import {
   Sheet,
@@ -149,7 +160,10 @@ export function ShareSheet({
       label: "Threads",
       icon: AtSign,
       run: () =>
-        window.open(`https://www.threads.net/intent/post?text=${enc(textFor("threads"))}`, "_blank"),
+        window.open(
+          `https://www.threads.net/intent/post?text=${enc(textFor("threads"))}`,
+          "_blank",
+        ),
     },
   ];
 
@@ -166,9 +180,7 @@ export function ShareSheet({
       <SheetContent side="bottom" className="gap-4 rounded-t-3xl p-4 sm:p-6">
         <SheetHeader className="text-left">
           <SheetTitle className="text-base">{heading}</SheetTitle>
-          <SheetDescription className="sr-only">
-            Elige cómo compartir {title}.
-          </SheetDescription>
+          <SheetDescription className="sr-only">Elige cómo compartir {title}.</SheetDescription>
         </SheetHeader>
         <p className="line-clamp-2 text-[13px] text-muted-foreground">{title}</p>
 

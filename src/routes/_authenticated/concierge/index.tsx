@@ -721,11 +721,7 @@ function CaseRowCard({
       {pendingQuestionSince ? (
         <p className="mt-1 text-xs font-medium text-destructive">
           El viajero escribió el {meridaDateTime(pendingQuestionSince)} y espera respuesta.{" "}
-          <Link
-            to="/concierge/expedientes/$caseId"
-            params={{ caseId: c.id }}
-            className="underline"
-          >
+          <Link to="/concierge/expedientes/$caseId" params={{ caseId: c.id }} className="underline">
             Responder
           </Link>
         </p>
@@ -738,12 +734,8 @@ function CaseRowCard({
         <strong className="font-medium text-foreground">
           {ownerId ? (ownerName ?? "Concierge asignado") : "Sin asignar"}
         </strong>
-        {c.last_activity_at
-          ? ` · Última actividad ${meridaDateTime(c.last_activity_at)}`
-          : ""}
-        {c.target_response_at
-          ? ` · Objetivo ${meridaDateTime(c.target_response_at)}`
-          : ""}
+        {c.last_activity_at ? ` · Última actividad ${meridaDateTime(c.last_activity_at)}` : ""}
+        {c.target_response_at ? ` · Objetivo ${meridaDateTime(c.target_response_at)}` : ""}
       </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">

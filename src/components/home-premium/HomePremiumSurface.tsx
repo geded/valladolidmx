@@ -668,7 +668,6 @@ function RoutesSection({
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
-
               <div className="relative aspect-[16/11] overflow-hidden">
                 <EditorialMediaFrame
                   media={route.media}
@@ -764,7 +763,6 @@ function DestinationsSection({
             onClick={() => onOpen(destination.name)}
             className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
           >
-
             <EditorialMediaFrame
               media={destination.media}
               label={destination.name}
@@ -785,7 +783,6 @@ function DestinationsSection({
         <Link
           data-eb-card={0}
           to={featured.href ?? "/destinos"}
-
           onClick={() => onOpen(featured.name)}
           className="group relative min-h-0 overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
         >
@@ -809,7 +806,6 @@ function DestinationsSection({
               key={destination.name}
               data-eb-card={index + 1}
               to={destination.href ?? "/destinos"}
-
               onClick={() => onOpen(destination.name)}
               className="grid min-h-0 grid-cols-[42%_1fr] overflow-hidden rounded-2xl border border-border bg-card"
             >
@@ -939,7 +935,6 @@ function ExperiencesSection({
                 to={item.href}
                 className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
               >
-
                 <EditorialMediaFrame
                   media={item.media}
                   label={item.title}
@@ -969,7 +964,6 @@ function ExperiencesSection({
         <article
           data-eb-card={0}
           className={cn(
-
             "h-full overflow-hidden rounded-2xl border border-border bg-card",
             cinematic &&
               "relative border-0 bg-[var(--brand-territory-deep)] text-white shadow-elevated",
@@ -1074,7 +1068,6 @@ function CompactMediaRow({
         to={item.href}
         className="grid h-full min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr] lg:min-h-0"
       >
-
         <EditorialMediaFrame
           media={item.media}
           label={item.title}

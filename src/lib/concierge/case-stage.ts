@@ -193,9 +193,7 @@ const PENDING_ORDER = new Set(["pending", "cart", "confirmed"]);
 
 /** Diferencia en días entre hoy (hora de Mérida) y una fecha ISO `YYYY-MM-DD`. */
 export function daysFromToday(date: string, now: Date = new Date()): number {
-  const today = new Date(
-    now.toLocaleString("en-US", { timeZone: "America/Merida" }),
-  );
+  const today = new Date(now.toLocaleString("en-US", { timeZone: "America/Merida" }));
   const t = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   const [y, m, d] = date.slice(0, 10).split("-").map(Number);
   if (!y || !m || !d) return Number.NaN;

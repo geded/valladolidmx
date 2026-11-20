@@ -177,9 +177,7 @@ export async function getCurrentPushSubscription(): Promise<PushSubscription | n
  * automáticamente — el consumidor es responsable de enviarla al
  * endpoint autorizado en una sub-adenda posterior.
  */
-export async function subscribePush(
-  vapidOverride?: string,
-): Promise<PushSubscription | null> {
+export async function subscribePush(vapidOverride?: string): Promise<PushSubscription | null> {
   const { forbidden, reason } = isForbiddenContext();
   if (forbidden) {
     emit("skipped", { reason });

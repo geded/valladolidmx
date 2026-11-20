@@ -7,7 +7,10 @@
  * dato real se omite.
  */
 import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
-import type { ProductReviewItem, ProductReviewStats } from "@/lib/catalog/marketplace-reads.functions";
+import type {
+  ProductReviewItem,
+  ProductReviewStats,
+} from "@/lib/catalog/marketplace-reads.functions";
 import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import {
   resolveExperienceCommerce,
@@ -103,7 +106,11 @@ export function buildExperienceVMFromProduct(
   curatedRelated?: ProductRelatedDTO | null,
 ): ExperiencePremiumVM {
   const cover = product.cover_url
-    ? { url: product.cover_url, alt: `${product.name} — ${product.business.display_name}`, asset: product.cover_asset }
+    ? {
+        url: product.cover_url,
+        alt: `${product.name} — ${product.business.display_name}`,
+        asset: product.cover_asset,
+      }
     : null;
   const gallery = product.media
     .filter((item) => Boolean(item.url))

@@ -38,12 +38,9 @@ export function CaseMessages({ caseId, internal = false }: { caseId: string; int
       setBody("");
       await qc.invalidateQueries({ queryKey: ["concierge", "case-messages", caseId] });
       await qc.invalidateQueries({ queryKey: ["concierge", "case-file", caseId] });
-      toast.success(
-        internal && tab === "internal" ? "Nota interna guardada" : "Mensaje enviado",
-      );
+      toast.success(internal && tab === "internal" ? "Nota interna guardada" : "Mensaje enviado");
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo enviar el mensaje"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo enviar el mensaje"),
   });
 
   const visibility = internal ? tab : "traveler";
@@ -89,9 +86,7 @@ export function CaseMessages({ caseId, internal = false }: { caseId: string; int
             <li
               key={m.id}
               className={`rounded-lg border p-3 text-sm ${
-                m.mine
-                  ? "ml-6 border-primary/30 bg-primary/5"
-                  : "mr-6 border-border bg-background"
+                m.mine ? "ml-6 border-primary/30 bg-primary/5" : "mr-6 border-border bg-background"
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">

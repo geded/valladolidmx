@@ -207,7 +207,6 @@ function EmpresaTerritorialPage() {
   // G8-R1-C2 — punto único de decisión: el resolutor canónico.
   const premiumEnabled = canonicalBinding.surface === "premium";
 
-
   /* Textos de sección editables desde el constructor. Cuando la
      composición publicada declara el bloque `vmx.business.premium`, la
      autoridad visual sigue siendo `BusinessSurface` y sólo se aplican sus

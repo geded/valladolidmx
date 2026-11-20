@@ -61,9 +61,7 @@ export function VisibilityShell({
 export function formatDate(iso?: string | null) {
   if (!iso) return null;
   try {
-    return (
-      formatInMerida(iso, { day: "2-digit", month: "long", year: "numeric" }) || null
-    );
+    return formatInMerida(iso, { day: "2-digit", month: "long", year: "numeric" }) || null;
   } catch {
     return null;
   }

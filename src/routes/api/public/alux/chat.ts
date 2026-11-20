@@ -818,9 +818,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
                 if (done) break;
                 text += value;
                 controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({ type: "text", chunk: value })}\n\n`,
-                  ),
+                  encoder.encode(`data: ${JSON.stringify({ type: "text", chunk: value })}\n\n`),
                 );
               }
 
@@ -865,8 +863,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             const newSignals = detected.filter((s) => !prevSignals.includes(s));
             const mergedSignals = Array.from(new Set([...prevSignals, ...detected]));
 
-            const nextSpatialState: string = visitor ? "granted" : (prev.last_spatial_state ?? "none");
-            const spatialTransitioned = !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
+            const nextSpatialState: string = visitor
+              ? "granted"
+              : (prev.last_spatial_state ?? "none");
+            const spatialTransitioned =
+              !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
             const geoMovedKm =
               visitor && prev.last_lat != null && prev.last_lng != null
                 ? haversineKm(visitor, { lat: Number(prev.last_lat), lng: Number(prev.last_lng) })
@@ -878,7 +879,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             const territoryChanged =
               (!!pathContext?.destination &&
                 pathContext.destination !== (prev.last_destination_slug ?? null)) ||
-              (!!pathContext?.category && pathContext.category !== (prev.last_category_slug ?? null));
+              (!!pathContext?.category &&
+                pathContext.category !== (prev.last_category_slug ?? null));
 
             const refreshReasons: string[] = [];
             if (!previousSummary && detected.length > 0) refreshReasons.push("first_signal");

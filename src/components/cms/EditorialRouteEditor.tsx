@@ -71,7 +71,6 @@ const BASE_FIELDS: EditorField[] = [
   },
 ];
 
-
 export function EditorialRouteEditor({ id }: { id?: string }) {
   const destinationsFn = useServerFn(listDestinationsForSelect);
   const destinations = useQuery({
@@ -116,7 +115,6 @@ export function EditorialRouteEditor({ id }: { id?: string }) {
           </p>
         )
       }
-
     />
   );
 }

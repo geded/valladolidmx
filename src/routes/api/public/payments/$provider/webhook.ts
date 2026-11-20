@@ -97,9 +97,18 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
           await supabaseAdmin.from("concierge_order_events").insert({
             order_id: normalized.orderId,
             event_type: "payment_failed",
-            payload: { provider: normalized.provider, intent_id: normalized.providerIntentId, provider_event_id: normalized.providerEventId, reason: normalized.reason },
+            payload: {
+              provider: normalized.provider,
+              intent_id: normalized.providerIntentId,
+              provider_event_id: normalized.providerEventId,
+              reason: normalized.reason,
+            },
           });
-          await supabaseAdmin.from("concierge_orders").update({ status: "awaiting_payment" }).eq("id", normalized.orderId).eq("status", "awaiting_payment");
+          await supabaseAdmin
+            .from("concierge_orders")
+            .update({ status: "awaiting_payment" })
+            .eq("id", normalized.orderId)
+            .eq("status", "awaiting_payment");
         } else if (normalized.type === "payment_failed" && normalized.orderId) {
           const { error } = await supabaseAdmin.rpc("order_mark_payment_failed", {
             p_order_id: normalized.orderId,

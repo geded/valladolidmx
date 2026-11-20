@@ -31,10 +31,7 @@ export function commercialRails(templateKey: string | null): readonly string[] {
 }
 
 /** `true` sólo si la plantilla declara ese carril como espacio comercial. */
-export function railAcceptsSponsored(
-  templateKey: string | null,
-  railKey: string,
-): boolean {
+export function railAcceptsSponsored(templateKey: string | null, railKey: string): boolean {
   if (!templateKey || !railKey) return false;
   return commercialRails(templateKey).includes(railKey);
 }

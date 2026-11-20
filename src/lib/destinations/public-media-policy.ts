@@ -33,7 +33,9 @@ export function isAccreditedDestinationMedia(media: DestinationMediaFacts | null
   // La carga gobernada (G8-M1 · `buildRightsMetadata`) escribe los derechos en
   // `metadata.rights`. Se acepta esa forma vigente y la histórica plana.
   const rights =
-    typeof metadata.rights === "object" && metadata.rights !== null && !Array.isArray(metadata.rights)
+    typeof metadata.rights === "object" &&
+    metadata.rights !== null &&
+    !Array.isArray(metadata.rights)
       ? (metadata.rights as Record<string, unknown>)
       : {};
   const rightsDeclared =

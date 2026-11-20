@@ -22,7 +22,9 @@ const money = (amount: number | null | undefined, currency: string) =>
     : new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(amount / 100);
 
 const date = (value: string | null) =>
-  value ? new Date(value).toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" }) : "—";
+  value
+    ? new Date(value).toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" })
+    : "—";
 
 export const Route = createFileRoute("/_authenticated/cms/experiencias/$productId")({
   head: () => ({
@@ -180,10 +182,7 @@ function ExperienciaFichaPage() {
               value={d.duration_minutes ? `${d.duration_minutes} min` : "—"}
             />
             <Field label="Cupo por salida" value={d.capacity ? `${d.capacity}` : "—"} />
-            <Field
-              label="Requiere disponibilidad"
-              value={d.requires_availability ? "Sí" : "No"}
-            />
+            <Field label="Requiere disponibilidad" value={d.requires_availability ? "Sí" : "No"} />
           </dl>
           <p className="mt-3 text-xs text-muted-foreground">
             El calendario de salidas, el cupo real y los apartados se administran más abajo.

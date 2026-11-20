@@ -17,7 +17,11 @@ import {
 function toWebp(canvas: HTMLCanvasElement): Promise<Blob | null> {
   return new Promise((resolve) => {
     try {
-      canvas.toBlob((b) => resolve(b && b.type === "image/webp" ? b : null), "image/webp", DERIVE_ON_UPLOAD_QUALITY);
+      canvas.toBlob(
+        (b) => resolve(b && b.type === "image/webp" ? b : null),
+        "image/webp",
+        DERIVE_ON_UPLOAD_QUALITY,
+      );
     } catch {
       resolve(null);
     }
@@ -26,7 +30,8 @@ function toWebp(canvas: HTMLCanvasElement): Promise<Blob | null> {
 
 async function run(file: Blob, assetId: string) {
   if (typeof document === "undefined" || typeof createImageBitmap !== "function") return;
-  if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") return;
+  if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml")
+    return;
   const bmp = await createImageBitmap(file);
   try {
     const widths = plannedDerivedWidths(bmp.width);

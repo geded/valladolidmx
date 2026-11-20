@@ -24,7 +24,6 @@ import {
   type CaseSuggestion,
 } from "@/lib/concierge/proposal-studio.functions";
 
-
 const money = (cents: number, currency = "MXN") =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(cents / 100);
 
@@ -90,7 +89,6 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
     });
   };
 
-
   const charge = useMutation({
     mutationFn: (cents: number) =>
       chargeFn({ data: { caseId, amountCents: cents, title: "Ajuste de itinerario" } }),
@@ -130,7 +128,6 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
 
   const aluxSchedule = useMutation({
     mutationFn: () => aluxScheduleFn({ data: { caseId } }),
@@ -344,8 +341,6 @@ export function CaseItineraryPanel({ caseId }: { caseId: string }) {
           ) : null}
         </section>
       ) : null}
-
-
 
       <section className="rounded-lg border border-border bg-card p-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

@@ -184,9 +184,7 @@ function QuoteCard({
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
         Tipo: {quote.request.kind}
-        {quote.valid_until
-          ? ` · Vigente hasta ${meridaDateTime(quote.valid_until)}`
-          : ""}
+        {quote.valid_until ? ` · Vigente hasta ${meridaDateTime(quote.valid_until)}` : ""}
       </p>
       {quote.request.notes ? (
         <p className="mt-2 text-xs text-foreground/80">

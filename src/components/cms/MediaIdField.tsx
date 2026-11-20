@@ -22,14 +22,7 @@ interface Props {
   role?: ImageRole;
 }
 
-export function MediaIdField({
-  label,
-  value,
-  onChange,
-  helpText,
-  required,
-  role = "hero",
-}: Props) {
+export function MediaIdField({ label, value, onChange, helpText, required, role = "hero" }: Props) {
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState<{ url: string; alt: string | null } | null>(null);
   const resolve = useServerFn(getStudioMediaAssetById);

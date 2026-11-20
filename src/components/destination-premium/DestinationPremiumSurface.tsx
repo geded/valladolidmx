@@ -318,7 +318,11 @@ function DestinationRoutes({
             >
               {route.coverUrl ? (
                 <EditorialMediaFrame
-                  media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }}
+                  media={{
+                    url: route.coverUrl,
+                    alt: route.coverAlt ?? route.name,
+                    asset: route.coverAsset,
+                  }}
                   label={route.name}
                   className="aspect-video w-full shrink-0 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
@@ -327,7 +331,9 @@ function DestinationRoutes({
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                   {route.originDestinationLabel ?? "Oriente Maya de Yucatán"}
                 </p>
-                <h3 className="mt-1 font-serif text-base font-semibold leading-snug">{route.name}</h3>
+                <h3 className="mt-1 font-serif text-base font-semibold leading-snug">
+                  {route.name}
+                </h3>
                 {route.summary ? (
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{route.summary}</p>
                 ) : null}
@@ -431,41 +437,68 @@ function HeroCopy({
   return (
     <div className={cn(compact ? "min-w-0" : "max-w-2xl", !distributed && "text-center")}>
       <div className="flex min-w-0 flex-wrap items-center justify-center gap-2 max-sm:flex-nowrap max-sm:gap-1 max-sm:[--badge-gap-sm:0.25rem] max-sm:[--badge-px-sm:0.375rem] max-sm:[--badge-text-sm:10px] max-sm:[&_img]:size-5 max-sm:[&_ul]:flex-nowrap">
-      <DestinationIdentity content={content} />
-      <Button variant="ghost" size="sm" className="h-8 shrink-0 rounded-pill px-3 text-xs font-medium max-sm:gap-0.5 max-sm:px-1 max-sm:text-[10px] max-sm:[&_svg]:size-3" asChild>
-        <Link to="/arma-tu-viaje" search={{ destination: content.slug, destinationLabel: content.hero.title }}>
-          {content.hero.primaryCta.label}<ArrowRight className="size-3.5 shrink-0" aria-hidden />
-        </Link>
-      </Button>
-      </div>
-      <div className={cn("mt-3", distributed && "grid min-w-0 gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:gap-x-10")}>
-      <div className="min-w-0">
-      <h1 className="text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
-        {content.hero.title}
-      </h1>
-      <p className="mt-2.5 text-base text-foreground/80 sm:text-lg">{content.hero.subtitle}</p>
-      {content.hero.description ? (
-        <p className={cn("mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground", !distributed && "mx-auto")}>
-          {content.hero.description}
-        </p>
-      ) : null}
-      </div>
-      {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
-      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start flex-nowrap sm:shrink-0 sm:justify-end max-sm:gap-0.5 max-sm:[&>*]:shrink-0 max-[380px]:gap-0! max-[380px]:[&>a]:px-0.5! max-[380px]:[&>button]:px-1! max-[380px]:[&>a]:text-[11px]! max-[380px]:[&>button]:text-[11px]! max-sm:[&>a]:min-h-11 max-sm:[&>button]:min-h-11 max-sm:[&>a]:px-1 max-sm:[&>button]:px-1 max-sm:[&>a]:text-xs max-sm:[&>button]:text-xs max-sm:[&>a]:gap-1 max-sm:[&>button]:gap-1 max-sm:[&>a_svg]:mr-0 max-sm:[&>button_svg]:mr-0 max-sm:[&>a_svg]:size-3.5 max-sm:[&>button_svg]:size-3.5" : "mt-4 justify-center")}>
+        <DestinationIdentity content={content} />
         <Button
-          size="sm"
           variant="ghost"
-          className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm"
+          size="sm"
+          className="h-8 shrink-0 rounded-pill px-3 text-xs font-medium max-sm:gap-0.5 max-sm:px-1 max-sm:text-[10px] max-sm:[&_svg]:size-3"
           asChild
         >
-          <a href={content.hero.secondaryCta.href}>
-            <Images className="mr-1.5 size-4" aria-hidden />
-            {content.hero.secondaryCta.label}
-          </a>
+          <Link
+            to="/arma-tu-viaje"
+            search={{ destination: content.slug, destinationLabel: content.hero.title }}
+          >
+            {content.hero.primaryCta.label}
+            <ArrowRight className="size-3.5 shrink-0" aria-hidden />
+          </Link>
         </Button>
-        <DestinationShareButton title={content.hero.title} />
-        {heroAction}
       </div>
+      <div
+        className={cn(
+          "mt-3",
+          distributed &&
+            "grid min-w-0 gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:gap-x-10",
+        )}
+      >
+        <div className="min-w-0">
+          <h1 className="text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
+            {content.hero.title}
+          </h1>
+          <p className="mt-2.5 text-base text-foreground/80 sm:text-lg">{content.hero.subtitle}</p>
+          {content.hero.description ? (
+            <p
+              className={cn(
+                "mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground",
+                !distributed && "mx-auto",
+              )}
+            >
+              {content.hero.description}
+            </p>
+          ) : null}
+        </div>
+        {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
+        <div
+          className={cn(
+            "flex min-w-0 flex-wrap items-center gap-1 gap-y-2",
+            distributed
+              ? "justify-start flex-nowrap sm:shrink-0 sm:justify-end max-sm:gap-0.5 max-sm:[&>*]:shrink-0 max-[380px]:gap-0! max-[380px]:[&>a]:px-0.5! max-[380px]:[&>button]:px-1! max-[380px]:[&>a]:text-[11px]! max-[380px]:[&>button]:text-[11px]! max-sm:[&>a]:min-h-11 max-sm:[&>button]:min-h-11 max-sm:[&>a]:px-1 max-sm:[&>button]:px-1 max-sm:[&>a]:text-xs max-sm:[&>button]:text-xs max-sm:[&>a]:gap-1 max-sm:[&>button]:gap-1 max-sm:[&>a_svg]:mr-0 max-sm:[&>button_svg]:mr-0 max-sm:[&>a_svg]:size-3.5 max-sm:[&>button_svg]:size-3.5"
+              : "mt-4 justify-center",
+          )}
+        >
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm"
+            asChild
+          >
+            <a href={content.hero.secondaryCta.href}>
+              <Images className="mr-1.5 size-4" aria-hidden />
+              {content.hero.secondaryCta.label}
+            </a>
+          </Button>
+          <DestinationShareButton title={content.hero.title} />
+          {heroAction}
+        </div>
       </div>
     </div>
   );
@@ -589,10 +622,21 @@ function HeroEditorial({
                   >
                     <ChevronRight className="size-5" aria-hidden />
                   </button>
-                  <div className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5" aria-hidden>
+                  <div
+                    className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5"
+                    aria-hidden
+                  >
                     {slides.slice(0, Math.min(total, 7)).map((_, d) => {
                       const active = Math.min(index, total - 1) === d || (d === 6 && index >= 6);
-                      return <span key={d} className={cn("size-1.5 rounded-full bg-background/60 transition-all", active && "w-4 bg-background")} />;
+                      return (
+                        <span
+                          key={d}
+                          className={cn(
+                            "size-1.5 rounded-full bg-background/60 transition-all",
+                            active && "w-4 bg-background",
+                          )}
+                        />
+                      );
                     })}
                   </div>
                   <Button
@@ -713,7 +757,8 @@ function DestinationPhotoLightbox({
           onTouchStart={(e) => setTouchX(e.touches[0]?.clientX ?? null)}
           onTouchEnd={(e) => {
             const end = e.changedTouches[0]?.clientX;
-            if (touchX != null && end != null && Math.abs(end - touchX) > 40) go(end < touchX ? 1 : -1);
+            if (touchX != null && end != null && Math.abs(end - touchX) > 40)
+              go(end < touchX ? 1 : -1);
             setTouchX(null);
           }}
         >
@@ -793,11 +838,31 @@ function HeroCinematografico({
   if (!content.hero.cover.url) return <HeroEditorial content={content} heroAction={heroAction} />;
   return (
     <section className="relative overflow-hidden rounded-3xl shadow-floating">
-      <picture className="contents">{resolveMediaSource(content.hero.cover.asset, { fallbackUrl: content.hero.cover.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img src={resolveMediaSource(content.hero.cover.asset, { fallbackUrl: content.hero.cover.url, context: "hero" }).src}
-        alt={content.hero.cover.alt}
-        loading="eager"
-        className="h-[420px] w-full object-cover sm:h-[520px]"
-      /></picture>
+      <picture className="contents">
+        {resolveMediaSource(content.hero.cover.asset, {
+          fallbackUrl: content.hero.cover.url,
+          context: "hero",
+          sizes: "100vw",
+        }).sources.map((source) => (
+          <source
+            key={source.type}
+            type={source.type}
+            srcSet={source.srcSet}
+            sizes={source.sizes}
+          />
+        ))}
+        <img
+          src={
+            resolveMediaSource(content.hero.cover.asset, {
+              fallbackUrl: content.hero.cover.url,
+              context: "hero",
+            }).src
+          }
+          alt={content.hero.cover.alt}
+          loading="eager"
+          className="h-[420px] w-full object-cover sm:h-[520px]"
+        />
+      </picture>
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
         aria-hidden
@@ -851,7 +916,13 @@ function ServiciosStrip({
   );
 }
 
-function DescubreDestino({ content, compactTop = false }: { content: DestinationPremiumContent; compactTop?: boolean }) {
+function DescubreDestino({
+  content,
+  compactTop = false,
+}: {
+  content: DestinationPremiumContent;
+  compactTop?: boolean;
+}) {
   const [lead] = content.descubre.media.filter((item) => Boolean(item.url));
   const hasMedia = Boolean(lead);
   return (
@@ -924,15 +995,29 @@ function GaleriaEditorial({
       {layout === "mosaico" ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {items.map((m, i) => (
-            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
-              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
-              alt={m.alt}
-              loading="lazy"
-              className={cn(
-                "w-full rounded-3xl object-cover shadow-soft",
-                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
-              )}
-            /></picture>
+            <picture key={m.url + i} className="contents">
+              {resolveMediaSource(m.asset, {
+                fallbackUrl: m.url,
+                context: "gallery",
+                sizes: "100vw",
+              }).sources.map((source) => (
+                <source
+                  key={source.type}
+                  type={source.type}
+                  srcSet={source.srcSet}
+                  sizes={source.sizes}
+                />
+              ))}
+              <img
+                src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
+                alt={m.alt}
+                loading="lazy"
+                className={cn(
+                  "w-full rounded-3xl object-cover shadow-soft",
+                  i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
+                )}
+              />
+            </picture>
           ))}
         </div>
       ) : null}
@@ -945,11 +1030,26 @@ function GaleriaEditorial({
         >
           {items.map((m, i) => (
             <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
-              <picture className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
-                alt={m.alt}
-                loading="lazy"
-                className="h-60 w-full rounded-3xl object-cover shadow-soft"
-              /></picture>
+              <picture className="contents">
+                {resolveMediaSource(m.asset, {
+                  fallbackUrl: m.url,
+                  context: "gallery",
+                  sizes: "100vw",
+                }).sources.map((source) => (
+                  <source
+                    key={source.type}
+                    type={source.type}
+                    srcSet={source.srcSet}
+                    sizes={source.sizes}
+                  />
+                ))}
+                <img
+                  src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
+                  alt={m.alt}
+                  loading="lazy"
+                  className="h-60 w-full rounded-3xl object-cover shadow-soft"
+                />
+              </picture>
             </li>
           ))}
         </ul>
@@ -958,12 +1058,26 @@ function GaleriaEditorial({
       {layout === "cuadricula" ? (
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
           {items.map((m, i) => (
-            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
-              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
-              alt={m.alt}
-              loading="lazy"
-              className="h-48 w-full rounded-3xl object-cover shadow-soft"
-            /></picture>
+            <picture key={m.url + i} className="contents">
+              {resolveMediaSource(m.asset, {
+                fallbackUrl: m.url,
+                context: "gallery",
+                sizes: "100vw",
+              }).sources.map((source) => (
+                <source
+                  key={source.type}
+                  type={source.type}
+                  srcSet={source.srcSet}
+                  sizes={source.sizes}
+                />
+              ))}
+              <img
+                src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
+                alt={m.alt}
+                loading="lazy"
+                className="h-48 w-full rounded-3xl object-cover shadow-soft"
+              />
+            </picture>
           ))}
         </div>
       ) : null}
@@ -971,12 +1085,26 @@ function GaleriaEditorial({
       {layout === "tira" ? (
         <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
           {items.map((m, i) => (
-            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
-              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
-              alt={m.alt}
-              loading="lazy"
-              className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            /></picture>
+            <picture key={m.url + i} className="contents">
+              {resolveMediaSource(m.asset, {
+                fallbackUrl: m.url,
+                context: "gallery",
+                sizes: "100vw",
+              }).sources.map((source) => (
+                <source
+                  key={source.type}
+                  type={source.type}
+                  srcSet={source.srcSet}
+                  sizes={source.sizes}
+                />
+              ))}
+              <img
+                src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
+                alt={m.alt}
+                loading="lazy"
+                className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
+              />
+            </picture>
           ))}
         </div>
       ) : null}
@@ -1059,7 +1187,15 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
         {content.nearby.kicker}
       </p>
-      <h2 id="cerca-del-destino" className={cn("mt-2 font-serif", regionalCatalog ? "text-3xl tracking-tight sm:text-4xl" : "text-xl leading-snug sm:text-2xl")}>
+      <h2
+        id="cerca-del-destino"
+        className={cn(
+          "mt-2 font-serif",
+          regionalCatalog
+            ? "text-3xl tracking-tight sm:text-4xl"
+            : "text-xl leading-snug sm:text-2xl",
+        )}
+      >
         {content.nearby.title}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{content.nearby.description}</p>
@@ -1081,18 +1217,30 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
           />
         </div>
       ) : null}
-      <div className={regionalCatalog ? "mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "mt-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin] [&>a]:w-60 [&>a]:max-w-[calc(100%-1rem)] [&>a]:shrink-0 [&>a]:snap-start [&>article]:w-60 [&>article]:max-w-[calc(100%-1rem)] [&>article]:shrink-0 [&>article]:snap-start"}>
+      <div
+        className={
+          regionalCatalog
+            ? "mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            : "mt-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin] [&>a]:w-60 [&>a]:max-w-[calc(100%-1rem)] [&>a]:shrink-0 [&>a]:snap-start [&>article]:w-60 [&>article]:max-w-[calc(100%-1rem)] [&>article]:shrink-0 [&>article]:snap-start"
+        }
+      >
         {shown.map((d) => {
           const card = (
             <article
               key={d.slug}
-              className={cn("group min-w-0 overflow-hidden border border-border bg-card shadow-soft", regionalCatalog ? "rounded-3xl" : "h-full rounded-2xl")}
+              className={cn(
+                "group min-w-0 overflow-hidden border border-border bg-card shadow-soft",
+                regionalCatalog ? "rounded-3xl" : "h-full rounded-2xl",
+              )}
             >
               <div className="relative">
                 <EditorialMediaFrame
                   media={d.media}
                   label={d.name}
-                  className={cn("w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]", regionalCatalog ? "h-44" : "aspect-video")}
+                  className={cn(
+                    "w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]",
+                    regionalCatalog ? "h-44" : "aspect-video",
+                  )}
                 />
                 {isPuebloMagico(d.slug) ? (
                   <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
@@ -1101,7 +1249,14 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
                 ) : null}
               </div>
               <div className="p-4">
-                <h3 className={cn("font-serif", regionalCatalog ? "text-lg" : "text-base font-semibold leading-snug")}>{d.name}</h3>
+                <h3
+                  className={cn(
+                    "font-serif",
+                    regionalCatalog ? "text-lg" : "text-base font-semibold leading-snug",
+                  )}
+                >
+                  {d.name}
+                </h3>
                 <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
                 {d.distance ? (
                   <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
@@ -1116,7 +1271,10 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
             <Link
               key={d.slug}
               to={d.href}
-              className={cn("block min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", regionalCatalog ? "rounded-3xl" : "rounded-2xl")}
+              className={cn(
+                "block min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                regionalCatalog ? "rounded-3xl" : "rounded-2xl",
+              )}
             >
               {card}
             </Link>

@@ -47,7 +47,6 @@ function seg(s: string | undefined): string {
   return normalized ? `/${encodeURIComponent(normalized)}` : "";
 }
 
-
 /**
  * Construye el path canónico para una referencia territorial.
  * Prohibido interpolar rutas a mano en componentes.

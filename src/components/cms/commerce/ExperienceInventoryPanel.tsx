@@ -91,7 +91,15 @@ const inputClass =
 const btn =
   "inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold hover:bg-muted disabled:opacity-50";
 
-function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <section className="rounded-xl border bg-card p-4 shadow-soft">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -178,8 +186,11 @@ export function ExperienceInventoryPanel({ productId }: { productId: string }) {
   });
 
   const statusMutation = useMutation({
-    mutationFn: (v: { departureId: string; status: "scheduled" | "closed" | "cancelled"; reason?: string }) =>
-      setStatus({ data: v }),
+    mutationFn: (v: {
+      departureId: string;
+      status: "scheduled" | "closed" | "cancelled";
+      reason?: string;
+    }) => setStatus({ data: v }),
     onSuccess: () => {
       toast.success("Salida actualizada.");
       void invalidate();
@@ -518,9 +529,7 @@ export function ExperienceInventoryPanel({ productId }: { productId: string }) {
                     <td className="py-2 pr-3">{fmtDateTime(d.starts_at, d.timezone)}</td>
                     <td className="py-2 pr-3 text-muted-foreground">
                       {DEPARTURE_STATUS_LABEL[d.status] ?? d.status}
-                      {d.blacked_out && (
-                        <span className="ml-1 text-warning">· sin venta</span>
-                      )}
+                      {d.blacked_out && <span className="ml-1 text-warning">· sin venta</span>}
                     </td>
                     <td className="py-2 pr-3">
                       {d.capacity_reservable}

@@ -185,7 +185,6 @@ export interface AluxContextualSuggestion {
   readonly coords?: { lat: number; lng: number; source: string } | null;
 }
 
-
 export interface AluxActiveDestinationPromotion {
   readonly slug: string;
   readonly title: string;
@@ -226,7 +225,6 @@ export interface AluxContextualSuggestResult {
     Record<string, { loaded: number; eligible: number; note: string }>
   >;
 }
-
 
 const EMPTY: AluxContextualSuggestResult = {
   suggestions: [],
@@ -314,10 +312,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       .filter((row) => canonicalBusinessUrl(row) !== null);
 
     /** URL canónica de una empresa vía autoridad de navegación (nunca manual). */
-    function canonicalBusinessUrl(row: {
-      slug: string;
-      category_slug: string;
-    }): string | null {
+    function canonicalBusinessUrl(row: { slug: string; category_slug: string }): string | null {
       return buildCanonicalEntityUrl({
         entityType: "business",
         slug: row.slug,
@@ -570,7 +565,6 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         favoriteKind: "business",
         planKind: "business",
       };
-
     }
 
     // 4a. Enriquecimiento con Alux (Lovable AI Gateway).
@@ -791,7 +785,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     // y explicable: Alux nunca redacta sobre entidades que no leyó.
     const businessIndex = new Map(
       businesses.map(
-        (b) => [b.id, { slug: b.slug, categorySlug: b.category_slug, name: b.display_name }] as const,
+        (b) =>
+          [b.id, { slug: b.slug, categorySlug: b.category_slug, name: b.display_name }] as const,
       ),
     );
     let catalogFamilies: AluxContextualSuggestResult["catalogFamilies"];
@@ -845,7 +840,6 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       console.warn("[alux.contextual-suggest] catálogo canónico no disponible:", error);
     }
 
-
     return {
       suggestions,
       activePromotions,
@@ -867,5 +861,4 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       aiStatus,
       catalogFamilies,
     };
-
   });

@@ -10,10 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listCmsTerritoryOptions } from "@/lib/cms/reads.functions";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
-import {
-  zonesForDestination,
-  type TerritorialZone,
-} from "@/lib/places/place-territory";
+import { zonesForDestination, type TerritorialZone } from "@/lib/places/place-territory";
 
 export const cmsSelectClass =
   "h-9 w-full rounded-md border border-border bg-background px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary";

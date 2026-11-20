@@ -123,13 +123,7 @@ export function DirectSaleRequestsPanel() {
   );
 }
 
-function RequestRow({
-  request,
-  onDone,
-}: {
-  request: DirectSaleRequestRow;
-  onDone: () => void;
-}) {
+function RequestRow({ request, onDone }: { request: DirectSaleRequestRow; onDone: () => void }) {
   const decide = useServerFn(decideDirectSaleRequest);
   const revoke = useServerFn(revokeDirectSaleAuthorization);
   const [commission, setCommission] = useState<string>(

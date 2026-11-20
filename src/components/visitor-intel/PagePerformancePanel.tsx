@@ -79,8 +79,8 @@ export function PagePerformancePanel() {
         <div>
           <h2 className="text-base font-semibold">Rendimiento de páginas</h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Visitas reales de las páginas públicas, su origen y hasta dónde llegan las personas.
-            Sin datos personales: sólo señales seudónimas del recorrido.
+            Visitas reales de las páginas públicas, su origen y hasta dónde llegan las personas. Sin
+            datos personales: sólo señales seudónimas del recorrido.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

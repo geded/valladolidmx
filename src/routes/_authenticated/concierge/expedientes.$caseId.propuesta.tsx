@@ -6,7 +6,10 @@ import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
-import { ProposalStudio, type StudioCaseFile } from "@/components/concierge/proposal/ProposalStudio";
+import {
+  ProposalStudio,
+  type StudioCaseFile,
+} from "@/components/concierge/proposal/ProposalStudio";
 
 export const Route = createFileRoute("/_authenticated/concierge/expedientes/$caseId/propuesta")({
   component: ProposalStudioPage,

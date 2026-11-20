@@ -646,134 +646,134 @@ function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => vo
 
   return (
     <DialogPortal>
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
-    >
       <div
-        className="my-auto max-h-[92dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4"
+        role="dialog"
+        aria-modal="true"
+        onClick={onClose}
       >
-        <header className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold">Editar usuario</h2>
-            <p className="text-xs text-muted-foreground">{row.email}</p>
-          </div>
-          <button type="button" onClick={onClose} className="text-sm text-muted-foreground">
-            ✕
-          </button>
-        </header>
-
-        {isSuper ? (
-          <div className="mt-3 rounded-md border border-amber-300/50 bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
-            Cuenta super_admin: la eliminación está bloqueada por seguridad.
-          </div>
-        ) : null}
-
-        <section className="mt-4 space-y-2">
-          <label className="block text-sm">
-            Nombre a mostrar
-            <div className="mt-1 flex gap-2">
-              <input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <button
-                type="button"
-                disabled={nameMut.isPending || !displayName.trim()}
-                onClick={() => nameMut.mutate()}
-                className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
-              >
-                Guardar
-              </button>
+        <div
+          className="my-auto max-h-[92dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <header className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold">Editar usuario</h2>
+              <p className="text-xs text-muted-foreground">{row.email}</p>
             </div>
-          </label>
-        </section>
+            <button type="button" onClick={onClose} className="text-sm text-muted-foreground">
+              ✕
+            </button>
+          </header>
 
-        <section className="mt-4 space-y-2">
-          <label className="block text-sm">
-            Correo electrónico
-            <div className="mt-1 flex gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <button
-                type="button"
-                disabled={emailMut.isPending || !email.trim() || email.trim() === row.email}
-                onClick={() => emailMut.mutate()}
-                className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
-              >
-                Actualizar
-              </button>
+          {isSuper ? (
+            <div className="mt-3 rounded-md border border-amber-300/50 bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+              Cuenta super_admin: la eliminación está bloqueada por seguridad.
             </div>
-          </label>
-          <p className="text-[11px] text-muted-foreground">
-            El correo se marca como confirmado. Notifica al usuario del cambio.
-          </p>
-        </section>
+          ) : null}
 
-        <section className="mt-4 space-y-2">
-          <label className="block text-sm">
-            Nueva contraseña
-            <div className="mt-1 flex gap-2">
-              <input
-                type="text"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <button
-                type="button"
-                disabled={passMut.isPending || password.length < 8}
-                onClick={() => passMut.mutate()}
-                className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
-              >
-                Cambiar
-              </button>
-            </div>
-          </label>
-          <button
-            type="button"
-            disabled={resetMut.isPending || !row.email}
-            onClick={() => resetMut.mutate()}
-            className="text-xs text-primary underline disabled:opacity-50"
-          >
-            …o enviar enlace de recuperación al usuario
-          </button>
-        </section>
-
-        {!isSuper ? (
-          <section className="mt-6 rounded-md border border-destructive/40 bg-destructive/5 p-3">
-            <h3 className="text-sm font-medium text-destructive">Eliminar cuenta</h3>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Acción irreversible. Escribe <code>ELIMINAR</code> para confirmar.
-            </p>
-            <div className="mt-2 flex gap-2">
-              <input
-                value={confirmDel}
-                onChange={(e) => setConfirmDel(e.target.value)}
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <button
-                type="button"
-                disabled={delMut.isPending || confirmDel !== "ELIMINAR"}
-                onClick={() => delMut.mutate()}
-                className="rounded-md border border-destructive bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground disabled:opacity-50"
-              >
-                Eliminar
-              </button>
-            </div>
+          <section className="mt-4 space-y-2">
+            <label className="block text-sm">
+              Nombre a mostrar
+              <div className="mt-1 flex gap-2">
+                <input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+                />
+                <button
+                  type="button"
+                  disabled={nameMut.isPending || !displayName.trim()}
+                  onClick={() => nameMut.mutate()}
+                  className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  Guardar
+                </button>
+              </div>
+            </label>
           </section>
-        ) : null}
+
+          <section className="mt-4 space-y-2">
+            <label className="block text-sm">
+              Correo electrónico
+              <div className="mt-1 flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+                />
+                <button
+                  type="button"
+                  disabled={emailMut.isPending || !email.trim() || email.trim() === row.email}
+                  onClick={() => emailMut.mutate()}
+                  className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  Actualizar
+                </button>
+              </div>
+            </label>
+            <p className="text-[11px] text-muted-foreground">
+              El correo se marca como confirmado. Notifica al usuario del cambio.
+            </p>
+          </section>
+
+          <section className="mt-4 space-y-2">
+            <label className="block text-sm">
+              Nueva contraseña
+              <div className="mt-1 flex gap-2">
+                <input
+                  type="text"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mínimo 8 caracteres"
+                  className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+                />
+                <button
+                  type="button"
+                  disabled={passMut.isPending || password.length < 8}
+                  onClick={() => passMut.mutate()}
+                  className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  Cambiar
+                </button>
+              </div>
+            </label>
+            <button
+              type="button"
+              disabled={resetMut.isPending || !row.email}
+              onClick={() => resetMut.mutate()}
+              className="text-xs text-primary underline disabled:opacity-50"
+            >
+              …o enviar enlace de recuperación al usuario
+            </button>
+          </section>
+
+          {!isSuper ? (
+            <section className="mt-6 rounded-md border border-destructive/40 bg-destructive/5 p-3">
+              <h3 className="text-sm font-medium text-destructive">Eliminar cuenta</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Acción irreversible. Escribe <code>ELIMINAR</code> para confirmar.
+              </p>
+              <div className="mt-2 flex gap-2">
+                <input
+                  value={confirmDel}
+                  onChange={(e) => setConfirmDel(e.target.value)}
+                  className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+                />
+                <button
+                  type="button"
+                  disabled={delMut.isPending || confirmDel !== "ELIMINAR"}
+                  onClick={() => delMut.mutate()}
+                  className="rounded-md border border-destructive bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground disabled:opacity-50"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </section>
+          ) : null}
+        </div>
       </div>
-    </div>
     </DialogPortal>
   );
 }
@@ -980,87 +980,87 @@ function InviteDialog({
 
   return (
     <DialogPortal>
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
-    >
       <div
-        className="my-auto max-h-[92dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4"
+        role="dialog"
+        aria-modal="true"
+        onClick={onClose}
       >
-        <h2 className="text-lg font-semibold">Invitar nuevo usuario</h2>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Enviaremos un enlace de acceso al correo. El usuario definirá su contraseña al aceptar.
-        </p>
-
-        <form
-          className="mt-4 space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!email.trim()) return;
-            mut.mutate();
-          }}
+        <div
+          className="my-auto max-h-[92dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
+          onClick={(e) => e.stopPropagation()}
         >
-          <label className="block text-sm">
-            Correo electrónico
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              placeholder="persona@dominio.com"
-            />
-          </label>
+          <h2 className="text-lg font-semibold">Invitar nuevo usuario</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Enviaremos un enlace de acceso al correo. El usuario definirá su contraseña al aceptar.
+          </p>
 
-          <label className="block text-sm">
-            Nombre a mostrar (opcional)
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              placeholder="Ej. María López"
-            />
-          </label>
+          <form
+            className="mt-4 space-y-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!email.trim()) return;
+              mut.mutate();
+            }}
+          >
+            <label className="block text-sm">
+              Correo electrónico
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                placeholder="persona@dominio.com"
+              />
+            </label>
 
-          <label className="block text-sm">
-            Rol inicial
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as AppRole)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              {allowedRoles.map((r) => (
-                <option key={r} value={r}>
-                  {ROLE_LABELS[r]}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="block text-sm">
+              Nombre a mostrar (opcional)
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                placeholder="Ej. María López"
+              />
+            </label>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-border px-3 py-2 text-sm"
-              disabled={mut.isPending}
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={mut.isPending || !email.trim()}
-              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
-              {mut.isPending ? "Enviando…" : "Enviar invitación"}
-            </button>
-          </div>
-        </form>
+            <label className="block text-sm">
+              Rol inicial
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as AppRole)}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              >
+                {allowedRoles.map((r) => (
+                  <option key={r} value={r}>
+                    {ROLE_LABELS[r]}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-md border border-border px-3 py-2 text-sm"
+                disabled={mut.isPending}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={mut.isPending || !email.trim()}
+                className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+              >
+                {mut.isPending ? "Enviando…" : "Enviar invitación"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
     </DialogPortal>
   );
 }
@@ -1311,186 +1311,188 @@ function RoleEditor({
 
   return (
     <DialogPortal>
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4">
-      <div className="my-auto max-h-[92dvh] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 shadow-xl sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold">
-              {isNew ? "Crear rol personalizado" : `Editar rol: ${role!.name}`}
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {isSuperAdmin
-                ? "El super administrador tiene todos los permisos por diseño. Sólo se muestra como referencia."
-                : isSystem
-                  ? "Rol de sistema. Puedes ajustar permisos pero no renombrar ni eliminar."
-                  : "Rol personalizado. Puedes editar todo o eliminarlo."}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-border px-3 py-1 text-sm"
-          >
-            Cerrar
-          </button>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-          <label className="block text-sm">
-            Nombre
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isSystem}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
-            />
-          </label>
-          <label className="block text-sm">
-            Identificador (slug)
-            <input
-              value={slug}
-              onChange={(e) => setSlug(e.target.value.toLowerCase())}
-              disabled={!isNew}
-              placeholder="ej. editor_destinos"
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
-            />
-          </label>
-          <label className="block text-sm md:col-span-2">
-            Descripción
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={isSystem}
-              rows={2}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
-            />
-          </label>
-          <label className="flex items-center gap-3 text-sm">
-            Color
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              disabled={isSystem}
-              className="h-9 w-16 rounded border border-border bg-background disabled:opacity-60"
-            />
-            <code className="text-xs text-muted-foreground">{color}</code>
-          </label>
-        </div>
-
-        <div className="mt-6">
-          <h3 className="text-sm font-medium">Permisos</h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {disabled
-              ? "Editable sólo para roles que no son super_admin."
-              : "Marca las acciones que este rol podrá ejecutar. Los permisos marcados con ⚠ son sensibles."}
-          </p>
-          <div className="mt-3 space-y-4">
-            {byCategory.map(([cat, list]) => (
-              <div key={cat} className="rounded-xl border border-border p-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium">{cat}</h4>
-                  <button
-                    type="button"
-                    disabled={disabled}
-                    onClick={() =>
-                      setSelected((prev) => {
-                        const next = new Set(prev);
-                        const allOn = list.every((p) => next.has(p.id));
-                        for (const p of list) {
-                          if (allOn) next.delete(p.id);
-                          else next.add(p.id);
-                        }
-                        return next;
-                      })
-                    }
-                    className="text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50"
-                  >
-                    {list.every((p) => selected.has(p.id)) ? "Quitar todos" : "Marcar todos"}
-                  </button>
-                </div>
-                <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
-                  {list.map((p) => (
-                    <label
-                      key={p.id}
-                      className="flex items-start gap-2 rounded-md px-2 py-1 text-sm hover:bg-muted/40"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selected.has(p.id)}
-                        onChange={() => togglePerm(p.id)}
-                        disabled={disabled}
-                        className="mt-1"
-                      />
-                      <span>
-                        <span className="font-medium">
-                          {p.label}
-                          {p.is_dangerous ? <span className="ml-1 text-destructive">⚠</span> : null}
-                        </span>
-                        <span className="block text-[11px] text-muted-foreground">
-                          <code>{p.key}</code>
-                          {p.description ? ` · ${p.description}` : ""}
-                        </span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-          {canDelete ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={confirmDel}
-                onChange={(e) => setConfirmDel(e.target.value)}
-                placeholder='Escribe "ELIMINAR" para borrar'
-                className="w-56 rounded-md border border-destructive/40 bg-background px-3 py-2 text-xs"
-              />
-              <button
-                type="button"
-                disabled={confirmDel !== "ELIMINAR" || deleteMut.isPending}
-                onClick={() => deleteMut.mutate()}
-                className="rounded-md border border-destructive px-3 py-2 text-xs text-destructive disabled:opacity-50"
-              >
-                {deleteMut.isPending ? "Eliminando…" : "Eliminar rol"}
-              </button>
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center sm:p-4">
+        <div className="my-auto max-h-[92dvh] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-4 shadow-xl sm:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold">
+                {isNew ? "Crear rol personalizado" : `Editar rol: ${role!.name}`}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {isSuperAdmin
+                  ? "El super administrador tiene todos los permisos por diseño. Sólo se muestra como referencia."
+                  : isSystem
+                    ? "Rol de sistema. Puedes ajustar permisos pero no renombrar ni eliminar."
+                    : "Rol personalizado. Puedes editar todo o eliminarlo."}
+              </p>
             </div>
-          ) : (
-            <span />
-          )}
-          <div className="flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md border border-border px-3 py-2 text-sm"
+              className="rounded-md border border-border px-3 py-1 text-sm"
             >
-              Cancelar
+              Cerrar
             </button>
-            <button
-              type="button"
-              disabled={
-                disabled ||
-                createMut.isPending ||
-                updateMut.isPending ||
-                (isNew && (!name.trim() || !slug.trim()))
-              }
-              onClick={() => (isNew ? createMut.mutate() : updateMut.mutate())}
-              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
-              {createMut.isPending || updateMut.isPending
-                ? "Guardando…"
-                : isNew
-                  ? "Crear rol"
-                  : "Guardar cambios"}
-            </button>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+            <label className="block text-sm">
+              Nombre
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isSystem}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+              />
+            </label>
+            <label className="block text-sm">
+              Identificador (slug)
+              <input
+                value={slug}
+                onChange={(e) => setSlug(e.target.value.toLowerCase())}
+                disabled={!isNew}
+                placeholder="ej. editor_destinos"
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+              />
+            </label>
+            <label className="block text-sm md:col-span-2">
+              Descripción
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                disabled={isSystem}
+                rows={2}
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+              />
+            </label>
+            <label className="flex items-center gap-3 text-sm">
+              Color
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                disabled={isSystem}
+                className="h-9 w-16 rounded border border-border bg-background disabled:opacity-60"
+              />
+              <code className="text-xs text-muted-foreground">{color}</code>
+            </label>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-sm font-medium">Permisos</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {disabled
+                ? "Editable sólo para roles que no son super_admin."
+                : "Marca las acciones que este rol podrá ejecutar. Los permisos marcados con ⚠ son sensibles."}
+            </p>
+            <div className="mt-3 space-y-4">
+              {byCategory.map(([cat, list]) => (
+                <div key={cat} className="rounded-xl border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium">{cat}</h4>
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      onClick={() =>
+                        setSelected((prev) => {
+                          const next = new Set(prev);
+                          const allOn = list.every((p) => next.has(p.id));
+                          for (const p of list) {
+                            if (allOn) next.delete(p.id);
+                            else next.add(p.id);
+                          }
+                          return next;
+                        })
+                      }
+                      className="text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50"
+                    >
+                      {list.every((p) => selected.has(p.id)) ? "Quitar todos" : "Marcar todos"}
+                    </button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
+                    {list.map((p) => (
+                      <label
+                        key={p.id}
+                        className="flex items-start gap-2 rounded-md px-2 py-1 text-sm hover:bg-muted/40"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected.has(p.id)}
+                          onChange={() => togglePerm(p.id)}
+                          disabled={disabled}
+                          className="mt-1"
+                        />
+                        <span>
+                          <span className="font-medium">
+                            {p.label}
+                            {p.is_dangerous ? (
+                              <span className="ml-1 text-destructive">⚠</span>
+                            ) : null}
+                          </span>
+                          <span className="block text-[11px] text-muted-foreground">
+                            <code>{p.key}</code>
+                            {p.description ? ` · ${p.description}` : ""}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+            {canDelete ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={confirmDel}
+                  onChange={(e) => setConfirmDel(e.target.value)}
+                  placeholder='Escribe "ELIMINAR" para borrar'
+                  className="w-56 rounded-md border border-destructive/40 bg-background px-3 py-2 text-xs"
+                />
+                <button
+                  type="button"
+                  disabled={confirmDel !== "ELIMINAR" || deleteMut.isPending}
+                  onClick={() => deleteMut.mutate()}
+                  className="rounded-md border border-destructive px-3 py-2 text-xs text-destructive disabled:opacity-50"
+                >
+                  {deleteMut.isPending ? "Eliminando…" : "Eliminar rol"}
+                </button>
+              </div>
+            ) : (
+              <span />
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-md border border-border px-3 py-2 text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={
+                  disabled ||
+                  createMut.isPending ||
+                  updateMut.isPending ||
+                  (isNew && (!name.trim() || !slug.trim()))
+                }
+                onClick={() => (isNew ? createMut.mutate() : updateMut.mutate())}
+                className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+              >
+                {createMut.isPending || updateMut.isPending
+                  ? "Guardando…"
+                  : isNew
+                    ? "Crear rol"
+                    : "Guardar cambios"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </DialogPortal>
   );
 }

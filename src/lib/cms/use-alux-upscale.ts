@@ -14,12 +14,7 @@
 import { useCallback, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { aluxUpscaleImage } from "@/lib/cms/alux-upscale.functions";
-import {
-  evaluateRoleFit,
-  ROLE_LABELS,
-  type ImageRole,
-  type RoleFit,
-} from "@/lib/cms/image-upload";
+import { evaluateRoleFit, ROLE_LABELS, type ImageRole, type RoleFit } from "@/lib/cms/image-upload";
 
 /* ───────────  Helpers compartidos  ─────────── */
 

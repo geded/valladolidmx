@@ -74,8 +74,14 @@ export function paletteContrastChecks(palette: BrandPalette) {
 
 export function aluxPaletteContrastChecks(palette: AluxPalette) {
   return [
-    { label: "Acción principal de Alux", ratio: contrastRatio(palette.primaryForeground, palette.primary) },
-    { label: "Superficie de Alux", ratio: contrastRatio(palette.surfaceForeground, palette.surface) },
+    {
+      label: "Acción principal de Alux",
+      ratio: contrastRatio(palette.primaryForeground, palette.primary),
+    },
+    {
+      label: "Superficie de Alux",
+      ratio: contrastRatio(palette.surfaceForeground, palette.surface),
+    },
     { label: "Acento de Alux", ratio: contrastRatio(palette.accentForeground, palette.accent) },
     { label: "Insignia de Alux", ratio: contrastRatio(palette.badgeForeground, palette.badge) },
   ].map((check) => ({ ...check, pass: check.ratio >= 4.5 }));

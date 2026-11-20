@@ -139,7 +139,12 @@ function minorAgesLabel(ages: number[]): string {
  */
 export function briefToHumanSummary(
   brief: TripBrief,
-  opts: { partySize?: number | null; startDate?: string | null; endDate?: string | null; itemCount?: number },
+  opts: {
+    partySize?: number | null;
+    startDate?: string | null;
+    endDate?: string | null;
+    itemCount?: number;
+  },
 ): string {
   const parts: string[] = [];
 
@@ -210,7 +215,9 @@ export function briefToHumanSummary(
 
   // Lugares guardados
   if (opts.itemCount != null && opts.itemCount > 0) {
-    parts.push(`${opts.itemCount} lugar${opts.itemCount === 1 ? "" : "es"} guardado${opts.itemCount === 1 ? "" : "s"}`);
+    parts.push(
+      `${opts.itemCount} lugar${opts.itemCount === 1 ? "" : "es"} guardado${opts.itemCount === 1 ? "" : "s"}`,
+    );
   }
 
   // Notas libres
@@ -260,13 +267,16 @@ export function briefToDetailRows(brief: TripBrief): Array<{ label: string; valu
 
   rows.push({ label: "Transportación", value: TRANSPORT_MODE_LABEL[brief.transportMode] });
   if (brief.transportMode === "rent_car") {
-    if (brief.rentalCarType) rows.push({ label: "Tipo de auto", value: RENTAL_CAR_TYPE_LABEL[brief.rentalCarType] });
+    if (brief.rentalCarType)
+      rows.push({ label: "Tipo de auto", value: RENTAL_CAR_TYPE_LABEL[brief.rentalCarType] });
     if (brief.needsChildSeat) rows.push({ label: "Silla infantil", value: "Sí" });
     if (brief.needsAdditionalDriver) rows.push({ label: "Conductor adicional", value: "Sí" });
-    if (brief.hasValidLicense != null) rows.push({ label: "Licencia vigente", value: brief.hasValidLicense ? "Sí" : "No" });
+    if (brief.hasValidLicense != null)
+      rows.push({ label: "Licencia vigente", value: brief.hasValidLicense ? "Sí" : "No" });
   }
   if (brief.transportMode === "tours_with_transport") {
-    if (brief.tourPreference) rows.push({ label: "Preferencia", value: TOUR_PREFERENCE_LABEL[brief.tourPreference] });
+    if (brief.tourPreference)
+      rows.push({ label: "Preferencia", value: TOUR_PREFERENCE_LABEL[brief.tourPreference] });
     if (brief.pickupPoint) rows.push({ label: "Punto de recogida", value: brief.pickupPoint });
   }
   if (brief.airportTransfer) {

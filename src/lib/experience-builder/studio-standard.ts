@@ -123,12 +123,15 @@ export const SURFACE_ROUTE_TEMPLATES: readonly {
   readonly test: (pathname: string) => boolean;
   readonly templateKey: string;
 }[] = [
-  { test: (p) => p === "/" , templateKey: "vmx.home.premium-g4" },
+  { test: (p) => p === "/", templateKey: "vmx.home.premium-g4" },
   {
     test: (p) => /^\/oriente-maya\/[^/]+\/?$/.test(p) && !p.startsWith("/oriente-maya/destinos"),
     templateKey: "vmx.destination.premium-g4",
   },
-  { test: (p) => /^\/(?:oriente-maya\/[^/]+\/)?lugares\/[^/]+\/?$/.test(p), templateKey: "vmx.place.premium-q2d" },
+  {
+    test: (p) => /^\/(?:oriente-maya\/[^/]+\/)?lugares\/[^/]+\/?$/.test(p),
+    templateKey: "vmx.place.premium-q2d",
+  },
   {
     test: (p) =>
       /^\/(hoteles|restaurantes|casas-de-vacaciones|experiencias|lugares|que-hacer)\/?$/.test(p) ||

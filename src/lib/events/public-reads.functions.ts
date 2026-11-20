@@ -55,7 +55,6 @@ export interface PublicEventCard {
   event_timezone: string;
 }
 
-
 export interface PublicEventDetail extends PublicEventCard {
   body: string | null;
   external_url: string | null;
@@ -133,7 +132,14 @@ type CardRow = {
     latitude?: number | null;
     longitude?: number | null;
   } | null;
-  media_assets?: { id: string; storage_bucket?: string | null; storage_path?: string | null; width: number | null; height: number | null; pipeline_status: string | null } | null;
+  media_assets?: {
+    id: string;
+    storage_bucket?: string | null;
+    storage_path?: string | null;
+    width: number | null;
+    height: number | null;
+    pipeline_status: string | null;
+  } | null;
 };
 
 /**
@@ -158,7 +164,17 @@ async function attachEventCovers(cards: PublicEventCard[], rows: CardRow[]) {
   if (!(await vb.shouldServePublicVariants())) return;
   const bases = cards.flatMap((card) => {
     const asset = rows.find((r) => r.id === card.id)?.media_assets;
-    return asset && card.cover_url ? [{ id: asset.id, file_url: card.cover_url, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status }] : [];
+    return asset && card.cover_url
+      ? [
+          {
+            id: asset.id,
+            file_url: card.cover_url,
+            width: asset.width,
+            height: asset.height,
+            pipeline_status: asset.pipeline_status,
+          },
+        ]
+      : [];
   });
   const bundles = await vb.attachReadyVariants(bases);
   for (const card of cards) {
@@ -172,7 +188,11 @@ async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEven
     rows.map(async (r) => {
       const scheduleTimes = normalizeScheduleTimes(r.schedule_times);
       const exceptionDates = normalizeExceptionDates(r.exception_dates);
-      const next = nextEventOccurrence({ ...r, schedule_times: scheduleTimes, exception_dates: exceptionDates });
+      const next = nextEventOccurrence({
+        ...r,
+        schedule_times: scheduleTimes,
+        exception_dates: exceptionDates,
+      });
       return {
         id: r.id,
         slug: r.slug,
@@ -210,9 +230,10 @@ function isUpcomingEvent(event: PublicEventCard, now = new Date()): boolean {
 }
 
 function sortByNextOccurrence(events: PublicEventCard[]): PublicEventCard[] {
-  return [...events].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
+  return [...events].sort(
+    (a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
+  );
 }
-
 
 export const listPublishedEvents = createServerFn({ method: "GET" })
   .inputValidator(
@@ -255,7 +276,9 @@ export const listPublishedEvents = createServerFn({ method: "GET" })
       return [];
     }
     const cards = await mapCards((rows ?? []) as unknown as CardRow[], true);
-    return sortByNextOccurrence(data.upcomingOnly ? cards.filter((event) => isUpcomingEvent(event)) : cards).slice(0, data.limit);
+    return sortByNextOccurrence(
+      data.upcomingOnly ? cards.filter((event) => isUpcomingEvent(event)) : cards,
+    ).slice(0, data.limit);
   });
 
 export const listEventsForDestination = createServerFn({ method: "GET" })
@@ -280,7 +303,10 @@ export const listEventsForDestination = createServerFn({ method: "GET" })
       return [];
     }
     const cards = await mapCards((rows ?? []) as unknown as CardRow[], true);
-    return sortByNextOccurrence(cards.filter((event) => isUpcomingEvent(event))).slice(0, data.limit);
+    return sortByNextOccurrence(cards.filter((event) => isUpcomingEvent(event))).slice(
+      0,
+      data.limit,
+    );
   });
 
 /**
@@ -333,7 +359,9 @@ export const getEventRelated = createServerFn({ method: "GET" })
       return [];
     }
     const filtered = ((rows ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id));
-    const cards = sortByNextOccurrence((await mapCards(filtered, true)).filter((event) => isUpcomingEvent(event)));
+    const cards = sortByNextOccurrence(
+      (await mapCards(filtered, true)).filter((event) => isUpcomingEvent(event)),
+    );
 
     // Fallback: si no hay suficientes en el destino, completa con próximos globales.
     let out = cards;
@@ -412,7 +440,18 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const cover = await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path);
     const vb = await import("@/lib/media/variant-bundles.server");
     const asset = r.media_assets;
-    const bundles = asset && cover && await vb.shouldServePublicVariants() ? await vb.attachReadyVariants([{ id: asset.id, file_url: cover, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status }]) : {};
+    const bundles =
+      asset && cover && (await vb.shouldServePublicVariants())
+        ? await vb.attachReadyVariants([
+            {
+              id: asset.id,
+              file_url: cover,
+              width: asset.width,
+              height: asset.height,
+              pipeline_status: asset.pipeline_status,
+            },
+          ])
+        : {};
     // Sólo consideramos organizador si la empresa está publicada, no
     // eliminada, y expone destino + categoría primaria + slug — datos
     // necesarios para construir un `@id` canónico y visible.
@@ -426,7 +465,11 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       : null;
     const scheduleTimes = normalizeScheduleTimes(r.schedule_times);
     const exceptionDates = normalizeExceptionDates(r.exception_dates);
-    const next = nextEventOccurrence({ ...r, schedule_times: scheduleTimes, exception_dates: exceptionDates });
+    const next = nextEventOccurrence({
+      ...r,
+      schedule_times: scheduleTimes,
+      exception_dates: exceptionDates,
+    });
     return {
       filter_attributes: normalizeFilterAttributes(r.filter_attributes),
       latitude: eventLat(r),

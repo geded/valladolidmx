@@ -322,7 +322,11 @@ export function ImageFramingDialog(props: Props) {
   };
 
   const title =
-    role === "logo" ? "Acomoda el logo" : role === "cover" ? "Acomoda la portada" : "Acomoda la foto";
+    role === "logo"
+      ? "Acomoda el logo"
+      : role === "cover"
+        ? "Acomoda la portada"
+        : "Acomoda la foto";
 
   return (
     <Dialog open={!!file} onOpenChange={(o) => !o && props.onCancel()}>
@@ -504,9 +508,7 @@ export function ImageFramingDialog(props: Props) {
   );
 }
 
-function ChipButton(
-  props: React.ButtonHTMLAttributes<HTMLButtonElement> & { active?: boolean },
-) {
+function ChipButton(props: React.ButtonHTMLAttributes<HTMLButtonElement> & { active?: boolean }) {
   const { active, className, ...rest } = props;
   return (
     <button

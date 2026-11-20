@@ -55,7 +55,8 @@ export function buildDestinationPremiumRuntime(input: {
   // cuando existe, y la galería conserva el resto para variantes que la usan.
   const heroSupporting = editorialPool.slice(1);
   const afterHero = editorialPool.slice(Math.min(poolSize, 5));
-  const narrativeMedia = (afterHero[0] ?? editorialPool[1]) ? [afterHero[0] ?? editorialPool[1]] : [];
+  const narrativeMedia =
+    (afterHero[0] ?? editorialPool[1]) ? [afterHero[0] ?? editorialPool[1]] : [];
   const galleryItems = editorialPool.slice(1);
   const heroDescription = destination.tagline?.trim() ?? "";
   const descubreText = destination.description?.trim() ?? "";

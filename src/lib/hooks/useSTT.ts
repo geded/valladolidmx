@@ -19,7 +19,11 @@ export function useSTT() {
 
   const cleanup = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      try { recorderRef.current.stop(); } catch { /* noop */ }
+      try {
+        recorderRef.current.stop();
+      } catch {
+        /* noop */
+      }
     }
     recorderRef.current = null;
     if (streamRef.current) {
@@ -55,9 +59,12 @@ export function useSTT() {
 
         try {
           const form = new FormData();
-          const ext = blob.type.includes("mp4") ? "mp4" : blob.type.includes("ogg") ? "ogg" : "webm";
+          const ext = blob.type.includes("mp4")
+            ? "mp4"
+            : blob.type.includes("ogg")
+              ? "ogg"
+              : "webm";
           form.append("file", blob, `recording.${ext}`);
-
 
           const response = await fetch("/api/public/stt", {
             method: "POST",
@@ -132,7 +139,11 @@ export function useSTT() {
         }
       };
 
-      try { recorder.stop(); } catch { /* noop */ }
+      try {
+        recorder.stop();
+      } catch {
+        /* noop */
+      }
     });
   }, [cleanup]);
 
@@ -144,11 +155,19 @@ export function useSTT() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const preferred = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
-      const supported = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported
-        ? preferred.find((t) => MediaRecorder.isTypeSupported(t))
-        : undefined;
-      const recorder = supported ? new MediaRecorder(stream, { mimeType: supported }) : new MediaRecorder(stream);
+      const preferred = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",
+        "audio/ogg;codecs=opus",
+      ];
+      const supported =
+        typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported
+          ? preferred.find((t) => MediaRecorder.isTypeSupported(t))
+          : undefined;
+      const recorder = supported
+        ? new MediaRecorder(stream, { mimeType: supported })
+        : new MediaRecorder(stream);
 
       recorderRef.current = recorder;
       chunksRef.current = [];

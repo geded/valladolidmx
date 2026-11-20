@@ -465,10 +465,7 @@ export const updateProductDirectSaleSettings = createServerFn({ method: "POST" }
       if (data.enabled !== current.direct_sale_enabled) {
         await assertDirectSaleAdmin(context as never);
       }
-      if (
-        data.commissionBps != null &&
-        data.commissionBps !== current.direct_sale_commission_bps
-      ) {
+      if (data.commissionBps != null && data.commissionBps !== current.direct_sale_commission_bps) {
         await assertDirectSaleAdmin(context as never);
       }
     }

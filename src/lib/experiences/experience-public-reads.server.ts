@@ -37,7 +37,11 @@ import {
   EXPERIENCE_ATTRIBUTE_FAMILY,
   EXPERIENCE_TYPE_ATTRIBUTE_KEY,
 } from "@/lib/experiences/experience-attributes";
-import { attachReadyVariants, shouldServePublicVariants, type AssetBaseForVariants } from "@/lib/media/variant-bundles.server";
+import {
+  attachReadyVariants,
+  shouldServePublicVariants,
+  type AssetBaseForVariants,
+} from "@/lib/media/variant-bundles.server";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 /**
@@ -164,8 +168,24 @@ export function resolveExperienceTypeLabel(
 async function signCovers(
   client: SupabaseClient<Database>,
   productIds: readonly string[],
-): Promise<Map<string, { url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>> {
-  const coverByProduct = new Map<string, { url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>();
+): Promise<
+  Map<
+    string,
+    {
+      url: string;
+      alt: string | null;
+      asset?: import("@/lib/media/resolve-source").MediaAssetInput;
+    }
+  >
+> {
+  const coverByProduct = new Map<
+    string,
+    {
+      url: string;
+      alt: string | null;
+      asset?: import("@/lib/media/resolve-source").MediaAssetInput;
+    }
+  >();
   const bases: AssetBaseForVariants[] = [];
   const assetByProduct = new Map<string, string>();
   if (!productIds.length) return coverByProduct;
@@ -207,7 +227,13 @@ async function signCovers(
         .createSignedUrl(asset.storage_path, 60 * 60);
       if (signed?.signedUrl) {
         assetByProduct.set(productId, String(asset.id));
-        bases.push({ id: String(asset.id), file_url: signed.signedUrl, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
+        bases.push({
+          id: String(asset.id),
+          file_url: signed.signedUrl,
+          width: asset.width ?? null,
+          height: asset.height ?? null,
+          pipeline_status: asset.pipeline_status ?? null,
+        });
         coverByProduct.set(productId, {
           url: signed.signedUrl,
           alt: (asset.alt_text as string | null) ?? null,
@@ -377,8 +403,7 @@ export async function listExperiencesListing(
             ? Number(product.direct_sale_price_amount)
             : null,
         onlineSalePriceCurrency: (product.direct_sale_currency as string | null) ?? null,
-        durationMinutes:
-          product.duration_minutes != null ? Number(product.duration_minutes) : null,
+        durationMinutes: product.duration_minutes != null ? Number(product.duration_minutes) : null,
         coordinates:
           (product.location_id ? locationById.get(String(product.location_id)) : null) ??
           locationByBusiness.get(String(product.business_id)) ??

@@ -182,8 +182,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
     const q = normalize(query.trim());
     const filtered = rows.filter((r) => {
       const inBand =
-        max === Infinity ||
-        (typeof r.durationSeconds === "number" && r.durationSeconds <= max);
+        max === Infinity || (typeof r.durationSeconds === "number" && r.durationSeconds <= max);
       const inQuery =
         !q ||
         normalize(r.destination.name).includes(q) ||
@@ -246,8 +245,6 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
         ...stops.map((s) => ({ lat: s.latitude, lng: s.longitude })),
       ]
     : undefined;
-
-
 
   /** Panel del recorrido, reutilizado en escritorio y en la hoja móvil. */
   const routePanel = (
@@ -596,7 +593,6 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                 </Button>
               ) : null}
             </div>
-
 
             {/* Recorrido en escritorio */}
             <div className="mt-4 hidden rounded-2xl border border-border bg-card p-4 lg:block">

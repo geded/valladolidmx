@@ -11,10 +11,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { StatusBadge } from "@/components/cms/EntityListView";
-import {
-  describeEditorialHistory,
-  getEditorialStatusGuidance,
-} from "@/lib/cms/editorial-language";
+import { describeEditorialHistory, getEditorialStatusGuidance } from "@/lib/cms/editorial-language";
 import { meridaDateTime } from "@/lib/time/merida";
 import {
   getReviewForModeration,
@@ -236,9 +233,7 @@ export function ReviewModerator({ id }: { id: string }) {
                   </div>
                 </details>
               </div>
-              <time className="text-muted-foreground">
-                {meridaDateTime(h.at)} · hora de Mérida
-              </time>
+              <time className="text-muted-foreground">{meridaDateTime(h.at)} · hora de Mérida</time>
             </div>
           ))}
         </div>

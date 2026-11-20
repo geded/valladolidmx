@@ -65,11 +65,10 @@ export function EditorialMediaFrame({
     // la foto, WebKit recalculaba primero la imagen y después el <picture>, que es
     // el agrandamiento visible durante el scroll en el canvas de 1024 px.
     const imagePresentationClass = classTokens
-      .filter(
-        (token) =>
-          /^(object-|transition(?:-|$)|duration-|ease-|opacity-|scale-|transform(?:-|$)|group-hover:|hover:|motion-)/.test(
-            token,
-          ),
+      .filter((token) =>
+        /^(object-|transition(?:-|$)|duration-|ease-|opacity-|scale-|transform(?:-|$)|group-hover:|hover:|motion-)/.test(
+          token,
+        ),
       )
       .join(" ");
     const reservedRatio =
@@ -110,7 +109,6 @@ export function EditorialMediaFrame({
         />
       </picture>
     );
-
   }
 
   return (

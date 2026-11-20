@@ -46,7 +46,11 @@ export function ProductLocationPanel({ productId }: { productId: string }) {
         },
       }),
     onSuccess: async () => {
-      setMessage(specific ? "Punto de encuentro guardado." : "La experiencia usa la ubicación principal del negocio.");
+      setMessage(
+        specific
+          ? "Punto de encuentro guardado."
+          : "La experiencia usa la ubicación principal del negocio.",
+      );
       await qc.invalidateQueries({ queryKey: ["cms", "product", productId, "location"] });
     },
     onError: (error) => setMessage(error instanceof Error ? error.message : "No se pudo guardar."),
@@ -75,27 +79,59 @@ export function ProductLocationPanel({ productId }: { productId: string }) {
       {!specific ? (
         <div className="mt-3 rounded-lg border border-border bg-muted/40 p-3 text-sm">
           <p className="font-medium">{current.data?.label || "Ubicación principal del negocio"}</p>
-          {current.data?.addressLine1 ? <p className="mt-1 text-muted-foreground">{current.data.addressLine1}</p> : null}
+          {current.data?.addressLine1 ? (
+            <p className="mt-1 text-muted-foreground">{current.data.addressLine1}</p>
+          ) : null}
         </div>
       ) : (
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <LocationPickerMap lat={lat} lng={lng} onChange={(point) => { setLat(point.lat); setLng(point.lng); }} />
+          <LocationPickerMap
+            lat={lat}
+            lng={lng}
+            onChange={(point) => {
+              setLat(point.lat);
+              setLng(point.lng);
+            }}
+          />
           <div className="space-y-3">
-            <label className="block text-xs font-medium">Nombre del punto
-              <input value={label} onChange={(event) => setLabel(event.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            <label className="block text-xs font-medium">
+              Nombre del punto
+              <input
+                value={label}
+                onChange={(event) => setLabel(event.target.value)}
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
             </label>
-            <label className="block text-xs font-medium">Dirección
-              <input value={address} onChange={(event) => setAddress(event.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            <label className="block text-xs font-medium">
+              Dirección
+              <input
+                value={address}
+                onChange={(event) => setAddress(event.target.value)}
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
             </label>
-            <p className="text-xs text-muted-foreground">Toca el mapa o arrastra el pin para ajustar.</p>
+            <p className="text-xs text-muted-foreground">
+              Toca el mapa o arrastra el pin para ajustar.
+            </p>
           </div>
         </div>
       )}
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Button type="button" disabled={save.isPending || current.isLoading} onClick={() => { setMessage(null); save.mutate(); }}>
+        <Button
+          type="button"
+          disabled={save.isPending || current.isLoading}
+          onClick={() => {
+            setMessage(null);
+            save.mutate();
+          }}
+        >
           {save.isPending ? "Guardando…" : "Guardar ubicación"}
         </Button>
-        {message ? <p role="status" className="text-xs text-muted-foreground">{message}</p> : null}
+        {message ? (
+          <p role="status" className="text-xs text-muted-foreground">
+            {message}
+          </p>
+        ) : null}
       </div>
     </section>
   );

@@ -279,14 +279,19 @@ export const saveMediaMetadata = createServerFn({ method: "POST" })
           .maybeSingle();
         if (currentError) throw currentError;
         const currentMetadata =
-          current?.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
+          current?.metadata &&
+          typeof current.metadata === "object" &&
+          !Array.isArray(current.metadata)
             ? (current.metadata as Record<string, unknown>)
             : {};
         const governed = buildRightsMetadata(rightsInput);
         patch.metadata = {
           ...currentMetadata,
           ...governed,
-          rights: { ...(currentMetadata.rights as Record<string, unknown> | undefined), ...governed.rights },
+          rights: {
+            ...(currentMetadata.rights as Record<string, unknown> | undefined),
+            ...governed.rights,
+          },
           lifecycle: {
             ...(currentMetadata.lifecycle as Record<string, unknown> | undefined),
             ...governed.lifecycle,

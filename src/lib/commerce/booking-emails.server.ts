@@ -119,7 +119,10 @@ export async function sendBookingTravelerEmail(
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as unknown as {
-      rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      rpc: (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: unknown }>;
       from: (table: string) => any;
     };
 
@@ -142,7 +145,10 @@ export async function sendBookingTravelerEmail(
       .eq("email", email)
       .maybeSingle();
     if (suppressed) {
-      await admin.from("concierge_orders").update({ [step.column]: nowIso }).eq("id", orderId);
+      await admin
+        .from("concierge_orders")
+        .update({ [step.column]: nowIso })
+        .eq("id", orderId);
       return { sent: false, reason: "suppressed" };
     }
 
@@ -176,7 +182,6 @@ export async function sendBookingTravelerEmail(
 
     const messageId = crypto.randomUUID();
 
-
     const { error: enqueueError } = await sendManagedPayload(admin, {
       queue_name: "transactional_emails",
       payload: {
@@ -206,7 +211,10 @@ export async function sendBookingTravelerEmail(
       return { sent: false, reason: "enqueue_failed" };
     }
 
-    await admin.from("concierge_orders").update({ [step.column]: nowIso }).eq("id", orderId);
+    await admin
+      .from("concierge_orders")
+      .update({ [step.column]: nowIso })
+      .eq("id", orderId);
     return { sent: true };
   } catch (err) {
     console.error("booking traveler email failed", {

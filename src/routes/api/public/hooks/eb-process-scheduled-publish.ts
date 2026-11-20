@@ -30,7 +30,8 @@ export const Route = createFileRoute("/api/public/hooks/eb-process-scheduled-pub
         const candidates = [process.env.EB_CRON_SECRET, process.env.CRON_HOOKS_SECRET].filter(
           (value): value is string => typeof value === "string" && value.length >= 32,
         );
-        const authorized = provided.length > 0 && candidates.some((exp) => safeEqual(provided, exp));
+        const authorized =
+          provided.length > 0 && candidates.some((exp) => safeEqual(provided, exp));
         if (!authorized) {
           return new Response("Unauthorized", { status: 401 });
         }

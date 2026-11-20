@@ -40,7 +40,15 @@ interface BadgeChipProps {
   navigationHref?: string;
 }
 
-function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram, navigationHref }: BadgeChipProps) {
+function BadgeChip({
+  item,
+  variant,
+  size,
+  showLabel,
+  monochrome,
+  linkToProgram,
+  navigationHref,
+}: BadgeChipProps) {
   const entry = getBadgeRegistryEntry(item.kind);
   const Icon = entry.icon;
   const label = item.label || entry.label;
@@ -85,7 +93,10 @@ function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram, 
 
   const iconSizePx = size === "sm" ? 12 : size === "lg" ? 18 : 14;
   const showText = showLabel && variant !== "icon-only";
-  const internalHref = navigationHref?.startsWith("/") && !navigationHref.startsWith("//") ? navigationHref : undefined;
+  const internalHref =
+    navigationHref?.startsWith("/") && !navigationHref.startsWith("//")
+      ? navigationHref
+      : undefined;
   const isLink = internalHref || (linkToProgram && (item.programUrl || entry.programUrl));
   const href = internalHref || item.programUrl || entry.programUrl || "";
 
@@ -146,7 +157,12 @@ function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram, 
 /* Componente principal                                                       */
 /* -------------------------------------------------------------------------- */
 
-export function InstitutionalBadges({ dto, subjectSlug, className, navigationHrefs }: InstitutionalBadgesProps) {
+export function InstitutionalBadges({
+  dto,
+  subjectSlug,
+  className,
+  navigationHrefs,
+}: InstitutionalBadgesProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const { variant, size, layout, items, ariaLabel, capabilities } = dto;
 

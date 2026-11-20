@@ -91,9 +91,15 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
                       className="flex items-start gap-3 border-b border-border pb-3 last:border-b-0 sm:last:border-b-0"
                     >
                       {I ? (
-                        <I className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                        <I
+                          className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
+                          aria-hidden="true"
+                        />
                       ) : (
-                        <Check className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                        <Check
+                          className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
+                          aria-hidden="true"
+                        />
                       )}
                       <span className={cn("min-w-0 text-sm leading-snug", TONE[it.tone])}>
                         {it.value}
@@ -130,12 +136,11 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
           {items.map((it, i) => {
             const I = it.iconKey ? ICONS[it.iconKey] : null;
             return (
-              <li
-                key={i}
-                className="min-w-0 rounded-lg border border-border bg-card p-2.5 sm:p-4"
-              >
+              <li key={i} className="min-w-0 rounded-lg border border-border bg-card p-2.5 sm:p-4">
                 <div className="flex min-w-0 items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground sm:gap-2 sm:text-xs sm:tracking-widest">
-                  {I ? <I className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true" /> : null}
+                  {I ? (
+                    <I className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true" />
+                  ) : null}
                   <span className="truncate">{it.label}</span>
                 </div>
                 <MaybeLink

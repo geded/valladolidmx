@@ -91,11 +91,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
       }
     ).media_assets;
     const { isAccreditedDestinationMedia } = await import("./public-media-policy");
-    if (
-      media?.storage_bucket &&
-      media?.storage_path &&
-      isAccreditedDestinationMedia(media)
-    ) {
+    if (media?.storage_bucket && media?.storage_path && isAccreditedDestinationMedia(media)) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: signed, error: signErr } = await supabaseAdmin.storage
         .from(media.storage_bucket)
@@ -107,8 +103,18 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
         const meta = (media.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(media, { fallback: "" });
         const vb = await import("@/lib/media/variant-bundles.server");
-        const bundles = media.id && await vb.shouldServePublicVariants()
-          ? await vb.attachReadyVariants([{ id: media.id, file_url: hero_url, width: media.width ?? null, height: media.height ?? null, pipeline_status: media.pipeline_status ?? null }]) : {};
+        const bundles =
+          media.id && (await vb.shouldServePublicVariants())
+            ? await vb.attachReadyVariants([
+                {
+                  id: media.id,
+                  file_url: hero_url,
+                  width: media.width ?? null,
+                  height: media.height ?? null,
+                  pipeline_status: media.pipeline_status ?? null,
+                },
+              ])
+            : {};
         hero_media = {
           asset: media.id ? bundles[media.id] : undefined,
           mediaAssetId: media.id ?? null,
@@ -256,7 +262,14 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
       rows.map(async (r) => {
         const m = (
           r as unknown as {
-            media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
+            media_assets?: {
+              id: string;
+              storage_bucket: string;
+              storage_path: string;
+              width: number | null;
+              height: number | null;
+              pipeline_status: string | null;
+            } | null;
           }
         ).media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
@@ -295,7 +308,7 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
     const { data: rows, error } = await sb
       .from("destination_media")
       .select(
-         "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum ), destinations!inner(slug)",
+        "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum ), destinations!inner(slug)",
       )
       .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
@@ -340,7 +353,13 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         if (!s?.signedUrl) return null;
         const meta = (m.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(m, { fallback: "" });
-        bases.push({ id: m.id, file_url: s.signedUrl, width: m.width ?? null, height: m.height ?? null, pipeline_status: m.pipeline_status });
+        bases.push({
+          id: m.id,
+          file_url: s.signedUrl,
+          width: m.width ?? null,
+          height: m.height ?? null,
+          pipeline_status: m.pipeline_status,
+        });
         const item: PublicMediaAttribution = {
           mediaAssetId: m.id ?? row.media_asset_id ?? null,
           url: s.signedUrl,
@@ -361,7 +380,9 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
     const vb = await import("@/lib/media/variant-bundles.server");
     if (await vb.shouldServePublicVariants()) {
       const bundles = await vb.attachReadyVariants(bases);
-      for (const item of items) if (item.mediaAssetId && bundles[item.mediaAssetId]) item.asset = bundles[item.mediaAssetId];
+      for (const item of items)
+        if (item.mediaAssetId && bundles[item.mediaAssetId])
+          item.asset = bundles[item.mediaAssetId];
     }
     return items;
   });
@@ -427,7 +448,9 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .limit(60),
       sb
         .from("events")
-        .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone")
+        .select(
+          "id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
+        )
         .eq("status", "published")
         .is("deleted_at", null)
         .eq("destination_id", dest.id)
@@ -564,7 +587,14 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             first.map(async (r) => {
               const a = (
                 r as unknown as {
-                  media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
+                  media_assets?: {
+                    id: string;
+                    storage_bucket: string;
+                    storage_path: string;
+                    width: number | null;
+                    height: number | null;
+                    pipeline_status: string | null;
+                  } | null;
                 }
               ).media_assets;
               if (!a) return { id: r.business_id as string, url: null as string | null };
@@ -573,14 +603,22 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
                 .createSignedUrl(a.storage_path, 3600);
               if (s?.signedUrl) {
                 idByBusiness.set(String(r.business_id), a.id);
-                bases.push({ id: a.id, file_url: s.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+                bases.push({
+                  id: a.id,
+                  file_url: s.signedUrl,
+                  width: a.width,
+                  height: a.height,
+                  pipeline_status: a.pipeline_status,
+                });
               }
               return { id: r.business_id as string, url: s?.signedUrl ?? null };
             }),
           );
           const byBiz = new Map(signed.map((x) => [x.id, x.url] as const));
           const vb = await import("@/lib/media/variant-bundles.server");
-          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(bases) : {};
+          const bundles = (await vb.shouldServePublicVariants())
+            ? await vb.attachReadyVariants(bases)
+            : {};
           const patchCover = (c: MarketplaceBusinessCard) => ({
             ...c,
             cover_url: byBiz.get(c.id) ?? null,
@@ -646,7 +684,8 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             .order("sort_order", { ascending: true });
           const byProd = new Map<string, string | null>();
           const idByProduct = new Map<string, string>();
-          const productBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+          const productBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] =
+            [];
           if (pmedia && pmedia.length > 0) {
             try {
               const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -661,7 +700,14 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
                 first.map(async (r) => {
                   const a = (
                     r as unknown as {
-                      media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
+                      media_assets?: {
+                        id: string;
+                        storage_bucket: string;
+                        storage_path: string;
+                        width: number | null;
+                        height: number | null;
+                        pipeline_status: string | null;
+                      } | null;
                     }
                   ).media_assets;
                   if (!a) return { id: r.product_id as string, url: null as string | null };
@@ -670,7 +716,13 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
                     .createSignedUrl(a.storage_path, 3600);
                   if (s?.signedUrl) {
                     idByProduct.set(String(r.product_id), a.id);
-                    productBases.push({ id: a.id, file_url: s.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+                    productBases.push({
+                      id: a.id,
+                      file_url: s.signedUrl,
+                      width: a.width,
+                      height: a.height,
+                      pipeline_status: a.pipeline_status,
+                    });
                   }
                   return { id: r.product_id as string, url: s?.signedUrl ?? null };
                 }),
@@ -681,10 +733,13 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             }
           }
           const vb = await import("@/lib/media/variant-bundles.server");
-          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(productBases) : {};
+          const bundles = (await vb.shouldServePublicVariants())
+            ? await vb.attachReadyVariants(productBases)
+            : {};
           grouped.productos = grouped.productos.map((p) => {
             const own = byProd.get(p.id) ?? null;
-            if (own) return { ...p, cover_url: own, cover_asset: bundles[idByProduct.get(p.id) ?? ""] };
+            if (own)
+              return { ...p, cover_url: own, cover_asset: bundles[idByProduct.get(p.id) ?? ""] };
             // Fallback: usar la portada del negocio dueño.
             const parent = grouped.hoteles
               .concat(grouped.restaurantes, grouped.experiencias, grouped.otras)
@@ -715,7 +770,12 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           const next = nextEventOccurrence({
             starts_at: e.starts_at as string,
             ends_at: e.ends_at as string | null,
-            recurrence_frequency: e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null,
+            recurrence_frequency: e.recurrence_frequency as
+              | "daily"
+              | "weekly"
+              | "monthly"
+              | "yearly"
+              | null,
             recurrence_interval: e.recurrence_interval as number,
             recurrence_weekdays: e.recurrence_weekdays as number[],
             recurrence_until: e.recurrence_until as string | null,
@@ -725,27 +785,28 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           });
           if (!next) return null;
           return {
-          id: e.id as string,
-          slug: e.slug as string,
-          title: e.title as string,
-          summary: (e.summary as string | null) ?? null,
-          starts_at: next.startsAt,
-          ends_at: e.recurrence_frequency ? null : ((e.ends_at as string | null) ?? null),
-          venue_name: (e.venue_name as string | null) ?? null,
-          is_free: Boolean(e.is_free),
-          destination_slug: dest.slug,
-          destination_name: null,
-          filter_attributes: {},
-          latitude: null,
-          longitude: null,
-          cover_url: null,
-          recurrence_frequency: (e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null) ?? null,
-          recurrence_interval: Number(e.recurrence_interval ?? 1),
-          recurrence_weekdays: (e.recurrence_weekdays as number[]) ?? [],
-          recurrence_until: (e.recurrence_until as string | null) ?? null,
-          schedule_times: scheduleTimes,
-          exception_dates: exceptionDates,
-          event_timezone: (e.event_timezone as string | null) ?? "America/Merida",
+            id: e.id as string,
+            slug: e.slug as string,
+            title: e.title as string,
+            summary: (e.summary as string | null) ?? null,
+            starts_at: next.startsAt,
+            ends_at: e.recurrence_frequency ? null : ((e.ends_at as string | null) ?? null),
+            venue_name: (e.venue_name as string | null) ?? null,
+            is_free: Boolean(e.is_free),
+            destination_slug: dest.slug,
+            destination_name: null,
+            filter_attributes: {},
+            latitude: null,
+            longitude: null,
+            cover_url: null,
+            recurrence_frequency:
+              (e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null) ?? null,
+            recurrence_interval: Number(e.recurrence_interval ?? 1),
+            recurrence_weekdays: (e.recurrence_weekdays as number[]) ?? [],
+            recurrence_until: (e.recurrence_until as string | null) ?? null,
+            schedule_times: scheduleTimes,
+            exception_dates: exceptionDates,
+            event_timezone: (e.event_timezone as string | null) ?? "America/Merida",
           } satisfies PublicEventCard;
         })
         .filter((event): event is PublicEventCard => event !== null)

@@ -207,7 +207,6 @@ const schema: BlockSchema = {
     ...mediaFields,
   }),
 
-
   // 10 · Historias (Qué hacer)
   que_hacer_kicker: text("Historias · kicker", "que_hacer_kicker"),
   que_hacer_title: text("Historias · título", "que_hacer_title"),

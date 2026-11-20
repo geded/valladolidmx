@@ -167,14 +167,22 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
                 .createSignedUrl(asset.storage_path, 3600);
               if (s?.signedUrl) {
                 idByBusiness.set(String(r.business_id), asset.id);
-                bases.push({ id: asset.id, file_url: s.signedUrl, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status });
+                bases.push({
+                  id: asset.id,
+                  file_url: s.signedUrl,
+                  width: asset.width,
+                  height: asset.height,
+                  pipeline_status: asset.pipeline_status,
+                });
               }
               return [String(r.business_id), s?.signedUrl ?? null] as const;
             }),
           );
           const byBiz = new Map(signed);
           const vb = await import("@/lib/media/variant-bundles.server");
-          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(bases) : {};
+          const bundles = (await vb.shouldServePublicVariants())
+            ? await vb.attachReadyVariants(bases)
+            : {};
           for (const card of shown) {
             card.cover_url = byBiz.get(card.id) ?? null;
             card.cover_asset = bundles[idByBusiness.get(card.id) ?? ""];

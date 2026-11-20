@@ -10,11 +10,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { CmsTerritoryBar, useCmsTerritoryOptions } from "@/components/cms/CmsTerritoryBar";
-import {
-  CMS_STATUS_OPTIONS,
-  CmsFilterGrid,
-  CmsSelectFilter,
-} from "@/components/cms/CmsFilters";
+import { CMS_STATUS_OPTIONS, CmsFilterGrid, CmsSelectFilter } from "@/components/cms/CmsFilters";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
 import {
   listCommerceExperiences,

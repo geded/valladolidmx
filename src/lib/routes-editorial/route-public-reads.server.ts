@@ -8,7 +8,11 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import type { MediaAssetInput } from "@/lib/media/resolve-source";
-import { attachReadyVariants, shouldServePublicVariants, type AssetBaseForVariants } from "@/lib/media/variant-bundles.server";
+import {
+  attachReadyVariants,
+  shouldServePublicVariants,
+  type AssetBaseForVariants,
+} from "@/lib/media/variant-bundles.server";
 type RouteMedia = { url: string | null; alt: string | null; asset?: MediaAssetInput };
 import type {
   EditorialRouteCardDTO,
@@ -74,9 +78,7 @@ async function destinationSlugMap(
   return map;
 }
 
-async function signMedia(
-  ids: string[],
-): Promise<Map<string, RouteMedia>> {
+async function signMedia(ids: string[]): Promise<Map<string, RouteMedia>> {
   const out = new Map<string, RouteMedia>();
   const unique = Array.from(new Set(ids.filter(Boolean)));
   if (!unique.length) return out;
@@ -97,7 +99,14 @@ async function signMedia(
         .createSignedUrl(String(asset.storage_path), 60 * 60);
       url = signed?.signedUrl ?? null;
     }
-    if (url) bases.push({ id: String(asset.id), file_url: url, width: typeof asset.width === "number" ? asset.width : null, height: typeof asset.height === "number" ? asset.height : null, pipeline_status: typeof asset.pipeline_status === "string" ? asset.pipeline_status : null });
+    if (url)
+      bases.push({
+        id: String(asset.id),
+        file_url: url,
+        width: typeof asset.width === "number" ? asset.width : null,
+        height: typeof asset.height === "number" ? asset.height : null,
+        pipeline_status: typeof asset.pipeline_status === "string" ? asset.pipeline_status : null,
+      });
     out.set(String(asset.id), {
       url,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

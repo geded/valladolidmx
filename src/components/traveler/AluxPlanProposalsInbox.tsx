@@ -93,9 +93,7 @@ export function AluxPlanProposalsInbox({ onChanged }: { onChanged?: () => void }
           />
         ))}
       </ul>
-      <p className="mt-3 text-[11px] text-muted-foreground">
-        {alux.copy("proposalsDisclaimer")}
-      </p>
+      <p className="mt-3 text-[11px] text-muted-foreground">{alux.copy("proposalsDisclaimer")}</p>
     </section>
   );
 }

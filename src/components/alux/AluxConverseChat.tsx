@@ -437,7 +437,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
     >
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
         <MessageCircle className="size-3.5" aria-hidden />
-         <span id="alux-converse">{alux.copy("conversationTitle")}</span>
+        <span id="alux-converse">{alux.copy("conversationTitle")}</span>
         {messages.length > 0 ? (
           <button
             type="button"

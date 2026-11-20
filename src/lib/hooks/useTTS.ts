@@ -32,7 +32,11 @@ export function useTTS() {
   const stop = useCallback(() => {
     abortRef.current?.abort();
     for (const src of sourcesRef.current) {
-      try { src.stop(); } catch { /* already stopped */ }
+      try {
+        src.stop();
+      } catch {
+        /* already stopped */
+      }
     }
     sourcesRef.current.clear();
     if (contextRef.current) {
@@ -47,7 +51,11 @@ export function useTTS() {
     if (abortRef.current) {
       abortRef.current.abort();
       for (const src of sourcesRef.current) {
-        try { src.stop(); } catch { /* noop */ }
+        try {
+          src.stop();
+        } catch {
+          /* noop */
+        }
       }
       sourcesRef.current.clear();
     }

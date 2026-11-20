@@ -148,7 +148,11 @@ export function ReservationRefundPanel({
             >
               {mutation.isPending ? "Registrando…" : "Confirmar reembolso"}
             </Button>
-            <Button variant="ghost" onClick={() => setOpenForm(false)} disabled={mutation.isPending}>
+            <Button
+              variant="ghost"
+              onClick={() => setOpenForm(false)}
+              disabled={mutation.isPending}
+            >
               Cancelar
             </Button>
           </div>

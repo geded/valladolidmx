@@ -7,10 +7,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import {
-  EDITORIAL_STATUS_ORDER,
-  getEditorialStatusLabel,
-} from "@/lib/cms/editorial-language";
+import { EDITORIAL_STATUS_ORDER, getEditorialStatusLabel } from "@/lib/cms/editorial-language";
 
 export const Route = createFileRoute("/_authenticated/cms/")({
   head: () => ({

@@ -303,7 +303,6 @@ export function hasVisitedTravelPlanner(): boolean {
   }
 }
 
-
 /**
  * Devuelve el pathname anterior al actual. Los efectos de la página se
  * ejecutan antes que el puente global, por lo que el rastro puede no
@@ -398,9 +397,7 @@ export function readJourneyTrail(): JourneyStep[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as JourneyStep[];
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (s) => s && typeof s.path === "string" && typeof s.label === "string",
-    );
+    return parsed.filter((s) => s && typeof s.path === "string" && typeof s.label === "string");
   } catch {
     return [];
   }

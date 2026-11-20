@@ -134,7 +134,10 @@ function isRootOrderOnlyDelta(next: CompositionTree, previous: CompositionTree):
   const strip = (node: CompositionNode) => {
     const { order: _order, ...rest } = (node.config ?? {}) as Record<string, unknown>;
     return canonicalize(
-      dropUndefined({ ...(node as unknown as Record<string, unknown>), config: dropUndefined(rest) }),
+      dropUndefined({
+        ...(node as unknown as Record<string, unknown>),
+        config: dropUndefined(rest),
+      }),
     );
   };
   let orderChanged = false;
@@ -394,7 +397,6 @@ export const getComposition = createServerFn({ method: "GET" })
     };
   });
 
-
 /**
  * Devuelve el árbol de la revisión activa (snapshot publicado) de una
  * composición, o `null` si nunca se publicó. Se usa en el Studio para
@@ -460,8 +462,6 @@ function isTransientDbError(message: string): boolean {
     m.includes("too many clients")
   );
 }
-
-
 
 export const createComposition = createServerFn({ method: "POST" })
   .inputValidator(

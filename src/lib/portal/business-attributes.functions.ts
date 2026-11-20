@@ -212,7 +212,8 @@ export const createAttributeOptionQuick = createServerFn({ method: "POST" })
       .eq("definition_id", data.definitionId)
       .ilike("label", data.label)
       .maybeSingle();
-    if (existing?.value) return { value: existing.value as string, label: existing.label as string };
+    if (existing?.value)
+      return { value: existing.value as string, label: existing.label as string };
 
     const { data: maxRow } = await supabase
       .from("tourism_attribute_options")

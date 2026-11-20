@@ -80,7 +80,6 @@ export async function enqueueTransactionalEmail(
 
     const messageId = crypto.randomUUID();
 
-
     const { error: enqueueError } = await sendManagedPayload(supabaseAdmin, {
       queue_name: "transactional_emails",
       payload: {

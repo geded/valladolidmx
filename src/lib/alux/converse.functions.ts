@@ -694,7 +694,13 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const deterministicIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
     const intentApiKey = process.env["LOVABLE_API_KEY"];
     const baseIntent = intentApiKey
-      ? await enhanceIntentWithAI(intentApiKey, INTENT_MODEL, message, deterministicIntent, knownSlugs)
+      ? await enhanceIntentWithAI(
+          intentApiKey,
+          INTENT_MODEL,
+          message,
+          deterministicIntent,
+          knownSlugs,
+        )
       : deterministicIntent;
     const mentioned = baseIntent.mentionedDestinationSlugs;
     const selectedRouteNeedsStopTerritory = Boolean(

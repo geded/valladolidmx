@@ -4,8 +4,26 @@
  */
 
 const STOPWORDS = new Set([
-  "hotel", "hoteles", "restaurante", "restaurant", "casa", "boutique", "the", "el", "la",
-  "los", "las", "de", "del", "y", "&", "b&b", "bed", "breakfast", "hostal", "suites",
+  "hotel",
+  "hoteles",
+  "restaurante",
+  "restaurant",
+  "casa",
+  "boutique",
+  "the",
+  "el",
+  "la",
+  "los",
+  "las",
+  "de",
+  "del",
+  "y",
+  "&",
+  "b&b",
+  "bed",
+  "breakfast",
+  "hostal",
+  "suites",
 ]);
 
 export function normalizeName(s: string): string {
@@ -30,7 +48,8 @@ export function isBusinessMatch(query: string, name: string, slug = ""): boolean
   const n = normalizeName(name);
   const sl = normalizeName(slug);
   const compact = (x: string) => x.replace(/ /g, "");
-  if (n.includes(q) || compact(n).includes(compact(q)) || compact(sl).includes(compact(q))) return true;
+  if (n.includes(q) || compact(n).includes(compact(q)) || compact(sl).includes(compact(q)))
+    return true;
   const qt = keyTokens(query);
   if (qt.length === 0) return false;
   const nt = new Set([...keyTokens(name), ...keyTokens(slug)]);

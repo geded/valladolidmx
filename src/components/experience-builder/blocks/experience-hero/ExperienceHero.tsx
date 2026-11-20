@@ -326,15 +326,30 @@ export function ExperienceHero({
         )}
       >
         <picture className="contents">
-{resolveMediaSource(dto.media?.asset, { fallbackUrl: dto.media?.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-<img src={resolveMediaSource(dto.media?.asset, { fallbackUrl: dto.media?.url, context: "hero" }).src}
-          alt={dto.media?.alt}
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-        />
-</picture>
+          {resolveMediaSource(dto.media?.asset, {
+            fallbackUrl: dto.media?.url,
+            context: "hero",
+            sizes: "100vw",
+          }).sources.map((source) => (
+            <source
+              key={source.type}
+              type={source.type}
+              srcSet={source.srcSet}
+              sizes={source.sizes}
+            />
+          ))}
+          <img
+            src={
+              resolveMediaSource(dto.media?.asset, { fallbackUrl: dto.media?.url, context: "hero" })
+                .src
+            }
+            alt={dto.media?.alt}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10"
@@ -363,15 +378,32 @@ export function ExperienceHero({
       >
         <div className="relative aspect-[4/3] md:aspect-auto">
           <picture className="contents">
-{resolveMediaSource(dto.media?.asset, { fallbackUrl: dto.media?.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-<img src={resolveMediaSource(dto.media?.asset, { fallbackUrl: dto.media?.url, context: "hero" }).src}
-            alt={dto.media?.alt}
-            className="h-full w-full object-cover"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-          />
-</picture>
+            {resolveMediaSource(dto.media?.asset, {
+              fallbackUrl: dto.media?.url,
+              context: "hero",
+              sizes: "100vw",
+            }).sources.map((source) => (
+              <source
+                key={source.type}
+                type={source.type}
+                srcSet={source.srcSet}
+                sizes={source.sizes}
+              />
+            ))}
+            <img
+              src={
+                resolveMediaSource(dto.media?.asset, {
+                  fallbackUrl: dto.media?.url,
+                  context: "hero",
+                }).src
+              }
+              alt={dto.media?.alt}
+              className="h-full w-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
         </div>
         <div className="flex items-center p-6 sm:p-10">{textStack}</div>
       </section>
@@ -431,20 +463,31 @@ function CinematicHero({
       >
         {slides.map((s, i) => (
           <picture key={`${s.url}-${i}`} className="contents">
-{resolveMediaSource(s.asset, { fallbackUrl: s.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-<img 
-            src={resolveMediaSource(s.asset, { fallbackUrl: s.url, context: "hero" }).src}
-            alt={s.alt}
-            className={cn(
-              "absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out",
-              slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0",
-            )}
-            style={{ objectPosition: s.focalPoint ?? "center" }}
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-            decoding="async"
-          />
-</picture>
+            {resolveMediaSource(s.asset, {
+              fallbackUrl: s.url,
+              context: "hero",
+              sizes: "100vw",
+            }).sources.map((source) => (
+              <source
+                key={source.type}
+                type={source.type}
+                srcSet={source.srcSet}
+                sizes={source.sizes}
+              />
+            ))}
+            <img
+              src={resolveMediaSource(s.asset, { fallbackUrl: s.url, context: "hero" }).src}
+              alt={s.alt}
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out",
+                slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0",
+              )}
+              style={{ objectPosition: s.focalPoint ?? "center" }}
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
+              decoding="async"
+            />
+          </picture>
         ))}
       </div>
       <div
@@ -524,16 +567,28 @@ function GalleryHero({
                 style={{ aspectRatio: "4 / 3" }}
               >
                 <picture className="contents">
-{resolveMediaSource(s.asset, { fallbackUrl: s.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
-<img src={resolveMediaSource(s.asset, { fallbackUrl: s.url, context: "hero" }).src}
-                  alt={s.alt || `${dto.title} — foto ${i + 1}`}
-                  className="h-full w-full object-cover"
-                  style={{ objectPosition: s.focalPoint ?? "center" }}
-                  loading={i === 0 ? "eager" : "lazy"}
-                  fetchPriority={i === 0 ? "high" : "auto"}
-                  decoding="async"
-                />
-</picture>
+                  {resolveMediaSource(s.asset, {
+                    fallbackUrl: s.url,
+                    context: "hero",
+                    sizes: "100vw",
+                  }).sources.map((source) => (
+                    <source
+                      key={source.type}
+                      type={source.type}
+                      srcSet={source.srcSet}
+                      sizes={source.sizes}
+                    />
+                  ))}
+                  <img
+                    src={resolveMediaSource(s.asset, { fallbackUrl: s.url, context: "hero" }).src}
+                    alt={s.alt || `${dto.title} — foto ${i + 1}`}
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: s.focalPoint ?? "center" }}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "auto"}
+                    decoding="async"
+                  />
+                </picture>
               </li>
             ))}
           </ul>

@@ -15,7 +15,6 @@ export const MERIDA_LOCALE = "es-MX";
 
 export type DestinationDateInput = Date | string | number;
 
-
 function parseDestinationDate(input: DestinationDateInput): Date | null {
   if (input instanceof Date) {
     return Number.isNaN(input.getTime()) ? null : new Date(input.getTime());

@@ -60,10 +60,7 @@ export const signDerivedVariantUploads = createServerFn({ method: "POST" })
 export const registerDerivedVariants = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: {
-      assetId: string;
-      variants: Array<{ width: number; height: number; bytes: number }>;
-    }) => {
+    (d: { assetId: string; variants: Array<{ width: number; height: number; bytes: number }> }) => {
       if (!d?.assetId || !Array.isArray(d.variants) || d.variants.length === 0)
         throw new Error("invalid_input");
       const variants = d.variants.filter(

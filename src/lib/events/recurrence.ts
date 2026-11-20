@@ -76,7 +76,8 @@ function localDateTimeIso(date: string, time: string): string {
     timeZone: EVENT_TIME_ZONE,
     timeZoneName: "longOffset",
   }).formatToParts(probe);
-  const offset = parts.find((part) => part.type === "timeZoneName")?.value.replace("GMT", "") || "-06:00";
+  const offset =
+    parts.find((part) => part.type === "timeZoneName")?.value.replace("GMT", "") || "-06:00";
   return `${date}T${time}:00${offset}`;
 }
 
@@ -114,7 +115,11 @@ export function normalizeExceptionDates(value: unknown): EventExceptionDate[] {
   return [...unique.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
 
-function isOccurrenceDate(input: EventRecurrenceInput, candidate: string, startDate: string): boolean {
+function isOccurrenceDate(
+  input: EventRecurrenceInput,
+  candidate: string,
+  startDate: string,
+): boolean {
   const interval = Math.max(1, Math.floor(input.recurrence_interval ?? 1));
   const distance = dayDistance(startDate, candidate);
   if (distance < 0) return false;
@@ -125,11 +130,18 @@ function isOccurrenceDate(input: EventRecurrenceInput, candidate: string, startD
       const weekdays = input.recurrence_weekdays?.length
         ? input.recurrence_weekdays
         : [utcDate(startDate).getUTCDay()];
-      return Math.floor(distance / 7) % interval === 0 && weekdays.includes(utcDate(candidate).getUTCDay());
+      return (
+        Math.floor(distance / 7) % interval === 0 &&
+        weekdays.includes(utcDate(candidate).getUTCDay())
+      );
     }
     case "monthly": {
       const months = monthDistance(startDate, candidate);
-      return months >= 0 && months % interval === 0 && utcDate(candidate).getUTCDate() === utcDate(startDate).getUTCDate();
+      return (
+        months >= 0 &&
+        months % interval === 0 &&
+        utcDate(candidate).getUTCDate() === utcDate(startDate).getUTCDate()
+      );
     }
     case "yearly": {
       const start = utcDate(startDate);
@@ -153,13 +165,18 @@ export function nextEventOccurrence(
   if (Number.isNaN(base.getTime())) return null;
   if (!input.recurrence_frequency) {
     if (base.getTime() < now.getTime()) return null;
-    return { startsAt: input.starts_at, endsAt: input.ends_at ?? null, date: input.starts_at.slice(0, 10) };
+    return {
+      startsAt: input.starts_at,
+      endsAt: input.ends_at ?? null,
+      date: input.starts_at.slice(0, 10),
+    };
   }
 
   const startDate = input.starts_at.slice(0, 10);
   const today = localDateInMerida(now);
   const currentTime = localTimeInMerida(now);
-  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  const until =
+    input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
   const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
   const fallbackTime = meridaTimeOfIso(input.starts_at);
   const times = normalizeScheduleTimes(input.schedule_times);
@@ -221,7 +238,8 @@ export function upcomingEventOccurrences(
   const startDate = input.starts_at.slice(0, 10);
   const today = localDateInMerida(now);
   const currentTime = localTimeInMerida(now);
-  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  const until =
+    input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
   const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
   const times = normalizeScheduleTimes(input.schedule_times);
   const schedule = times.length ? times : [{ time: meridaTimeOfIso(input.starts_at), label: null }];
@@ -263,7 +281,8 @@ export function eventOccursOnDate(input: EventRecurrenceInput, dateKey: string):
     return dateKey >= startDate && dateKey <= (endKey >= startDate ? endKey : startDate);
   }
 
-  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  const until =
+    input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
   if (until && dateKey > until) return false;
   const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
   if (excluded.has(dateKey)) return false;

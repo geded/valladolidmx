@@ -327,7 +327,8 @@ export const getPlaceCms = createServerFn({ method: "POST" })
             path?: string | null;
             signedUrl?: string | null;
           }>) {
-            if (row?.path && row?.signedUrl) signedByKey.set(`${bucket}:${row.path}`, row.signedUrl);
+            if (row?.path && row?.signedUrl)
+              signedByKey.set(`${bucket}:${row.path}`, row.signedUrl);
           }
         } catch {
           // Sin firma la ficha sigue funcionando: sólo no muestra miniatura.
@@ -335,7 +336,8 @@ export const getPlaceCms = createServerFn({ method: "POST" })
       }
       assets = assets.map((a) => ({
         ...a,
-        previewUrl: signedByKey.get(`${a.storage_bucket ?? "studio-media"}:${a.storage_path}`) ?? null,
+        previewUrl:
+          signedByKey.get(`${a.storage_bucket ?? "studio-media"}:${a.storage_path}`) ?? null,
       }));
     }
 

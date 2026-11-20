@@ -167,8 +167,7 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
       const productIds = raw.map((r) => r.id as string);
 
       // Ventas pagadas del periodo por producto.
-      const since =
-        data.salesFrom ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const since = data.salesFrom ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const sales = new Map<string, { orders: number; amount: number }>();
       if (productIds.length > 0) {
         const { data: items } = await context.supabase
@@ -179,7 +178,7 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
           .not("order.paid_at", "is", null)
           .gte("order.paid_at", since);
 
-        for (const item of ((items ?? []) as unknown as RawRow[])) {
+        for (const item of (items ?? []) as unknown as RawRow[]) {
           const key = item.entity_id as string;
           const prev = sales.get(key) ?? { orders: 0, amount: 0 };
           sales.set(key, {
@@ -200,12 +199,9 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
           status: r.status as string,
           business_id: r.business_id as string,
           business_name: business
-            ? ((business.display_name as string | null) ??
-              (business.legal_name as string | null))
+            ? ((business.display_name as string | null) ?? (business.legal_name as string | null))
             : null,
-          destination_id: business
-            ? ((business.destination_id as string | null) ?? null)
-            : null,
+          destination_id: business ? ((business.destination_id as string | null) ?? null) : null,
           conversion_mode: r.conversion_mode as string,
           price_amount: (r.price_amount as number | null) ?? null,
           price_currency: (r.price_currency as string) ?? "MXN",
@@ -336,8 +332,7 @@ export const getCommerceExperience = createServerFn({ method: "POST" })
       sold_amount: paid.reduce((acc, o) => acc + o.subtotal_amount, 0),
       description: (r.description as string | null) ?? null,
       tagline: (r.tagline as string | null) ?? null,
-      direct_sale_cancellation_policy:
-        (r.direct_sale_cancellation_policy as string | null) ?? null,
+      direct_sale_cancellation_policy: (r.direct_sale_cancellation_policy as string | null) ?? null,
       direct_sale_terms: (r.direct_sale_terms as string | null) ?? null,
       accepts_online_payment: Boolean(r.accepts_online_payment),
       published_at: (r.published_at as string | null) ?? null,

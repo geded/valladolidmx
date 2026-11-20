@@ -123,8 +123,8 @@ export function HostSettlementsPanel() {
         <div>
           <h2 className="text-xl font-semibold">Liquidaciones a anfitriones</h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Reservaciones ya pagadas por periodo: lo vendido, la comisión de la plataforma y lo
-            que se le paga a cada anfitrión, separando efectivo y tarjeta.
+            Reservaciones ya pagadas por periodo: lo vendido, la comisión de la plataforma y lo que
+            se le paga a cada anfitrión, separando efectivo y tarjeta.
           </p>
         </div>
         <div className="flex flex-wrap items-end gap-2">
@@ -175,7 +175,10 @@ export function HostSettlementsPanel() {
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Kpi label="Reservaciones pagadas" value={String(result.totals.orders_count)} />
             <Kpi label="Vendido" value={money(result.totals.gross_amount, currency)} />
-            <Kpi label="Comisión plataforma" value={money(result.totals.commission_amount, currency)} />
+            <Kpi
+              label="Comisión plataforma"
+              value={money(result.totals.commission_amount, currency)}
+            />
             <Kpi label="A pagar a anfitriones" value={money(result.totals.net_amount, currency)} />
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
@@ -297,9 +300,7 @@ function SettlementCard({
                   <td className="py-2 pr-3 text-right text-muted-foreground">
                     {money(l.commission_amount, l.currency)}
                   </td>
-                  <td className="py-2 text-right font-medium">
-                    {money(l.net_amount, l.currency)}
-                  </td>
+                  <td className="py-2 text-right font-medium">{money(l.net_amount, l.currency)}</td>
                 </tr>
               ))}
             </tbody>

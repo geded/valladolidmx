@@ -16,7 +16,12 @@ export const imageSettings: Omit<ImageConfig, "apiKey"> = {
   format: "gemini-chat" as const,
 };
 
-export function generateImage(config: ImageConfig, prompt: string, stream = true, signal?: AbortSignal) {
+export function generateImage(
+  config: ImageConfig,
+  prompt: string,
+  stream = true,
+  signal?: AbortSignal,
+) {
   const input =
     config.format === "openai"
       ? { prompt, ...(stream ? { partial_images: 1 } : {}) }

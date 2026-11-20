@@ -764,7 +764,6 @@ export function PlaceEditor({ placeId }: Props) {
         }}
       />
 
-
       {fieldError && (
         <div
           role="alert"

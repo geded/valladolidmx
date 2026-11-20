@@ -90,7 +90,6 @@ function ItinerariesDeskPage() {
               <th className="p-3">Agenda</th>
               <th className="p-3">Estado</th>
               <th className="p-3">Expediente</th>
-
             </tr>
           </thead>
           <tbody>

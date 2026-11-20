@@ -284,7 +284,6 @@ const ProposalItem = z.union([
   }),
 ]);
 
-
 const ProposalCreateInput = z.object({
   caseId: z.string().uuid(),
   items: z.array(ProposalItem).min(1),
@@ -353,7 +352,6 @@ export const acceptConciergeProposal = createServerFn({ method: "POST" })
     }
     return res as Json;
   });
-
 
 const ProposalReasonInput = z.object({
   proposalId: z.string().uuid(),
@@ -881,7 +879,11 @@ export const listConciergeProposals = createServerFn({ method: "GET" })
     }
 
     const travelerIds = Array.from(
-      new Set(Array.from(cases.values()).map((c) => c.traveler_user_id).filter(Boolean)),
+      new Set(
+        Array.from(cases.values())
+          .map((c) => c.traveler_user_id)
+          .filter(Boolean),
+      ),
     ) as string[];
     const names = new Map<string, string | null>();
     if (travelerIds.length) {
@@ -891,10 +893,7 @@ export const listConciergeProposals = createServerFn({ method: "GET" })
         .in("user_id", travelerIds);
       for (const p of (profiles ?? []) as Array<Record<string, unknown>>) {
         const full = [p["first_name"], p["last_name"]].filter(Boolean).join(" ").trim();
-        names.set(
-          p["user_id"] as string,
-          (p["display_name"] as string | null) || (full || null),
-        );
+        names.set(p["user_id"] as string, (p["display_name"] as string | null) || full || null);
       }
     }
 
@@ -939,7 +938,12 @@ export const listConciergeProposals = createServerFn({ method: "GET" })
       };
     });
 
-    return { rows: result, total: count ?? result.length, page: data.page, pageSize: data.pageSize };
+    return {
+      rows: result,
+      total: count ?? result.length,
+      page: data.page,
+      pageSize: data.pageSize,
+    };
   });
 
 export interface PendingQuestionRow {
@@ -1004,7 +1008,7 @@ export const listConciergePendingQuestions = createServerFn({ method: "GET" })
         .in("user_id", travelerIds);
       for (const p of (profiles ?? []) as Array<Record<string, unknown>>) {
         const full = [p["first_name"], p["last_name"]].filter(Boolean).join(" ").trim();
-        names.set(p["user_id"] as string, (p["display_name"] as string | null) || (full || null));
+        names.set(p["user_id"] as string, (p["display_name"] as string | null) || full || null);
       }
     }
 

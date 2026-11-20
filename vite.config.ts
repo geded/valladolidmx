@@ -45,8 +45,6 @@ export default defineConfig({
           // El valor por defecto del plugin ("index.html") debe anularse.
           navigateFallback: undefined,
 
-
-
           // Sólo el cascarón público estable. Los chunks de rutas, CMS,
           // administración y sesiones se solicitan bajo demanda y nunca se
           // incorporan indiscriminadamente al precache.
@@ -130,9 +128,7 @@ export default defineConfig({
             // sensibles siguen en NetworkOnly y nada autenticado se almacena.
             {
               urlPattern: ({ url, sameOrigin, request }) =>
-                sameOrigin &&
-                request.method === "GET" &&
-                url.pathname.startsWith("/_serverFn/"),
+                sameOrigin && request.method === "GET" && url.pathname.startsWith("/_serverFn/"),
               handler: "NetworkFirst",
               options: {
                 cacheName: "server-data-v1",
@@ -147,8 +143,7 @@ export default defineConfig({
             // pública ya visitada sin mezclar archivos de versiones distintas.
             {
               urlPattern: ({ url, sameOrigin }) =>
-                sameOrigin &&
-                /^\/assets\/.+-[A-Za-z0-9_-]+\.(?:js|css|woff2?)$/.test(url.pathname),
+                sameOrigin && /^\/assets\/.+-[A-Za-z0-9_-]+\.(?:js|css|woff2?)$/.test(url.pathname),
               handler: "CacheFirst",
               options: {
                 cacheName: "built-assets-v1",

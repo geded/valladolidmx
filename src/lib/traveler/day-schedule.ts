@@ -84,10 +84,7 @@ export function fromMinutes(total: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-function haversineKm(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
+function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const R = 6371;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;

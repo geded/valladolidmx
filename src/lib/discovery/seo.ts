@@ -612,16 +612,18 @@ export function eventJsonLd(input: {
       (input.schedule.repeatInterval ?? 1) > 1
         ? frequency.replace("1", String(input.schedule.repeatInterval))
         : frequency;
-    node.eventSchedule = (input.schedule.times?.length ? input.schedule.times : [{ time: input.startDate.slice(11, 16) }]).map(
-      (item) => ({
-        "@type": "Schedule",
-        startDate: input.schedule!.startDate.slice(0, 10),
-        startTime: item.time,
-        repeatFrequency,
-        scheduleTimezone: "America/Merida",
-        ...(input.schedule!.endDate ? { endDate: input.schedule!.endDate } : {}),
-      }),
-    );
+    node.eventSchedule = (
+      input.schedule.times?.length
+        ? input.schedule.times
+        : [{ time: input.startDate.slice(11, 16) }]
+    ).map((item) => ({
+      "@type": "Schedule",
+      startDate: input.schedule!.startDate.slice(0, 10),
+      startTime: item.time,
+      repeatFrequency,
+      scheduleTimezone: "America/Merida",
+      ...(input.schedule!.endDate ? { endDate: input.schedule!.endDate } : {}),
+    }));
   }
   return node;
 }

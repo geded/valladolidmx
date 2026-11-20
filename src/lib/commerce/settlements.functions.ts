@@ -104,8 +104,7 @@ export const getHostSettlements = createServerFn({ method: "POST" })
     await assertAdmin(context);
 
     const to = data.to ?? new Date().toISOString();
-    const from =
-      data.from ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const from = data.from ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     let query = context.supabase
       .from("concierge_orders")
@@ -131,7 +130,7 @@ export const getHostSettlements = createServerFn({ method: "POST" })
     const seenOrders = new Map<string, Set<string>>();
     let currency = "MXN";
 
-    for (const r of ((rows ?? []) as unknown as Array<Record<string, unknown>>)) {
+    for (const r of (rows ?? []) as unknown as Array<Record<string, unknown>>) {
       const orderId = r.id as string;
       const folio = r.folio as string;
       const paidAt = (r.paid_at as string | null) ?? null;

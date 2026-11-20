@@ -185,7 +185,12 @@ function PlaceRoute() {
             draftNotice={isDraft ? "Borrador · no publicado" : null}
             showBreadcrumbs={false}
             saveSlot={
-              <FavoriteButton entityKind="place" entityId={dto.id} entityTitle={dto.name} entitySlug={slug} />
+              <FavoriteButton
+                entityKind="place"
+                entityId={dto.id}
+                entityTitle={dto.name}
+                entitySlug={slug}
+              />
             }
             tripSlot={
               <AddToTravelPlanButton

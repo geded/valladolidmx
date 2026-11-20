@@ -317,10 +317,15 @@ function RootShell({ children }: { children: ReactNode }) {
   // El shell también se pinta cuando el loader raíz no terminó (errores o
   // not-found tempranos): conservar los valores de código como fallback.
   const loaderData = Route.useLoaderData() as
-    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings>; siteDomains: typeof SITE_DOMAIN_DEFAULTS }
+    | {
+        omxdsVisualFoundationsEnabled: boolean;
+        brandSettings: ReturnType<typeof normalizeBrandSettings>;
+        siteDomains: typeof SITE_DOMAIN_DEFAULTS;
+      }
     | undefined;
   const omxdsVisualFoundationsEnabled = loaderData?.omxdsVisualFoundationsEnabled ?? false;
-  const brandSettings = loaderData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
+  const brandSettings =
+    loaderData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
   const siteDomains = loaderData?.siteDomains ?? SITE_DOMAIN_DEFAULTS;
   // Mantiene el origen canónico sincronizado también tras hidratar.
   setCanonicalDomain(siteDomains.primaryDomain);
@@ -353,7 +358,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const rootData = Route.useLoaderData() as
-    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings> }
+    | {
+        omxdsVisualFoundationsEnabled: boolean;
+        brandSettings: ReturnType<typeof normalizeBrandSettings>;
+      }
     | undefined;
   const omxdsVisualFoundationsEnabled = rootData?.omxdsVisualFoundationsEnabled ?? false;
   const brandSettings = rootData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
@@ -509,7 +517,9 @@ function PublicChrome({
   // Experience Builder y verlo aplicado en cualquier ruta.
   void pathname;
   const publishedHome = (
-    Route.useLoaderData() as { publishedHome?: Awaited<ReturnType<typeof getPublishedHomeComposition>> | null } | undefined
+    Route.useLoaderData() as
+      | { publishedHome?: Awaited<ReturnType<typeof getPublishedHomeComposition>> | null }
+      | undefined
   )?.publishedHome;
   const config = publishedHome?.snapshot?.chrome?.[position];
 

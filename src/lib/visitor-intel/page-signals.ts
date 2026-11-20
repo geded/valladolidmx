@@ -77,7 +77,11 @@ export function classifyPageType(pathname: string): PageType {
 }
 
 /** Agrupa el origen de la visita sin guardar la URL de referencia completa. */
-export function classifyTrafficSource(referrer: string, search: string, origin: string): TrafficSource {
+export function classifyTrafficSource(
+  referrer: string,
+  search: string,
+  origin: string,
+): TrafficSource {
   const params = new URLSearchParams(search);
   if (
     params.get("utm_source") ||
@@ -160,7 +164,6 @@ export function buildPageSignalEvent(input: PageSignalInput): VisitorEvent {
   } as VisitorEvent;
 }
 
-
 /** A4 · Propósitos declarables del tratamiento. */
 export const CONSENT_PURPOSES = ["measurement", "personalization"] as const;
 export type ConsentPurpose = (typeof CONSENT_PURPOSES)[number];
@@ -170,9 +173,7 @@ export function parseConsentPurpose(surface: string): ConsentPurpose | null {
   const match = /\|cns:([a-z_]+)/.exec(surface);
   if (!match) return null;
   const value = match[1];
-  return (CONSENT_PURPOSES as readonly string[]).includes(value)
-    ? (value as ConsentPurpose)
-    : null;
+  return (CONSENT_PURPOSES as readonly string[]).includes(value) ? (value as ConsentPurpose) : null;
 }
 
 /** Lee del contexto codificado en `surface` (lectura del monitor). */

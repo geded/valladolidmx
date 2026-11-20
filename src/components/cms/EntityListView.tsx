@@ -75,17 +75,25 @@ export function EntityListView<Row>(props: Props<Row>) {
             : "flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between"
         }
       >
-        <div className={toolbarVariant === "compact" ? "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3" : ""}>
+        <div
+          className={
+            toolbarVariant === "compact"
+              ? "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3"
+              : ""
+          }
+        >
           <div className="min-w-0">
-          {stage && (
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-              {stage}
-            </p>
-          )}
-          <h1 className="mt-1 text-2xl font-semibold tracking-normal">{title}</h1>
-          {description && (
-            <p className="mt-0.5 max-w-2xl text-xs text-muted-foreground sm:text-sm">{description}</p>
-          )}
+            {stage && (
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+                {stage}
+              </p>
+            )}
+            <h1 className="mt-1 text-2xl font-semibold tracking-normal">{title}</h1>
+            {description && (
+              <p className="mt-0.5 max-w-2xl text-xs text-muted-foreground sm:text-sm">
+                {description}
+              </p>
+            )}
           </div>
           {toolbarVariant === "compact" ? (
             <div className="shrink-0 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs font-semibold tabular-nums text-foreground">
@@ -95,9 +103,9 @@ export function EntityListView<Row>(props: Props<Row>) {
         </div>
         <div className={toolbarVariant === "compact" ? "min-w-0" : "flex items-center gap-3"}>
           {toolbarVariant !== "compact" ? (
-          <p className="text-xs text-muted-foreground">
-            {isFetching ? "Actualizando…" : `${total} registro${total === 1 ? "" : "s"}`}
-          </p>
+            <p className="text-xs text-muted-foreground">
+              {isFetching ? "Actualizando…" : `${total} registro${total === 1 ? "" : "s"}`}
+            </p>
           ) : null}
           {headerActions}
         </div>
@@ -138,7 +146,11 @@ export function EntityListView<Row>(props: Props<Row>) {
         </div>
         <button
           type="submit"
-          className={toolbarVariant === "compact" ? "h-10 shrink-0 rounded-lg bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95" : "h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"}
+          className={
+            toolbarVariant === "compact"
+              ? "h-10 shrink-0 rounded-lg bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"
+              : "h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"
+          }
         >
           Aplicar
         </button>
@@ -149,14 +161,24 @@ export function EntityListView<Row>(props: Props<Row>) {
               setDraft("");
               onSearchChange("");
             }}
-            className={toolbarVariant === "compact" ? "col-span-2 h-9 justify-self-start rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent" : "h-9 rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent"}
+            className={
+              toolbarVariant === "compact"
+                ? "col-span-2 h-9 justify-self-start rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent"
+                : "h-9 rounded-md border border-border bg-card px-4 text-xs font-medium hover:bg-accent"
+            }
           >
             Limpiar
           </button>
         )}
       </form>
 
-      <div className={toolbarVariant === "compact" ? "mt-4 overflow-hidden rounded-xl border border-border bg-card" : "mt-5 overflow-hidden rounded-xl border border-border bg-card"}>
+      <div
+        className={
+          toolbarVariant === "compact"
+            ? "mt-4 overflow-hidden rounded-xl border border-border bg-card"
+            : "mt-5 overflow-hidden rounded-xl border border-border bg-card"
+        }
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-left text-[11px] uppercase tracking-[0.12em] text-muted-foreground">

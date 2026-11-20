@@ -157,20 +157,20 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
           </div>
         )}
         <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-xs font-medium">
-            {asset?.alt_text || "Sin texto alternativo"}
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="truncate text-xs font-medium">
+              {asset?.alt_text || "Sin texto alternativo"}
+            </p>
+            {temporary ? (
+              <span className="rounded-pill border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning-foreground">
+                Temporal · IA
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {approved ? "Aprobada" : "Pendiente de aprobación"} · {asset?.status ?? "draft"}
+            {temporary ? " · pendiente de sustitución por fotografía real" : ""}
           </p>
-          {temporary ? (
-            <span className="rounded-pill border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning-foreground">
-              Temporal · IA
-            </span>
-          ) : null}
-        </div>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">
-          {approved ? "Aprobada" : "Pendiente de aprobación"} · {asset?.status ?? "draft"}
-          {temporary ? " · pendiente de sustitución por fotografía real" : ""}
-        </p>
         </div>
       </div>
     );

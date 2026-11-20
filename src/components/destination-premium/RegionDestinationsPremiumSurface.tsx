@@ -328,7 +328,10 @@ export function RegionDestinationsPremiumSurface({
           </section>
         </div>
 
-        <section id="pueblos-magicos" className="mt-5 scroll-mt-24 rounded-3xl border border-border bg-card p-4 shadow-sm">
+        <section
+          id="pueblos-magicos"
+          className="mt-5 scroll-mt-24 rounded-3xl border border-border bg-card p-4 shadow-sm"
+        >
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">

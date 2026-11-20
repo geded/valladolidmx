@@ -113,7 +113,9 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain('srcDoc="<!doctype html><html><head></head><body></body></html>"');
     expect(studio).toContain("onLoad={() => setIframeLoadVersion((version) => version + 1)}");
     expect(studio).toContain("justify-start overflow-auto overscroll-contain");
-    expect(studio).toContain('doc.addEventListener("scroll", read, { passive: true, capture: true })');
+    expect(studio).toContain(
+      'doc.addEventListener("scroll", read, { passive: true, capture: true })',
+    );
     expect(studio).toContain("setCanvasScrollTop(win.scrollY)");
     // La sección seleccionada sólo se revela cuando está fuera de pantalla:
     // el panel inferior se descuenta del área realmente visible y no puede
@@ -148,8 +150,10 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     // Una plantilla compuesta usa selección por sección; su bloque raíz no
     // dibuja un borde sobre la página completa ni captura el clic interno.
     expect(studio).toContain("sectionManaged={node.id === renderedCompositeNode?.id}");
-    expect(studio).toContain("role={sectionManaged ? undefined : \"button\"}");
-    expect(studio).toContain('pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree');
+    expect(studio).toContain('role={sectionManaged ? undefined : "button"}');
+    expect(studio).toContain(
+      'pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree',
+    );
     expect(studio).toContain("onSelect={(id) => selectUnit(id, null)}");
     // Ya no existe el arrastre nativo HTML5 en el lienzo (competía con dnd-kit).
     expect(studio).not.toContain("onDragStart={(event) => {");
@@ -162,7 +166,9 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toContain("draftHashRef.current = page?.draft_hash ?? null");
     expect(studio).not.toContain("page?.draft_hash ?? draftHash ?? null");
     expect(studio).toContain("page.draft_version >= draftVersionRef.current");
-    expect(studio).toContain("const restoreTask = saveChainRef.current.catch(() => undefined).then(");
+    expect(studio).toContain(
+      "const restoreTask = saveChainRef.current.catch(() => undefined).then(",
+    );
     expect(studio).toContain('expected_hash: draftHashRef.current ?? ""');
 
     const studioFunctions = read("src/lib/experience-builder/studio.functions.ts");

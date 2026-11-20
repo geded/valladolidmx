@@ -13,9 +13,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, X, Plane, Bus, Car, MapPin, Users, Accessibility, Utensils, Languages } from "lucide-react";
+import {
+  Plus,
+  X,
+  Plane,
+  Bus,
+  Car,
+  MapPin,
+  Users,
+  Accessibility,
+  Utensils,
+  Languages,
+} from "lucide-react";
 import { saveTripBrief, promotePlanToCase } from "@/lib/traveler/travel-plans.functions";
-import { getMyPersonalProfile, saveMyConciergeContact } from "@/lib/traveler/profile-personal.functions";
+import {
+  getMyPersonalProfile,
+  saveMyConciergeContact,
+} from "@/lib/traveler/profile-personal.functions";
 import { useAluxBrand } from "@/lib/brand/brand-context";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
@@ -195,16 +209,19 @@ export function TripBriefForm({
     if (existingBrief.mobilityNotes) setMobilityNotes(existingBrief.mobilityNotes);
     if (existingBrief.groupType) setGroupType(existingBrief.groupType);
     if (existingBrief.preferredLanguage) setPreferredLanguage(existingBrief.preferredLanguage);
-    if (existingBrief.dietaryOrHealthNotes) setDietaryOrHealthNotes(existingBrief.dietaryOrHealthNotes);
+    if (existingBrief.dietaryOrHealthNotes)
+      setDietaryOrHealthNotes(existingBrief.dietaryOrHealthNotes);
     if (existingBrief.transportMode) setTransportMode(existingBrief.transportMode);
     if (existingBrief.rentalCarType) setRentalCarType(existingBrief.rentalCarType);
     if (existingBrief.needsChildSeat != null) setNeedsChildSeat(existingBrief.needsChildSeat);
-    if (existingBrief.needsAdditionalDriver != null) setNeedsAdditionalDriver(existingBrief.needsAdditionalDriver);
+    if (existingBrief.needsAdditionalDriver != null)
+      setNeedsAdditionalDriver(existingBrief.needsAdditionalDriver);
     if (existingBrief.hasValidLicense != null) setHasValidLicense(existingBrief.hasValidLicense);
     if (existingBrief.pickupPoint) setPickupPoint(existingBrief.pickupPoint);
     if (existingBrief.tourPreference) setTourPreference(existingBrief.tourPreference);
     if (existingBrief.airportTransfer) setAirportTransfer(existingBrief.airportTransfer);
-    if (existingBrief.mobilityNotesGeneral) setMobilityNotesGeneral(existingBrief.mobilityNotesGeneral);
+    if (existingBrief.mobilityNotesGeneral)
+      setMobilityNotesGeneral(existingBrief.mobilityNotesGeneral);
     if (existingBrief.notes) setNotes(existingBrief.notes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -321,8 +338,8 @@ export function TripBriefForm({
   if (!hasContent) {
     return (
       <div className="mt-4 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-        Agrega al menos un destino, empresa, producto o evento — o escribe notas generales del
-        viaje — para poder enviarlo.
+        Agrega al menos un destino, empresa, producto o evento — o escribe notas generales del viaje
+        — para poder enviarlo.
       </div>
     );
   }
@@ -538,7 +555,17 @@ export function TripBriefForm({
           >
             {LANGUAGES.map((l) => (
               <option key={l} value={l}>
-                {l === "es" ? "Español" : l === "en" ? "Inglés" : l === "fr" ? "Francés" : l === "de" ? "Alemán" : l === "it" ? "Italiano" : "Portugués"}
+                {l === "es"
+                  ? "Español"
+                  : l === "en"
+                    ? "Inglés"
+                    : l === "fr"
+                      ? "Francés"
+                      : l === "de"
+                        ? "Alemán"
+                        : l === "it"
+                          ? "Italiano"
+                          : "Portugués"}
               </option>
             ))}
           </select>
@@ -734,8 +761,8 @@ export function TripBriefForm({
             className="mt-0.5 size-4 accent-primary"
           />
           <span>
-            Confirmo que este móvil tiene WhatsApp y autorizo al Concierge a escribirme sobre
-            este viaje.
+            Confirmo que este móvil tiene WhatsApp y autorizo al Concierge a escribirme sobre este
+            viaje.
           </span>
         </label>
       </fieldset>
@@ -773,4 +800,3 @@ export function TripBriefForm({
     </form>
   );
 }
-

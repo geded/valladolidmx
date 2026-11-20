@@ -20,15 +20,11 @@ import {
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { MediaIdField } from "@/components/cms/MediaIdField";
-import {
-  describeEditorialHistory,
-  getEditorialStatusGuidance,
-} from "@/lib/cms/editorial-language";
+import { describeEditorialHistory, getEditorialStatusGuidance } from "@/lib/cms/editorial-language";
 import { meridaDateTime } from "@/lib/time/merida";
 import { Sparkles } from "lucide-react";
 import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
 import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
-
 
 export type FieldType =
   | "text"
@@ -244,7 +240,6 @@ export function EntityEditor(props: Props) {
     setValues((s) => ({ ...s, [name]: value }));
   }, []);
 
-
   /* Altas nuevas: adoptan el contexto de trabajo (p. ej. el destino elegido)
      sin pisar lo que el editor ya escribió. */
   const defaultsKey = JSON.stringify(props.defaults ?? {});
@@ -265,8 +260,6 @@ export function EntityEditor(props: Props) {
       return changed ? next : current;
     });
   }, [defaultsKey, isEdit]);
-
-
 
   /* Nombre de la ficha: base de la búsqueda que hace Alux.
      Cada familia nombra su campo principal distinto (empresas usan
@@ -292,7 +285,6 @@ export function EntityEditor(props: Props) {
     [fields],
   );
 
-
   /** Valores tal como están guardados en el CMS (base para descartar el respaldo). */
   const savedValues = useMemo(() => {
     if (!detail.data) return null;
@@ -306,9 +298,7 @@ export function EntityEditor(props: Props) {
         const date = new Date(String(v));
         next[f.name] = Number.isNaN(date.getTime())
           ? ""
-          : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-              .toISOString()
-              .slice(0, 16);
+          : new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
       } else if (Array.isArray(v)) {
         next[f.name] = v.join("\n");
       } else {
@@ -329,7 +319,6 @@ export function EntityEditor(props: Props) {
     clearLocalDraft();
     setValues(savedValues ?? initialValues);
   }, [clearLocalDraft, savedValues, initialValues]);
-
 
   const status = (detail.data?.status as unknown as ContentStatus | undefined) ?? "draft";
 
@@ -476,14 +465,11 @@ export function EntityEditor(props: Props) {
         description="Pregunta qué escribir en cada campo de esta ficha, con qué extensión y qué falta para publicarla."
       />
 
-
       {recovered !== null && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm">
           <span>
-            Recuperamos lo que estabas escribiendo en este equipo
-            {" "}
-            ({meridaDateTime(new Date(recovered).toISOString())}). Guarda la ficha para
-            conservarlo.
+            Recuperamos lo que estabas escribiendo en este equipo (
+            {meridaDateTime(new Date(recovered).toISOString())}). Guarda la ficha para conservarlo.
           </span>
           <button
             type="button"

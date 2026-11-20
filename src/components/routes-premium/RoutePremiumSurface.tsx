@@ -90,7 +90,9 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
   // Navegación interna: sólo se declaran las secciones realmente presentes.
   const subnavAnchors = [
     ...(mapStops.length ? [{ id: "ruta-mapa", label: "Mapa", iconKey: "map-pin" }] : []),
-    ...(route.stops.length ? [{ id: "ruta-itinerario", label: "Itinerario", iconKey: "info" }] : []),
+    ...(route.stops.length
+      ? [{ id: "ruta-itinerario", label: "Itinerario", iconKey: "info" }]
+      : []),
     ...(route.gallery.length ? [{ id: "ruta-galeria", label: "Galería", iconKey: "camera" }] : []),
   ];
 
@@ -143,7 +145,6 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           className="col-span-2 min-h-11 w-full justify-center rounded-pill sm:w-auto"
         />
       </div>
-
 
       <ShareSheet
         open={shareOpen}

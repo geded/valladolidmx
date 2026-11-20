@@ -20,7 +20,6 @@ import {
   parseConsentPurpose,
 } from "./page-signals";
 
-
 export const PAGE_PERFORMANCE_CONTRACT_VERSION = "1.0.0" as const;
 
 export interface PagePerformanceRow {
@@ -64,9 +63,7 @@ export interface PagePerformanceSnapshot {
 export const MIN_SUBJECTS_FOR_READ = 25;
 
 /** Devuelve la instantánea sin cifras cuando la muestra es insuficiente. */
-export function suppressSmallSample(
-  snapshot: PagePerformanceSnapshot,
-): PagePerformanceSnapshot {
+export function suppressSmallSample(snapshot: PagePerformanceSnapshot): PagePerformanceSnapshot {
   if (snapshot.total_visitors >= MIN_SUBJECTS_FOR_READ) return snapshot;
   return {
     ...snapshot,
@@ -209,10 +206,7 @@ export function aggregatePageRows(
   };
 }
 
-async function readEvents(
-  since: string,
-  filters: { route_prefix?: string },
-): Promise<EventRow[]> {
+async function readEvents(since: string, filters: { route_prefix?: string }): Promise<EventRow[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = (supabaseAdmin as any)

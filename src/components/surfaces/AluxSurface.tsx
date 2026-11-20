@@ -37,9 +37,7 @@ export function AluxSurface() {
           <MessageCircle className="size-5" aria-hidden />
         </span>
         <h2 className="mt-4 text-lg font-semibold">{alux.copy("humanConciergeTitle")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {alux.copy("humanConciergeBody")}
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{alux.copy("humanConciergeBody")}</p>
         <Link
           to="/arma-tu-viaje"
           className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]"

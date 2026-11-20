@@ -13,13 +13,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type FavoriteEntityKind =
-  | "business"
-  | "product"
-  | "promotion"
-  | "place"
-  | "event"
-  | "route";
+export type FavoriteEntityKind = "business" | "product" | "promotion" | "place" | "event" | "route";
 
 const KINDS = new Set<FavoriteEntityKind>([
   "business",
@@ -160,7 +154,6 @@ export const listMyFavorites = createServerFn({ method: "GET" })
         });
       }
     }
-
 
     if (byKind.route.length > 0) {
       const { data } = await context.supabase

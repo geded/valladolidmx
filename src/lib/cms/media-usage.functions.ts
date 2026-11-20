@@ -267,7 +267,6 @@ export const listMediaUsage = createServerFn({ method: "POST" })
     return { references: await resolveMediaUsageReferences(context.supabase, data.mediaIds) };
   });
 
-
 /* ─────────────────────────  Ficha de la imagen  ─────────────────────── */
 
 const DetailInput = z.object({ mediaId: z.string().uuid() });
@@ -316,81 +315,80 @@ function num(value: unknown): number | null {
 export const getMediaDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => DetailInput.parse(d))
-  .handler(async ({ data, context }): Promise<{ media: MediaDetail; previewUrl: string | null }> => {
-    await assertEditorial(context);
-    const { data: media, error } = await context.supabase
-      .from("media_assets")
-      .select(
-        "id, storage_bucket, storage_path, mime_type, kind, width, height, status, review_state, alt_text, alt_text_ai, alt_text_source, title, description, caption, credit, usage_context, original_checksum, metadata, created_at, updated_at",
-      )
-      .eq("id", data.mediaId)
-      .is("deleted_at", null)
-      .maybeSingle();
-    if (error) throw error;
-    if (!media) throw new Error("not_found");
+  .handler(
+    async ({ data, context }): Promise<{ media: MediaDetail; previewUrl: string | null }> => {
+      await assertEditorial(context);
+      const { data: media, error } = await context.supabase
+        .from("media_assets")
+        .select(
+          "id, storage_bucket, storage_path, mime_type, kind, width, height, status, review_state, alt_text, alt_text_ai, alt_text_source, title, description, caption, credit, usage_context, original_checksum, metadata, created_at, updated_at",
+        )
+        .eq("id", data.mediaId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (!media) throw new Error("not_found");
 
-    const row = media as Record<string, unknown>;
-    const rawMetadata =
-      typeof row.metadata === "object" && row.metadata !== null && !Array.isArray(row.metadata)
-        ? (row.metadata as Record<string, unknown>)
-        : {};
-    const rawRights =
-      typeof rawMetadata.rights === "object" &&
-      rawMetadata.rights !== null &&
-      !Array.isArray(rawMetadata.rights)
-        ? (rawMetadata.rights as Record<string, unknown>)
-        : {};
-    const detail: MediaDetail = {
-      id: String(row.id),
-      storage_bucket: text(row.storage_bucket),
-      storage_path: text(row.storage_path),
-      mime_type: text(row.mime_type),
-      kind: text(row.kind),
-      width: num(row.width),
-      height: num(row.height),
-      status: text(row.status),
-      review_state: text(row.review_state),
-      alt_text: text(row.alt_text),
-      alt_text_ai: text(row.alt_text_ai),
-      alt_text_source: text(row.alt_text_source),
-      title: text(row.title),
-      description: text(row.description),
-      caption: text(row.caption),
-      credit: text(row.credit),
-      usage_context: text(row.usage_context),
-      original_checksum: text(row.original_checksum),
-      metadata: {
-        rights: {
-          author: text(rawRights.author),
-          source: text(rawRights.source),
-          license: text(rawRights.license),
-          place: text(rawRights.place),
-          captured_on: text(rawRights.captured_on),
-          nature: text(rawRights.nature),
-          rights_confirmed:
-            typeof rawRights.rights_confirmed === "boolean"
-              ? rawRights.rights_confirmed
-              : null,
+      const row = media as Record<string, unknown>;
+      const rawMetadata =
+        typeof row.metadata === "object" && row.metadata !== null && !Array.isArray(row.metadata)
+          ? (row.metadata as Record<string, unknown>)
+          : {};
+      const rawRights =
+        typeof rawMetadata.rights === "object" &&
+        rawMetadata.rights !== null &&
+        !Array.isArray(rawMetadata.rights)
+          ? (rawMetadata.rights as Record<string, unknown>)
+          : {};
+      const detail: MediaDetail = {
+        id: String(row.id),
+        storage_bucket: text(row.storage_bucket),
+        storage_path: text(row.storage_path),
+        mime_type: text(row.mime_type),
+        kind: text(row.kind),
+        width: num(row.width),
+        height: num(row.height),
+        status: text(row.status),
+        review_state: text(row.review_state),
+        alt_text: text(row.alt_text),
+        alt_text_ai: text(row.alt_text_ai),
+        alt_text_source: text(row.alt_text_source),
+        title: text(row.title),
+        description: text(row.description),
+        caption: text(row.caption),
+        credit: text(row.credit),
+        usage_context: text(row.usage_context),
+        original_checksum: text(row.original_checksum),
+        metadata: {
+          rights: {
+            author: text(rawRights.author),
+            source: text(rawRights.source),
+            license: text(rawRights.license),
+            place: text(rawRights.place),
+            captured_on: text(rawRights.captured_on),
+            nature: text(rawRights.nature),
+            rights_confirmed:
+              typeof rawRights.rights_confirmed === "boolean" ? rawRights.rights_confirmed : null,
+          },
         },
-      },
-      created_at: text(row.created_at),
-      updated_at: text(row.updated_at),
-    };
+        created_at: text(row.created_at),
+        updated_at: text(row.updated_at),
+      };
 
-    let previewUrl: string | null = null;
-    if (detail.storage_bucket && detail.storage_path) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const storage = (context.supabase as any).storage;
-        const { data: signed } = await storage
-          .from(detail.storage_bucket)
-          .createSignedUrl(detail.storage_path, 3600);
-        previewUrl = signed?.signedUrl ?? null;
-      } catch {
-        previewUrl = null;
+      let previewUrl: string | null = null;
+      if (detail.storage_bucket && detail.storage_path) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const storage = (context.supabase as any).storage;
+          const { data: signed } = await storage
+            .from(detail.storage_bucket)
+            .createSignedUrl(detail.storage_path, 3600);
+          previewUrl = signed?.signedUrl ?? null;
+        } catch {
+          previewUrl = null;
+        }
       }
-    }
 
-    return { media: detail, previewUrl };
-  });
-
+      return { media: detail, previewUrl };
+    },
+  );

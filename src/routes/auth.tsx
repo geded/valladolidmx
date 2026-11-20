@@ -62,9 +62,7 @@ function AuthRoute() {
     // No mezclarla con pasos viejos de la misma pestaña: al abrir Acceso desde
     // Home, el breadcrumb debe ser Inicio → Cuenta aunque antes se hayan
     // visitado destinos, Mapa o Arma tu Viaje.
-    const trail = targetStep
-      ? [...readJourneyPrefix(targetStep.path), targetStep]
-      : [];
+    const trail = targetStep ? [...readJourneyPrefix(targetStep.path), targetStep] : [];
     if (target) rememberAuthReturnPath(target);
     setReturnTarget(target);
     setJourney(trail);
@@ -248,7 +246,7 @@ function AuthRoute() {
                 type="button"
                 variant="outline"
                 onClick={handleGoogle}
-               className="h-11 w-full rounded-lg bg-card text-xs shadow-none hover:bg-muted hover:text-foreground sm:h-10 sm:text-[13px]"
+                className="h-11 w-full rounded-lg bg-card text-xs shadow-none hover:bg-muted hover:text-foreground sm:h-10 sm:text-[13px]"
               >
                 <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
                   <path
@@ -270,7 +268,7 @@ function AuthRoute() {
                 </svg>
                 {t("auth.google")}
               </Button>
-               <div className="relative my-3 text-center text-[11px] text-muted-foreground sm:my-4 sm:text-xs">
+              <div className="relative my-3 text-center text-[11px] text-muted-foreground sm:my-4 sm:text-xs">
                 <span className="relative z-10 bg-card px-3">{t("auth.or_email")}</span>
                 <span className="absolute inset-x-0 top-1/2 h-px bg-border" aria-hidden />
               </div>
@@ -280,10 +278,13 @@ function AuthRoute() {
           <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
             {mode === "signup" ? (
               <div>
-                 <label className="text-xs font-medium text-foreground sm:text-[13px]" htmlFor="name">
+                <label
+                  className="text-xs font-medium text-foreground sm:text-[13px]"
+                  htmlFor="name"
+                >
                   {t("auth.name")}
                 </label>
-                 <div className="relative mt-1">
+                <div className="relative mt-1">
                   <UserRound
                     className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
                     aria-hidden
@@ -322,7 +323,10 @@ function AuthRoute() {
 
             {mode !== "forgot" ? (
               <div>
-                <label className="text-xs font-medium text-foreground sm:text-[13px]" htmlFor="password">
+                <label
+                  className="text-xs font-medium text-foreground sm:text-[13px]"
+                  htmlFor="password"
+                >
                   {t("auth.password")}
                 </label>
                 <div className="relative mt-1">

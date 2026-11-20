@@ -239,7 +239,6 @@ function TripPlannerHero({
           </Button>
         ) : null}
 
-
         {!user ? (
           <Link
             to="/auth"
@@ -450,7 +449,10 @@ function HowItWorksSection() {
       </div>
       <ol className="grid gap-3 sm:gap-4 md:grid-cols-3">
         {steps.map(({ n, Icon, title, body }) => (
-          <li key={n} className="rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-6">
+          <li
+            key={n}
+            className="rounded-2xl border border-border/70 bg-card p-5 shadow-soft sm:p-6"
+          >
             <div className="flex items-center gap-3">
               <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="size-5" aria-hidden />

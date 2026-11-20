@@ -47,7 +47,9 @@ function toShowcaseItem(route: EditorialRouteCardDTO): PremiumShowcaseItem {
     key: route.id,
     name: route.name,
     note: route.summary || "Ruta sugerida del Oriente Maya",
-    media: route.coverUrl ? { url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset } : null,
+    media: route.coverUrl
+      ? { url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }
+      : null,
     to: routePublicPath(route.slug),
     kicker: "Ruta",
     meta: [route.originDestinationLabel, duration].filter(Boolean).join(" · ") || null,
@@ -176,7 +178,11 @@ export function RoutesListingSurface({
         subtitle="Itinerarios editoriales con paradas reales: destinos, lugares, eventos y empresas publicadas."
         media={
           heroRoute?.coverUrl
-            ? { url: heroRoute.coverUrl, alt: heroRoute.coverAlt ?? heroRoute.name, asset: heroRoute.coverAsset }
+            ? {
+                url: heroRoute.coverUrl,
+                alt: heroRoute.coverAlt ?? heroRoute.name,
+                asset: heroRoute.coverAsset,
+              }
             : null
         }
         caption={territory ? `Rutas que pasan por ${territory}` : undefined}

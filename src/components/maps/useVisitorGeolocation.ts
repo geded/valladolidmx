@@ -104,18 +104,22 @@ export function useVisitorGeolocation() {
       setStatus(err.code === err.PERMISSION_DENIED ? "denied" : "unavailable");
     };
 
-    navigator.geolocation.getCurrentPosition(accept, (err) => {
-      if (err.code === err.PERMISSION_DENIED) {
-        fail(err);
-        return;
-      }
-      // Reintento tolerante (interiores, GPS frío) sin caer en IP lejana.
-      navigator.geolocation.getCurrentPosition(accept, fail, {
-        enableHighAccuracy: false,
-        timeout: 12_000,
-        maximumAge: 60_000,
-      });
-    }, { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 });
+    navigator.geolocation.getCurrentPosition(
+      accept,
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          fail(err);
+          return;
+        }
+        // Reintento tolerante (interiores, GPS frío) sin caer en IP lejana.
+        navigator.geolocation.getCurrentPosition(accept, fail, {
+          enableHighAccuracy: false,
+          timeout: 12_000,
+          maximumAge: 60_000,
+        });
+      },
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 },
+    );
   }, []);
 
   const clear = useCallback(() => {

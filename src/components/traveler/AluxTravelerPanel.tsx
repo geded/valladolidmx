@@ -199,16 +199,14 @@ export function AluxTravelerPanel() {
         </span>
         <div className="min-w-0">
           <h2 className="text-lg font-semibold">{alux.copy("travelerPanelTitle")}</h2>
-          <p className="text-xs text-muted-foreground">
-            {alux.copy("travelerPanelDescription")}
-          </p>
+          <p className="text-xs text-muted-foreground">{alux.copy("travelerPanelDescription")}</p>
         </div>
       </header>
 
       <div className="mt-3 rounded-xl border border-alux/20 bg-alux/5 p-3 text-xs text-foreground">
         <p className="font-medium">{alux.copy("profilePromptTitle")}</p>
         <p className="mt-1 text-muted-foreground">
-          {alux.copy("profilePromptBody")} {" "}
+          {alux.copy("profilePromptBody")}{" "}
           <a href="/cuenta/perfil" className="font-medium text-alux hover:underline">
             {alux.copy("completeProfile")}
           </a>
@@ -307,9 +305,7 @@ export function AluxTravelerPanel() {
         ) : null}
       </div>
 
-      <p className="mt-4 text-[11px] italic text-muted-foreground">
-        {alux.copy("disclaimer")}
-      </p>
+      <p className="mt-4 text-[11px] italic text-muted-foreground">{alux.copy("disclaimer")}</p>
     </section>
   );
 }

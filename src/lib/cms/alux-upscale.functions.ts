@@ -68,11 +68,11 @@ export const aluxUpscaleImage = createServerFn({ method: "POST" })
             "No cambies el encuadre, la composición, la arquitectura, las personas, los rótulos ni ningún elemento visible. Nada de filtros artificiales, HDR exagerado, saturación irreal, objetos nuevos, texto, marcas de agua ni bordes.",
           ]
         : [
-      "Amplía esta fotografía a mayor resolución conservando exactamente la misma escena.",
-      `Tamaño objetivo aproximado: ${data.targetLongSide} px en el lado mayor (original ${data.width}×${data.height} px).`,
-      data.roleLabel ? `Uso previsto: ${data.roleLabel}.` : "",
-      "Reconstruye detalle y nitidez de forma realista. No cambies el encuadre, la composición, los colores, las personas, los rótulos ni ningún elemento visible.",
-      "No añadas objetos, texto, marcas de agua ni bordes.",
+            "Amplía esta fotografía a mayor resolución conservando exactamente la misma escena.",
+            `Tamaño objetivo aproximado: ${data.targetLongSide} px en el lado mayor (original ${data.width}×${data.height} px).`,
+            data.roleLabel ? `Uso previsto: ${data.roleLabel}.` : "",
+            "Reconstruye detalle y nitidez de forma realista. No cambies el encuadre, la composición, los colores, las personas, los rótulos ni ningún elemento visible.",
+            "No añadas objetos, texto, marcas de agua ni bordes.",
           ]
     )
       .filter(Boolean)

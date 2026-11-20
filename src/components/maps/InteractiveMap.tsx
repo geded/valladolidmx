@@ -26,7 +26,6 @@ import {
 import { MapUnavailableFallback } from "./MapUnavailableFallback";
 import { StaticMap } from "./StaticMap";
 
-
 /** Resultado de la capa de ruta, reportado a la superficie consumidora. */
 export interface MapRouteStatus {
   /** `directions` = geometría vial real; `approximate` = línea entre coordenadas CMS. */
@@ -235,7 +234,6 @@ export interface InteractiveMapProps {
   minZoom?: number;
   /** Muestra el nombre de cada parada junto a su pin. */
   showMarkerNames?: boolean;
-
 }
 
 function labelForIndex(i: number) {
@@ -298,10 +296,7 @@ function markerIconDataUri(letter: string, selected = false): string {
 function markerNameIconDataUri(text: string): { url: string; width: number; height: number } {
   const { bg, fg, stroke } = getMarkerColors();
   const clean = text.length > 28 ? `${text.slice(0, 27)}…` : text;
-  const safe = clean
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  const safe = clean.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const width = Math.max(56, Math.round(clean.length * 7.2) + 20);
   const height = 26;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -330,7 +325,6 @@ export function InteractiveMap({
   restriction,
   minZoom,
   showMarkerNames = false,
-
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [failed, setFailed] = useState(false);
@@ -355,7 +349,6 @@ export function InteractiveMap({
   /* Fallo de autorización del proveedor: suscripción por instancia. */
   useEffect(() => subscribeGoogleMapsAuthFailure(() => setFailed(true)), []);
 
-
   useEffect(() => {
     if (!shouldMount) return;
     const apiKey = getGoogleMapsBrowserKey();
@@ -368,13 +361,7 @@ export function InteractiveMap({
     loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
-        const {
-          markers,
-          routeStops,
-          fitPoints,
-          restriction,
-        } = latestRef.current;
-
+        const { markers, routeStops, fitPoints, restriction } = latestRef.current;
 
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
@@ -459,7 +446,6 @@ export function InteractiveMap({
         } else if (list.length > 1) {
           map.fitBounds(bounds, fitPadding);
         }
-
 
         /* Capa de ruta: sólo con la capacidad real del proveedor. */
         const stops =
@@ -629,7 +615,6 @@ export function InteractiveMap({
       </div>
     );
   }
-
 
   return (
     <div

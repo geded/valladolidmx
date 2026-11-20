@@ -45,13 +45,7 @@ type RowRec = Record<string, unknown>;
  * desde el constructor (texto, imagen y enlace), sin crear contenido nuevo
  * ni sustituir el catálogo del CMS.
  */
-export type HomeEditableRail =
-  | "destinos"
-  | "rutas"
-  | "experiencias"
-  | "stays"
-  | "food"
-  | "eventos";
+export type HomeEditableRail = "destinos" | "rutas" | "experiencias" | "stays" | "food" | "eventos";
 
 export const HOME_RAIL_CONFIG_KEY: Record<HomeEditableRail, string> = {
   destinos: "destinos_items",
@@ -255,7 +249,6 @@ export function compactHomeDestinationEditorOverrides(
   return compactHomeRailEditorOverrides("destinos", real, next);
 }
 
-
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
 const GOVERNED_VERTICAL_MEDIA = {
@@ -417,7 +410,10 @@ function applyHomeRailLimits(
       food: limited(content.servicios.food, limits.servicios),
     },
     eventos: { ...content.eventos, items: limited(content.eventos.items, limits.eventos) },
-    categorias: { ...content.categorias, items: limited(content.categorias.items, limits.categorias) },
+    categorias: {
+      ...content.categorias,
+      items: limited(content.categorias.items, limits.categorias),
+    },
     queHacer: { ...content.queHacer, items: limited(content.queHacer.items, limits.queHacer) },
   };
 }
@@ -468,141 +464,144 @@ export function mergeHomeRealContent(
   }));
 
   return attachMediaAssets(
-    applyHomeRailLimits({
-      ...safeContent,
-      hero: {
-        ...safeContent.hero,
-        slides: realHeroSlides.length > 0 ? realHeroSlides : safeContent.hero.slides,
-      },
-      destinos: {
-        ...safeContent.destinos,
-        items: homeDestinations.map((card, index) => {
-          const row = destinationRows[index];
-          const fallback = mediaOf(card, "destination", index);
-          return {
-            name: str(row?.name, card.title),
-            note: str(row?.note, card.subtitle),
-            media: rowMedia(row, fallback),
-            puebloMagico:
-              typeof row?.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
-            href: str(row?.href, card.href),
-          };
-        }),
-      },
-      rutas: {
-        ...safeContent.rutas,
-        items: real.rutas.map((route, index) => {
-          const row = routeRows[index];
-          const sequence = Array.isArray(row?.sequence)
-            ? (row.sequence as unknown[])
-                .map((stop) =>
-                  stop && typeof stop === "object" ? String((stop as RowRec).label ?? "") : "",
-                )
-                .filter((label) => label.length > 0)
-            : route.sequence;
-          return {
-            ...route,
-            title: str(row?.title, route.title),
-            duration: str(row?.duration, route.duration),
-            stops: num(row?.stops, route.stops),
-            vibe: str(row?.vibe, route.vibe),
-            description: str(row?.description, route.description),
-            sequence: sequence.length > 0 ? sequence : route.sequence,
-            href: str(row?.href, route.href),
-            media: rowMedia(row, { url: route.mediaUrl, alt: route.title }),
-          };
-        }),
-      },
-      experiencias: {
-        ...safeContent.experiencias,
-        items: real.experiencias.map((card, index) => {
-          const row = experienceRows[index];
-          return {
-            businessId: card.businessId,
-            title: str(row?.title, card.title),
-            category: str(row?.category, card.category),
-            summary: str(row?.summary, card.subtitle),
-            media: rowMedia(row, mediaOf(card, "experience", index)),
-            href: str(row?.href, card.href),
-          };
-        }),
-      },
-      servicios: {
-        ...safeContent.servicios,
-        stays: real.stays.map((card, index) => {
-          const row = stayRows[index];
-          return {
-            businessId: card.businessId,
-            title: str(row?.title, card.title),
-            destination: str(row?.destination, card.category),
-            category: str(row?.category, "Hospedaje"),
-            summary: str(row?.summary, card.subtitle),
-            media: rowMedia(row, mediaOf(card, "hotel", index)),
-            href: str(row?.href, card.href),
-          };
-        }),
-        food: real.food.map((card, index) => {
-          const row = foodRows[index];
-          return {
-            businessId: card.businessId,
-            title: str(row?.title, card.title),
-            destination: str(row?.destination, card.category),
-            category: str(row?.category, "Gastronomía"),
-            summary: str(row?.summary, card.subtitle),
-            media: rowMedia(row, mediaOf(card, "restaurant", index)),
-            href: str(row?.href, card.href),
-          };
-        }),
-      },
-      eventos: {
-        ...safeContent.eventos,
-        // La selección editorial explícita del constructor manda sobre la
-        // portada inferida del primer evento. Sólo usamos el evento como
-        // fallback cuando la composición publicada no configuró un medio.
-        media:
-          safeContent.eventos.media.url.length > 0
-            ? safeContent.eventos.media
-            : firstEventWithMedia
-              ? mediaOf(firstEventWithMedia)
-              : safeContent.eventos.media,
-        items: real.eventos.map((card, index) => {
-          const row = eventRows[index];
-          const media = rowMedia(row, {
-            url: card.mediaUrl,
-            alt: card.mediaUrl.length > 0 ? card.title : "",
-          });
-          return {
-            day: str(row?.day, card.day),
-            title: str(row?.title, card.title),
-            type: str(row?.type, card.category),
-            detail: str(row?.detail, card.subtitle),
-            href: str(row?.href, card.href),
-            startsAt: card.startsAt,
-            recurrence: card.recurrence,
-            media: media.url.length > 0 ? media : null,
-          };
-        }),
-      },
+    applyHomeRailLimits(
+      {
+        ...safeContent,
+        hero: {
+          ...safeContent.hero,
+          slides: realHeroSlides.length > 0 ? realHeroSlides : safeContent.hero.slides,
+        },
+        destinos: {
+          ...safeContent.destinos,
+          items: homeDestinations.map((card, index) => {
+            const row = destinationRows[index];
+            const fallback = mediaOf(card, "destination", index);
+            return {
+              name: str(row?.name, card.title),
+              note: str(row?.note, card.subtitle),
+              media: rowMedia(row, fallback),
+              puebloMagico:
+                typeof row?.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
+              href: str(row?.href, card.href),
+            };
+          }),
+        },
+        rutas: {
+          ...safeContent.rutas,
+          items: real.rutas.map((route, index) => {
+            const row = routeRows[index];
+            const sequence = Array.isArray(row?.sequence)
+              ? (row.sequence as unknown[])
+                  .map((stop) =>
+                    stop && typeof stop === "object" ? String((stop as RowRec).label ?? "") : "",
+                  )
+                  .filter((label) => label.length > 0)
+              : route.sequence;
+            return {
+              ...route,
+              title: str(row?.title, route.title),
+              duration: str(row?.duration, route.duration),
+              stops: num(row?.stops, route.stops),
+              vibe: str(row?.vibe, route.vibe),
+              description: str(row?.description, route.description),
+              sequence: sequence.length > 0 ? sequence : route.sequence,
+              href: str(row?.href, route.href),
+              media: rowMedia(row, { url: route.mediaUrl, alt: route.title }),
+            };
+          }),
+        },
+        experiencias: {
+          ...safeContent.experiencias,
+          items: real.experiencias.map((card, index) => {
+            const row = experienceRows[index];
+            return {
+              businessId: card.businessId,
+              title: str(row?.title, card.title),
+              category: str(row?.category, card.category),
+              summary: str(row?.summary, card.subtitle),
+              media: rowMedia(row, mediaOf(card, "experience", index)),
+              href: str(row?.href, card.href),
+            };
+          }),
+        },
+        servicios: {
+          ...safeContent.servicios,
+          stays: real.stays.map((card, index) => {
+            const row = stayRows[index];
+            return {
+              businessId: card.businessId,
+              title: str(row?.title, card.title),
+              destination: str(row?.destination, card.category),
+              category: str(row?.category, "Hospedaje"),
+              summary: str(row?.summary, card.subtitle),
+              media: rowMedia(row, mediaOf(card, "hotel", index)),
+              href: str(row?.href, card.href),
+            };
+          }),
+          food: real.food.map((card, index) => {
+            const row = foodRows[index];
+            return {
+              businessId: card.businessId,
+              title: str(row?.title, card.title),
+              destination: str(row?.destination, card.category),
+              category: str(row?.category, "Gastronomía"),
+              summary: str(row?.summary, card.subtitle),
+              media: rowMedia(row, mediaOf(card, "restaurant", index)),
+              href: str(row?.href, card.href),
+            };
+          }),
+        },
+        eventos: {
+          ...safeContent.eventos,
+          // La selección editorial explícita del constructor manda sobre la
+          // portada inferida del primer evento. Sólo usamos el evento como
+          // fallback cuando la composición publicada no configuró un medio.
+          media:
+            safeContent.eventos.media.url.length > 0
+              ? safeContent.eventos.media
+              : firstEventWithMedia
+                ? mediaOf(firstEventWithMedia)
+                : safeContent.eventos.media,
+          items: real.eventos.map((card, index) => {
+            const row = eventRows[index];
+            const media = rowMedia(row, {
+              url: card.mediaUrl,
+              alt: card.mediaUrl.length > 0 ? card.title : "",
+            });
+            return {
+              day: str(row?.day, card.day),
+              title: str(row?.title, card.title),
+              type: str(row?.type, card.category),
+              detail: str(row?.detail, card.subtitle),
+              href: str(row?.href, card.href),
+              startsAt: card.startsAt,
+              recurrence: card.recurrence,
+              media: media.url.length > 0 ? media : null,
+            };
+          }),
+        },
 
-      mapa: {
-        ...safeContent.mapa,
-        dto: {
-          ...safeContent.mapa.dto,
-          points: real.mapPoints.map((point) => ({
-            id: point.id,
-            kind: point.kind,
-            lat: point.lat,
-            lng: point.lng,
-            title: point.title,
-            subtitle: point.subtitle,
-            href: point.href,
-            thumbUrl: null,
-            badge: null,
-            priceLabel: null,
-          })),
+        mapa: {
+          ...safeContent.mapa,
+          dto: {
+            ...safeContent.mapa.dto,
+            points: real.mapPoints.map((point) => ({
+              id: point.id,
+              kind: point.kind,
+              lat: point.lat,
+              lng: point.lng,
+              title: point.title,
+              subtitle: point.subtitle,
+              href: point.href,
+              thumbUrl: null,
+              badge: null,
+              priceLabel: null,
+            })),
+          },
         },
       },
-    }, limits),
+      limits,
+    ),
     mediaAssets,
   );
 }

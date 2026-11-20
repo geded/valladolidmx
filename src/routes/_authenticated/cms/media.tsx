@@ -48,7 +48,6 @@ type Row = {
   }>;
 };
 
-
 export const Route = createFileRoute("/_authenticated/cms/media")({
   validateSearch: (search: Record<string, unknown>) => ({
     estado: search["estado"] === "in_review" ? ("in_review" as const) : undefined,
@@ -241,7 +240,6 @@ type ScopeValue = (typeof SCOPE_OPTIONS)[number]["value"];
 type StateValue = (typeof STATE_OPTIONS)[number]["value"];
 type UsageValue = (typeof USAGE_OPTIONS)[number]["value"];
 
-
 const USAGE_LABELS: Record<string, string> = {
   cover: "Portada",
   cover_mobile: "Portada móvil",
@@ -275,7 +273,10 @@ function CompactFilterSelect<T extends string>({
         {label}
       </p>
       <Select value={value} onValueChange={(next) => onChange(next as T)}>
-        <SelectTrigger className="h-10 min-w-0 rounded-lg bg-background px-3 text-xs font-medium shadow-none" aria-label={label}>
+        <SelectTrigger
+          className="h-10 min-w-0 rounded-lg bg-background px-3 text-xs font-medium shadow-none"
+          aria-label={label}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -299,154 +300,164 @@ function MediaPage() {
 
   return (
     <>
-    <CmsEntityPage<Row>
-      queryKey="media"
-      fn={listMediaCms}
-      title="Biblioteca multimedia"
-      description="Filtra por quién subió la imagen, su estado de aprobación y para qué se usa."
-      rowKey={(r) => r.id}
-      emptyMessage="Sin imágenes con estos filtros."
-      extraParams={{ scope, usage, state }}
-      toolbarVariant="compact"
-      headerActions={
-        <div className="grid min-w-0 gap-2 rounded-lg border border-border bg-card p-2.5 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-3">
-          <div className="grid min-w-0 grid-cols-1 gap-2 min-[520px]:grid-cols-3">
-            <CompactFilterSelect
-              label="Biblioteca"
-              options={SCOPE_OPTIONS}
-              value={scope}
-              onChange={setScope}
-            />
-            <CompactFilterSelect
-              label="Estado"
-              options={STATE_OPTIONS}
-              value={state}
-              onChange={setState}
-            />
-            <CompactFilterSelect
-              label="Uso"
-              options={USAGE_OPTIONS}
-              value={usage}
-              onChange={setUsage}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-1.5 border-t border-border/70 pt-2 sm:flex sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0 [&_button]:h-10 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:text-xs">
-            <AiConceptBatchUpload />
-            <BatchToolbar />
-          </div>
-        </div>
-      }
-      columns={[
-        {
-          key: "thumb",
-          header: "Imagen",
-          render: (r) => (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setDetailId(r.id)}
-              className="h-14 w-20 p-0"
-              aria-label="Ver ficha de la imagen"
-              title="Ver y editar la imagen"
-            >
-              {r.previewUrl ? (
-                <img
-                  src={r.previewUrl}
-                  alt={r.alt_text ?? ""}
-                  loading="lazy"
-                  className="h-14 w-20 rounded-md border border-border object-cover"
-                />
-              ) : (
-                <div className="flex h-14 w-20 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
-                  Sin vista previa
-                </div>
-              )}
-            </Button>
-          ),
-        },
-        {
-          key: "alt",
-          header: "ALT",
-          render: (r) => (
-            <div className="w-40 space-y-1 sm:w-48">
-              <div className="line-clamp-2 text-xs font-medium leading-snug" title={r.alt_text ?? "Sin ALT"}>
-                {r.alt_text ?? <span className="text-muted-foreground italic">(sin ALT)</span>}
-              </div>
-              {r.alt_text_ai && r.alt_text_source !== "human" && (
-                <div className="line-clamp-1 text-[10px] text-muted-foreground">IA: {r.alt_text_ai}</div>
-              )}
+      <CmsEntityPage<Row>
+        queryKey="media"
+        fn={listMediaCms}
+        title="Biblioteca multimedia"
+        description="Filtra por quién subió la imagen, su estado de aprobación y para qué se usa."
+        rowKey={(r) => r.id}
+        emptyMessage="Sin imágenes con estos filtros."
+        extraParams={{ scope, usage, state }}
+        toolbarVariant="compact"
+        headerActions={
+          <div className="grid min-w-0 gap-2 rounded-lg border border-border bg-card p-2.5 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-3">
+            <div className="grid min-w-0 grid-cols-1 gap-2 min-[520px]:grid-cols-3">
+              <CompactFilterSelect
+                label="Biblioteca"
+                options={SCOPE_OPTIONS}
+                value={scope}
+                onChange={setScope}
+              />
+              <CompactFilterSelect
+                label="Estado"
+                options={STATE_OPTIONS}
+                value={state}
+                onChange={setState}
+              />
+              <CompactFilterSelect
+                label="Uso"
+                options={USAGE_OPTIONS}
+                value={usage}
+                onChange={setUsage}
+              />
             </div>
-          ),
-        },
-        {
-          key: "usage",
-          header: "Uso",
-          render: (r) => {
-            const refs = r.usageRefs ?? [];
-            if (refs.length === 0) {
-              return (
-                <span className="text-xs text-muted-foreground">
-                  {r.usage_context
-                    ? (USAGE_LABELS[r.usage_context] ?? r.usage_context)
-                    : "Sin usar todavía"}
-                </span>
-              );
-            }
-            return (
-              <ul className="w-36 space-y-0.5 text-[11px] sm:w-44">
-                {refs.slice(0, 1).map((ref, i) => (
-                  <li key={`${ref.role}-${ref.entityLabel}-${i}`}>
-                    <span className="text-muted-foreground">{ref.role} · {ref.family}</span>
-                    <span className="block truncate font-medium" title={ref.entityLabel}>{ref.entityLabel}</span>
-                  </li>
-                ))}
-                {refs.length > 1 ? (
-                  <li className="text-muted-foreground">+{refs.length - 1} uso{refs.length === 2 ? "" : "s"}</li>
-                ) : null}
-              </ul>
-            );
+            <div className="grid grid-cols-2 gap-1.5 border-t border-border/70 pt-2 sm:flex sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0 [&_button]:h-10 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:text-xs">
+              <AiConceptBatchUpload />
+              <BatchToolbar />
+            </div>
+          </div>
+        }
+        columns={[
+          {
+            key: "thumb",
+            header: "Imagen",
+            render: (r) => (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDetailId(r.id)}
+                className="h-14 w-20 p-0"
+                aria-label="Ver ficha de la imagen"
+                title="Ver y editar la imagen"
+              >
+                {r.previewUrl ? (
+                  <img
+                    src={r.previewUrl}
+                    alt={r.alt_text ?? ""}
+                    loading="lazy"
+                    className="h-14 w-20 rounded-md border border-border object-cover"
+                  />
+                ) : (
+                  <div className="flex h-14 w-20 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
+                    Sin vista previa
+                  </div>
+                )}
+              </Button>
+            ),
           },
-        },
+          {
+            key: "alt",
+            header: "ALT",
+            render: (r) => (
+              <div className="w-40 space-y-1 sm:w-48">
+                <div
+                  className="line-clamp-2 text-xs font-medium leading-snug"
+                  title={r.alt_text ?? "Sin ALT"}
+                >
+                  {r.alt_text ?? <span className="text-muted-foreground italic">(sin ALT)</span>}
+                </div>
+                {r.alt_text_ai && r.alt_text_source !== "human" && (
+                  <div className="line-clamp-1 text-[10px] text-muted-foreground">
+                    IA: {r.alt_text_ai}
+                  </div>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "usage",
+            header: "Uso",
+            render: (r) => {
+              const refs = r.usageRefs ?? [];
+              if (refs.length === 0) {
+                return (
+                  <span className="text-xs text-muted-foreground">
+                    {r.usage_context
+                      ? (USAGE_LABELS[r.usage_context] ?? r.usage_context)
+                      : "Sin usar todavía"}
+                  </span>
+                );
+              }
+              return (
+                <ul className="w-36 space-y-0.5 text-[11px] sm:w-44">
+                  {refs.slice(0, 1).map((ref, i) => (
+                    <li key={`${ref.role}-${ref.entityLabel}-${i}`}>
+                      <span className="text-muted-foreground">
+                        {ref.role} · {ref.family}
+                      </span>
+                      <span className="block truncate font-medium" title={ref.entityLabel}>
+                        {ref.entityLabel}
+                      </span>
+                    </li>
+                  ))}
+                  {refs.length > 1 ? (
+                    <li className="text-muted-foreground">
+                      +{refs.length - 1} uso{refs.length === 2 ? "" : "s"}
+                    </li>
+                  ) : null}
+                </ul>
+              );
+            },
+          },
 
-        {
-          key: "kind",
-          header: "Tipo",
-          className: "hidden lg:table-cell",
-          render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span>,
-        },
-        {
-          key: "bucket",
-          header: "Bucket",
-          className: "hidden xl:table-cell",
-          render: (r) => (
-            <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code>
-          ),
-        },
-        {
-          key: "dim",
-          header: "Dim.",
-          className: "hidden xl:table-cell",
-          render: (r) => (
-            <span className="text-xs text-muted-foreground">
-              {r.width && r.height ? `${r.width}×${r.height}` : "—"}
-            </span>
-          ),
-        },
-        { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
-        {
-          key: "actions",
-          header: "Acción",
-          render: (r) => (
-            <Button size="sm" variant="outline" onClick={() => setDetailId(r.id)}>
-              <Edit3 className="size-3.5" aria-hidden />
-              Editar
-            </Button>
-          ),
-        },
-      ]}
-    />
-    <MediaDetailsSheet mediaId={detailId} onOpenChange={(open) => !open && setDetailId(null)} />
+          {
+            key: "kind",
+            header: "Tipo",
+            className: "hidden lg:table-cell",
+            render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span>,
+          },
+          {
+            key: "bucket",
+            header: "Bucket",
+            className: "hidden xl:table-cell",
+            render: (r) => (
+              <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code>
+            ),
+          },
+          {
+            key: "dim",
+            header: "Dim.",
+            className: "hidden xl:table-cell",
+            render: (r) => (
+              <span className="text-xs text-muted-foreground">
+                {r.width && r.height ? `${r.width}×${r.height}` : "—"}
+              </span>
+            ),
+          },
+          { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
+          {
+            key: "actions",
+            header: "Acción",
+            render: (r) => (
+              <Button size="sm" variant="outline" onClick={() => setDetailId(r.id)}>
+                <Edit3 className="size-3.5" aria-hidden />
+                Editar
+              </Button>
+            ),
+          },
+        ]}
+      />
+      <MediaDetailsSheet mediaId={detailId} onOpenChange={(open) => !open && setDetailId(null)} />
     </>
   );
 }
-

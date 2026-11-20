@@ -16,11 +16,7 @@ export interface AluxSourcesFooterProps {
 export function AluxSourcesFooter({ sources }: AluxSourcesFooterProps) {
   const alux = useAluxBrand();
   if (!sources || sources.length === 0) {
-    return (
-      <p className="text-[11px] italic text-muted-foreground">
-        {alux.copy("sourcesEmpty")}
-      </p>
-    );
+    return <p className="text-[11px] italic text-muted-foreground">{alux.copy("sourcesEmpty")}</p>;
   }
   return (
     <div>

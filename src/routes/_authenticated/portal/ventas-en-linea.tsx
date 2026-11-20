@@ -109,8 +109,8 @@ function DirectSalesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Ventas en línea</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Prepara el precio, las políticas y los términos de tus experiencias. La activación de
-          la venta en línea y la comisión de la plataforma las autoriza y fija Administración tras
+          Prepara el precio, las políticas y los términos de tus experiencias. La activación de la
+          venta en línea y la comisión de la plataforma las autoriza y fija Administración tras
           revisión. Una vez activada, la experiencia se vende directo desde su ficha y llega al
           Concierge como reservación con folio ERL.
         </p>
@@ -224,15 +224,7 @@ function ProductDirectSaleCard({
       (minLeadHours ? Number(minLeadHours) : null) !== product.direct_sale_min_lead_hours ||
       (maxQuantity ? Number(maxQuantity) : null) !== product.direct_sale_max_quantity
     );
-  }, [
-    price,
-    currency,
-    cancellationPolicy,
-    terms,
-    minLeadHours,
-    maxQuantity,
-    product,
-  ]);
+  }, [price, currency, cancellationPolicy, terms, minLeadHours, maxQuantity, product]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -335,9 +327,7 @@ function ProductDirectSaleCard({
             </span>
           </label>
           <p className="text-[11px] text-muted-foreground">
-            {enabled
-              ? "Activada por Administración."
-              : "La activa Administración tras revisión."}
+            {enabled ? "Activada por Administración." : "La activa Administración tras revisión."}
           </p>
         </div>
       </div>

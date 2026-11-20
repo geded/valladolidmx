@@ -42,7 +42,9 @@ function mapRow(row: any): EventRecurrenceEditorDTO {
     recurrenceFrequency: normalizeFrequency(row.recurrence_frequency),
     recurrenceInterval: Math.max(1, Math.min(99, Number(row.recurrence_interval) || 1)),
     recurrenceWeekdays: Array.isArray(row.recurrence_weekdays)
-      ? row.recurrence_weekdays.filter((day: unknown) => Number.isInteger(day) && Number(day) >= 0 && Number(day) <= 6)
+      ? row.recurrence_weekdays.filter(
+          (day: unknown) => Number.isInteger(day) && Number(day) >= 0 && Number(day) <= 6,
+        )
       : [],
     recurrenceUntil: typeof row.recurrence_until === "string" ? row.recurrence_until : null,
     scheduleTimes: normalizeScheduleTimes(row.schedule_times),
@@ -54,7 +56,9 @@ function mapRow(row: any): EventRecurrenceEditorDTO {
 async function readRecurrence(supabase: any, eventId: string) {
   const { data, error } = await supabase
     .from("events")
-    .select("recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone")
+    .select(
+      "recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
+    )
     .eq("id", eventId)
     .is("deleted_at", null)
     .single();
@@ -74,9 +78,16 @@ export const updateEventRecurrence = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { eventId: string; values: EventRecurrenceEditorDTO }) => {
     const frequency = normalizeFrequency(input.values?.recurrenceFrequency);
-    const interval = Math.max(1, Math.min(99, Math.floor(Number(input.values?.recurrenceInterval) || 1)));
+    const interval = Math.max(
+      1,
+      Math.min(99, Math.floor(Number(input.values?.recurrenceInterval) || 1)),
+    );
     const weekdays = Array.from(
-      new Set((input.values?.recurrenceWeekdays ?? []).filter((day) => Number.isInteger(day) && day >= 0 && day <= 6)),
+      new Set(
+        (input.values?.recurrenceWeekdays ?? []).filter(
+          (day) => Number.isInteger(day) && day >= 0 && day <= 6,
+        ),
+      ),
     ).sort();
     const until = input.values?.recurrenceUntil;
     return {
@@ -85,7 +96,8 @@ export const updateEventRecurrence = createServerFn({ method: "POST" })
         recurrenceFrequency: frequency,
         recurrenceInterval: interval,
         recurrenceWeekdays: frequency === "weekly" ? weekdays : [],
-        recurrenceUntil: typeof until === "string" && /^\d{4}-\d{2}-\d{2}$/.test(until) ? until : null,
+        recurrenceUntil:
+          typeof until === "string" && /^\d{4}-\d{2}-\d{2}$/.test(until) ? until : null,
         scheduleTimes: normalizeScheduleTimes(input.values?.scheduleTimes),
         exceptionDates: normalizeExceptionDates(input.values?.exceptionDates),
         eventTimezone: "America/Merida" as const,

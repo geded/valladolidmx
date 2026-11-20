@@ -24,7 +24,10 @@ export function WorkspaceBottomNav() {
   // "Más" es la navegación completa en móvil. Algunos destinos operativos
   // viven sólo en el sidebar de escritorio; se incorporan aquí sin duplicar
   // los que ya forman parte de la barra inferior.
-  const all = [...bottomItems, ...sidebarItems.filter((item) => !bottomItems.some((bottom) => bottom.id === item.id))];
+  const all = [
+    ...bottomItems,
+    ...sidebarItems.filter((item) => !bottomItems.some((bottom) => bottom.id === item.id)),
+  ];
 
   return (
     <>

@@ -92,7 +92,10 @@ export function AluxMediaSourceButtons({ hint, slot, website, disabled, onFile, 
           onPickMany={
             onFiles
               ? (photos) => {
-                  onFiles(photos.map((p) => p.file), photos);
+                  onFiles(
+                    photos.map((p) => p.file),
+                    photos,
+                  );
                   setMode(null);
                 }
               : undefined

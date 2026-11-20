@@ -143,7 +143,11 @@ export const suggestPlanDaySchedule = createServerFn({ method: "POST" })
         .from("destinations")
         .select("id, latitude, longitude")
         .in("id", Array.from(new Set(destIds)));
-      for (const d of (dests ?? []) as Array<{ id: string; latitude: unknown; longitude: unknown }>) {
+      for (const d of (dests ?? []) as Array<{
+        id: string;
+        latitude: unknown;
+        longitude: unknown;
+      }>) {
         // Coordenada ausente jamás se convierte a (0,0): Number(null) === 0.
         if (d.latitude == null || d.longitude == null) continue;
         const lat = Number(d.latitude);
@@ -252,10 +256,17 @@ export const restorePlanDaySchedule = createServerFn({ method: "POST" })
           ? Math.round(r.durationMinutes)
           : null;
       const source =
-        r.scheduleSource === "concierge" || r.scheduleSource === "alux" || r.scheduleSource === "traveler"
+        r.scheduleSource === "concierge" ||
+        r.scheduleSource === "alux" ||
+        r.scheduleSource === "traveler"
           ? (r.scheduleSource as string)
           : null;
-      return { itemId: r.itemId, startsAtLocal: time, durationMinutes: dur, scheduleSource: source };
+      return {
+        itemId: r.itemId,
+        startsAtLocal: time,
+        durationMinutes: dur,
+        scheduleSource: source,
+      };
     });
     return { previous };
   })

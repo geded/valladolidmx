@@ -288,9 +288,7 @@ export function PublicAluxChat() {
             } else if (parsed.type === "error") {
               setMessages(nextHistory);
               setError(
-                typeof parsed.message === "string"
-                  ? parsed.message
-                  : "No pude responder ahora.",
+                typeof parsed.message === "string" ? parsed.message : "No pude responder ahora.",
               );
             }
           }
@@ -317,9 +315,7 @@ export function PublicAluxChat() {
 
         <div className="flex-1 min-w-0">
           <h2 className="font-serif text-lg leading-none">{alux.copy("conversationTitle")}</h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            {alux.copy("publicAvailability")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{alux.copy("publicAvailability")}</p>
         </div>
         {rateInfo && (
           <span className="text-[11px] text-muted-foreground tabular-nums">
@@ -331,10 +327,10 @@ export function PublicAluxChat() {
             type="button"
             onClick={resetConversation}
             className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
-             title={alux.copy("newConversation")}
+            title={alux.copy("newConversation")}
           >
             <RotateCcw className="h-3 w-3" />
-             {alux.copy("newConversation")}
+            {alux.copy("newConversation")}
           </button>
         )}
       </header>
@@ -380,9 +376,7 @@ export function PublicAluxChat() {
       >
         {messages.length === 0 && (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {alux.copy("publicIntro")}
-            </p>
+            <p className="text-sm text-muted-foreground">{alux.copy("publicIntro")}</p>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((s) => (
                 <button
@@ -457,7 +451,7 @@ export function PublicAluxChat() {
               onClick={() => rememberAuthReturnPath("/alux")}
               className="underline font-medium"
             >
-               {alux.copy("createAccount")}
+              {alux.copy("createAccount")}
             </Link>
           </div>
         )}
@@ -525,11 +519,7 @@ export function PublicAluxChat() {
 
       <p className="px-5 pb-4 pt-2 text-[11px] text-muted-foreground bg-muted/30">
         {alux.copy("disclaimer")} Para armar tu viaje completo,{" "}
-        <Link
-          to="/auth"
-          onClick={() => rememberAuthReturnPath("/alux")}
-          className="underline"
-        >
+        <Link to="/auth" onClick={() => rememberAuthReturnPath("/alux")} className="underline">
           crea tu cuenta gratuita
         </Link>
         .
@@ -591,7 +581,7 @@ function AluxProposals({ items }: { items: Proposal[] }) {
         );
       })}
       <p className="basis-full text-[10px] text-muted-foreground">
-        {alux.copy("proposalFooter").replace("Mi Viaje.", "")} {" "}
+        {alux.copy("proposalFooter").replace("Mi Viaje.", "")}{" "}
         <Link to="/cuenta/mi-viaje" className="underline">
           Mi Viaje
         </Link>

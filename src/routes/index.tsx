@@ -92,8 +92,7 @@ export const Route = createFileRoute("/")({
     return {
       authorityTree: stableAuthorityTree,
       seo: stableAuthorityTree.chrome?.seo ?? null,
-      fallbackImage:
-        !premiumNode?.hidden ? (pickFirstMediaUrl(stableAuthorityTree) ?? null) : null,
+      fallbackImage: !premiumNode?.hidden ? (pickFirstMediaUrl(stableAuthorityTree) ?? null) : null,
     };
   },
   component: HomePage,

@@ -213,10 +213,16 @@ export function TourismListingSurface({
 
   const heroMedia = useMemo(() => {
     const rows = [
-      ...(hero.mediaUrl ? [{ url: hero.mediaUrl, alt: hero.mediaAlt, asset: hero.mediaAsset }] : []),
+      ...(hero.mediaUrl
+        ? [{ url: hero.mediaUrl, alt: hero.mediaAlt, asset: hero.mediaAsset }]
+        : []),
       ...items
         .filter((item) => Boolean(item.mediaUrl))
-        .map((item) => ({ url: item.mediaUrl as string, alt: item.mediaAlt ?? item.name, asset: item.mediaAsset })),
+        .map((item) => ({
+          url: item.mediaUrl as string,
+          alt: item.mediaAlt ?? item.name,
+          asset: item.mediaAsset,
+        })),
     ];
     return rows
       .filter((row, index) => rows.findIndex((candidate) => candidate.url === row.url) === index)
@@ -275,15 +281,13 @@ export function TourismListingSurface({
                   url: activeHeroMedia.url,
                   asset: activeHeroMedia.asset,
                   alt:
-                    activeHeroMedia.alt ??
-                    `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
+                    activeHeroMedia.alt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
                 }
               : null,
             badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
           }}
         />
       </div>
-
 
       <section
         className="rounded-2xl border border-border bg-card p-4 shadow-soft"

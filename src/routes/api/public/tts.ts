@@ -16,9 +16,10 @@ export const Route = createFileRoute("/api/public/tts")({
     handlers: {
       POST: async ({ request }) => {
         const origin = request.headers.get("origin") || "";
-        const corsOrigin = origin && origin.includes("lovable.app")
-          ? origin
-          : "https://www.quehacerenvalladolid.com";
+        const corsOrigin =
+          origin && origin.includes("lovable.app")
+            ? origin
+            : "https://www.quehacerenvalladolid.com";
 
         const corsHeaders = {
           "Access-Control-Allow-Origin": corsOrigin,
@@ -33,28 +34,28 @@ export const Route = createFileRoute("/api/public/tts")({
 
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) {
-          return new Response(
-            JSON.stringify({ error: "TTS no disponible" }),
-            { status: 503, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "TTS no disponible" }), {
+            status: 503,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         let body: { text?: string; locale?: string };
         try {
           body = await request.json();
         } catch {
-          return new Response(
-            JSON.stringify({ error: "JSON inválido" }),
-            { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "JSON inválido" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         const text = (body.text ?? "").trim();
         if (!text) {
-          return new Response(
-            JSON.stringify({ error: "Texto vacío" }),
-            { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-          );
+          return new Response(JSON.stringify({ error: "Texto vacío" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         if (text.length > MAX_CHARS) {
@@ -101,7 +102,7 @@ export const Route = createFileRoute("/api/public/tts")({
             status: 200,
             headers: {
               "Content-Type": "text/event-stream",
-              "Connection": "keep-alive",
+              Connection: "keep-alive",
               ...corsHeaders,
             },
           });

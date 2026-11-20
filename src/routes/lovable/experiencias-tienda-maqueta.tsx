@@ -195,12 +195,10 @@ function Page() {
     [category, destination],
   );
 
-  const goToResults = () => document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
+  const goToResults = () =>
+    document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
 
-  const rememberContext = (
-    kind: "territory_viewed" | "category_explored",
-    key: string,
-  ) => {
+  const rememberContext = (kind: "territory_viewed" | "category_explored", key: string) => {
     void emitAluxSignal({
       kind,
       key,
@@ -230,16 +228,21 @@ function Page() {
     if (!option) return;
     setParty(value);
     void anonymousTrip.setTravelerCount(
-      value === "familiar"
-        ? { adults: 2, children: 2 }
-        : { adults: option.partySize, children: 0 },
+      value === "familiar" ? { adults: 2, children: 2 } : { adults: option.partySize, children: 0 },
     );
   };
 
   const askAlux = () => {
     const partyLabel = PARTY_OPTIONS.find((item) => item.value === party)?.label ?? null;
     const partyPreference = party
-      ? ({ solo: "Viajo solo", pareja: "En pareja", familiar: "En familia", amigos: "Con amigos" } as const)[party]
+      ? (
+          {
+            solo: "Viajo solo",
+            pareja: "En pareja",
+            familiar: "En familia",
+            amigos: "Con amigos",
+          } as const
+        )[party]
       : null;
     const categoryLabel = CATEGORIES.find((item) => item.slug === category)?.label ?? null;
     const context = [
@@ -309,14 +312,18 @@ function Page() {
               <ViewSwitch view={view} onView={setView} />
             </div>
             {filtered.length === 0 ? (
-              <EmptyResults onClear={() => { setCategory("all"); setDestination("Todos los destinos"); }} />
+              <EmptyResults
+                onClear={() => {
+                  setCategory("all");
+                  setDestination("Todos los destinos");
+                }}
+              />
             ) : view === "lista" ? (
               <Results cards={filtered} />
             ) : (
               <MapView cards={filtered} />
             )}
           </section>
-
         </div>
       </PublicShell>
     </div>
@@ -364,7 +371,9 @@ function ExperienceSearch({
           options={CATEGORIES.map((item) => ({ value: item.slug, label: item.label }))}
         />
         <label className="rounded-xl border border-border bg-card px-3 py-2">
-          <span className="block text-[10px] font-semibold uppercase text-muted-foreground">Fecha</span>
+          <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
+            Fecha
+          </span>
           <input
             type="date"
             aria-label="Fecha de la experiencia"
@@ -401,7 +410,9 @@ function SearchSelect({
 }) {
   return (
     <label className="rounded-xl border border-border bg-card px-3 py-2">
-      <span className="block text-[10px] font-semibold uppercase text-muted-foreground">{label}</span>
+      <span className="block text-[10px] font-semibold uppercase text-muted-foreground">
+        {label}
+      </span>
       <select
         aria-label={label}
         value={value}
@@ -513,7 +524,10 @@ function ViewSwitch({
   onView: (value: "lista" | "mapa") => void;
 }) {
   return (
-    <div className="flex shrink-0 rounded-pill border border-border bg-card p-1" aria-label="Vista de resultados">
+    <div
+      className="flex shrink-0 rounded-pill border border-border bg-card p-1"
+      aria-label="Vista de resultados"
+    >
       <Button
         type="button"
         variant={view === "lista" ? "default" : "ghost"}
@@ -550,8 +564,15 @@ function Results({ cards }: { cards: readonly Card[] }) {
 
 function ExperienceCard({ card, compact = false }: { card: Card; compact?: boolean }) {
   return (
-    <article className={cn("group min-w-0", compact && "grid grid-cols-[8rem_minmax(0,1fr)] gap-3")}>
-      <div className={cn("relative overflow-hidden rounded-xl bg-muted", compact ? "h-32" : "aspect-[4/3]")}>
+    <article
+      className={cn("group min-w-0", compact && "grid grid-cols-[8rem_minmax(0,1fr)] gap-3")}
+    >
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-xl bg-muted",
+          compact ? "h-32" : "aspect-[4/3]",
+        )}
+      >
         <img
           src={card.image}
           alt={`Fotografía de muestra: ${card.title}`}
@@ -578,12 +599,19 @@ function ExperienceCard({ card, compact = false }: { card: Card; compact?: boole
       </div>
       <div className={cn("pt-3", compact && "flex min-w-0 flex-col justify-center pt-0")}>
         <div className="flex items-center justify-between gap-2 text-xs">
-          <p className="truncate font-semibold text-primary">{card.place} · {card.category}</p>
+          <p className="truncate font-semibold text-primary">
+            {card.place} · {card.category}
+          </p>
           <span className="inline-flex shrink-0 items-center gap-1 font-medium">
             <Star className="size-3 fill-current" aria-hidden /> {card.rating}
           </span>
         </div>
-        <h3 className={cn("mt-1 line-clamp-2 font-display leading-snug", compact ? "text-base" : "text-lg")}>
+        <h3
+          className={cn(
+            "mt-1 line-clamp-2 font-display leading-snug",
+            compact ? "text-base" : "text-lg",
+          )}
+        >
           {card.title}
         </h3>
         <p className="mt-1 truncate text-xs text-muted-foreground">

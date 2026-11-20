@@ -46,7 +46,6 @@ const InputSchema = z.object({
     .optional(),
 });
 
-
 export interface WorkspaceAssistResponse {
   answer: string;
   /** Preguntas sugeridas para continuar. */
@@ -170,7 +169,8 @@ async function reservationContext(
     .limit(1)
     .maybeSingle();
   if (error || !order) {
-    if (opts.folio) return `RESERVACIÓN CONSULTADA\nNo existe ninguna reservación con el folio "${opts.folio}" visible para esta persona.`;
+    if (opts.folio)
+      return `RESERVACIÓN CONSULTADA\nNo existe ninguna reservación con el folio "${opts.folio}" visible para esta persona.`;
     return null;
   }
 
@@ -245,7 +245,9 @@ async function reservationContext(
     order.traveler_phone
       ? `· Teléfono / WhatsApp: ${order.traveler_phone} — enlace directo: https://wa.me/${String(order.traveler_phone).replace(/\D/g, "")}`
       : "· Teléfono no registrado en la reservación.",
-    order.traveler_email ? `· Correo: ${order.traveler_email}.` : "· Correo no registrado en la reservación.",
+    order.traveler_email
+      ? `· Correo: ${order.traveler_email}.`
+      : "· Correo no registrado en la reservación.",
     order.destination_name ? `· Destino: ${order.destination_name}.` : null,
     order.editorial_title ? `· Título: ${order.editorial_title}.` : null,
     `· Estado de la reservación: ${order.status}.`,
@@ -387,8 +389,12 @@ async function caseContext(supabase: any, caseId: string): Promise<string | null
     `· Creado: ${String(kase.created_at).slice(0, 10)}. Última actividad: ${String(
       kase.last_activity_at ?? kase.created_at,
     ).slice(0, 10)}.`,
-    proposalLines.length ? "PROPUESTAS\n" + proposalLines.join("\n") : "· Sin propuestas registradas.",
-    noteLines.length ? "CONVERSACIÓN Y NOTAS (de lo más antiguo a lo más reciente)\n" + noteLines.join("\n") : null,
+    proposalLines.length
+      ? "PROPUESTAS\n" + proposalLines.join("\n")
+      : "· Sin propuestas registradas.",
+    noteLines.length
+      ? "CONVERSACIÓN Y NOTAS (de lo más antiguo a lo más reciente)\n" + noteLines.join("\n")
+      : null,
     timelineLines.length ? "ÚLTIMOS MOVIMIENTOS\n" + timelineLines.join("\n") : null,
   ]
     .filter(Boolean)
@@ -406,8 +412,12 @@ async function interestsContext(supabase: any, caseId: string): Promise<string |
   if (!info?.has_traveler) return null;
 
   const memory = (info.memory ?? null) as any;
-  const categories: string[] = Array.isArray(memory?.categoryAffinity) ? memory.categoryAffinity : [];
-  const territories: string[] = Array.isArray(memory?.territoryAffinity) ? memory.territoryAffinity : [];
+  const categories: string[] = Array.isArray(memory?.categoryAffinity)
+    ? memory.categoryAffinity
+    : [];
+  const territories: string[] = Array.isArray(memory?.territoryAffinity)
+    ? memory.territoryAffinity
+    : [];
   const favorites = (Array.isArray(info.favorites) ? info.favorites : []) as any[];
   const planned = (Array.isArray(info.planned) ? info.planned : []) as any[];
 
@@ -440,11 +450,6 @@ async function interestsContext(supabase: any, caseId: string): Promise<string |
     .filter(Boolean)
     .join("\n");
 }
-
-
-
-
-
 
 /**
  * Panorama reciente de reservaciones (sólo lectura, RLS del propio usuario).
@@ -488,9 +493,7 @@ async function fillTravelerContacts(supabase: any, orders: any[]): Promise<void>
     const p = userId ? profileByUser.get(userId) : undefined;
     if (!p) continue;
     const name =
-      p.display_name ||
-      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
-      null;
+      p.display_name || [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || null;
     if (!o.traveler_name && name) o.traveler_name = name;
     if (!o.traveler_phone && p.phone) o.traveler_phone = p.phone;
     if (!o.traveler_email && p.email) o.traveler_email = p.email;
@@ -723,8 +726,6 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       }
     }
 
-
-
     const entityBlock =
       data.subject?.kind === "entity"
         ? [
@@ -758,10 +759,8 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
       recentBlock,
     ]
 
-
       .filter(Boolean)
       .join("\n\n");
-
 
     const historyBlock = (data.history ?? [])
       .map((h) => `${h.role === "user" ? "Persona" : "Alux"}: ${h.content}`)
@@ -782,9 +781,10 @@ export const aluxWorkspaceAssist = createServerFn({ method: "POST" })
         maxOutputTokens: 700,
         abortSignal: AbortSignal.timeout(25_000),
       });
-      const parsed = extractJson(res.text ?? "") as
-        | { answer?: unknown; followUps?: unknown }
-        | null;
+      const parsed = extractJson(res.text ?? "") as {
+        answer?: unknown;
+        followUps?: unknown;
+      } | null;
       const answer = typeof parsed?.answer === "string" ? parsed.answer.trim() : "";
       if (!answer) return fallback(data.question);
       const followUps = Array.isArray(parsed?.followUps)

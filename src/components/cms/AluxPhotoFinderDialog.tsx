@@ -119,25 +119,58 @@ export function AluxPhotoFinderDialog({
   const restoredRef = useRef(false);
   useEffect(() => {
     const s = readMediaFinder<{
-      query: string; site: string; pasted: string; photos: PhotoCandidate[];
-      contacts: OwnerContact[]; usedQuery: string | null; searched: boolean;
-      mode: "search" | "generate"; genPrompt: string; genImage: string | null;
+      query: string;
+      site: string;
+      pasted: string;
+      photos: PhotoCandidate[];
+      contacts: OwnerContact[];
+      usedQuery: string | null;
+      searched: boolean;
+      mode: "search" | "generate";
+      genPrompt: string;
+      genImage: string | null;
     }>(sessionKey);
     if (s) {
-      setQuery(s.query ?? ""); setSite(s.site ?? ""); setPasted(s.pasted ?? "");
-      setPhotos(s.photos ?? []); setContacts(s.contacts ?? []);
-      setUsedQuery(s.usedQuery ?? null); setSearched(!!s.searched);
+      setQuery(s.query ?? "");
+      setSite(s.site ?? "");
+      setPasted(s.pasted ?? "");
+      setPhotos(s.photos ?? []);
+      setContacts(s.contacts ?? []);
+      setUsedQuery(s.usedQuery ?? null);
+      setSearched(!!s.searched);
       if (s.mode) setMode(s.mode);
-      setGenPrompt(s.genPrompt ?? ""); setGenImage(s.genImage ?? null);
+      setGenPrompt(s.genPrompt ?? "");
+      setGenImage(s.genImage ?? null);
     }
     restoredRef.current = true;
   }, [sessionKey]);
   useEffect(() => {
     if (!restoredRef.current) return;
     writeMediaFinder(sessionKey, {
-      query, site, pasted, photos, contacts, usedQuery, searched, mode, genPrompt, genImage,
+      query,
+      site,
+      pasted,
+      photos,
+      contacts,
+      usedQuery,
+      searched,
+      mode,
+      genPrompt,
+      genImage,
     });
-  }, [sessionKey, query, site, pasted, photos, contacts, usedQuery, searched, mode, genPrompt, genImage]);
+  }, [
+    sessionKey,
+    query,
+    site,
+    pasted,
+    photos,
+    contacts,
+    usedQuery,
+    searched,
+    mode,
+    genPrompt,
+    genImage,
+  ]);
 
   if (!open) return null;
 
@@ -181,7 +214,11 @@ export function AluxPhotoFinderDialog({
 
   const buildPicked = async (photo: PhotoCandidate): Promise<AluxPickedPhoto> => {
     const res = await fetchBytes({
-      data: { url: photo.url, fallbackUrl: photo.thumbUrl ?? null, refererUrl: photo.sourceUrl ?? null },
+      data: {
+        url: photo.url,
+        fallbackUrl: photo.thumbUrl ?? null,
+        refererUrl: photo.sourceUrl ?? null,
+      },
     });
     const bin = atob(res.bytesBase64);
     const bytes = new Uint8Array(bin.length);
@@ -431,188 +468,195 @@ export function AluxPhotoFinderDialog({
         )}
 
         {mode === "search" && (
-        <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
-          <input
-            type="url"
-            value={site}
-            onChange={(e) => setSite(e.target.value)}
-            placeholder="Página del negocio o del evento (https://…)"
-            aria-label="Página del negocio o del evento"
-            className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
-          />
-          <div className="flex flex-1 items-center gap-2">
+          <div className="flex flex-col gap-2 border-b border-border bg-muted/20 px-4 py-2 sm:flex-row">
             <input
               type="url"
-              value={pasted}
-              onChange={(e) => setPasted(e.target.value)}
-              placeholder="O pega el enlace de una foto (se guarda una copia)"
-              aria-label="Enlace directo de una foto"
+              value={site}
+              onChange={(e) => setSite(e.target.value)}
+              placeholder="Página del negocio o del evento (https://…)"
+              aria-label="Página del negocio o del evento"
               className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
             />
-            <button
-              type="button"
-              disabled={picking !== null}
-              onClick={() => {
-                if (!pasted.trim().startsWith("https://")) {
-                  setError(
-                    "Pega en este campo el enlace directo de una foto (debe empezar con https:// y terminar en .jpg, .png o .webp). El primer campo es la página del negocio: para traer sus fotos, usa «Buscar».",
-                  );
-                  return;
-                }
-                void choose({
-                  url: pasted.trim(),
-                  thumbUrl: pasted.trim(),
-                  width: 0,
-                  height: 0,
-                  title: decodeURIComponent(pasted.trim().split("/").pop() ?? "foto").slice(0, 120),
-                  author: (() => {
-                    try {
-                      return new URL(pasted.trim()).hostname.replace(/^www\./, "");
-                    } catch {
-                      return "";
-                    }
-                  })(),
-                  license: "Publicada por el negocio",
-                  sourceUrl: site.trim() || pasted.trim(),
-                  provider: "Enlace directo",
-                });
-              }}
-              className="h-10 shrink-0 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
-            >
-              Traer copia
-            </button>
+            <div className="flex flex-1 items-center gap-2">
+              <input
+                type="url"
+                value={pasted}
+                onChange={(e) => setPasted(e.target.value)}
+                placeholder="O pega el enlace de una foto (se guarda una copia)"
+                aria-label="Enlace directo de una foto"
+                className="h-10 flex-1 rounded-md border border-border bg-background px-2 text-xs"
+              />
+              <button
+                type="button"
+                disabled={picking !== null}
+                onClick={() => {
+                  if (!pasted.trim().startsWith("https://")) {
+                    setError(
+                      "Pega en este campo el enlace directo de una foto (debe empezar con https:// y terminar en .jpg, .png o .webp). El primer campo es la página del negocio: para traer sus fotos, usa «Buscar».",
+                    );
+                    return;
+                  }
+                  void choose({
+                    url: pasted.trim(),
+                    thumbUrl: pasted.trim(),
+                    width: 0,
+                    height: 0,
+                    title: decodeURIComponent(pasted.trim().split("/").pop() ?? "foto").slice(
+                      0,
+                      120,
+                    ),
+                    author: (() => {
+                      try {
+                        return new URL(pasted.trim()).hostname.replace(/^www\./, "");
+                      } catch {
+                        return "";
+                      }
+                    })(),
+                    license: "Publicada por el negocio",
+                    sourceUrl: site.trim() || pasted.trim(),
+                    provider: "Enlace directo",
+                  });
+                }}
+                className="h-10 shrink-0 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+              >
+                Traer copia
+              </button>
+            </div>
           </div>
-        </div>
         )}
 
         {mode === "search" && (
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          {error && (
-            <p
-              role="alert"
-              className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-            >
-              {error}
-            </p>
-          )}
-
-          {loading && (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-              Buscando fotos de «{query}»…
-            </p>
-          )}
-
-          {!loading && searched && usedQuery && photos.length > 0 && (
-            <p className="mb-3 text-xs text-muted-foreground">
-              No había resultados exactos; mostramos fotos de «{usedQuery}».
-            </p>
-          )}
-
-          {!loading && searched && photos.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No encontramos fotos de esto exactamente como lo escribiste. Prueba con el nombre del
-              lugar o la sede (por ejemplo «Palacio Municipal de Valladolid, Yucatán») o pega la
-              página del negocio o del evento en el campo de arriba: de ahí traemos sus propias
-              fotos y guardamos una copia nuestra.
-            </p>
-          )}
-
-          {!loading && contacts.length > 0 && (
-            <div className="mb-4 rounded-lg border border-border bg-muted/40 p-3">
-              <p className="mb-2 text-xs font-medium">
-                Contacto publicado por el titular (para pedir permiso)
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            {error && (
+              <p
+                role="alert"
+                className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+              >
+                {error}
               </p>
-              <ul className="space-y-2 text-xs text-muted-foreground">
-                {contacts.map((c) => (
-                  <li key={c.sourceUrl}>
-                    <a
-                      href={c.sourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-medium text-foreground underline underline-offset-2"
-                    >
-                      {c.host}
-                    </a>
-                    {c.emails.length > 0 && <> · {c.emails.join(", ")}</>}
-                    {c.phones.length > 0 && <> · {c.phones.join(", ")}</>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            )}
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {photos.map((photo) => {
-              const isSelected = selected.has(photo.url);
-              return (
-                <figure
-                  key={photo.url}
-                  className={
-                    "overflow-hidden rounded-lg border " +
-                    (isSelected ? "border-primary ring-2 ring-primary/40" : "border-border")
-                  }
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleSelect(photo.url)}
-                    aria-pressed={isSelected}
-                    aria-label={isSelected ? `Quitar ${photo.title} de la selección` : `Seleccionar ${photo.title}`}
-                    className="relative block w-full"
-                  >
-                    <img
-                      src={photo.thumbUrl}
-                      alt={photo.title}
-                      loading="lazy"
-                      className="h-32 w-full bg-muted object-cover"
-                    />
-                    <span
-                      className={
-                        "absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full border text-[11px] font-bold " +
-                        (isSelected
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-white/70 bg-black/40 text-white")
-                      }
-                      aria-hidden
-                    >
-                      {isSelected ? "✓" : "+"}
-                    </span>
-                  </button>
-                  <figcaption className="space-y-1 px-2 py-2 text-[11px]">
-                    <p className="truncate font-medium" title={photo.title}>
-                      {photo.title}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
-                      {photo.license}
-                    </p>
-                    <p className="truncate text-muted-foreground">
-                      {photo.author || "Autor no declarado"} · {photo.provider}
-                    </p>
-                    <div className="flex items-center justify-between gap-1 pt-1">
+            {loading && (
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                Buscando fotos de «{query}»…
+              </p>
+            )}
+
+            {!loading && searched && usedQuery && photos.length > 0 && (
+              <p className="mb-3 text-xs text-muted-foreground">
+                No había resultados exactos; mostramos fotos de «{usedQuery}».
+              </p>
+            )}
+
+            {!loading && searched && photos.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No encontramos fotos de esto exactamente como lo escribiste. Prueba con el nombre
+                del lugar o la sede (por ejemplo «Palacio Municipal de Valladolid, Yucatán») o pega
+                la página del negocio o del evento en el campo de arriba: de ahí traemos sus propias
+                fotos y guardamos una copia nuestra.
+              </p>
+            )}
+
+            {!loading && contacts.length > 0 && (
+              <div className="mb-4 rounded-lg border border-border bg-muted/40 p-3">
+                <p className="mb-2 text-xs font-medium">
+                  Contacto publicado por el titular (para pedir permiso)
+                </p>
+                <ul className="space-y-2 text-xs text-muted-foreground">
+                  {contacts.map((c) => (
+                    <li key={c.sourceUrl}>
                       <a
-                        href={photo.sourceUrl}
+                        href={c.sourceUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-primary underline"
+                        className="font-medium text-foreground underline underline-offset-2"
                       >
-                        fuente
+                        {c.host}
                       </a>
-                      <button
-                        type="button"
-                        onClick={() => void choose(photo)}
-                        disabled={picking !== null || pickingMany}
-                        className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+                      {c.emails.length > 0 && <> · {c.emails.join(", ")}</>}
+                      {c.phones.length > 0 && <> · {c.phones.join(", ")}</>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {photos.map((photo) => {
+                const isSelected = selected.has(photo.url);
+                return (
+                  <figure
+                    key={photo.url}
+                    className={
+                      "overflow-hidden rounded-lg border " +
+                      (isSelected ? "border-primary ring-2 ring-primary/40" : "border-border")
+                    }
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleSelect(photo.url)}
+                      aria-pressed={isSelected}
+                      aria-label={
+                        isSelected
+                          ? `Quitar ${photo.title} de la selección`
+                          : `Seleccionar ${photo.title}`
+                      }
+                      className="relative block w-full"
+                    >
+                      <img
+                        src={photo.thumbUrl}
+                        alt={photo.title}
+                        loading="lazy"
+                        className="h-32 w-full bg-muted object-cover"
+                      />
+                      <span
+                        className={
+                          "absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full border text-[11px] font-bold " +
+                          (isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-white/70 bg-black/40 text-white")
+                        }
+                        aria-hidden
                       >
-                        {picking === photo.url ? "Trayendo…" : "Usar esta"}
-                      </button>
-                    </div>
-                  </figcaption>
-                </figure>
-              );
-            })}
+                        {isSelected ? "✓" : "+"}
+                      </span>
+                    </button>
+                    <figcaption className="space-y-1 px-2 py-2 text-[11px]">
+                      <p className="truncate font-medium" title={photo.title}>
+                        {photo.title}
+                      </p>
+                      <p className="text-muted-foreground">
+                        {photo.width > 0 ? `${photo.width}×${photo.height} px · ` : ""}
+                        {photo.license}
+                      </p>
+                      <p className="truncate text-muted-foreground">
+                        {photo.author || "Autor no declarado"} · {photo.provider}
+                      </p>
+                      <div className="flex items-center justify-between gap-1 pt-1">
+                        <a
+                          href={photo.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary underline"
+                        >
+                          fuente
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => void choose(photo)}
+                          disabled={picking !== null || pickingMany}
+                          className="h-9 rounded-pill border border-border px-3 text-[11px] font-medium hover:bg-accent disabled:opacity-50"
+                        >
+                          {picking === photo.url ? "Trayendo…" : "Usar esta"}
+                        </button>
+                      </div>
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </div>
           </div>
-        </div>
         )}
 
         {mode === "search" && selected.size > 0 && (
@@ -737,9 +781,9 @@ export function AluxPhotoFinderDialog({
               <div className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-8 text-center">
                 <Wand2 className="mx-auto mb-2 size-6 text-muted-foreground" aria-hidden />
                 <p className="text-sm text-muted-foreground">
-                  Escribe qué imagen necesitas y Alux la generará con IA.
-                  Funciona mejor con descripciones concretas: «cenote al amanecer con luz natural»,
-                  «fachada colonial iluminada de noche», «platillo de cochinita pibil sobre madera».
+                  Escribe qué imagen necesitas y Alux la generará con IA. Funciona mejor con
+                  descripciones concretas: «cenote al amanecer con luz natural», «fachada colonial
+                  iluminada de noche», «platillo de cochinita pibil sobre madera».
                 </p>
               </div>
             )}

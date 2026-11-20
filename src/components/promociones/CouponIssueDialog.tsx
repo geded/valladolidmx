@@ -166,8 +166,7 @@ export function CouponIssueDialog({
               </p>
             ) : null}
             <p className="text-xs text-muted-foreground">
-              Válido hasta{" "}
-              {meridaLongDate(coupon.valid_until)}
+              Válido hasta {meridaLongDate(coupon.valid_until)}
             </p>
             <p className="text-center text-xs text-muted-foreground">
               Presenta este QR o dicta el código en el negocio para aplicar tu descuento.

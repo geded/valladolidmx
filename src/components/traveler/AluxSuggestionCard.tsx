@@ -53,9 +53,7 @@ export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggesti
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
             {alux.copy("suggestionEyebrow", { capability: capabilityLabel })}
           </p>
-          <p className="text-[11px] text-muted-foreground">
-            {alux.copy("suggestionSafety")}
-          </p>
+          <p className="text-[11px] text-muted-foreground">{alux.copy("suggestionSafety")}</p>
         </div>
         {suggestion.latency_ms > 0 && (
           <span

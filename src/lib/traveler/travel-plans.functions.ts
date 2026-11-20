@@ -637,7 +637,11 @@ export const updatePlanItem = createServerFn({ method: "POST" })
     }
     let touchedSchedule = false;
     if ("startsAtLocal" in src) {
-      if (src.startsAtLocal === null || src.startsAtLocal === "" || src.startsAtLocal === undefined) {
+      if (
+        src.startsAtLocal === null ||
+        src.startsAtLocal === "" ||
+        src.startsAtLocal === undefined
+      ) {
         patch.starts_at_local = null;
       } else {
         const t = normalizeLocalTime(src.startsAtLocal);
@@ -814,7 +818,8 @@ export const saveTripBrief = createServerFn({ method: "POST" })
     meta["trip_brief"] = data.brief as unknown as Json;
 
     // Actualizar party_size coherente: adultos + menores
-    const minorsCount = data.brief.hasMinors && data.brief.minorAges ? data.brief.minorAges.length : 0;
+    const minorsCount =
+      data.brief.hasMinors && data.brief.minorAges ? data.brief.minorAges.length : 0;
     const partySize = data.brief.adults + minorsCount;
 
     const { error: updErr } = await context.supabase
@@ -1019,7 +1024,6 @@ async function attachHandoffContext(args: {
   } catch {
     tripBrief = null;
   }
-
 
   // Perfil M2 (subset operativo, sin PII).
   const profilePromise = userSupabase

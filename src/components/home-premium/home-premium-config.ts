@@ -77,7 +77,6 @@ const sectionOrder = (value: unknown): HomePremiumSectionKey[] => {
   return result;
 };
 
-
 /**
  * G8-R1-F1L-R2 · Sólo se acepta una ruta interna canónica ("/..."). Cualquier
  * otro valor —incluido "#"— se resuelve como `null` y la tarjeta se descarta.

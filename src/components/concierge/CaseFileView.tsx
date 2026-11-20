@@ -434,9 +434,7 @@ export function CaseFileView({
                   {q.total_amount_cents != null
                     ? `${(q.total_amount_cents / 100).toLocaleString("es-MX", { style: "currency", currency: q.currency })}`
                     : "Sin monto"}
-                  {q.valid_until
-                    ? ` · Vigente hasta ${meridaDateTime(q.valid_until)}`
-                    : ""}
+                  {q.valid_until ? ` · Vigente hasta ${meridaDateTime(q.valid_until)}` : ""}
                 </p>
                 {q.notes ? <p className="mt-1 text-xs text-foreground/80">{q.notes}</p> : null}
               </li>
@@ -472,9 +470,7 @@ export function CaseFileView({
               <li key={t.id} className="rounded-md border border-border bg-card p-3 text-xs">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{labelFor(t.event_type, EVENT_TYPE_LABELS)}</span>
-                  <span className="text-muted-foreground">
-                    {meridaDateTime(t.occurred_at)}
-                  </span>
+                  <span className="text-muted-foreground">{meridaDateTime(t.occurred_at)}</span>
                 </div>
                 {t.summary ? <p className="mt-1 text-foreground/80">{t.summary}</p> : null}
               </li>
@@ -927,9 +923,7 @@ function ProposalCard({
           travelerName: traveler?.display_name ?? undefined,
           caseReference: `Expediente ${caseId.slice(0, 8).toUpperCase()}`,
           totalLabel: money(p.total_amount_cents, p.currency),
-          validUntilLabel: p.valid_until
-            ? meridaLongDate(p.valid_until)
-            : undefined,
+          validUntilLabel: p.valid_until ? meridaLongDate(p.valid_until) : undefined,
         },
       });
     } catch {
@@ -1164,7 +1158,6 @@ function ProposalCompare({
 
 /* El compositor de propuestas vive ahora en su propia pantalla:
  * /concierge/expedientes/$caseId/propuesta (Estudio de Propuesta). */
-
 
 /**
  * Partidas de la propuesta agrupadas por día del viaje, con hora local del

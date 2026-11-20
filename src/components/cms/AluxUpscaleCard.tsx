@@ -18,7 +18,10 @@ export function AluxUpscaleCard({ fit, upscaling, busy, onUpscale, onSkip }: Pro
   return (
     <div className="mt-3 rounded-lg border border-amber-300/60 bg-amber-50 p-3 dark:border-amber-700/50 dark:bg-amber-950/30">
       <div className="flex items-start gap-2">
-        <Sparkles className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
+        <Sparkles
+          className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
+          aria-hidden
+        />
         <div className="flex-1">
           <p className="text-xs text-amber-800 dark:text-amber-200">
             {describeRoleFit(fit)} Alux IA puede ampliarla conservando la misma escena.
